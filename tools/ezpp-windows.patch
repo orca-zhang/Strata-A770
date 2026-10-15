@@ -1,0 +1,231 @@
+Patch for ezpp commit 236b731286baf4978288f881e274b68857a61d56.
+Upstream: https://github.com/ez8-co/ezpp
+
+Upstream license:
+
+MIT License
+
+Copyright (c) 2010-2018 <http://ez8.co> <orca.zhang@yahoo.com>
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+--- a/ezpp.hpp
++++ b/ezpp.hpp
+@@ -308,23 +308,23 @@
+ 
+   #ifdef _WIN32
+     namespace detail {
+-      LARGE_INTEGER init_freq()
++      inline LARGE_INTEGER init_freq()
+       {
+         LARGE_INTEGER freq;
+         QueryPerformanceFrequency(&freq);
+         return freq;
+       }
+     }
+-    int64_t time_now()
++    inline int64_t time_now()
+     {
+       static LARGE_INTEGER freq = detail::init_freq();
+       LARGE_INTEGER cnter;
+       QueryPerformanceCounter(&cnter);
+-      return cnter.QuadPart / freq.QuadPart * 1000;
++      return (cnter.QuadPart / freq.QuadPart) * 1000 + (cnter.QuadPart % freq.QuadPart) * 1000 / freq.QuadPart;
+     }
+   #else
+     #include <sys/time.h>
+-    int64_t time_now()
++    inline int64_t time_now()
+     {
+       timeval tv;
+       gettimeofday(&tv, 0);
+@@ -349,7 +349,7 @@
+   */
+   namespace folly {
+ 
+-    size_t nextPowTwo(size_t v) {
++    inline size_t nextPowTwo(size_t v) {
+     #ifdef _MSC_VER
+       unsigned long x = 0;
+       _BitScanForward(&x, v - 1);
+@@ -838,7 +838,7 @@
+     std::string _file;
+   };
+ 
+-  ezpp& inst() {
++  inline ezpp& inst() {
+     static ezpp inst(ezpp::init());
+     return inst;
+   }
+@@ -858,7 +858,7 @@
+   }
+ 
+   // protected
+-  void
++  inline void
+   ezpp::outputTime(FILE* fp, int64_t duration) {
+     double seconds = (double)duration / 1000;
+     double minute = seconds / 60;
+@@ -883,7 +883,7 @@
+   }
+ 
+   // protected
+-  ezpp::ezpp(int/* dummy */)
++  inline ezpp::ezpp(int/* dummy */)
+     : _doMap(EZPP_NODE_MAX)
+     , _nodeMap(EZPP_NODE_MAX)
+     , _begin(0)
+@@ -893,7 +893,7 @@
+   {}
+ 
+   // protected
+-  ezpp::~ezpp() {
++  inline ezpp::~ezpp() {
+     print();
+     if (_enabled && (_option & EZPP_OPT_SAVE_IN_DTOR)) {
+       save();
+@@ -902,7 +902,7 @@
+   }
+ 
+   // public static
+-  node* 
++  inline node*
+   ezpp::create(size_t id, size_t c12n, unsigned char flags, const char* file, int line, const std::string& name, const std::string& ext) {
+     if (!inst().enabled() || !flags) {
+       return 0;
+@@ -920,7 +920,7 @@
+   }
+ 
+   // public static
+-  void
++  inline void
+   ezpp::release(const std::pair<size_t, folly::MutableData<node*> >& node_pair) {
+     if (!node_pair.second.data->checkInUse()) {
+       delete node_pair.second.data;
+@@ -930,7 +930,7 @@
+     }
+   }
+ 
+-  void
++  inline void
+   ezpp::output(FILE* fp) {
+     if (_nodeMap.cbegin() != _nodeMap.cend()) {
+       fprintf(fp, "========== Easy Performance Profiler Report ==========\r\n");
+@@ -978,19 +978,19 @@
+   }
+ 
+   // public
+-  void 
++  inline void
+   ezpp::print() {
+     output(stdout);
+   }
+ 
+   // public
+-  std::string
++  inline std::string
+   ezpp::getOutputFileName() {
+     return _file.empty() ? "ezpp.log" : _file;
+   }
+ 
+   // public
+-  void
++  inline void
+   ezpp::save(const std::string& file/* = ""*/) {
+     FILE* fp = fopen(file.empty() ? getOutputFileName().c_str() : file.c_str(), "wb+");
+     if(!fp) return;
+@@ -999,7 +999,7 @@
+   }
+ 
+   // public
+-  void
++  inline void
+   ezpp::clear() {
+     std::for_each(_doMap.cbegin(), _doMap.cend(), ezpp::release);
+     _doMap.clear();
+@@ -1009,13 +1009,13 @@
+   }
+ 
+   // protected
+-  void
++  inline void
+   ezpp::removeDoNode(size_t id) {
+     _doMap.erase(id);
+   }
+ 
+   // public
+-  void
++  inline void
+   ezpp::addOption(unsigned char optModify) {
+     if (optModify & EZPP_OPT_SWITCH) {
+       if ((optModify & EZPP_OPT_FORCE_ENABLE) && !_enabled) {
+@@ -1038,7 +1038,7 @@
+   }
+ 
+   // public
+-  void
++  inline void
+   ezpp::removeOption(unsigned char optModify) {
+     if ((optModify & EZPP_OPT_FORCE_DISABLE) && !_enabled) {
+       _enabled = true;
+@@ -1051,7 +1051,7 @@
+   }
+ 
+   // protected
+-  node::node(size_t id, size_t c12n, unsigned char flags)
++  inline node::node(size_t id, size_t c12n, unsigned char flags)
+     : _id(id)
+     , _beginMap(EZPP_NODE_MAX)
+     , _costMap(EZPP_NODE_MAX)
+@@ -1076,7 +1076,7 @@
+   }
+ 
+   // public
+-  void 
++  inline void
+   node::begin(size_t c12n) {
+     if (_beginMap.cbegin() != _beginMap.cend()) {
+       call(c12n);
+@@ -1090,7 +1090,7 @@
+   #define _GET_(m, k) m.findOrConstruct(k, atomic_init, (const folly::MutableAtom<int64_t>*)0).first->second.data
+ 
+   // public
+-  void 
++  inline void
+   node::call(size_t c12n) {
+     int64_t now = time_now();
+     if (!_GET_(_refMap, c12n)++ || (_flags & EZPP_NODE_CLS))
+@@ -1102,7 +1102,7 @@
+   }
+ 
+   // public
+-  void 
++  inline void
+   node::end(size_t c12n) {
+     --_totalRefCnt;
+     int64_t now = time_now();
+@@ -1125,7 +1125,7 @@
+   #undef _GET_
+ 
+   // public
+-  void
++  inline void
+   node::output(FILE* fp) {
+     fprintf(fp, "[Name] ");
+     if (_line) {
