@@ -1,8 +1,8 @@
 # Strata-A770
 
-![Strata-A770 短提示解码：5.8 → 40.46 tok/s，DDR3 + PCIe 3.0 实测](docs/media/a770-performance-hero.png)
+![Strata-A770 性能对比：2K 代码解码 3.72×、8K 解码 3.37×、8K 预填充 2.08×，DDR3 + PCIe 3.0 实测](docs/media/a770-performance-hero-v2.png)
 
-*头图为历史阶段对比：最初 Short 36 为 5.8 tok/s，本轮 Short 28 热缓存复测中位数为 40.46 tok/s；输入与配置不同，非等输出、单变量 A/B。测试平台使用 DDR3 内存和 PCIe 3.0。*
+*头图为历史阶段中位数对比：2K 代码解码 7.6 → 28.25 tok/s（3.72×），8K 解码 6.8 → 22.89 tok/s（3.37×），8K prefill 239.2 → 497.85 tok/s（2.08×）。prefill 起点为显存预算修正阶段；各阶段输入与配置不同，非等输出、单变量 A/B。测试平台使用 DDR3 内存和 PCIe 3.0。*
 
 在 **Intel Arc A770 16 GB + 系统内存**上运行 Qwen3.8-Flash-Next。
 
