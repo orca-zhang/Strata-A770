@@ -160,7 +160,7 @@ oneMKL pieces install per-user.
 
 ## A770 branch measurements
 
-See [A770_PERFORMANCE.md](A770_PERFORMANCE.md) for the public hardware, methods, operator and model results, optional experiments, and PCIe readback. Local experiment archives and machine configurations are excluded from this public snapshot.
+See the [branch README](../README.md) for the latest measured decode and fresh-prefill performance, including comparisons with the initial baseline. [A770_PERFORMANCE.md](A770_PERFORMANCE.md) documents the measurement conditions, operator benchmarks, correctness checks, and optional experiments.
 
 ## Reporting a problem
 

@@ -28,6 +28,18 @@ void gdn_conv_l2_multi(const float* history, const float* qkv, const float* conv
                        int qk_heads, float eps, int n_tok, void* stream, int t_begin = 0, bool commit = false);
 /// history <- the last 3 entries of [history | qkv_0 .. qkv_{n-1}], n = *n_keep (0 leaves it as it was).
 void gdn_conv_commit(float* history, const float* qkv, int channels, const int32_t* n_keep, void* stream);
+#ifdef SYCL_LANGUAGE_VERSION
+/// Try a fused history/state commit; false submits nothing, so the caller can use the existing kernels.
+bool gdn_commit_esimd(float* state, float* history, const float* qkv, const float* h,
+                      int C, const float* gate, const float* beta, int h_k, int h_v,
+                      int n_tok, const int32_t* n_keep, void* stream);
+/// Try one commit for consecutive GDN layers. Each state row is (128,h_v,128) followed by (C,3) history;
+/// qkv/h and gate/beta rows have n_tok*C and n_tok*h_v floats. All pointers start at the first layer.
+/// n_tok is the allocated verification capacity (4 or 6), not the number accepted; false submits nothing.
+bool gdn_commit_layers_esimd(float* state, const float* qkv, const float* h,
+                            int C, const float* gate, const float* beta, int h_k, int h_v,
+                            int n_tok, int n_layers, const int32_t* n_keep, void* stream);
+#endif
 /// alpha/beta for T columns of x (T, n_embd): gate (T, h_v), beta (T, h_v).  Bitwise `fused_gdn_ab` per column.
 void gdn_ab_multi(const float* x, const uint16_t* w_alpha, const uint16_t* w_beta, const float* dt, const float* ssm_a,
                   float* gate, float* beta, int n_embd, int h_v, int n_tok, void* stream);

@@ -21,6 +21,7 @@
 
 #include <algorithm>
 #include <chrono>
+#include <cmath>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -138,6 +139,47 @@ void copy_q8_pool(const Pools& dst, const Pools& src, int64_t pages, const k::Qs
     ck(DPCT_CHECK_ERROR(q.memcpy(dst.p.k_scale, src.p.k_scale, scales)), "bench ks copy");
     ck(DPCT_CHECK_ERROR(q.memcpy(dst.p.v_scale, src.p.v_scale, scales)), "bench vs copy");
     ck(DPCT_CHECK_ERROR(q.wait()), "bench pool copy wait");
+}
+
+// Independent FP64 samples: comparing two readers alone cannot catch a shared attention bug.
+bool attention_reference(const Pools& host, int fmt, const k::QsaShapes& s,
+                         const std::vector<float>& q, const std::vector<int32_t>& ids,
+                         const std::vector<int32_t>& steps, const std::vector<float>& out,
+                         int n_q, int64_t cap) {
+    auto load = [&](bool value, int cell, int head, int dim) -> double {
+        const size_t row = (size_t(cell / s.page_size) * s.n_head_kv + head) * s.page_size + cell % s.page_size;
+        auto half = [](uint16_t bits) { return double(sycl::bit_cast<sycl::half>(bits)); };
+        if (fmt == k::kKvF16) return half((value ? host.p.v_pool : host.p.k_pool)[row * s.head_dim + dim]);
+        if (fmt == k::kKvInt8)
+            return (value ? host.p.v_q : host.p.k_q)[row * s.head_dim + dim] *
+                   half((value ? host.p.v_scale : host.p.k_scale)[row * (s.head_dim / k::KV_Q8_GROUP) + dim / k::KV_Q8_GROUP]);
+        const auto& block = reinterpret_cast<const k::block_q4_0*>(value ? host.p.v_q4 : host.p.k_q4)
+                            [row * (s.head_dim / k::QK4_0) + dim / k::QK4_0];
+        const int j = dim % k::QK4_0;
+        return ((j < 16 ? block.qs[j] & 15 : block.qs[j - 16] >> 4) - 8) * half(block.d);
+    };
+    for (int b = 0; b < n_q; ++b) for (int h : {0, 11, 12, 23}) {
+        const int width = steps[b * k::kStepCount + k::kStepWidth];
+        const int kvh = h / (s.n_head / s.n_head_kv);
+        std::vector<double> weights(width);
+        double maximum = -1e300, normalizer = 0;
+        for (int i = 0; i < width; ++i) {
+            double dot = 0;
+            for (int d = 0; d < s.head_dim; ++d)
+                dot += q[(size_t(b) * s.n_head + h) * s.head_dim + d] * load(false, ids[b * cap + i], kvh, d);
+            weights[i] = dot / std::sqrt(double(s.head_dim));
+            maximum = std::max(maximum, weights[i]);
+        }
+        for (double& w : weights) { w = std::exp(w - maximum); normalizer += w; }
+        for (int d : {0, 17, 255}) {
+            double sum = 0;
+            for (int i = 0; i < width; ++i) sum += weights[i] * load(true, ids[b * cap + i], kvh, d);
+            const double want = normalizer > 0 ? sum / normalizer : 0;
+            const float got = out[(size_t(b) * s.n_head + h) * s.head_dim + d];
+            if (!std::isfinite(got) || std::abs(got - want) > 1e-4) return false;
+        }
+    }
+    return true;
 }
 
 int bench_int8() {
@@ -387,6 +429,9 @@ bool run(int fmt) {
            "b");
         if (std::memcmp(a.data(), b2.data(), (size_t) n_q * NH * D * 4) != 0) {
             if (bad++ < 5) std::fprintf(stderr, "  %s pos %lld n_q %d: streamed attention differs\n", name, (long long) pos, n_q);
+        }
+        if ((batches == 0 || pos == N - 1) && !attention_reference(host, fmt, s, hq, hids, hst, a, n_q, cap)) {
+            if (bad++ < 5) std::fprintf(stderr, "  %s pos %lld: FP64 attention reference differs\n", name, (long long) pos);
         }
         if (!checked_host_attn) {
             checked_host_attn = true;

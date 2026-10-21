@@ -43,6 +43,9 @@ void native_qsa_indexer_append(const float* raw, const int32_t* relative_pos_dev
                                const QsaIndexerBuffers& buffers, const QsaShapes& shapes,
                                int64_t max_cells, const RopeScaling& scaling, void* stream);
 
+// Ordered append of raw[n_steps,128] using positions[t*pos_stride] on the device.
+// Nonnegative stride (zero repeats one position); n_steps <= 0 is a no-op.
+// Invalid device positions are skipped. No host readback; usable during graph capture.
 void native_qsa_indexer_append_steps(const float* raw, const int32_t* relative_pos_device,
                                      int pos_stride, int n_steps, int32_t pos_base,
                                      const float* gamma, float epsilon,

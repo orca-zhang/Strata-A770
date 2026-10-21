@@ -17,6 +17,14 @@ int main_impl(int argc, char** argv) {
     const int n_in = argc > 1 ? std::atoi(argv[1]) : 2560, n_out = argc > 2 ? std::atoi(argv[2]) : 2560, ncols = argc > 3 ? std::atoi(argv[3]) : 4;
     sycl::queue* s = &dpct::get_in_order_queue();
     std::printf("device: %s\n", s->get_device().get_info<sycl::info::device::name>().c_str());
+    const bool check_grf = argc > 4 && std::strcmp(argv[4], "--check-grf") == 0;
+    const auto device = s->get_device();
+    if (check_grf && (!device.is_gpu() || device.get_info<sycl::info::device::vendor_id>() != 0x8086 ||
+        device.get_info<sycl::ext::oneapi::experimental::info::device::architecture>() !=
+            sycl::ext::oneapi::experimental::architecture::intel_gpu_acm_g10)) {
+        std::printf("Q6_K GRF check skipped (requires ACM G10)\n");
+        return 0;
+    }
     // Q6_K: 210 bytes per 256 weights
     const size_t wbytes = (size_t) n_out * (n_in / 256) * 210;
     std::vector<uint8_t> hw(wbytes);
@@ -33,6 +41,24 @@ int main_impl(int argc, char** argv) {
     strata::kernels::native_quantize_q8_1(x, xq, n_in, ncols, s);
     s->wait();
     std::printf("quantize done\n");
+    if (check_grf) {
+        std::vector<float> ref((size_t) ncols * n_out), got(ref.size());
+        for (int large : {0, 1}) {
+#ifdef _WIN32
+            _putenv_s("STRATA_MMVQ_LARGE_GRF", large ? "1" : "0");
+#else
+            setenv("STRATA_MMVQ_LARGE_GRF", large ? "1" : "0", 1);
+#endif
+            strata::kernels::native_q6_k_mmvq(w, xq, y, n_in, n_out, ncols, s);
+            auto& out = large ? got : ref;
+            s->memcpy(out.data(), y, out.size() * sizeof(float)).wait_and_throw();
+        }
+        const bool equal = std::memcmp(ref.data(), got.data(), ref.size() * sizeof(float)) == 0 &&
+            std::all_of(got.begin(), got.end(), [](float v) { return std::isfinite(v); });
+        std::printf("Q6_K GRF 128/256: %s\n", equal ? "bitwise equal" : "FAIL");
+        sycl::free(w, *s); sycl::free(x, *s); sycl::free(xq, *s); sycl::free(y, *s);
+        return equal ? 0 : 1;
+    }
     if (argc > 4 && std::strcmp(argv[4], "--repack224") == 0) {
         std::vector<uint8_t> padded(wbytes / 210 * 224, 0);
         for (size_t b = 0; b < wbytes / 210; ++b) std::memcpy(padded.data() + b * 224, hw.data() + b * 210, 210);
@@ -101,7 +127,12 @@ int main_impl(int argc, char** argv) {
     for (int i = 0; i < it; ++i) strata::kernels::native_q6_k_mmvq(w, xq, y, n_in, n_out, ncols, s);
     s->wait();
     const double us = std::chrono::duration<double, std::micro>(std::chrono::steady_clock::now() - t0).count() / it;
-    std::printf("q6_k mmvq %d x %d, %d cols: %.1f us  (%.1f GB/s of weights)\n", n_in, n_out, ncols, us, wbytes / us / 1e3);
+    std::vector<float> hy((size_t) ncols * n_out);
+    s->memcpy(hy.data(), y, hy.size() * sizeof(float)).wait_and_throw();
+    if (!std::all_of(hy.begin(), hy.end(), [](float v) { return std::isfinite(v); })) return 1;
+    unsigned long long cs = 1469598103934665603ull;
+    for (float v : hy) { uint32_t u; std::memcpy(&u, &v, sizeof(u)); cs = (cs ^ u) * 1099511628211ull; }
+    std::printf("q6_k mmvq %d x %d, %d cols: %.1f us  (%.1f GB/s of weights)  checksum %016llx\n", n_in, n_out, ncols, us, wbytes / us / 1e3, cs);
     return 0;
 }
 

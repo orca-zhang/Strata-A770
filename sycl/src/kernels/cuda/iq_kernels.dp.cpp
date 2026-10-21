@@ -668,15 +668,8 @@ template<> struct Fmt<8> { static constexpr int qk = 32, ipb = QI8_0 / VDR_Q8_0,
 
 __dpct_inline__ float warp_sum(float v) {
 #pragma unroll
-    /*
-    DPCT1108: '__shfl_xor_sync' was migrated with the experimental feature
-    masked sub_group function which may not be supported by all compilers or
-    runtimes. You may need to adjust the code.
-    */
-    for (int o = 16; o > 0; o >>= 1) v +=
-        dpct::experimental::permute_sub_group_by_xor(
-            0xffffffffu, sycl::ext::oneapi::this_work_item::get_sub_group(), v,
-            o);
+    for (int o = 16; o > 0; o >>= 1)
+        v += sycl::permute_group_by_xor(sycl::ext::oneapi::this_work_item::get_sub_group(), v, o);
     return v;
 }
 
@@ -692,7 +685,7 @@ template <int LANES>
 __dpct_inline__ float lanes_sum(float v) {
 #pragma unroll
     for (int o = LANES / 2; o > 0; o >>= 1)
-        v += dpct::experimental::permute_sub_group_by_xor(0xffffffffu, sycl::ext::oneapi::this_work_item::get_sub_group(), v, o);
+        v += sycl::permute_group_by_xor(sycl::ext::oneapi::this_work_item::get_sub_group(), v, o);
     return v;
 }
 template <int TY, int LANES>
@@ -1548,7 +1541,7 @@ __dpct_inline__ void swiglu_entries_kernel(const float *__restrict__ gate,
     h[i] = (g / (1.0f + sycl::native::exp(-g))) * up[i];
 }
 
-template <int TD, int LN = kExpertLanes, bool SINGLE = false>
+template <int TD, int LN = kExpertLanes, bool SINGLE = false, int WG = 256>
 __dpct_inline__ void native_down_kernel(
     const unsigned long long *__restrict__ grp_ptr,
     const int32_t *__restrict__ grp_start, const int32_t *__restrict__ n_groups,
@@ -1558,7 +1551,7 @@ __dpct_inline__ void native_down_kernel(
     const int ng = *n_groups;   // #363: the group stride, as native_gu_kernel
     const int rib = item_ct1.get_local_id(2) / LN,
               sub = item_ct1.get_local_id(2) % LN;
-    const int r = item_ct1.get_group(2) * (256 / LN) + rib;
+    const int r = item_ct1.get_group(2) * (WG / LN) + rib;
     if (r >= L.n_embd) return;
     const size_t off = L.down_off + (size_t) r * L.d_row;
     const int nb = (int) (L.n_ff / Fmt<TD>::qk), hb = (int) (L.n_ff / 32);
@@ -1642,24 +1635,8 @@ __dpct_inline__ void q8_1_store(const float xi, block_q8_1 *__restrict__ y,
     float amax = sycl::fabs(xi), sum = xi;
 #pragma unroll
     for (int o = 16; o > 0; o >>= 1) {
-        /*
-        DPCT1108: '__shfl_xor_sync' was migrated with the experimental
-        feature masked sub_group function which may not be supported by all
-        compilers or runtimes. You may need to adjust the code.
-        */
-        amax = sycl::fmax(
-            amax,
-            dpct::experimental::permute_sub_group_by_xor(
-                0xffffffffu, sycl::ext::oneapi::this_work_item::get_sub_group(),
-                amax, o));
-        /*
-        DPCT1108: '__shfl_xor_sync' was migrated with the experimental
-        feature masked sub_group function which may not be supported by all
-        compilers or runtimes. You may need to adjust the code.
-        */
-        sum += dpct::experimental::permute_sub_group_by_xor(
-            0xffffffffu, sycl::ext::oneapi::this_work_item::get_sub_group(),
-            sum, o);
+        amax = sycl::fmax(amax, sycl::permute_group_by_xor(sycl::ext::oneapi::this_work_item::get_sub_group(), amax, o));
+        sum += sycl::permute_group_by_xor(sycl::ext::oneapi::this_work_item::get_sub_group(), sum, o);
     }
     const float d = q8_1_finite(amax / 127.0f);   // #606: q8_1_finite.hpp - the same bits for every finite block
     const int8_t q = q8_1_quant(xi, d, amax);
@@ -2315,39 +2292,66 @@ void launch_gu_lanes(dpct::dim3 grid, dpct::queue_ptr s, const unsigned long lon
 bool g_down_sg16 = std::getenv("STRATA_DOWN_SG16") == nullptr || env_on("STRATA_DOWN_SG16");
 bool g_down_single = std::getenv("STRATA_DOWN_SINGLE_GROUP") == nullptr || env_on("STRATA_DOWN_SINGLE_GROUP");
 
-template <int TD, int LN, int SG = 32, bool SINGLE = false>
+inline int down_wg() {
+    const char* v = std::getenv("STRATA_DOWN_WG");
+    return (v && v[0] != '\0') ? std::atoi(v) : 256;
+}
+
+template <int TD, int LN, int SG = 32, bool SINGLE = false, int WG = 256>
 void launch_down_port(unsigned groups, dpct::queue_ptr s, const unsigned long long *grp_ptr, const int32_t *grp_start,
                       const int32_t *n_groups, const int32_t *ent_dst, const block_q8_1 *hq,
                       const NativeExpertLayout &L, float *out) {
-    constexpr int ROWS = 256 / LN;
+    constexpr int ROWS = WG / LN;
     const unsigned gx = (unsigned) ((L.n_embd + ROWS - 1) / ROWS);
     auto exp_props = sycl::ext::oneapi::experimental::properties{sycl::ext::oneapi::experimental::use_root_sync};
-    s->parallel_for<dpct_kernel_name<class native_down_port, dpct_kernel_scalar<TD>, dpct_kernel_scalar<LN>, dpct_kernel_scalar<SG>, dpct_kernel_scalar<SINGLE>>>(
-        sycl::nd_range<3>(sycl::range<3>(1, groups, (size_t) gx * 256), sycl::range<3>(1, 1, 256)), exp_props,
+    s->parallel_for<dpct_kernel_name<class native_down_port, dpct_kernel_scalar<TD>, dpct_kernel_scalar<LN>, dpct_kernel_scalar<SG>, dpct_kernel_scalar<SINGLE>, dpct_kernel_scalar<WG>>>(
+        sycl::nd_range<3>(sycl::range<3>(1, groups, (size_t) gx * WG), sycl::range<3>(1, 1, WG)), exp_props,
         [=](sycl::nd_item<3>) [[sycl::reqd_sub_group_size(SG)]] {
-            native_down_kernel<TD, LN, SINGLE>(grp_ptr, grp_start, n_groups, ent_dst, hq, L, out);
+            native_down_kernel<TD, LN, SINGLE, WG>(grp_ptr, grp_start, n_groups, ent_dst, hq, L, out);
         });
 }
 template <int TD>
 void launch_down_lanes(dpct::dim3 grid, dpct::queue_ptr s, const unsigned long long *grp_ptr, const int32_t *grp_start,
                        const int32_t *n_groups, const int32_t *ent_dst, const block_q8_1 *hq,
                        const NativeExpertLayout &L, float *out) {
+    const int dwg = down_wg();
     switch (down_lanes()) {
         case 4:
-            if (g_down_sg16 && g_down_single) launch_down_port<TD, 4, 16, true>(grid.y, s, grp_ptr, grp_start, n_groups, ent_dst, hq, L, out);
-            else if (g_down_sg16) launch_down_port<TD, 4, 16, false>(grid.y, s, grp_ptr, grp_start, n_groups, ent_dst, hq, L, out);
-            else launch_down_port<TD, 4, 32, false>(grid.y, s, grp_ptr, grp_start, n_groups, ent_dst, hq, L, out);
+            if (dwg == 128) {
+                if (g_down_sg16 && g_down_single) launch_down_port<TD, 4, 16, true, 128>(grid.y, s, grp_ptr, grp_start, n_groups, ent_dst, hq, L, out);
+                else if (g_down_sg16) launch_down_port<TD, 4, 16, false, 128>(grid.y, s, grp_ptr, grp_start, n_groups, ent_dst, hq, L, out);
+                else launch_down_port<TD, 4, 32, false, 128>(grid.y, s, grp_ptr, grp_start, n_groups, ent_dst, hq, L, out);
+            } else {
+                if (g_down_sg16 && g_down_single) launch_down_port<TD, 4, 16, true, 256>(grid.y, s, grp_ptr, grp_start, n_groups, ent_dst, hq, L, out);
+                else if (g_down_sg16) launch_down_port<TD, 4, 16, false, 256>(grid.y, s, grp_ptr, grp_start, n_groups, ent_dst, hq, L, out);
+                else launch_down_port<TD, 4, 32, false, 256>(grid.y, s, grp_ptr, grp_start, n_groups, ent_dst, hq, L, out);
+            }
             break;
         case 16:
-            if (g_down_sg16 && g_down_single) launch_down_port<TD, 16, 16, true>(grid.y, s, grp_ptr, grp_start, n_groups, ent_dst, hq, L, out);
-            else if (g_down_sg16) launch_down_port<TD, 16, 16, false>(grid.y, s, grp_ptr, grp_start, n_groups, ent_dst, hq, L, out);
-            else launch_down_port<TD, 16, 32, false>(grid.y, s, grp_ptr, grp_start, n_groups, ent_dst, hq, L, out);
+            if (dwg == 128) {
+                if (g_down_sg16 && g_down_single) launch_down_port<TD, 16, 16, true, 128>(grid.y, s, grp_ptr, grp_start, n_groups, ent_dst, hq, L, out);
+                else if (g_down_sg16) launch_down_port<TD, 16, 16, false, 128>(grid.y, s, grp_ptr, grp_start, n_groups, ent_dst, hq, L, out);
+                else launch_down_port<TD, 16, 32, false, 128>(grid.y, s, grp_ptr, grp_start, n_groups, ent_dst, hq, L, out);
+            } else {
+                if (g_down_sg16 && g_down_single) launch_down_port<TD, 16, 16, true, 256>(grid.y, s, grp_ptr, grp_start, n_groups, ent_dst, hq, L, out);
+                else if (g_down_sg16) launch_down_port<TD, 16, 16, false, 256>(grid.y, s, grp_ptr, grp_start, n_groups, ent_dst, hq, L, out);
+                else launch_down_port<TD, 16, 32, false, 256>(grid.y, s, grp_ptr, grp_start, n_groups, ent_dst, hq, L, out);
+            }
             break;
-        case 32: launch_down_port<TD, 32, 32, false>(grid.y, s, grp_ptr, grp_start, n_groups, ent_dst, hq, L, out); break;
+        case 32:
+            if (dwg == 128) launch_down_port<TD, 32, 32, false, 128>(grid.y, s, grp_ptr, grp_start, n_groups, ent_dst, hq, L, out);
+            else launch_down_port<TD, 32, 32, false, 256>(grid.y, s, grp_ptr, grp_start, n_groups, ent_dst, hq, L, out);
+            break;
         default:
-            if (g_down_sg16 && g_down_single) launch_down_port<TD, 8, 16, true>(grid.y, s, grp_ptr, grp_start, n_groups, ent_dst, hq, L, out);
-            else if (g_down_sg16) launch_down_port<TD, 8, 16, false>(grid.y, s, grp_ptr, grp_start, n_groups, ent_dst, hq, L, out);
-            else launch_down_port<TD, 8, 32, false>(grid.y, s, grp_ptr, grp_start, n_groups, ent_dst, hq, L, out);
+            if (dwg == 128) {
+                if (g_down_sg16 && g_down_single) launch_down_port<TD, 8, 16, true, 128>(grid.y, s, grp_ptr, grp_start, n_groups, ent_dst, hq, L, out);
+                else if (g_down_sg16) launch_down_port<TD, 8, 16, false, 128>(grid.y, s, grp_ptr, grp_start, n_groups, ent_dst, hq, L, out);
+                else launch_down_port<TD, 8, 32, false, 128>(grid.y, s, grp_ptr, grp_start, n_groups, ent_dst, hq, L, out);
+            } else {
+                if (g_down_sg16 && g_down_single) launch_down_port<TD, 8, 16, true, 256>(grid.y, s, grp_ptr, grp_start, n_groups, ent_dst, hq, L, out);
+                else if (g_down_sg16) launch_down_port<TD, 8, 16, false, 256>(grid.y, s, grp_ptr, grp_start, n_groups, ent_dst, hq, L, out);
+                else launch_down_port<TD, 8, 32, false, 256>(grid.y, s, grp_ptr, grp_start, n_groups, ent_dst, hq, L, out);
+            }
             break;
     }
 }

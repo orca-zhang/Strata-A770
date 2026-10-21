@@ -20,8 +20,10 @@
 // filled with a value that encodes its own coordinates.
 #define DPCT_PROFILING_ENABLED
 #include <sycl/sycl.hpp>
+#include <sycl/ext/oneapi/experimental/device_architecture.hpp>
 #include <dpct/dpct.hpp>
 #include "strata/kernels/gdn.hpp"
+#include "strata/prefill/kernels.hpp"
 #include "strata/kernels/native_mmvq.hpp"
 #include "strata/kernels/verify_kernels.hpp"
 
@@ -34,6 +36,7 @@
 #include <vector>
 #include <algorithm>
 #include <chrono>
+#include <stdexcept>
 
 namespace {
 
@@ -93,6 +96,119 @@ double rel_l1(const std::vector<float>& a, const std::vector<float>& b) {
     return d / (m > 1e-30 ? m : 1e-30);
 }
 
+// Compare every state element and every token/head output, including FP16 bits.
+// Fixtures have nonzero initial state, modulo-paired heads, signed q/k/v, and
+// both shallow and deep decay. A tolerance is diagnostic only, never a pass.
+int prefill_case(int T, int seed, int repeats) {
+    constexpr int S = 128, HK = 16, HV = 48, C = 10240;
+    sycl::queue q(dpct::get_in_order_queue().get_device(),
+                  sycl::property_list{sycl::property::queue::in_order{}});
+    // Variant 6 runs on Intel GPUs only (the engine throws elsewhere): skip, not fail, on any other device.
+    const auto dev = q.get_device();
+    const auto sizes = dev.get_info<sycl::info::device::sub_group_sizes>();
+    if (!dev.is_gpu() || dev.get_info<sycl::info::device::vendor_id>() != 0x8086 ||
+        std::find(sizes.begin(), sizes.end(), size_t(32)) == sizes.end() ||
+        std::find(sizes.begin(), sizes.end(), size_t(16)) == sizes.end()) {
+        static bool said = false;
+        if (!said) std::printf("prefill gdn: skipped (needs an Intel GPU with sub-groups 16 and 32)\n");
+        said = true;
+        return 0;
+    }
+    std::mt19937 rng(seed);
+    std::normal_distribution<float> gauss(0.0f, 1.0f);
+    std::vector<float> st(size_t(S) * HV * S), h(size_t(T) * C),
+        gate(size_t(T) * HV), beta(gate.size()), z(size_t(T) * HV * S), gamma(S);
+    for (auto& x : st) x = gauss(rng) * 0.03f;
+    for (int t = 0; t < T; ++t) {
+        for (int j = 0; j < C; ++j) h[size_t(t) * C + j] = gauss(rng) * (j < 2 * HK * S ? 0.08f : 0.7f);
+    }
+    for (auto& x : gate) x = -(seed % 2 ? 0.02f : 2.0f) * (1.0f + std::fabs(gauss(rng)));
+    for (auto& x : beta) x = 0.1f + float(rng() % 800) / 1000.0f;
+    for (auto& x : z) x = gauss(rng);
+    for (auto& x : gamma) x = 1.0f + 0.2f * gauss(rng);
+    auto copy = [&](const std::vector<float>& src) {
+        auto* ptr = sycl::malloc_device<float>(src.size(), q);
+        if (!ptr) throw std::bad_alloc();
+        q.memcpy(ptr, src.data(), src.size() * sizeof(float)).wait_and_throw();
+        return ptr;
+    };
+    float *dst = copy(st), *dh = copy(h), *dg = copy(gate), *db = copy(beta), *dz = copy(z), *dgm = copy(gamma);
+    float* dy = sycl::malloc_device<float>(z.size(), q);
+    uint16_t* dy16 = sycl::malloc_device<uint16_t>(z.size(), q);
+    if (!dy || !dy16) throw std::bad_alloc();
+    std::vector<float> refst(st.size()), refy(z.size()), gotst(st.size()), goty(z.size());
+    std::vector<uint16_t> ref16(z.size()), got16(z.size());
+    auto run = [&](int variant, std::vector<float>& ost, std::vector<float>& oy, std::vector<uint16_t>& o16) {
+        // Warm up the compiled kernel before measuring; every run resets state.
+        q.memcpy(dst, st.data(), st.size() * sizeof(float)).wait_and_throw();
+        if (variant == -1)
+            strata::prefill::gdn_recurrence(dst, dh, dg, db, dz, dgm, 1e-6f, dy, dy16, T, &q);
+        else
+            strata::prefill::gdn_recurrence_variant(variant, dst, dh, dg, db, dz, dgm,
+                                                   1e-6f, dy, dy16, T, &q);
+        q.wait_and_throw();
+        double elapsed = 0;
+        for (int i = 0; i < repeats; ++i) {
+            q.memcpy(dst, st.data(), st.size() * sizeof(float)).wait_and_throw();
+            const auto start = std::chrono::steady_clock::now();
+            if (variant == -1)
+                strata::prefill::gdn_recurrence(dst, dh, dg, db, dz, dgm, 1e-6f, dy, dy16, T, &q);
+            else
+                strata::prefill::gdn_recurrence_variant(variant, dst, dh, dg, db, dz, dgm,
+                                                       1e-6f, dy, dy16, T, &q);
+            q.wait_and_throw();
+            elapsed += std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - start).count();
+        }
+        q.memcpy(ost.data(), dst, ost.size() * sizeof(float)).wait_and_throw();
+        q.memcpy(oy.data(), dy, oy.size() * sizeof(float)).wait_and_throw();
+        q.memcpy(o16.data(), dy16, o16.size() * sizeof(uint16_t)).wait_and_throw();
+        return elapsed / repeats;
+    };
+    const double base_ms = run(0, refst, refy, ref16);
+    const double xe_ms = run(6, gotst, goty, got16);
+    size_t state_bad = 0, y_bad = 0, half_bad = 0;
+    double max_abs = 0, max_rel = 0;
+    auto compare = [&](const std::vector<float>& a, const std::vector<float>& b, size_t& mismatches) {
+        for (size_t i = 0; i < a.size(); ++i) {
+            if (!std::isfinite(a[i]) || !std::isfinite(b[i]) ||
+                std::memcmp(&a[i], &b[i], sizeof(float)) != 0) ++mismatches;
+            const double diff = std::fabs(double(a[i]) - b[i]);
+            max_abs = std::max(max_abs, diff);
+            max_rel = std::max(max_rel, diff / std::max(std::fabs(double(a[i])), 1e-20));
+        }
+    };
+    compare(refst, gotst, state_bad);
+    compare(refy, goty, y_bad);
+    for (size_t i = 0; i < ref16.size(); ++i) half_bad += ref16[i] != got16[i];
+    std::printf("prefill T=%d seed=%d heads=%d: state=%zu y=%zu fp16=%zu mismatches; max_abs=%.9g max_rel=%.9g; baseline=%.3f ms xe=%.3f ms\n",
+                T, seed, HV, state_bad, y_bad, half_bad, max_abs, max_rel, base_ms, xe_ms);
+    // T=7 additionally checks the production entry point (variant 6 on Alchemist or under STRATA_GDN_XE=1,
+    // else variant 0) and T=0's no-op contract.
+    int extra_bad = 0;
+    if (T == 7) {
+        run(-1, gotst, goty, got16);
+        // Both variants must match anyway; compare production to baseline.
+        extra_bad += std::memcmp(refst.data(), gotst.data(), refst.size() * sizeof(float)) != 0;
+        extra_bad += std::memcmp(refy.data(), goty.data(), refy.size() * sizeof(float)) != 0;
+        extra_bad += ref16 != got16;
+        q.memcpy(dst, st.data(), st.size() * sizeof(float)).wait_and_throw();
+        strata::prefill::gdn_recurrence_variant(6, dst, dh, dg, db, dz, dgm,
+                                               1e-6f, dy, dy16, 0, &q);
+        q.memcpy(gotst.data(), dst, st.size() * sizeof(float)).wait_and_throw();
+        extra_bad += gotst != st;
+        const auto saved_y = goty;
+        const auto saved16 = got16;
+        q.memcpy(goty.data(), dy, goty.size() * sizeof(float)).wait_and_throw();
+        q.memcpy(got16.data(), dy16, got16.size() * sizeof(uint16_t)).wait_and_throw();
+        extra_bad += goty != saved_y || got16 != saved16;
+        std::printf("prefill production + T=0: %s\n", extra_bad ? "FAIL" : "OK");
+    }
+    for (auto ptr : {dst, dh, dg, db, dz, dgm, dy}) sycl::free(ptr, q);
+    sycl::free(dy16, q);
+    return state_bad || y_bad || half_bad || extra_bad ? 1 : 0;
+}
+
+
 void window_sg(int sg) {
 #ifdef _WIN32
     _putenv_s("STRATA_GDN_SG16", sg == 16 ? "1" : "0");
@@ -100,6 +216,96 @@ void window_sg(int sg) {
     setenv("STRATA_GDN_SG16", sg == 16 ? "1" : "0", 1);
 #endif
 }
+
+// Exercise the production combined state/history stride with distinct global input and local state ordinals.
+int commit_layers_check() {
+    using namespace strata::kernels;
+    constexpr int S=128, HK=16, HV=48, C=10240, L=6, FIRST=3, ORD0=1, PAD=16;
+    constexpr size_t SS=size_t(S)*HV*S, STRIDE=SS+C*3;
+    auto& q=dpct::get_in_order_queue();
+    if (!q.get_device().is_gpu() || q.get_device().get_info<sycl::info::device::vendor_id>() != 0x8086 ||
+        q.get_device().get_info<sycl::ext::oneapi::experimental::info::device::architecture>() !=
+        sycl::ext::oneapi::experimental::architecture::intel_gpu_acm_g10) {
+        std::printf("GDN layer commit: skipped (needs ACM G10)\n"); return 77;
+    }
+    std::mt19937 rng(2937); std::normal_distribution<float> random(0.f,.03f);
+    auto values=[&](size_t n) { std::vector<float> v(n); for(auto& x:v)x=random(rng); return v; };
+    auto initial=values(L*STRIDE+2*PAD), input=values(8*6*C), conv=values(input.size());
+    std::vector<float> gate(8*6*HV), beta(gate.size());
+    for(size_t i=0;i<gate.size();++i) { gate[i]=-.03125f*(i%321); beta[i]=float(i%33)/32.f; }
+    std::vector<float*> allocations;
+    auto copy=[&](const std::vector<float>& v) {
+        auto* p=sycl::malloc_device<float>(v.size(),q); if(!p)throw std::bad_alloc();
+        allocations.push_back(p); q.memcpy(p,v.data(),v.size()*4).wait_and_throw(); return p;
+    };
+    auto *state=copy(initial), *h=copy(input), *qkv=copy(conv), *g=copy(gate), *b=copy(beta);
+    auto* keep_d=sycl::malloc_device<int32_t>(1,q); if(!keep_d)throw std::bad_alloc();
+    auto reset=[&](int keep) {
+        q.memcpy(state,initial.data(),initial.size()*4); q.memcpy(keep_d,&keep,4).wait_and_throw();
+    };
+    auto get=[&] {
+        std::vector<float> v(initial.size()); q.memcpy(v.data(),state,v.size()*4).wait_and_throw(); return v;
+    };
+    auto launch=[&](bool batch,int T,int count) {
+        float* st=state+PAD+(FIRST-ORD0)*STRIDE;
+        if(batch) {
+            if(!gdn_commit_layers_esimd(st,qkv+FIRST*T*C,h+FIRST*T*C,C,g+FIRST*T*HV,b+FIRST*T*HV,
+                                       HK,HV,T,count,keep_d,&q))throw std::runtime_error("batch refused");
+        } else for(int i=0;i<count;++i) {
+            const int global=FIRST+i;
+            if(!gdn_commit_esimd(st+i*STRIDE,st+i*STRIDE+SS,qkv+global*T*C,h+global*T*C,C,
+                                g+global*T*HV,b+global*T*HV,HK,HV,T,keep_d,&q))
+                throw std::runtime_error("single commit refused");
+        }
+    };
+    int cases=0;
+    for(int T:{4,6}) {
+        using namespace sycl::ext::oneapi::experimental;
+        command_graph graph(q.get_context(),q.get_device()); graph.begin_recording(q);
+        launch(true,T,3); graph.end_recording(q); auto executable=graph.finalize();
+        for(int count:{1,3}) for(int keep=-1;keep<=T;++keep) {
+            reset(keep); launch(false,T,count); const auto want=get();
+            reset(keep);
+            if(count==3)q.ext_oneapi_graph(executable); else launch(true,T,count);
+            const auto got=get();
+            if(std::memcmp(want.data(),got.data(),got.size()*4))throw std::runtime_error("layer commit parity");
+            auto history_oracle=initial;
+            if(keep>0)for(int i=0;i<count;++i)for(int c=0;c<C;++c)for(int j=0;j<3;++j) {
+                const int src=keep+j;
+                const size_t dst=PAD+(FIRST-ORD0+i)*STRIDE+SS+c*3+j;
+                history_oracle[dst]=src<3?initial[dst-j+src]:conv[((FIRST+i)*T+src-3)*C+c];
+            }
+            for(int l=0;l<L;++l) {
+                const size_t start=PAD+l*STRIDE;
+                const bool active=keep>0&&l>=FIRST-ORD0&&l<FIRST-ORD0+count;
+                if(std::memcmp(got.data()+start+(active?SS:0),history_oracle.data()+start+(active?SS:0),
+                               (active?C*3:STRIDE)*4))throw std::runtime_error("history/stage boundary");
+            }
+            if(std::memcmp(got.data(),initial.data(),PAD*4)||
+               std::memcmp(got.data()+PAD+L*STRIDE,initial.data()+PAD+L*STRIDE,PAD*4))
+                throw std::runtime_error("layer commit guard");
+            ++cases;
+        }
+    }
+    reset(2);
+    for(int T:{0,1,2,3,5,7,8}) {
+        if(gdn_commit_layers_esimd(state+PAD,qkv,h,C,g,b,HK,HV,T,3,keep_d,&q))throw std::runtime_error("invalid capacity accepted");
+        ++cases;
+    }
+    if(gdn_commit_layers_esimd(state+PAD,qkv,h,C,g,b,HK,HV,6,0,keep_d,&q)||
+       gdn_commit_layers_esimd(state+PAD,qkv,h,C,g,b,HK,HV,6,3,nullptr,&q)||
+       gdn_commit_layers_esimd(state+PAD,qkv,h,C-1,g,b,HK,HV,6,3,keep_d,&q)||get()!=initial)
+        throw std::runtime_error("refusal submitted work");
+    cases+=3;
+    for(auto pair:{std::pair{h,&input},std::pair{qkv,&conv},std::pair{g,&gate},std::pair{b,&beta}}) {
+        std::vector<float> got(pair.second->size()); q.memcpy(got.data(),pair.first,got.size()*4).wait_and_throw();
+        if(got!=*pair.second)throw std::runtime_error("commit modified input"); ++cases;
+    }
+    for(auto* p:allocations)sycl::free(p,q); sycl::free(keep_d,q);
+    std::printf("GDN layer commit: %d cases, 0 failures (bitwise state, CPU history, offsets, guards, graph, refusal, inputs)\n",cases);
+    return 0;
+}
+
 
 int window_check(bool bench) {
     constexpr int S = 128, HK = 16, HV = 48, C = S * (2 * HK + HV), V = S * HV;
@@ -109,6 +315,11 @@ int window_check(bool bench) {
     auto values = [&](size_t n) { std::vector<float> v(n); for (auto& x : v) x = random(rng); return v; };
     const auto initial = values(S * HV * S), h = values(8 * C), z = values(8 * V);
     std::vector<float> gate(8 * HV, -.3f), beta(8 * HV, .5f), gamma(S, 1.f);
+    // Exercise native exponential and update parity across different heads and tokens.
+    for (size_t i = 0; i < gate.size(); ++i) {
+        gate[i] = -0.03125f * (i % 321);
+        beta[i] = float(i % 33) / 32.f;
+    }
     std::vector<float*> allocations;
     auto copy = [&](const std::vector<float>& v) {
         auto* p = sycl::malloc_device<float>(v.size(), q);
@@ -117,7 +328,7 @@ int window_check(bool bench) {
     };
     float *state = copy(initial), *dh = copy(h), *dz = copy(z), *dg = copy(gate), *db = copy(beta), *dn = copy(gamma);
     std::vector<float> blank(8 * V, 42.f), a(blank.size()), b(blank.size()), c(blank.size());
-    std::vector<float> sa(initial.size()), sb(initial.size()), sc(initial.size());
+    std::vector<float> sa(initial.size()), sb(initial.size()), sc(initial.size()), state_ref;
     float* y = copy(blank);
     const size_t qbytes = (size_t) 8 * (V / 32) * 36;
     std::vector<uint8_t> qblank(qbytes, 0xa5), qref(qbytes), q16(qbytes), q32(qbytes);
@@ -141,16 +352,61 @@ int window_check(bool bench) {
             q.memcpy(qout.data(), xq, qbytes).wait();
         };
         run(32, false, a, sa, qref); run(32, true, c, sc, q32); run(16, true, b, sb, q16); ++cases;
+        if (begin == 0) state_ref = sa;
         if (std::memcmp(a.data(), b.data(), a.size() * 4) || std::memcmp(a.data(), c.data(), a.size() * 4) ||
             std::memcmp(sa.data(), sb.data(), sa.size() * 4) || std::memcmp(sa.data(), sc.data(), sa.size() * 4) ||
+            std::memcmp(state_ref.data(), sb.data(), sb.size() * 4) ||
+            (begin == T && std::memcmp(blank.data(), b.data(), b.size() * 4)) ||
             std::memcmp(qref.data(), q16.data(), qbytes) || std::memcmp(qref.data(), q32.data(), qbytes) ||
             !std::all_of(b.begin(), b.end(), [](float x) { return std::isfinite(x); }) ||
             (keep <= 0 && std::memcmp(initial.data(), sb.data(), sb.size() * 4))) {
             std::printf("window mismatch: T=%d keep=%d begin=%d\n", T, keep, begin); ++bad;
         }
+        run(16, false, c, sc, q32);
+        if (std::memcmp(a.data(), c.data(), a.size() * 4) ||
+            std::memcmp(sa.data(), sc.data(), sa.size() * 4) || std::memcmp(qref.data(), q32.data(), qbytes)) {
+            std::printf("window SG16 plain mismatch: T=%d keep=%d begin=%d\n", T, keep, begin); ++bad;
+        }
     }
     std::printf("GDN window SG16/32 + q8 tail: %d cases, %d failures (verify, commit, rejected suffix, output prefix)\n",
                 cases, bad);
+    // Compare fused commit against the existing recurrence and an independent history oracle.
+    const auto history = values(C * 3 + 32), qkv = values(8 * C);
+    float* dhist = copy(history), *dqkv = copy(qkv);
+    std::vector<float> hist_out(history.size()), want_hist(history.size());
+    int commit_cases = 0;
+    for (int T = 1; T <= 8; ++T) for (int keep = 0; keep <= T; ++keep) {
+        q.memcpy(keep_d, &keep, sizeof(keep));
+        q.memcpy(state, initial.data(), initial.size() * 4);
+        strata::kernels::gdn_step_norm_multi(state, dh, C, dg, db, dz, dn, 1e-6f, y, HK, HV,
+                                             T, keep_d, &q, T);
+        q.memcpy(sa.data(), state, sa.size() * 4).wait();
+        q.memcpy(state, initial.data(), initial.size() * 4);
+        q.memcpy(dhist, history.data(), history.size() * 4);
+        q.memcpy(y, blank.data(), blank.size() * 4);
+        if (!strata::kernels::gdn_commit_esimd(state, dhist + 16, dqkv, dh, C, dg, db, HK, HV, T, keep_d, &q)) {
+            strata::kernels::gdn_conv_commit(dhist + 16, dqkv, C, keep_d, &q);
+            strata::kernels::gdn_step_norm_multi(state, dh, C, dg, db, dz, dn, 1e-6f, y, HK, HV,
+                                                 T, keep_d, &q, T);
+        }
+        q.memcpy(sb.data(), state, sb.size() * 4);
+        q.memcpy(hist_out.data(), dhist, hist_out.size() * 4);
+        q.memcpy(b.data(), y, b.size() * 4).wait();
+        want_hist = history;
+        if (keep > 0) for (int c = 0; c < C; ++c) for (int j = 0; j < 3; ++j) {
+            const int src = keep + j;
+            want_hist[16 + c * 3 + j] = src < 3 ? history[16 + c * 3 + src] : qkv[(size_t) (src - 3) * C + c];
+        }
+        ++commit_cases;
+        if (std::memcmp(sa.data(), sb.data(), sa.size() * 4) ||
+            std::memcmp(hist_out.data(), want_hist.data(), hist_out.size() * 4) ||
+            std::memcmp(b.data(), blank.data(), b.size() * 4)) {
+            std::printf("fused commit mismatch: T=%d keep=%d\n", T, keep); ++bad;
+        }
+    }
+    if (strata::kernels::gdn_commit_esimd(state, dhist + 16, dqkv, dh, C, dg, db, HK, HV, 6, nullptr, &q)) ++bad;
+    std::printf("GDN fused commit: %d cases, %d total failures (state, history, canaries, untouched output)\n",
+                commit_cases, bad);
     if (bench && !bad) {
         constexpr int layers = 40;
         auto* states = sycl::malloc_device<float>(layers * initial.size(), q);
@@ -196,18 +452,47 @@ int window_check(bool bench) {
 }  // namespace
 
 int main(int argc, char** argv) {
+    if (argc == 2 && std::string(argv[1]) == "--commit-layers-check") {
+        try { return commit_layers_check(); }
+        catch (const std::exception& e) { std::fprintf(stderr,"%s\n",e.what()); return 1; }
+    }
     if (argc == 2 && (std::string(argv[1]) == "--window-check" || std::string(argv[1]) == "--bench-window"))
         return window_check(std::string(argv[1]) == "--bench-window");
-    bool selftest = false;
+    bool selftest = false, prefill_only = false;
+    int prefill_tokens = 0, prefill_repeat = 1;
     for (int i = 1; i < argc; ++i) {
-        if (std::string(argv[i]) == "--selftest") selftest = true;
-        else { std::fprintf(stderr, "usage: gdn_parity [--selftest]\n"); return 2; }
+        const std::string arg(argv[i]);
+        if (arg == "--selftest") selftest = true;
+        else if (arg == "--prefill-only") prefill_only = true;
+        else if ((arg == "--prefill-tokens" || arg == "--prefill-repeat") && i + 1 < argc) {
+            char* end = nullptr;
+            const long n = std::strtol(argv[++i], &end, 10);
+            if (!end || *end || n < 1 || n > (arg == "--prefill-tokens" ? 32768 : 1000)) return 2;
+            (arg == "--prefill-tokens" ? prefill_tokens : prefill_repeat) = int(n);
+        } else {
+            std::fprintf(stderr, "usage: gdn_parity [--selftest] [--prefill-only] [--prefill-tokens N] [--prefill-repeat N]\n");
+            return 2;
+        }
     }
+    const auto device = dpct::get_in_order_queue().get_device();
+    std::printf("device: %s (%s), sub-groups:", device.get_info<sycl::info::device::name>().c_str(),
+                device.is_cpu() ? "CPU" : device.is_gpu() ? "GPU" : "other");
+    for (auto n : device.get_info<sycl::info::device::sub_group_sizes>()) std::printf(" %zu", n);
+    std::printf("\n");
+    int prefill_bad = 0;
+    for (int t : prefill_tokens ? std::vector<int>{prefill_tokens} : std::vector<int>{1, 7, 256, 1000})
+        for (int seed : {2025, 2026}) prefill_bad += prefill_case(t, seed, prefill_repeat);
+    std::printf("prefill gdn: %d failures\n", prefill_bad);
+    if (prefill_only) {
+        if (selftest && !prefill_bad) std::printf("gdn_parity OK\n");
+        return prefill_bad ? 1 : 0;
+    }
+
 
     const int S = 128, h_k = 16, h_v = 48;      // the artifact's real geometry
     std::mt19937 rng(2024);
     std::normal_distribution<float> gauss(0.0f, 1.0f);
-    int bad = 0;
+    int bad = prefill_bad;
 
     // ================= 1. the recurrence =================
     {

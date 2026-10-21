@@ -4,6 +4,9 @@
 // elementwise.cu) with the same operation order, so a verify window reproduces plain decode bit for bit.
 #define DPCT_PROFILING_ENABLED
 #include <sycl/sycl.hpp>
+#include <sycl/ext/intel/esimd.hpp>
+#include <sycl/ext/oneapi/experimental/device_architecture.hpp>
+#include <sycl/ext/intel/experimental/grf_size_properties.hpp>
 #include <dpct/dpct.hpp>
 #include "strata/sycl_queue.hpp"
 #include "strata/sycl_doorbell.hpp"
@@ -1096,6 +1099,108 @@ void gdn_ab_multi(const float* x, const uint16_t* w_alpha, const uint16_t* w_bet
     check("gdn_ab_multi");
 }
 
+
+// State-only commit: a vector owns all rows of eight columns, without SLM or barriers.
+template<int MAXT, bool COMMIT_CONV = false, bool BATCH = false>
+static void gdn_state_replay_esimd(float* state, const float* h, int C, const float* gate,
+                          const float* beta, int h_k, int h_v, const int32_t* n_keep,
+                          void* stream, float* history = nullptr, const float* qkv = nullptr, int n_layers = 1) {
+    // Keep the 128-row tile in registers with the measured GRF allocation.
+    const auto props = sycl::ext::oneapi::experimental::properties{
+        sycl::ext::intel::experimental::grf_size<256>};
+    strata::q_of(stream)->parallel_for(sycl::range<1>((size_t) n_layers * h_v * 16), props,
+        [=](sycl::id<1> index) SYCL_ESIMD_KERNEL {
+            namespace es = sycl::ext::intel::esimd;
+            using V = es::simd<float, 8>;
+            const size_t layer = BATCH ? index[0] / (h_v * 16) : 0;
+            const int lane = BATCH ? index[0] % (h_v * 16) : index[0];
+            const int head = lane / 16, col = (lane % 16) * 8;
+            const size_t state_stride = (size_t) S * h_v * S + (size_t) C * 3;
+            float* state_l = state + layer * state_stride;
+            float* history_l = COMMIT_CONV ? history + layer * state_stride : nullptr;
+            const float* h_l = h + layer * MAXT * C;
+            const float* qkv_l = COMMIT_CONV ? qkv + layer * MAXT * C : nullptr;
+            const float* gate_l = gate + layer * MAXT * h_v;
+            const float* beta_l = beta + layer * MAXT * h_v;
+            const int qh = head % h_k, qk = S * h_k;
+            const int n = *n_keep;
+            if (n <= 0) return;
+            if constexpr (COMMIT_CONV) {
+                // Each work item owns disjoint channels; read all three before overwriting history.
+                const es::simd<uint32_t, 16> offsets(0, 3 * sizeof(float));
+                for (int c = lane * 16; c < C; c += h_v * 16 * 16) {
+                    es::simd<float, 16> seq[3];
+#pragma unroll
+                    for (int j = 0; j < 3; ++j) {
+                        const int src = n + j;
+                        seq[j] = src < 3 ? es::gather<float, 16>(history_l + c * 3 + src, offsets)
+                                         : es::block_load<float, 16>(qkv_l + (size_t) (src - 3) * C + c);
+                    }
+#pragma unroll
+                    for (int j = 0; j < 3; ++j) es::scatter<float, 16>(history_l + c * 3 + j, offsets, seq[j]);
+                }
+            }
+            const size_t stride = (size_t) h_v * S;
+            float* ptr = state_l + (size_t) head * S + col;
+            V rows[S];
+#pragma unroll
+            for (int r = 0; r < S; ++r) rows[r] = es::block_load<float, 8>(ptr + r * stride);
+            auto fma = [](V a, V b, V c) SYCL_ESIMD_FUNCTION {
+                return V(__builtin_elementwise_fma(a.data(), b.data(), c.data()));
+            };
+#pragma unroll
+            for (int t = 0; t < MAXT; ++t) {
+                if (t >= n) break;
+                const float* ht = h_l + (size_t) t * C;
+                auto key = es::block_load<float, S>(ht + qk + qh * S);
+                const float g = es::exp(gate_l[(size_t) t * h_v + head]);
+                V a = 0.0f, b = 0.0f, c = 0.0f, d = 0.0f;
+#pragma unroll
+                for (int r = 0; r < RPG; ++r) {
+                    a = fma(rows[r], V(key[r]), a);
+                    b = fma(rows[RPG + r], V(key[RPG + r]), b);
+                    c = fma(rows[2 * RPG + r], V(key[2 * RPG + r]), c);
+                    d = fma(rows[3 * RPG + r], V(key[3 * RPG + r]), d);
+                }
+                V value = es::block_load<float, 8>(ht + 2 * qk + head * S + col);
+                V delta = (value - g * ((a + b) + c + d)) * beta_l[(size_t) t * h_v + head];
+#pragma unroll
+                for (int r = 0; r < S; ++r) rows[r] = fma(V(g), rows[r], V(key[r]) * delta);
+            }
+#pragma unroll
+            for (int r = 0; r < S; ++r) es::block_store<float, 8>(ptr + r * stride, rows[r]);
+        });
+}
+
+bool gdn_commit_esimd(float* state, float* history, const float* qkv, const float* h,
+                      int C, const float* gate, const float* beta, int h_k, int h_v,
+                      int n_tok, const int32_t* n_keep, void* stream) {
+    // ponytail: fuse only measured ACM G10 four/six-token commits; callers retain their fallback.
+    if (!state || !history || !qkv || !h || !gate || !beta || !n_keep || h_k <= 0 || h_v <= 0 ||
+        h_v % h_k || C != S * (2 * h_k + h_v) || (n_tok != 4 && n_tok != 6) ||
+        strata::q_of(stream)->get_device().get_info<
+            sycl::ext::oneapi::experimental::info::device::architecture>() !=
+            sycl::ext::oneapi::experimental::architecture::intel_gpu_acm_g10) return false;
+    if (n_tok == 4) gdn_state_replay_esimd<4, true>(state, h, C, gate, beta, h_k, h_v, n_keep, stream, history, qkv);
+    else gdn_state_replay_esimd<6, true>(state, h, C, gate, beta, h_k, h_v, n_keep, stream, history, qkv);
+    return true;
+}
+
+bool gdn_commit_layers_esimd(float* state, const float* qkv, const float* h,
+                            int C, const float* gate, const float* beta, int h_k, int h_v,
+                            int n_tok, int n_layers, const int32_t* n_keep, void* stream) {
+    // ponytail: batch the existing fixed-layout commit; no pointer tables or extra device copies.
+    if (!state || !qkv || !h || !gate || !beta || !n_keep || n_layers <= 0 || h_k <= 0 || h_v <= 0 ||
+        h_v % h_k || C != (int64_t) S * (2ll * h_k + h_v) || (n_tok != 4 && n_tok != 6) ||
+        strata::q_of(stream)->get_device().get_info<
+            sycl::ext::oneapi::experimental::info::device::architecture>() !=
+            sycl::ext::oneapi::experimental::architecture::intel_gpu_acm_g10) return false;
+    float* history = state + (size_t) S * h_v * S;
+    if (n_tok == 4) gdn_state_replay_esimd<4, true, true>(state, h, C, gate, beta, h_k, h_v, n_keep, stream, history, qkv, n_layers);
+    else gdn_state_replay_esimd<6, true, true>(state, h, C, gate, beta, h_k, h_v, n_keep, stream, history, qkv, n_layers);
+    return true;
+}
+
 void gdn_step_norm_multi(float* state, const float* h, int conv_channels, const float* gate, const float* beta,
                          const float* z, const float* gamma, float eps, float* y, int h_k, int h_v, int n_tok,
                          const int32_t* n_keep, void* stream, int t_out_begin, void* xq_out) {
@@ -1106,12 +1211,22 @@ void gdn_step_norm_multi(float* state, const float* h, int conv_channels, const 
     }
     auto exp_props = sycl::ext::oneapi::experimental::properties{
         sycl::ext::oneapi::experimental::use_root_sync};
+    // ponytail: only ACM G10 four/six-token commits are measured; retain the existing fallback elsewhere.
+    if (n_keep && (n_tok == 4 || n_tok == 6) && t_out_begin >= n_tok && !xq_out &&
+        strata::q_of(stream)->get_device().get_info<
+            sycl::ext::oneapi::experimental::info::device::architecture>() ==
+            sycl::ext::oneapi::experimental::architecture::intel_gpu_acm_g10) {
+        if (n_tok == 4) gdn_state_replay_esimd<4>(state, h, conv_channels, gate, beta, h_k, h_v, n_keep, stream);
+        else gdn_state_replay_esimd<6>(state, h, conv_channels, gate, beta, h_k, h_v, n_keep, stream);
+        return;
+    }
     const char* sg16_env = std::getenv("STRATA_GDN_SG16");
     const bool sg16 = sg16_env && sg16_env[0] == '1';
     const char* split_env = std::getenv("STRATA_GDN_SPLIT");
-    // Keep the Q8-tail experiment isolated from this candidate.
-    const bool split = !xq_out && split_env && split_env[0] == '1' && n_tok > 1 &&
-                       (t_out_begin >= n_tok || n_tok - t_out_begin >= 2);
+    // ponytail: only four-token commits measured faster; other split paths remain opt-in.
+    const bool split = !xq_out && n_tok > 1 &&
+                       ((n_tok == 4 && t_out_begin >= n_tok) ||
+                        (split_env && split_env[0] == '1' && (t_out_begin >= n_tok || n_tok - t_out_begin >= 2)));
     auto launch_base = [&]<int SG, bool Q> {
         strata::q_of(stream)
             ->parallel_for<
@@ -1133,17 +1248,22 @@ void gdn_step_norm_multi(float* state, const float* h, int conv_channels, const 
         const auto split_local = sycl::range(1, RG, kGdnSplitCols);
         const auto split_global = sycl::range(1, (unsigned) h_v, S / kGdnSplitCols) * split_local;
         if (t_out_begin >= n_tok) {
-            strata::q_of(stream)
-                ->parallel_for<
-                    dpct_kernel_name<class gdn_state_replay_kernel_6ef318,
-                                     dpct_kernel_scalar<SG>>>(
-                    sycl::nd_range<3>(split_global, split_local), exp_props,
-                    [=](sycl::nd_item<3> item)
-                        [[sycl::reqd_sub_group_size(SG)]] {
-                            gdn_state_replay_kernel<kVerifyMaxT>(
-                                state, h, conv_channels, gate, beta, h_k, h_v,
-                                n_tok, n_keep);
-                        });
+            auto replay = [&]<int MAXT> {
+                strata::q_of(stream)
+                    ->parallel_for<
+                        dpct_kernel_name<class gdn_state_replay_kernel_6ef318,
+                                         dpct_kernel_scalar<SG>, dpct_kernel_scalar<MAXT>>>(
+                        sycl::nd_range<3>(split_global, split_local), exp_props,
+                        [=](sycl::nd_item<3> item)
+                            [[sycl::reqd_sub_group_size(SG)]] {
+                                gdn_state_replay_kernel<MAXT>(
+                                    state, h, conv_channels, gate, beta, h_k, h_v,
+                                    n_tok, n_keep);
+                            });
+            };
+            // ponytail: the usual four-token window needs half the prefetched registers.
+            if (n_tok <= 4) replay.template operator()<4>();
+            else replay.template operator()<kVerifyMaxT>();
             return;
         }
         strata::q_of(stream)

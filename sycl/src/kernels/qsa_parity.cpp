@@ -52,6 +52,8 @@
 #include "strata/kernels/qsa.hpp"
 #include "strata/kernels/native_qsa.hpp"
 #include "strata/kernels/native_qsa_indexer.hpp"
+#include "strata/kernels/mrope.hpp"
+#include <stdexcept>
 #include "strata/kernels/native_mmvq.hpp"
 #include "strata/kernels/q8_1_finite.hpp"
 
@@ -521,12 +523,123 @@ int run_qsa_q8_check(bool bench) {
     return bad ? 1 : 0;
 }
 
+int run_indexer_commit_check() try {
+    using namespace strata::kernels;
+    constexpr int D = 128, MC = 37, TS = 3*D, PS = (MC/4+1)*D, N = TS+D+PS+4, MT = 8;
+    auto& q = dpct::get_in_order_queue();
+    Dev<float> a(N), b(N), raw(MT*D), gamma(D), cos_tab(160*32), sin_tab(160*32);
+    Dev<int32_t> apos(3), bpos(3), positions(MT*3), one(1), mtab(160*3);
+    const QsaIndexerBuffers ba{a.p+1, a.p+TS+2, a.p+TS+D+3, apos.p+1};
+    const QsaIndexerBuffers bb{b.p+1, b.p+TS+2, b.p+TS+D+3, bpos.p+1};
+    const auto shapes = qsa_real_shapes();
+    RopeScaling sc;
+    std::vector<float> source(MT*D), weights(D), initial(N, 19.25f);
+    for (int i=0; i<MT*D; ++i) source[i] = std::sin(float(i)*.73f)*float(1+i%31);
+    for (int i=0; i<D; ++i) weights[i] = .5f+float(i%17)/16.f;
+    raw.put(source); gamma.put(weights);
+    const std::vector<int32_t> initial_pos{1234567, -31, 1234567};
+    std::vector<int32_t> mapping(160*3);
+    for (int p=0; p<160; ++p) for (int j=0; j<3; ++j) mapping[p*3+j]=p+j;
+    mtab.put(mapping);
+    int cases=0;
+    for (int variant=0; variant<3; ++variant) {
+        sc.type = variant==0 ? RopeScalingType::None : variant==1 ? RopeScalingType::Linear : RopeScalingType::YaRN;
+        sc.factor = variant==0 ? 1.0 : 2.0; sc.ext_factor = variant==2 ? 1.0 : 0.0;
+        const int base=variant==0 ? 0 : 100;
+        std::vector<float> hc(160*32), hs(hc.size());
+        build_rope_table(64, sc, 160, hc.data(), hs.data()); cos_tab.put(hc); sin_tab.put(hs);
+        for (bool table : {false, true}) {
+            if (table) rope_table_set(cos_tab.p, sin_tab.p, 160, sc);
+            else rope_table_release(cos_tab.p);
+            // With STRATA_ROPE_TABLE=1 the second pass exercises the table kernel too.
+            mrope_table_set(table ? mtab.p : nullptr);
+            for (int start : {0,1,2,3,32,35}) {
+                a.put(initial); apos.put(initial_pos);
+                for (int p=0; p<start; ++p) {
+                    one.put({p});
+                    native_qsa_indexer_append(raw.p+(p%MT)*D, one.p, base, gamma.p, 1e-6f, ba, shapes, MC, sc, &q);
+                    q.wait_and_throw();
+                }
+                const auto saved=a.get(N); const auto saved_pos=apos.get(3);
+                for (int T : {1,2,4,6,8}) for (int keep=0; keep<=T; ++keep) {
+                    std::vector<int32_t> pos(MT*3, -771);
+                    for (int t=0; t<T; ++t) pos[t*3]=t<keep ? start+t : -1;
+                    positions.put(pos); a.put(saved); b.put(saved); apos.put(saved_pos); bpos.put(saved_pos);
+                    for (int t=0; t<T; ++t)
+                        native_qsa_indexer_append(raw.p+t*D, positions.p+t*3, base, gamma.p, 1e-6f, ba, shapes, MC, sc, &q);
+                    native_qsa_indexer_append_steps(raw.p, positions.p, 3, T, base, gamma.p, 1e-6f, bb, shapes, MC, sc, &q);
+                    q.wait_and_throw();
+                    const auto va=a.get(N), vb=b.get(N); const auto pa=apos.get(3), pb=bpos.get(3);
+                    if (std::memcmp(va.data(),vb.data(),N*4) || pa!=pb)
+                        throw std::runtime_error("indexer commit differs from sequential appends");
+                    for (int i : {0,TS+1,TS+D+2,N-1})
+                        if (vb[i]!=saved[i]) throw std::runtime_error("indexer commit crossed a state boundary");
+                    if (pb.front()!=initial_pos.front() || pb.back()!=initial_pos.back())
+                        throw std::runtime_error("indexer commit crossed the position boundary");
+                    auto tail=std::vector<float>(saved.begin()+1,saved.begin()+1+TS);
+                    for (int t=0; t<keep && start+t<MC; ++t) if ((start+t)%4<3)
+                        for (int d=0; d<D; ++d) tail[((start+t)%4)*D+d]=f32_from_f16(f16_from_f32(source[t*D+d]));
+                    if (std::memcmp(tail.data(),vb.data()+1,TS*4))
+                        throw std::runtime_error("indexer commit tail disagrees with CPU oracle");
+                    if (!keep && (std::memcmp(saved.data(),vb.data(),N*4) || saved_pos!=pb))
+                        throw std::runtime_error("zero acceptance changed indexer state");
+                    ++cases;
+                }
+            }
+        }
+    }
+    rope_table_release(cos_tab.p); mrope_table_set(nullptr); sc=RopeScaling{};
+    // Capture once; changing only device positions must change both acceptance and destination on replay.
+    using namespace sycl::ext::oneapi::experimental;
+    command_graph graph(q.get_context(), q.get_device());
+    graph.begin_recording(q);
+    native_qsa_indexer_append_steps(raw.p, positions.p, 3, 6, 0, gamma.p, 1e-6f, bb, shapes, MC, sc, &q);
+    graph.end_recording(q);
+    auto executable=graph.finalize();
+    for (const std::vector<int32_t> pos : {
+            std::vector<int32_t>{-1,-1,-1,-1,-1,-1}, {0,1,2,3,4,5}, {3,-1,-1,-1,-1,-1},
+            {32,33,34,35,36,37}, {-1,1,-7,3,MC,5}, {1,1,1,1,1,1}}) {
+        std::vector<int32_t> strided(MT*3,-771);
+        for (int t=0; t<6; ++t)strided[t*3]=pos[t];
+        positions.put(strided); a.put(initial); b.put(initial); apos.put(initial_pos); bpos.put(initial_pos);
+        for (int t=0; t<6; ++t)
+            native_qsa_indexer_append(raw.p+t*D, positions.p+t*3, 0, gamma.p, 1e-6f, ba, shapes, MC, sc, &q);
+        q.ext_oneapi_graph(executable).wait_and_throw();
+        const auto va=a.get(N),vb=b.get(N);
+        if (std::memcmp(va.data(),vb.data(),N*4) || apos.get(3)!=bpos.get(3))
+            throw std::runtime_error("indexer commit graph replay used stale device positions");
+        ++cases;
+    }
+    // Zero steps are a no-op, stride zero repeats the same device position, negative stride is rejected.
+    const auto before=b.get(N);
+    native_qsa_indexer_append_steps(nullptr,nullptr,0,0,0,nullptr,0,{},shapes,MC,sc,nullptr);
+    if (before!=b.get(N))throw std::runtime_error("empty commit changed state");
+    positions.put(std::vector<int32_t>(MT*3,2)); a.put(initial); b.put(initial); apos.put(initial_pos); bpos.put(initial_pos);
+    for (int t=0;t<6;++t)native_qsa_indexer_append(raw.p+t*D,positions.p,0,gamma.p,1e-6f,ba,shapes,MC,sc,&q);
+    native_qsa_indexer_append_steps(raw.p,positions.p,0,6,0,gamma.p,1e-6f,bb,shapes,MC,sc,&q);
+    q.wait_and_throw();
+    if (a.get(N)!=b.get(N) || apos.get(3)!=bpos.get(3))throw std::runtime_error("stride-zero commit differs");
+    bool rejected=false;
+    try { native_qsa_indexer_append_steps(raw.p,positions.p,-1,6,0,gamma.p,1e-6f,bb,shapes,MC,sc,&q); }
+    catch (const std::invalid_argument&) { rejected=true; }
+    if (!rejected)throw std::runtime_error("negative position stride accepted");
+    if (raw.get(source.size())!=source || gamma.get(D)!=weights)throw std::runtime_error("read-only input changed");
+    std::printf("PASS indexer commit: %d sequential/CPU/canary cases, six dynamic graph replays, stride/no-op guards\n",cases);
+    return 0;
+} catch(const std::exception& e) {
+    std::fprintf(stderr,"indexer commit check: %s\n",e.what());
+    return 1;
+}
+
+
 }  // namespace
 
 int main(int argc, char** argv) {
     std::setvbuf(stdout, nullptr, _IONBF, 0);   // a crash must not swallow what was printed already
     if (argc >= 2 && (std::string(argv[1]) == "--qsa-q8-check" || std::string(argv[1]) == "--bench-gate-q8"))
         return run_qsa_q8_check(std::string(argv[1]) == "--bench-gate-q8");
+    if (argc >= 2 && std::string(argv[1]) == "--indexer-commit-check")
+        return run_indexer_commit_check();
     bool selftest = false, dense = false, bench = false;
     for (int i = 1; i < argc; ++i) {
         const std::string a = argv[i];
@@ -534,12 +647,13 @@ int main(int argc, char** argv) {
         else if (a == "--qsa-dense") dense = true;
         else if (a == "--bench") bench = true;
         else {
-            std::fprintf(stderr, "usage: qsa_parity [--selftest] [--qsa-dense] [--bench] [--qsa-q8-check] [--bench-gate-q8]\n"
+            std::fprintf(stderr, "usage: qsa_parity [--selftest] [--qsa-dense] [--bench] [--qsa-q8-check] [--bench-gate-q8] [--indexer-commit-check]\n"
                                  "  --qsa-dense      attend to EVERY cell instead of the indexer's selection\n"
                                  "                   (P1.S4's isolation switch; the sparse selection is still run\n"
                                  "                    and checked, against the reference's dense/sparse property)\n"
                                  "  --bench          time the kernels at 32K of context\n"
                                  "  --qsa-q8-check   verify bitwise parity between fused and unfused QSA gate+Q8_1 tail\n"
+                                 "  --indexer-commit-check  check batched state and dynamic graph replay\n"
                                  "  --bench-gate-q8  benchmark fused vs unfused QSA gate+Q8_1 tail across 12 layers\n");
             return 2;
         }

@@ -4,6 +4,7 @@
 #include <dpct/dpct.hpp>
 #include "strata/sycl_queue.hpp"
 #include "strata/prefill/kernels.hpp"
+#include "strata/prefill/gdn_xe.hpp"
 #include "strata/kernels/mrope.hpp"
 #include "strata/kernels/router_top10.hpp"
 
@@ -11,6 +12,8 @@
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
+#include <algorithm>
+#include <stdexcept>
 
 namespace strata::prefill {
 namespace {
@@ -1720,8 +1723,23 @@ void gdn_conv(float* history, const float* qkv, const float* conv_w, float* h, i
     }
     check("gdn_conv");
 }
-void gdn_recurrence(float* state, const float* h, const float* gate, const float* beta, const float* z,
-                    const float* gamma, float eps, float* y, uint16_t* y16, int64_t T, void* stream, int64_t ld16) {
+static bool gdn_xe_device(void* stream) {
+    const auto device = strata::q_of(stream)->get_device();
+    const auto sizes = device.get_info<sycl::info::device::sub_group_sizes>();
+    return device.is_gpu() && device.get_info<sycl::info::device::vendor_id>() == 0x8086 &&
+           std::find(sizes.begin(), sizes.end(), size_t(16)) != sizes.end();
+}
+static bool gdn_xe_on(void* stream) {
+    const char* v = std::getenv("STRATA_GDN_XE");
+    if (v && *v) return std::atoi(v) != 0 && gdn_xe_device(stream);
+    // ponytail: default only on the measured A770 architecture; query this queue for mixed-card runs.
+    return gdn_xe_device(stream) && strata::q_of(stream)->get_device().get_info<
+        sycl::ext::oneapi::experimental::info::device::architecture>() ==
+        sycl::ext::oneapi::experimental::architecture::intel_gpu_acm_g10;
+}
+void gdn_recurrence_variant(int variant, float* state, const float* h, const float* gate, const float* beta,
+                            const float* z, const float* gamma, float eps, float* y, uint16_t* y16, int64_t T,
+                            void* stream, int64_t ld16) {
     // Matches kernels.hpp (upstream added ld16: y16's row stride, 0 = 6144). Packed rows only on this port.
     if (ld16 != 0 && ld16 != 6144) {
         std::fprintf(stderr, "prefill gdn_recurrence: a padded y16 (ld16 %lld) needs STRATA_PF_PAD's path\n",
@@ -1729,7 +1747,10 @@ void gdn_recurrence(float* state, const float* h, const float* gate, const float
         std::exit(1);
     }
     static const bool serial = std::getenv("STRATA_GDN_REC_HEADS") != nullptr;   // the one-block-per-head kernel (A/B)
-    if (serial || T <= 0) {
+    const bool xe = T > 0 && !serial && variant == 6;
+    if (xe && !gdn_xe_device(stream))
+        throw std::runtime_error("GDN Xe variant requires an Intel GPU with 16-lane sub-groups");
+    if (!xe && (serial || T <= 0 || variant == 2)) {
         /*
         DPCT1049: The work-group size passed to the SYCL kernel may exceed
         the limit. To get the device limit, query
@@ -1751,7 +1772,9 @@ void gdn_recurrence(float* state, const float* h, const float* gate, const float
     } else {
         static const bool pipe = [] { const char* v = std::getenv("STRATA_GDN_PIPELINE"); return v == nullptr || std::atoi(v) != 0; }();
 #if !defined(__HIPCC__)
-        if (pipe && gdn_keyhead_ok())   // the value heads of a key head in one thread (same bits)
+        if (xe) {
+            detail::gdn_xe_launch(*strata::q_of(stream), state, h, gate, beta, y, T);
+        } else if (pipe && gdn_keyhead_ok())   // the value heads of a key head in one thread (same bits)
         {
             auto exp_props = sycl::ext::oneapi::experimental::properties{
                 sycl::ext::oneapi::experimental::use_root_sync};
@@ -1813,6 +1836,10 @@ void gdn_recurrence(float* state, const float* h, const float* gate, const float
         }
     }
     check("gdn_recurrence");
+}
+void gdn_recurrence(float* state, const float* h, const float* gate, const float* beta, const float* z,
+                    const float* gamma, float eps, float* y, uint16_t* y16, int64_t T, void* stream, int64_t ld16) {
+    gdn_recurrence_variant(gdn_xe_on(stream) ? 6 : 0, state, h, gate, beta, z, gamma, eps, y, y16, T, stream, ld16);
 }
 void route(const float* logits, int32_t* ids, float* weights, int64_t T, int64_t n_expert, void* stream) {
     if (n_expert == 512)

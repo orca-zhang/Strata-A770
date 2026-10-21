@@ -1,0 +1,1162 @@
+{
+  "date": "2026-10-21",
+  "hardware": {
+    "gpu": "Intel Arc A770 16 GB",
+    "cpu": "Intel Xeon E5-2696 v4",
+    "ram": "256 GiB DDR3",
+    "os": "Windows 10",
+    "driver": "32.0.101.9034"
+  },
+  "toolchain": "Intel oneAPI DPC++ 2025.3.2, Level Zero",
+  "measurement_scope": "Controlled operator timings, synthetic expert screens and four integrated model correctness requests. No new steady-state whole-model decode or prefill measurement.",
+  "decision": "Adopt the independently confirmed 256-GRF ESIMD four/six-token state commit for ACM G10 in source. Other candidates remain off; production EXE/configuration retained.",
+  "limitations": "Time reductions are observations relative to each experiment baseline. Negative values mean slower. Several cases have over 3% neighboring baseline drift; small or inconsistent gains are not confirmed. Do not combine percentages or infer whole-model gains.",
+  "qsa_retests": [
+    {
+      "candidate": "value2",
+      "adopted": false,
+      "method": "Five fresh A/B/A/B/A processes; four KV formats; 1/4/8 queries; 2051 selected cells; 32 warmup calls and nine retained batches of 64 complete calls per shape.",
+      "checks_passed": 60,
+      "timing_unit": "microseconds",
+      "int8_observations": {
+        "1/1": {
+          "baseline": 86.06875,
+          "candidate": 103.81718699999999,
+          "reduction_pct": -20.621232444993097,
+          "pairs": [
+            {
+              "reduction_pct": -22.169924767489313,
+              "drift_pct": -15.892574463980624
+            },
+            {
+              "reduction_pct": -17.326535713893065,
+              "drift_pct": 5.072008271302675
+            }
+          ]
+        },
+        "1/4": {
+          "baseline": 117.629688,
+          "candidate": 123.765625,
+          "reduction_pct": -5.21631664958595,
+          "pairs": [
+            {
+              "reduction_pct": -2.793399376008465,
+              "drift_pct": -12.121642745488126
+            },
+            {
+              "reduction_pct": -3.0831181087215276,
+              "drift_pct": 1.4486313065976697
+            }
+          ]
+        },
+        "1/8": {
+          "baseline": 190.164062,
+          "candidate": 207.469531,
+          "reduction_pct": -9.100283627723504,
+          "pairs": [
+            {
+              "reduction_pct": -8.972280093360485,
+              "drift_pct": 1.6359625206687545
+            },
+            {
+              "reduction_pct": -9.656151206978603,
+              "drift_pct": 0.8274108069904473
+            }
+          ]
+        }
+      },
+      "record_sha256": "e35395b0d4912b6e2439e621cb05c57e78daa5bd85632fb695b58f35b665675a"
+    },
+    {
+      "candidate": "value-unroll4",
+      "adopted": false,
+      "method": "Five fresh A/B/A/B/A processes; four KV formats; 1/4/8 queries; 2051 selected cells; 32 warmup calls and nine retained batches of 64 complete calls per shape.",
+      "checks_passed": 60,
+      "timing_unit": "microseconds",
+      "int8_observations": {
+        "1/1": {
+          "baseline": 82.353125,
+          "candidate": 87.90703099999999,
+          "reduction_pct": -6.744013660683779,
+          "pairs": [
+            {
+              "reduction_pct": -14.42018308015005,
+              "drift_pct": 1.7549285202150156
+            },
+            {
+              "reduction_pct": 1.0501408457534445,
+              "drift_pct": 2.2540128258642156
+            }
+          ]
+        },
+        "1/4": {
+          "baseline": 114.3,
+          "candidate": 120.675,
+          "reduction_pct": -5.577427821522307,
+          "pairs": [
+            {
+              "reduction_pct": -10.020444422364116,
+              "drift_pct": -0.1187887332980031
+            },
+            {
+              "reduction_pct": -1.353437359690579,
+              "drift_pct": -0.5604768153980699
+            }
+          ]
+        },
+        "1/8": {
+          "baseline": 186.689063,
+          "candidate": 186.0796875,
+          "reduction_pct": 0.32641199768622675,
+          "pairs": [
+            {
+              "reduction_pct": 0.18864662125823717,
+              "drift_pct": -0.08278949657133383
+            },
+            {
+              "reduction_pct": 0.42965503668603855,
+              "drift_pct": -0.15232600958525744
+            }
+          ]
+        }
+      },
+      "record_sha256": "6db67267fea60f195113f177d9499eccb02dd49249b2dfea107fdee051cd1388"
+    },
+    {
+      "candidate": "fixed-wg",
+      "adopted": false,
+      "method": "Five fresh A/B/A/B/A processes; four KV formats; 1/4/8 queries; 2051 selected cells; 32 warmup calls and nine retained batches of 64 complete calls per shape.",
+      "checks_passed": 60,
+      "timing_unit": "microseconds",
+      "int8_observations": {
+        "1/1": {
+          "baseline": 84.564063,
+          "candidate": 89.79374949999999,
+          "reduction_pct": -6.18428953679766,
+          "pairs": [
+            {
+              "reduction_pct": -10.716509829782161,
+              "drift_pct": -0.9386374919095442
+            },
+            {
+              "reduction_pct": -1.792425418550958,
+              "drift_pct": 2.667263520908647
+            }
+          ]
+        },
+        "1/4": {
+          "baseline": 116.321875,
+          "candidate": 123.303125,
+          "reduction_pct": -6.001665636837439,
+          "pairs": [
+            {
+              "reduction_pct": -10.809367793444924,
+              "drift_pct": -1.5219080675926255
+            },
+            {
+              "reduction_pct": -0.7496029525011494,
+              "drift_pct": 5.773873203284019
+            }
+          ]
+        },
+        "1/8": {
+          "baseline": 192.123437,
+          "candidate": 188.8632815,
+          "reduction_pct": 1.6969067131564985,
+          "pairs": [
+            {
+              "reduction_pct": 3.4789029907031144,
+              "drift_pct": -0.8246651344260503
+            },
+            {
+              "reduction_pct": -0.7685422428218569,
+              "drift_pct": 1.0963961814822065
+            }
+          ]
+        }
+      },
+      "record_sha256": "e01b32679aad351c613e09fd5567fcdde23902000e85a0b17bc96bfec21c0afe"
+    },
+    {
+      "candidate": "native-xor",
+      "adopted": false,
+      "method": "Five fresh A/B/A/B/A processes; four KV formats; 1/4/8 queries; 2051 selected cells; 32 warmup calls and nine retained batches of 64 complete calls per shape.",
+      "checks_passed": 60,
+      "timing_unit": "microseconds",
+      "int8_observations": {
+        "1/1": {
+          "baseline": 86.559375,
+          "candidate": 90.1382815,
+          "reduction_pct": -4.134626087584392,
+          "pairs": [
+            {
+              "reduction_pct": 5.10032885471372,
+              "drift_pct": 24.046470846120126
+            },
+            {
+              "reduction_pct": 6.22790614083012,
+              "drift_pct": -18.421982682452732
+            }
+          ]
+        },
+        "1/4": {
+          "baseline": 120.165625,
+          "candidate": 128.191406,
+          "reduction_pct": -6.678932515018321,
+          "pairs": [
+            {
+              "reduction_pct": -6.38473445262191,
+              "drift_pct": 8.17476146838445
+            },
+            {
+              "reduction_pct": -4.34008127680332,
+              "drift_pct": -4.190855861467546
+            }
+          ]
+        },
+        "1/8": {
+          "baseline": 193.3375,
+          "candidate": 198.614063,
+          "reduction_pct": -2.729197905217551,
+          "pairs": [
+            {
+              "reduction_pct": -0.9109678814384514,
+              "drift_pct": -0.8825240835326875
+            },
+            {
+              "reduction_pct": -5.375381360285236,
+              "drift_pct": 1.0526404226868014
+            }
+          ]
+        }
+      },
+      "record_sha256": "4fcef63a74406f68d7da8d5544019648140dfe77a1f008de83bc6edd158b88a2"
+    },
+    {
+      "candidate": "sg8",
+      "adopted": false,
+      "method": "Five fresh A/B/A/B/A processes; four KV formats; 1/4/8 queries; 2051 selected cells; 32 warmup calls and nine retained batches of 64 complete calls per shape.",
+      "checks_passed": 60,
+      "timing_unit": "microseconds",
+      "int8_observations": {
+        "1/1": {
+          "baseline": 83.290625,
+          "candidate": 86.2320315,
+          "reduction_pct": -3.5314976925674424,
+          "pairs": [
+            {
+              "reduction_pct": -7.968382507482641,
+              "drift_pct": 1.7709075901399363
+            },
+            {
+              "reduction_pct": 2.525393631535855,
+              "drift_pct": -2.1216595760368717
+            }
+          ]
+        },
+        "1/4": {
+          "baseline": 114.790625,
+          "candidate": 161.8171875,
+          "reduction_pct": -40.96725015653497,
+          "pairs": [
+            {
+              "reduction_pct": -45.99781661736155,
+              "drift_pct": 1.7717876150411094
+            },
+            {
+              "reduction_pct": -37.14034945767466,
+              "drift_pct": 0.10617156235537273
+            }
+          ]
+        },
+        "1/8": {
+          "baseline": 186.39375,
+          "candidate": 261.728125,
+          "reduction_pct": -40.41679240854372,
+          "pairs": [
+            {
+              "reduction_pct": -39.79917815466383,
+              "drift_pct": 2.432180668394235
+            },
+            {
+              "reduction_pct": -38.14085193317784,
+              "drift_pct": -2.158721826711718
+            }
+          ]
+        }
+      },
+      "record_sha256": "44cd847468b98ee2225b232b75e39135d6378d5928082d39db28684e086ccdae"
+    },
+    {
+      "candidate": "chunk-no-root",
+      "adopted": false,
+      "method": "Five fresh A/B/A/B/A processes; four KV formats; 1/4/8 queries; 2051 selected cells; 32 warmup calls and nine retained batches of 64 complete calls per shape.",
+      "checks_passed": 60,
+      "timing_unit": "microseconds",
+      "int8_observations": {
+        "1/1": {
+          "baseline": 83.739063,
+          "candidate": 84.0007815,
+          "reduction_pct": -0.31254051648512693,
+          "pairs": [
+            {
+              "reduction_pct": -1.1993344718543186,
+              "drift_pct": -1.2856162481779898
+            },
+            {
+              "reduction_pct": 0.31655194921500485,
+              "drift_pct": 3.436413125661586
+            }
+          ]
+        },
+        "1/4": {
+          "baseline": 116.878125,
+          "candidate": 113.3671875,
+          "reduction_pct": 3.0039303761931424,
+          "pairs": [
+            {
+              "reduction_pct": 1.8444237833986854,
+              "drift_pct": 0.048127055426339105
+            },
+            {
+              "reduction_pct": 2.337525884044156,
+              "drift_pct": -3.8443032683930567
+            }
+          ]
+        },
+        "1/8": {
+          "baseline": 191.209375,
+          "candidate": 190.50859350000002,
+          "reduction_pct": 0.3664995505581081,
+          "pairs": [
+            {
+              "reduction_pct": -0.4409445640412679,
+              "drift_pct": 1.7548488737320955
+            },
+            {
+              "reduction_pct": 1.4709135158809672,
+              "drift_pct": -0.7783741709504244
+            }
+          ]
+        }
+      },
+      "record_sha256": "b8c4d14b44296ace161517f1889cedbead3e99df1c3880eebae363db5ecd1c32"
+    }
+  ],
+  "new_implementations": {
+    "paired_query_kv_reuse": {
+      "adopted": false,
+      "method": "Two adjacent queries share loaded K/V when selected physical rows agree, with independent reads otherwise. Four KV formats, five selection capacities, seven query counts and ten selection patterns; three A/B/A processes.",
+      "checks_passed": 4200,
+      "correctness": "Whole-output bit fingerprints, independent FP64 samples, finiteness and canaries pass.",
+      "timing_unit": "microseconds",
+      "int8_observations": {
+        "1/2/0": {
+          "baseline_us": 87.9984375,
+          "candidate_us": 137.6375,
+          "reduction_pct": -56.409027148919556,
+          "pairs": [
+            {
+              "reduction_pct": -56.410003558807695,
+              "drift_pct": -0.7042004317208694
+            }
+          ]
+        },
+        "1/2/8": {
+          "baseline_us": 88.078125,
+          "candidate_us": 112.110938,
+          "reduction_pct": -27.285790881674664,
+          "pairs": [
+            {
+              "reduction_pct": -27.285886237779234,
+              "drift_pct": 0.24510996112971917
+            }
+          ]
+        },
+        "1/2/9": {
+          "baseline_us": 91.6054685,
+          "candidate_us": 138.770312,
+          "reduction_pct": -51.48693006247764,
+          "pairs": [
+            {
+              "reduction_pct": -51.487143867159915,
+              "drift_pct": 0.33658583108728823
+            }
+          ]
+        },
+        "1/4/0": {
+          "baseline_us": 114.7828125,
+          "candidate_us": 159.0125,
+          "reduction_pct": -38.53337144879594,
+          "pairs": [
+            {
+              "reduction_pct": -38.53337823874383,
+              "drift_pct": 0.06263787140172727
+            }
+          ]
+        },
+        "1/4/8": {
+          "baseline_us": 115.678125,
+          "candidate_us": 137.017188,
+          "reduction_pct": -18.4469302212497,
+          "pairs": [
+            {
+              "reduction_pct": -18.44704485269444,
+              "drift_pct": -0.2778630925032832
+            }
+          ]
+        },
+        "1/4/9": {
+          "baseline_us": 117.7249995,
+          "candidate_us": 164.8875,
+          "reduction_pct": -40.06158479533482,
+          "pairs": [
+            {
+              "reduction_pct": -40.06322835347296,
+              "drift_pct": 0.9736059471525893
+            }
+          ]
+        },
+        "1/8/0": {
+          "baseline_us": 199.478125,
+          "candidate_us": 284.973437,
+          "reduction_pct": -42.859492488211416,
+          "pairs": [
+            {
+              "reduction_pct": -43.01879568243885,
+              "drift_pct": 9.904473783726008
+            }
+          ]
+        },
+        "1/8/8": {
+          "baseline_us": 185.813281,
+          "candidate_us": 251.159375,
+          "reduction_pct": -35.16761215792752,
+          "pairs": [
+            {
+              "reduction_pct": -35.16812472971389,
+              "drift_pct": 0.5523094295341036
+            }
+          ]
+        },
+        "1/8/9": {
+          "baseline_us": 191.16484400000002,
+          "candidate_us": 273.034375,
+          "reduction_pct": -42.82666691580592,
+          "pairs": [
+            {
+              "reduction_pct": -42.84103894756621,
+              "drift_pct": 2.8778710886327774
+            }
+          ]
+        }
+      },
+      "selection_patterns": {
+        "0": "different lists",
+        "8": "identical lists",
+        "9": "75% identical prefix"
+      },
+      "record_sha256": "80206cb48b356b3a5ea4dd2b6911678629dd4a343a944280fed260e70909cbcb"
+    },
+    "qsa_unused_root_sync_properties": {
+      "adopted": false,
+      "method": "Remove unused launch properties from chunk and merge without changing arithmetic or barriers. Two full 1400-shape correctness processes, then five fresh INT8 A/B/A/B/A timing processes, 128 warmups and 31 batches of 512 complete calls per shape.",
+      "full_checks_passed": 2800,
+      "timing_unit": "microseconds",
+      "observations": {
+        "1": {
+          "baseline": 84.251758,
+          "candidate": 85.25039100000001,
+          "reduction_pct": -1.1852963353002233,
+          "pairs": [
+            {
+              "reduction_pct": -0.14601463744825516,
+              "drift_pct": 2.7971404466123895
+            },
+            {
+              "reduction_pct": -2.9362800232953346,
+              "drift_pct": -9.194582954876962
+            }
+          ]
+        },
+        "4": {
+          "baseline": 118.653711,
+          "candidate": 115.60537099999999,
+          "reduction_pct": 2.569106329931825,
+          "pairs": [
+            {
+              "reduction_pct": -2.677162746872175,
+              "drift_pct": 1.3420366380873183
+            },
+            {
+              "reduction_pct": 7.537749629100743,
+              "drift_pct": 0.876862587129712
+            }
+          ]
+        },
+        "8": {
+          "baseline": 199.241016,
+          "candidate": 198.74267600000002,
+          "reduction_pct": 0.25011918228723395,
+          "pairs": [
+            {
+              "reduction_pct": 0.36129437357190763,
+              "drift_pct": -0.11945149375576225
+            },
+            {
+              "reduction_pct": -3.3287481262837204,
+              "drift_pct": -6.710720648001511
+            }
+          ]
+        }
+      },
+      "record_sha256": "af1da718d3b8c1ff10cff5d44ce2b1309b7f7e3267a49e669b8f001cd4eede57"
+    },
+    "esimd_8_columns": {
+      "adopted": false,
+      "method": "Four-token state-only ESIMD commit, no SLM or work-group barriers. Five fresh A/B/A/B/A processes; 36 independent layer states; nine retained batches of four sequences; ms per 36 layers.",
+      "window_cases_passed": 156,
+      "cpu_selftests_passed": 1,
+      "fixture_fingerprints_checked": 95,
+      "timing_unit": "milliseconds",
+      "t4_commit_observations": {
+        "commit-T4-keep1": {
+          "baseline": 1.386325,
+          "candidate": 2.0863750000000003,
+          "reduction_pct": -50.49681712441168,
+          "pairs": [
+            {
+              "reduction_pct": -52.936804628123824,
+              "drift_pct": 0.21505764990783494
+            },
+            {
+              "reduction_pct": -47.16720629705768,
+              "drift_pct": 1.4372531693506163
+            }
+          ]
+        },
+        "commit-T4-keep2": {
+          "baseline": 1.48645,
+          "candidate": 2.23895,
+          "reduction_pct": -50.6239698610784,
+          "pairs": [
+            {
+              "reduction_pct": -52.111812483503094,
+              "drift_pct": 1.6445568927790033
+            },
+            {
+              "reduction_pct": -48.84005405835523,
+              "drift_pct": 2.0686871405025453
+            }
+          ]
+        },
+        "commit-T4-keep3": {
+          "baseline": 1.528875,
+          "candidate": 2.4343250000000003,
+          "reduction_pct": -59.22328509524979,
+          "pairs": [
+            {
+              "reduction_pct": -58.261622859908925,
+              "drift_pct": -0.8699206933202586
+            },
+            {
+              "reduction_pct": -60.79882405507227,
+              "drift_pct": 1.8590304010029257
+            }
+          ]
+        },
+        "commit-T4-keep4": {
+          "baseline": 1.615,
+          "candidate": 2.5541375,
+          "reduction_pct": -58.150928792569665,
+          "pairs": [
+            {
+              "reduction_pct": -58.01352593801605,
+              "drift_pct": 3.0608236569614755
+            },
+            {
+              "reduction_pct": -57.06456212726599,
+              "drift_pct": -1.5108780168010871
+            }
+          ]
+        }
+      },
+      "record_sha256": "3000cf51cdbc5e66aa7b81f2e6212683430698005acb52f2bbc2965bb080d090"
+    },
+    "esimd_4_columns": {
+      "adopted": false,
+      "method": "Four-token state-only ESIMD commit, no SLM or work-group barriers. Five fresh A/B/A/B/A processes; 36 independent layer states; nine retained batches of four sequences; ms per 36 layers.",
+      "window_cases_passed": 156,
+      "cpu_selftests_passed": 1,
+      "fixture_fingerprints_checked": 95,
+      "timing_unit": "milliseconds",
+      "t4_commit_observations": {
+        "commit-T4-keep1": {
+          "baseline": 1.509025,
+          "candidate": 2.6778625,
+          "reduction_pct": -77.45647023740491,
+          "pairs": [
+            {
+              "reduction_pct": -79.29477496624678,
+              "drift_pct": 8.350305498981658
+            },
+            {
+              "reduction_pct": -72.3599096523504,
+              "drift_pct": -3.8470115967885743
+            }
+          ]
+        },
+        "commit-T4-keep2": {
+          "baseline": 1.573675,
+          "candidate": 2.9047125,
+          "reduction_pct": -84.5814733029374,
+          "pairs": [
+            {
+              "reduction_pct": -80.64969594451732,
+              "drift_pct": -6.519446960809061
+            },
+            {
+              "reduction_pct": -85.24328626447893,
+              "drift_pct": -3.131205617424182
+            }
+          ]
+        },
+        "commit-T4-keep3": {
+          "baseline": 1.6333,
+          "candidate": 3.0923875,
+          "reduction_pct": -89.33371089205903,
+          "pairs": [
+            {
+              "reduction_pct": -91.79053019928244,
+              "drift_pct": 4.144615188420575
+            },
+            {
+              "reduction_pct": -86.42443395658385,
+              "drift_pct": 4.674585195616232
+            }
+          ]
+        },
+        "commit-T4-keep4": {
+          "baseline": 1.758325,
+          "candidate": 3.27905,
+          "reduction_pct": -86.48713974947748,
+          "pairs": [
+            {
+              "reduction_pct": -81.35434530137542,
+              "drift_pct": -4.042512551844579
+            },
+            {
+              "reduction_pct": -88.00776020409012,
+              "drift_pct": -0.17914776847283154
+            }
+          ]
+        }
+      },
+      "record_sha256": "0b90c59ce72c579339f26073ea64b7d403bcc659004b33726b2851c0c4cab6f6"
+    },
+    "esimd_8_columns_256_grf": {
+      "adopted": true,
+      "method": "Four-token state-only ESIMD commit, no SLM or work-group barriers. Five fresh A/B/A/B/A processes; 36 independent layer states; nine retained batches of four sequences; ms per 36 layers.",
+      "window_cases_passed": 156,
+      "cpu_selftests_passed": 1,
+      "fixture_fingerprints_checked": 95,
+      "timing_unit": "milliseconds",
+      "t4_commit_observations": {
+        "commit-T4-keep1": {
+          "baseline": 1.401,
+          "candidate": 1.0322,
+          "reduction_pct": 26.324054246966455,
+          "pairs": [
+            {
+              "reduction_pct": 26.738560458067575,
+              "drift_pct": -5.174455988358318
+            },
+            {
+              "reduction_pct": 27.539707538246027,
+              "drift_pct": -0.942184154175596
+            }
+          ]
+        },
+        "commit-T4-keep2": {
+          "baseline": 1.474925,
+          "candidate": 1.1049625,
+          "reduction_pct": 25.083478820956994,
+          "pairs": [
+            {
+              "reduction_pct": 26.101954302647833,
+              "drift_pct": -4.31574167180252
+            },
+            {
+              "reduction_pct": 25.447327410416886,
+              "drift_pct": -0.7119006051155119
+            }
+          ]
+        },
+        "commit-T4-keep3": {
+          "baseline": 1.65445,
+          "candidate": 1.2449,
+          "reduction_pct": 24.754450119375026,
+          "pairs": [
+            {
+              "reduction_pct": 20.243682540490514,
+              "drift_pct": 3.380510513325219
+            },
+            {
+              "reduction_pct": 29.42172862745491,
+              "drift_pct": 4.212880413430442
+            }
+          ]
+        },
+        "commit-T4-keep4": {
+          "baseline": 1.643625,
+          "candidate": 1.3247375,
+          "reduction_pct": 19.401475397368618,
+          "pairs": [
+            {
+              "reduction_pct": 19.60239999104464,
+              "drift_pct": 0.862187993802066
+            },
+            {
+              "reduction_pct": 21.503327101506496,
+              "drift_pct": 6.858316221765937
+            }
+          ]
+        }
+      },
+      "record_sha256": "3a2d84d9dca41c3d94189c1269572ad3f18f60b95f089bb670aeebe592260adb"
+    }
+  },
+  "gdn_exp_retest": {
+    "adopted": false,
+    "method": "Five fresh A/B/A/B/A processes; 36 independent layer states; 16 warmup sequences and nine retained batches of four sequences; report ms per 36 layers.",
+    "window_cases_per_arm": 156,
+    "cpu_selftests_per_arm": 1,
+    "fixture_fingerprints_checked": 95,
+    "timing_unit": "milliseconds",
+    "t4_commit_observations": {
+      "commit-T4-keep1": {
+        "baseline": 1.423725,
+        "candidate": 1.4112,
+        "reduction_pct": 0.8797344992888312,
+        "pairs": [
+          {
+            "reduction_pct": -0.5539601206841382,
+            "drift_pct": -2.864398873589824
+          },
+          {
+            "reduction_pct": 1.8623776739513986,
+            "drift_pct": 1.2876834148510374
+          }
+        ]
+      },
+      "commit-T4-keep2": {
+        "baseline": 1.506825,
+        "candidate": 1.4876,
+        "reduction_pct": 1.275861496855979,
+        "pairs": [
+          {
+            "reduction_pct": 3.4991340879571564,
+            "drift_pct": -1.5934954040065952
+          },
+          {
+            "reduction_pct": -1.2758632180782215,
+            "drift_pct": -2.1734441623944445
+          }
+        ]
+      },
+      "commit-T4-keep3": {
+        "baseline": 1.5625,
+        "candidate": 1.5251875,
+        "reduction_pct": 2.3880000000000012,
+        "pairs": [
+          {
+            "reduction_pct": 1.5675459263526204,
+            "drift_pct": -4.601299375481771
+          },
+          {
+            "reduction_pct": 1.0817935938772005,
+            "drift_pct": 3.060484136930275
+          }
+        ]
+      },
+      "commit-T4-keep4": {
+        "baseline": 1.5944,
+        "candidate": 1.6119750000000002,
+        "reduction_pct": -1.1022955343703122,
+        "pairs": [
+          {
+            "reduction_pct": -0.003879975811327263,
+            "drift_pct": -1.3502557066234266
+          },
+          {
+            "reduction_pct": -2.7258120063149427,
+            "drift_pct": 0.7997471155365865
+          }
+        ]
+      }
+    },
+    "record_sha256": "28c3d072101e0aec8b316841c7ac6c9ff2cae70d09af7faed4bfc899f6e271a8"
+  },
+  "gdn_esimd_t4_initial_confirmation": {
+    "adopted": true,
+    "method": "Fresh A/B/A/B/A processes against the guarded final source. Both arms rebuilt against one benchmark object. 36 independent layer states, 64 warmup sequences, 31 retained batches of 32 sequences per shape. Report the median of process medians in ms per 36-layer sequence; each timed batch waits once after 32 sequences.",
+    "routing": "ACM G10 only, four-token window, non-null device accepted-count pointer, state-only output. Other devices, verification, output-producing calls and window sizes retain the previous path.",
+    "window_cases_per_arm": 156,
+    "window_inputs": "Per-head/per-token gate values from 0 to -10, beta from 0 to 1.",
+    "cpu_selftests_per_arm": 1,
+    "fixture_fingerprints_checked": 95,
+    "timing_unit": "milliseconds",
+    "observations": {
+      "commit-T4-keep1": {
+        "baseline": 1.4012,
+        "candidate": 1.038616,
+        "reduction_pct": 25.876677133885238,
+        "pairs": [
+          {
+            "reduction_pct": 26.4685813549562,
+            "drift_pct": 1.190111247038339
+          },
+          {
+            "reduction_pct": 25.761953745349018,
+            "drift_pct": -0.8202221423171729
+          }
+        ]
+      },
+      "commit-T4-keep2": {
+        "baseline": 1.480037,
+        "candidate": 1.12705,
+        "reduction_pct": 23.84987672605482,
+        "pairs": [
+          {
+            "reduction_pct": 23.848574180046743,
+            "drift_pct": -0.33336213740622345
+          },
+          {
+            "reduction_pct": 23.6920613260615,
+            "drift_pct": 0.2508240005310469
+          }
+        ]
+      },
+      "commit-T4-keep3": {
+        "baseline": 1.55265,
+        "candidate": 1.2342345,
+        "reduction_pct": 20.507873635397555,
+        "pairs": [
+          {
+            "reduction_pct": 20.890853511857944,
+            "drift_pct": 0.07065339902745382
+          },
+          {
+            "reduction_pct": 20.181027904412353,
+            "drift_pct": -0.07060351524410535
+          }
+        ]
+      },
+      "commit-T4-keep4": {
+        "baseline": 1.612206,
+        "candidate": 1.3358155,
+        "reduction_pct": 17.143621844851086,
+        "pairs": [
+          {
+            "reduction_pct": 17.205622354112926,
+            "drift_pct": -0.453203578157213
+          },
+          {
+            "reduction_pct": 17.136976214822262,
+            "drift_pct": 0.10692437801307353
+          }
+        ]
+      }
+    },
+    "max_neighboring_baseline_drift_pct": 1.190111247038339,
+    "source_sha256": "7963b80c3be21b45202989a41ac78dc2e8963ca0e14992c5f9c23aed3d842da2",
+    "test_source_sha256": "23882753708dbf6ca88bbaef76df56bf66d0f21476c3c5eb0df808a3baaf7111",
+    "record_sha256": "206a87e0acdcec074ffdb9cbcf5cc39cf227ae7bce3562f5d544638c966f7446"
+  },
+  "gdn_esimd_confirmation": {
+    "adopted": true,
+    "method": "Fresh A/B/A/B/A processes against the final guarded T4/T6 source. Both arms rebuilt against one benchmark object. 36 independent layer states, 64 warmup sequences, 31 retained batches of 32 sequences per shape. Report the median of process medians in ms per 36-layer sequence; each timed batch waits once after 32 sequences.",
+    "routing": "ACM G10 only, four/six-token window, non-null device accepted-count pointer, state-only output. Other devices, verification, output-producing calls and window sizes retain the previous path.",
+    "runtime_configuration": "CLI --spec 4 with default suffix drafting reserves six-token verify/commit capacity; MTP window stays four.",
+    "state_shape": {
+      "state_dimension": 128,
+      "key_heads": 16,
+      "value_heads": 48,
+      "dtype": "FP32"
+    },
+    "input_seed": 712,
+    "benchmark_source_sha256": "6216b05325528c88c04470f4926bcab9eee43c38365720eb2a30e9e460510d9c",
+    "baseline_source_sha256": "31a58b615a144a8083aa85e53bdf4acd1715db6dd0440c58b6f0182ac40857d8",
+    "window_cases_per_arm": 156,
+    "window_inputs": "Per-head/per-token gate values from 0 to -10, beta from 0 to 1.",
+    "cpu_selftests_per_arm": 1,
+    "fixture_fingerprints_checked": 115,
+    "timing_unit": "milliseconds",
+    "observations": {
+      "commit-T4-keep1": {
+        "baseline": 1.3835,
+        "candidate": 1.008783,
+        "reduction_pct": 27.084712685218648,
+        "pairs": [
+          {
+            "reduction_pct": 27.14995464436355,
+            "drift_pct": -1.7952854058093881
+          },
+          {
+            "reduction_pct": 27.17435219892055,
+            "drift_pct": 0.4640881731220903
+          }
+        ]
+      },
+      "commit-T4-keep2": {
+        "baseline": 1.454031,
+        "candidate": 1.1139640000000002,
+        "reduction_pct": 23.38787825018861,
+        "pairs": [
+          {
+            "reduction_pct": 23.91681993414401,
+            "drift_pct": -1.6414834096260655
+          },
+          {
+            "reduction_pct": 23.2160848823724,
+            "drift_pct": -0.7152529760369619
+          }
+        ]
+      },
+      "commit-T4-keep3": {
+        "baseline": 1.530381,
+        "candidate": 1.2210610000000002,
+        "reduction_pct": 20.211960289627207,
+        "pairs": [
+          {
+            "reduction_pct": 20.173557222953377,
+            "drift_pct": 0.45191360844130113
+          },
+          {
+            "reduction_pct": 20.31540501967689,
+            "drift_pct": -1.1838961501908885
+          }
+        ]
+      },
+      "commit-T4-keep4": {
+        "baseline": 1.581191,
+        "candidate": 1.321242,
+        "reduction_pct": 16.44007586686238,
+        "pairs": [
+          {
+            "reduction_pct": 16.93991412844944,
+            "drift_pct": -2.258222208471272
+          },
+          {
+            "reduction_pct": 16.764348681313557,
+            "drift_pct": 0.10351010030666963
+          }
+        ]
+      },
+      "commit-T6-keep1": {
+        "baseline": 1.402716,
+        "candidate": 1.007806,
+        "reduction_pct": 28.153239857533528,
+        "pairs": [
+          {
+            "reduction_pct": 28.099763077852526,
+            "drift_pct": 0.09547745147990838
+          },
+          {
+            "reduction_pct": 28.656798022805074,
+            "drift_pct": 1.3624996079035334
+          }
+        ]
+      },
+      "commit-T6-keep2": {
+        "baseline": 1.496791,
+        "candidate": 1.1031705,
+        "reduction_pct": 26.29762605467296,
+        "pairs": [
+          {
+            "reduction_pct": 26.19848460448391,
+            "drift_pct": -0.5382494651858916
+          },
+          {
+            "reduction_pct": 26.170633842697278,
+            "drift_pct": 0.3850306830756933
+          }
+        ]
+      },
+      "commit-T6-keep3": {
+        "baseline": 1.595034,
+        "candidate": 1.2038030000000002,
+        "reduction_pct": 24.528066486357027,
+        "pairs": [
+          {
+            "reduction_pct": 24.55063131401387,
+            "drift_pct": -0.40293801947814956
+          },
+          {
+            "reduction_pct": 24.654875565671595,
+            "drift_pct": -0.008212991071043785
+          }
+        ]
+      },
+      "commit-T6-keep4": {
+        "baseline": 1.720506,
+        "candidate": 1.3117375,
+        "reduction_pct": 23.758621010330682,
+        "pairs": [
+          {
+            "reduction_pct": 23.691897976148447,
+            "drift_pct": 0.10171426312957088
+          },
+          {
+            "reduction_pct": 23.394677378995464,
+            "drift_pct": -1.4225527447719766
+          }
+        ]
+      },
+      "commit-T6-keep5": {
+        "baseline": 1.798503,
+        "candidate": 1.4014515,
+        "reduction_pct": 22.076777186359987,
+        "pairs": [
+          {
+            "reduction_pct": 22.510286335750685,
+            "drift_pct": 0.8225729954300931
+          },
+          {
+            "reduction_pct": 22.205881883725652,
+            "drift_pct": -1.0055716189901531
+          }
+        ]
+      },
+      "commit-T6-keep6": {
+        "baseline": 1.915403,
+        "candidate": 1.5196375,
+        "reduction_pct": 20.662257498813563,
+        "pairs": [
+          {
+            "reduction_pct": 20.68210245950276,
+            "drift_pct": -1.8425150221346054
+          },
+          {
+            "reduction_pct": 20.18101145261726,
+            "drift_pct": 1.0115376786051344
+          }
+        ]
+      }
+    },
+    "max_neighboring_baseline_drift_pct": 2.258222208471272,
+    "source_sha256": "0ef5800a8caa2d24c1aa38a395c8a1d62031c35324679d8107f19ccc294c5b8f",
+    "test_source_sha256": "23882753708dbf6ca88bbaef76df56bf66d0f21476c3c5eb0df808a3baaf7111",
+    "record_sha256": "09ec93630e35c991aad82a9d044b13006b625f3fb3f9cc0405cb44161e5a3143"
+  },
+  "matrix_shapes": {
+    "adopted": false,
+    "method": "Frozen synthetic hot-expert FP16 XMX vs dequant+oneMKL; not a dp4a or whole-model comparison.",
+    "checks_passed": 18,
+    "timing_unit": "milliseconds",
+    "observations": [
+      {
+        "ty": 29,
+        "M": 1,
+        "mode": "gu",
+        "variant": 3,
+        "dequant_mkl_ms": 0.212915,
+        "xmx_ms": 0.16369,
+        "time_reduction_pct": 23.1195547518963
+      },
+      {
+        "ty": 29,
+        "M": 2,
+        "mode": "gu",
+        "variant": 3,
+        "dequant_mkl_ms": 0.211889,
+        "xmx_ms": 0.171223,
+        "time_reduction_pct": 19.1921241782254
+      },
+      {
+        "ty": 29,
+        "M": 4,
+        "mode": "gu",
+        "variant": 3,
+        "dequant_mkl_ms": 0.211321,
+        "xmx_ms": 0.173648,
+        "time_reduction_pct": 17.827381093218374
+      },
+      {
+        "ty": 29,
+        "M": 6,
+        "mode": "gu",
+        "variant": 3,
+        "dequant_mkl_ms": 0.234317,
+        "xmx_ms": 0.188587,
+        "time_reduction_pct": 19.51629629945757
+      },
+      {
+        "ty": 22,
+        "M": 40,
+        "mode": "gu",
+        "variant": 2,
+        "dequant_mkl_ms": 0.090794,
+        "xmx_ms": 1.050904,
+        "time_reduction_pct": -1057.4597440359496
+      },
+      {
+        "ty": 42,
+        "M": 40,
+        "mode": "down",
+        "variant": 2,
+        "dequant_mkl_ms": 0.058252,
+        "xmx_ms": 0.396731,
+        "time_reduction_pct": -581.059877772437
+      }
+    ],
+    "record_sha256": "23257b56c57bd72a3893236a994ebbf86c72dc9e14ad37973c50b3412089acde",
+    "limitations": "FP16 synthetic hot single-expert comparison with oneMKL. Production decode uses Q8 activation/MMVQ. This does not establish an automatic dispatch threshold or model-output equivalence."
+  },
+  "source_sha256": {
+    "sycl/src/kernels/cuda/qsa_decode_attn.dp.cpp": "0b9d3d689f8599e7f549755a93ff30f0c10aa1026485b17cd5f6e41496a2d48d",
+    "sycl/src/kernels/cuda/verify_kernels.dp.cpp": "0ef5800a8caa2d24c1aa38a395c8a1d62031c35324679d8107f19ccc294c5b8f",
+    "sycl/src/kernels/gdn_parity.cpp": "23882753708dbf6ca88bbaef76df56bf66d0f21476c3c5eb0df808a3baaf7111"
+  },
+  "integrated_model_validation": {
+    "requests": 4,
+    "all_historical_outputs_match": true,
+    "scope": "Cold correctness requests only; not a steady-state speed comparison.",
+    "actual_expert_cache_slots": 5771,
+    "runtime_verify_capacity": 6,
+    "runtime_mtp_window": 4,
+    "exe_sha256": "943e4563faf716142218c0e78ce3c697e86d935b6468f8dd8abbfd312a234a2e",
+    "cases": [
+      {
+        "case": "short",
+        "prompt_tokens": 28,
+        "output_tokens": 76,
+        "output_sha256": "0dd1743aea5b0dbc64c2a6d1251ea33bf97a499f12cab40881669f15bf026db0"
+      },
+      {
+        "case": "code",
+        "prompt_tokens": 2048,
+        "output_tokens": 128,
+        "output_sha256": "aae0316f98660f7857721e9f0a255ed4197ab1facbe3bc88b6a9211b3c02869a"
+      },
+      {
+        "case": "prose",
+        "prompt_tokens": 2048,
+        "output_tokens": 128,
+        "output_sha256": "ce0d2952add07034badf5ff774b30cfc94a5b32116e254c7e823fc0b54fb6290"
+      },
+      {
+        "case": "long",
+        "prompt_tokens": 8000,
+        "output_tokens": 128,
+        "output_sha256": "40fe04e391c3d6147d5d39c53cc10dae41934d73818f5f01df356f1c0f100c12"
+      }
+    ],
+    "production_exe_unchanged": true,
+    "production_config_unchanged": true,
+    "record_sha256": "493d2aebb1cf9d80dc27396b65028418e7110179c08390d6659d989e5b020d80",
+    "source_manifest_sha256": "a3b1fec8f71e56884e6406b7a84dd93665c509c28dccc9c4fe33d87de3e10146",
+    "engine_link": "Measured kernel object replaces the matching object in the frozen full-source build; Level Zero SDK 1.33.1 import library.",
+    "link_inputs_record_sha256": "85c9f83b7c222d74dca612ef62f386bb25df5761af1443d124bad7c332fcff05"
+  }
+}

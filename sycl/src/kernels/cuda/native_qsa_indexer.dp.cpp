@@ -426,6 +426,51 @@ void native_qsa_indexer_append(const float* raw, const int32_t* relative_pos_dev
     if (error !=
         0) throw std::runtime_error(dpct::get_error_string_dummy(error));
 }
+
+void native_qsa_indexer_append_steps(const float* raw, const int32_t* positions,
+                                     int pos_stride, int n_steps, int32_t pos_base,
+                                     const float* gamma, float epsilon, const QsaIndexerBuffers& b,
+                                     const QsaShapes& s, int64_t max_cells, const RopeScaling& scaling, void* stream) {
+    if (n_steps <= 0) return;
+    if (pos_stride < 0) throw std::invalid_argument("native QSA indexer requires nonnegative position stride");
+    if (n_steps == 1) {
+        native_qsa_indexer_append(raw, positions, pos_base, gamma, epsilon, b, s, max_cells, scaling, stream);
+        return;
+    }
+    if (!stream || s.idx_dim != D || s.idx_block != R || s.n_rot != ROT ||
+        max_cells < 1 || max_cells > INT32_MAX || pos_base < 0 || pos_base % R ||
+        int64_t(pos_base) + max_cells > INT32_MAX || !std::isfinite(epsilon) || epsilon <= 0.0f ||
+        rope_scaling_invalid(scaling) != nullptr)
+        throw std::invalid_argument("native QSA indexer steps: invalid geometry, capacity, scaling or stream");
+    const Span spans[] = {{raw,std::size_t(n_steps)*D*4},
+        {positions,(std::size_t(n_steps-1)*pos_stride+1)*4}, {gamma,D*4}, {b.tail,(R-1)*D*4},
+        {b.dead,D*4}, {b.pooled,std::size_t(max_cells/R+1)*D*4}, {b.block_pos,4}};
+    for (const auto& span : spans) validate(span);
+    for (int i = 0; i < 7; ++i) for (int j = i + 1; j < 7; ++j)
+        if (overlaps(spans[i], spans[j])) throw std::invalid_argument("native QSA indexer buffers overlap");
+    const float theta_scale = powf((float) scaling.freq_base, -2.0f / ROT);
+    const RopeKernelArgs k = scaling.kernel_args(ROT);
+    const RopeTab rt = rope_table_for(scaling);
+    const int32_t* mtab = mrope_table();
+    auto launch = [&]<bool TAB>() {
+        strata::q_of(stream)->parallel_for<dpct_kernel_name<class append_steps_kernel, dpct_kernel_scalar<TAB>>>(
+            sycl::nd_range<3>(sycl::range(1, 1, THREADS), sycl::range(1, 1, THREADS)),
+            sycl::ext::oneapi::experimental::properties{sycl::ext::oneapi::experimental::use_root_sync},
+            [=](sycl::nd_item<3> item) [[sycl::reqd_sub_group_size(32)]] {
+                // ponytail: reuse the single-token arithmetic; windows are small, so no second pooling algorithm.
+                for (int t = 0; t < n_steps; ++t) {
+                    append<TAB>(raw + std::size_t(t)*D, positions + std::size_t(t)*pos_stride,
+                                pos_base, gamma, epsilon, b.tail, b.dead, b.pooled, b.block_pos,
+                                int(max_cells), theta_scale, k.freq_scale, k.corr_low, k.corr_high,
+                                k.ext_factor, k.attn_factor, mtab, rt);
+                    item.barrier(); // every lane rejoins, including skipped device positions
+                }
+            });
+    };
+    if (rt.cos != nullptr) launch.template operator()<true>();
+    else launch.template operator()<false>();
+}
+
 void native_qsa_indexer_append_batch(const float* raw, int64_t n, int64_t p0, int32_t pos_base, const float* gamma,
                                      float epsilon, const QsaIndexerBuffers& b, const QsaShapes& s, int64_t max_cells,
                                      const RopeScaling& scaling, void* stream) {

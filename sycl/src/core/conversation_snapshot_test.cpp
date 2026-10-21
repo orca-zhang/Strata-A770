@@ -4,6 +4,7 @@
 #include "strata/core/conversation_snapshot.hpp"
 #include "strata/kernels/kv_q4.hpp"
 
+#include <algorithm>
 #include <array>
 #include <cstdio>
 #include <cstdlib>
@@ -122,7 +123,8 @@ struct Fixture {
     ~Fixture() {
         for (void *p : device)
             DPCT_CHECK_ERROR(sycl::free(p, dpct::get_in_order_queue()));
-        for (void *p : host) DPCT_CHECK_ERROR(free(p));
+        for (void *p : host)
+            DPCT_CHECK_ERROR(sycl::free(p, dpct::get_in_order_queue()));
     }
 };
 bool equal(const ConversationKv& a,const ConversationKv& b) {
@@ -172,6 +174,11 @@ void full_session(int fmt, int mode, int experts) {
     ConversationCheckpoint checkpoint;
     checkpoint.ids.assign(ids.begin(),ids.begin()+3);
     check(conversation_checkpoint_save(checkpoint,ss,g,err),"save complete running checkpoint");
+    // Inspect before any later GPU synchronization can hide an unfinished save.
+    for (const auto* bytes : {&checkpoint.gdn, &checkpoint.ple, &checkpoint.tails,
+                              &checkpoint.dead, &checkpoint.block_pos})
+        check(std::all_of(bytes->begin(),bytes->end(),[](uint8_t b){return b==13;}),
+              "checkpoint save returns complete host payload");
     checkpoint.used = 17;
     checkpoints.push_back(std::move(checkpoint));
     const ConversationView view{ids,images,checkpoints,true};
@@ -228,7 +235,7 @@ void full_session(int fmt, int mode, int experts) {
     check(conversation_checkpoint_restore(a.checkpoints[0],ss,g,err),"restore early running checkpoint");
     std::vector<uint8_t> spare(sizes.dead);
     cuda_check(DPCT_CHECK_ERROR(
-        dpct::get_in_order_queue()
+        dpct::get_out_of_order_queue()
             .memcpy(spare.data(), main.state.idx_pooled, sizes.dead)
             .wait()));
     check(spare==a.checkpoints[0].dead,"checkpoint rebuilds spare row over a later completed block");

@@ -310,6 +310,12 @@ if(STRATA_SYCL_PARITY)
     target_link_libraries(${p}_parity PRIVATE strata_kernels)
     add_test(NAME ${p}_parity COMMAND ${p}_parity --selftest)
   endforeach()
+  add_test(NAME qsa_indexer_commit COMMAND qsa_parity --indexer-commit-check)
+  set_tests_properties(qsa_indexer_commit PROPERTIES ENVIRONMENT "STRATA_ROPE_TABLE=1")
+  target_link_libraries(gdn_parity PRIVATE strata_prefill)
+  add_test(NAME prefill_gdn_parity COMMAND gdn_parity --selftest --prefill-only)
+  add_test(NAME gdn_commit_layers COMMAND gdn_parity --commit-layers-check)
+  set_tests_properties(gdn_commit_layers PROPERTIES SKIP_RETURN_CODE 77)
   add_test(NAME native_router_parity COMMAND router_top10_parity --selftest --native)
   # 0.1.31: the IQ kernels that decode a weight part once for every column/entry, bitwise vs the per-column ones
   # (no --selftest flag: it runs its checks by default), and the rewritten per-hit/grouped expert kernels vs the
@@ -354,6 +360,7 @@ if(STRATA_SYCL_PARITY)
   target_link_libraries(kv_hybrid_parity PRIVATE strata_kernels)
   add_executable(mmvq_bench ${CMAKE_CURRENT_SOURCE_DIR}/src/kernels/mmvq_bench.cpp)   # dense mmvq timing
   target_link_libraries(mmvq_bench PRIVATE strata_kernels)
+  add_test(NAME q6_grf_parity COMMAND mmvq_bench 2560 2571 6 --check-grf)
   add_executable(ternary64_bench ${CMAKE_CURRENT_SOURCE_DIR}/src/kernels/ternary64_bench.cpp)
   target_link_libraries(ternary64_bench PRIVATE strata_kernels)
   add_executable(mmvq_sg_bench ${CMAKE_CURRENT_SOURCE_DIR}/src/kernels/mmvq_sg_bench.cpp)   # SIMD16 vs 32 decode mmvq

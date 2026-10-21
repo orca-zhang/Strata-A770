@@ -64,6 +64,7 @@ void gdn_recurrence(float* state, const float* h, const float* gate, const float
 /// The kernels behind gdn_recurrence, for the parity test: 0 = the column-split kernels + the norm kernel (or the
 /// one-block-per-head kernel under STRATA_GDN_REC_HEADS), 1 = four lanes per column (no barrier per token) + the grid-stride norm, 2 = the
 /// one-block-per-head kernel (its fused norm rounds differently).  0 and 1 give the same bits.
+/// SYCL: 6 = Xe sub-group recurrence + the same norm; STRATA_GDN_XE=0 disables the ACM G10 default.
 void gdn_recurrence_variant(int variant, float* state, const float* h, const float* gate, const float* beta,
                             const float* z, const float* gamma, float eps, float* y, uint16_t* y16, int64_t T,
                             void* stream, int64_t ld16 = 0);

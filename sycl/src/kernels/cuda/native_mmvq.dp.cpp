@@ -25,6 +25,7 @@
 
 #define DPCT_PROFILING_ENABLED
 #include <sycl/sycl.hpp>
+#include <sycl/ext/intel/experimental/grf_size_properties.hpp>
 #include <dpct/dpct.hpp>
 #include "strata/sycl_math.hpp"
 #include "strata/sycl_queue.hpp"
@@ -1610,6 +1611,23 @@ void launch_q6k_wide(const void* weights, const void* x_q8_1, float* y, int n_in
     }
     if (rpw == 1 && q6k_a2()) {
         const unsigned blocks = unsigned((std::size_t(n_out) + WARPS - 1) / WARPS);
+        if constexpr (NCOLS > 1) {
+            const char* v = std::getenv("STRATA_MMVQ_LARGE_GRF");
+            // ponytail: ACM G10 only; 10240x2560 at four columns was 3.9% slower. Remeasure before widening.
+            const bool large = v ? std::atoi(v) != 0 :
+                (NCOLS != 4 || n_in != 10240 || n_out != 2560) && s->get_device().get_info<
+                sycl::ext::oneapi::experimental::info::device::architecture>() ==
+                sycl::ext::oneapi::experimental::architecture::intel_gpu_acm_g10;
+            if (large) {
+                s->parallel_for<dpct_kernel_name<class native_mmvq_q6k_wide_a2_grf256, dpct_kernel_scalar<NCOLS>>>(
+                    sycl::nd_range<3>(sycl::range(1, 1, blocks) * sycl::range(1, WARPS, WARP), sycl::range(1, WARPS, WARP)),
+                    sycl::ext::oneapi::experimental::properties{sycl::ext::intel::experimental::grf_size<256>},
+                    [=](sycl::nd_item<3>) [[sycl::reqd_sub_group_size(32)]] {
+                        native_mmvq_q6k_wide_kernel<NCOLS, 1, WARP, (int) sizeof(Q6KBlock), true>(w, x, y, n_in, n_out);
+                    });
+                return;
+            }
+        }
         s->parallel_for<dpct_kernel_name<class native_mmvq_q6k_wide_a2, dpct_kernel_scalar<NCOLS>>>(
             sycl::nd_range<3>(sycl::range(1, 1, blocks) * sycl::range(1, WARPS, WARP), sycl::range(1, WARPS, WARP)),
             [=](sycl::nd_item<3>) [[sycl::reqd_sub_group_size(32)]] {

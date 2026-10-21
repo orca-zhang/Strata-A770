@@ -105,7 +105,6 @@ const bool g_doorbell_store = env_on("STRATA_DOORBELL_STORE");
 const bool g_trace = env_on("STRATA_VERIFY_TRACE");
 const bool g_gdn_q8_tail = env_on("STRATA_GDN_Q8_TAIL");
 const bool g_qsa_q8_tail = env_on("STRATA_QSA_Q8_TAIL");
-const bool g_gdn_split = env_on("STRATA_GDN_SPLIT");
 const bool g_verify_no_host = env_on("STRATA_VERIFY_NO_HOST");
 const bool g_verify_host_mix = env_on("STRATA_VERIFY_HOST_MIX");
 const bool g_verify_cpu_q2 = env_on("STRATA_VERIFY_CPU_Q2");
@@ -1801,21 +1800,35 @@ bool Verifier::record_commit(std::string &err) {
         copy_i32_from_mapped(commit_, m_commit_, 2 + MT, cs_);
         int64_t qsa_index = 0, gdn_index = 0;
         for (int64_t l = 0; l < lb_; ++l) (is_qsa_layer(g, l) ? qsa_index : gdn_index) += 1;
+        int gdn_layers = 0;
+        for (int64_t l = lb_; l < le_; ++l) gdn_layers += !is_qsa_layer(g, l);
+        // GDN and QSA commit disjoint state; inputs remain live until this queue completes.
+        const bool gdn_batched = gdn_layers > 1 && g.ssm_state_size == 128 && g.ssm_d_conv == 4 &&
+            gdn_commit_layers_esimd(ss.gdn_state + (size_t) (gdn_index - ss.gdn_ord0) * gdn_floats,
+                qkv_L_ + (size_t) gdn_index * MT * C, h_L_ + (size_t) gdn_index * MT * C, (int) C,
+                gate_L_ + (size_t) gdn_index * MT * HV, beta_L_ + (size_t) gdn_index * MT * HV,
+                (int) g.ssm_k_heads, (int) HV, (int) MT, gdn_layers, commit_, cs_);
         for (int64_t l = lb_; l < le_ && ok; ++l) {
             const LayerView v(*wt_, l);
             const LayerWeights* cached = descriptor_cache_ ? &layer_weights_[(size_t) l] : nullptr;
             if (!is_qsa_layer(g, l)) {
+                if (gdn_batched) { ++gdn_index; continue; }
                 const WeightRef* wnm = cached ? cached->gdn_norm : need(v, "ssm_norm.weight", err);
                 if (!wnm) { ok = false; break; }
                 if (cached) gdn_index = cached->state_index;
                 float* state = ss.gdn_state + (size_t) (gdn_index - ss.gdn_ord0) * gdn_floats;
                 float* conv = state + (uint64_t) g.ssm_state_size * g.ssm_v_heads * g.ssm_state_size;
                 const float* qkv = qkv_L_ + (size_t) gdn_index * MT * C;
-                gdn_conv_commit(conv, qkv, (int) C, commit_, cs_);
-                gdn_step_norm_multi(state, h_L_ + (size_t) gdn_index * MT * C, (int) C, gate_L_ + (size_t) gdn_index * MT * HV,
-                                    beta_L_ + (size_t) gdn_index * MT * HV, z_, (const float*) wnm->data, EPS, y_dummy_,
-                                    (int) g.ssm_k_heads, (int) HV, (int) MT, commit_, cs_,
-                                    g_gdn_split ? (int) MT : 0);   // split commit replays state only; y_dummy_ is never read
+                if (!gdn_commit_esimd(state, conv, qkv, h_L_ + (size_t) gdn_index * MT * C, (int) C,
+                                      gate_L_ + (size_t) gdn_index * MT * HV,
+                                      beta_L_ + (size_t) gdn_index * MT * HV,
+                                      (int) g.ssm_k_heads, (int) HV, (int) MT, commit_, cs_)) {
+                    gdn_conv_commit(conv, qkv, (int) C, commit_, cs_);
+                    gdn_step_norm_multi(state, h_L_ + (size_t) gdn_index * MT * C, (int) C, gate_L_ + (size_t) gdn_index * MT * HV,
+                                        beta_L_ + (size_t) gdn_index * MT * HV, z_, (const float*) wnm->data, EPS, y_dummy_,
+                                        (int) g.ssm_k_heads, (int) HV, (int) MT, commit_, cs_,
+                                        (int) MT);   // ponytail: commit needs only state; y_dummy_ is never read
+                }
                 ++gdn_index;
             } else {
                 if (cached) qsa_index = cached->state_index;
@@ -1824,10 +1837,9 @@ bool Verifier::record_commit(std::string &err) {
                 if (!wikn) { ok = false; break; }
                 copy_from_mapped(st.idx_tail, tail_snap_ + (size_t) qsa_index * TS, TS, cs_);
                 const QsaIndexerBuffers ib{st.idx_tail, st.idx_dead, st.idx_pooled, st.idx_block_pos};
-                for (int64_t t = 0; t < MT; ++t)
-                    native_qsa_indexer_append(idx_raw_L_ + (size_t) (qsa_index * MT + t) * ID, commit_ + 2 + t, 0,
-                                              (const float*) wikn->data, EPS, ib, s, st.max_cells,
-                                              rope_scaling(), cs_);
+                native_qsa_indexer_append_steps(idx_raw_L_ + (size_t) qsa_index * MT * ID, commit_ + 2, 1, (int) MT, 0,
+                                                (const float*) wikn->data, EPS, ib, s, st.max_cells,
+                                                rope_scaling(), cs_);
                 ++qsa_index;
             }
         }

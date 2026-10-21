@@ -39,11 +39,16 @@ bool sync(std::string& error) {
 
 bool copy(void* dst, const void* src, size_t bytes, std::string& error) {
     if (!bytes) return true;
-    if (!dst || !src) return fail(error, "missing running-state buffer");
+    if (!dst || !src) {
+        sync(error); // Drain earlier copies before the caller can release their host buffers.
+        return fail(error, "missing running-state buffer");
+    }
     try {
-        dpct::get_in_order_queue().memcpy(dst, src, bytes).wait();
+        // ponytail: one in-order queue; the checkpoint waits once after submitting all its copies.
+        dpct::get_in_order_queue().memcpy(dst, src, bytes);
         return true;
     } catch (sycl::exception const& e) {
+        sync(error); // A failed submission must not leave copies using the caller's host buffers.
         error = std::string("conversation snapshot running-state copy: ") + e.what();
         return false;
     }
@@ -177,7 +182,7 @@ bool conversation_checkpoint_save(ConversationCheckpoint& c, const SessionState&
             !copy(c.dead.data() + j * z.dead, st.idx_dead, z.dead, error) ||
             !copy(c.block_pos.data() + j * z.block_pos, st.idx_block_pos, z.block_pos, error)) return false;
     }
-    return true;
+    return sync(error);
 }
 
 bool conversation_checkpoint_restore(const ConversationCheckpoint& c, SessionState& ss,

@@ -19,7 +19,8 @@ constexpr int HD = 256;          // head_dim
 constexpr int G = 12;            // query heads per KV head (24 / 2)
 constexpr int CHUNK = 64;        // cells per block
 constexpr int THREADS = 256;
-constexpr int WARPS = THREADS / 32;
+constexpr int SG = 16;
+constexpr int WARPS = THREADS / SG;
 
 __dpct_inline__ float warp_sum(float v) {
 #pragma unroll
@@ -28,7 +29,7 @@ __dpct_inline__ float warp_sum(float v) {
     masked sub_group function which may not be supported by all compilers or
     runtimes. You may need to adjust the code.
     */
-    for (int o = 16; o > 0; o >>= 1) v +=
+    for (int o = SG / 2; o > 0; o >>= 1) v +=
         dpct::experimental::permute_sub_group_by_xor(
             0xffffffffu, sycl::ext::oneapi::this_work_item::get_sub_group(), v,
             o);
@@ -41,7 +42,7 @@ __dpct_inline__ float warp_max(float v) {
     masked sub_group function which may not be supported by all compilers or
     runtimes. You may need to adjust the code.
     */
-    for (int o = 16; o > 0; o >>= 1) v = sycl::fmax(
+    for (int o = SG / 2; o > 0; o >>= 1) v = sycl::fmax(
         v, dpct::experimental::permute_sub_group_by_xor(
                0xffffffffu, sycl::ext::oneapi::this_work_item::get_sub_group(),
                v, o));
@@ -130,7 +131,7 @@ attn_chunk_kernel(const float *__restrict__ q, QsaAttnPools p,
     part_m += (size_t)item_ct1.get_group(0) * (size_t)scratch_stride;
     part_l += (size_t)item_ct1.get_group(0) * (size_t)scratch_stride;
     auto &sq =
-        *sycl::ext::oneapi::group_local_memory_for_overwrite<float[G][HD]>(
+        *sycl::ext::oneapi::group_local_memory_for_overwrite<float[G][8][32]>(
             sycl::ext::oneapi::this_work_item::get_work_group<
                 3>()); // 12 KB: this KV head's query heads
     auto &sp =
@@ -148,7 +149,9 @@ attn_chunk_kernel(const float *__restrict__ q, QsaAttnPools p,
     */
     const int n_ids = *(step + kStepWidth);
     const int chunk = item_ct1.get_group(2), kvh = item_ct1.get_group(1);
-    const int t = item_ct1.get_local_id(2), lane = t & 31, warp = t >> 5;
+    const int t = item_ct1.get_local_id(2), lane = t & (SG - 1), warp = t / SG;
+    // Query staging retains its 32-column layout, independent of the compute subgroup.
+    const int qlane = t & 31, qwarp = t >> 5;
     const int c0 = chunk * CHUNK;
     const int n_here = sycl::min(CHUNK, n_ids - c0);
     const int slot = kvh * n_chunks + chunk;
@@ -157,8 +160,15 @@ attn_chunk_kernel(const float *__restrict__ q, QsaAttnPools p,
         return;
     }
 #pragma unroll
-    for (int i = t; i < G * HD; i += THREADS)
-        sq[i / HD][i % HD] = q[(size_t)(kvh * G) * HD + i];
+    for (int h = qwarp; h < G; h += THREADS / 32) {
+        const float* src = q + (size_t)(kvh * G + h) * HD + qlane * 8;
+        sycl::float4 a, b;
+        a.load(0, src); b.load(1, src);
+        sq[h][0][qlane] = a.x(); sq[h][1][qlane] = a.y();
+        sq[h][2][qlane] = a.z(); sq[h][3][qlane] = a.w();
+        sq[h][4][qlane] = b.x(); sq[h][5][qlane] = b.y();
+        sq[h][6][qlane] = b.z(); sq[h][7][qlane] = b.w();
+    }
     if (t < CHUNK) {
         long long r = -1;
         if (t < n_here) {
@@ -177,23 +187,28 @@ attn_chunk_kernel(const float *__restrict__ q, QsaAttnPools p,
     performance if there is no access to global memory.
     */
     item_ct1.barrier(sycl::access::fence_space::local_space);
-    // scores: each warp takes cells warp, warp+8, ...; each lane holds 8 of the 256 dimensions.
+    // Scores: each subgroup takes cells warp, warp+16, ...; each lane holds two 8-D halves.
     for (int c = warp; c < CHUNK; c += WARPS) {
         if (c >= n_here || srow[c] < 0) {
             if (lane < G) sp[lane][c] = -FLT_MAX;
             continue;
         }
         float k8[8];
+        float k_hi[8];
         load8<KV_MODE>(p, false, srow[c], lane * 8, k8);
+        load8<KV_MODE>(p, false, srow[c], (lane + 16) * 8, k_hi);
 #pragma unroll
         for (int h = 0; h < G; ++h) {
-            const sycl::float4 qa =
-                *reinterpret_cast<const sycl::float4 *>(&sq[h][lane * 8]);
-            const sycl::float4 qb =
-                *reinterpret_cast<const sycl::float4 *>(&sq[h][lane * 8 + 4]);
-            float s = k8[0] * qa.x() + k8[1] * qa.y() + k8[2] * qa.z() +
-                      k8[3] * qa.w() + k8[4] * qb.x() + k8[5] * qb.y() +
-                      k8[6] * qb.z() + k8[7] * qb.w();
+            float lo = k8[0] * sq[h][0][lane] + k8[1] * sq[h][1][lane] +
+                      k8[2] * sq[h][2][lane] + k8[3] * sq[h][3][lane] +
+                      k8[4] * sq[h][4][lane] + k8[5] * sq[h][5][lane] +
+                      k8[6] * sq[h][6][lane] + k8[7] * sq[h][7][lane];
+            float hi = k_hi[0] * sq[h][0][lane + 16] + k_hi[1] * sq[h][1][lane + 16] +
+                      k_hi[2] * sq[h][2][lane + 16] + k_hi[3] * sq[h][3][lane + 16] +
+                      k_hi[4] * sq[h][4][lane + 16] + k_hi[5] * sq[h][5][lane + 16] +
+                      k_hi[6] * sq[h][6][lane + 16] + k_hi[7] * sq[h][7][lane + 16];
+            // Preserve the SG32 reduction tree: its first XOR-16 sum is now local.
+            float s = lo + hi;
             s = warp_sum(s);
             if (lane == 0) sp[h][c] = s * scale;
         }
@@ -204,19 +219,19 @@ attn_chunk_kernel(const float *__restrict__ q, QsaAttnPools p,
     performance if there is no access to global memory.
     */
     item_ct1.barrier(sycl::access::fence_space::local_space);
-    // per-head chunk max and exp-sum: warp w handles heads w and w+8.
+    // Per-head chunk max and exp-sum: one subgroup per head, four cells per lane.
     for (int h = warp; h < G; h += WARPS) {
-        const float a = sp[h][lane], b = sp[h][lane + 32];
-        const float m = warp_max(sycl::fmax(a, b));
-        const float ea = (lane < n_here && srow[lane] >= 0)
-                             ? sycl::native::exp(a - m)
-                             : 0.0f;
-        const float eb = (lane + 32 < n_here && srow[lane + 32] >= 0)
-                             ? sycl::native::exp(b - m)
-                             : 0.0f;
-        sp[h][lane] = ea;
-        sp[h][lane + 32] = eb;
-        const float l = warp_sum(ea + eb);
+        const float a = sp[h][lane], b = sp[h][lane + 16];
+        const float c = sp[h][lane + 32], d = sp[h][lane + 48];
+        const float m = warp_max(sycl::fmax(sycl::fmax(a, c), sycl::fmax(b, d)));
+        const float ea = (lane < n_here && srow[lane] >= 0) ? sycl::native::exp(a - m) : 0.0f;
+        const float eb = (lane + 16 < n_here && srow[lane + 16] >= 0) ? sycl::native::exp(b - m) : 0.0f;
+        const float ec = (lane + 32 < n_here && srow[lane + 32] >= 0) ? sycl::native::exp(c - m) : 0.0f;
+        const float ed = (lane + 48 < n_here && srow[lane + 48] >= 0) ? sycl::native::exp(d - m) : 0.0f;
+        sp[h][lane] = ea; sp[h][lane + 16] = eb;
+        sp[h][lane + 32] = ec; sp[h][lane + 48] = ed;
+        // Match the SG32 per-lane pair sums, then its first XOR-16 sum.
+        const float l = warp_sum((ea + ec) + (eb + ed));
         if (lane == 0) { part_m[slot * G + h] = m; part_l[slot * G + h] = l; }
     }
     /*
@@ -332,7 +347,7 @@ void launch_attn_chunk(dpct::queue_ptr st, const dpct::dim3& grid, const float* 
     st->parallel_for<dpct_kernel_name<class attn_chunk_kernel_batched,
                                       dpct_kernel_scalar<KV_MODE>, dpct_kernel_scalar<HOST_IDENTITY>>>(
         sycl::nd_range<3>(grid * sycl::range(1, 1, THREADS), sycl::range(1, 1, THREADS)),
-        exp_props, [=](sycl::nd_item<3> item_ct1) [[sycl::reqd_sub_group_size(32)]] {
+        exp_props, [=](sycl::nd_item<3> item_ct1) [[sycl::reqd_sub_group_size(16)]] {
             attn_chunk_kernel<KV_MODE, HOST_IDENTITY>(q, pools, ids, steps, n_head_kv, page_size, scale,
                                                       part_acc, part_m, part_l, n_chunks, cap, stride);
         });

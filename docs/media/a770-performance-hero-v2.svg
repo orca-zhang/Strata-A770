@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="2400" height="1200" viewBox="0 0 2400 1200" role="img" aria-labelledby="title desc">
-  <title id="title">Strata-A770: 2K code decode 3.72×, 8K decode 3.37×, 8K prefill 2.08×</title>
-  <desc id="desc">Historical stage medians compared with the 2026-10-15 deployed binary: 2K code decode 7.6 to 28.25 tok/s; 8K decode 6.8 to 22.89 tok/s; 8K prefill 239.2 to 497.85 tok/s. Prefill baseline starts at the corrected VRAM-budget stage. Intel Arc A770 16 GB, 256 GiB DDR3 system memory, PCIe 3.0. Inputs and configurations differ; see README for measurement conditions.</desc>
+  <title id="title">Strata-A770: code decode 29.02 tok/s, long prefill 596.92 tok/s</title>
+  <desc id="desc">2026-10-21 combined retained-optimization build. Five retained medians after warmup: code2048 decode29.02/prefill259.10; prose2048 decode27.87/prefill276.95; long8000 decode24.39/prefill596.92 tok/s. Intel Arc A77016GB,256GiB DDR3,IQ2_XS,spec4,prompt-cache0,max128output. Timings exclude model loading; see README for full ranges and conditions. Historical decode ratios versus7.6/7.0/6.8tok/s: 3.82/3.98/3.59. Long prefill ratio versus239.2tok/s: 2.50. Historical configurations differ;not a controlled software A/B.</desc>
   <defs>
     <radialGradient id="halo" cx="91%" cy="42%" r="85%">
       <stop stop-color="#213721"/><stop offset=".5" stop-color="#101b17"/><stop offset="1" stop-color="#080d10"/>
@@ -30,13 +30,13 @@
     <text x="204" y="148" fill="#eef5ec" font-size="65" font-weight="700" letter-spacing="5">STRATA <tspan fill="#c7ff55">/ A770</tspan></text>
     <text x="2288" y="115" fill="#d9e5d7" font-size="28" text-anchor="end" letter-spacing="3">INTEL ARC A770 · 16 GB</text>
     <text x="2288" y="158" fill="#8ba18a" font-size="24" text-anchor="end" letter-spacing="3">QWEN3.8-FLASH-NEXT</text>
-    <text x="114" y="242" fill="#a3b59f" font-size="29" letter-spacing="3">实测性能进化 <tspan fill="#58715e">/</tspan> MEASURED PERFORMANCE</text>
+    <text x="114" y="242" fill="#a3b59f" font-size="29" letter-spacing="3">A770 本地推理 <tspan fill="#58715e">/</tspan> MEASURED PERFORMANCE</text>
     <path d="M112 272H2288" stroke="#b4d6a6" stroke-opacity=".18"/>
     <g fill="#93a68d" font-size="24" letter-spacing="2">
       <text x="148" y="321">工作负载 / WORKLOAD</text>
-      <text x="1008" y="321" text-anchor="end">历史阶段</text>
-      <text x="1580" y="321" text-anchor="end">本轮复测</text>
-      <text x="2248" y="321" text-anchor="end" fill="#c7e9a2">提升倍数 / SPEEDUP</text>
+      <text x="1008" y="321" text-anchor="end">历史倍率 / DECODE</text>
+      <text x="1580" y="321" text-anchor="end">生成 / DECODE · tok/s</text>
+      <text x="2248" y="321" text-anchor="end" fill="#c7e9a2">预填 / PREFILL · tok/s</text>
     </g>
   </g>
   <g fill="url(#row)" stroke="#a5cd83" stroke-opacity=".12">
@@ -52,54 +52,45 @@
   <g font-family="Bahnschrift, 'Microsoft YaHei', Arial, sans-serif">
     <g fill="#edf5e8" font-size="53" font-weight="700">
       <text x="152" y="442">2K 代码</text>
-      <text x="152" y="666">8K 长上下文</text>
-      <text x="152" y="890">8K 预填充</text>
+      <text x="152" y="666">2K 文本</text>
+      <text x="152" y="890">8K 长文</text>
     </g>
     <g fill="#8ba18a" font-size="27" letter-spacing="4">
-      <text x="155" y="490">CODE · DECODE</text>
-      <text x="155" y="714">LONG · DECODE</text>
-      <text x="155" y="938">LONG · PREFILL</text>
+      <text x="155" y="490">CODE · 2K PROMPT</text>
+      <text x="155" y="714">PROSE · 2K PROMPT</text>
+      <text x="155" y="938">LONG · 8K PROMPT</text>
     </g>
   </g>
   <g font-family="Impact, 'Arial Narrow', sans-serif" font-size="139" text-anchor="end" fill="#8f9d92">
-    <text x="1010" y="506">7.6</text>
-    <text x="1010" y="730">6.8</text>
-    <text x="1010" y="954">239.2</text>
+    <text x="1010" y="506">3.82×</text>
+    <text x="1010" y="730">3.98×</text>
+    <text x="1010" y="954">3.59×</text>
   </g>
-  <g fill="none" stroke="url(#arrow)" stroke-width="6" stroke-linejoin="miter">
-    <path d="M1048 456H1122M1096 430L1122 456L1096 482"/>
-    <path d="M1048 680H1122M1096 654L1122 680L1096 706"/>
-    <path d="M1048 904H1122M1096 878L1122 904L1096 930"/>
-  </g>
+  <path d="M1120 390V514M1120 614V738M1120 838V962" stroke="#c7ff55" stroke-opacity=".15"/>
   <g font-family="Impact, 'Arial Narrow', sans-serif" font-size="160" text-anchor="end" fill="#f0f7e9">
-    <text x="1582" y="509">28.25</text>
-    <text x="1582" y="733">22.89</text>
-    <text x="1582" y="957">497.85</text>
-  </g>
-  <g font-family="Bahnschrift, Arial, sans-serif" fill="#a8bfa0" font-size="30">
-    <text x="1610" y="505">tok/s</text>
-    <text x="1610" y="729">tok/s</text>
-    <text x="1610" y="953">tok/s</text>
+    <text x="1582" y="509">29.02</text>
+    <text x="1582" y="733">27.87</text>
+    <text x="1582" y="957">24.39</text>
   </g>
   <g stroke="#c7ff55" stroke-opacity=".15">
     <path d="M1778 390V514M1778 614V738M1778 838V962"/>
   </g>
   <g font-family="Impact, 'Arial Narrow', sans-serif" font-size="172" text-anchor="end" fill="#bfff57" opacity=".15" filter="url(#glow)">
-    <text x="2245" y="514">3.72×</text>
-    <text x="2245" y="738">3.37×</text>
-    <text x="2245" y="962">2.08×</text>
+    <text x="2245" y="514">259.10</text>
+    <text x="2245" y="738">276.95</text>
+    <text x="2245" y="962">596.92</text>
   </g>
   <g font-family="Impact, 'Arial Narrow', sans-serif" font-size="172" text-anchor="end" fill="url(#digits)">
-    <text x="2245" y="514">3.72×</text>
-    <text x="2245" y="738">3.37×</text>
-    <text x="2245" y="962">2.08×</text>
+    <text x="2245" y="514">259.10</text>
+    <text x="2245" y="738">276.95</text>
+    <text x="2245" y="962">596.92</text>
   </g>
   <path d="M112 1035H2288" stroke="#8ba86b" stroke-opacity=".35"/>
   <g font-family="Bahnschrift, 'Microsoft YaHei', Arial, sans-serif">
-    <text x="115" y="1082" fill="#8ca183" font-size="24" letter-spacing="2">实测平台 / TESTED ON · 256 GiB RAM</text>
-    <text x="112" y="1154" fill="#edf5e7" font-size="64" font-weight="700">DDR3 <tspan fill="#668553">+</tspan> PCIe 3.0</text>
-    <text x="2286" y="1080" text-anchor="end" fill="#b4c5aa" font-size="26">历史阶段对比 · 非单变量 A/B</text>
-    <text x="2286" y="1122" text-anchor="end" fill="#97ac8c" font-size="25">prefill 起点为显存预算修正阶段</text>
-    <text x="2286" y="1164" text-anchor="end" fill="#7e9874" font-size="23">Measured medians · See README for conditions.</text>
+    <text x="115" y="1082" fill="#8ca183" font-size="24" letter-spacing="2">实测平台 · 256 GiB DDR3 + 16 GB VRAM</text>
+    <text x="112" y="1154" fill="#edf5e7" font-size="64" font-weight="700">8K 预填 <tspan fill="#c7ff55">2.50×</tspan></text>
+    <text x="2286" y="1080" text-anchor="end" fill="#b4c5aa" font-size="26">2026-10-21 · IQ2_XS · spec4</text>
+    <text x="2286" y="1122" text-anchor="end" fill="#97ac8c" font-size="25">预热后五次中位数 · 倍率对比历史阶段</text>
+    <text x="2286" y="1164" text-anchor="end" fill="#7e9874" font-size="23">历史配置不同 · 倍率非单变量 A/B · 详见 README</text>
   </g>
 </svg>
