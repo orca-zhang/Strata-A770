@@ -210,5 +210,27 @@ class Structured(unittest.TestCase):
         self.assertEqual(r.returncode, 0)
 
 
+class StructuredDecode(unittest.TestCase):
+    def test_wrapped_objects_keep_strict_json_and_string_boundaries(self):
+        value = {'text': 'braces { } and escaped "\\\n\u4e2d\U0001f600', 'nested': [{'empty': {}}]}
+        raw = json.dumps(value, ensure_ascii=False)
+        validator = structured._ObjectOnly()
+        for text in (raw, '\u2003' + raw + '\u2003', 'Here it is: ' + raw + ' - done',
+                     '```json\n' + raw + '\n```', raw + ' {"ignored": true}',
+                     '\ufeff' + raw):
+            with self.subTest(text=text):
+                self.assertEqual(json.loads(structured.validated_json(text, validator, 'stop')), value)
+        for text in ('', 'no JSON', '[] trailing', '[1,2]', 'true trailing', '123 extra',
+                     '{"x":1,"x":2}', '{"x":{"a":1,"a":2}}', '{"x":NaN}',
+                     '{"x":Infinity}', '{"x":-Infinity}', '{"x":1e999}',
+                     '{"x":"unterminated}', '{"x":1,}', '{"x":"raw\nnewline"}',
+                     '```json\n{"x":\n```'):
+            with self.subTest(text=text), self.assertRaises(structured.StructuredOutputError):
+                structured.validated_json(text, validator, 'stop')
+        for reason in ('length', 'cancel', 'error', None):
+            with self.subTest(reason=reason), self.assertRaises(structured.StructuredOutputError):
+                structured.validated_json(raw, validator, reason)
+
+
 if __name__ == "__main__":
     unittest.main()

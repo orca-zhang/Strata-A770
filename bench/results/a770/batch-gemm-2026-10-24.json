@@ -1,0 +1,1049 @@
+{
+  "date": "2026-10-24",
+  "hardware": "Intel Arc A770 16 GB, Xeon E5-2696 v4, Windows, PCIe 3.0 x16",
+  "toolchain": "DPC++ 2025.3.2, oneMKL 2025.3, driver 32.0.101.9034",
+  "scope": "Screens use standalone GEMM with generated inputs, excluding transfer/dequantization/widening/SwiGLU; model_probe is a separate completion-only check",
+  "whole_model_speedup_established": false,
+  "q2_model_tested": false,
+  "screens": [
+    {
+      "name": "fp16_eight_groups",
+      "scope": "FP16 GEMM only; no expert transfer/dequantization or whole-model timing",
+      "source_sha256": "d56e9705d84430cbbfcda3222824f1df9a700a136f3f150d18902919ab5987fd",
+      "exe_sha256": "2d9ab6be583563d81c4a8d6a8709a7a8d304d5ec0fffd6fab3e4555dba0ca86f",
+      "runs": [
+        {
+          "mode": "single",
+          "returncode": 0,
+          "stdout_sha256": "16180ebad654cd39d7280fdbec43f53dac6b2c3e214f6db8f2fd06667d7112fd",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "rows": [
+            {
+              "projection": "gate_up",
+              "rows": "40",
+              "mode": "single",
+              "us": 237678.48125,
+              "checked_elements": 2631680
+            },
+            {
+              "projection": "gate_up",
+              "rows": "varied",
+              "mode": "single",
+              "us": 239746.75,
+              "checked_elements": 2631680
+            },
+            {
+              "projection": "down",
+              "rows": "40",
+              "mode": "single",
+              "us": 130681.575,
+              "checked_elements": 5263360
+            },
+            {
+              "projection": "down",
+              "rows": "varied",
+              "mode": "single",
+              "us": 132770.19375,
+              "checked_elements": 5263360
+            }
+          ],
+          "competition_after_run": false
+        },
+        {
+          "mode": "batch",
+          "returncode": 0,
+          "stdout_sha256": "0ab48f97fd64d0e57bfd5068319fb4d2c744d88722accfbf16ec867012d1705e",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "rows": [
+            {
+              "projection": "gate_up",
+              "rows": "40",
+              "mode": "batch",
+              "us": 239679.325,
+              "checked_elements": 2631680
+            },
+            {
+              "projection": "gate_up",
+              "rows": "varied",
+              "mode": "batch",
+              "us": 237299.33125,
+              "checked_elements": 2631680
+            },
+            {
+              "projection": "down",
+              "rows": "40",
+              "mode": "batch",
+              "us": 126573.8625,
+              "checked_elements": 5263360
+            },
+            {
+              "projection": "down",
+              "rows": "varied",
+              "mode": "batch",
+              "us": 131088.69375,
+              "checked_elements": 5263360
+            }
+          ],
+          "competition_after_run": false
+        },
+        {
+          "mode": "single",
+          "returncode": 0,
+          "stdout_sha256": "28f6e702dedbb345f68854c25596c9bc2dba3ebe86e65a5f78b209c9047117e8",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "rows": [
+            {
+              "projection": "gate_up",
+              "rows": "40",
+              "mode": "single",
+              "us": 238651.76875,
+              "checked_elements": 2631680
+            },
+            {
+              "projection": "gate_up",
+              "rows": "varied",
+              "mode": "single",
+              "us": 240610.41875,
+              "checked_elements": 2631680
+            },
+            {
+              "projection": "down",
+              "rows": "40",
+              "mode": "single",
+              "us": 128554.00625,
+              "checked_elements": 5263360
+            },
+            {
+              "projection": "down",
+              "rows": "varied",
+              "mode": "single",
+              "us": 128362.4,
+              "checked_elements": 5263360
+            }
+          ],
+          "competition_after_run": false
+        }
+      ],
+      "comparisons": [
+        {
+          "projection": "gate_up",
+          "rows": "40",
+          "baseline": 238164.6278189232,
+          "candidate": 239679.325,
+          "throughput_change_pct": -0.631968227162194,
+          "baseline_drift_pct": 0.40949752576726617
+        },
+        {
+          "projection": "gate_up",
+          "rows": "varied",
+          "baseline": 240178.19616162407,
+          "candidate": 237299.33125,
+          "throughput_change_pct": 1.2131786872130457,
+          "baseline_drift_pct": 0.36024210964278325
+        },
+        {
+          "projection": "down",
+          "rows": "40",
+          "baseline": 129613.42526648173,
+          "candidate": 126573.8625,
+          "throughput_change_pct": 2.4014142465485167,
+          "baseline_drift_pct": -1.6280556382948341
+        },
+        {
+          "projection": "down",
+          "rows": "varied",
+          "baseline": 130547.69518538043,
+          "candidate": 131088.69375,
+          "throughput_change_pct": -0.412696586672312,
+          "baseline_drift_pct": -3.319866926081072
+        }
+      ]
+    },
+    {
+      "name": "fp32_eight_groups",
+      "scope": "FP32 GEMM only; no expert transfer/dequantization/widening or whole-model timing",
+      "source_sha256": "2bcbc103a45eea60ce7206acdc333a04435fdc7af6cd6b7c962d5edd0f7f4d34",
+      "exe_sha256": "a4f357bdfcae90b28e7a2961ee748b1631fad335a48a0da8208bf890d91002a6",
+      "runs": [
+        {
+          "mode": "single",
+          "returncode": 0,
+          "stdout_sha256": "7f04a87cc5ddb578273e64869fb4544e367d8b3a37d91b91615cbe0555b13dc9",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "rows": [
+            {
+              "projection": "gate_up",
+              "rows": "40",
+              "mode": "single",
+              "us": 65366.525,
+              "checked_elements": 2631680
+            },
+            {
+              "projection": "gate_up",
+              "rows": "varied",
+              "mode": "single",
+              "us": 61327.99375,
+              "checked_elements": 2631680
+            },
+            {
+              "projection": "down",
+              "rows": "40",
+              "mode": "single",
+              "us": 22313.65625,
+              "checked_elements": 5263360
+            },
+            {
+              "projection": "down",
+              "rows": "varied",
+              "mode": "single",
+              "us": 21018.65,
+              "checked_elements": 5263360
+            }
+          ],
+          "competition_after_run": false
+        },
+        {
+          "mode": "batch",
+          "returncode": 0,
+          "stdout_sha256": "40a120dfaae300d52ba8ade08277b76a1a170e95926a878620d11041624bd263",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "rows": [
+            {
+              "projection": "gate_up",
+              "rows": "40",
+              "mode": "batch",
+              "us": 65735.175,
+              "checked_elements": 2631680
+            },
+            {
+              "projection": "gate_up",
+              "rows": "varied",
+              "mode": "batch",
+              "us": 61386.19375,
+              "checked_elements": 2631680
+            },
+            {
+              "projection": "down",
+              "rows": "40",
+              "mode": "batch",
+              "us": 22288.48125,
+              "checked_elements": 5263360
+            },
+            {
+              "projection": "down",
+              "rows": "varied",
+              "mode": "batch",
+              "us": 21006.64375,
+              "checked_elements": 5263360
+            }
+          ],
+          "competition_after_run": false
+        },
+        {
+          "mode": "single",
+          "returncode": 0,
+          "stdout_sha256": "52b861087a9c56f6b2f11e55612f6e9205bce7480d28eab34ce46f3636a4865c",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "rows": [
+            {
+              "projection": "gate_up",
+              "rows": "40",
+              "mode": "single",
+              "us": 65722.11875,
+              "checked_elements": 2631680
+            },
+            {
+              "projection": "gate_up",
+              "rows": "varied",
+              "mode": "single",
+              "us": 60709.075,
+              "checked_elements": 2631680
+            },
+            {
+              "projection": "down",
+              "rows": "40",
+              "mode": "single",
+              "us": 22177.45,
+              "checked_elements": 5263360
+            },
+            {
+              "projection": "down",
+              "rows": "varied",
+              "mode": "single",
+              "us": 20895.63125,
+              "checked_elements": 5263360
+            }
+          ],
+          "competition_after_run": false
+        }
+      ],
+      "comparisons": [
+        {
+          "projection": "gate_up",
+          "rows": "40",
+          "baseline": 65544.08072682722,
+          "candidate": 65735.175,
+          "throughput_change_pct": -0.29070322422171113,
+          "baseline_drift_pct": 0.5439997766440774
+        },
+        {
+          "projection": "gate_up",
+          "rows": "varied",
+          "baseline": 61017.74964851032,
+          "candidate": 61386.19375,
+          "throughput_change_pct": -0.6002067875232608,
+          "baseline_drift_pct": -1.0091945164927285
+        },
+        {
+          "projection": "down",
+          "rows": "40",
+          "baseline": 22245.44887840123,
+          "candidate": 22288.48125,
+          "throughput_change_pct": -0.19307000381092454,
+          "baseline_drift_pct": -0.6104165470416811
+        },
+        {
+          "projection": "down",
+          "rows": "varied",
+          "baseline": 20957.05035955233,
+          "candidate": 21006.64375,
+          "throughput_change_pct": -0.23608431236270544,
+          "baseline_drift_pct": -0.5852837836873626
+        }
+      ]
+    },
+    {
+      "name": "fp16_equal_shapes_one_group",
+      "scope": "FP16 GEMM only; one equal-shape group for uniform rows, eight groups otherwise; no expert transfer/dequantization or whole-model timing",
+      "source_sha256": "e684edcb477abed2bd952bc3750fa1c6fc1e4bb8b91f65a7ad2dce64cd442a4d",
+      "exe_sha256": "76cf80f14a1d170e6407ad948338fef50aa87ae05e504d1129af42ce05e045be",
+      "runs": [
+        {
+          "mode": "single",
+          "returncode": 0,
+          "stdout_sha256": "9eb28c4af02a6698c92dc687051be0ca975e49b3a140629c997c4b51eac59086",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "rows": [
+            {
+              "projection": "gate_up",
+              "rows": "40",
+              "mode": "single",
+              "us": 388823.15,
+              "checked_elements": 2631680
+            },
+            {
+              "projection": "gate_up",
+              "rows": "varied",
+              "mode": "single",
+              "us": 397591.425,
+              "checked_elements": 2631680
+            },
+            {
+              "projection": "down",
+              "rows": "40",
+              "mode": "single",
+              "us": 175715.925,
+              "checked_elements": 5263360
+            },
+            {
+              "projection": "down",
+              "rows": "varied",
+              "mode": "single",
+              "us": 170938.925,
+              "checked_elements": 5263360
+            }
+          ],
+          "competition_after_run": false
+        },
+        {
+          "mode": "batch",
+          "returncode": 0,
+          "stdout_sha256": "2ff400a4731e33f96c244df5423b68d40998803365d9aff1add9db2eb93da328",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "rows": [
+            {
+              "projection": "gate_up",
+              "rows": "40",
+              "mode": "batch",
+              "us": 389252.225,
+              "checked_elements": 2631680
+            },
+            {
+              "projection": "gate_up",
+              "rows": "varied",
+              "mode": "batch",
+              "us": 374926.775,
+              "checked_elements": 2631680
+            },
+            {
+              "projection": "down",
+              "rows": "40",
+              "mode": "batch",
+              "us": 171673.4,
+              "checked_elements": 5263360
+            },
+            {
+              "projection": "down",
+              "rows": "varied",
+              "mode": "batch",
+              "us": 174653.9,
+              "checked_elements": 5263360
+            }
+          ],
+          "competition_after_run": false
+        },
+        {
+          "mode": "single",
+          "returncode": 0,
+          "stdout_sha256": "782218cccbbf2f7e3a522d9cc761c8f0bf90960525cc8eef8fc31f03b2b4b733",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "rows": [
+            {
+              "projection": "gate_up",
+              "rows": "40",
+              "mode": "single",
+              "us": 381007.525,
+              "checked_elements": 2631680
+            },
+            {
+              "projection": "gate_up",
+              "rows": "varied",
+              "mode": "single",
+              "us": 382997.375,
+              "checked_elements": 2631680
+            },
+            {
+              "projection": "down",
+              "rows": "40",
+              "mode": "single",
+              "us": 177154.65,
+              "checked_elements": 5263360
+            },
+            {
+              "projection": "down",
+              "rows": "varied",
+              "mode": "single",
+              "us": 175624.075,
+              "checked_elements": 5263360
+            }
+          ],
+          "competition_after_run": false
+        }
+      ],
+      "comparisons": [
+        {
+          "projection": "gate_up",
+          "rows": "40",
+          "baseline": 384895.50016102265,
+          "candidate": 389252.225,
+          "throughput_change_pct": -1.119254960964533,
+          "baseline_drift_pct": -2.0100719311594517
+        },
+        {
+          "projection": "gate_up",
+          "rows": "varied",
+          "baseline": 390226.1806920563,
+          "candidate": 374926.775,
+          "throughput_change_pct": 4.080638330526343,
+          "baseline_drift_pct": -3.670614878074896
+        },
+        {
+          "projection": "down",
+          "rows": "40",
+          "baseline": 176433.82100040017,
+          "candidate": 171673.4,
+          "throughput_change_pct": 2.772952012600771,
+          "baseline_drift_pct": 0.8187789467573925
+        },
+        {
+          "projection": "down",
+          "rows": "varied",
+          "baseline": 173265.66475969602,
+          "candidate": 174653.9,
+          "throughput_change_pct": -0.7948492649199168,
+          "baseline_drift_pct": 2.7408327272445465
+        }
+      ]
+    },
+    {
+      "name": "fp16_large_usm_pool",
+      "scope": "Single FP16 GEMM calls only, default allocator versus 512 MiB pool budget with 64 MiB host/device/shared max-poolable size; no model timing",
+      "source_sha256": "e684edcb477abed2bd952bc3750fa1c6fc1e4bb8b91f65a7ad2dce64cd442a4d",
+      "exe_sha256": "2c6e131fbad79e3adbbfe2676f52551d2adff81ba90b73bfdd2bb56e6ade6bd2",
+      "runs": [
+        {
+          "mode": "baseline",
+          "returncode": 0,
+          "env_override": {},
+          "stdout_sha256": "ecd4eb1121e39984159230077ea0c0cac538d8f6044c0c218a385f08e52d3b0d",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "rows": [
+            {
+              "projection": "gate_up",
+              "rows": "40",
+              "mode": "single",
+              "us": 369479.025,
+              "checked_elements": 2631680
+            },
+            {
+              "projection": "gate_up",
+              "rows": "varied",
+              "mode": "single",
+              "us": 372247.15,
+              "checked_elements": 2631680
+            },
+            {
+              "projection": "down",
+              "rows": "40",
+              "mode": "single",
+              "us": 172423.15,
+              "checked_elements": 5263360
+            },
+            {
+              "projection": "down",
+              "rows": "varied",
+              "mode": "single",
+              "us": 172864.475,
+              "checked_elements": 5263360
+            }
+          ],
+          "competition_after_run": false
+        },
+        {
+          "mode": "pool",
+          "returncode": 0,
+          "env_override": {
+            "UR_L0_USM_ALLOCATOR": "1;512M;host:64M,8,64K;device:64M,8,64K;shared:64M,8,64K"
+          },
+          "stdout_sha256": "01adcb13a3a5d29ac629cbd1d3666385302468d8ec110dfecdcad25045087fd4",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "rows": [
+            {
+              "projection": "gate_up",
+              "rows": "40",
+              "mode": "single",
+              "us": 240634.1,
+              "checked_elements": 2631680
+            },
+            {
+              "projection": "gate_up",
+              "rows": "varied",
+              "mode": "single",
+              "us": 241266.825,
+              "checked_elements": 2631680
+            },
+            {
+              "projection": "down",
+              "rows": "40",
+              "mode": "single",
+              "us": 119679.775,
+              "checked_elements": 5263360
+            },
+            {
+              "projection": "down",
+              "rows": "varied",
+              "mode": "single",
+              "us": 120867.025,
+              "checked_elements": 5263360
+            }
+          ],
+          "competition_after_run": false
+        },
+        {
+          "mode": "baseline",
+          "returncode": 0,
+          "env_override": {},
+          "stdout_sha256": "f813a8719eef5da7f31ee40b163ae82e502c025113ec5b9bfba5e43885144e42",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "rows": [
+            {
+              "projection": "gate_up",
+              "rows": "40",
+              "mode": "single",
+              "us": 376596.275,
+              "checked_elements": 2631680
+            },
+            {
+              "projection": "gate_up",
+              "rows": "varied",
+              "mode": "single",
+              "us": 397045.125,
+              "checked_elements": 2631680
+            },
+            {
+              "projection": "down",
+              "rows": "40",
+              "mode": "single",
+              "us": 171643.75,
+              "checked_elements": 5263360
+            },
+            {
+              "projection": "down",
+              "rows": "varied",
+              "mode": "single",
+              "us": 173142.925,
+              "checked_elements": 5263360
+            }
+          ],
+          "competition_after_run": false
+        }
+      ],
+      "comparisons": [
+        {
+          "projection": "gate_up",
+          "rows": "40",
+          "baseline": 373020.67570797185,
+          "candidate": 240634.1,
+          "throughput_change_pct": 55.01571710242723,
+          "baseline_drift_pct": 1.926293380253452
+        },
+        {
+          "projection": "gate_up",
+          "rows": "varied",
+          "baseline": 384446.2461809762,
+          "candidate": 241266.825,
+          "throughput_change_pct": 59.34484410816787,
+          "baseline_drift_pct": 6.661696402511064
+        },
+        {
+          "projection": "down",
+          "rows": "40",
+          "baseline": 172033.0086140811,
+          "candidate": 119679.775,
+          "throughput_change_pct": 43.74442850856055,
+          "baseline_drift_pct": -0.4520274684692849
+        },
+        {
+          "projection": "down",
+          "rows": "varied",
+          "baseline": 173003.64397922193,
+          "candidate": 120867.025,
+          "throughput_change_pct": 43.135519368679695,
+          "baseline_drift_pct": 0.1610799442742561
+        }
+      ],
+      "allocator_setting": "1;512M;host:64M,8,64K;device:64M,8,64K;shared:64M,8,64K",
+      "runtime_pool_settings_host_device_sharedrw_sharedro": {
+        "SlabMinSize": [
+          65536,
+          65536,
+          65536,
+          2097152
+        ],
+        "MaxPoolableSize": [
+          67108864,
+          67108864,
+          67108864,
+          4194304
+        ],
+        "Capacity": [
+          8,
+          8,
+          8,
+          4
+        ],
+        "MaxPoolSize": [
+          536870912
+        ],
+        "EnableBuffers": [
+          1
+        ]
+      }
+    },
+    {
+      "name": "fp16_large_usm_pool_confirmation",
+      "scope": "Single FP16 GEMM calls only, default allocator versus 512 MiB pool budget with 64 MiB host/device/shared max-poolable size; no model timing",
+      "source_sha256": "e684edcb477abed2bd952bc3750fa1c6fc1e4bb8b91f65a7ad2dce64cd442a4d",
+      "exe_sha256": "2c6e131fbad79e3adbbfe2676f52551d2adff81ba90b73bfdd2bb56e6ade6bd2",
+      "runs": [
+        {
+          "mode": "baseline",
+          "returncode": 0,
+          "env_override": {},
+          "stdout_sha256": "c8836bfeac53457fca10a325755ce080a44656afbc4e0783723968caea26b02b",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "rows": [
+            {
+              "projection": "gate_up",
+              "rows": "40",
+              "mode": "single",
+              "us": 361780.575,
+              "checked_elements": 2631680
+            },
+            {
+              "projection": "gate_up",
+              "rows": "varied",
+              "mode": "single",
+              "us": 391759.975,
+              "checked_elements": 2631680
+            },
+            {
+              "projection": "down",
+              "rows": "40",
+              "mode": "single",
+              "us": 173468.75,
+              "checked_elements": 5263360
+            },
+            {
+              "projection": "down",
+              "rows": "varied",
+              "mode": "single",
+              "us": 173427.775,
+              "checked_elements": 5263360
+            }
+          ],
+          "competition_after_run": false
+        },
+        {
+          "mode": "pool",
+          "returncode": 0,
+          "env_override": {
+            "UR_L0_USM_ALLOCATOR": "1;512M;host:64M,8,64K;device:64M,8,64K;shared:64M,8,64K"
+          },
+          "stdout_sha256": "12978340387c3563aff119d73ac3d3cb7de50ffd731f18441302eaef1c2a179c",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "rows": [
+            {
+              "projection": "gate_up",
+              "rows": "40",
+              "mode": "single",
+              "us": 235899.5,
+              "checked_elements": 2631680
+            },
+            {
+              "projection": "gate_up",
+              "rows": "varied",
+              "mode": "single",
+              "us": 231244.25,
+              "checked_elements": 2631680
+            },
+            {
+              "projection": "down",
+              "rows": "40",
+              "mode": "single",
+              "us": 115896.375,
+              "checked_elements": 5263360
+            },
+            {
+              "projection": "down",
+              "rows": "varied",
+              "mode": "single",
+              "us": 119856.075,
+              "checked_elements": 5263360
+            }
+          ],
+          "competition_after_run": false
+        },
+        {
+          "mode": "baseline",
+          "returncode": 0,
+          "env_override": {},
+          "stdout_sha256": "18d796899259bd18e5104f79af3553154692fabde15dd189e62ef95be145bdc5",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "rows": [
+            {
+              "projection": "gate_up",
+              "rows": "40",
+              "mode": "single",
+              "us": 376255.4,
+              "checked_elements": 2631680
+            },
+            {
+              "projection": "gate_up",
+              "rows": "varied",
+              "mode": "single",
+              "us": 384225.9,
+              "checked_elements": 2631680
+            },
+            {
+              "projection": "down",
+              "rows": "40",
+              "mode": "single",
+              "us": 171618.225,
+              "checked_elements": 5263360
+            },
+            {
+              "projection": "down",
+              "rows": "varied",
+              "mode": "single",
+              "us": 176171.025,
+              "checked_elements": 5263360
+            }
+          ],
+          "competition_after_run": false
+        },
+        {
+          "mode": "pool",
+          "returncode": 0,
+          "env_override": {
+            "UR_L0_USM_ALLOCATOR": "1;512M;host:64M,8,64K;device:64M,8,64K;shared:64M,8,64K"
+          },
+          "stdout_sha256": "1f69fc8c021da9044454707f04144a543d851e2a22354aa2c4864104f089ff2a",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "rows": [
+            {
+              "projection": "gate_up",
+              "rows": "40",
+              "mode": "single",
+              "us": 244264.0,
+              "checked_elements": 2631680
+            },
+            {
+              "projection": "gate_up",
+              "rows": "varied",
+              "mode": "single",
+              "us": 250466.15,
+              "checked_elements": 2631680
+            },
+            {
+              "projection": "down",
+              "rows": "40",
+              "mode": "single",
+              "us": 114658.8,
+              "checked_elements": 5263360
+            },
+            {
+              "projection": "down",
+              "rows": "varied",
+              "mode": "single",
+              "us": 111717.375,
+              "checked_elements": 5263360
+            }
+          ],
+          "competition_after_run": false
+        },
+        {
+          "mode": "baseline",
+          "returncode": 0,
+          "env_override": {},
+          "stdout_sha256": "0af185d9ac624f28fe46e000ba65bd3ec854ace1dfdc25db92d1af6252fde2d6",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "rows": [
+            {
+              "projection": "gate_up",
+              "rows": "40",
+              "mode": "single",
+              "us": 366293.35,
+              "checked_elements": 2631680
+            },
+            {
+              "projection": "gate_up",
+              "rows": "varied",
+              "mode": "single",
+              "us": 389631.225,
+              "checked_elements": 2631680
+            },
+            {
+              "projection": "down",
+              "rows": "40",
+              "mode": "single",
+              "us": 169873.65,
+              "checked_elements": 5263360
+            },
+            {
+              "projection": "down",
+              "rows": "varied",
+              "mode": "single",
+              "us": 171183.3,
+              "checked_elements": 5263360
+            }
+          ],
+          "competition_after_run": false
+        }
+      ],
+      "comparisons": [
+        {
+          "repeat": 0,
+          "projection": "gate_up",
+          "rows": "40",
+          "baseline": 368947.00833433383,
+          "candidate": 235899.5,
+          "throughput_change_pct": 56.40008068450075,
+          "baseline_drift_pct": 4.00099563112255
+        },
+        {
+          "repeat": 0,
+          "projection": "gate_up",
+          "rows": "varied",
+          "baseline": 387974.64991717244,
+          "candidate": 231244.25,
+          "throughput_change_pct": 67.77699333807108,
+          "baseline_drift_pct": -1.9231354606860873
+        },
+        {
+          "repeat": 0,
+          "projection": "down",
+          "rows": "40",
+          "baseline": 172541.0066273196,
+          "candidate": 115896.375,
+          "throughput_change_pct": 48.87524016805496,
+          "baseline_drift_pct": -1.066777157268961
+        },
+        {
+          "repeat": 0,
+          "projection": "down",
+          "rows": "varied",
+          "baseline": 174794.0184480561,
+          "candidate": 119856.075,
+          "throughput_change_pct": 45.836594805942134,
+          "baseline_drift_pct": 1.5817823875097226
+        },
+        {
+          "repeat": 1,
+          "projection": "gate_up",
+          "rows": "40",
+          "baseline": 371240.9607271132,
+          "candidate": 244264.0,
+          "throughput_change_pct": 51.98349356725232,
+          "baseline_drift_pct": -2.6476829302649385
+        },
+        {
+          "repeat": 1,
+          "projection": "gate_up",
+          "rows": "varied",
+          "baseline": 386919.12345311587,
+          "candidate": 250466.15,
+          "throughput_change_pct": 54.47960670658125,
+          "baseline_drift_pct": 1.4068091193227605
+        },
+        {
+          "repeat": 1,
+          "projection": "down",
+          "rows": "40",
+          "baseline": 170743.7093636871,
+          "candidate": 114658.8,
+          "throughput_change_pct": 48.91461393603205,
+          "baseline_drift_pct": -1.0165441345171833
+        },
+        {
+          "repeat": 1,
+          "projection": "down",
+          "rows": "varied",
+          "baseline": 173659.25666051463,
+          "candidate": 111717.375,
+          "throughput_change_pct": 55.44516388835186,
+          "baseline_drift_pct": -2.8311835047789558
+        }
+      ],
+      "allocator_setting": "1;512M;host:64M,8,64K;device:64M,8,64K;shared:64M,8,64K",
+      "operator_signal_confirmed": true,
+      "summary": [
+        {
+          "projection": "gate_up",
+          "rows": "40",
+          "baseline_us": 370092.2072017085,
+          "candidate_us": 240045.31961277645,
+          "throughput_change_pct": 54.17597301989232,
+          "latency_reduction_pct": 35.13905050101571
+        },
+        {
+          "projection": "gate_up",
+          "rows": "varied",
+          "baseline_us": 387446.5272369619,
+          "candidate_us": 240663.36864412393,
+          "throughput_change_pct": 60.99106790526587,
+          "latency_reduction_pct": 37.884752675319646
+        },
+        {
+          "projection": "down",
+          "rows": "40",
+          "baseline_us": 171640.00550248497,
+          "candidate_us": 115275.92672301533,
+          "throughput_change_pct": 48.89492575054382,
+          "latency_reduction_pct": 32.83854402967472
+        },
+        {
+          "projection": "down",
+          "rows": "varied",
+          "baseline_us": 174225.7136946028,
+          "candidate_us": 115715.19380272897,
+          "throughput_change_pct": 50.564250008190314,
+          "latency_reduction_pct": 33.583171307557905
+        }
+      ]
+    }
+  ],
+  "evidence_sha256": {
+    "build-sycl-a770-batch-grouped-20261024/finish.py": "5265a1346c5e46fe6cd05fef9853f7c5717bc61f113186980b4a35b7d8698d35",
+    "build-sycl-a770-batch-tight-20261024/batch_gemm.cpp": "d56e9705d84430cbbfcda3222824f1df9a700a136f3f150d18902919ab5987fd",
+    "build-sycl-a770-batch-tight-20261024/batch.py": "6763c9b6cea0bf99c2c6dfcdd8e18e6ae939822e4a3be4f240f52ba36baabed1",
+    "build-sycl-a770-batch-tight-20261024/batch-build.json": "0bd12140e458822118b4adf84f79621313cb7fb5f8a13a51aef3c1541dc1f236",
+    "build-sycl-a770-batch-tight-20261024/batch-results.json": "4e49e772720cf57318593e98362ae6483381f0413e559c70277e9c29f3695edf",
+    "build-sycl-a770-batch-tight-20261024/batch-0.stdout": "16180ebad654cd39d7280fdbec43f53dac6b2c3e214f6db8f2fd06667d7112fd",
+    "build-sycl-a770-batch-tight-20261024/batch-0.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-sycl-a770-batch-tight-20261024/batch-1.stdout": "0ab48f97fd64d0e57bfd5068319fb4d2c744d88722accfbf16ec867012d1705e",
+    "build-sycl-a770-batch-tight-20261024/batch-1.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-sycl-a770-batch-tight-20261024/batch-2.stdout": "28f6e702dedbb345f68854c25596c9bc2dba3ebe86e65a5f78b209c9047117e8",
+    "build-sycl-a770-batch-tight-20261024/batch-2.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-sycl-a770-batch-fp32-20261024/batch_gemm.cpp": "2bcbc103a45eea60ce7206acdc333a04435fdc7af6cd6b7c962d5edd0f7f4d34",
+    "build-sycl-a770-batch-fp32-20261024/batch.py": "f3bc413b669a0ff551e06c063bcdb3f38e4ff3ea49269894404b61f6b2f5bf27",
+    "build-sycl-a770-batch-fp32-20261024/batch-build.json": "6dece68ac206741b45e7fc6c39791f17c16680c8d6a59f3fc24f17dbe31e1b08",
+    "build-sycl-a770-batch-fp32-20261024/batch-results.json": "c7b40cacbd65af9f4c2cf8c6e3a41bbc98b7a04b1abd56430813e30ac4ef2d79",
+    "build-sycl-a770-batch-fp32-20261024/batch-0.stdout": "7f04a87cc5ddb578273e64869fb4544e367d8b3a37d91b91615cbe0555b13dc9",
+    "build-sycl-a770-batch-fp32-20261024/batch-0.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-sycl-a770-batch-fp32-20261024/batch-1.stdout": "40a120dfaae300d52ba8ade08277b76a1a170e95926a878620d11041624bd263",
+    "build-sycl-a770-batch-fp32-20261024/batch-1.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-sycl-a770-batch-fp32-20261024/batch-2.stdout": "52b861087a9c56f6b2f11e55612f6e9205bce7480d28eab34ce46f3636a4865c",
+    "build-sycl-a770-batch-fp32-20261024/batch-2.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-sycl-a770-batch-grouped-20261024/batch_gemm.cpp": "e684edcb477abed2bd952bc3750fa1c6fc1e4bb8b91f65a7ad2dce64cd442a4d",
+    "build-sycl-a770-batch-grouped-20261024/batch.py": "9bf390fbce2510782d942aa8f836cda788157fd90f052ec688308f5218a81e25",
+    "build-sycl-a770-batch-grouped-20261024/batch-build.json": "1645646c1a20871b1b131e80587cf1735ac8e563d232e7f94232a626c5501e32",
+    "build-sycl-a770-batch-grouped-20261024/batch-results.json": "5bc3961f5bd69ac0da06fc6957af0a8a7129957eb8f031e2eb5156f7aa802a16",
+    "build-sycl-a770-batch-grouped-20261024/batch-0.stdout": "9eb28c4af02a6698c92dc687051be0ca975e49b3a140629c997c4b51eac59086",
+    "build-sycl-a770-batch-grouped-20261024/batch-0.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-sycl-a770-batch-grouped-20261024/batch-1.stdout": "2ff400a4731e33f96c244df5423b68d40998803365d9aff1add9db2eb93da328",
+    "build-sycl-a770-batch-grouped-20261024/batch-1.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-sycl-a770-batch-grouped-20261024/batch-2.stdout": "782218cccbbf2f7e3a522d9cc761c8f0bf90960525cc8eef8fc31f03b2b4b733",
+    "build-sycl-a770-batch-grouped-20261024/batch-2.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-sycl-a770-batch-large-pool-20261024/batch_gemm.cpp": "e684edcb477abed2bd952bc3750fa1c6fc1e4bb8b91f65a7ad2dce64cd442a4d",
+    "build-sycl-a770-batch-large-pool-20261024/batch.py": "fdf3b174cee1b1a752f1c3b704fbaa2ff985496b25cdb057208eb0c380284d41",
+    "build-sycl-a770-batch-large-pool-20261024/batch-build.json": "a8e332ae76d9ca80c433cd8973e2f5fe675a790fae547ca0a8144c4c28a92321",
+    "build-sycl-a770-batch-large-pool-20261024/batch-results.json": "41a6a000249bab847404d522cbe694f8e9d613891e4ad3bed288394cb777df19",
+    "build-sycl-a770-batch-large-pool-20261024/batch-0.stdout": "ecd4eb1121e39984159230077ea0c0cac538d8f6044c0c218a385f08e52d3b0d",
+    "build-sycl-a770-batch-large-pool-20261024/batch-0.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-sycl-a770-batch-large-pool-20261024/batch-1.stdout": "01adcb13a3a5d29ac629cbd1d3666385302468d8ec110dfecdcad25045087fd4",
+    "build-sycl-a770-batch-large-pool-20261024/batch-1.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-sycl-a770-batch-large-pool-20261024/batch-2.stdout": "f813a8719eef5da7f31ee40b163ae82e502c025113ec5b9bfba5e43885144e42",
+    "build-sycl-a770-batch-large-pool-20261024/batch-2.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-sycl-a770-batch-large-pool-20261024/allocator-trace.stdout": "e71aa41475f28a67d2e1a4d065ce88cbdd9c4aec9c676b13d565a2900ed86661",
+    "build-sycl-a770-batch-large-pool-20261024/allocator-trace.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-sycl-a770-recheck-followup-20261023/health.json": "3cf50b85486b83cc5ad485b1e84d091b889ebeda72d579333e86991832f0c0dd",
+    "build-sycl-a770-usm-pool-20261024/run.py": "69601108e6b64e7180902d59c41d55e321677590915843b0b9650735194b12f5",
+    "build-sycl-a770-batch-large-pool-confirm-20261024/batch_gemm.cpp": "e684edcb477abed2bd952bc3750fa1c6fc1e4bb8b91f65a7ad2dce64cd442a4d",
+    "build-sycl-a770-batch-large-pool-confirm-20261024/batch.py": "cb7027ae489e1ad8929544a7775eeea748de3207ee459b1596fdece09779fba7",
+    "build-sycl-a770-batch-large-pool-confirm-20261024/batch-build.json": "a8e332ae76d9ca80c433cd8973e2f5fe675a790fae547ca0a8144c4c28a92321",
+    "build-sycl-a770-batch-large-pool-confirm-20261024/batch-results.json": "78a14a350b58f8567ef4c8ebfbe00e21b0ba1b8053c19d9f3a7a7e0383925653",
+    "build-sycl-a770-batch-large-pool-confirm-20261024/batch-0.stdout": "c8836bfeac53457fca10a325755ce080a44656afbc4e0783723968caea26b02b",
+    "build-sycl-a770-batch-large-pool-confirm-20261024/batch-0.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-sycl-a770-batch-large-pool-confirm-20261024/batch-1.stdout": "12978340387c3563aff119d73ac3d3cb7de50ffd731f18441302eaef1c2a179c",
+    "build-sycl-a770-batch-large-pool-confirm-20261024/batch-1.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-sycl-a770-batch-large-pool-confirm-20261024/batch-2.stdout": "18d796899259bd18e5104f79af3553154692fabde15dd189e62ef95be145bdc5",
+    "build-sycl-a770-batch-large-pool-confirm-20261024/batch-2.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-sycl-a770-batch-large-pool-confirm-20261024/batch-3.stdout": "1f69fc8c021da9044454707f04144a543d851e2a22354aa2c4864104f089ff2a",
+    "build-sycl-a770-batch-large-pool-confirm-20261024/batch-3.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-sycl-a770-batch-large-pool-confirm-20261024/batch-4.stdout": "0af185d9ac624f28fe46e000ba65bd3ec854ace1dfdc25db92d1af6252fde2d6",
+    "build-sycl-a770-batch-large-pool-confirm-20261024/batch-4.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-sycl-a770-batch-large-pool-confirm-20261024/model.protocol": "4696495a009631010c3085017557e6750bcb02b34cf3502b3c024653ee51cc00",
+    "build-sycl-a770-batch-large-pool-confirm-20261024/model.stderr": "e946171ef714f2daf24184f345b952644e846ffcae9fefa31414c03e99a3a0a7"
+  },
+  "reporter_sha256": "b55c9a8332805f2dec30064c1b3ac10f6aeba9ade989d42cbd2de655b2a130be",
+  "model_probe": {
+    "timeout": true,
+    "timeout_seconds": 150,
+    "wall_seconds": 153.46899999999732,
+    "exe_sha256": "c4b6fb8fea2b0e35c5c2bcde1c1e608d2c134d2f239a0779cd3c4636c1328564",
+    "competition_after_run": false,
+    "scope": "Single frozen IQ2_XS 2K completion probe; no paired baseline or speedup calculation",
+    "completed": false,
+    "generated_tokens": 0,
+    "completed_requests": 0,
+    "input_tokens": 2048,
+    "requested_output_tokens": 16,
+    "context": 8192,
+    "kv": "fp16",
+    "expert_slots": 4191,
+    "error_count": 0,
+    "requests_sha256": "5b0c601b79f8df822b3043fda5faabb4f11cad1f0953f3bf1b88f45847fe213d",
+    "metadata_correction": "Raw requests_sha256 is the old model-driver hash; the request hash here was independently recomputed"
+  }
+}

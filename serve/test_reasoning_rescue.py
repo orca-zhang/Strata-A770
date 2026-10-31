@@ -116,6 +116,23 @@ class Gates(unittest.TestCase):
     def test_a_fence_needs_the_same_marker_to_close(self):
         self.check("~~~\n```\n" + CALL, 0)
 
+    def test_fence_lengths_and_closing_lines(self):
+        for marker in ("`", "~"):
+            for length in (3, 4, 6):
+                opening = marker * length + "xml\ncode\n"
+                for closing, want in ((marker * (length - 1), 0), (marker * length + "example", 0),
+                                      (marker * length, 1), (marker * (length + 1) + " \t\r", 1)):
+                    self.check(opening + closing + "\n" + CALL, want)
+
+    def test_inline_code_needs_matching_backtick_runs(self):
+        for length in (1, 2, 3, 4, 6):
+            opening = "Use " + "`" * length + "example "
+            self.check(opening + "\n" + CALL, 0)
+            self.check(opening + "`" * (length + 1) + "\n" + CALL, 0)
+            self.check(opening + "`" * length + "\n" + CALL, 1)
+            self.check(opening + "`" * (length + 1) + " text " + "`" * length + "\n" + CALL, 1)
+            self.check(opening + "\n```\ncode\n```\n" + CALL, 1)
+
     def test_fence_split_across_chunks(self):
         text = "Format:\n```xml\n" + CALL + "\n```\n"
         for cut in range(1, len(text)):
@@ -138,6 +155,22 @@ class Gates(unittest.TestCase):
                 p = OutputParser(thinking=True, tools=SCHEMA, stream_tools=True)
                 evs = p.feed(quoted[:cut]) + p.feed(quoted[cut:]) + p.finish("stop")
                 self.assertEqual(calls(evs), [])
+
+    def test_held_call_end_tags_at_every_split(self):
+        prefix = "Go.\n<tool_call><function=write><parameter=path>\nunfinished"
+        literal = CALL.replace("file.txt", "literal </tool_call> in value")
+        for text, want, thought in (
+                ("Go.\n" + CALL + "\n" + CALL + "\n</think>answer", ["write", "write"], "Go.\n"),
+                ("Go.\n" + literal + "</think>answer", ["write"], "Go.\n"),
+                (prefix + "</think>answer", [], prefix),
+                (prefix + " </tool_call> literal</think>answer", [], prefix + " </tool_call> literal")):
+            for cut in range(len(text) + 1):
+                with self.subTest(cut=cut, text=text[:40]):
+                    p = OutputParser(thinking=True, tools=SCHEMA, stream_tools=True)
+                    evs = p.feed(text[:cut]) + p.feed("") + p.feed(text[cut:]) + p.finish("stop")
+                    self.assertEqual(calls(evs), want)
+                    self.assertEqual(reasoning(evs), thought)
+                    self.assertEqual("".join(e.text for e in evs if e.kind == "content"), "answer")
 
     def test_the_end_of_the_turn_splits_a_held_tail(self):
         p = OutputParser(thinking=True, tools=SCHEMA)
@@ -187,6 +220,8 @@ class VisibleAnswer(unittest.TestCase):
 
     def test_quoted_calls_stay_text(self):
         for body in ("Format:\n```xml\n" + RM + "\n```\nDone.", "Format:\n~~~\n" + RM + "\n~~~\nDone.",
+                     "````markdown\n```xml\n" + CALL + "\n```\n````\nDone.",
+                     "~~~xml\n~~~example\n" + CALL, "~~~~~~xml\n~~~\n" + CALL,
                      "Use `" + RM + "` like this.", "Use `x`, then `\n" + RM + "`", "```\n" + RM,
                      "Text\n\n```python\nx = 1\n```\n```\n" + CALL):
             with self.subTest(body=body[:30]):
@@ -196,6 +231,9 @@ class VisibleAnswer(unittest.TestCase):
 
     def test_real_calls_still_fire(self):
         for body in (CALL, "Let me do it.\n\n" + CALL, "Let me do it. " + CALL, "```\ncode\n```\n" + CALL,
+                     "````markdown\n```xml\nexample\n```\n````\n" + CALL,
+                     "~~~~~~xml\ncode\n~~~~~~~ \t\n" + CALL,
+                     "Use ``unfinished\n```\ncode\n```\n" + CALL,
                      "`a` and `b` " + CALL, "~~~\nx\n~~~\n\n" + CALL):
             with self.subTest(body=body[:30]):
                 self.assertEqual(self.run_all(self.HEAD + body)[0], ("write",))
@@ -203,6 +241,22 @@ class VisibleAnswer(unittest.TestCase):
 
     def test_a_closed_call_in_a_length_cut_answer_stays_a_call(self):
         self.assertEqual(self.run_all(self.HEAD + "Now.\n" + CALL, finish="length")[0], ("write",))
+
+    def test_inline_code_at_every_split(self):
+        for length in (2, 3, 6):
+            marker = "`" * length
+            quoted = "Use " + marker + "example `a`\n" + CALL + "\nend " + marker + " then "
+            for thinking in (False, True):
+                text = (self.HEAD if thinking else "") + quoted + CALL
+                for streaming in (False, True):
+                    for cut in range(len(text) + 1):
+                        with self.subTest(length=length, thinking=thinking, streaming=streaming, cut=cut):
+                            p = OutputParser(thinking=thinking, tools=SCHEMA, stream_tools=streaming)
+                            evs = p.feed(text[:cut]) + p.feed(text[cut:]) + p.finish()
+                            self.assertEqual(calls(evs), ["write"])
+                            self.assertEqual("".join(e.text for e in evs if e.kind == "content"), quoted)
+                            self.assertEqual([e.call.arguments for e in evs if e.kind == "tool_call"],
+                                             [{"path": "file.txt"}])
 
     def test_without_thinking(self):
         p = OutputParser(thinking=False, tools=SCHEMA)
@@ -276,7 +330,11 @@ class OverHttp(unittest.TestCase):
 
     def test_visible_answer_fences_on_all_three_apis(self):
         for name, body, want in (("fence", "Format:\n```xml\n" + RM + "\n```\nDone.", 0),
+                                 ("nested fence", "````markdown\n```xml\n" + CALL + "\n```\n````\nDone.", 0),
+                                 ("closed outer fence", "````markdown\n```xml\nexample\n```\n````\n" + CALL, 1),
                                  ("inline", "Use `" + RM + "` here.", 0),
+                                 ("double inline", "Use ``" + CALL + "`` here.", 0),
+                                 ("closed double inline", "Use ``example ` code``\n" + CALL, 1),
                                  ("real", "Doing it.\n\n" + CALL, 1)):
             with self.subTest(name):
                 a = self.ask( "ok</think>\n\n" + body)

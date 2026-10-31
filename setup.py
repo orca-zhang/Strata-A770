@@ -1872,8 +1872,8 @@ def amd_gpus_windows(adapters=None, registry=None) -> list[dict]:
 
 
 # ------------------------------------------------------------------------------------------------ Intel Arc on Windows
-# The SYCL port (sycl/, docs/INTEL_ARC.md) runs on discrete Intel Arc cards, Linux-only for now.  On Windows setup
-# used to stop at "no NVIDIA GPU found" without naming the Intel card in the PC.  These helpers list the Intel
+# The Intel backends run on discrete Arc cards (native Orca by default, explicit SYCL for comparisons).
+# These helpers list the Intel
 # display adapters the same way amd_gpus_windows does (Win32_VideoController + the display-class registry's 64-bit
 # VRAM size, which is the true VRAM: WMI's AdapterRAM stops at 4 GB).  The device table mirrors
 # sycl/setup_intel.py INTEL_ARC - keep the two in sync.
@@ -1930,7 +1930,7 @@ def intel_gpus_windows(adapters=None, registry=None) -> list[dict]:
 
 
 def intel_problem(g) -> str | None:
-    """Why Strata cannot use this Intel card (None: a discrete Arc the SYCL port knows, experimental Linux-only)."""
+    """Why Strata cannot use this Intel card (None: a known discrete Arc)."""
     if g.get("pci_id") in _WIN_INTEL_DID:
         return None
     return ("not supported - Strata's Intel backend runs on discrete Arc cards only "
@@ -1938,7 +1938,7 @@ def intel_problem(g) -> str | None:
 
 
 def intel_gpus() -> list[dict]:
-    """Every Intel GPU Strata knows, for the no-NVIDIA / no-AMD message: Windows display adapters, else the Linux
+    """Every Intel GPU Strata knows, for backend selection: Windows display adapters, else the Linux
     sysfs cards (vendor 8086 under xe or i915, sycl/setup_intel.py's detection without importing it)."""
     if WIN:
         try:
@@ -4110,18 +4110,20 @@ def resolve_rope(ctx: int, scaling, scale, trained: int = 262144):
 
 
 # ------------------------------------------------------------------------------------------------ main
-def sycl_setup(argv) -> int:
-    """--backend sycl: the Intel Arc engine (the SYCL port in sycl/, PR #423), experimental. There is no ready-made
-    Intel engine: it is compiled from source on the PC (docs/INTEL_ARC.md), then sycl/setup_intel.py runs this setup
-    with the Intel steps swapped in. Nothing of the CUDA / HIP paths is used or changed."""
+def sycl_setup(argv, backend="sycl") -> int:
+    """Delegate the orca/sycl backends to the Intel installer with the selected runtime.
+    Both need a source-built engine; see sycl/orca/README.md and docs/INTEL_ARC.md."""
     say()
-    warn("Intel Arc (--backend sycl) is EXPERIMENTAL: a community port of the engine, not tested by the Strata "
-         "maintainers (no Intel card here). Expect rough edges; issues with your card and driver versions help.")
-    if WIN:
-        say("  Windows native build: install Intel oneAPI (icx/icpx + oneMKL), then sycl\\tools\\build.bat.")
+    if backend == "orca":
+        say("  Intel Arc: Orca L0, with native Level Zero execution (sycl/orca/README.md).")
+        say("  Use a matching native executable and kernel image directory; Linux GPU validation is pending.")
+    else:
+        warn("Intel Arc (--backend sycl) is EXPERIMENTAL: a community port of the engine, not tested by the Strata "
+             "maintainers (no Intel card here). Expect rough edges; issues with your card and driver versions help.")
+        if WIN:
+            say("  Windows native build: install Intel oneAPI (icx/icpx + oneMKL), then sycl\\tools\\build.bat.")
+        say("  There is no ready-made Intel engine: it is built from source with Intel oneAPI (icpx + oneMKL),")
         say("  docs/INTEL_ARC.md. Setup continues with sycl/setup_intel.py.")
-    say("  There is no ready-made Intel engine: it is built from source with Intel oneAPI (icpx + oneMKL),")
-    say("  docs/INTEL_ARC.md. Setup continues with sycl/setup_intel.py.")
     rest, skip = [], False
     for x in argv:                                     # setup_intel.py drives this setup through its AMD path
         if skip:
@@ -4133,7 +4135,7 @@ def sycl_setup(argv) -> int:
     script = ROOT / "sycl" / "setup_intel.py"
     if not script.exists():
         fail(f"{script} is missing", "use a full Strata checkout (git clone) - docs/INTEL_ARC.md")
-    return subprocess.call([sys.executable, str(script), *rest])
+    return subprocess.call([sys.executable, str(script), "--runtime", backend, *rest])
 
 
 def main() -> int:
@@ -4224,14 +4226,20 @@ def main() -> int:
     ap.add_argument("--kv-streaming", choices=["auto", "on", "off"], default="auto",
                     help="from a 64K context: keep the KV cache in RAM and only the attention's window in VRAM (more "
                          "experts fit on the GPU); auto: when the RAM has room for it")
-    ap.add_argument("--backend", choices=["cuda", "hip", "sycl"],
-                    help="cuda = NVIDIA (default), hip = AMD RX 7900 / 7800 / 7700 XT, RX 9060 XT / 9070 / AI PRO R9700 on "
+    ap.add_argument("--backend", choices=["cuda", "hip", "sycl", "orca"],
+                    help="cuda = NVIDIA, hip = AMD RX 7900 / 7800 / 7700 XT, RX 9060 XT / 9070 / AI PRO R9700 on "
                          "Linux or Windows (chosen by itself when the PC has no NVIDIA card Strata can use), "
-                         "sycl = Intel Arc, EXPERIMENTAL: Linux, built from source (docs/INTEL_ARC.md)")
+                         "orca = Intel Arc with native Level Zero (chosen when no NVIDIA or AMD card can be used; sycl/orca/README.md), "
+                         "sycl = Intel Arc SYCL baseline (docs/INTEL_ARC.md)")
+    ap.add_argument("--orca-engine", type=Path, help="With --backend orca: native executable (default: build-strata-orca)")
+    ap.add_argument("--orca-images", type=Path, help="With --backend orca: kernel packs (default: images beside the executable)")
+    ap.add_argument("--orca-lib-dir", type=Path, action="append", help="With --backend orca: native library search directory; repeatable")
     ap.add_argument("--skip-build", action="store_true", help=argparse.SUPPRESS)
     a = ap.parse_args()
-    if a.backend == "sycl":                            # Intel Arc: the SYCL port's own setup (sycl/setup_intel.py)
-        return sycl_setup(sys.argv[1:])
+    if (a.orca_engine is not None or a.orca_images is not None or a.orca_lib_dir) and a.backend != "orca":
+        ap.error("--orca-engine, --orca-images and --orca-lib-dir require --backend orca")
+    if a.backend in ("sycl", "orca"):
+        return sycl_setup(sys.argv[1:], a.backend)
     if a.resident_budget_gib is not None and not a.resident_budget_gib > 0:
         ap.error("--resident-budget-gib takes a number of GiB above 0, e.g. --resident-budget-gib 32")
     if a.vision_tokens is not None and a.vision_tokens < 1:
@@ -4258,6 +4266,9 @@ def main() -> int:
     have = installed_configs()
     if a.update:                                       # #475: UPDATE.bat / update.sh - never starts the model
         return update_install(have, a)
+    if have and a.backend is None and a.cuda not in ("12", "13") and all(
+            json.loads(p.read_text(encoding="utf-8-sig")).get("backend") in ("sycl", "orca") for p in have):
+        return sycl_setup(sys.argv[1:], "orca")
     explicit = a.setup or a.model or a.family or a.check or a.no_start
     adopted = None                                     # #629: the earlier install this copy is set up like
     if not have and not explicit:                      # a new copy of Strata (an update unzipped elsewhere): set it
@@ -4328,13 +4339,19 @@ def main() -> int:
     found = gpus()
     amd = amd_gpus()
     amd_ok = [g for g in amd if amd_problem(g) is None]
+    intel, intel_usable = None, []
+    if a.backend is None and a.cuda not in ("12", "13") and not amd_ok and not any(gpu_problem(g) is None for g in found):
+        intel = intel_gpus()
+        intel_usable = [g for g in intel if intel_problem(g) is None]
     # older NVIDIA GPUs (Pascal / Volta): the experimental CUDA 12 engine, when chosen (docs/OLDER_GPUS.md)
     OLD_GPUS = OLD_GPUS or old_gpus_opt_in(found, named_gpus(a.gpu, a.gpus), a.cuda,
-                                           other=bool(amd_ok) or a.backend == "hip")
+                                           other=bool(amd_ok or intel_usable) or a.backend == "hip")
     if OLD_GPUS and a.backend != "hip":
         warn(f"older NVIDIA GPUs (Pascal / Volta) can be used ({OLD_GPUS}): experimental, through a second engine "
              "built with CUDA 12 (docs/OLDER_GPUS.md)")
     nv_ok = any(gpu_problem(g) is None for g in found)
+    if a.backend is None and not nv_ok and intel_usable:
+        return sycl_setup(sys.argv[1:], "orca")
     hip = a.backend == "hip" or (a.backend is None and not nv_ok and bool(amd_ok))
     if a.backend is None and nv_ok and amd_ok:
         # both kinds of card: asked (a first run on such a PC used to take NVIDIA without mentioning the Radeon)
@@ -4397,18 +4414,19 @@ def main() -> int:
                 (warn if line.startswith("!") else say)(line.lstrip("!"))
     else:
         if not found:
-            intel = intel_gpus()
+            if intel is None:
+                intel = intel_gpus()
             intel_usable = [g for g in intel if intel_problem(g) is None]
             if intel_usable:
                 say("  Your Intel GPUs:")
                 for g in intel:
                     say(f"    GPU {g['index']}: {g['name']}, {g['vram_gb']:.1f} GB VRAM - "
-                        + (intel_problem(g) or "can be used (experimental, Linux-only)"))
+                        + (intel_problem(g) or "native Orca L0"))
             fail("no NVIDIA GPU found (nvidia-smi did not answer)",
                  "install the NVIDIA driver from https://www.nvidia.com/drivers and restart the PC"
                  + (f"; AMD ({', '.join(AMD_ARCHS)}): --backend hip" if amd else "")
                  + ("; Intel (" + ", ".join(f"{g['name']} {g['vram_gb']:.0f} GB" for g in intel_usable) +
-                    "): experimental Linux-only, docs/INTEL_ARC.md (--backend sycl on Linux)" if intel_usable else ""))
+                    "): --backend orca, sycl/orca/README.md" if intel_usable else ""))
         if len(found) > 1 or gpu_problem(found[0]) is not None:
             gpu_table(found)
         sel = choose_gpus(a, found)                    # asked when two or more cards can share the model

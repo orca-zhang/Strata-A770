@@ -1,0 +1,51 @@
+{
+  "complete": true,
+  "check_passed": true,
+  "gpu_work": false,
+  "performance_measurement": false,
+  "commands": [
+    {
+      "label": "build",
+      "command": [
+        "C:\\Program Files\\CMake\\bin\\cmake.exe",
+        "--build",
+        "G:\\GitHub\\Strata\\build-orca-native-20261029\\clean-root-orca-1793380617150969000\\build",
+        "--target",
+        "strata-orca-gguf-ring-check",
+        "--parallel",
+        "2"
+      ],
+      "exit_code": 0,
+      "log_sha256": "698b6cc037049c7e09d3b38172bfff57f633d728d640e2f1d2758b1054c3d4c6"
+    },
+    {
+      "label": "check",
+      "command": [
+        "G:\\GitHub\\Strata\\build-orca-native-20261029\\clean-root-orca-1793380617150969000\\build\\orca\\strata-orca-gguf-ring-check.exe"
+      ],
+      "exit_code": 0,
+      "log_sha256": "33abb3c89ec5b1063d06a9c6850eb36939107e25b5a5a78e975f617d2c71123b"
+    }
+  ],
+  "source_sha256": {
+    "sycl/orca/engine.cmake": "f20c8c100f326ca1cacf51db343549ad84df4d887f280d07d46a12a87f730d34",
+    "sycl/src/core/gguf_expert_source_test.cpp": "3895b5037f324cc3f2c028092dfefe0551ab2aec8e6e274f68c3d85d6307dbb0"
+  },
+  "model_exe_before": "f5c335812e55ab004281259e123d5cc8e1648dcec6d9ca59f338e9374ec51b05",
+  "check_output": "gguf_expert_source_test: PASS (geometry, bytes, hits, wrap, failure, reopen)\n",
+  "model_exe_unchanged": true,
+  "date": "2026-10-31",
+  "scope": "Native-generated GGUF file-ring check, synthetic geometry and bytes; no model/GPU workload",
+  "linux_validated": false,
+  "source_report": "build-orca-native-20261029\\gguf-ring-native-1793389949585361300\\results.json",
+  "source_report_sha256": "903af4658f3a9ed0fce12e68756dd9c5cf7888efcb5ec7897cd9dcfad45a224b",
+  "cases": [
+    "invalid geometry",
+    "GGUF tensor metadata",
+    "exact gate/up/down bytes",
+    "repeated-hit read counts",
+    "ring wrap",
+    "failed/truncated read retry",
+    "close and reopen"
+  ]
+}

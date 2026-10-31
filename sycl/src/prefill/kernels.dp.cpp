@@ -1627,6 +1627,38 @@ void gr_write(float* R, const float* bo, const float* inj, int64_t inj_ld, int64
     }
     check("gr_write");
 }
+// Opt-in last/all-row diagnostics use separate entry points, preserving the normal
+// kernels and dispatch count. Read only the elements written by this work-item.
+void gr_write_finite(float* R, const float* bo, const float* inj, int64_t inj_ld, int64_t T, void* stream,
+                     uint32_t* count, bool all_rows) {
+    strata::q_of(stream)->parallel_for<class GrWriteFinite>(
+        sycl::nd_range<3>(sycl::range(1, 1, blocks_for(T * D)) * sycl::range(1, 1, 256),
+                         sycl::range(1, 1, 256)), [=](sycl::nd_item<3> item) {
+            gr_write_kernel(R, bo, inj, inj_ld, T);
+            const int64_t i = item.get_global_id(2);
+            if (i < T * D && (all_rows || i >= (T - 1) * D) && !sycl::isfinite(R[i]))
+                sycl::atomic_ref<uint32_t, sycl::memory_order::relaxed, sycl::memory_scope::device,
+                    sycl::access::address_space::global_space>(*count).fetch_add(1);
+        });
+}
+void gr_write_norm_rs_finite(float* R, const float* bo, const float* inj, int64_t inj_ld, const float* w,
+                             float eps, float* rs, uint16_t* xn16, int64_t T, void* stream,
+                             uint16_t* xn16_lo, uint32_t* count, bool all_rows) {
+    strata::q_of(stream)->parallel_for<class GrWriteNormFinite>(
+        sycl::nd_range<3>(sycl::range(1, 1, (unsigned)(T * HC)) * sycl::range(1, 1, 256),
+                         sycl::range(1, 1, 256)),
+        [=](sycl::nd_item<3> item) [[sycl::reqd_sub_group_size(32)]] {
+            gr_write_norm_rs_kernel(R, bo, inj, inj_ld, w, eps, rs, xn16, xn16_lo);
+            const int64_t row = item.get_group(2);
+            if (!all_rows && row / HC != T - 1) return;
+            uint32_t bad = 0;
+            for (int d = item.get_local_id(2); d < N; d += 256)
+                bad += !sycl::isfinite(R[row * N + d]);
+            if (bad)
+                sycl::atomic_ref<uint32_t, sycl::memory_order::relaxed, sycl::memory_scope::device,
+                    sycl::access::address_space::global_space>(*count).fetch_add(bad);
+        });
+}
 void gr_broadcast(const float* e, float* R, int64_t T, void* stream) {
     {
         auto exp_props = sycl::ext::oneapi::experimental::properties{
@@ -2128,6 +2160,62 @@ void gate_attn(const float* attn, const float* q_full, uint16_t* out16, int64_t 
                 });
     }
     check("gate_attn");
+}
+
+// Diagnostic reduction: no host wait or full tensor readback between layers.
+void finite_count_async(const float* values, int64_t count, uint32_t* output, void* stream) {
+    if (count < 0 || count > UINT32_MAX || (count && (!values || !output)))
+        throw std::invalid_argument("invalid asynchronous finite check");
+    if (!count) return;
+    strata::q_of(stream)->parallel_for(sycl::nd_range<1>(2048, 256), [=](sycl::nd_item<1> item) {
+        uint32_t bad = 0;
+        for (int64_t i = item.get_global_id(0); i < count; i += 2048)
+            bad += !sycl::isfinite(values[i]);
+        if (bad) sycl::atomic_ref<uint32_t, sycl::memory_order::relaxed, sycl::memory_scope::device,
+            sycl::access::address_space::global_space>(*output).fetch_add(bad);
+    });
+}
+
+void finite_count16_async(const uint16_t* values, int64_t count, bool bf16, uint32_t* output, void* stream) {
+    if (count < 0 || count > UINT32_MAX || (count && (!values || !output)))
+        throw std::invalid_argument("invalid asynchronous 16-bit finite check");
+    if (!count) return;
+    const uint16_t exponent = bf16 ? 0x7f80 : 0x7c00;
+    strata::q_of(stream)->parallel_for<class Finite16Count>(sycl::nd_range<1>(2048, 256), [=](sycl::nd_item<1> item) {
+        uint32_t bad = 0;
+        for (int64_t i = item.get_global_id(0); i < count; i += 2048)
+            bad += (values[i] & exponent) == exponent;
+        if (bad) sycl::atomic_ref<uint32_t, sycl::memory_order::relaxed, sycl::memory_scope::device,
+            sycl::access::address_space::global_space>(*output).fetch_add(bad);
+    });
+}
+
+// Opt-in Down diagnostic. One work-group and an in-order stream make the first
+// bad product the sole writer; snapshot before the next expert reuses its DQ slot.
+// meta = {rows, N, K, layer, expert, chunk_position}; rows == 0 means no capture.
+void capture_down_async(const uint16_t* x, const uint16_t* w, const float* y,
+                        int64_t rows, int64_t capacity, int64_t layer, int64_t expert, int64_t position,
+                        int64_t* meta, uint16_t* saved_x, uint16_t* saved_w, float* saved_y, void* stream) {
+    if (rows < 0 || rows > capacity || rows > INT32_MAX / 2560 ||
+        (rows && (!x || !w || !y || !meta || !saved_x || !saved_w || !saved_y)))
+        throw std::invalid_argument("invalid asynchronous Down capture");
+    if (!rows) return;
+    // ponytail: one group scans this diagnostic product; use a two-pass reduction
+    // only if large-product diagnostic cost warrants the extra launch.
+    strata::q_of(stream)->parallel_for<class CaptureDown>(sycl::nd_range<1>(256, 256), [=](sycl::nd_item<1> item) {
+        if (meta[0]) return;
+        const int64_t lane = item.get_local_id(0);
+        bool bad = false;
+        for (int64_t i = lane; i < rows * 2560; i += 256) bad |= !sycl::isfinite(y[i]);
+        if (!sycl::any_of_group(item.get_group(), bad)) return;
+        if (!lane) {
+            meta[0] = rows; meta[1] = 2560; meta[2] = 640;
+            meta[3] = layer; meta[4] = expert; meta[5] = position;
+        }
+        for (int64_t i = lane; i < rows * 640; i += 256) saved_x[i] = x[i];
+        for (int64_t i = lane; i < 2560 * 640; i += 256) saved_w[i] = w[i];
+        for (int64_t i = lane; i < rows * 2560; i += 256) saved_y[i] = y[i];
+    });
 }
 
 }  // namespace strata::prefill

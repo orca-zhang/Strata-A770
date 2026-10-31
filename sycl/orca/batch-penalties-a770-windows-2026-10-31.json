@@ -1,0 +1,63 @@
+{
+  "complete": true,
+  "check_passed": true,
+  "performance_measurement": false,
+  "tests": [
+    {
+      "label": "greedy-penalties",
+      "command": [
+        "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Python311\\python.exe",
+        "G:\\GitHub\\Strata\\tools\\batch_test.py",
+        "--exe",
+        "G:\\GitHub\\Strata\\build-orca-native-20261029\\clean-root-orca-1793380617150969000\\build\\orca\\strata.exe",
+        "--config",
+        "G:\\GitHub\\Strata\\build-orca-native-20261029\\batch-scheduler-check-1793387058187693700\\config.json",
+        "--batch",
+        "2",
+        "--n",
+        "2",
+        "--max-new",
+        "64",
+        "--keys",
+        "temperature=0 top_k=20 seed=123 penalty_last_n=64 penalty_repeat=1.1 penalty_freq=0.2 penalty_present=0.3",
+        "--dump",
+        "G:\\GitHub\\Strata\\build-orca-native-20261029\\batch-penalty-check-1793387487404681400\\greedy-penalties.json"
+      ],
+      "exit_code": 0,
+      "matched_tokens": 128,
+      "dump_sha256": "854a7fdd4ac2eda73427737d0eee7058408c6dd60b1167dce904d4454d33b1e2"
+    },
+    {
+      "label": "sampled-penalties",
+      "command": [
+        "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Python311\\python.exe",
+        "G:\\GitHub\\Strata\\tools\\batch_test.py",
+        "--exe",
+        "G:\\GitHub\\Strata\\build-orca-native-20261029\\clean-root-orca-1793380617150969000\\build\\orca\\strata.exe",
+        "--config",
+        "G:\\GitHub\\Strata\\build-orca-native-20261029\\batch-scheduler-check-1793387058187693700\\config.json",
+        "--batch",
+        "2",
+        "--n",
+        "2",
+        "--max-new",
+        "64",
+        "--keys",
+        "temperature=0.7 top_k=20 seed=123 penalty_last_n=64 penalty_repeat=1.1 penalty_freq=0.2 penalty_present=0.3",
+        "--dump",
+        "G:\\GitHub\\Strata\\build-orca-native-20261029\\batch-penalty-check-1793387487404681400\\sampled-penalties.json"
+      ],
+      "exit_code": 0,
+      "matched_tokens": 128,
+      "dump_sha256": "3aefa0e0cd92d24c9adfba130943928320414507cfe1b7e17f114e369612ca7a"
+    }
+  ],
+  "exe_sha256": "f5c335812e55ab004281259e123d5cc8e1648dcec6d9ca59f338e9374ec51b05",
+  "exe_unchanged": true,
+  "date": "2026-10-31",
+  "scope": "Native independent-slot sampling penalties: greedy and fixed-seed sampled, solo versus batch2",
+  "full_model_speedup_established": false,
+  "linux_gpu_validated": false,
+  "original_report": "build-orca-native-20261029\\batch-penalty-check-1793387487404681400\\results.json",
+  "original_report_sha256": "024421cd0ba16e0c28a5c9052e2cd212e74609a00a2542cacf01e67f2cbf8f6c"
+}

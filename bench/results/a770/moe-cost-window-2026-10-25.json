@@ -1,0 +1,325 @@
+{
+  "complete": true,
+  "adopted": false,
+  "date": "2026-10-25",
+  "scope": "same-binary full-model cost-window comparison",
+  "hardware": {
+    "gpu": "Intel Arc A770 16 GB",
+    "cpu": "Intel Xeon E5-2696 v4",
+    "ram_gib": 256,
+    "pcie": "3.0 x16",
+    "driver": "32.0.101.9034",
+    "compiler": "DPC++ 2025.3",
+    "backend": "Level Zero"
+  },
+  "settings": {
+    "model": "IQ2_XS",
+    "kv": "FP16",
+    "draft_vocab": 248320,
+    "target_vocab": 248320,
+    "mtp": 4,
+    "spec_min_p": 0.5,
+    "context": 8192,
+    "prefill": 8192,
+    "prompt_cache": 0,
+    "actual_expert_slots": 5771,
+    "prefill_workspace_mib": 128,
+    "command_graphs": true,
+    "profiling": false
+  },
+  "rule": "A1/B1/A2/B2/A3 fresh processes. Short16 initializer,one warmup per case,three interleaved retained cycles. Both B pairs must gain>=1% on both cases,with<=3% adjacent baseline time drift and all outputs equal. Same rebuilt exe; only cost flag0/1 differs.",
+  "validation": {
+    "cpu_checks": 56,
+    "full_2k_requests": 40,
+    "retained_2k_requests": 30,
+    "matched_output_tokens": 5120,
+    "all_outputs_equal": true,
+    "all_exit_codes_zero": true,
+    "max_baseline_drift_pct": 0.4915184490878355
+  },
+  "runs": [
+    {
+      "label": "A1",
+      "cost_window": "0",
+      "expert_slots": 5771,
+      "summary": {
+        "Code2K": {
+          "decode_tps": 29.368575624082233,
+          "range": [
+            28.542758390010036,
+            29.40568356727699
+          ],
+          "accepted": [
+            75,
+            75,
+            75
+          ],
+          "offered": [
+            98,
+            98,
+            98
+          ],
+          "outputs_equal": true
+        },
+        "Prose2K": {
+          "decode_tps": 29.312082073829806,
+          "range": [
+            29.00126880551024,
+            29.553010712966383
+          ],
+          "accepted": [
+            73,
+            73,
+            73
+          ],
+          "offered": [
+            98,
+            100,
+            98
+          ],
+          "outputs_equal": true
+        }
+      },
+      "warmup_tps": {
+        "Code2K": 25.326474079936684,
+        "Prose2K": 27.359196323607993
+      }
+    },
+    {
+      "label": "B1",
+      "cost_window": "1",
+      "expert_slots": 5771,
+      "summary": {
+        "Code2K": {
+          "decode_tps": 27.02132151150517,
+          "range": [
+            26.100077484605034,
+            28.10715854194115
+          ],
+          "accepted": [
+            65,
+            69,
+            68
+          ],
+          "offered": [
+            88,
+            92,
+            92
+          ],
+          "outputs_equal": true
+        },
+        "Prose2K": {
+          "decode_tps": 28.158479442110128,
+          "range": [
+            27.448373469431516,
+            28.223050294357595
+          ],
+          "accepted": [
+            69,
+            69,
+            69
+          ],
+          "offered": [
+            94,
+            97,
+            97
+          ],
+          "outputs_equal": true
+        }
+      },
+      "warmup_tps": {
+        "Code2K": 23.733590447229847,
+        "Prose2K": 24.77451321952541
+      }
+    },
+    {
+      "label": "A2",
+      "cost_window": "0",
+      "expert_slots": 5771,
+      "summary": {
+        "Code2K": {
+          "decode_tps": 29.262493713136116,
+          "range": [
+            29.241770040892785,
+            29.357124836586316
+          ],
+          "accepted": [
+            75,
+            75,
+            75
+          ],
+          "offered": [
+            98,
+            98,
+            98
+          ],
+          "outputs_equal": true
+        },
+        "Prose2K": {
+          "decode_tps": 29.31543870095962,
+          "range": [
+            29.304029304029303,
+            29.396229014996667
+          ],
+          "accepted": [
+            73,
+            73,
+            73
+          ],
+          "offered": [
+            98,
+            98,
+            98
+          ],
+          "outputs_equal": true
+        }
+      },
+      "warmup_tps": {
+        "Code2K": 25.32897991491046,
+        "Prose2K": 26.687238079352834
+      }
+    },
+    {
+      "label": "B2",
+      "cost_window": "1",
+      "expert_slots": 5771,
+      "summary": {
+        "Code2K": {
+          "decode_tps": 28.287917965037902,
+          "range": [
+            28.065251710226274,
+            28.773743958637745
+          ],
+          "accepted": [
+            69,
+            70,
+            71
+          ],
+          "offered": [
+            85,
+            88,
+            86
+          ],
+          "outputs_equal": true
+        },
+        "Prose2K": {
+          "decode_tps": 28.43749305725267,
+          "range": [
+            27.964083630087604,
+            28.954035468693448
+          ],
+          "accepted": [
+            67,
+            68,
+            70
+          ],
+          "offered": [
+            86,
+            87,
+            90
+          ],
+          "outputs_equal": true
+        }
+      },
+      "warmup_tps": {
+        "Code2K": 25.312951134138867,
+        "Prose2K": 27.191230828057954
+      }
+    },
+    {
+      "label": "A3",
+      "cost_window": "0",
+      "expert_slots": 5771,
+      "summary": {
+        "Code2K": {
+          "decode_tps": 29.407034714085512,
+          "range": [
+            29.340974212034386,
+            29.495126391225202
+          ],
+          "accepted": [
+            75,
+            75,
+            75
+          ],
+          "offered": [
+            98,
+            98,
+            98
+          ],
+          "outputs_equal": true
+        },
+        "Prose2K": {
+          "decode_tps": 29.409061667126185,
+          "range": [
+            29.046678920734337,
+            29.49580606507512
+          ],
+          "accepted": [
+            73,
+            73,
+            73
+          ],
+          "offered": [
+            98,
+            100,
+            98
+          ],
+          "outputs_equal": true
+        }
+      },
+      "warmup_tps": {
+        "Code2K": 25.261994513410567,
+        "Prose2K": 27.365630478470948
+      }
+    }
+  ],
+  "comparison": {
+    "B1": {
+      "Code2K": {
+        "baseline": 34.11166291570963,
+        "candidate": 37.0078125,
+        "throughput_change_pct": -7.8257789062522125,
+        "baseline_drift_pct": 0.3625183553597644,
+        "drift_eligible": true,
+        "outputs_equal": true,
+        "passes": false
+      },
+      "Prose2K": {
+        "baseline": 34.11367181908844,
+        "candidate": 35.51328125,
+        "throughput_change_pct": -3.9410873387306644,
+        "baseline_drift_pct": -0.011450032060089654,
+        "drift_eligible": true,
+        "outputs_equal": true,
+        "passes": false
+      }
+    },
+    "B2": {
+      "Code2K": {
+        "baseline": 34.089349670921095,
+        "candidate": 35.35078125,
+        "throughput_change_pct": -3.568327302749219,
+        "baseline_drift_pct": -0.4915184490878355,
+        "drift_eligible": true,
+        "outputs_equal": true,
+        "passes": false
+      },
+      "Prose2K": {
+        "baseline": 34.05737859291425,
+        "candidate": 35.16484375,
+        "throughput_change_pct": -3.1493532715775374,
+        "baseline_drift_pct": -0.3183473421432437,
+        "drift_eligible": true,
+        "outputs_equal": true,
+        "passes": false
+      }
+    }
+  },
+  "local_archive": {
+    "directory": "build-sycl-a770-moe-cost-window-20261025",
+    "audit_command": "python build-sycl-a770-moe-cost-window-20261025/run.py --check",
+    "results_sha256": "593b61b2d00583b6d9107cd5d58e12a37debe4fc6d2536aeb956ff86caf09a52"
+  },
+  "limits": "Two fixed2048-token prompts with full128 greedy outputs. Frozen graph engine with128MiB workspace. No stage profiling or general model-quality attribution. Raw inputs/outputs,environment,logs and binaries remain local."
+}

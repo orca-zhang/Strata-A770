@@ -57,8 +57,8 @@ Engine 0.1.26, the same runs. † not measured again: 0.1.14.
 Output speed depends on the text as well: speculative decoding runs faster when more of the drafted tokens are
 accepted, so a different answer to the same prompt moves it by several percent. Run back to back on the 4K prompt,
 0.1.14 writes 88.5 tokens/s and 0.1.12 85.7. The numbers before 0.1.13 (prompts about half as fast):
-[`bench/results/2026-09-24-final`](https://github.com/Niko1221/Strata/blob/f40c418e483adc89e2e4f58e602c32a7e7d892c8/bench/results/2026-09-24-final/matrix.md); these:
-[`bench/results/2026-09-28-speed-0114`](https://github.com/Niko1221/Strata/blob/f40c418e483adc89e2e4f58e602c32a7e7d892c8/bench/results/2026-09-28-speed-0114/README.md).
+[`bench/results/2026-09-24-final`](../bench/results/2026-09-24-final/matrix.md); these:
+[`bench/results/2026-09-28-speed-0114`](../bench/results/2026-09-28-speed-0114/README.md).
 
 IQ3_XXS and IQ3_S at 262K are not measured: with their 43 / 50 GB of experts, a 260K-token context brings a 64 GB PC
 to its memory limit by setup's estimate (the experts + the context's KV cache + 24 GB), so setup recommends up to 128K
@@ -76,7 +76,7 @@ note; never under WSL, which cannot stream).
 **4-bit KV cache (engine 0.1.8, optional):** `START-HERE.bat --setup` asks above 8K context (or pass `--kv q4_0`). It
 halves the KV cache's memory with a Hadamard rotation before 4-bit rounding (PR #21), about 4% faster at 128K, but it
 is measurably less precise on long documents (perplexity +8-12%; needle tests still pass). 8-bit stays the default.
-Details: [`bench/results/2026-09-27-kv-q4`](https://github.com/Niko1221/Strata/blob/f40c418e483adc89e2e4f58e602c32a7e7d892c8/bench/results/2026-09-27-kv-q4/README.md).
+Details: [`bench/results/2026-09-27-kv-q4`](../bench/results/2026-09-27-kv-q4/README.md).
 
 **Hybrid K8V4 KV cache (engine 0.1.25, optional, PR #120):** `--kv k8v4` (`START-HERE.bat --setup --kv k8v4`) keeps
 the keys at 8 bits and stores the values as rotated 4-bit: 23% less KV memory than 8-bit, so more experts fit in
@@ -182,7 +182,7 @@ are left alone. Unset or `0` keeps the previous behavior. On one 32 GB Windows 1
 and a Thunderbolt RTX 3090, IQ2_XS with `--mmap-experts --layer-split 12 --trim-stage-weights` raised median available
 RAM from 0.51 to 12.19 GiB across 1K/4K/16K prompt trials, with 3.7-4.4% lower prefill throughput. It did not reduce
 committed memory or physical SSD reads. This is a working-set hint, not an unmap or a guarantee that the OS drops
-its file cache. See the [configuration, measurements and limits](https://github.com/Niko1221/Strata/blob/f40c418e483adc89e2e4f58e602c32a7e7d892c8/bench/results/2026-10-04-windows-mapped-release/README.md).
+its file cache. See the [configuration, measurements and limits](../bench/results/2026-10-04-windows-mapped-release/README.md).
 
 **Low-RAM mode without `experts.bin` (engine 0.1.31):** for the native packs (IQ2_XS, IQ3_XXS, IQ3_S, the Coder, Swift,
 Q2_0 packed by `tools/iq_pack.py`; not the canonical Q2_0 pack setup makes for AVX-512 CPUs) the mapped mode no longer
@@ -267,7 +267,7 @@ whole chunk at once; unpinned experts are copied by helper threads. Measured on 
 32K-token prompt: Q2_0 572 -> 1,290 tokens/s, IQ3_S 383 -> 1,208. Through the server (Q2_0, 128K context): 999 tokens
 353 -> 438 tokens/s, 6,927 tokens 529 -> 1,077, 28,584 tokens 584 -> 1,249. Output speed is unchanged. Needles 5/5
 (1K-262K). Details and the quality check:
-[`bench/results/2026-09-28-prefill-speed`](https://github.com/Niko1221/Strata/blob/f40c418e483adc89e2e4f58e602c32a7e7d892c8/bench/results/2026-09-28-prefill-speed/README.md). Existing installs
+[`bench/results/2026-09-28-prefill-speed`](../bench/results/2026-09-28-prefill-speed/README.md). Existing installs
 switch to `--prefill auto` the next time START-HERE / setup.sh starts them. The raw numbers:
 [`bench/results/`](../bench/results/). The [paper](paper/Strata-Paper.pdf) explains every number.
 

@@ -1,0 +1,780 @@
+{
+  "date": "2026-10-23",
+  "status": "implemented_opt_in_short_screen_passed",
+  "backend": "SYCL",
+  "hardware": "Intel Arc A770 16 GB, Windows, Xeon E5-2696 v4, 256 GiB DDR3, PCIe 3.0",
+  "toolchain": "Intel oneAPI compiler 2025.3; borrowed engine/kernel libraries frozen and hashed before linking",
+  "model": "Qwen3.8-Flash-Next IQ2_XS pack",
+  "feature": {
+    "environment": "STRATA_MTP_CUM_MIN_P",
+    "default": 0,
+    "screened_value": 0.5,
+    "range": [
+      0,
+      1
+    ],
+    "invalid_input": "diagnostic and disabled",
+    "scope": "MTP verification window; draft generation is not stopped earlier"
+  },
+  "production_config_or_executable_changed": false,
+  "independent_performance_confirmation": false,
+  "whole_model_speedup_established": false,
+  "exe_sha256": "ed55034a3e17d8ccb2e40285b1d192f2a4a0d8422626fc039f78d6e84df693fa",
+  "source_sha256": {
+    "include/strata/spec/draft_policy.hpp": "f565eb9a31e48e1201bad5754ffab05bb2671521e238b0d7f8d51a18140bd0c2",
+    "src/spec/draft_policy.cpp": "dcc2c0fe7eb620bd831d0643bdf59c2bb63205ddbca4458c7c8f05a6d53ea67e",
+    "src/spec/draft_policy_test.cpp": "6279fc943e845487e6881e674df53ae98b46b77973a55d31cc574159acf3582b",
+    "sycl/src/program/generate.cpp": "5fe2b988a0ddd6db6f3e4247b778b1896657bd13b6deac0cc4f8d3e1c6285c80"
+  },
+  "workspace_matches_tested_sources": {
+    "include/strata/spec/draft_policy.hpp": true,
+    "src/spec/draft_policy.cpp": true,
+    "src/spec/draft_policy_test.cpp": false,
+    "sycl/src/program/generate.cpp": false
+  },
+  "libraries_sha256": {
+    "strata_engine.lib": "9e07d5cb0e0d6baaf37f9aa7a25c96c911338511c443e1e6846b4e0af80ba7da",
+    "strata_prefill.lib": "db7030439dcbe4ac607bb3a2e426a7720a6ae060c9f29bc1f9bc4682fa944377",
+    "strata_spec.lib": "c1414053f28e261ef906f1060b299e42ee2f7a15d12c78fa76bf663402592f81",
+    "strata_kernels.lib": "07c1cd82e697c847a7044104845c59a1b73f94d85928a1adee18e162e705322f",
+    "strata_core.lib": "c0169c00e7b272c04ad0b2908dff2690bb36678f2240327eb7cd11ecc10d3360",
+    "strata_kernels_cpu.lib": "a1e0f86f3479b1eb95275e546bf1af0fa875b1883eb85738cc05bca65e051737",
+    "ggml/src/ggml-cpu.lib": "eac8e0215b8cac74109ffc9a13e298107686054ddcdbd168de7094cb296f7217",
+    "ggml/src/ggml-base.lib": "578ac90275210e8620b82eaf45d15d4be5c648a1b2d630342aca95b10c6ddd4e"
+  },
+  "cpu_validation": {
+    "checks_passed": 53,
+    "log_sha256": "9dfa73b01d71b65230a1c77e6e52b8f26961513e3497510d8e3c2409b394c1a6"
+  },
+  "environment_validation": {
+    "checks_passed": 5,
+    "values": [
+      "0",
+      "0.5",
+      "nan",
+      "1.1",
+      "0.5junk"
+    ],
+    "summary_sha256": "1a7224cd66897084d7094ce162094dbb7fd99e43a141bf2b99d2a8d24eb11845"
+  },
+  "greedy_validation": {
+    "prompt_tokens": 23,
+    "output_tokens_per_mode": 70,
+    "modes": [
+      "off",
+      "cumulative_0.5",
+      "cost_window"
+    ],
+    "all_output_hashes_equal": true,
+    "rows": [
+      {
+        "mode": "off",
+        "generated": 70,
+        "accepted": 42,
+        "offered": 58,
+        "output_sha256": "45c80da5cc65b489e3407f1612006ba7841414f830bd74c6b593dc9165227255"
+      },
+      {
+        "mode": "cum",
+        "generated": 70,
+        "accepted": 42,
+        "offered": 54,
+        "output_sha256": "45c80da5cc65b489e3407f1612006ba7841414f830bd74c6b593dc9165227255"
+      },
+      {
+        "mode": "cost",
+        "generated": 70,
+        "accepted": 42,
+        "offered": 58,
+        "output_sha256": "45c80da5cc65b489e3407f1612006ba7841414f830bd74c6b593dc9165227255"
+      }
+    ],
+    "raw_report_sha256": "280214b8bdef4a65eaa726f54f489a3a1a454bcce5b7090bbda43ed14968e4b8"
+  },
+  "screen": {
+    "design": "same executable, off/cumulative 0.5/off in three processes; one Short prompt only",
+    "warmup_requests_per_arm": 10,
+    "retained_requests_per_arm": 5,
+    "total_requests": 45,
+    "context": 8192,
+    "prompt_tokens": 23,
+    "output_limit": 128,
+    "actual_output_tokens": 70,
+    "prompt_cache": 0,
+    "requested_expert_cache": 5500,
+    "actual_expert_slots": 5771,
+    "pcie_fraction": 0.16,
+    "adapt_swaps": 32,
+    "unrelated_batch_kv_steps_disabled": true,
+    "other_experimental_controls": "cost window, chained MTP submission and fused KV store disabled",
+    "profiling": false,
+    "concurrency_check": "shared GPU lock; other GPU/compiler processes checked before and after every retained request",
+    "all_15_retained_outputs_equal": true,
+    "comparisons": [
+      {
+        "case": "Short",
+        "mode": "cum",
+        "metrics": {
+          "decode_ms": {
+            "baseline": 31.309047007052065,
+            "candidate": 30.292857142857144,
+            "throughput_change_pct": 3.354552723114579,
+            "baseline_drift_pct": 1.5727030258438468
+          },
+          "prompt_ms": {
+            "baseline": 785.8688249319983,
+            "candidate": 798.5,
+            "throughput_change_pct": -1.5818628763934472,
+            "baseline_drift_pct": 1.7974065990499444
+          },
+          "ttft_ms": {
+            "baseline": 842.6390714858402,
+            "candidate": 854.7912000003635,
+            "throughput_change_pct": -1.4216487622378593,
+            "baseline_drift_pct": 1.8015087109690464
+          }
+        },
+        "outputs_equal": true
+      }
+    ],
+    "arms": [
+      {
+        "arm": "A1",
+        "mode": "off",
+        "decode_tok_s_median": 32.18982801434747,
+        "decode_tok_s_range": [
+          32.13072615441109,
+          32.23726627981947
+        ],
+        "prompt_ms_median": 778.9,
+        "ttft_ms_median": 835.149999999885,
+        "rows": [
+          {
+            "generated": 70,
+            "prompt_tokens": 23,
+            "prompt_ms": 769.7,
+            "decode_ms": 2173.2,
+            "ttft_ms": 826.1505999998917,
+            "accepted": 42,
+            "offered": 58,
+            "output_sha256": "45c80da5cc65b489e3407f1612006ba7841414f830bd74c6b593dc9165227255"
+          },
+          {
+            "generated": 70,
+            "prompt_tokens": 23,
+            "prompt_ms": 778.9,
+            "decode_ms": 2178.6,
+            "ttft_ms": 835.149999999885,
+            "accepted": 42,
+            "offered": 58,
+            "output_sha256": "45c80da5cc65b489e3407f1612006ba7841414f830bd74c6b593dc9165227255"
+          },
+          {
+            "generated": 70,
+            "prompt_tokens": 23,
+            "prompt_ms": 775.6,
+            "decode_ms": 2175.1,
+            "ttft_ms": 831.1241999999766,
+            "accepted": 42,
+            "offered": 58,
+            "output_sha256": "45c80da5cc65b489e3407f1612006ba7841414f830bd74c6b593dc9165227255"
+          },
+          {
+            "generated": 70,
+            "prompt_tokens": 23,
+            "prompt_ms": 785.8,
+            "decode_ms": 2171.4,
+            "ttft_ms": 842.0161000003645,
+            "accepted": 42,
+            "offered": 58,
+            "output_sha256": "45c80da5cc65b489e3407f1612006ba7841414f830bd74c6b593dc9165227255"
+          },
+          {
+            "generated": 70,
+            "prompt_tokens": 23,
+            "prompt_ms": 781.1,
+            "decode_ms": 2174.6,
+            "ttft_ms": 837.1192000004157,
+            "accepted": 42,
+            "offered": 58,
+            "output_sha256": "45c80da5cc65b489e3407f1612006ba7841414f830bd74c6b593dc9165227255"
+          }
+        ]
+      },
+      {
+        "arm": "B",
+        "mode": "cum",
+        "decode_tok_s_median": 33.01108229191229,
+        "decode_tok_s_range": [
+          32.874653642041984,
+          33.200531208499335
+        ],
+        "prompt_ms_median": 798.5,
+        "ttft_ms_median": 854.7912000003635,
+        "rows": [
+          {
+            "generated": 70,
+            "prompt_tokens": 23,
+            "prompt_ms": 783.2,
+            "decode_ms": 2111.6,
+            "ttft_ms": 838.8775000003079,
+            "accepted": 42,
+            "offered": 54,
+            "output_sha256": "45c80da5cc65b489e3407f1612006ba7841414f830bd74c6b593dc9165227255"
+          },
+          {
+            "generated": 70,
+            "prompt_tokens": 23,
+            "prompt_ms": 811.8,
+            "decode_ms": 2129.3,
+            "ttft_ms": 869.0483000000313,
+            "accepted": 42,
+            "offered": 54,
+            "output_sha256": "45c80da5cc65b489e3407f1612006ba7841414f830bd74c6b593dc9165227255"
+          },
+          {
+            "generated": 70,
+            "prompt_tokens": 23,
+            "prompt_ms": 795.9,
+            "decode_ms": 2120.5,
+            "ttft_ms": 851.595900000575,
+            "accepted": 42,
+            "offered": 54,
+            "output_sha256": "45c80da5cc65b489e3407f1612006ba7841414f830bd74c6b593dc9165227255"
+          },
+          {
+            "generated": 70,
+            "prompt_tokens": 23,
+            "prompt_ms": 798.5,
+            "decode_ms": 2108.4,
+            "ttft_ms": 854.7912000003635,
+            "accepted": 42,
+            "offered": 54,
+            "output_sha256": "45c80da5cc65b489e3407f1612006ba7841414f830bd74c6b593dc9165227255"
+          },
+          {
+            "generated": 70,
+            "prompt_tokens": 23,
+            "prompt_ms": 812.0,
+            "decode_ms": 2121.7,
+            "ttft_ms": 867.6701999993384,
+            "accepted": 42,
+            "offered": 54,
+            "output_sha256": "45c80da5cc65b489e3407f1612006ba7841414f830bd74c6b593dc9165227255"
+          }
+        ]
+      },
+      {
+        "arm": "A2",
+        "mode": "off",
+        "decode_tok_s_median": 31.691416153567545,
+        "decode_tok_s_range": [
+          31.226301467636173,
+          31.852930469603205
+        ],
+        "prompt_ms_median": 792.9,
+        "ttft_ms_median": 850.195299999541,
+        "rows": [
+          {
+            "generated": 70,
+            "prompt_tokens": 23,
+            "prompt_ms": 788.6,
+            "decode_ms": 2241.7,
+            "ttft_ms": 846.0818999992625,
+            "accepted": 42,
+            "offered": 58,
+            "output_sha256": "45c80da5cc65b489e3407f1612006ba7841414f830bd74c6b593dc9165227255"
+          },
+          {
+            "generated": 70,
+            "prompt_tokens": 23,
+            "prompt_ms": 792.9,
+            "decode_ms": 2206.8,
+            "ttft_ms": 850.5020000002332,
+            "accepted": 42,
+            "offered": 58,
+            "output_sha256": "45c80da5cc65b489e3407f1612006ba7841414f830bd74c6b593dc9165227255"
+          },
+          {
+            "generated": 70,
+            "prompt_tokens": 23,
+            "prompt_ms": 790.5,
+            "decode_ms": 2197.6,
+            "ttft_ms": 848.1735000004846,
+            "accepted": 42,
+            "offered": 58,
+            "output_sha256": "45c80da5cc65b489e3407f1612006ba7841414f830bd74c6b593dc9165227255"
+          },
+          {
+            "generated": 70,
+            "prompt_tokens": 23,
+            "prompt_ms": 793.9,
+            "decode_ms": 2208.8,
+            "ttft_ms": 850.195299999541,
+            "accepted": 42,
+            "offered": 58,
+            "output_sha256": "45c80da5cc65b489e3407f1612006ba7841414f830bd74c6b593dc9165227255"
+          },
+          {
+            "generated": 70,
+            "prompt_tokens": 23,
+            "prompt_ms": 794.1,
+            "decode_ms": 2214.0,
+            "ttft_ms": 851.9117999994705,
+            "accepted": 42,
+            "offered": 58,
+            "output_sha256": "45c80da5cc65b489e3407f1612006ba7841414f830bd74c6b593dc9165227255"
+          }
+        ]
+      }
+    ],
+    "raw_report_sha256": "0b2498fb35dcabb32d0b2cd288fe94262089b16ff39463aa9fd118ad79d0832e"
+  },
+  "limitations": [
+    "Only the 23-token Short prompt was screened; no independent repeat or Code2K/Prose2K/Long8K performance result.",
+    "With cumulative truncation disabled, Code2K returned no first token for over 240 seconds; a retry with batch KV disabled also timed out after 180 seconds. This does not identify the cause.",
+    "Fixed-seed sampling failed in the disabled control: 'double' is not supported in 'Intel(R) Arc(TM) A770 Graphics' device. Sampling correctness remains unverified.",
+    "Functional controls pin expert placement, set PCIe fraction to zero and STRATA_IQ_MT_MIN=1; performance requests use the normal adaptive placement and PCIe fraction.",
+    "Measured short-prompt throughput is not a general speed guarantee; cumulative confidence is a heuristic."
+  ],
+  "early_stop": {
+    "status": "implemented_greedy_validated_short_screen_passed",
+    "environment": "STRATA_MTP_CUM_MIN_P",
+    "default": 0,
+    "cpu_checks_passed": 56,
+    "scope": "Stop draft steps after a completed confidence prefix fails the cumulative floor, and retain verification-window truncation.",
+    "reuses_verification_rule": true,
+    "chain_submission_disabled_when_positive": true,
+    "production_config_or_executable_changed": false,
+    "additional_speedup_established": false,
+    "exe_sha256": "758a7722e186e55ea5e1d9d6359a5aa8e3b9bceb142a62c84d87d0063b8654a2",
+    "source_sha256": {
+      "sycl/include/strata/core/mtp.hpp": "ef1a5681b000c12e34a1ff5f0b59e2d27fb5780c3b0faa7c94f518194afb4f64",
+      "sycl/src/core/mtp.cpp": "d89f5938a2353ee495b84cd0a8f3877f40abd7db6da815d6fcf0a4b5c21ef5ec",
+      "sycl/src/program/generate.cpp": "c631f37cc12791dc42e3e40496523776b683bf0137aefe126dc681d1dcb4cbc7",
+      "sycl/CMakeLists.txt": "11923682c8c39b635d7926df31193b94ff397a11cae77cccfdc8aad6a27dbdeb",
+      "src/spec/draft_policy_test.cpp": "ef077e49209c5b3f1bf34bc810a63984a785b2fe2a802ed82e802ee2a69238fd"
+    },
+    "cpu_log_sha256": "3e7cdbcf2cb01fdce2e3dbc5d5ca64817993dfdfd8a0a375a1bb364f23e1f8a0",
+    "environment_checks_passed": 5,
+    "environment_report_sha256": "8329799f7a77bf75c9fe50e58c788e8d6d2f317d14778b4949c9bd6d72bd1120",
+    "initial_greedy_validation": {
+      "all_output_ids_equal": true,
+      "actual_expert_slots": 5771,
+      "rows": [
+        {
+          "mode": "verify",
+          "cases": [
+            {
+              "case": "Short",
+              "generated": 70,
+              "prompt_tokens": 23,
+              "accepted": 42,
+              "offered": 54,
+              "output_sha256": "45c80da5cc65b489e3407f1612006ba7841414f830bd74c6b593dc9165227255"
+            },
+            {
+              "case": "Code256",
+              "generated": 2,
+              "prompt_tokens": 256,
+              "accepted": 0,
+              "offered": 3,
+              "output_sha256": "c7b9cdef2e75c6fcb29c17fe0720de9e787152825ba38a244094c21acd531c1d"
+            },
+            {
+              "case": "Prose256",
+              "generated": 1,
+              "prompt_tokens": 256,
+              "accepted": 0,
+              "offered": 0,
+              "output_sha256": "f66a8a966619a7aae703ba69f26c7d0b93f5a86b91d51608f9e8b51bb4acc4c5"
+            }
+          ]
+        },
+        {
+          "mode": "early",
+          "cases": [
+            {
+              "case": "Short",
+              "generated": 70,
+              "prompt_tokens": 23,
+              "accepted": 42,
+              "offered": 54,
+              "output_sha256": "45c80da5cc65b489e3407f1612006ba7841414f830bd74c6b593dc9165227255"
+            },
+            {
+              "case": "Code256",
+              "generated": 2,
+              "prompt_tokens": 256,
+              "accepted": 0,
+              "offered": 3,
+              "output_sha256": "c7b9cdef2e75c6fcb29c17fe0720de9e787152825ba38a244094c21acd531c1d"
+            },
+            {
+              "case": "Prose256",
+              "generated": 1,
+              "prompt_tokens": 256,
+              "accepted": 0,
+              "offered": 0,
+              "output_sha256": "f66a8a966619a7aae703ba69f26c7d0b93f5a86b91d51608f9e8b51bb4acc4c5"
+            }
+          ]
+        }
+      ],
+      "raw_report_sha256": "ec49f274b8defa961e8107ebfa274327f2b3fe7ac6573d4f1d31e5759cefe75f",
+      "limitation": "Code256 and Prose256 are incomplete prefixes and produced only two and one tokens; complete chat/code requests remain pending."
+    },
+    "sampling_emulation_probe": {
+      "fp64_aspect_reported": true,
+      "kernel_execution_passed": false,
+      "failed_executable": "prior verify-only control",
+      "environment": {
+        "IGC_EnableDPEmulation": "1",
+        "OverrideDefaultFP64Settings": "1"
+      },
+      "kernel": "sampler_split_merge_kernel_b17bd4",
+      "error": "Double type is not supported on this platform; backend compiler failed build.",
+      "driver_flags_adopted": false,
+      "capability_log_sha256": "f14284d26e3c78a69113a9b642f37fc7314e6fef01866da8f8de40a6625165f3",
+      "engine_log_sha256": "ff0ed3f5303d0f37090a64abf37781930045781f6b2b250f7a437c9808695c52"
+    },
+    "excluded_performance_attempts": [
+      {
+        "reason": "Concurrent compiler detected before first candidate retained sample; no performance comparison used.",
+        "baseline_retained": 5,
+        "candidate_retained": 0,
+        "raw_report_sha256": "09fd9df6dbabfc598d26fb17d100eff6bf894dc0fdb92567f05ed3f263af7518",
+        "failure_report_sha256": "5a7d135c76ed26b97f3d699ea45f0fdf89522a1e3efeb7c0242d849db69062c4"
+      }
+    ],
+    "complete_chat_code_validation": {
+      "all_output_ids_equal": true,
+      "actual_expert_slots": 5771,
+      "rows": [
+        {
+          "mode": "verify",
+          "cases": [
+            {
+              "case": "Chat",
+              "generated": 78,
+              "prompt_tokens": 26,
+              "accepted": 39,
+              "offered": 51,
+              "output_sha256": "69a880e26350424095aebf5ff1a69b8ff5e2a34c186c55430944a1f8b457855d"
+            },
+            {
+              "case": "CodeChat",
+              "generated": 128,
+              "prompt_tokens": 35,
+              "accepted": 90,
+              "offered": 103,
+              "output_sha256": "c4b5f31a5f2832d0079d03ba23348f8a0e00f81e50eac9c6e52ea43d420510da"
+            }
+          ]
+        },
+        {
+          "mode": "early",
+          "cases": [
+            {
+              "case": "Chat",
+              "generated": 78,
+              "prompt_tokens": 26,
+              "accepted": 39,
+              "offered": 51,
+              "output_sha256": "69a880e26350424095aebf5ff1a69b8ff5e2a34c186c55430944a1f8b457855d"
+            },
+            {
+              "case": "CodeChat",
+              "generated": 128,
+              "prompt_tokens": 35,
+              "accepted": 90,
+              "offered": 103,
+              "output_sha256": "c4b5f31a5f2832d0079d03ba23348f8a0e00f81e50eac9c6e52ea43d420510da"
+            }
+          ]
+        }
+      ],
+      "raw_report_sha256": "f6fa41d822e64017ced53f4a7bd1acb1ab4cb570ee89063bc47c7cfa5a340952",
+      "functional_only": "CPU compilation was allowed; no timing from this check is used as performance evidence."
+    },
+    "performance_validation_pending": false,
+    "workspace_matches_tested_sources": {
+      "sycl/include/strata/core/mtp.hpp": true,
+      "sycl/src/core/mtp.cpp": true,
+      "sycl/src/program/generate.cpp": true,
+      "sycl/CMakeLists.txt": false,
+      "src/spec/draft_policy_test.cpp": true
+    },
+    "concurrent_cmake_note": "The current CMake file subsequently gained three sampler CTest mode entries from separate work. The engine link dependency and all four changed C++ source/header files still match the tested frozen build.",
+    "full_feature_disabled_control": {
+      "all_output_ids_equal": true,
+      "actual_expert_slots": 5771,
+      "cases": [
+        {
+          "case": "Chat",
+          "generated": 78,
+          "prompt_tokens": 26,
+          "accepted": 39,
+          "offered": 59,
+          "output_sha256": "69a880e26350424095aebf5ff1a69b8ff5e2a34c186c55430944a1f8b457855d"
+        },
+        {
+          "case": "CodeChat",
+          "generated": 128,
+          "prompt_tokens": 35,
+          "accepted": 92,
+          "offered": 100,
+          "output_sha256": "c4b5f31a5f2832d0079d03ba23348f8a0e00f81e50eac9c6e52ea43d420510da"
+        }
+      ],
+      "raw_report_sha256": "20e04e96a23d24691cab8e298e50303c77b92d23fcc239ad295a35a58147e6ea"
+    },
+    "full_short_greedy_outputs_equal_across_off_verify_only_and_early_stop": true,
+    "screen": {
+      "local_date": "2026-10-24",
+      "design": "same executable, off/early-stop cumulative 0.5/off in three processes; Short only",
+      "warmup_requests_per_arm": 10,
+      "retained_requests_per_arm": 5,
+      "total_requests": 45,
+      "prompt_tokens": 23,
+      "output_tokens": 70,
+      "context": 8192,
+      "prompt_cache": 0,
+      "requested_expert_cache": 5500,
+      "actual_expert_slots": 5771,
+      "pcie_fraction": 0.16,
+      "adapt_swaps": 32,
+      "profiling": false,
+      "other_experimental_paths_disabled": true,
+      "concurrency_check": "Shared GPU lock; GPU/compiler process checks before and after every retained request.",
+      "all_15_retained_outputs_equal": true,
+      "comparisons": [
+        {
+          "mode": "early",
+          "case": "Short",
+          "metrics": {
+            "decode_ms": {
+              "baseline": 31.512857142857143,
+              "candidate": 30.565714285714286,
+              "throughput_change_pct": 3.098710039259678,
+              "baseline_drift_pct": 0.0
+            },
+            "prompt_ms": {
+              "baseline": 786.923566809382,
+              "candidate": 792.5,
+              "throughput_change_pct": -0.7036508757877535,
+              "baseline_drift_pct": -1.6259137887572495
+            },
+            "ttft_ms": {
+              "baseline": 844.4906245180274,
+              "candidate": 849.1475999999238,
+              "throughput_change_pct": -0.5484294464115358,
+              "baseline_drift_pct": -1.617608730916975
+            }
+          },
+          "outputs_equal": true
+        }
+      ],
+      "arms": [
+        {
+          "arm": "A1",
+          "mode": "off",
+          "decode_tok_s_median": 31.733079468697582,
+          "decode_tok_s_range": [
+            31.69428597301458,
+            31.823967994180762
+          ],
+          "prompt_ms_median": 793.4,
+          "ttft_ms_median": 851.4048999986699,
+          "rows": [
+            {
+              "generated": 70,
+              "prompt_tokens": 23,
+              "prompt_ms": 792.2,
+              "decode_ms": 2199.6,
+              "ttft_ms": 850.3303999987111,
+              "accepted": 42,
+              "offered": 58,
+              "output_sha256": "45c80da5cc65b489e3407f1612006ba7841414f830bd74c6b593dc9165227255"
+            },
+            {
+              "generated": 70,
+              "prompt_tokens": 23,
+              "prompt_ms": 800.7,
+              "decode_ms": 2207.3,
+              "ttft_ms": 857.5921000010567,
+              "accepted": 42,
+              "offered": 58,
+              "output_sha256": "45c80da5cc65b489e3407f1612006ba7841414f830bd74c6b593dc9165227255"
+            },
+            {
+              "generated": 70,
+              "prompt_tokens": 23,
+              "prompt_ms": 794.8,
+              "decode_ms": 2205.9,
+              "ttft_ms": 851.4048999986699,
+              "accepted": 42,
+              "offered": 58,
+              "output_sha256": "45c80da5cc65b489e3407f1612006ba7841414f830bd74c6b593dc9165227255"
+            },
+            {
+              "generated": 70,
+              "prompt_tokens": 23,
+              "prompt_ms": 784.4,
+              "decode_ms": 2208.6,
+              "ttft_ms": 841.6287000000011,
+              "accepted": 42,
+              "offered": 58,
+              "output_sha256": "45c80da5cc65b489e3407f1612006ba7841414f830bd74c6b593dc9165227255"
+            },
+            {
+              "generated": 70,
+              "prompt_tokens": 23,
+              "prompt_ms": 793.4,
+              "decode_ms": 2199.9,
+              "ttft_ms": 851.4071999998123,
+              "accepted": 42,
+              "offered": 58,
+              "output_sha256": "45c80da5cc65b489e3407f1612006ba7841414f830bd74c6b593dc9165227255"
+            }
+          ]
+        },
+        {
+          "arm": "B",
+          "mode": "early",
+          "decode_tok_s_median": 32.71639558796037,
+          "decode_tok_s_range": [
+            32.632511304834274,
+            32.921036542350556
+          ],
+          "prompt_ms_median": 792.5,
+          "ttft_ms_median": 849.1475999999238,
+          "rows": [
+            {
+              "generated": 70,
+              "prompt_tokens": 23,
+              "prompt_ms": 788.7,
+              "decode_ms": 2144.3,
+              "ttft_ms": 846.2752000014007,
+              "accepted": 42,
+              "offered": 54,
+              "output_sha256": "45c80da5cc65b489e3407f1612006ba7841414f830bd74c6b593dc9165227255"
+            },
+            {
+              "generated": 70,
+              "prompt_tokens": 23,
+              "prompt_ms": 792.5,
+              "decode_ms": 2139.6,
+              "ttft_ms": 849.1475999999238,
+              "accepted": 42,
+              "offered": 54,
+              "output_sha256": "45c80da5cc65b489e3407f1612006ba7841414f830bd74c6b593dc9165227255"
+            },
+            {
+              "generated": 70,
+              "prompt_tokens": 23,
+              "prompt_ms": 794.8,
+              "decode_ms": 2126.3,
+              "ttft_ms": 851.675100000648,
+              "accepted": 42,
+              "offered": 54,
+              "output_sha256": "45c80da5cc65b489e3407f1612006ba7841414f830bd74c6b593dc9165227255"
+            },
+            {
+              "generated": 70,
+              "prompt_tokens": 23,
+              "prompt_ms": 788.8,
+              "decode_ms": 2130.5,
+              "ttft_ms": 844.8754000000918,
+              "accepted": 42,
+              "offered": 54,
+              "output_sha256": "45c80da5cc65b489e3407f1612006ba7841414f830bd74c6b593dc9165227255"
+            },
+            {
+              "generated": 70,
+              "prompt_tokens": 23,
+              "prompt_ms": 796.4,
+              "decode_ms": 2145.1,
+              "ttft_ms": 852.9150999984267,
+              "accepted": 42,
+              "offered": 54,
+              "output_sha256": "45c80da5cc65b489e3407f1612006ba7841414f830bd74c6b593dc9165227255"
+            }
+          ]
+        },
+        {
+          "arm": "A2",
+          "mode": "off",
+          "decode_tok_s_median": 31.733079468697582,
+          "decode_tok_s_range": [
+            31.598429106667265,
+            31.79650238473768
+          ],
+          "prompt_ms_median": 780.5,
+          "ttft_ms_median": 837.6325000008364,
+          "rows": [
+            {
+              "generated": 70,
+              "prompt_tokens": 23,
+              "prompt_ms": 780.5,
+              "decode_ms": 2215.3,
+              "ttft_ms": 837.6325000008364,
+              "accepted": 42,
+              "offered": 58,
+              "output_sha256": "45c80da5cc65b489e3407f1612006ba7841414f830bd74c6b593dc9165227255"
+            },
+            {
+              "generated": 70,
+              "prompt_tokens": 23,
+              "prompt_ms": 776.9,
+              "decode_ms": 2205.9,
+              "ttft_ms": 833.884699999544,
+              "accepted": 42,
+              "offered": 58,
+              "output_sha256": "45c80da5cc65b489e3407f1612006ba7841414f830bd74c6b593dc9165227255"
+            },
+            {
+              "generated": 70,
+              "prompt_tokens": 23,
+              "prompt_ms": 783.1,
+              "decode_ms": 2202.1,
+              "ttft_ms": 840.0239999991754,
+              "accepted": 42,
+              "offered": 58,
+              "output_sha256": "45c80da5cc65b489e3407f1612006ba7841414f830bd74c6b593dc9165227255"
+            },
+            {
+              "generated": 70,
+              "prompt_tokens": 23,
+              "prompt_ms": 781.1,
+              "decode_ms": 2201.5,
+              "ttft_ms": 838.4174000002531,
+              "accepted": 42,
+              "offered": 58,
+              "output_sha256": "45c80da5cc65b489e3407f1612006ba7841414f830bd74c6b593dc9165227255"
+            },
+            {
+              "generated": 70,
+              "prompt_tokens": 23,
+              "prompt_ms": 777.6,
+              "decode_ms": 2213.3,
+              "ttft_ms": 834.9701000006462,
+              "accepted": 42,
+              "offered": 58,
+              "output_sha256": "45c80da5cc65b489e3407f1612006ba7841414f830bd74c6b593dc9165227255"
+            }
+          ]
+        }
+      ],
+      "engine_prompt_plus_decode_throughput_change_pct": 1.9490213982324978,
+      "raw_report_sha256": "7efa4823496b8cde548cbce50c6088158d255c36deda3444ea92dab89fac37e2",
+      "scope": "Combined cumulative-window plus draft early-stop strategy; does not isolate early-stop contribution."
+    },
+    "default_enabled": false,
+    "independent_performance_confirmation": false,
+    "whole_model_speedup_established": false,
+    "long_input_validation_complete": false,
+    "fixed_seed_sampling_validation_complete": false
+  },
+  "first_screen_source_note": "Top-level build, CPU and performance fields describe the earlier verify-only implementation; early_stop records the later implementation separately."
+}

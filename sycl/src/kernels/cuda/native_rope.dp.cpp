@@ -27,6 +27,9 @@
 #include <dpct/dpct.hpp>
 #include "strata/sycl_queue.hpp"
 #include "strata/kernels/native_rope.hpp"
+#include "strata/kernels/native_qsa.hpp"
+#include "strata/kernels/kv_stream.hpp"
+#include "strata/kernels/f16_bits.hpp"
 #include "strata/kernels/mrope.hpp"
 #include <atomic>
 #include <cmath>
@@ -83,17 +86,25 @@ __dpct_inline__ float warp_sum(float value) {
     return value;
 }
 
-template <bool TAB>
+template <bool TAB, bool STORE_Q8 = false>
 __dpct_inline__ void norm_rope_kernel(const float* x, int in_stride, const float* gamma, float* out,
                                       int n_cols, int n_rot, float epsilon, float theta_scale,
                                       float freq_scale, float corr_low, float corr_high,
                                       float ext_factor, float mscale, const int* positions,
-                                      const int32_t* mtab, RopeTab rt) {
+                                      const int32_t* mtab, RopeTab rt,
+                                      const float* vcur = nullptr, int kv_heads = 0, int pos_stride = 0,
+                                      const int32_t* steps = nullptr, int step_stride = 0,
+                                      int8_t* kq = nullptr, int8_t* vq = nullptr,
+                                      uint16_t* ks = nullptr, uint16_t* vs = nullptr,
+                                      const int32_t* table = nullptr, int page_size = 0, KvHostPools host = {}) {
     auto item = sycl::ext::oneapi::this_work_item::get_nd_item<3>();
     const int tid = item.get_local_id(2);
     const int row = item.get_group(2);
     const float* in_row = x + size_t(row) * in_stride;
-    float* out_row = out + size_t(row) * n_cols;
+    float* out_row;
+    if constexpr (STORE_Q8) {
+        out_row = *sycl::ext::oneapi::group_local_memory_for_overwrite<float[256]>(item.get_group());
+    } else out_row = out + size_t(row) * n_cols;
     float partial = 0.0f;
     for (size_t col = tid; col < size_t(n_cols); col += 256) {
         const float xv = in_row[col];
@@ -117,12 +128,44 @@ __dpct_inline__ void norm_rope_kernel(const float* x, int in_stride, const float
         const float a = (scale * x_tid) * gamma[pair];
         const float b = (scale * x_hi) * gamma[pair + half_rot];
         float c, s;
-        if (!(TAB && rope_tab_cs(rt, mrope_pos(mtab, positions[row], pair), pair, c, s))) {
-            const float theta_extrap = mrope_pos(mtab, positions[row], pair) * dpct::pow(theta_scale, float(pair));
+        const int position = STORE_Q8 ? positions[(row / kv_heads) * pos_stride + row % kv_heads] : positions[row];
+        if (!(TAB && rope_tab_cs(rt, mrope_pos(mtab, position, pair), pair, c, s))) {
+            const float theta_extrap = mrope_pos(mtab, position, pair) * dpct::pow(theta_scale, float(pair));
             rope_scaled_angle(theta_extrap, freq_scale, corr_low, corr_high, ext_factor, mscale, pair, c, s);
         }
         out_row[pair] = a * c - b * s;
         out_row[pair + half_rot] = a * s + b * c;
+    }
+    if constexpr (STORE_Q8) {
+        item.barrier(sycl::access::fence_space::local_space);
+        const float kval = out_row[tid], vval = vcur[size_t(row) * 256 + tid];
+        float km = sycl::fabs(kval), vm = sycl::fabs(vval);
+        for (int offset = 16; offset; offset >>= 1) {
+            km = sycl::fmax(km, sycl::permute_group_by_xor(item.get_sub_group(), km, offset));
+            vm = sycl::fmax(vm, sycl::permute_group_by_xor(item.get_sub_group(), vm, offset));
+        }
+        auto& maxima = *sycl::ext::oneapi::group_local_memory_for_overwrite<float[16]>(item.get_group());
+        if (lane == 0) { maxima[tid / 32] = km; maxima[8 + tid / 32] = vm; }
+        item.barrier(sycl::access::fence_space::local_space);
+        const int group = tid / 64;
+        const uint16_t kb = f16_from_f32(sycl::fmax(maxima[2 * group], maxima[2 * group + 1]) / 127.0f);
+        const uint16_t vb = f16_from_f32(sycl::fmax(maxima[8 + 2 * group], maxima[9 + 2 * group]) / 127.0f);
+        const float ksf = f32_from_f16(kb), vsf = f32_from_f16(vb);
+        const int kcode = ksf > 0 ? sycl::clamp(sycl::vec<float,1>(kval / ksf).convert<int,sycl::rounding_mode::rte>()[0], -127, 127) : 0;
+        const int vcode = vsf > 0 ? sycl::clamp(sycl::vec<float,1>(vval / vsf).convert<int,sycl::rounding_mode::rte>()[0], -127, 127) : 0;
+        const int pos = steps[(row / kv_heads) * step_stride + kStepPos];
+        const int h = row % kv_heads;
+        const long long page = table[pos / page_size];
+        if (page >= 0) {
+            const long long dst = (page * kv_heads + h) * page_size + pos % page_size;
+            kq[dst * 256 + tid] = (int8_t)kcode; vq[dst * 256 + tid] = (int8_t)vcode;
+            if (tid % 64 == 0) { ks[dst * 4 + group] = kb; vs[dst * 4 + group] = vb; }
+        }
+        if (host.k_q) {
+            const long long dst = ((long long)(pos / page_size) * kv_heads + h) * page_size + pos % page_size;
+            host.k_q[dst * 256 + tid] = (int8_t)kcode; host.v_q[dst * 256 + tid] = (int8_t)vcode;
+            if (tid % 64 == 0) { host.k_scale[dst * 4 + group] = kb; host.v_scale[dst * 4 + group] = vb; }
+        }
     }
 }
 }
@@ -268,6 +311,36 @@ void native_rope_apply(const float* x, float* out, int rows, int head_dim,
     */
     if (error !=
         0) throw std::runtime_error(dpct::get_error_string_dummy(error));
+}
+
+void native_qsa_norm_rope_store_q8_steps(const float* kcur, const float* vcur, const float* gamma,
+    const int32_t* positions, int position_stride, const int32_t* steps, int step_stride, int n_tok,
+    int8_t* k_q, int8_t* v_q, uint16_t* k_scale, uint16_t* v_scale, const int32_t* table,
+    const QsaShapes& s, float epsilon, const RopeScaling& scaling, void* stream, const KvHostPools* host) {
+    if (n_tok == 0) return;
+    if (n_tok < 0 || s.head_dim != 256 || s.n_rot != 64 || s.n_head_kv < 1 || s.page_size < 1 ||
+        (int64_t)n_tok * s.n_head_kv > 65535 || position_stride < s.n_head_kv || step_stride <= kStepPos ||
+        !kcur || !vcur || !gamma || !positions || !steps || !k_q || !v_q || !k_scale || !v_scale || !table || !stream ||
+        !std::isfinite(epsilon) || epsilon <= 0 || rope_scaling_invalid(scaling) != nullptr ||
+        (host && host->k_q && (!host->v_q || !host->k_scale || !host->v_scale)))
+        throw std::invalid_argument("native_qsa_norm_rope_store_q8_steps: invalid arguments");
+    const float theta_scale = powf((float)scaling.freq_base, -2.0f / 64);
+    const RopeKernelArgs k = scaling.kernel_args(64);
+    const RopeTab rt = rope_table_for(scaling);
+    const auto mtab = mrope_table();
+    const KvHostPools hp = host ? *host : KvHostPools{};
+    auto launch = [&]<bool TAB>() {
+        q_of(stream)->parallel_for<dpct_kernel_name<class norm_rope_q8_store, dpct_kernel_scalar<TAB>>>(
+            sycl::nd_range<3>(sycl::range<3>(1, 1, n_tok * s.n_head_kv * 256), sycl::range<3>(1, 1, 256)),
+            [=](sycl::nd_item<3>) [[sycl::reqd_sub_group_size(32)]] {
+                norm_rope_kernel<TAB, true>(kcur, 256, gamma, nullptr, 256, 64, epsilon, theta_scale,
+                    k.freq_scale, k.corr_low, k.corr_high, k.ext_factor, k.attn_factor, positions, mtab, rt,
+                    vcur, (int)s.n_head_kv, position_stride, steps, step_stride, k_q, v_q, k_scale, v_scale,
+                    table, (int)s.page_size, hp);
+            });
+    };
+    if (rt.cos) launch.template operator()<true>();
+    else launch.template operator()<false>();
 }
 
 void native_qsa_rms_norm_rope(const float* x, int in_stride, const float* gamma, float* out,

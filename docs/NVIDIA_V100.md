@@ -47,7 +47,7 @@ with and without the Volta attention kernel (`STRATA_PROMPT_ATTN_OLD=1`):
 | 114,338 | 973 | 1,123 |
 
 Decode was 38-51 tok/s in every run and is not affected. The profile, the parity numbers, the needle test and the limits are in
-[bench/results/2026-10-03-v100-prompt-attn](https://github.com/Niko1221/Strata/blob/f40c418e483adc89e2e4f58e602c32a7e7d892c8/bench/results/2026-10-03-v100-prompt-attn/README.md).
+[bench/results/2026-10-03-v100-prompt-attn](../bench/results/2026-10-03-v100-prompt-attn/README.md).
 
 What the kernel does and does not guarantee: against an FP64 reference its error is about 5e-6 (output scale 3.6; the FP32 kernel it replaces: 2e-6); 15 of 15
 needles were found; greedy output was identical on the 28,650- and 114,338-token prompts and differed late in the answer on the 7,194-token one (another

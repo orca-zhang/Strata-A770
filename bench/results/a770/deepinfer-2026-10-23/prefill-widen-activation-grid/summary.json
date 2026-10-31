@@ -1,0 +1,302 @@
+{
+  "complete": true,
+  "date": "2026-10-24",
+  "status": "rejected_at_screen_source_not_integrated",
+  "change": "Replace flattened activation conversion indexing with a 2D SYCL range. Only two runtime lines differ.",
+  "hardware": "A770 16GB, Xeon E5-2696 v4, PCIe3.0x16, Windows, driver32.0.101.9034, DPC++2025.3.2, oneMKL2025.3",
+  "baseline": "Current combined source including retained vector weight widening; native XMX/half-output disabled in both arms.",
+  "baseline_source_sha256": "15e09007531e85916b516859846ab7382f894e64fa8072bb5002086c5d6e4519",
+  "candidate_source_sha256": "0e5c62e0030b6103ffb408160dae5829cd2ecd0437d04f5b22e1d200e6a23537",
+  "source_not_integrated": true,
+  "production_unchanged": true,
+  "phases": [
+    "screen"
+  ],
+  "independent_processes": 10,
+  "paired_comparisons": 36,
+  "eligible_pairs": 28,
+  "excluded_pairs": 8,
+  "positive_pairs": 10,
+  "median_points": 90,
+  "batch_rows": 450,
+  "correctness_checks": 5140,
+  "cpu_draft_policy_checks": 56,
+  "cpu_mtp_layout": "PASS native Q8_0 gate/up/down layout and malformed shape rejection",
+  "operator_scope": {
+    "t": [
+      4,
+      40,
+      256
+    ],
+    "n": [
+      1280,
+      4096,
+      12288
+    ],
+    "k": 2560,
+    "ldy": "N",
+    "fp16_ldx": 2560,
+    "bf16_ldx": "2560 at N4096, 2573 otherwise",
+    "workspace_mib": 128,
+    "warmups": 4,
+    "batches": 5,
+    "calls_per_batch": 16,
+    "timing": "Median batched wall time of the synchronous full GEMM API, including allocation, conversion, GEMM, copies, waits and free. No profiler.",
+    "pool": "1;512M;host:128M,8,64K;device:128M,8,64K;shared:128M,8,64K"
+  },
+  "retention_rule": "Exact parity. Screen and independent confirmation: positive median gain in each candidate round, at least 75% drift-eligible pairs positive, no per-shape geometric regression beyond 1%. Adjacent baseline drift <=3%. No 3% gain requirement.",
+  "rounds": [
+    {
+      "phase": "screen",
+      "candidate_run": 1,
+      "eligible_pairs": 14,
+      "median_gain_pct": -0.44747776070689915
+    },
+    {
+      "phase": "screen",
+      "candidate_run": 3,
+      "eligible_pairs": 14,
+      "median_gain_pct": -0.25780234045924555
+    }
+  ],
+  "cases": [
+    {
+      "bf16": false,
+      "n": 1280,
+      "k": 2560,
+      "t": 4,
+      "eligible_pairs": 2,
+      "descriptive_gain_pct": -0.12892299153705045
+    },
+    {
+      "bf16": false,
+      "n": 1280,
+      "k": 2560,
+      "t": 40,
+      "eligible_pairs": 2,
+      "descriptive_gain_pct": -0.1627455565262892
+    },
+    {
+      "bf16": false,
+      "n": 1280,
+      "k": 2560,
+      "t": 256,
+      "eligible_pairs": 2,
+      "descriptive_gain_pct": -0.1746524271404981
+    },
+    {
+      "bf16": false,
+      "n": 4096,
+      "k": 2560,
+      "t": 4,
+      "eligible_pairs": 2,
+      "descriptive_gain_pct": -1.003273323252496
+    },
+    {
+      "bf16": false,
+      "n": 12288,
+      "k": 2560,
+      "t": 4,
+      "eligible_pairs": 2,
+      "descriptive_gain_pct": -2.1415929216818785
+    },
+    {
+      "bf16": false,
+      "n": 12288,
+      "k": 2560,
+      "t": 40,
+      "eligible_pairs": 2,
+      "descriptive_gain_pct": -1.4316767101749117
+    },
+    {
+      "bf16": false,
+      "n": 12288,
+      "k": 2560,
+      "t": 256,
+      "eligible_pairs": 2,
+      "descriptive_gain_pct": -1.2986824762397986
+    },
+    {
+      "bf16": true,
+      "n": 1280,
+      "k": 2560,
+      "t": 4,
+      "eligible_pairs": 2,
+      "descriptive_gain_pct": 0.145054812430212
+    },
+    {
+      "bf16": true,
+      "n": 1280,
+      "k": 2560,
+      "t": 40,
+      "eligible_pairs": 2,
+      "descriptive_gain_pct": -0.16895007102513127
+    },
+    {
+      "bf16": true,
+      "n": 1280,
+      "k": 2560,
+      "t": 256,
+      "eligible_pairs": 2,
+      "descriptive_gain_pct": 0.1355251730158491
+    },
+    {
+      "bf16": true,
+      "n": 4096,
+      "k": 2560,
+      "t": 4,
+      "eligible_pairs": 2,
+      "descriptive_gain_pct": -0.14549284797882311
+    },
+    {
+      "bf16": true,
+      "n": 4096,
+      "k": 2560,
+      "t": 40,
+      "eligible_pairs": 2,
+      "descriptive_gain_pct": -1.0530230201749702
+    },
+    {
+      "bf16": true,
+      "n": 12288,
+      "k": 2560,
+      "t": 4,
+      "eligible_pairs": 2,
+      "descriptive_gain_pct": -0.21986833100707814
+    },
+    {
+      "bf16": true,
+      "n": 12288,
+      "k": 2560,
+      "t": 40,
+      "eligible_pairs": 2,
+      "descriptive_gain_pct": 0.09863992470868777
+    }
+  ],
+  "exclusions": [
+    {
+      "phase": "screen",
+      "shape": "large",
+      "candidate_run": 1,
+      "bf16": false,
+      "n": 4096,
+      "k": 2560,
+      "t": 40,
+      "baseline": 9037.242409857736,
+      "candidate": 9003.25625,
+      "throughput_change_pct": 0.37748742137306834,
+      "baseline_drift_pct": 4.09912757796338,
+      "eligible": false
+    },
+    {
+      "phase": "screen",
+      "shape": "large",
+      "candidate_run": 1,
+      "bf16": false,
+      "n": 4096,
+      "k": 2560,
+      "t": 256,
+      "baseline": 12166.463387628304,
+      "candidate": 12134.09375,
+      "throughput_change_pct": 0.26676600902564296,
+      "baseline_drift_pct": 3.892622228924436,
+      "eligible": false
+    },
+    {
+      "phase": "screen",
+      "shape": "large",
+      "candidate_run": 1,
+      "bf16": true,
+      "n": 4096,
+      "k": 2560,
+      "t": 256,
+      "baseline": 12235.649994844089,
+      "candidate": 12186.86875,
+      "throughput_change_pct": 0.40027710025258845,
+      "baseline_drift_pct": 4.848091460515591,
+      "eligible": false
+    },
+    {
+      "phase": "screen",
+      "shape": "large",
+      "candidate_run": 1,
+      "bf16": true,
+      "n": 12288,
+      "k": 2560,
+      "t": 256,
+      "baseline": 28258.080926016348,
+      "candidate": 28252.94375,
+      "throughput_change_pct": 0.01818279915115628,
+      "baseline_drift_pct": 4.707676952620643,
+      "eligible": false
+    },
+    {
+      "phase": "screen",
+      "shape": "large",
+      "candidate_run": 3,
+      "bf16": false,
+      "n": 4096,
+      "k": 2560,
+      "t": 40,
+      "baseline": 9040.028646866771,
+      "candidate": 9154.10625,
+      "throughput_change_pct": -1.2461905074919732,
+      "baseline_drift_pct": -3.8784732836845914,
+      "eligible": false
+    },
+    {
+      "phase": "screen",
+      "shape": "large",
+      "candidate_run": 3,
+      "bf16": false,
+      "n": 4096,
+      "k": 2560,
+      "t": 256,
+      "baseline": 12153.989958034357,
+      "candidate": 12288.8875,
+      "throughput_change_pct": -1.097719724146251,
+      "baseline_drift_pct": -3.944036771228132,
+      "eligible": false
+    },
+    {
+      "phase": "screen",
+      "shape": "large",
+      "candidate_run": 3,
+      "bf16": true,
+      "n": 4096,
+      "k": 2560,
+      "t": 256,
+      "baseline": 12223.343563767265,
+      "candidate": 11935.7375,
+      "throughput_change_pct": 2.4096212217072033,
+      "baseline_drift_pct": -4.815678754543306,
+      "eligible": false
+    },
+    {
+      "phase": "screen",
+      "shape": "large",
+      "candidate_run": 3,
+      "bf16": true,
+      "n": 12288,
+      "k": 2560,
+      "t": 256,
+      "baseline": 28266.972362951972,
+      "candidate": 27619.6625,
+      "throughput_change_pct": 2.3436559478305474,
+      "baseline_drift_pct": -4.4359085812947345,
+      "eligible": false
+    }
+  ],
+  "limitations": [
+    "No independent confirmation or model run: initial screen failed.",
+    "No full-model speed claim. Paired rounds share a middle baseline; descriptive summaries are not confidence intervals."
+  ],
+  "workflow_issue": {
+    "error": "KeyError: 'throughput_gain_pct' at the screen reporting footer",
+    "raw_data_complete_before_error": true,
+    "measurements_rerun": false,
+    "executed_script_sha256": "53f6943888418889f792a87f0a55a63bfe63f71a6eb05f13cc6e5308ef814c83",
+    "corrected_script_sha256": "bcd6cb5fbd0b41395236c272e3c33cd4ca1616966ad4c299b2d5ee0e9b8d2388",
+    "resolution": "Correct field name; independently recalculate all saved medians/pairs. Screen failed the unchanged retention rule."
+  }
+}

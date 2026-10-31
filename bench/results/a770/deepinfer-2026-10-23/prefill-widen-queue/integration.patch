@@ -1,0 +1,17 @@
+--- a/sycl/src/prefill/gemm.dp.cpp
++++ b/sycl/src/prefill/gemm.dp.cpp
+@@ -627,12 +627,10 @@
+         const uint16_t v = X[offset];
+         xf[offset] = bf16 ? sycl::bit_cast<float>(uint32_t(v) << 16) : float(sycl::bit_cast<sycl::half>(v));
+     });
+-    // ponytail: retain the old API's blocking behavior while testing mapped/pool input lifetimes.
+-    // Replace these waits with explicit dependencies only after queued-chain and model parity pass.
+-    q->wait_and_throw();
++    // ponytail: the in-order queue orders conversion, GEMM and copy; the final wait protects all input lifetimes.
+     oneapi::mkl::blas::column_major::gemm(*q, oneapi::mkl::transpose::trans,
+         oneapi::mkl::transpose::nontrans, N, T, K, 1.f, wf, K, xf, ldx, beta, output.get(), ldy,
+-        oneapi::mkl::blas::compute_mode::unset).wait_and_throw();
++        oneapi::mkl::blas::compute_mode::unset);
+     q->memcpy(Y, output.get(), (size_t) T * ldy * sizeof(float)).wait_and_throw();
+     return true;
+ }

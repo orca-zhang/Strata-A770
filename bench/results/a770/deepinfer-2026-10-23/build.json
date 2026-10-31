@@ -1,0 +1,52 @@
+{
+  "hardware": {
+    "client_date": "2026-10-23",
+    "cpu": [
+      "Intel(R) Xeon(R) CPU E5-2696 v4 @ 2.20GHz"
+    ],
+    "gpu": [
+      {
+        "Name": "GameViewer Virtual Display Adapter",
+        "DriverVersion": "15.6.5.199",
+        "PNPDeviceID": "ROOT\\DISPLAY\\0000"
+      },
+      {
+        "Name": "Intel(R) Arc(TM) A770 Graphics",
+        "DriverVersion": "32.0.101.9034",
+        "PNPDeviceID": "PCI\\VEN_8086&DEV_56A0&SUBSYS_15131EF7&REV_08\\6&EC0B818&0&00080010"
+      }
+    ]
+  },
+  "compiler": "Intel oneAPI DPC++ 2025.3.2",
+  "level_zero_sdk": "1.33.1",
+  "ggml_source": "build-sycl/_deps/strata_llamacpp-src",
+  "source_snapshots": {
+    "source-manifest.json": "7557ef370263936f2a593623c4f4bc5a33cfbf7ddc78967354d12ee185333b43",
+    "candidate-source-manifest.json": "41b4951db60c3de79f27808259a5a7d135fe54593353daf1b381e359560e7783"
+  },
+  "production_exe": "G:\\GitHub\\Strata\\build-sycl-a770-unified-operators\\bin\\strata-unified-all-operators.exe",
+  "production_exe_sha256": "8f0d866ded297cf5a409e84cf5dd61f437c56c8a89aaeb2a85569265b6a3e122",
+  "config_original_sha256": "1a755372f0e6c90c0bfa2af865d67b51f8df49c10aa1613b041b08da8184ca88",
+  "script_sha256": "6c9f7de8efbfb9cb78360bc3329df738020f168c0ca606a04aca88b60111db06",
+  "final_build": {
+    "complete": true,
+    "method": "Override only verify.obj before the unchanged engine archive; all other objects reused.",
+    "final_source_manifest_sha256": "121b81cdc80d575e0a12f4abf8291e121dccce9490fe6874789eac5d0a6d9680",
+    "commands": [
+      "C:\\PROGRA~2\\Intel\\oneAPI\\compiler\\2025.3\\bin\\icx.exe  /nologo /TP -DSTRATA_HAS_LEVEL_ZERO_EVENTS=1 -DSTRATA_NATIVE_EXPERTS=1 -DSTRATA_SYCL_SERIAL_Q8_1=0 -DSTRATA_VERSION=\\\"0.1.39-sycl\\\" -D_USE_STD_VECTOR_ALGORITHMS=0 -DSTRATA_SYCL_VERIFY_GRAPH_EVENT_WAIT=0 -IG:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\source-final\\sycl\\..\\src\\core -I\"C:\\Program Files\\LevelZeroSDK\\1.33.1\\include\" -IG:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\source-final\\sycl\\include -IG:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\source-final\\sycl\\..\\include -IG:\\GitHub\\Strata\\build-sycl\\_deps\\strata_llamacpp-src\\ggml\\src\\..\\include /DWIN32 /D_WINDOWS /EHsc /O2 /Ob2 /DNDEBUG -Qstd:c++20 -MD -fsycl -fsycl-default-sub-group-size=32 -fsycl-device-code-split=per_kernel /fp:precise -Wno-unused-parameter -Wno-unused-variable -Wno-deprecated-declarations -Wall -Wextra -QMD -QMT G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\candidate-final\\verify.obj -QMF G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\candidate-final\\verify.obj.d /FoG:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\candidate-final\\verify.obj /FdG:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\candidate-final\\verify.pdb -c G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\source-final\\sycl\\src\\core\\verify.cpp",
+      "C:\\windows\\system32\\cmd.exe /C \"cd . && \"C:\\Program Files\\CMake\\bin\\cmake.exe\" -E vs_link_exe --msvc-ver=1944 --intdir=G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\candidate-final --rc=\"C:\\PROGRA~2\\Windows Kits\\10\\bin\\10.0.26100.0\\x64\\rc.exe\" --mt=\"C:\\PROGRA~2\\Windows Kits\\10\\bin\\10.0.26100.0\\x64\\mt.exe\" --manifests  -- C:\\PROGRA~2\\Intel\\oneAPI\\compiler\\2025.3\\bin\\icx.exe /nologo CMakeFiles\\strata.dir\\src\\program\\generate.cpp.obj G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\candidate-final\\verify.obj  /Qoption,link,/machine:x64 /Qoption,link,/INCREMENTAL:NO /Qoption,link,/subsystem:console -fsycl -Xsycl-target-backend=spir64 -cl-fp32-correctly-rounded-divide-sqrt -fsycl-device-code-split=per_kernel  strata_engine.lib  strata_prefill.lib  strata_spec.lib  strata_engine.lib  strata_kernels.lib  strata_core.lib  strata_kernels_cpu.lib  ggml\\src\\ggml-cpu.lib  ggml\\src\\ggml-base.lib  \"C:\\Program Files\\LevelZeroSDK\\1.33.1\\lib\\ze_loader.lib\"  \"C:\\Program Files (x86)\\Intel\\oneAPI\\mkl\\2025.3\\lib\\mkl_sycl.lib\"  \"C:\\Program Files (x86)\\Intel\\oneAPI\\mkl\\2025.3\\lib\\mkl_intel_lp64.lib\"  \"C:\\Program Files (x86)\\Intel\\oneAPI\\mkl\\2025.3\\lib\\mkl_sequential.lib\"  \"C:\\Program Files (x86)\\Intel\\oneAPI\\mkl\\2025.3\\lib\\mkl_core.lib\"  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /link /out:G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\candidate-final\\strata.exe /implib:G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\candidate-final\\strata.lib /pdb:G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\candidate-final\\strata.pdb /version:0.0 && cd .\""
+    ],
+    "measured_exe_sha256": "68af81f8700992406ddd75e551d131ac8181db9514b1ac0a8149c9e6e054c730",
+    "new_source": "source-final/sycl/src/core/verify.cpp",
+    "sha256": {
+      "strata.exe": "41f87f3a3f2b0149f21000f2331e66a86702256264c234ec95319522ea4ca6bd",
+      "strata.lib": "78df0b45472cb408eed58ac0e830eb546f9c84bb9026b53870cf7ca62aa01dec",
+      "verify.obj": "214d1d2bd5c4d073585b2c875b2bfdd4df36e6e7b62522ad313b987973dd9084"
+    }
+  },
+  "notes": [
+    "No production EXE or config was replaced.",
+    "Candidate includes the concurrent cumulative-confidence helper; its floor stays zero in this experiment.",
+    "96 unchanged dependency objects/libraries are byte-identical; only this experiment's changed compilation units are rebuilt."
+  ]
+}

@@ -1,0 +1,104 @@
+--- a/sycl/src/kernels/cuda/verify_kernels.dp.cpp
++++ b/sycl/src/kernels/cuda/verify_kernels.dp.cpp
+@@ -1172,11 +1172,11 @@
+         });
+ }
+ 
+-template<int MAXT, bool FIXED = false>
++template<int MAXT, bool FIXED = false, bool SINGLE = false>
+ static void gdn_state_replay_layers_esimd(float* state, const float* qkv, const float* h,
+                                          int conv_channels, const float* gate, const float* beta,
+                                          int key_heads, int value_heads,
+-                                         int n_layers, const int32_t* n_keep, void* stream) {
++                                         int n_layers, const int32_t* n_keep, void* stream, float* history = nullptr) {
+     const int C = FIXED ? 10240 : conv_channels;
+     const int h_k = FIXED ? 16 : key_heads, h_v = FIXED ? 48 : value_heads;
+     const auto props = sycl::ext::oneapi::experimental::properties{
+@@ -1188,38 +1188,40 @@
+             using V = es::simd<float, 32>;
+             es::slm_init<2 * RG * 32 * sizeof(float)>();
+             const size_t index = item.get_global_linear_id();
+-            const size_t layer = index / (h_v * 16);
+-            const int lane = index % (h_v * 16), local = item.get_local_linear_id();
++            const size_t layer = SINGLE ? 0 : index / (h_v * 16);
++            const int lane = SINGLE ? index : index % (h_v * 16), local = item.get_local_linear_id();
+             const int head = lane / 16, col = (lane / 4 % 4) * 32;
+             const size_t state_stride = (size_t) S * h_v * S + (size_t) C * 3;
+             float* state_l = state + layer * state_stride;
+-            float* history_l = state_l + (size_t) S * h_v * S;
++            float* history_l = SINGLE ? history : state_l + (size_t) S * h_v * S;
+             const float* h_l = h + layer * MAXT * C;
+-            const float* qkv_l = qkv + layer * MAXT * C;
++            const float* qkv_l = SINGLE ? qkv : qkv + layer * MAXT * C;
+             const float* gate_l = gate + layer * MAXT * h_v;
+             const float* beta_l = beta + layer * MAXT * h_v;
+             const int qh = head % h_k, qk = S * h_k;
+             const int n = *n_keep;
+             if (n <= 0) return;
+-            const es::simd<uint32_t, 16> offsets(0, 3 * sizeof(float));
+-            for (int c = lane * 16; c < C; c += h_v * 16 * 16) {
+-                es::simd<float, 16> seq[3];
+-#pragma unroll
+-                for (int j = 0; j < 3; ++j) {
+-                    const int src = n + j;
+-                    seq[j] = src < 3 ? es::gather<float, 16>(history_l + c * 3 + src, offsets)
+-                                     : es::block_load<float, 16>(qkv_l + (size_t) (src - 3) * C + c);
+-                }
+-                if constexpr (FIXED) {
+-                    // Write the 16 channel triplets as two contiguous blocks.
+-                    es::simd<float, 48> packed;
+-#pragma unroll
+-                    for (int j = 0; j < 3; ++j) packed.template select<16, 3>(j) = seq[j];
+-                    es::block_store<float, 32>(history_l + c * 3, packed.template select<32, 1>(0).read());
+-                    es::block_store<float, 16>(history_l + c * 3 + 32, packed.template select<16, 1>(32).read());
+-                } else {
+-#pragma unroll
+-                    for (int j = 0; j < 3; ++j) es::scatter<float, 16>(history_l + c * 3 + j, offsets, seq[j]);
++            if (!SINGLE || history_l) {
++                const es::simd<uint32_t, 16> offsets(0, 3 * sizeof(float));
++                for (int c = lane * 16; c < C; c += h_v * 16 * 16) {
++                    es::simd<float, 16> seq[3];
++    #pragma unroll
++                    for (int j = 0; j < 3; ++j) {
++                        const int src = n + j;
++                        seq[j] = src < 3 ? es::gather<float, 16>(history_l + c * 3 + src, offsets)
++                                         : es::block_load<float, 16>(qkv_l + (size_t) (src - 3) * C + c);
++                    }
++                    if constexpr (FIXED) {
++                        // Write the 16 channel triplets as two contiguous blocks.
++                        es::simd<float, 48> packed;
++    #pragma unroll
++                        for (int j = 0; j < 3; ++j) packed.template select<16, 3>(j) = seq[j];
++                        es::block_store<float, 32>(history_l + c * 3, packed.template select<32, 1>(0).read());
++                        es::block_store<float, 16>(history_l + c * 3 + 32, packed.template select<16, 1>(32).read());
++                    } else {
++    #pragma unroll
++                        for (int j = 0; j < 3; ++j) es::scatter<float, 16>(history_l + c * 3 + j, offsets, seq[j]);
++                    }
+                 }
+             }
+             const size_t stride = (size_t) h_v * S;
+@@ -1267,7 +1269,10 @@
+         strata::q_of(stream)->get_device().get_info<
+             sycl::ext::oneapi::experimental::info::device::architecture>() !=
+             sycl::ext::oneapi::experimental::architecture::intel_gpu_acm_g10) return false;
+-    if (n_tok == 4) gdn_state_replay_esimd<4, true>(state, h, C, gate, beta, h_k, h_v, n_keep, stream, history, qkv);
++    if (h_k == 16 && h_v == 48) {
++        if (n_tok == 4) gdn_state_replay_layers_esimd<4, true, true>(state, qkv, h, C, gate, beta, h_k, h_v, 1, n_keep, stream, history);
++        else gdn_state_replay_layers_esimd<6, true, true>(state, qkv, h, C, gate, beta, h_k, h_v, 1, n_keep, stream, history);
++    } else if (n_tok == 4) gdn_state_replay_esimd<4, true>(state, h, C, gate, beta, h_k, h_v, n_keep, stream, history, qkv);
+     else gdn_state_replay_esimd<6, true>(state, h, C, gate, beta, h_k, h_v, n_keep, stream, history, qkv);
+     return true;
+ }
+@@ -1305,7 +1310,10 @@
+         strata::q_of(stream)->get_device().get_info<
+             sycl::ext::oneapi::experimental::info::device::architecture>() ==
+             sycl::ext::oneapi::experimental::architecture::intel_gpu_acm_g10) {
+-        if (n_tok == 4) gdn_state_replay_esimd<4>(state, h, conv_channels, gate, beta, h_k, h_v, n_keep, stream);
++        if (h_k == 16 && h_v == 48 && conv_channels == 10240) {
++            if (n_tok == 4) gdn_state_replay_layers_esimd<4, true, true>(state, nullptr, h, conv_channels, gate, beta, h_k, h_v, 1, n_keep, stream);
++            else gdn_state_replay_layers_esimd<6, true, true>(state, nullptr, h, conv_channels, gate, beta, h_k, h_v, 1, n_keep, stream);
++        } else if (n_tok == 4) gdn_state_replay_esimd<4>(state, h, conv_channels, gate, beta, h_k, h_v, n_keep, stream);
+         else gdn_state_replay_esimd<6>(state, h, conv_channels, gate, beta, h_k, h_v, n_keep, stream);
+         return;
+     }

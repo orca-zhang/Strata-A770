@@ -1,0 +1,44 @@
+{
+  "complete": true,
+  "purpose": "Independent oneMKL probe",
+  "source_sha256": "d08e9fd658f60876c33ac90d516978ccac60ae134c6ce5a0efe72aab9b2e51e3",
+  "commands": [
+    [
+      "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin\\icx.exe",
+      "/nologo",
+      "/EHsc",
+      "/O2",
+      "/MD",
+      "-Qstd:c++20",
+      "-fsycl",
+      "-fsycl-device-code-split=per_kernel",
+      "/fp:precise",
+      "-Wno-deprecated-declarations",
+      "-IG:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\source\\sycl\\include",
+      "-IC:\\Program Files (x86)\\Intel\\oneAPI\\mkl\\2025.3\\include",
+      "-c",
+      "G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\mkl-widen-probe\\probe.cpp",
+      "/FoG:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\mkl-widen-probe\\probe.obj"
+    ],
+    [
+      "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin\\icx.exe",
+      "/nologo",
+      "G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\mkl-widen-probe\\probe.obj",
+      "-fsycl",
+      "-fsycl-device-code-split=per_kernel",
+      "C:\\Program Files (x86)\\Intel\\oneAPI\\mkl\\2025.3\\lib\\mkl_sycl.lib",
+      "C:\\Program Files (x86)\\Intel\\oneAPI\\mkl\\2025.3\\lib\\mkl_intel_lp64.lib",
+      "C:\\Program Files (x86)\\Intel\\oneAPI\\mkl\\2025.3\\lib\\mkl_sequential.lib",
+      "C:\\Program Files (x86)\\Intel\\oneAPI\\mkl\\2025.3\\lib\\mkl_core.lib",
+      "/link",
+      "/out:G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\mkl-widen-probe\\strata-mkl-scalar-probe.exe"
+    ]
+  ],
+  "runs": [],
+  "exe_sha256": "42de945b3794ae9281bc7775c7460c75f55d092e213248498756a1cc2be724b2",
+  "returncode": 1,
+  "queries": [],
+  "parity": [],
+  "benches": [],
+  "summary": []
+}

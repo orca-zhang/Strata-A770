@@ -1,0 +1,31 @@
+--- a/sycl/src/kernels/cuda/verify_kernels.dp.cpp
++++ b/sycl/src/kernels/cuda/verify_kernels.dp.cpp
+@@ -1172,10 +1172,13 @@
+         });
+ }
+ 
+-template<int MAXT>
++template<int MAXT, bool FIXED = false>
+ static void gdn_state_replay_layers_esimd(float* state, const float* qkv, const float* h,
+-                                         int C, const float* gate, const float* beta, int h_k, int h_v,
++                                         int conv_channels, const float* gate, const float* beta,
++                                         int key_heads, int value_heads,
+                                          int n_layers, const int32_t* n_keep, void* stream) {
++    const int C = FIXED ? 10240 : conv_channels;
++    const int h_k = FIXED ? 16 : key_heads, h_v = FIXED ? 48 : value_heads;
+     const auto props = sycl::ext::oneapi::experimental::properties{
+         sycl::ext::intel::experimental::grf_size<256>};
+     // Four work items share a 32-column tile; each keeps one 32-row chain in registers.
+@@ -1269,7 +1272,11 @@
+         strata::q_of(stream)->get_device().get_info<
+             sycl::ext::oneapi::experimental::info::device::architecture>() !=
+             sycl::ext::oneapi::experimental::architecture::intel_gpu_acm_g10) return false;
+-    if (n_tok == 4) gdn_state_replay_layers_esimd<4>(state, qkv, h, C, gate, beta, h_k, h_v, n_layers, n_keep, stream);
++    // ponytail: specialize only the measured HK16/HV48 layout; other geometries keep the generic kernel.
++    if (h_k == 16 && h_v == 48) {
++        if (n_tok == 4) gdn_state_replay_layers_esimd<4, true>(state, qkv, h, C, gate, beta, h_k, h_v, n_layers, n_keep, stream);
++        else gdn_state_replay_layers_esimd<6, true>(state, qkv, h, C, gate, beta, h_k, h_v, n_layers, n_keep, stream);
++    } else if (n_tok == 4) gdn_state_replay_layers_esimd<4>(state, qkv, h, C, gate, beta, h_k, h_v, n_layers, n_keep, stream);
+     else gdn_state_replay_layers_esimd<6>(state, qkv, h, C, gate, beta, h_k, h_v, n_layers, n_keep, stream);
+     return true;
+ }

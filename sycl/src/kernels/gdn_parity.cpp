@@ -218,10 +218,11 @@ void window_sg(int sg) {
 }
 
 // Exercise the production combined state/history stride with distinct global input and local state ordinals.
-int commit_layers_check() {
+int commit_layers_check(int HK, int HV) {
     using namespace strata::kernels;
-    constexpr int S=128, HK=16, HV=48, C=10240, L=6, FIRST=3, ORD0=1, PAD=16;
-    constexpr size_t SS=size_t(S)*HV*S, STRIDE=SS+C*3;
+    constexpr int S=128, L=6, FIRST=3, ORD0=1, PAD=16;
+    const int C=S*(2*HK+HV);
+    const size_t SS=size_t(S)*HV*S, STRIDE=SS+C*3;
     auto& q=dpct::get_in_order_queue();
     if (!q.get_device().is_gpu() || q.get_device().get_info<sycl::info::device::vendor_id>() != 0x8086 ||
         q.get_device().get_info<sycl::ext::oneapi::experimental::info::device::architecture>() !=
@@ -302,7 +303,7 @@ int commit_layers_check() {
         if(got!=*pair.second)throw std::runtime_error("commit modified input"); ++cases;
     }
     for(auto* p:allocations)sycl::free(p,q); sycl::free(keep_d,q);
-    std::printf("GDN layer commit: %d cases, 0 failures (bitwise state, CPU history, offsets, guards, graph, refusal, inputs)\n",cases);
+    std::printf("GDN layer commit HK=%d HV=%d: %d cases, 0 failures (bitwise state, CPU history, offsets, guards, graph, refusal, inputs)\n",HK,HV,cases);
     return 0;
 }
 
@@ -453,7 +454,13 @@ int window_check(bool bench) {
 
 int main(int argc, char** argv) {
     if (argc == 2 && std::string(argv[1]) == "--commit-layers-check") {
-        try { return commit_layers_check(); }
+        try {
+            for (auto [hk,hv] : {std::pair{16,48}, {1,1}, {1,3}, {2,6}}) {
+                const int rc=commit_layers_check(hk,hv);
+                if (rc) return rc;
+            }
+            return 0;
+        }
         catch (const std::exception& e) { std::fprintf(stderr,"%s\n",e.what()); return 1; }
     }
     if (argc == 2 && (std::string(argv[1]) == "--window-check" || std::string(argv[1]) == "--bench-window"))

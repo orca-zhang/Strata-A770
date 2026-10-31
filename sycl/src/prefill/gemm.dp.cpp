@@ -1,9 +1,14 @@
 // src/prefill/gemm.cu - see include/strata/prefill/gemm.hpp.
 #define DPCT_PROFILING_ENABLED
 #include <sycl/sycl.hpp>
+#include <sycl/ext/oneapi/matrix/matrix.hpp>
+#include <array>
+#include <string>
+#include <stdexcept>
 #include <dpct/dpct.hpp>
 #include "strata/sycl_queue.hpp"
 #include "strata/prefill/gemm.hpp"
+#include "strata/prefill/kernels.hpp"
 #include "strata/kernels/dequant_bf16.hpp"
 #include <dpct/blas_utils.hpp>
 
@@ -23,6 +28,8 @@
 #include <cstdlib>
 #include <cstring>
 #include <memory>
+#include <algorithm>
+#include <chrono>
 #include <dpct/lib_common_utils.hpp>
 
 #if defined(__HIPCC__) && defined(STRATA_HIPBLASLT_AVAILABLE)
@@ -324,6 +331,7 @@ bool Gemm::init_external(void *stream, uint16_t *scratch, int64_t scratch_elems,
     note(DPCT_CHECK_ERROR(h->set_queue(strata::q_of(stream))),
          "cublasSetStream");
     workspace_ = workspace;
+    workspace_bytes_ = ws_bytes;
     /*
     DPCT1027: The call to cublasSetWorkspace was replaced with 0 because
     this functionality is redundant in SYCL.
@@ -348,6 +356,7 @@ void Gemm::rebind(uint16_t* scratch, int64_t scratch_elems, void* workspace, siz
     scratch_ = scratch;
     scratch_elems_ = scratch_elems;
     workspace_ = workspace;
+    workspace_bytes_ = ws_bytes;
     /*
     DPCT1026: The call to cublasSetWorkspace was removed because this
     functionality is redundant in SYCL.
@@ -374,7 +383,14 @@ bool Gemm::init(void *stream, int64_t scratch_elems, std::string &err) try {
     note(DPCT_CHECK_ERROR(h->set_queue(strata::q_of(stream))),
          "cublasSetStream");
     // A fixed workspace so the handle never allocates on the way (and graphs could capture it later).
-    const size_t ws = 32u << 20;
+    // ponytail: keep the old budget unless GPU widening is explicitly enabled.
+    const size_t ws = [] {
+        const char* f16 = std::getenv("STRATA_PREFILL_GPU_WIDEN");
+        const char* bf16 = std::getenv("STRATA_PREFILL_BF16_GPU_WIDEN");
+        return ((f16 && std::strcmp(f16, "1") == 0) || (bf16 && std::strcmp(bf16, "1") == 0))
+                   ? 128u << 20 : 32u << 20;
+    }();
+    workspace_bytes_ = ws;
     /*
     DPCT1000: Error handling if-stmt was detected but could not be
     rewritten.
@@ -391,7 +407,7 @@ bool Gemm::init(void *stream, int64_t scratch_elems, std::string &err) try {
         /*
         DPCT1001: The statement could not be removed.
         */
-        err = std::string("prefill gemm: workspace of 32 MiB: ") +
+        err = std::string("prefill gemm: workspace of ") + std::to_string(ws >> 20) + " MiB: " +
               dpct::get_error_string_dummy(e);
         return false;
     }
@@ -507,6 +523,342 @@ bool onemkl_usable(void* stream) {
     } catch (...) {}
     return true;
 }
+
+// Dense 16-bit input -> FP32 output, without an FP32 weight copy.
+template <class Input, int NSG = 8>
+void native_xmx_launch(const uint16_t* X, const uint16_t* W, float* Y,
+                       int64_t T, int64_t N, int64_t K, int64_t ldx, sycl::queue* q,
+                       const uint16_t* input_tail = nullptr) {
+    namespace jm = sycl::ext::oneapi::experimental::matrix;
+    constexpr int SG = 8, TILE = 8;
+    const auto* x = reinterpret_cast<const Input*>(X);
+    const auto* w = reinterpret_cast<const Input*>(W);
+    const auto* last = reinterpret_cast<const Input*>(input_tail);
+    q->submit([&](sycl::handler& h) {
+        sycl::local_accessor<float, 1> tail(sycl::range<1>(NSG * TILE * TILE), h);
+        h.parallel_for(sycl::nd_range<3>(sycl::range<3>((T + TILE - 1) / TILE,
+            (N + TILE * NSG - 1) / (TILE * NSG), SG * NSG), sycl::range<3>(1, 1, SG * NSG)),
+            [=](sycl::nd_item<3> it) [[sycl::reqd_sub_group_size(SG)]] {
+                const auto sg = it.get_sub_group();
+                const int subgroup = int(sg.get_group_id()[0]);
+                const int lane = int(sg.get_local_id()[0]);
+                const int64_t row = int64_t(it.get_group(0)) * TILE;
+                const int64_t col = (int64_t(it.get_group(1)) * NSG + subgroup) * TILE;
+                if (col >= N) return;
+                const bool partial = last && row + TILE > T;
+                const auto* source = partial ? last : x + row * ldx;
+                const size_t stride = size_t(partial ? K : ldx);
+                auto gptr = [](auto* p) { return sycl::address_space_cast<sycl::access::address_space::global_space,
+                    sycl::access::decorated::no>(p); };
+                jm::joint_matrix<sycl::sub_group, float, jm::use::accumulator, TILE, TILE> c;
+                jm::joint_matrix_fill(sg, c, 0.f);
+                for (int64_t k = 0; k < K; k += 16) {
+                    jm::joint_matrix<sycl::sub_group, Input, jm::use::a, TILE, 16, jm::layout::row_major> a;
+                    jm::joint_matrix<sycl::sub_group, Input, jm::use::b, 16, TILE, jm::layout::col_major> b;
+                    jm::joint_matrix_load(sg, a, gptr(source + k), stride);
+                    jm::joint_matrix_load(sg, b, gptr(w + col * K + k), size_t(K));
+                    jm::joint_matrix_mad(sg, c, a, b, c);
+                }
+                if (row + TILE <= T) {
+                    jm::joint_matrix_store(sg, c, gptr(Y + row * N + col), size_t(N), jm::layout::row_major);
+                } else {
+                    auto* tmp = tail.get_multi_ptr<sycl::access::decorated::no>().get() + subgroup * TILE * TILE;
+                    jm::joint_matrix_store(sg, c, sycl::address_space_cast<sycl::access::address_space::local_space,
+                        sycl::access::decorated::no>(tmp), TILE, jm::layout::row_major);
+                    sycl::group_barrier(sg);
+                    for (int i = lane; i < TILE * TILE; i += SG)
+                        if (row + i / TILE < T) Y[(row + i / TILE) * N + col + i % TILE] = tmp[i];
+                }
+            });
+    });
+}
+
+bool native_xmx_gemm(const uint16_t* X, const uint16_t* W, float* Y,
+                      int64_t T, int64_t N, int64_t K, int64_t ldx, int64_t ldy, float beta,
+                      void* workspace, size_t bytes, void* stream, bool bf16 = false, bool finish = true) {
+    static const bool enabled = [] {
+        const char* v = std::getenv("STRATA_PREFILL_NATIVE_XMX");
+        return v && std::strcmp(v, "1") == 0;
+    }();
+    // ponytail: only aligned contiguous beta=0 products; retain the original path for other layouts.
+    if (!enabled || T <= 0 || N <= 0 || K <= 0 || ldx < K || ldy != N || beta != 0.f || N % 8 || K % 16)
+        return false;
+    auto* q = strata::q_of(stream);
+    if (!q->is_in_order()) return false;
+    namespace jm = sycl::ext::oneapi::experimental::matrix;
+    namespace qi = sycl::ext::oneapi::experimental::info;
+    // This engine targets one Intel GPU; query the actual driver rather than assume DG2 support.
+    static const auto supported = [q] {
+        std::array<bool, 2> result{};
+        try {
+            const auto sizes = q->get_device().get_info<sycl::info::device::sub_group_sizes>();
+            if (std::find(sizes.begin(), sizes.end(), size_t(8)) == sizes.end()) return result;
+            for (const auto& c : q->get_device().get_info<qi::device::matrix_combinations>()) {
+                if (c.ctype != jm::matrix_type::fp32 || c.dtype != jm::matrix_type::fp32 ||
+                    !(c.msize == 8 || c.max_msize >= 8) || !(c.nsize == 8 || c.max_nsize >= 8) ||
+                    !(c.ksize == 16 || c.max_ksize >= 16)) continue;
+                if (c.atype == jm::matrix_type::fp16 && c.btype == jm::matrix_type::fp16) result[0] = true;
+                if (c.atype == jm::matrix_type::bf16 && c.btype == jm::matrix_type::bf16) result[1] = true;
+            }
+        } catch (...) {}
+        return result;
+    }();
+    if (!supported[bf16]) return false;
+    const bool pad = T % 8 != 0 || ldx % 8 != 0;
+    const uint16_t* input_tail = nullptr;
+    if (pad) {
+        // ponytail: aligned rows stay in place; only a misaligned stride needs a full copy.
+        const int64_t first = ldx % 8 == 0 ? T - T % 8 : 0;
+        const size_t rows = ldx % 8 == 0 ? 8 : size_t((T + 7) / 8) * 8;
+        if (!workspace || rows > (bytes / sizeof(uint16_t)) / size_t(K)) return false;
+        auto* padded = static_cast<uint16_t*>(workspace);
+        q->parallel_for(sycl::range<1>(rows * size_t(K)), [=](sycl::id<1> p) {
+            const size_t row = size_t(first) + p[0] / K, col = p[0] % K;
+            padded[p] = row < size_t(T) ? X[row * ldx + col] : uint16_t(0);
+        });
+        if (ldx % 8 == 0) input_tail = padded;
+        else { X = padded; ldx = K; }
+    }
+    static const bool a770 = q->get_device().get_info<sycl::info::device::name>().find("A770") != std::string::npos;
+    // ponytail: only these BF16 N8/K10240 shapes passed both A770 cohorts; wider dispatch needs measurements.
+    if (a770 && bf16 && N == 8 && K == 10240 && (T == 1024 || T == 2069))
+        native_xmx_launch<sycl::ext::oneapi::bfloat16, 1>(X, W, Y, T, N, K, ldx, q, input_tail);
+    else if (bf16) native_xmx_launch<sycl::ext::oneapi::bfloat16>(X, W, Y, T, N, K, ldx, q, input_tail);
+    else native_xmx_launch<sycl::half>(X, W, Y, T, N, K, ldx, q, input_tail);
+    if (finish) q->wait_and_throw();
+    static const bool profile = [] {
+        const char* v = std::getenv("STRATA_PREFILL_XMX_PROFILE");
+        return v && std::strcmp(v, "1") == 0;
+    }();
+    if (profile) std::fprintf(stderr, "NATIVE_XMX_CALL {\"bf16\":%s,\"T\":%lld,\"N\":%lld,\"K\":%lld,\"padded\":%s}\n",
+        bf16 ? "true" : "false", (long long)T, (long long)N, (long long)K, pad ? "true" : "false");
+    return true;
+}
+
+
+// The profiled HC injection and an opt-in shared-expert scalar gate.
+bool native_small_bf16_gemm(const uint16_t* X, const uint16_t* W, float* Y,
+                           int64_t T, int64_t N, int64_t K, int64_t ldx, int64_t ldy, float beta,
+                           void* workspace, size_t bytes, void* stream) {
+    static const bool enabled=[] {
+        const char* v=std::getenv("STRATA_PREFILL_XMX_HC_INJECT");
+        const char* x=std::getenv("STRATA_PREFILL_NATIVE_XMX");
+        return v && std::strcmp(v,"1")==0 && x && std::strcmp(x,"1")==0;
+    }();
+    static const bool shared_gate=[] {
+        const char* v=std::getenv("STRATA_PREFILL_XMX_SHARED_GATE");
+        const char* x=std::getenv("STRATA_PREFILL_NATIVE_XMX");
+        return v && std::strcmp(v,"1")==0 && x && std::strcmp(x,"1")==0;
+    }();
+    const bool supported=(enabled && N==4 && K==10240) || (shared_gate && N==1 && K==2560);
+    if (!supported || !workspace || T<=0 || T>INT_MAX || ldx<K || ldy!=N || beta!=0.f)
+        return false;
+    auto* q=strata::q_of(stream);
+    if (!q->is_in_order()) return false;
+    const size_t rows=ldx%8?size_t((T+7)/8)*8:T%8?8:0;
+    const size_t weights_bytes=8*size_t(K)*sizeof(uint16_t);
+    const size_t output_bytes=size_t(T)*8*sizeof(float);
+    const size_t padding_bytes=rows*size_t(K)*sizeof(uint16_t);
+    if (weights_bytes+output_bytes+padding_bytes>bytes) return false;
+    // ponytail: repack per call in the existing workspace; no persistent cache or new engine allocation.
+    auto* padded_w=static_cast<uint16_t*>(workspace);
+    auto* padded_y=reinterpret_cast<float*>(static_cast<unsigned char*>(workspace)+weights_bytes);
+    auto* padding=static_cast<unsigned char*>(workspace)+weights_bytes+output_bytes;
+    q->parallel_for(sycl::range<1>(8*size_t(K)),[=](sycl::id<1> i) {
+        padded_w[i]=i[0]<size_t(N*K)?W[i]:uint16_t(0);
+    });
+    if (!native_xmx_gemm(X,padded_w,padded_y,T,8,K,ldx,8,0.f,padding,padding_bytes,stream,true,false)) {
+        q->wait_and_throw(); // Unsupported hardware: finish the private repack before the original fallback.
+        return false;
+    }
+    q->parallel_for(sycl::range<1>(size_t(T)*size_t(N)),[=](sycl::id<1> i) {
+        Y[i]=padded_y[(i[0]/N)*8+i[0]%N];
+    });
+    q->wait_and_throw();
+    static const bool profile=[] {
+        const char* v=std::getenv("STRATA_PREFILL_XMX_HC_INJECT_PROFILE");
+        return v && std::strcmp(v,"1")==0;
+    }();
+    if (profile) std::fprintf(stderr,"%s {\"T\":%lld,\"N\":%lld,\"K\":%lld,\"ldx\":%lld,\"workspace_bytes\":%llu}\n",
+        N==4?"HC_INJECT_XMX_CALL":"SHARED_GATE_XMX_CALL",(long long)T,(long long)N,(long long)K,
+        (long long)ldx,(unsigned long long)(weights_bytes+output_bytes+padding_bytes));
+    return true;
+}
+
+bool native_half_output_gemm(const uint16_t* X, const uint16_t* W, float* Y,
+                            int64_t T, int64_t N, int64_t K, int64_t ldy, float beta, void* stream, bool bf16=false) {
+    static const int mode=[] {
+        const char* v=std::getenv("STRATA_PREFILL_HALF_OUTPUT");
+        return !v ? 0 : std::strcmp(v,"1")==0 ? 1 : std::strcmp(v,"256")==0 ? 256 :
+            std::strcmp(v,"512")==0 ? 512 : std::strcmp(v,"1024")==0 ? 1024 : 0;
+    }();
+    static const bool convert_bf16=[] {
+        const char* v=std::getenv("STRATA_PREFILL_HALF_BF16");
+        return v && std::strcmp(v,"1")==0;
+    }();
+    // ponytail: experimental, opt-in contiguous beta=0 only; existing paths handle padding and accumulation.
+    if (!mode || (bf16 && !convert_bf16) || ldy!=N || beta!=0.f || K<=0 || (T==1 && N==1)) return false;
+    auto* q=strata::q_of(stream);
+    if (!q->is_in_order()) return false;
+    static const bool profile=[] {
+        const char* v=std::getenv("STRATA_PREFILL_HALF_PROFILE");
+        return v && std::strcmp(v,"1")==0;
+    }();
+    const auto start=profile?std::chrono::steady_clock::now():std::chrono::steady_clock::time_point{};
+    q->wait_and_throw();
+    auto release=[q](auto* p) { sycl::free(p,*q); };
+    std::unique_ptr<sycl::half,decltype(release)> partial(sycl::malloc_device<sycl::half>((size_t)T*N,*q),release);
+    std::unique_ptr<int,decltype(release)> bad(sycl::malloc_shared<int>(1,*q),release);
+    std::unique_ptr<sycl::half,decltype(release)> wh(bf16?sycl::malloc_device<sycl::half>((size_t)N*K,*q):nullptr,release);
+    std::unique_ptr<sycl::half,decltype(release)> xh(bf16?sycl::malloc_device<sycl::half>((size_t)T*K,*q):nullptr,release);
+    if (!partial || !bad || (bf16 && (!wh || !xh))) return false;
+    *bad=0;
+    auto* h=partial.get();
+    auto* invalid=bad.get();
+    const sycl::half* weights=reinterpret_cast<const sycl::half*>(W);
+    const sycl::half* inputs=reinterpret_cast<const sycl::half*>(X);
+    if (bf16) {
+        auto* converted_w=wh.get();
+        auto* converted_x=xh.get();
+        const size_t nw=(size_t)N*K;
+        q->parallel_for(sycl::range<1>(nw+(size_t)T*K),[=](sycl::id<1> p) {
+            const size_t i=p[0];
+            const uint16_t v=i<nw?W[i]:X[i-nw];
+            const sycl::half value(sycl::bit_cast<float>(uint32_t(v)<<16));
+            if (i<nw) converted_w[i]=value; else converted_x[i-nw]=value;
+            if (!sycl::isfinite(float(value)))
+                sycl::atomic_ref<int,sycl::memory_order::relaxed,sycl::memory_scope::device,
+                    sycl::access::address_space::global_space>(*invalid).store(1);
+        });
+        // The in-order queue completes conversion before GEMM; a bad conversion still forces the final retry.
+        weights=converted_w;inputs=converted_x;
+    }
+    const int64_t block=mode==1?K:mode;
+    for (int64_t offset=0;offset<K;offset+=block) {
+        oneapi::mkl::blas::column_major::gemm(*q,oneapi::mkl::transpose::trans,oneapi::mkl::transpose::nontrans,
+            N,T,std::min(block,K-offset),sycl::half(1),weights+offset,K,inputs+offset,K,
+            sycl::half(0),h,N,oneapi::mkl::blas::compute_mode::unset);
+        q->parallel_for(sycl::range<1>((size_t)T*N),[=](sycl::id<1> i) {
+            const float value=(offset?Y[i]:0.f)+float(h[i]);
+            Y[i]=value;
+            if (!sycl::isfinite(value))
+                sycl::atomic_ref<int,sycl::memory_order::relaxed,sycl::memory_scope::device,
+                    sycl::access::address_space::global_space>(*invalid).store(1);
+        });
+    }
+    q->wait_and_throw();
+    // Log before returning: serve uses _Exit, which skips atexit callbacks. Excludes buffer destruction/retry.
+    if (profile) std::fprintf(stderr,"NATIVE_HALF_CALL {\"mode\":%d,\"bf16\":%s,\"T\":%lld,\"N\":%lld,\"K\":%lld,\"body_us\":%.3f,\"fallback\":%s}\n",
+        mode,bf16?"true":"false",(long long)T,(long long)N,(long long)K,
+        std::chrono::duration<double,std::micro>(std::chrono::steady_clock::now()-start).count(),*bad?"true":"false");
+    return !*bad;
+}
+
+bool gpu_widen_gemm(const uint16_t* X, const uint16_t* W, float* Y, int64_t T, int64_t N, int64_t K,
+                    int64_t ldx, int64_t ldy, float beta, void* workspace, size_t bytes, void* stream, bool bf16 = false) {
+    static const bool enabled = [] {
+        const char* v = std::getenv("STRATA_PREFILL_GPU_WIDEN");
+        return v && std::strcmp(v, "1") == 0;
+    }();
+    static const bool bf16_enabled = [] {
+        const char* v = std::getenv("STRATA_PREFILL_BF16_GPU_WIDEN");
+        return v && std::strcmp(v, "1") == 0;
+    }();
+    // ponytail: retain oneMKL's padding writes for interleaved outputs and native row slices.
+    if (!(bf16 ? bf16_enabled : enabled) || ldy != N || !workspace || K <= 0 || ldx < K) return false;
+    // oneMKL's scalar dot product uses a different reduction order from FP32 GEMM.
+    if (T == 1 && N == 1) return false;
+    auto* q = strata::q_of(stream);
+    if (!q->is_in_order()) return false;
+    const size_t capacity = bytes / sizeof(float);
+    if ((uint64_t) N > capacity / K) return false;
+    const size_t nw = (size_t) N * K;
+    if ((uint64_t) T > (capacity - nw) / ldx) return false;
+    // oneMKL 2025.3/A770 corrupts a C slice above 4 GiB when A/B/C share one allocation.
+    // ponytail: stage C in its own allocation; reuse this buffer only if allocation becomes a measured bottleneck.
+    auto release = [q](float* p) { sycl::free(p, *q); };
+    std::unique_ptr<float, decltype(release)> output(sycl::malloc_device<float>((size_t) T * ldy, *q), release);
+    if (!output) return false;
+    q->memcpy(output.get(), Y, (size_t) T * ldy * sizeof(float));
+    auto* wf = static_cast<float*>(workspace);
+    auto* xf = wf + nw;
+    // ponytail: use the existing bounded workspace; large products keep the original path.
+    // A770 oneMKL promotes 16-bit inputs to FP32 through host staging. Keep its FP32 GEMM and move only widening.
+    q->parallel_for(sycl::range<1>((nw + 3) / 4), [=](sycl::id<1> p) {
+        const size_t i = p[0] * 4;
+        if (i + 4 <= nw) {
+            sycl::vec<uint16_t, 4> bits;
+            bits.load(0, sycl::address_space_cast<sycl::access::address_space::global_space,
+                sycl::access::decorated::no>(W + i));
+            const sycl::vec<float, 4> value = bf16
+                ? sycl::bit_cast<sycl::vec<float, 4>>(bits.convert<uint32_t>() << 16)
+                : sycl::bit_cast<sycl::vec<sycl::half, 4>>(bits).convert<float>();
+            value.store(0, sycl::address_space_cast<sycl::access::address_space::global_space,
+                sycl::access::decorated::no>(wf + i));
+        } else {
+            for (size_t j = i; j < nw; ++j) {
+                const uint16_t v = W[j];
+                wf[j] = bf16 ? sycl::bit_cast<float>(uint32_t(v) << 16) : float(sycl::bit_cast<sycl::half>(v));
+            }
+        }
+    });
+    q->parallel_for(sycl::range<1>((size_t) T * K), [=](sycl::id<1> i) {
+        const size_t offset = (size_t(i) / K) * ldx + size_t(i) % K;
+        const uint16_t v = X[offset];
+        xf[offset] = bf16 ? sycl::bit_cast<float>(uint32_t(v) << 16) : float(sycl::bit_cast<sycl::half>(v));
+    });
+    // ponytail: the in-order queue orders conversion, GEMM and copy; the final wait protects all input lifetimes.
+    oneapi::mkl::blas::column_major::gemm(*q, oneapi::mkl::transpose::trans,
+        oneapi::mkl::transpose::nontrans, N, T, K, 1.f, wf, K, xf, ldx, beta, output.get(), ldy,
+        oneapi::mkl::blas::compute_mode::unset);
+    q->memcpy(Y, output.get(), (size_t) T * ldy * sizeof(float)).wait_and_throw();
+    return true;
+}
+// oneMKL's 16-bit path writes row padding; these two projections share that padding.
+bool gdn_ab_gemm(const uint16_t* X, const uint16_t* W, float* Y,
+                        int64_t T, int64_t N, int64_t K, int64_t ldx, int64_t ldy, float beta,
+                        void* workspace, size_t bytes, void* stream) {
+    static const int mode=[] {
+        const char* v=std::getenv("STRATA_PREFILL_GDN_AB");
+        return !v?0:std::strcmp(v,"widen")==0?1:std::strcmp(v,"xmx")==0?2:0;
+    }();
+    if (!mode || T<=0 || T>INT_MAX || N!=48 || K!=2560 || ldx<K || ldy!=96)
+        return false;
+    auto* q=strata::q_of(stream);
+    if (!q->is_in_order()) return false;
+    const size_t output_bytes=size_t(T)*48*sizeof(float);
+    const char* path="fallback";
+    bool staged=false;
+    // ponytail: reuse the original GEMMs and workspace; scatter valid columns only, never the other projection.
+    if (workspace && output_bytes<=bytes) {
+        auto* packed_y=static_cast<float*>(workspace);
+        auto* scratch=static_cast<unsigned char*>(workspace)+output_bytes;
+        const size_t scratch_bytes=bytes-output_bytes;
+        if (mode==2 && beta==0.f &&
+            native_xmx_gemm(X,W,packed_y,T,48,K,ldx,48,0.f,scratch,scratch_bytes,stream,true,false)) {
+            staged=true;path="xmx";
+        } else {
+            if (beta!=0.f) q->parallel_for(sycl::range<1>(size_t(T)*48),[=](sycl::id<1> i) {
+                packed_y[i]=Y[(i[0]/48)*96+i[0]%48];
+            });
+            staged=gpu_widen_gemm(X,W,packed_y,T,N,K,ldx,N,beta,scratch,scratch_bytes,stream,true);
+            if (staged) path="widen";
+        }
+        if (staged) q->parallel_for(sycl::range<1>(size_t(T)*48),[=](sycl::id<1> i) {
+            Y[(i[0]/48)*96+i[0]%48]=packed_y[i];
+        }).wait_and_throw();
+    }
+    // A short workspace must also preserve alpha/beta; do not return to the padding-clobbering path.
+    if (!staged) fallback_gemm(X,W,Y,T,N,K,ldx,ldy,1.f,beta,false,stream);
+    static const bool profile=[] {
+        const char* v=std::getenv("STRATA_PREFILL_GDN_AB_PROFILE");
+        return v && std::strcmp(v,"1")==0;
+    }();
+    if (profile) std::fprintf(stderr,"GDN_AB_CALL {\"T\":%lld,\"ldx\":%lld,\"beta\":%.9g,\"path\":\"%s\"}\n",
+        (long long)T,(long long)ldx,beta,path);
+    return true;
+}
+
 }  // namespace
 
 void Gemm::bf16(const uint16_t* X, const uint16_t* W, float* Y, int64_t T, int64_t N, int64_t K, int64_t ldy,
@@ -526,13 +878,21 @@ void Gemm::bf16(const uint16_t* X, const uint16_t* W, float* Y, int64_t T, int64
     // oneMKL SYCL BLAS has no OpenCL Xe2 backend ("does not support this API"): fall back to the plain
     // SYCL kernel there (slow prompts, same answers) instead of failing the prompt.
     if (!onemkl_usable(stream_) ||
-        DPCT_CHECK_ERROR(dpct::blas::gemm(
+        DPCT_CHECK_ERROR([&] {
+           if (gdn_ab_gemm(X,W,Y,T,N,K,ldx?ldx:K,ldy,beta,workspace_,workspace_bytes_,stream_)) return;
+           if (native_small_bf16_gemm(X,W,Y,T,N,K,ldx?ldx:K,ldy,beta,workspace_,workspace_bytes_,stream_)) return;
+           if (native_xmx_gemm(X,W,Y,T,N,K,ldx?ldx:K,ldy,beta,workspace_,workspace_bytes_,stream_,true)) return;
+           if (!ldx && native_half_output_gemm(X,W,Y,T,N,K,ldy,beta,stream_,true)) return;
+           if (gpu_widen_gemm(X, W, Y, T, N, K, ldx ? ldx : K, ldy, beta,
+                             workspace_, workspace_bytes_, stream_, true)) return;
+           dpct::blas::gemm(
            (dpct::blas::descriptor_ptr)handle_, oneapi::mkl::transpose::trans,
            oneapi::mkl::transpose::nontrans, (int)N, (int)T, (int)K, &alpha, W,
            dpct::library_data_t::real_bfloat16, (int)K, X,
            dpct::library_data_t::real_bfloat16, (int)(ldx ? ldx : K), &beta, Y,
            dpct::library_data_t::real_float, (int)ldy,
-           dpct::compute_type::f32)) != 0) {
+           dpct::compute_type::f32);
+        }()) != 0) {
         fallback_note();
         fallback_gemm(X, W, Y, T, N, K, ldx ? ldx : K, ldy, alpha, beta, false, stream_);
         return;
@@ -553,18 +913,38 @@ void Gemm::f16(const uint16_t* X, const uint16_t* W, float* Y, int64_t T, int64_
     }
 #endif
     if (!onemkl_usable(stream_) ||
-        DPCT_CHECK_ERROR(dpct::blas::gemm(
+        DPCT_CHECK_ERROR([&] {
+           if (native_xmx_gemm(X,W,Y,T,N,K,K,ldy,beta,workspace_,workspace_bytes_,stream_)) return;
+           if (native_half_output_gemm(X,W,Y,T,N,K,ldy,beta,stream_)) return;
+           if (gpu_widen_gemm(X, W, Y, T, N, K, K, ldy, beta,
+                             workspace_, workspace_bytes_, stream_)) return;
+           dpct::blas::gemm(
            (dpct::blas::descriptor_ptr)handle_, oneapi::mkl::transpose::trans,
            oneapi::mkl::transpose::nontrans, (int)N, (int)T, (int)K, &alpha, W,
            dpct::library_data_t::real_half, (int)K, X,
            dpct::library_data_t::real_half, (int)K, &beta, Y,
            dpct::library_data_t::real_float, (int)ldy,
-           dpct::compute_type::f32)) != 0) {
+           dpct::compute_type::f32);
+        }()) != 0) {
         fallback_note();
         fallback_gemm(X, W, Y, T, N, K, K, ldy, alpha, beta, true, stream_);
         return;
     }
     STRATA_ABSORB_HIPBLAS_STICKY("cublasGemmEx f16");
+}
+
+bool Gemm::f16_expert(const uint16_t* X, const uint16_t* Wgu, const uint16_t* Wd,
+                       float* GU, uint16_t* H, float* Y, int64_t T, bool finish) {
+    // ponytail: this model's fixed expert dimensions; general shapes keep the existing calls.
+    // The first launch validates support and the larger padding requirement before enqueueing anything.
+    if (!native_xmx_gemm(X,Wgu,GU,T,1280,2560,2560,1280,0.f,
+                         workspace_,workspace_bytes_,stream_,false,false)) return false;
+    swiglu_interleaved(GU,H,T,stream_);
+    // Same queue/type/T; 640-wide H needs no more padding than the already validated 2560-wide X.
+    if (!native_xmx_gemm(H,Wd,Y,T,2560,640,640,2560,0.f,
+                         workspace_,workspace_bytes_,stream_,false,finish))
+        throw std::runtime_error("prefill XMX expert chain: validated down launch was refused");
+    return true;
 }
 
 void Gemm::native(const uint16_t* X, int ggml_type, const void* W_blocks, float* Y, int64_t T, int64_t N, int64_t K,

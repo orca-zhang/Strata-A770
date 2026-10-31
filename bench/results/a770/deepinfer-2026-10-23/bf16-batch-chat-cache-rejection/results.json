@@ -1,0 +1,61 @@
+{
+  "complete": true,
+  "valid_comparison": false,
+  "reason": "Actual expert capacity changed between processes; both runs rejected by the existing INFO gate before generation at the changed capacity",
+  "runs": [
+    {
+      "directory": "prefill-widen-bf16-batch-chat-inputs/Code2K-256",
+      "widen": false,
+      "expected": [
+        5771,
+        7922
+      ],
+      "actual": [
+        5771,
+        7922
+      ],
+      "passed_capacity_gate": true,
+      "generated": [
+        8
+      ]
+    },
+    {
+      "directory": "prefill-widen-bf16-batch-chat-inputs/Code2K-256",
+      "widen": true,
+      "expected": [
+        5771,
+        7922
+      ],
+      "actual": [
+        5587,
+        7669
+      ],
+      "passed_capacity_gate": false,
+      "generated": []
+    },
+    {
+      "directory": "prefill-widen-bf16-batch-chat-window-reference",
+      "widen": false,
+      "expected": [
+        5771,
+        7922
+      ],
+      "actual": [
+        5591,
+        7675
+      ],
+      "passed_capacity_gate": false,
+      "generated": []
+    }
+  ],
+  "followup_requested_expert_cache": 4000,
+  "followup_expected_actual": [
+    4191,
+    5760
+  ],
+  "interrupted_queued_reference": {
+    "directory": "prefill-widen-bf16-batch-chat-fixed-reference",
+    "reason": "Queued reference acquired the lock during cancellation while combining dependent checks into one reservation; stopped before READY/GEN; its owned stale lock was removed after confirming the process and children had exited",
+    "generation_started": false
+  }
+}

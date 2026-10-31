@@ -5,20 +5,20 @@ might run on a similar machine. This guide suggests a report format and a pull
 request workflow; a single model, GPU, or context length is enough to contribute.
 
 Existing [benchmark reports](../bench/results/) provide examples. The
-[engine 0.1.26 speed report](https://github.com/Niko1221/Strata/blob/f40c418e483adc89e2e4f58e602c32a7e7d892c8/bench/results/2026-09-29-speed-0126/README.md)
+[engine 0.1.26 speed report](../bench/results/2026-09-29-speed-0126/README.md)
 includes hardware, settings, and per-run JSON. The
 [technical details](DETAILS.md#speed-measured) explain the published measurements
 and their limits. Report what you actually measured and label estimates separately.
 
 ## Community reports
 
-- [2026-09-30: RTX 5090, Core Ultra 9 285K, 64 GB RAM](https://github.com/Niko1221/Strata/blob/f40c418e483adc89e2e4f58e602c32a7e7d892c8/bench/results/2026-09-30-community-rtx-5090/README.md):
+- [2026-09-30: RTX 5090, Core Ultra 9 285K, 64 GB RAM](../bench/results/2026-09-30-community-rtx-5090/README.md):
   Strata 0.1.29, original Flash-Next IQ2_XS, 131,072-token context; three runs
   each at 4,096, 32,768, and 128,000 prompt tokens, plus six recall checks.
-- [2026-10-03: 2x AMD Instinct MI50 16 GB (gfx906), Xeon E5-2666 v3, 32 GB RAM](https://github.com/Niko1221/Strata/blob/f40c418e483adc89e2e4f58e602c32a7e7d892c8/bench/results/2026-10-03-community-2x-mi50/README.md):
+- [2026-10-03: 2x AMD Instinct MI50 16 GB (gfx906), Xeon E5-2666 v3, 32 GB RAM](../bench/results/2026-10-03-community-2x-mi50/README.md):
   the gfx906 build (#638) with #639 and #640, Coder IQ1_M, 131,072-token context, layer split across both cards;
   three runs each at 4,096, 32,768, and 128,000 prompt tokens, plus six recall checks.
-- [2026-10-04: 2x Intel Arc Pro B60 24 GB, Ryzen 5 5600, 64 GB RAM](https://github.com/Niko1221/Strata/blob/f40c418e483adc89e2e4f58e602c32a7e7d892c8/bench/results/2026-10-04-community-2x-arc-pro-b60/README.md):
+- [2026-10-04: 2x Intel Arc Pro B60 24 GB, Ryzen 5 5600, 64 GB RAM](../bench/results/2026-10-04-community-2x-arc-pro-b60/README.md):
   the SYCL port at `6f32ec0` with two fixes, Coder IQ1_M and Flash-Next IQ2_XS, 8,192-token context, layer split across both cards;
   short prompts and 2K-token prompts, plus one run on a single B60. Intel's SYCL engine, no 4,096/32,768/128,000-token sweep.
 

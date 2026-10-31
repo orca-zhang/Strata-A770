@@ -1,0 +1,41 @@
+{
+  "complete": true,
+  "performance_measurement": false,
+  "full_model_stability_established": false,
+  "linux_gpu_validated": false,
+  "date": "2026-10-30",
+  "device": "Intel Arc A770 16 GB",
+  "windows_driver": "32.0.101.9034",
+  "compiler": "IntelLLVM 2025.3.2",
+  "spirv_sha256": "1fe183621d35ed90003cb70656fb9c7015b5d95ab70ac2cc9901b86570c87415",
+  "local_run": "build-isa-m4-1793370698079902800",
+  "rows": [
+    {
+      "name": "default",
+      "grf_count": [
+        128
+      ],
+      "module_flags": "-cl-fp32-correctly-rounded-divide-sqrt",
+      "native_binary_sha256": "e110aea550e450a185613a403b41454f17b5892893eaed4246125fb70fceda62",
+      "assembly_sha256": "ddc79b7076ae4cebbece4e43594b578040db66be99f3edb691b4f1ab1e51f991",
+      "static_dpas_instruction_count": 1,
+      "dpas_instructions": [
+        "dpas.8x4 (8|M0)          r36:f         r36:f             r23:hf            r51.0:hf         {$3}"
+      ]
+    },
+    {
+      "name": "large",
+      "grf_count": [
+        256
+      ],
+      "module_flags": "-cl-fp32-correctly-rounded-divide-sqrt -ze-opt-large-register-file",
+      "native_binary_sha256": "5e535de040908c9a4a6034348d2734ae777770fadf042d6537db665496fad026",
+      "assembly_sha256": "5f3be016eac1e3ee3786443926ffb6976a9df31459cd0e7a2b38b00192a21981",
+      "static_dpas_instruction_count": 1,
+      "dpas_instructions": [
+        "dpas.8x4 (8|M0)          r57:f         r57:f             r44:hf            r72.0:hf         {$3}"
+      ]
+    }
+  ],
+  "scope": "Private FP16 M4/N8/NSG8 variant: static disassembly only; the two BF16 SPIR-V exports are unchanged. It removes the original 8x8 DPAS instruction shape, but this does not establish a cause or a fix for intermittent full-model corruption."
+}

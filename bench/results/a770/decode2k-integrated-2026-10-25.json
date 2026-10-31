@@ -1,0 +1,435 @@
+{
+  "complete": true,
+  "scope": "screen",
+  "target_achieved": false,
+  "rule": "Screen two complete frozen builds, not attribution to individual kernels: reuse the unprofiled production A0 baseline, newer frozen native-XMX/full-engine B, production A2. Same original 2048 input IDs, max128 greedy output, fixed5771 slots, FP16 KV, MTP4, PCIe3.0, no prompt cache. Each fresh process Short16 initialization, one warmup per case, three interleaved retained cycles. All samples retained, no profiler in throughput runs. <=3% A0/A2 drift, report output equality and both cases. New engine uses its validated matched128MiB workspace, production uses32MiB; no kernel-specific speed attribution. Separate newer-engine diagnostic with sampled GPU markers every8/max8 and host/depth counters. Older production binary disables stage profiling on Windows; the prior frozen check incorrectly required newer GPU-stage log format. Its successful unprofiled measurements are independently checked without changing any frozen files. This is screening, not independent confirmation or a production deployment.",
+  "requests": [
+    {
+      "build": "baseline",
+      "case": "Code2K",
+      "warmup": true,
+      "input_tokens": 2048,
+      "output_tokens": 128,
+      "reused": 0,
+      "accepted": 75,
+      "offered": 98,
+      "prompt_ms": 52094.1,
+      "decode_ms": 5984.6,
+      "output_sha256": "76252b2f9e9cc17646ecace8afbd0527b70a8487646e63301ec8af1779c32894"
+    },
+    {
+      "build": "baseline",
+      "case": "Prose2K",
+      "warmup": true,
+      "input_tokens": 2048,
+      "output_tokens": 128,
+      "reused": 0,
+      "accepted": 73,
+      "offered": 100,
+      "prompt_ms": 50793.2,
+      "decode_ms": 5594.0,
+      "output_sha256": "00c1afb1bf8359fc114b4c24b5d2636601cd4c8851032d099546275062c0c016"
+    },
+    {
+      "build": "baseline",
+      "case": "Code2K",
+      "warmup": false,
+      "input_tokens": 2048,
+      "output_tokens": 128,
+      "reused": 0,
+      "accepted": 75,
+      "offered": 98,
+      "prompt_ms": 51093.7,
+      "decode_ms": 5173.2,
+      "output_sha256": "76252b2f9e9cc17646ecace8afbd0527b70a8487646e63301ec8af1779c32894"
+    },
+    {
+      "build": "baseline",
+      "case": "Prose2K",
+      "warmup": false,
+      "input_tokens": 2048,
+      "output_tokens": 128,
+      "reused": 0,
+      "accepted": 73,
+      "offered": 98,
+      "prompt_ms": 49139.6,
+      "decode_ms": 5157.4,
+      "output_sha256": "00c1afb1bf8359fc114b4c24b5d2636601cd4c8851032d099546275062c0c016"
+    },
+    {
+      "build": "baseline",
+      "case": "Code2K",
+      "warmup": false,
+      "input_tokens": 2048,
+      "output_tokens": 128,
+      "reused": 0,
+      "accepted": 75,
+      "offered": 98,
+      "prompt_ms": 50337.6,
+      "decode_ms": 5149.7,
+      "output_sha256": "76252b2f9e9cc17646ecace8afbd0527b70a8487646e63301ec8af1779c32894"
+    },
+    {
+      "build": "baseline",
+      "case": "Prose2K",
+      "warmup": false,
+      "input_tokens": 2048,
+      "output_tokens": 128,
+      "reused": 0,
+      "accepted": 72,
+      "offered": 98,
+      "prompt_ms": 49170.2,
+      "decode_ms": 5241.7,
+      "output_sha256": "00c1afb1bf8359fc114b4c24b5d2636601cd4c8851032d099546275062c0c016"
+    },
+    {
+      "build": "baseline",
+      "case": "Code2K",
+      "warmup": false,
+      "input_tokens": 2048,
+      "output_tokens": 128,
+      "reused": 0,
+      "accepted": 75,
+      "offered": 98,
+      "prompt_ms": 49470.1,
+      "decode_ms": 5150.0,
+      "output_sha256": "76252b2f9e9cc17646ecace8afbd0527b70a8487646e63301ec8af1779c32894"
+    },
+    {
+      "build": "baseline",
+      "case": "Prose2K",
+      "warmup": false,
+      "input_tokens": 2048,
+      "output_tokens": 128,
+      "reused": 0,
+      "accepted": 72,
+      "offered": 97,
+      "prompt_ms": 49121.5,
+      "decode_ms": 5214.7,
+      "output_sha256": "00c1afb1bf8359fc114b4c24b5d2636601cd4c8851032d099546275062c0c016"
+    },
+    {
+      "build": "B",
+      "case": "Code2K",
+      "warmup": true,
+      "input_tokens": 2048,
+      "output_tokens": 128,
+      "reused": 0,
+      "accepted": 75,
+      "offered": 98,
+      "prompt_ms": 49527.1,
+      "decode_ms": 5370.7,
+      "output_sha256": "76252b2f9e9cc17646ecace8afbd0527b70a8487646e63301ec8af1779c32894"
+    },
+    {
+      "build": "B",
+      "case": "Prose2K",
+      "warmup": true,
+      "input_tokens": 2048,
+      "output_tokens": 128,
+      "reused": 0,
+      "accepted": 73,
+      "offered": 100,
+      "prompt_ms": 48600.9,
+      "decode_ms": 8429.9,
+      "output_sha256": "00c1afb1bf8359fc114b4c24b5d2636601cd4c8851032d099546275062c0c016"
+    },
+    {
+      "build": "B",
+      "case": "Code2K",
+      "warmup": false,
+      "input_tokens": 2048,
+      "output_tokens": 128,
+      "reused": 0,
+      "accepted": 75,
+      "offered": 98,
+      "prompt_ms": 49301.0,
+      "decode_ms": 4779.7,
+      "output_sha256": "76252b2f9e9cc17646ecace8afbd0527b70a8487646e63301ec8af1779c32894"
+    },
+    {
+      "build": "B",
+      "case": "Prose2K",
+      "warmup": false,
+      "input_tokens": 2048,
+      "output_tokens": 128,
+      "reused": 0,
+      "accepted": 72,
+      "offered": 97,
+      "prompt_ms": 48320.9,
+      "decode_ms": 4832.6,
+      "output_sha256": "00c1afb1bf8359fc114b4c24b5d2636601cd4c8851032d099546275062c0c016"
+    },
+    {
+      "build": "B",
+      "case": "Code2K",
+      "warmup": false,
+      "input_tokens": 2048,
+      "output_tokens": 128,
+      "reused": 0,
+      "accepted": 75,
+      "offered": 98,
+      "prompt_ms": 49259.3,
+      "decode_ms": 4819.2,
+      "output_sha256": "76252b2f9e9cc17646ecace8afbd0527b70a8487646e63301ec8af1779c32894"
+    },
+    {
+      "build": "B",
+      "case": "Prose2K",
+      "warmup": false,
+      "input_tokens": 2048,
+      "output_tokens": 128,
+      "reused": 0,
+      "accepted": 72,
+      "offered": 98,
+      "prompt_ms": 48184.0,
+      "decode_ms": 4844.0,
+      "output_sha256": "00c1afb1bf8359fc114b4c24b5d2636601cd4c8851032d099546275062c0c016"
+    },
+    {
+      "build": "B",
+      "case": "Code2K",
+      "warmup": false,
+      "input_tokens": 2048,
+      "output_tokens": 128,
+      "reused": 0,
+      "accepted": 75,
+      "offered": 98,
+      "prompt_ms": 49418.0,
+      "decode_ms": 4750.9,
+      "output_sha256": "76252b2f9e9cc17646ecace8afbd0527b70a8487646e63301ec8af1779c32894"
+    },
+    {
+      "build": "B",
+      "case": "Prose2K",
+      "warmup": false,
+      "input_tokens": 2048,
+      "output_tokens": 128,
+      "reused": 0,
+      "accepted": 72,
+      "offered": 97,
+      "prompt_ms": 48321.0,
+      "decode_ms": 4820.5,
+      "output_sha256": "00c1afb1bf8359fc114b4c24b5d2636601cd4c8851032d099546275062c0c016"
+    },
+    {
+      "build": "A2",
+      "case": "Code2K",
+      "warmup": true,
+      "input_tokens": 2048,
+      "output_tokens": 128,
+      "reused": 0,
+      "accepted": 75,
+      "offered": 98,
+      "prompt_ms": 49869.0,
+      "decode_ms": 5737.0,
+      "output_sha256": "76252b2f9e9cc17646ecace8afbd0527b70a8487646e63301ec8af1779c32894"
+    },
+    {
+      "build": "A2",
+      "case": "Prose2K",
+      "warmup": true,
+      "input_tokens": 2048,
+      "output_tokens": 128,
+      "reused": 0,
+      "accepted": 73,
+      "offered": 100,
+      "prompt_ms": 49032.3,
+      "decode_ms": 5441.7,
+      "output_sha256": "00c1afb1bf8359fc114b4c24b5d2636601cd4c8851032d099546275062c0c016"
+    },
+    {
+      "build": "A2",
+      "case": "Code2K",
+      "warmup": false,
+      "input_tokens": 2048,
+      "output_tokens": 128,
+      "reused": 0,
+      "accepted": 75,
+      "offered": 98,
+      "prompt_ms": 50322.6,
+      "decode_ms": 5144.7,
+      "output_sha256": "76252b2f9e9cc17646ecace8afbd0527b70a8487646e63301ec8af1779c32894"
+    },
+    {
+      "build": "A2",
+      "case": "Prose2K",
+      "warmup": false,
+      "input_tokens": 2048,
+      "output_tokens": 128,
+      "reused": 0,
+      "accepted": 73,
+      "offered": 98,
+      "prompt_ms": 49002.0,
+      "decode_ms": 5151.1,
+      "output_sha256": "00c1afb1bf8359fc114b4c24b5d2636601cd4c8851032d099546275062c0c016"
+    },
+    {
+      "build": "A2",
+      "case": "Code2K",
+      "warmup": false,
+      "input_tokens": 2048,
+      "output_tokens": 128,
+      "reused": 0,
+      "accepted": 75,
+      "offered": 98,
+      "prompt_ms": 50208.6,
+      "decode_ms": 5147.0,
+      "output_sha256": "76252b2f9e9cc17646ecace8afbd0527b70a8487646e63301ec8af1779c32894"
+    },
+    {
+      "build": "A2",
+      "case": "Prose2K",
+      "warmup": false,
+      "input_tokens": 2048,
+      "output_tokens": 128,
+      "reused": 0,
+      "accepted": 72,
+      "offered": 98,
+      "prompt_ms": 48708.0,
+      "decode_ms": 5241.3,
+      "output_sha256": "00c1afb1bf8359fc114b4c24b5d2636601cd4c8851032d099546275062c0c016"
+    },
+    {
+      "build": "A2",
+      "case": "Code2K",
+      "warmup": false,
+      "input_tokens": 2048,
+      "output_tokens": 128,
+      "reused": 0,
+      "accepted": 75,
+      "offered": 98,
+      "prompt_ms": 50263.4,
+      "decode_ms": 5145.5,
+      "output_sha256": "76252b2f9e9cc17646ecace8afbd0527b70a8487646e63301ec8af1779c32894"
+    },
+    {
+      "build": "A2",
+      "case": "Prose2K",
+      "warmup": false,
+      "input_tokens": 2048,
+      "output_tokens": 128,
+      "reused": 0,
+      "accepted": 72,
+      "offered": 97,
+      "prompt_ms": 49034.7,
+      "decode_ms": 5206.4,
+      "output_sha256": "00c1afb1bf8359fc114b4c24b5d2636601cd4c8851032d099546275062c0c016"
+    }
+  ],
+  "summary": {
+    "Code2K": {
+      "median_tps": {
+        "baseline": 24.854368932038835,
+        "B": 26.779923426156454,
+        "A2": 24.876105334758527
+      },
+      "range_tps": {
+        "baseline": [
+          24.74290574499343,
+          24.855816843699635
+        ],
+        "B": [
+          26.56042496679947,
+          26.942263571112843
+        ],
+        "A2": [
+          24.868855644064503,
+          24.879973565028088
+        ]
+      },
+      "throughput_change_pct": 7.700263788109996,
+      "baseline_time_drift_pct": -0.08737864077670299,
+      "drift_eligible": true,
+      "outputs_equal": true,
+      "required_gain_to40_pct": 49.365624999999994
+    },
+    "Prose2K": {
+      "median_tps": {
+        "baseline": 24.545994975741653,
+        "B": 26.486777304142695,
+        "A2": 24.585125998770746
+      },
+      "range_tps": {
+        "baseline": [
+          24.419558540168268,
+          24.818707100476985
+        ],
+        "B": [
+          26.424442609413706,
+          26.553262109739652
+        ],
+        "A2": [
+          24.421422166256463,
+          24.849061365533572
+        ]
+      },
+      "throughput_change_pct": 7.820807584801326,
+      "baseline_time_drift_pct": -0.15916543617083834,
+      "drift_eligible": true,
+      "outputs_equal": true,
+      "required_gain_to40_pct": 51.018750000000026
+    }
+  },
+  "host_profile": [
+    {
+      "case": "initializer",
+      "windows": 7,
+      "vram_entries": 4385,
+      "routed_entries": 10560,
+      "vram_entry_hit_pct": 41.52462121212121,
+      "submit_ms_mean": 26.649857142857144,
+      "post_submit_wait_ms_mean": 98.205
+    },
+    {
+      "case": "Code2K",
+      "windows": 55,
+      "vram_entries": 56160,
+      "routed_entries": 73440,
+      "vram_entry_hit_pct": 76.47058823529412,
+      "submit_ms_mean": 23.774436363636365,
+      "post_submit_wait_ms_mean": 59.97378181818182
+    },
+    {
+      "case": "Prose2K",
+      "windows": 56,
+      "vram_entries": 60484,
+      "routed_entries": 74880,
+      "vram_entry_hit_pct": 80.77457264957265,
+      "submit_ms_mean": 23.76548214285714,
+      "post_submit_wait_ms_mean": 52.545678571428574
+    }
+  ],
+  "gpu_stage_lines": [
+    "strata decode GPU stages: GDN layers: hc-read0 5.80ms 36.0x q8+qkv/q-idx gemv 3.42ms 36.0x conv 0.44ms 36.0x ab 1.78ms 36.0x z 2.87ms 36.0x rec 1.93ms 36.0x out-proj 2.41ms 36.0x route plan+publish 0.99ms 36.0x shared+quant 5.11ms 36.0x waitA 0.10ms 36.0x VRAM hits 73.23ms 36.0x copy+combine 0.42ms 36.0x (gap) 0.10ms 36.0x head 1.76ms 1.0x hc-read1 4.64ms 36.0x router gemv 0.97ms 36.0x router top10 1.06ms 36.0x | QSA layers: hc-read0 1.55ms 12.0x q8+kv-idx 0.33ms 12.0x k/v+norm-rope 0.97ms 12.0x kv+idx append 0.74ms 12.0x q+q-idx 1.69ms 12.0x scores+topk 0.19ms 12.0x kv-resolve 0.03ms 12.0x attention 0.72ms 12.0x gate 0.17ms 12.0x out-proj 0.83ms 12.0x route plan+publish 0.32ms 12.0x shared+quant 1.85ms 12.0x waitA 0.03ms 12.0x VRAM hits 23.40ms 12.0x copy+combine 0.14ms 12.0x (gap) 0.03ms 11.0x hc-read1 1.53ms 12.0x router gemv 0.34ms 12.0x router top10 0.35ms 12.0x | total 142.21 ms/window, avg T 4.00 over 1 sampled windows",
+    "strata decode GPU stages: GDN layers: hc-read0 5.09ms 36.0x q8+qkv/q-idx gemv 2.96ms 36.0x conv 0.44ms 36.0x ab 1.46ms 36.0x z 2.55ms 36.0x rec 1.70ms 36.0x out-proj 2.05ms 36.0x route plan+publish 0.85ms 36.0x shared+quant 4.28ms 36.0x waitA 0.09ms 36.0x VRAM hits 32.43ms 36.0x copy+combine 0.42ms 36.0x (gap) 0.09ms 36.0x head 1.56ms 1.0x hc-read1 3.93ms 36.0x router gemv 1.09ms 36.0x router top10 0.78ms 36.0x | QSA layers: hc-read0 1.40ms 12.0x q8+kv-idx 0.28ms 12.0x k/v+norm-rope 0.83ms 12.0x kv+idx append 0.54ms 12.0x q+q-idx 1.52ms 12.0x scores+topk 0.41ms 12.0x kv-resolve 0.04ms 12.0x attention 1.31ms 12.0x gate 0.19ms 12.0x out-proj 0.72ms 12.0x route plan+publish 0.29ms 12.0x shared+quant 1.57ms 12.0x waitA 0.03ms 12.0x VRAM hits 9.21ms 12.0x copy+combine 0.15ms 12.0x (gap) 0.03ms 11.0x hc-read1 1.44ms 12.0x router gemv 0.37ms 12.0x router top10 0.27ms 12.0x | total 82.35 ms/window, avg T 2.71 over 7 sampled windows",
+    "strata decode GPU stages: GDN layers: hc-read0 5.05ms 36.0x q8+qkv/q-idx gemv 2.94ms 36.0x conv 0.41ms 36.0x ab 1.48ms 36.0x z 2.53ms 36.0x rec 1.67ms 36.0x out-proj 2.07ms 36.0x route plan+publish 0.84ms 36.0x shared+quant 4.28ms 36.0x waitA 0.10ms 36.0x VRAM hits 31.57ms 36.0x copy+combine 0.42ms 36.0x (gap) 0.09ms 36.0x head 1.56ms 1.0x hc-read1 3.89ms 36.0x router gemv 1.09ms 36.0x router top10 0.79ms 36.0x | QSA layers: hc-read0 1.39ms 12.0x q8+kv-idx 0.28ms 12.0x k/v+norm-rope 0.80ms 12.0x kv+idx append 0.52ms 12.0x q+q-idx 1.53ms 12.0x scores+topk 0.45ms 12.0x kv-resolve 0.04ms 12.0x attention 1.31ms 12.0x gate 0.16ms 12.0x out-proj 0.72ms 12.0x route plan+publish 0.28ms 12.0x shared+quant 1.57ms 12.0x waitA 0.03ms 12.0x VRAM hits 8.92ms 12.0x copy+combine 0.15ms 12.0x (gap) 0.03ms 11.0x hc-read1 1.44ms 12.0x router gemv 0.40ms 12.0x router top10 0.27ms 12.0x | total 81.06 ms/window, avg T 2.71 over 7 sampled windows"
+  ],
+  "local_files_sha256": {
+    "build-sycl-a770-decode2k-baseline-20261025/run.py": "5b6ab63e7a1b8ee2fc5227f9bacf6a7465ee013e9177137760848baf5a32ce87",
+    "build-sycl-a770-decode2k-baseline-20261025/config.json": "b001f19b5f97dfd74a7f9aca0e122f67e66d970a87bcf5024ebae7ab987c2291",
+    "build-sycl-a770-decode2k-baseline-20261025/frozen-environment.json": "8cad0dcfc65e54908d6e8f798da2c92057f7f792adf881c78ff61634441fc59d",
+    "build-sycl-a770-production-xmx-v2-20261025/bin/strata-unified-all-operators.exe": "73996f4fab16c89531574d29bea70097cd5309d4db03c00af5829d78920e7890",
+    "tools/bench_deepinfer.py": "10cf806bfdffc9cb4ba110d87503d6b28b8c163a789c1567c4a0dde0c1a83730",
+    "bench/results/2026-10-13-a770-iq2s-single-group-adopt/screen.in": "526fcd265606426dc3ebc84bfeccc5202ecc67bb90af4ab81f7c5862c7225bd1",
+    "build-sycl-a770-decode2k-baseline-20261025/protocol.json": "936e0a9e27325591f35076349d3731b15dddafbbca6cfa3fa44c5d627cee2612",
+    "build-sycl-a770-decode2k-baseline-20261025/baseline.protocol": "6625920eb317bc1cfa9551c90e7c0f8d8aff4b55d7e0bcfd904f7641fcb5844b",
+    "build-sycl-a770-decode2k-baseline-20261025/baseline.stderr": "3fef4d0d081f947497a13268ff62c2fdd537a7e9fbbdf9e0d5d7573c0834fdc6",
+    "build-sycl-a770-decode2k-baseline-20261025/profile.protocol": "85a1d6e8b56ac3bdf77868f6224fb62a27cb981a6ff963b97abef74f629483c5",
+    "build-sycl-a770-decode2k-baseline-20261025/profile.stderr": "c8178b9e8e0c3237e5951393e3b7176d9216d064fc144ab6360141578a389ab9",
+    "build-sycl-a770-decode2k-integrated-20261025/run.py": "c1fd15460613ea2957126f539b46e244c6edea0d7068faec0104070f2868c9b7",
+    "build-sycl-a770-decode2k-baseline-20261025/results.json": "c45d123a5189bd788e100c48a5b2b5fc10ef9a53aaccd7730292c65f904f5e0b",
+    "build-sycl-a770-native-xmx-20261024/integration/results.json": "b063ca2d94ae8721c285f8e5212b718f5a5ddaa0ef56b739f935b790bc0ffdb9",
+    "build-sycl-a770-native-xmx-20261024/integration/model/strata.exe": "34be68f70133b711d76cc665ddafc5e623a1b5cab5d0788a1edc47a82d65751a",
+    "build-sycl-a770-decode2k-integrated-20261025/protocol.json": "d2044f762bd53cd834e58dfd9c0607834a289670a1e41c627f2f13f1098f6f73",
+    "build-sycl-a770-decode2k-integrated-20261025/A2.protocol": "d0c825176792c315c76a45752ee1be73efba49847ae43fab22165ac01bf799c7",
+    "build-sycl-a770-decode2k-integrated-20261025/A2.stderr": "3a37e0a7c93fd52bdf422531077c3b6866ab245256e7d2c01751e47ae8e5fa12",
+    "build-sycl-a770-decode2k-integrated-20261025/B.protocol": "d80c2481048d4a0fd35ccff6e874fa695e31b8d4624cb9ebf1345aca9b3ab491",
+    "build-sycl-a770-decode2k-integrated-20261025/B.stderr": "56d16d2e524bab8564c66d51e7f5d9c7e76081ee67df72affe3c1421db2436ee",
+    "build-sycl-a770-decode2k-integrated-20261025/profile.protocol": "89ea3319c9c00547cc1ce6aa368da03a3a92eb8d1cb48c63a64cbdee71326ad9",
+    "build-sycl-a770-decode2k-integrated-20261025/profile.stderr": "de109865aa2d8027204197773ec5890e3e2388980ac3953d39ff712ccf6d7b11",
+    "build-sycl-a770-decode2k-integrated-20261025/results.json": "5e5557a3b22a6d7b12a6e738ead649ecaddcbd7008d93ed8660cf1574a7c5a38",
+    "build-sycl-a770-decode2k-integrated-20261025/publish.py": "0277fdf70e5752b91f811536f43a8541635ff7181a942c8ae4af2e3640191d0a",
+    "bench/results/a770/check_decode2k_integrated_20261025.py": "ea9eba95cdc7b743bc8d97d0e2fa09a133a22fbacc7ea4330004f805917ddae0"
+  }
+}

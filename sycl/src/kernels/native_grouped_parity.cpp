@@ -372,6 +372,28 @@ void check(int gu, int dt, int64_t H, int64_t FF, dpct::queue_ptr s,
             const int ng = S.plan(groups, base, rng);
             k::native_gu_sg16_set(false);
             const auto ref = S.result(true, 0, 0x00, s);
+            if (gu == 29 && ng > 0) {
+                // ponytail: one-entry groups exercise the original dot as the reference for IQ1_M reuse.
+                std::vector<unsigned long long> original(ng), single;
+                std::vector<int32_t> bounds(ng + 1), starts;
+                s->memcpy(original.data(), S.ptr, original.size() * sizeof(original[0]));
+                s->memcpy(bounds.data(), S.start, bounds.size() * sizeof(bounds[0])).wait_and_throw();
+                for (int g = 0; g < ng; ++g)
+                    for (int e = bounds[g]; e < bounds[g + 1]; ++e) { single.push_back(original[g]); starts.push_back(e); }
+                starts.push_back(bounds.back());
+                const int count = (int) single.size();
+                s->memcpy(S.ptr, single.data(), single.size() * sizeof(single[0]));
+                s->memcpy(S.start, starts.data(), starts.size() * sizeof(starts[0]));
+                s->memcpy(S.n, &count, sizeof(count)).wait_and_throw();
+                ++calls;
+                if (S.result(true, 0, 0x00, s) != ref) {
+                    std::printf("IQ1_M grouped / single-entry reference differs: FAIL\n");
+                    ++bad;
+                }
+                s->memcpy(S.ptr, original.data(), original.size() * sizeof(original[0]));
+                s->memcpy(S.start, bounds.data(), bounds.size() * sizeof(bounds[0]));
+                s->memcpy(S.n, &ng, sizeof(ng)).wait_and_throw();
+            }
             k::native_gu_sg16_set(true);
             size_t w = 0;
             for (const uint32_t v : ref) w += v != 0xFFFFFFFFu;
@@ -755,6 +777,8 @@ int main(int argc, char** argv) {
         for (int dt : {20, 23, 42, 7, 8}) check(gu, dt, 512, 256, s, rng);   // STRATA_D_FMTS; IQ4_XS: n_ff % 256
     check(21, 20, 2560, 640, s, rng);                                   // a model's shapes
     check(21, 23, 2560, 768, s, rng);
+    check(42, 42, 2560, 640, s, rng);  // A770 Q2 paired gate/up, including 4/2/1-entry tails
+    check(29, 42, 2560, 640, s, rng);  // IQ1_M weight reuse, including odd and multi-pair groups
     if (do_bench) bench(s, rng);
     std::printf("native_grouped_parity: %d failures\n", g_fail);
     dpct::get_current_device().destroy_queue(s);

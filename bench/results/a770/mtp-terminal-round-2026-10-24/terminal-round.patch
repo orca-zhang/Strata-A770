@@ -1,0 +1,42 @@
+--- sycl/src/program/generate.cpp (before)
++++ sycl/src/program/generate.cpp (after)
+@@ -7399,16 +7399,17 @@
+                 if (req_logprobs >= 0) std::fflush(stdout);
+                 ++rounds;
+                 const Clock::time_point tw2 = Clock::now();
++                const bool last = eos || produced_n >= max_new || stop_req.load();
+                 // coupled drafts with penalties: the next window's row-0 history (`consumed` holds this window's
+                 // commit, outv[a] is its row 0) - the drafts extend it on the device as the verify rows will
+-                if (hist_n > 0 && mtp.coupled() && !eos && produced_n < max_new)
++                if (hist_n > 0 && mtp.coupled() && !last)
+                     mtp.set_draft_history(consumed.data(), (int64_t) consumed.size(), outv[(size_t) a]);
+                 bool drafted;
+                 {
+ #ifdef STRATA_EZPP
+                     EZPP_EX("mtp.draft");
+ #endif
+-                    drafted = !use_mtp || eos || produced_n >= max_new ||
++                    drafted = !use_mtp || last ||
+                               mtp.draft(T, outv.data(), p, a, drafts.data(), err, dprob.data(), (float) req_spec_min_p,
+                                         nullptr, g_env_mtp_cum_min_p);
+                 }
+@@ -7431,7 +7432,8 @@
+                     std::printf("ERR %s\n", err.c_str());
+                     return 1;
+                 }
+-                if (timed_round && !eos)
++                // A terminal round skips the next draft, so it has no comparable full-round cost.
++                if (timed_round && !last)
+                     policy.observe(from_sfx, T, a, sfx_match,
+                                    std::chrono::duration<double, std::milli>(Clock::now() - round0).count());
+                 if (eos) { finish = "stop"; break; }
+@@ -8474,7 +8476,8 @@
+             p += a + 1;
+             const double round_ms = std::chrono::duration<double, std::milli>(Clock::now() - t0).count();
+             total_ms += round_ms;
+-            if (timed_round) policy.observe(from_sfx, T, a, sfx_match, round_ms);
++            if (timed_round && (int64_t) produced.size() < o.max_new)
++                policy.observe(from_sfx, T, a, sfx_match, round_ms);
+             if (rounds % 64 == 0)
+                 std::fprintf(stderr, "strata generate: position %lld, %lld tokens, %lld rounds\n", (long long) p,
+                              (long long) produced.size(), (long long) rounds);

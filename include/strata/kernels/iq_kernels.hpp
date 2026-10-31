@@ -40,6 +40,16 @@ void iq_embed_rows(int ggml_type, const void* table, size_t row_bytes, const int
 void iq_dequant_gu_f16(int ggml_type, const void* gate, const void* up, int64_t n_ff, int64_t n_embd, uint16_t* dst,
                        void* stream);
 
+/// SYCL: gate/up and down in one submission, with the same layouts and rounding as the two calls above.
+/// Returns false without submitting for unsupported formats or dimensions.
+bool iq_dequant_expert_f16(int gu_type, int d_type, const void* gate, const void* up, const void* down,
+                           int64_t n_ff, int64_t n_embd, uint16_t* gu, uint16_t* d, void* stream);
+// ponytail: A770 calibration covers only these shapes; benchmark before extending it.
+inline bool iq_fused_dequant_eligible(int gt, int dt, int64_t tokens, int64_t nf, int64_t ne) {
+    return dt == 42 && nf == 640 && ne == 2560 && tokens > 0 &&
+           ((gt == 16 && tokens <= 16) || (gt == 22 && tokens <= 9));
+}
+
 /// The layout of one native expert blob: [gate rows | up rows | down rows], raw GGUF blocks.
 struct NativeExpertLayout {
     int gu_type = -1, d_type = -1;

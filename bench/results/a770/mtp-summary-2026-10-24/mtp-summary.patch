@@ -1,0 +1,22 @@
+--- sycl/src/program/generate.cpp (before)
++++ sycl/src/program/generate.cpp (after)
+@@ -8562,7 +8562,7 @@
+         (void) pool_ms0;
+         if (use_mtp && rounds > 0)
+             std::printf("%-24s %.3f ms/round drafting (%lld rounds), MTP prompt %.1f ms, %.0f MiB of VRAM\n", "mtp",
+-                        mtp.ms_draft / (double) mtp.rounds, (long long) mtp.rounds, mtp.ms_prefill,
++                        mtp.rounds > 0 ? mtp.ms_draft / (double) mtp.rounds : 0.0, (long long) mtp.rounds, mtp.ms_prefill,
+                         (double) mtp.vram_bytes() / 1048576.0);
+     }
+ 
+--- src/program/generate.cpp (before)
++++ src/program/generate.cpp (after)
+@@ -10911,7 +10911,7 @@
+         (void) pool_ms0;
+         if (use_mtp && rounds > 0)
+             std::printf("%-24s %.3f ms/round drafting (%lld rounds), MTP prompt %.1f ms, %.0f MiB of VRAM\n", "mtp",
+-                        mtp.ms_draft / (double) mtp.rounds, (long long) mtp.rounds, mtp.ms_prefill,
++                        mtp.rounds > 0 ? mtp.ms_draft / (double) mtp.rounds : 0.0, (long long) mtp.rounds, mtp.ms_prefill,
+                         (double) mtp.vram_bytes() / 1048576.0);
+     }
+ 

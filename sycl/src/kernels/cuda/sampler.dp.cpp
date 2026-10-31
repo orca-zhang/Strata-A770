@@ -416,6 +416,7 @@ sampler_kernel exceeds 128 bytes and may cause high register pressure. Consult
 with your hardware vendor to find the total register size available and adjust
 the code, or use smaller sub-group size to avoid high register pressure.
 */
+template <typename Acc>
 __dpct_inline__ void sampler_kernel(const float *__restrict__ logits,
                                     int n_vocab, int n_tokens,
                                     const int *__restrict__ history,
@@ -582,16 +583,16 @@ __dpct_inline__ void sampler_kernel(const float *__restrict__ logits,
 #pragma unroll
     for (int i = 1; i < k; ++i) mx = sycl::fmax(mx, sel_logit[i]);
     if (p.top_p < 1.0f) {
-        double sum = 0.0;
+        Acc sum = 0;
 #pragma unroll
         for (int i = 0; i < k; ++i) sum +=
-            sycl::exp((double)sel_logit[i] - (double)mx);
-        double cum = 0.0;
+            sycl::exp((Acc)sel_logit[i] - (Acc)mx);
+        Acc cum = 0;
         int cut = k;
 #pragma unroll
         for (int i = 0; i < k; ++i) {
-            cum += sycl::exp((double)sel_logit[i] - (double)mx) / sum;
-            if (cum >= (double) p.top_p) { cut = i + 1; break; }
+            cum += sycl::exp((Acc)sel_logit[i] - (Acc)mx) / sum;
+            if (cum >= (Acc) p.top_p) { cut = i + 1; break; }
         }
         if (cut < p.min_keep) cut = p.min_keep < k ? p.min_keep : k;
         n_keep = cut;
@@ -612,17 +613,17 @@ __dpct_inline__ void sampler_kernel(const float *__restrict__ logits,
     float smx = scaled(0);
 #pragma unroll
     for (int i = 1; i < n_keep; ++i) smx = sycl::fmax(smx, scaled(i));
-    double sum = 0.0;
+    Acc sum = 0;
 #pragma unroll
     for (int i = 0; i < n_keep; ++i) sum +=
-        sycl::exp((double)scaled(i) - (double)smx);
+        sycl::exp((Acc)scaled(i) - (Acc)smx);
     const float u = philox_uniform(p.seed, p.counter + (uint64_t) t);
-    double cum = 0.0;
+    Acc cum = 0;
     int pick = sel_ids[n_keep - 1];
 #pragma unroll
     for (int i = 0; i < n_keep; ++i) {
-        cum += sycl::exp((double)scaled(i) - (double)smx) / sum;
-        if ((double) u < cum) { pick = sel_ids[i]; break; }
+        cum += sycl::exp((Acc)scaled(i) - (Acc)smx) / sum;
+        if ((Acc) u < cum) { pick = sel_ids[i]; break; }
     }
     if (item_ct1.get_local_id(2) == 0) out[t] = pick;
 }
@@ -681,14 +682,15 @@ __dpct_inline__ void warp_first(float &bv, int &bi) {
 /// Here the lanes share the `exp`s (one per entry, into `ex`) and then the quotients, and lane 0 alone runs the two
 /// ORDERED sums and the two cumulative scans.  Every double is the one the old chain computed: the same `exp` of
 /// the same argument, the sums in the same order, `cum += e / sum` with the same correctly rounded quotient - so
-/// the cut, the survivors and the pick are the same.  (`n_keep == 0`, reachable only with min_p > 1, which the
+/// the cut, the survivors and the pick are the same on FP64 devices. Devices without FP64 use FP32
+/// with the same ordered sums; CDF-boundary picks can differ. (`n_keep == 0`, reachable only with min_p > 1, which the
 /// callers clamp, read `sel_ids[-1]` in the old tail; it reads `sel_ids[0]` here.)
 /// kProb (the coupled draft only): lane 0 also writes the pick's probability under the final distribution to
 /// `*prob_out`.  The sampler's own calls take kProb = false, whose code is the tail above, unchanged.
-template <bool kProb = false>
+template <typename Acc, bool kProb = false>
 inline void sampled_tail_warp(const int *sel_ids, const float *sel_logit, int k,
                               const SamplerParams &p, int t,
-                              int *__restrict__ out, double *ex,
+                              int *__restrict__ out, Acc *ex,
                               float *prob_out = nullptr) {
     const int lane =
         (int)(sycl::ext::oneapi::this_work_item::get_nd_item<3>().get_local_id(
@@ -702,9 +704,9 @@ inline void sampled_tail_warp(const int *sel_ids, const float *sel_logit, int k,
     if (p.top_p < 1.0f) {
 #pragma unroll
         for (int i = lane; i < k; i += 32)
-            ex[i] = sycl::exp((double)sel_logit[i] - (double)mx);
+            ex[i] = sycl::exp((Acc)sel_logit[i] - (Acc)mx);
         sycl::group_barrier(sycl::ext::oneapi::this_work_item::get_sub_group());
-        double sum = 0.0;
+        Acc sum = 0;
         if (lane == 0)
 #pragma unroll
             for (int i = 0; i < k; ++i) sum += ex[i];
@@ -724,11 +726,11 @@ inline void sampled_tail_warp(const int *sel_ids, const float *sel_logit, int k,
         sycl::group_barrier(sycl::ext::oneapi::this_work_item::get_sub_group());
         int cut = k;
         if (lane == 0) {
-            double cum = 0.0;
+            Acc cum = 0;
 #pragma unroll
             for (int i = 0; i < k; ++i) {
                 cum += ex[i];
-                if (cum >= (double) p.top_p) { cut = i + 1; break; }
+                if (cum >= (Acc) p.top_p) { cut = i + 1; break; }
             }
         }
         /*
@@ -758,9 +760,9 @@ inline void sampled_tail_warp(const int *sel_ids, const float *sel_logit, int k,
         smx = sycl::fmax(smx, sel_logit[i] * inv_t);
 #pragma unroll
     for (int i = lane; i < n_keep; i += 32)
-        ex[i] = sycl::exp((double)(sel_logit[i] * inv_t) - (double)smx);
+        ex[i] = sycl::exp((Acc)(sel_logit[i] * inv_t) - (Acc)smx);
     sycl::group_barrier(sycl::ext::oneapi::this_work_item::get_sub_group());
-    double sum = 0.0;
+    Acc sum = 0;
     if (lane == 0)
 #pragma unroll
         for (int i = 0; i < n_keep; ++i) sum += ex[i];
@@ -777,13 +779,13 @@ inline void sampled_tail_warp(const int *sel_ids, const float *sel_logit, int k,
     sycl::group_barrier(sycl::ext::oneapi::this_work_item::get_sub_group());
     if (lane == 0) {
         const float u = philox_uniform(p.seed, p.counter + (uint64_t) t);
-        double cum = 0.0;
+        Acc cum = 0;
         int pi = n_keep > 0 ? n_keep - 1 : 0;
         int pick = sel_ids[pi];
 #pragma unroll
         for (int i = 0; i < n_keep; ++i) {
             cum += ex[i];
-            if ((double) u < cum) { pick = sel_ids[i]; pi = i; break; }
+            if ((Acc) u < cum) { pick = sel_ids[i]; pi = i; break; }
         }
         out[t] = pick;
         if constexpr (kProb) *prob_out = n_keep > 0 ? (float) ex[pi] : 1.0f;
@@ -803,6 +805,7 @@ sampler_one_block_kernel exceeds 128 bytes and may cause high register pressure.
 Consult with your hardware vendor to find the total register size available and
 adjust the code, or use smaller sub-group size to avoid high register pressure.
 */
+template <typename Acc>
 __dpct_inline__ void
 sampler_one_block_kernel(const float *__restrict__ logits, int n_vocab,
                          const int *__restrict__ history, int history_len,
@@ -858,7 +861,7 @@ sampler_one_block_kernel(const float *__restrict__ logits, int n_vocab,
         *sycl::ext::oneapi::group_local_memory_for_overwrite<float[kSelMax]>(
             sycl::ext::oneapi::this_work_item::get_work_group<3>());
     auto &ex =
-        *sycl::ext::oneapi::group_local_memory_for_overwrite<double[kSelMax]>(
+        *sycl::ext::oneapi::group_local_memory_for_overwrite<Acc[kSelMax]>(
             sycl::ext::oneapi::this_work_item::get_work_group<3>());
     auto &sv = *sycl::ext::oneapi::group_local_memory_for_overwrite<float[32]>(
         sycl::ext::oneapi::this_work_item::get_work_group<3>());
@@ -1128,6 +1131,7 @@ sampler_split_part_kernel(const float *__restrict__ logits, int n_vocab,
 
 /// **SPLIT STAGE 2: ONE WARP PER ROW MERGES THE BLOCK LISTS, THEN RUNS THE TAIL.**  The row's lists (at most 64 x
 /// 64 entries, 32 KB) are copied to shared memory, merged into the row's top_k list, and `sampled_tail_warp` picks.
+template <typename Acc>
 __dpct_inline__ void
 sampler_split_merge_kernel(const sycl::int2 *__restrict__ cand, int n_blocks,
                            int n_vocab, const SamplerParams p, int k,
@@ -1145,7 +1149,7 @@ sampler_split_merge_kernel(const sycl::int2 *__restrict__ cand, int n_blocks,
         *sycl::ext::oneapi::group_local_memory_for_overwrite<float[kSelMax]>(
             sycl::ext::oneapi::this_work_item::get_work_group<3>());
     auto &ex =
-        *sycl::ext::oneapi::group_local_memory_for_overwrite<double[kSelMax]>(
+        *sycl::ext::oneapi::group_local_memory_for_overwrite<Acc[kSelMax]>(
             sycl::ext::oneapi::this_work_item::get_work_group<3>());
     const sycl::int2 *src = cand + (size_t)t * n_blocks * k;
 #pragma unroll
@@ -1225,6 +1229,7 @@ __dpct_inline__ void coupled_penalize_kernel(
 /// The merge of `sampler_split_merge_kernel` (lists of `kpart` entries, the request's top_k taken from them), then
 /// `sampled_tail_warp` with the counter of the row that will verify this draft.  Lane 0 maps the pick to its token
 /// id, writes it and its probability, and appends it to the ring for the next draft's penalty window.
+template <typename Acc>
 __dpct_inline__ void coupled_merge_kernel(
     const sycl::int2 *__restrict__ cand, int n_blocks, int nv, int kpart,
     const SamplerParams *__restrict__ dp, const int *__restrict__ step_rec,
@@ -1246,7 +1251,7 @@ __dpct_inline__ void coupled_merge_kernel(
         *sycl::ext::oneapi::group_local_memory_for_overwrite<float[kSelMax]>(
             sycl::ext::oneapi::this_work_item::get_work_group<3>());
     auto &ex =
-        *sycl::ext::oneapi::group_local_memory_for_overwrite<double[kSelMax]>(
+        *sycl::ext::oneapi::group_local_memory_for_overwrite<Acc[kSelMax]>(
             sycl::ext::oneapi::this_work_item::get_work_group<3>());
     auto &pick = *sycl::ext::oneapi::group_local_memory_for_overwrite<int[1]>(
         sycl::ext::oneapi::this_work_item::get_work_group<3>());
@@ -1262,7 +1267,7 @@ __dpct_inline__ void coupled_merge_kernel(
     if (p.greedy || p.temperature <= 0.0f) {   // never launched for greedy requests; the argmax, defensively
         if (lane == 0) { pick[0] = sel_ids[0]; prob[0] = 1.0f; }
     } else {
-        sampled_tail_warp<true>(sel_ids, sel_logit, k, p, 0, pick, ex, prob);
+        sampled_tail_warp<Acc, true>(sel_ids, sel_logit, k, p, 0, pick, ex, prob);
     }
     sycl::group_barrier(sycl::ext::oneapi::this_work_item::get_sub_group());
     if (lane == 0) {
@@ -1517,131 +1522,131 @@ void sample_tokens(const float* logits, int n_tokens, int n_vocab, const int* hi
                             });
                 });
         }
-    } else if (sampled_path() == SampledPath::Old) {
-        // The same block-per-token shape: the selection's k argmax rounds reduce inside the block.  See
-        // `sampler_kernel`'s header for what the old one-thread-per-token launch cost.
-        /*
-        DPCT1049: The work-group size passed to the SYCL kernel may exceed
-        the limit. To get the device limit, query
-        info::device::max_work_group_size. Adjust the work-group size if needed.
-        */
-        auto exp_props = sycl::ext::oneapi::experimental::properties{
-            sycl::ext::oneapi::experimental::use_root_sync};
-        dpct::has_capability_or_fail(
-            strata::q_of(stream)->get_device(),
-            {sycl::aspect::fp64});
-
-        strata::q_of(stream)
-            ->submit([&](sycl::handler &cgh) {
-                sycl::local_accessor<uint8_t, 1> dpct_local_acc_ct1(
-                    sycl::range(shmem), cgh);
-
-                cgh.parallel_for<dpct_kernel_name<class sampler_kernel_ebb5aa>>(
-                    sycl::nd_range<3>(sycl::range(1, 1, (unsigned)n_tokens) *
-                                          sycl::range(1, 1, 1024),
-                                      sycl::range(1, 1, 1024)),
-                    exp_props,
-                    [=](sycl::nd_item<3> item_ct1) [[sycl::reqd_sub_group_size(
-                        32)]] {
-                        sampler_kernel(
-                            logits, n_vocab, n_tokens, history, history_len, p,
-                            out,
-                            dpct_local_acc_ct1
-                                .get_multi_ptr<sycl::access::decorated::no>()
-                                .get());
-                    });
-            });
     } else {
-        // The split top_k by default: stage 1 over (61 blocks x rows) for 248,320 logits, stage 2 one warp per
-        // row.  The one-block kernel when asked for, or when the split cannot run: a wider vocabulary than the merge
-        // holds, more than `kSplitMaxRows` rows (the engine samples at most a verify window), a stream under capture,
-        // no scratch.
-        const int k = sampled_k(p.top_k, n_vocab);
-        const int n_blocks = (n_vocab + kSplitBlockSpan - 1) / kSplitBlockSpan;
-        sycl::int2 *scratch = nullptr;
-        if (sampled_path() == SampledPath::Split && n_blocks <= kSplitMaxBlocks && n_tokens <= kSplitMaxRows &&
-            !stream_capturing(stream))
-            // sized for 16 rows and 64 entries at least, so a verify window or a wider top_k does not regrow it
-            scratch = split_scratch(stream, (size_t) (n_tokens > 16 ? n_tokens : 16) * n_blocks * kSelMax);
-        if (scratch != nullptr) {
-            {
+        auto submit = [&]<typename Acc>() {
+            if (sampled_path() == SampledPath::Old) {
+                // The same block-per-token shape: the selection's k argmax rounds reduce inside the block.  See
+                // `sampler_kernel`'s header for what the old one-thread-per-token launch cost.
+                /*
+                DPCT1049: The work-group size passed to the SYCL kernel may exceed
+                the limit. To get the device limit, query
+                info::device::max_work_group_size. Adjust the work-group size if needed.
+                */
                 auto exp_props = sycl::ext::oneapi::experimental::properties{
                     sycl::ext::oneapi::experimental::use_root_sync};
 
                 strata::q_of(stream)
-                    ->parallel_for<dpct_kernel_name<
-                        class sampler_split_part_kernel_cc5673>>(
-                        sycl::nd_range<3>(
-                            sycl::range(1, (unsigned)n_tokens,
-                                        (unsigned)n_blocks) *
-                                sycl::range(1, 1, kSplitWarps * 32),
-                            sycl::range(1, 1, kSplitWarps * 32)),
-                        exp_props,
-                        [=](sycl::nd_item<3> item_ct1)
-                            [[sycl::reqd_sub_group_size(32)]] {
-                                sampler_split_part_kernel(
-                                    logits, n_vocab, history, history_len, p, k,
-                                    n_blocks, scratch);
-                            });
-            }
-            {
-                auto exp_props = sycl::ext::oneapi::experimental::properties{
-                    sycl::ext::oneapi::experimental::use_root_sync};
-                dpct::has_capability_or_fail(
-                    strata::q_of(stream)->get_device(),
-                    {sycl::aspect::fp64});
+                    ->submit([&](sycl::handler &cgh) {
+                        sycl::local_accessor<uint8_t, 1> dpct_local_acc_ct1(
+                            sycl::range(shmem), cgh);
 
-                strata::q_of(stream)
-                    ->parallel_for<dpct_kernel_name<
-                        class sampler_split_merge_kernel_b17bd4>>(
-                        sycl::nd_range<3>(
-                            sycl::range(1, 1, (unsigned)n_tokens) *
-                                sycl::range(1, 1, 32),
-                            sycl::range(1, 1, 32)),
-                        exp_props,
-                        [=](sycl::nd_item<3> item_ct1)
-                            [[sycl::reqd_sub_group_size(32)]] {
-                                sampler_split_merge_kernel(scratch, n_blocks,
-                                                           n_vocab, p, k, out);
-                            });
-            }
-        } else {
-            /*
-            DPCT1049: The work-group size passed to the SYCL kernel may
-            exceed the limit. To get the device limit, query
-            info::device::max_work_group_size. Adjust the work-group size if
-            needed.
-            */
-            auto exp_props = sycl::ext::oneapi::experimental::properties{
-                sycl::ext::oneapi::experimental::use_root_sync};
-            dpct::has_capability_or_fail(
-                strata::q_of(stream)->get_device(),
-                {sycl::aspect::fp64});
-
-            strata::q_of(stream)
-                ->submit([&](sycl::handler &cgh) {
-                    sycl::local_accessor<uint8_t, 1> dpct_local_acc_ct1(
-                        sycl::range(shmem), cgh);
-
-                    cgh.parallel_for<dpct_kernel_name<
-                        class sampler_one_block_kernel_79fa88>>(
-                        sycl::nd_range<3>(
-                            sycl::range(1, 1, (unsigned)n_tokens) *
-                                sycl::range(1, 1, 1024),
-                            sycl::range(1, 1, 1024)),
-                        exp_props,
-                        [=](sycl::nd_item<3> item_ct1)
-                            [[sycl::reqd_sub_group_size(32)]] {
-                                sampler_one_block_kernel(
-                                    logits, n_vocab, history, history_len, p,
+                        cgh.parallel_for<dpct_kernel_name<class sampler_kernel_ebb5aa, Acc>>(
+                            sycl::nd_range<3>(sycl::range(1, 1, (unsigned)n_tokens) *
+                                                  sycl::range(1, 1, 1024),
+                                              sycl::range(1, 1, 1024)),
+                            exp_props,
+                            [=](sycl::nd_item<3> item_ct1) [[sycl::reqd_sub_group_size(
+                                32)]] {
+                                sampler_kernel<Acc>(
+                                    logits, n_vocab, n_tokens, history, history_len, p,
                                     out,
                                     dpct_local_acc_ct1
-                                        .get_multi_ptr<
-                                            sycl::access::decorated::no>()
+                                        .get_multi_ptr<sycl::access::decorated::no>()
                                         .get());
                             });
-                });
-        }
+                    });
+            } else {
+                // The split top_k by default: stage 1 over (61 blocks x rows) for 248,320 logits, stage 2 one warp per
+                // row.  The one-block kernel when asked for, or when the split cannot run: a wider vocabulary than the merge
+                // holds, more than `kSplitMaxRows` rows (the engine samples at most a verify window), a stream under capture,
+                // no scratch.
+                const int k = sampled_k(p.top_k, n_vocab);
+                const int n_blocks = (n_vocab + kSplitBlockSpan - 1) / kSplitBlockSpan;
+                sycl::int2 *scratch = nullptr;
+                if (sampled_path() == SampledPath::Split && n_blocks <= kSplitMaxBlocks && n_tokens <= kSplitMaxRows &&
+                    !stream_capturing(stream))
+                    // sized for 16 rows and 64 entries at least, so a verify window or a wider top_k does not regrow it
+                    scratch = split_scratch(stream, (size_t) (n_tokens > 16 ? n_tokens : 16) * n_blocks * kSelMax);
+                if (scratch != nullptr) {
+                    {
+                        auto exp_props = sycl::ext::oneapi::experimental::properties{
+                            sycl::ext::oneapi::experimental::use_root_sync};
+
+                        strata::q_of(stream)
+                            ->parallel_for<dpct_kernel_name<
+                                class sampler_split_part_kernel_cc5673, Acc>>(
+                                sycl::nd_range<3>(
+                                    sycl::range(1, (unsigned)n_tokens,
+                                                (unsigned)n_blocks) *
+                                        sycl::range(1, 1, kSplitWarps * 32),
+                                    sycl::range(1, 1, kSplitWarps * 32)),
+                                exp_props,
+                                [=](sycl::nd_item<3> item_ct1)
+                                    [[sycl::reqd_sub_group_size(32)]] {
+                                        sampler_split_part_kernel(
+                                            logits, n_vocab, history, history_len, p, k,
+                                            n_blocks, scratch);
+                                    });
+                    }
+                    {
+                        auto exp_props = sycl::ext::oneapi::experimental::properties{
+                            sycl::ext::oneapi::experimental::use_root_sync};
+
+                        strata::q_of(stream)
+                            ->parallel_for<dpct_kernel_name<
+                                class sampler_split_merge_kernel_b17bd4, Acc>>(
+                                sycl::nd_range<3>(
+                                    sycl::range(1, 1, (unsigned)n_tokens) *
+                                        sycl::range(1, 1, 32),
+                                    sycl::range(1, 1, 32)),
+                                exp_props,
+                                [=](sycl::nd_item<3> item_ct1)
+                                    [[sycl::reqd_sub_group_size(32)]] {
+                                        sampler_split_merge_kernel<Acc>(scratch, n_blocks,
+                                                                   n_vocab, p, k, out);
+                                    });
+                    }
+                } else {
+                    /*
+                    DPCT1049: The work-group size passed to the SYCL kernel may
+                    exceed the limit. To get the device limit, query
+                    info::device::max_work_group_size. Adjust the work-group size if
+                    needed.
+                    */
+                    auto exp_props = sycl::ext::oneapi::experimental::properties{
+                        sycl::ext::oneapi::experimental::use_root_sync};
+
+                    strata::q_of(stream)
+                        ->submit([&](sycl::handler &cgh) {
+                            sycl::local_accessor<uint8_t, 1> dpct_local_acc_ct1(
+                                sycl::range(shmem), cgh);
+
+                            cgh.parallel_for<dpct_kernel_name<
+                                class sampler_one_block_kernel_79fa88, Acc>>(
+                                sycl::nd_range<3>(
+                                    sycl::range(1, 1, (unsigned)n_tokens) *
+                                        sycl::range(1, 1, 1024),
+                                    sycl::range(1, 1, 1024)),
+                                exp_props,
+                                [=](sycl::nd_item<3> item_ct1)
+                                    [[sycl::reqd_sub_group_size(32)]] {
+                                        sampler_one_block_kernel<Acc>(
+                                            logits, n_vocab, history, history_len, p,
+                                            out,
+                                            dpct_local_acc_ct1
+                                                .get_multi_ptr<
+                                                    sycl::access::decorated::no>()
+                                                .get());
+                                    });
+                        });
+                }
+            }
+        };
+        // Separate kernel instantiations keep FP64 out of devices such as Arc A770.
+        if (strata::q_of(stream)->get_device().has(sycl::aspect::fp64))
+            submit.operator()<double>();
+        else
+            submit.operator()<float>();
     }
     /*
     DPCT1010: SYCL uses exceptions to report errors and does not use the
@@ -1753,16 +1758,20 @@ void coupled_draft_sample(float* logits, int nv, const int32_t* sub_to_id, const
     {
         auto exp_props = sycl::ext::oneapi::experimental::properties{
             sycl::ext::oneapi::experimental::use_root_sync};
-        dpct::has_capability_or_fail(s->get_device(), {sycl::aspect::fp64});
-
-        s->parallel_for<dpct_kernel_name<class coupled_merge_kernel_1fbeb1>>(
-            sycl::nd_range<3>(sycl::range(1, 1, 32), sycl::range(1, 1, 32)),
-            exp_props,
-            [=](sycl::nd_item<3> item_ct1) [[sycl::reqd_sub_group_size(32)]] {
-                coupled_merge_kernel((const sycl::int2 *)scratch, n_blocks, nv,
-                                     kpart, params, step_rec, sub_to_id, ring,
-                                     cap, j, out_id, out_prob);
-            });
+        auto submit = [&]<typename Acc>() {
+            s->parallel_for<dpct_kernel_name<class coupled_merge_kernel_1fbeb1, Acc>>(
+                sycl::nd_range<3>(sycl::range(1, 1, 32), sycl::range(1, 1, 32)),
+                exp_props,
+                [=](sycl::nd_item<3> item_ct1) [[sycl::reqd_sub_group_size(32)]] {
+                    coupled_merge_kernel<Acc>((const sycl::int2 *)scratch, n_blocks, nv,
+                                         kpart, params, step_rec, sub_to_id, ring,
+                                         cap, j, out_id, out_prob);
+                });
+        };
+        if (s->get_device().has(sycl::aspect::fp64))
+            submit.operator()<double>();
+        else
+            submit.operator()<float>();
     }
     coupled_check("coupled_draft merge");
 }

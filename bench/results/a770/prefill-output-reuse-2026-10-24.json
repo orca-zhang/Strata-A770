@@ -1,0 +1,126 @@
+{
+  "date": "2026-10-24",
+  "scope": "existing GPU widening versus output reuse; widening on in both arms",
+  "operator_pairs": [
+    {
+      "run": 1,
+      "bf16": false,
+      "baseline": 7322.21062673997,
+      "candidate": 7289.85,
+      "throughput_change_pct": 0.44391347887775545,
+      "baseline_drift_pct": 0.6580355873592625,
+      "raw_us": [
+        7298.2375,
+        7289.85,
+        7346.2625
+      ],
+      "elapsed_reduction_pct": 0.4419515961722298
+    },
+    {
+      "run": 1,
+      "bf16": true,
+      "baseline": 22953.765624844924,
+      "candidate": 23418.21875,
+      "throughput_change_pct": -1.9832982606974636,
+      "baseline_drift_pct": -0.0007351707883351821,
+      "raw_us": [
+        22953.85,
+        23418.21875,
+        22953.68125
+      ],
+      "elapsed_reduction_pct": -2.0234288906930242
+    },
+    {
+      "run": 3,
+      "bf16": false,
+      "baseline": 7347.262431947443,
+      "candidate": 7448.15,
+      "throughput_change_pct": -1.3545319046012416,
+      "baseline_drift_pct": 0.02722472822063171,
+      "raw_us": [
+        7346.2625,
+        7448.15,
+        7348.2625
+      ],
+      "elapsed_reduction_pct": -1.373131407609418
+    },
+    {
+      "run": 3,
+      "bf16": true,
+      "baseline": 22797.348877645873,
+      "candidate": 24289.90625,
+      "throughput_change_pct": -6.14476382490825,
+      "baseline_drift_pct": -1.3575164550130858,
+      "raw_us": [
+        22953.68125,
+        24289.90625,
+        22642.08125
+      ],
+      "elapsed_reduction_pct": -6.54706553979032
+    }
+  ],
+  "checks": {
+    "complete": true,
+    "exe_sha256": "4e612d7fc3b19f616e4406ccdf5b262ec9eaeb4f624f4c1b159e50c93fa4b410",
+    "runs": [
+      {
+        "widen": false,
+        "returncode": 0,
+        "summary": [
+          {
+            "checks": 255,
+            "mismatched_cases": 0
+          }
+        ]
+      },
+      {
+        "widen": true,
+        "returncode": 0,
+        "summary": [
+          {
+            "checks": 255,
+            "mismatched_cases": 0
+          }
+        ]
+      }
+    ]
+  },
+  "model": null,
+  "adopted": false,
+  "hardware": "Arc A770 16 GB, Xeon E5-2696 v4, Windows, PCIe 3.0 x16, oneAPI 2025.3.2, oneMKL 2025.3",
+  "files_sha256": {
+    "build-sycl-a770-prefill-reuse-20261024/run.py": "e42fb327475fca88816af98c4f143559d0cd1a54f2a0477f93baa3c4cc4667d1",
+    "build-sycl-a770-prefill-reuse-20261024/baseline-sources.json": "6706dce31d753b407b4c0e62edd7e08f11927531a866774b790da86160fb6349",
+    "build-sycl-a770-prefill-reuse-20261024/candidate/build.json": "4b8e0005930a5b2856e06a9434bed83d9005328f1e79717b373a97a913577583",
+    "build-sycl-a770-prefill-reuse-20261024/candidate/results.json": "c325de4b0925fe06cfe909d76ff52aa3eea30b1c37abae06eceb997e7a1dd5fa",
+    "build-sycl-a770-prefill-reuse-20261024/checks/results.json": "2dd9ec5765d74c49cbc0753908af94f816b034033a07e4bb7f6edba11f3c2d41",
+    "build-sycl-a770-prefill-reuse-20261024/operators/results.json": "aaed97f03feb6fe4058893c010e0e0ce1683db4b479c6e923333fd6706b31664",
+    "build-sycl-deepinfer-20261023/prefill-widen-output-stage/build.json": "54b50c570ac140274e818fe614f0c8493827bdb0a8db6b646908cce52b8051a2",
+    "build-sycl-a770-prefill-reuse-20261024/checks/0.log": "d7e086cff9c42daa549e916d1ff799754946e508e5f90eb4217699bd4de07368",
+    "build-sycl-a770-prefill-reuse-20261024/checks/1.log": "d7e086cff9c42daa549e916d1ff799754946e508e5f90eb4217699bd4de07368",
+    "build-sycl-a770-prefill-reuse-20261024/operators/0.log": "e6c1c25516fed09106319526d5cd29f83d430faff443d73809f0daa184ddcaa5",
+    "build-sycl-a770-prefill-reuse-20261024/operators/1.log": "2cd495415388fac5cb2abed5f05a4d00b033edeb9dd67bad2f070dc89191d9a9",
+    "build-sycl-a770-prefill-reuse-20261024/operators/2.log": "0c03a7851032076eb076dd4c2dde1d9c57df30ec72330dda008b4f3b06504c9a",
+    "build-sycl-a770-prefill-reuse-20261024/operators/3.log": "511155130f4812b1663051eb22c26f1e59ac49d9f5beb7dd634ee9fc937c474c",
+    "build-sycl-a770-prefill-reuse-20261024/operators/4.log": "3810e419fba4403e63d4e968e1e12d37a6aa1fa670f9c8e38c7cd74171c242bb",
+    "build-sycl-a770-prefill-reuse-20261024/candidate/gemm.dp.cpp": "bfda122c554d92b896bdc03d87f0d354d464578c76a9869cc5aabaeb50f3ac26",
+    "build-sycl-a770-prefill-reuse-20261024/candidate/gemm_parity.cpp": "3e0deeda915014d157b6bdf2c76546697aa4ffdae3fe6afa764d5be045273440",
+    "build-sycl-a770-prefill-reuse-20261024/candidate/prefill.cpp": "0697919ce830d355110bc6c40e734f64c2b0a9d48d9c0af4bf30c6d32a95c531",
+    "build-sycl-a770-prefill-reuse-20261024/candidate/include/strata/prefill/gemm.hpp": "79b9226f9dac021d75e089c0f22d857a102d5e9c2687b9819277b368c5cf817f",
+    "build-sycl-a770-prefill-reuse-20261024/candidate/gemm.obj": "fa6feaf6d3d7faeb3e04befd59da50870988d308a5708a38a7e5280cb7229f6a",
+    "build-sycl-a770-prefill-reuse-20261024/candidate/parity.obj": "57bc26af54158091821cfef62194d66f89b604cd4e9c922acbc98db35bde97b4",
+    "build-sycl-a770-prefill-reuse-20261024/candidate/prefill.obj": "71e41b97779517d57e6fd7696187f1f1ea67a90c979c25c4ce82924846002440",
+    "build-sycl-a770-prefill-reuse-20261024/candidate/parity/strata.exe": "4e612d7fc3b19f616e4406ccdf5b262ec9eaeb4f624f4c1b159e50c93fa4b410",
+    "build-sycl-a770-prefill-reuse-20261024/candidate/model/strata.exe": "4a12c911eb023ab7ba3e8dcc55fbd2fe903bec71645775f6ebf63279648de5c4",
+    "build-sycl-deepinfer-20261023/baseline/strata_engine.lib": "53322fc27e5d3970695c9558d00cedff70325b2ab946052f82818d33b691b5f8",
+    "build-sycl-deepinfer-20261023/baseline/strata_prefill.lib": "db7030439dcbe4ac607bb3a2e426a7720a6ae060c9f29bc1f9bc4682fa944377",
+    "build-sycl-deepinfer-20261023/baseline/strata_spec.lib": "417e16e26147c87ea2a73bbd9b0d0d305a3477c90c721e90770ad5df136172c5",
+    "build-sycl-deepinfer-20261023/baseline/strata_kernels.lib": "66be7e63d2d994935e5da2150e1663c350334f4c50f656d05a4794a1c60bb173",
+    "build-sycl-deepinfer-20261023/baseline/strata_core.lib": "fe7a34a2cce8612bc1c802398ca0490b06052f9fab1a5bba8477718d8ab3e9ca",
+    "build-sycl-deepinfer-20261023/sampler-fp32/sampler.obj": "8179a1285c8234eb812da978004299c0ff8fc09cb98dc6579a18fafee928dd4d",
+    "build-sycl-deepinfer-20261023/prefill-widen-output-stage/parity/strata.exe": "1b303298764069b4c6a347470a6b3cb97b708baed7de883730f550d8aecebf5c",
+    "build-sycl-deepinfer-20261023/prefill-widen-output-stage/model/strata.exe": "227aae2b9c04aa74cfd1b1df9afdf1accd69c639c2fa6b8c2bd69a275d26af0d"
+  },
+  "driver_note": "First build completed and its 255-case disabled-path check passed, then the shared build driver asserted its newer default count of 485. Original result retained; explicit 255-case checks rerun in checks/.",
+  "production_changed_by_this_experiment": false
+}

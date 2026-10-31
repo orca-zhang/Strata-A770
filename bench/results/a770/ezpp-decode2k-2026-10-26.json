@@ -1,0 +1,1581 @@
+{
+  "complete": true,
+  "production_changed": false,
+  "target_achieved": false,
+  "performance_acceptance": false,
+  "eager_shares_apply_to_graph": false,
+  "minimum_gain_pct": 1,
+  "maximum_baseline_drift_pct": 3,
+  "hardware": "A77016GB / PCIe3.0 / E5-2696v4 / Windows / DPC++2025.3.2 / driver32.0.101.9034",
+  "rule": "User requested ezpp instead of VTune. Same matched-ABI frozen HC-arena engine,original BF16/6297slots/FP16KV. Only main and verify rebuilt with existing scopes and patched inline Windows ezpp header; clear before decode excludes prefill,plus pending-cache and adapt-join scopes. First ordinary command-graph profile,then eager with existing phase waits enabled. Two independent fresh processes,Short16,one warmup/case plus two retained interleaved cycles; all12 original2048/full128 outputs must equal the original BF16 reference. Eager drains change the schedule and are only diagnostic; graph scopes are host elapsed,not individual GPU times. Millisecond clock is unsuitable for tiny per-call timings. No speed or graph GPU-stage-share acceptance. Thirty seconds settle outside timing; require6297slots and READYfree>=1500MiB. Shared GPU/compiler lock throughout. No production changes.",
+  "runs": [
+    {
+      "label": "graph",
+      "exit_code": 0,
+      "expert_slots": 6297,
+      "free_mib": 2241,
+      "rows": [
+        {
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 49513.0,
+          "decode_ms": 4817.9,
+          "finish": "length",
+          "accepted": 75,
+          "offered": 98,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 49566.536799999085,
+          "case": "Code2K",
+          "warmup": true,
+          "report": "graph-0-Code2K.txt",
+          "scopes": {
+            "cache.apply_pending": {
+              "milliseconds": 27.0,
+              "calls": 55
+            },
+            "verify.run (submission + GPU wait)": {
+              "milliseconds": 4180.0,
+              "calls": 55
+            },
+            "verify.commit": {
+              "milliseconds": 7.0,
+              "calls": 55
+            },
+            "cache.adapt_join": {
+              "milliseconds": 3.0,
+              "calls": 55
+            },
+            "mtp.draft": {
+              "milliseconds": 599.0,
+              "calls": 55
+            },
+            "cache.adapt": {
+              "milliseconds": 128.0,
+              "calls": 55
+            },
+            "verify.submit.pre": {
+              "milliseconds": 17.0,
+              "calls": 96
+            },
+            "verify.submit.head": {
+              "milliseconds": 0.0,
+              "calls": 2
+            },
+            "verify.submit.post": {
+              "milliseconds": 2.0,
+              "calls": 96
+            },
+            "verify.submit.input": {
+              "milliseconds": 0.0,
+              "calls": 2
+            },
+            "verify.submit.post.plan": {
+              "milliseconds": 0.0,
+              "calls": 96
+            },
+            "verify.submit.pre.attn.gdn.output": {
+              "milliseconds": 4.0,
+              "calls": 72
+            },
+            "verify.submit.pre.attn.qsa.kv_store": {
+              "milliseconds": 0.0,
+              "calls": 24
+            },
+            "verify.submit.pre.shared.routed_quant": {
+              "milliseconds": 0.0,
+              "calls": 96
+            },
+            "verify.submit.post.experts": {
+              "milliseconds": 2.0,
+              "calls": 96
+            },
+            "verify.submit.pre.route": {
+              "milliseconds": 2.0,
+              "calls": 96
+            },
+            "verify.submit.pre.attn.qsa.query": {
+              "milliseconds": 0.0,
+              "calls": 24
+            },
+            "verify.submit.pre.attn": {
+              "milliseconds": 6.0,
+              "calls": 96
+            },
+            "verify.submit.post.misses": {
+              "milliseconds": 0.0,
+              "calls": 96
+            },
+            "verify.submit.pre.shared.prepare": {
+              "milliseconds": 1.0,
+              "calls": 96
+            },
+            "verify.submit.pre.shared.run": {
+              "milliseconds": 3.0,
+              "calls": 96
+            },
+            "verify.submit.pre.attn.gdn.input": {
+              "milliseconds": 0.0,
+              "calls": 72
+            },
+            "verify.submit.pre.hc0": {
+              "milliseconds": 2.0,
+              "calls": 96
+            },
+            "verify.submit.pre.shared": {
+              "milliseconds": 5.0,
+              "calls": 96
+            },
+            "verify.submit.pre.attn.qsa.kv_projection": {
+              "milliseconds": 0.0,
+              "calls": 24
+            },
+            "verify.submit.pre.attn.qsa.select": {
+              "milliseconds": 0.0,
+              "calls": 24
+            },
+            "verify.submit.post.combine": {
+              "milliseconds": 0.0,
+              "calls": 96
+            },
+            "verify.submit.pre.attn.qsa.attend": {
+              "milliseconds": 0.0,
+              "calls": 24
+            },
+            "verify.submit.pre.hc1": {
+              "milliseconds": 1.0,
+              "calls": 96
+            },
+            "verify.submit.pre.attn.qsa.output": {
+              "milliseconds": 1.0,
+              "calls": 24
+            },
+            "verify.submit.pre.attn.gdn.state": {
+              "milliseconds": 0.0,
+              "calls": 72
+            },
+            "verify.final_wait": {
+              "milliseconds": 4010.0,
+              "calls": 55
+            },
+            "verify.gpu_reach_wait": {
+              "milliseconds": 0.0,
+              "calls": 55
+            },
+            "verify.submit": {
+              "milliseconds": 8.0,
+              "calls": 55
+            }
+          },
+          "output_sha256": "76252b2f9e9cc17646ecace8afbd0527b70a8487646e63301ec8af1779c32894"
+        },
+        {
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 47945.4,
+          "decode_ms": 4470.4,
+          "finish": "length",
+          "accepted": 72,
+          "offered": 99,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 47990.15589999908,
+          "case": "Prose2K",
+          "warmup": true,
+          "report": "graph-1-Prose2K.txt",
+          "scopes": {
+            "cache.adapt_join": {
+              "milliseconds": 5.0,
+              "calls": 57
+            },
+            "mtp.draft": {
+              "milliseconds": 592.0,
+              "calls": 57
+            },
+            "verify.commit": {
+              "milliseconds": 6.0,
+              "calls": 57
+            },
+            "verify.run (submission + GPU wait)": {
+              "milliseconds": 3830.0,
+              "calls": 57
+            },
+            "cache.apply_pending": {
+              "milliseconds": 35.0,
+              "calls": 57
+            },
+            "cache.adapt": {
+              "milliseconds": 145.0,
+              "calls": 57
+            },
+            "verify.final_wait": {
+              "milliseconds": 3790.0,
+              "calls": 57
+            },
+            "verify.gpu_reach_wait": {
+              "milliseconds": 0.0,
+              "calls": 57
+            },
+            "verify.submit": {
+              "milliseconds": 8.0,
+              "calls": 57
+            }
+          },
+          "output_sha256": "00c1afb1bf8359fc114b4c24b5d2636601cd4c8851032d099546275062c0c016"
+        },
+        {
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 49131.4,
+          "decode_ms": 4137.9,
+          "finish": "length",
+          "accepted": 75,
+          "offered": 98,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 49171.56220000106,
+          "case": "Code2K",
+          "warmup": false,
+          "report": "graph-2-Code2K.txt",
+          "scopes": {
+            "cache.adapt_join": {
+              "milliseconds": 3.0,
+              "calls": 55
+            },
+            "mtp.draft": {
+              "milliseconds": 583.0,
+              "calls": 55
+            },
+            "verify.commit": {
+              "milliseconds": 4.0,
+              "calls": 55
+            },
+            "verify.run (submission + GPU wait)": {
+              "milliseconds": 3500.0,
+              "calls": 55
+            },
+            "cache.apply_pending": {
+              "milliseconds": 39.0,
+              "calls": 55
+            },
+            "cache.adapt": {
+              "milliseconds": 142.0,
+              "calls": 55
+            },
+            "verify.final_wait": {
+              "milliseconds": 3500.0,
+              "calls": 55
+            },
+            "verify.gpu_reach_wait": {
+              "milliseconds": 0.0,
+              "calls": 55
+            },
+            "verify.submit": {
+              "milliseconds": 4.0,
+              "calls": 55
+            }
+          },
+          "output_sha256": "76252b2f9e9cc17646ecace8afbd0527b70a8487646e63301ec8af1779c32894"
+        },
+        {
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 48073.2,
+          "decode_ms": 4146.5,
+          "finish": "length",
+          "accepted": 73,
+          "offered": 98,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 48113.902600000074,
+          "case": "Prose2K",
+          "warmup": false,
+          "report": "graph-3-Prose2K.txt",
+          "scopes": {
+            "cache.adapt_join": {
+              "milliseconds": 2.0,
+              "calls": 56
+            },
+            "mtp.draft": {
+              "milliseconds": 580.0,
+              "calls": 56
+            },
+            "verify.commit": {
+              "milliseconds": 7.0,
+              "calls": 56
+            },
+            "verify.run (submission + GPU wait)": {
+              "milliseconds": 3520.0,
+              "calls": 56
+            },
+            "cache.apply_pending": {
+              "milliseconds": 29.0,
+              "calls": 56
+            },
+            "cache.adapt": {
+              "milliseconds": 140.0,
+              "calls": 56
+            },
+            "verify.final_wait": {
+              "milliseconds": 3510.0,
+              "calls": 56
+            },
+            "verify.gpu_reach_wait": {
+              "milliseconds": 0.0,
+              "calls": 56
+            },
+            "verify.submit": {
+              "milliseconds": 8.0,
+              "calls": 56
+            }
+          },
+          "output_sha256": "00c1afb1bf8359fc114b4c24b5d2636601cd4c8851032d099546275062c0c016"
+        },
+        {
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 49115.2,
+          "decode_ms": 4121.3,
+          "finish": "length",
+          "accepted": 75,
+          "offered": 98,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 49158.15629999997,
+          "case": "Code2K",
+          "warmup": false,
+          "report": "graph-4-Code2K.txt",
+          "scopes": {
+            "cache.adapt_join": {
+              "milliseconds": 3.0,
+              "calls": 55
+            },
+            "mtp.draft": {
+              "milliseconds": 580.0,
+              "calls": 55
+            },
+            "verify.commit": {
+              "milliseconds": 7.0,
+              "calls": 55
+            },
+            "verify.run (submission + GPU wait)": {
+              "milliseconds": 3490.0,
+              "calls": 55
+            },
+            "cache.apply_pending": {
+              "milliseconds": 36.0,
+              "calls": 55
+            },
+            "cache.adapt": {
+              "milliseconds": 137.0,
+              "calls": 55
+            },
+            "verify.final_wait": {
+              "milliseconds": 3480.0,
+              "calls": 55
+            },
+            "verify.gpu_reach_wait": {
+              "milliseconds": 0.0,
+              "calls": 55
+            },
+            "verify.submit": {
+              "milliseconds": 6.0,
+              "calls": 55
+            }
+          },
+          "output_sha256": "76252b2f9e9cc17646ecace8afbd0527b70a8487646e63301ec8af1779c32894"
+        },
+        {
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 48044.8,
+          "decode_ms": 4239.2,
+          "finish": "length",
+          "accepted": 73,
+          "offered": 100,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 48086.70340000026,
+          "case": "Prose2K",
+          "warmup": false,
+          "report": "graph-5-Prose2K.txt",
+          "scopes": {
+            "cache.apply_pending": {
+              "milliseconds": 26.0,
+              "calls": 56
+            },
+            "cache.adapt_join": {
+              "milliseconds": 4.0,
+              "calls": 56
+            },
+            "verify.run (submission + GPU wait)": {
+              "milliseconds": 3610.0,
+              "calls": 56
+            },
+            "verify.commit": {
+              "milliseconds": 5.0,
+              "calls": 56
+            },
+            "mtp.draft": {
+              "milliseconds": 585.0,
+              "calls": 56
+            },
+            "cache.adapt": {
+              "milliseconds": 138.0,
+              "calls": 56
+            },
+            "verify.submit.head": {
+              "milliseconds": 0.0,
+              "calls": 1
+            },
+            "verify.submit.input": {
+              "milliseconds": 0.0,
+              "calls": 1
+            },
+            "verify.submit.pre": {
+              "milliseconds": 7.0,
+              "calls": 48
+            },
+            "verify.submit.post": {
+              "milliseconds": 3.0,
+              "calls": 48
+            },
+            "verify.submit.pre.hc0": {
+              "milliseconds": 1.0,
+              "calls": 48
+            },
+            "verify.submit.pre.attn.qsa.query": {
+              "milliseconds": 1.0,
+              "calls": 12
+            },
+            "verify.submit.post.experts": {
+              "milliseconds": 3.0,
+              "calls": 48
+            },
+            "verify.submit.pre.attn.qsa.kv_store": {
+              "milliseconds": 0.0,
+              "calls": 12
+            },
+            "verify.submit.pre.attn": {
+              "milliseconds": 4.0,
+              "calls": 48
+            },
+            "verify.submit.pre.hc1": {
+              "milliseconds": 2.0,
+              "calls": 48
+            },
+            "verify.submit.post.combine": {
+              "milliseconds": 0.0,
+              "calls": 48
+            },
+            "verify.submit.pre.shared": {
+              "milliseconds": 0.0,
+              "calls": 48
+            },
+            "verify.submit.pre.attn.gdn.output": {
+              "milliseconds": 0.0,
+              "calls": 36
+            },
+            "verify.submit.pre.attn.qsa.attend": {
+              "milliseconds": 0.0,
+              "calls": 12
+            },
+            "verify.submit.pre.attn.gdn.state": {
+              "milliseconds": 0.0,
+              "calls": 36
+            },
+            "verify.submit.pre.shared.routed_quant": {
+              "milliseconds": 0.0,
+              "calls": 48
+            },
+            "verify.submit.pre.route": {
+              "milliseconds": 0.0,
+              "calls": 48
+            },
+            "verify.submit.post.plan": {
+              "milliseconds": 0.0,
+              "calls": 48
+            },
+            "verify.submit.pre.attn.qsa.select": {
+              "milliseconds": 1.0,
+              "calls": 12
+            },
+            "verify.submit.pre.shared.prepare": {
+              "milliseconds": 0.0,
+              "calls": 48
+            },
+            "verify.submit.pre.attn.gdn.input": {
+              "milliseconds": 1.0,
+              "calls": 36
+            },
+            "verify.submit.post.misses": {
+              "milliseconds": 0.0,
+              "calls": 48
+            },
+            "verify.submit.pre.attn.qsa.output": {
+              "milliseconds": 0.0,
+              "calls": 12
+            },
+            "verify.submit.pre.shared.run": {
+              "milliseconds": 0.0,
+              "calls": 48
+            },
+            "verify.submit.pre.attn.qsa.kv_projection": {
+              "milliseconds": 1.0,
+              "calls": 12
+            },
+            "verify.final_wait": {
+              "milliseconds": 3530.0,
+              "calls": 56
+            },
+            "verify.gpu_reach_wait": {
+              "milliseconds": 0.0,
+              "calls": 56
+            },
+            "verify.submit": {
+              "milliseconds": 8.0,
+              "calls": 56
+            }
+          },
+          "output_sha256": "00c1afb1bf8359fc114b4c24b5d2636601cd4c8851032d099546275062c0c016"
+        }
+      ]
+    },
+    {
+      "label": "eager-phases",
+      "exit_code": 0,
+      "expert_slots": 6297,
+      "free_mib": 2229,
+      "rows": [
+        {
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 48399.6,
+          "decode_ms": 7961.8,
+          "finish": "length",
+          "accepted": 75,
+          "offered": 98,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 48510.20910000079,
+          "case": "Code2K",
+          "warmup": true,
+          "report": "eager-phases-0-Code2K.txt",
+          "scopes": {
+            "cache.apply_pending": {
+              "milliseconds": 24.0,
+              "calls": 55
+            },
+            "cache.adapt_join": {
+              "milliseconds": 3.0,
+              "calls": 55
+            },
+            "mtp.draft": {
+              "milliseconds": 637.0,
+              "calls": 55
+            },
+            "verify.commit": {
+              "milliseconds": 26.0,
+              "calls": 55
+            },
+            "verify.run (submission + GPU wait)": {
+              "milliseconds": 7250.0,
+              "calls": 55
+            },
+            "cache.adapt": {
+              "milliseconds": 132.0,
+              "calls": 55
+            },
+            "verify.submit.pre": {
+              "milliseconds": 4315.0,
+              "calls": 2640
+            },
+            "verify.submit.post": {
+              "milliseconds": 2770.0,
+              "calls": 2640
+            },
+            "verify.submit.head": {
+              "milliseconds": 99.0,
+              "calls": 55
+            },
+            "verify.submit.input": {
+              "milliseconds": 18.0,
+              "calls": 55
+            },
+            "verify.submit.pre.shared.run": {
+              "milliseconds": 349.0,
+              "calls": 2640
+            },
+            "verify.submit.pre.attn.gdn.input": {
+              "milliseconds": 119.0,
+              "calls": 1980
+            },
+            "verify.submit.post.plan": {
+              "milliseconds": 23.0,
+              "calls": 2640
+            },
+            "verify.submit.pre.attn.gdn.state": {
+              "milliseconds": 149.0,
+              "calls": 1980
+            },
+            "verify.submit.pre.attn.qsa.kv_projection": {
+              "milliseconds": 88.0,
+              "calls": 660
+            },
+            "verify.submit.pre.attn.gdn.output": {
+              "milliseconds": 21.0,
+              "calls": 1980
+            },
+            "verify.submit.pre.attn.qsa.kv_store": {
+              "milliseconds": 63.0,
+              "calls": 660
+            },
+            "verify.submit.pre.attn.qsa.attend": {
+              "milliseconds": 33.0,
+              "calls": 660
+            },
+            "verify.submit.pre.route": {
+              "milliseconds": 551.0,
+              "calls": 2640
+            },
+            "verify.submit.post.experts": {
+              "milliseconds": 2380.0,
+              "calls": 2640
+            },
+            "verify.submit.post.combine": {
+              "milliseconds": 305.0,
+              "calls": 2640
+            },
+            "verify.submit.pre.shared": {
+              "milliseconds": 824.0,
+              "calls": 2640
+            },
+            "verify.submit.pre.attn.qsa.query": {
+              "milliseconds": 61.0,
+              "calls": 660
+            },
+            "verify.submit.pre.shared.prepare": {
+              "milliseconds": 84.0,
+              "calls": 2640
+            },
+            "verify.submit.pre.attn.qsa.output": {
+              "milliseconds": 8.0,
+              "calls": 660
+            },
+            "verify.submit.pre.attn": {
+              "milliseconds": 1490.0,
+              "calls": 2640
+            },
+            "verify.submit.pre.hc0": {
+              "milliseconds": 717.0,
+              "calls": 2640
+            },
+            "verify.submit.pre.shared.routed_quant": {
+              "milliseconds": 1.0,
+              "calls": 2640
+            },
+            "verify.submit.pre.hc1": {
+              "milliseconds": 681.0,
+              "calls": 2640
+            },
+            "verify.submit.pre.attn.qsa.select": {
+              "milliseconds": 31.0,
+              "calls": 660
+            },
+            "verify.submit.post.misses": {
+              "milliseconds": 40.0,
+              "calls": 2640
+            },
+            "verify.submit": {
+              "milliseconds": 7210.0,
+              "calls": 55
+            },
+            "verify.gpu_reach_wait": {
+              "milliseconds": 0.0,
+              "calls": 55
+            },
+            "verify.final_wait": {
+              "milliseconds": 1.0,
+              "calls": 55
+            }
+          },
+          "output_sha256": "76252b2f9e9cc17646ecace8afbd0527b70a8487646e63301ec8af1779c32894"
+        },
+        {
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 47751.3,
+          "decode_ms": 7849.8,
+          "finish": "length",
+          "accepted": 72,
+          "offered": 99,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 47854.063900000256,
+          "case": "Prose2K",
+          "warmup": true,
+          "report": "eager-phases-1-Prose2K.txt",
+          "scopes": {
+            "cache.apply_pending": {
+              "milliseconds": 41.0,
+              "calls": 57
+            },
+            "cache.adapt_join": {
+              "milliseconds": 3.0,
+              "calls": 57
+            },
+            "mtp.draft": {
+              "milliseconds": 642.0,
+              "calls": 57
+            },
+            "verify.commit": {
+              "milliseconds": 35.0,
+              "calls": 57
+            },
+            "verify.run (submission + GPU wait)": {
+              "milliseconds": 7110.0,
+              "calls": 57
+            },
+            "cache.adapt": {
+              "milliseconds": 141.0,
+              "calls": 57
+            },
+            "verify.submit.post": {
+              "milliseconds": 2530.0,
+              "calls": 2736
+            },
+            "verify.submit.pre": {
+              "milliseconds": 4417.0,
+              "calls": 2736
+            },
+            "verify.submit.head": {
+              "milliseconds": 101.0,
+              "calls": 57
+            },
+            "verify.submit.input": {
+              "milliseconds": 25.0,
+              "calls": 57
+            },
+            "verify.submit.pre.attn.gdn.input": {
+              "milliseconds": 108.0,
+              "calls": 2052
+            },
+            "verify.submit.pre.route": {
+              "milliseconds": 553.0,
+              "calls": 2736
+            },
+            "verify.submit.pre.attn.gdn.state": {
+              "milliseconds": 192.0,
+              "calls": 2052
+            },
+            "verify.submit.pre.shared.run": {
+              "milliseconds": 396.0,
+              "calls": 2736
+            },
+            "verify.submit.pre.attn.qsa.output": {
+              "milliseconds": 11.0,
+              "calls": 684
+            },
+            "verify.submit.pre.attn.qsa.select": {
+              "milliseconds": 32.0,
+              "calls": 684
+            },
+            "verify.submit.pre.attn.gdn.output": {
+              "milliseconds": 38.0,
+              "calls": 2052
+            },
+            "verify.submit.pre.attn.qsa.kv_projection": {
+              "milliseconds": 63.0,
+              "calls": 684
+            },
+            "verify.submit.post.misses": {
+              "milliseconds": 31.0,
+              "calls": 2736
+            },
+            "verify.submit.pre.shared.prepare": {
+              "milliseconds": 83.0,
+              "calls": 2736
+            },
+            "verify.submit.pre.attn.qsa.query": {
+              "milliseconds": 57.0,
+              "calls": 684
+            },
+            "verify.submit.pre.shared.routed_quant": {
+              "milliseconds": 1.0,
+              "calls": 2736
+            },
+            "verify.submit.pre.attn.qsa.attend": {
+              "milliseconds": 37.0,
+              "calls": 684
+            },
+            "verify.submit.pre.attn.qsa.kv_store": {
+              "milliseconds": 81.0,
+              "calls": 684
+            },
+            "verify.submit.post.plan": {
+              "milliseconds": 42.0,
+              "calls": 2736
+            },
+            "verify.submit.pre.attn": {
+              "milliseconds": 1580.0,
+              "calls": 2736
+            },
+            "verify.submit.pre.hc0": {
+              "milliseconds": 707.0,
+              "calls": 2736
+            },
+            "verify.submit.post.combine": {
+              "milliseconds": 324.0,
+              "calls": 2736
+            },
+            "verify.submit.pre.hc1": {
+              "milliseconds": 676.0,
+              "calls": 2736
+            },
+            "verify.submit.pre.shared": {
+              "milliseconds": 859.0,
+              "calls": 2736
+            },
+            "verify.submit.post.experts": {
+              "milliseconds": 2090.0,
+              "calls": 2736
+            },
+            "verify.submit": {
+              "milliseconds": 7080.0,
+              "calls": 57
+            },
+            "verify.gpu_reach_wait": {
+              "milliseconds": 0.0,
+              "calls": 57
+            },
+            "verify.final_wait": {
+              "milliseconds": 0.0,
+              "calls": 57
+            }
+          },
+          "output_sha256": "00c1afb1bf8359fc114b4c24b5d2636601cd4c8851032d099546275062c0c016"
+        },
+        {
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 48449.9,
+          "decode_ms": 7368.5,
+          "finish": "length",
+          "accepted": 75,
+          "offered": 98,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 48545.48390000127,
+          "case": "Code2K",
+          "warmup": false,
+          "report": "eager-phases-2-Code2K.txt",
+          "scopes": {
+            "mtp.draft": {
+              "milliseconds": 635.0,
+              "calls": 55
+            },
+            "verify.commit": {
+              "milliseconds": 25.0,
+              "calls": 55
+            },
+            "cache.apply_pending": {
+              "milliseconds": 30.0,
+              "calls": 55
+            },
+            "verify.run (submission + GPU wait)": {
+              "milliseconds": 6660.0,
+              "calls": 55
+            },
+            "cache.adapt_join": {
+              "milliseconds": 2.0,
+              "calls": 55
+            },
+            "cache.adapt": {
+              "milliseconds": 144.0,
+              "calls": 55
+            },
+            "verify.submit.pre": {
+              "milliseconds": 4250.0,
+              "calls": 2640
+            },
+            "verify.submit.post": {
+              "milliseconds": 2290.0,
+              "calls": 2640
+            },
+            "verify.submit.head": {
+              "milliseconds": 99.0,
+              "calls": 55
+            },
+            "verify.submit.input": {
+              "milliseconds": 11.0,
+              "calls": 55
+            },
+            "verify.submit.post.experts": {
+              "milliseconds": 1880.0,
+              "calls": 2640
+            },
+            "verify.submit.pre.attn.qsa.kv_projection": {
+              "milliseconds": 76.0,
+              "calls": 660
+            },
+            "verify.submit.pre.attn.gdn.output": {
+              "milliseconds": 40.0,
+              "calls": 1980
+            },
+            "verify.submit.pre.attn.qsa.query": {
+              "milliseconds": 53.0,
+              "calls": 660
+            },
+            "verify.submit.pre.hc1": {
+              "milliseconds": 715.0,
+              "calls": 2640
+            },
+            "verify.submit.pre.attn.gdn.input": {
+              "milliseconds": 98.0,
+              "calls": 1980
+            },
+            "verify.submit.pre.attn.qsa.attend": {
+              "milliseconds": 42.0,
+              "calls": 660
+            },
+            "verify.submit.pre.shared": {
+              "milliseconds": 764.0,
+              "calls": 2640
+            },
+            "verify.submit.pre.shared.routed_quant": {
+              "milliseconds": 0.0,
+              "calls": 2640
+            },
+            "verify.submit.post.misses": {
+              "milliseconds": 33.0,
+              "calls": 2640
+            },
+            "verify.submit.pre.attn.qsa.select": {
+              "milliseconds": 24.0,
+              "calls": 660
+            },
+            "verify.submit.pre.route": {
+              "milliseconds": 548.0,
+              "calls": 2640
+            },
+            "verify.submit.pre.shared.prepare": {
+              "milliseconds": 93.0,
+              "calls": 2640
+            },
+            "verify.submit.post.plan": {
+              "milliseconds": 40.0,
+              "calls": 2640
+            },
+            "verify.submit.post.combine": {
+              "milliseconds": 302.0,
+              "calls": 2640
+            },
+            "verify.submit.pre.attn.gdn.state": {
+              "milliseconds": 183.0,
+              "calls": 1980
+            },
+            "verify.submit.pre.attn.qsa.kv_store": {
+              "milliseconds": 71.0,
+              "calls": 660
+            },
+            "verify.submit.pre.attn": {
+              "milliseconds": 1470.0,
+              "calls": 2640
+            },
+            "verify.submit.pre.hc0": {
+              "milliseconds": 712.0,
+              "calls": 2640
+            },
+            "verify.submit.pre.attn.qsa.output": {
+              "milliseconds": 6.0,
+              "calls": 660
+            },
+            "verify.submit.pre.shared.run": {
+              "milliseconds": 341.0,
+              "calls": 2640
+            },
+            "verify.gpu_reach_wait": {
+              "milliseconds": 0.0,
+              "calls": 55
+            },
+            "verify.final_wait": {
+              "milliseconds": 2.0,
+              "calls": 55
+            },
+            "verify.submit": {
+              "milliseconds": 6660.0,
+              "calls": 55
+            }
+          },
+          "output_sha256": "76252b2f9e9cc17646ecace8afbd0527b70a8487646e63301ec8af1779c32894"
+        },
+        {
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 47542.6,
+          "decode_ms": 7508.7,
+          "finish": "length",
+          "accepted": 73,
+          "offered": 99,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 47641.41819999895,
+          "case": "Prose2K",
+          "warmup": false,
+          "report": "eager-phases-3-Prose2K.txt",
+          "scopes": {
+            "verify.commit": {
+              "milliseconds": 29.0,
+              "calls": 56
+            },
+            "cache.apply_pending": {
+              "milliseconds": 22.0,
+              "calls": 56
+            },
+            "mtp.draft": {
+              "milliseconds": 638.0,
+              "calls": 56
+            },
+            "cache.adapt_join": {
+              "milliseconds": 1.0,
+              "calls": 56
+            },
+            "verify.run (submission + GPU wait)": {
+              "milliseconds": 6800.0,
+              "calls": 56
+            },
+            "cache.adapt": {
+              "milliseconds": 140.0,
+              "calls": 56
+            },
+            "verify.submit.post": {
+              "milliseconds": 2330.0,
+              "calls": 2688
+            },
+            "verify.submit.head": {
+              "milliseconds": 97.0,
+              "calls": 56
+            },
+            "verify.submit.pre": {
+              "milliseconds": 4338.0,
+              "calls": 2688
+            },
+            "verify.submit.input": {
+              "milliseconds": 22.0,
+              "calls": 56
+            },
+            "verify.submit.pre.shared.run": {
+              "milliseconds": 344.0,
+              "calls": 2688
+            },
+            "verify.submit.pre.shared.prepare": {
+              "milliseconds": 81.0,
+              "calls": 2688
+            },
+            "verify.submit.pre.attn.gdn.output": {
+              "milliseconds": 30.0,
+              "calls": 2016
+            },
+            "verify.submit.post.experts": {
+              "milliseconds": 1900.0,
+              "calls": 2688
+            },
+            "verify.submit.post.misses": {
+              "milliseconds": 37.0,
+              "calls": 2688
+            },
+            "verify.submit.pre.route": {
+              "milliseconds": 564.0,
+              "calls": 2688
+            },
+            "verify.submit.pre.attn.gdn.state": {
+              "milliseconds": 181.0,
+              "calls": 2016
+            },
+            "verify.submit.pre.attn.qsa.output": {
+              "milliseconds": 14.0,
+              "calls": 672
+            },
+            "verify.submit.pre.hc1": {
+              "milliseconds": 724.0,
+              "calls": 2688
+            },
+            "verify.submit.pre.attn.qsa.kv_store": {
+              "milliseconds": 80.0,
+              "calls": 672
+            },
+            "verify.submit.pre.attn.qsa.attend": {
+              "milliseconds": 43.0,
+              "calls": 672
+            },
+            "verify.submit.pre.attn.gdn.input": {
+              "milliseconds": 106.0,
+              "calls": 2016
+            },
+            "verify.submit.pre.attn.qsa.query": {
+              "milliseconds": 63.0,
+              "calls": 672
+            },
+            "verify.submit.pre.shared.routed_quant": {
+              "milliseconds": 1.0,
+              "calls": 2688
+            },
+            "verify.submit.post.plan": {
+              "milliseconds": 39.0,
+              "calls": 2688
+            },
+            "verify.submit.pre.attn.qsa.select": {
+              "milliseconds": 19.0,
+              "calls": 672
+            },
+            "verify.submit.pre.attn.qsa.kv_projection": {
+              "milliseconds": 67.0,
+              "calls": 672
+            },
+            "verify.submit.pre.attn": {
+              "milliseconds": 1520.0,
+              "calls": 2688
+            },
+            "verify.submit.pre.hc0": {
+              "milliseconds": 706.0,
+              "calls": 2688
+            },
+            "verify.submit.post.combine": {
+              "milliseconds": 315.0,
+              "calls": 2688
+            },
+            "verify.submit.pre.shared": {
+              "milliseconds": 780.0,
+              "calls": 2688
+            },
+            "verify.final_wait": {
+              "milliseconds": 1.0,
+              "calls": 56
+            },
+            "verify.gpu_reach_wait": {
+              "milliseconds": 0.0,
+              "calls": 56
+            },
+            "verify.submit": {
+              "milliseconds": 6800.0,
+              "calls": 56
+            }
+          },
+          "output_sha256": "00c1afb1bf8359fc114b4c24b5d2636601cd4c8851032d099546275062c0c016"
+        },
+        {
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 48440.6,
+          "decode_ms": 7369.5,
+          "finish": "length",
+          "accepted": 75,
+          "offered": 98,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 48538.44179999942,
+          "case": "Code2K",
+          "warmup": false,
+          "report": "eager-phases-4-Code2K.txt",
+          "scopes": {
+            "cache.apply_pending": {
+              "milliseconds": 32.0,
+              "calls": 55
+            },
+            "mtp.draft": {
+              "milliseconds": 638.0,
+              "calls": 55
+            },
+            "verify.commit": {
+              "milliseconds": 28.0,
+              "calls": 55
+            },
+            "cache.adapt_join": {
+              "milliseconds": 3.0,
+              "calls": 55
+            },
+            "verify.run (submission + GPU wait)": {
+              "milliseconds": 6660.0,
+              "calls": 55
+            },
+            "cache.adapt": {
+              "milliseconds": 141.0,
+              "calls": 55
+            },
+            "verify.submit.post": {
+              "milliseconds": 2200.0,
+              "calls": 2640
+            },
+            "verify.submit.head": {
+              "milliseconds": 100.0,
+              "calls": 55
+            },
+            "verify.submit.pre": {
+              "milliseconds": 4340.0,
+              "calls": 2640
+            },
+            "verify.submit.input": {
+              "milliseconds": 14.0,
+              "calls": 55
+            },
+            "verify.submit.post.misses": {
+              "milliseconds": 32.0,
+              "calls": 2640
+            },
+            "verify.submit.pre.shared.run": {
+              "milliseconds": 386.0,
+              "calls": 2640
+            },
+            "verify.submit.pre.attn.gdn.state": {
+              "milliseconds": 193.0,
+              "calls": 1980
+            },
+            "verify.submit.post.experts": {
+              "milliseconds": 1800.0,
+              "calls": 2640
+            },
+            "verify.submit.pre.attn.qsa.query": {
+              "milliseconds": 45.0,
+              "calls": 660
+            },
+            "verify.submit.pre.route": {
+              "milliseconds": 573.0,
+              "calls": 2640
+            },
+            "verify.submit.pre.attn.gdn.output": {
+              "milliseconds": 29.0,
+              "calls": 1980
+            },
+            "verify.submit.post.plan": {
+              "milliseconds": 30.0,
+              "calls": 2640
+            },
+            "verify.submit.pre.attn.qsa.select": {
+              "milliseconds": 22.0,
+              "calls": 660
+            },
+            "verify.submit.pre.attn.qsa.output": {
+              "milliseconds": 16.0,
+              "calls": 660
+            },
+            "verify.submit.pre.attn.qsa.kv_projection": {
+              "milliseconds": 64.0,
+              "calls": 660
+            },
+            "verify.submit.pre.attn.qsa.attend": {
+              "milliseconds": 33.0,
+              "calls": 660
+            },
+            "verify.submit.pre.attn.qsa.kv_store": {
+              "milliseconds": 70.0,
+              "calls": 660
+            },
+            "verify.submit.post.combine": {
+              "milliseconds": 301.0,
+              "calls": 2640
+            },
+            "verify.submit.pre.shared.prepare": {
+              "milliseconds": 90.0,
+              "calls": 2640
+            },
+            "verify.submit.pre.hc1": {
+              "milliseconds": 663.0,
+              "calls": 2640
+            },
+            "verify.submit.pre.attn": {
+              "milliseconds": 1470.0,
+              "calls": 2640
+            },
+            "verify.submit.pre.hc0": {
+              "milliseconds": 741.0,
+              "calls": 2640
+            },
+            "verify.submit.pre.attn.gdn.input": {
+              "milliseconds": 133.0,
+              "calls": 1980
+            },
+            "verify.submit.pre.shared.routed_quant": {
+              "milliseconds": 3.0,
+              "calls": 2640
+            },
+            "verify.submit.pre.shared": {
+              "milliseconds": 842.0,
+              "calls": 2640
+            },
+            "verify.submit": {
+              "milliseconds": 6660.0,
+              "calls": 55
+            },
+            "verify.gpu_reach_wait": {
+              "milliseconds": 0.0,
+              "calls": 55
+            },
+            "verify.final_wait": {
+              "milliseconds": 1.0,
+              "calls": 55
+            }
+          },
+          "output_sha256": "76252b2f9e9cc17646ecace8afbd0527b70a8487646e63301ec8af1779c32894"
+        },
+        {
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 47144.1,
+          "decode_ms": 7537.0,
+          "finish": "length",
+          "accepted": 73,
+          "offered": 99,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 47242.27389999942,
+          "case": "Prose2K",
+          "warmup": false,
+          "report": "eager-phases-5-Prose2K.txt",
+          "scopes": {
+            "verify.commit": {
+              "milliseconds": 26.0,
+              "calls": 56
+            },
+            "cache.adapt_join": {
+              "milliseconds": 2.0,
+              "calls": 56
+            },
+            "verify.run (submission + GPU wait)": {
+              "milliseconds": 6820.0,
+              "calls": 56
+            },
+            "cache.apply_pending": {
+              "milliseconds": 32.0,
+              "calls": 56
+            },
+            "mtp.draft": {
+              "milliseconds": 639.0,
+              "calls": 56
+            },
+            "cache.adapt": {
+              "milliseconds": 140.0,
+              "calls": 56
+            },
+            "verify.submit.post": {
+              "milliseconds": 2310.0,
+              "calls": 2688
+            },
+            "verify.submit.head": {
+              "milliseconds": 99.0,
+              "calls": 56
+            },
+            "verify.submit.pre": {
+              "milliseconds": 4391.0,
+              "calls": 2688
+            },
+            "verify.submit.input": {
+              "milliseconds": 16.0,
+              "calls": 56
+            },
+            "verify.submit.pre.attn.qsa.output": {
+              "milliseconds": 16.0,
+              "calls": 672
+            },
+            "verify.submit.pre.attn.gdn.output": {
+              "milliseconds": 28.0,
+              "calls": 2016
+            },
+            "verify.submit.pre.attn.qsa.select": {
+              "milliseconds": 35.0,
+              "calls": 672
+            },
+            "verify.submit.pre.attn.gdn.input": {
+              "milliseconds": 114.0,
+              "calls": 2016
+            },
+            "verify.submit.pre.attn.qsa.kv_store": {
+              "milliseconds": 57.0,
+              "calls": 672
+            },
+            "verify.submit.post.combine": {
+              "milliseconds": 318.0,
+              "calls": 2688
+            },
+            "verify.submit.pre.attn.qsa.kv_projection": {
+              "milliseconds": 92.0,
+              "calls": 672
+            },
+            "verify.submit.pre.route": {
+              "milliseconds": 539.0,
+              "calls": 2688
+            },
+            "verify.submit.pre.shared": {
+              "milliseconds": 829.0,
+              "calls": 2688
+            },
+            "verify.submit.pre.shared.routed_quant": {
+              "milliseconds": 2.0,
+              "calls": 2688
+            },
+            "verify.submit.pre.shared.prepare": {
+              "milliseconds": 91.0,
+              "calls": 2688
+            },
+            "verify.submit.pre.hc1": {
+              "milliseconds": 696.0,
+              "calls": 2688
+            },
+            "verify.submit.pre.shared.run": {
+              "milliseconds": 403.0,
+              "calls": 2688
+            },
+            "verify.submit.post.misses": {
+              "milliseconds": 30.0,
+              "calls": 2688
+            },
+            "verify.submit.pre.attn.qsa.attend": {
+              "milliseconds": 23.0,
+              "calls": 672
+            },
+            "verify.submit.post.plan": {
+              "milliseconds": 35.0,
+              "calls": 2688
+            },
+            "verify.submit.pre.attn.qsa.query": {
+              "milliseconds": 66.0,
+              "calls": 672
+            },
+            "verify.submit.pre.attn": {
+              "milliseconds": 1540.0,
+              "calls": 2688
+            },
+            "verify.submit.pre.hc0": {
+              "milliseconds": 736.0,
+              "calls": 2688
+            },
+            "verify.submit.post.experts": {
+              "milliseconds": 1890.0,
+              "calls": 2688
+            },
+            "verify.submit.pre.attn.gdn.state": {
+              "milliseconds": 176.0,
+              "calls": 2016
+            },
+            "verify.gpu_reach_wait": {
+              "milliseconds": 0.0,
+              "calls": 56
+            },
+            "verify.final_wait": {
+              "milliseconds": 0.0,
+              "calls": 56
+            },
+            "verify.submit": {
+              "milliseconds": 6820.0,
+              "calls": 56
+            }
+          },
+          "output_sha256": "00c1afb1bf8359fc114b4c24b5d2636601cd4c8851032d099546275062c0c016"
+        }
+      ]
+    }
+  ],
+  "summaries": {
+    "graph": {
+      "Code2K": {
+        "decode_ms": 4129.6,
+        "verify_ms": 3495.0,
+        "draft_ms": 581.5,
+        "pending_ms": 37.5,
+        "join_ms": 3.0,
+        "verify_elapsed_pct": 84.63289422704378,
+        "draft_elapsed_pct": 14.081266950794264
+      },
+      "Prose2K": {
+        "decode_ms": 4192.85,
+        "verify_ms": 3565.0,
+        "draft_ms": 582.5,
+        "pending_ms": 27.5,
+        "join_ms": 3.0,
+        "verify_elapsed_pct": 85.02569851055964,
+        "draft_elapsed_pct": 13.892698283983448
+      }
+    },
+    "eager-phases": {
+      "Code2K": {
+        "decode_ms": 7369.0,
+        "verify_ms": 6660.0,
+        "draft_ms": 636.5,
+        "pending_ms": 31.0,
+        "join_ms": 2.5,
+        "primary_scope_ms": {
+          "verify.submit.post.experts": 1840.0,
+          "verify.submit.pre.attn": 1470.0,
+          "verify.submit.pre.hc0": 726.5,
+          "verify.submit.pre.hc1": 689.0,
+          "verify.submit.pre.shared": 803.0,
+          "verify.submit.pre.route": 560.5,
+          "verify.submit.post.combine": 301.5,
+          "verify.submit.post.plan": 35.0,
+          "verify.submit.post.misses": 32.5,
+          "verify.submit.input": 12.5,
+          "verify.submit.head": 99.5
+        },
+        "combined_hc_ms": 1415.5
+      },
+      "Prose2K": {
+        "decode_ms": 7522.85,
+        "verify_ms": 6810.0,
+        "draft_ms": 638.5,
+        "pending_ms": 27.0,
+        "join_ms": 1.5,
+        "primary_scope_ms": {
+          "verify.submit.post.experts": 1895.0,
+          "verify.submit.pre.attn": 1530.0,
+          "verify.submit.pre.hc0": 721.0,
+          "verify.submit.pre.hc1": 710.0,
+          "verify.submit.pre.shared": 804.5,
+          "verify.submit.pre.route": 551.5,
+          "verify.submit.post.combine": 316.5,
+          "verify.submit.post.plan": 37.0,
+          "verify.submit.post.misses": 33.5,
+          "verify.submit.input": 19.0,
+          "verify.submit.head": 98.0
+        },
+        "combined_hc_ms": 1431.0
+      }
+    }
+  },
+  "clock_checks": [
+    {
+      "requested_ms": 20,
+      "ezpp_ms": 25,
+      "steady_ms": 24.491
+    },
+    {
+      "requested_ms": 80,
+      "ezpp_ms": 85,
+      "steady_ms": 84.819
+    },
+    {
+      "requested_ms": 120,
+      "ezpp_ms": 134,
+      "steady_ms": 134.207
+    },
+    {
+      "requested_ms": 250,
+      "ezpp_ms": 267,
+      "steady_ms": 266.889
+    },
+    {
+      "requested_ms": 1050,
+      "ezpp_ms": 1061,
+      "steady_ms": 1061.601
+    }
+  ],
+  "reference_sha256": {
+    "Code2K": "76252b2f9e9cc17646ecace8afbd0527b70a8487646e63301ec8af1779c32894",
+    "Prose2K": "00c1afb1bf8359fc114b4c24b5d2636601cd4c8851032d099546275062c0c016"
+  },
+  "fingerprint_format": "SHA256 of ASCII JSON integer array with separators comma and colon",
+  "raw_file": "build-sycl-a770-ezpp-decode2k-20261026/results.json",
+  "raw_sha256": "5de9b35e0f102ebe893925703fb540ef1105fc09520da082cda676c22d8b9c7e",
+  "raw_audit": "Runner completed scope/output/source/binary audit under its exclusive GPU lock and exited0. Publication reads small reports/results only; does not rehash large binaries during other measurements.",
+  "audited_exe_sha256": "0baf7dcc775d4419288302a954eca1b600632897e627267bed0820de60cb6bed",
+  "checker_sha256": "8eec2ceb5a36d7497713e1ba1db427856de5ae1e16cc08929d9d941c92e68f11",
+  "report_sha256": "faeb7cb08e95ee7bfabbe8913b15005dc21ea0bddd9208fc677344432f76028e"
+}

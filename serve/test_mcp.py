@@ -311,6 +311,55 @@ class ToolLoop(unittest.TestCase):
         self.assertNotIn('"call"', Path(self.log.name).read_text())    # nothing ran
         self.assertEqual(cs[-1]["choices"][0]["finish_reason"], "stop")
 
+    def test_call_without_outer_close_keeps_arguments(self):
+        script = call_script("fake__add", a=2, b=3)
+        self.start(script[:-len("</tool_call>")], "</think>\n\n5.")
+        code, text = self.post({"strata_mcp": True})
+        self.assertEqual(code, 200, text)
+        chunks = self.chunks(text)
+        mcp = [c["strata_mcp"] for c in chunks if "strata_mcp" in c]
+        self.assertEqual([m["event"] for m in mcp], ["start", "call", "result"])
+        self.assertEqual(mcp[1]["arguments"], {"a": 2, "b": 3})
+        self.assertEqual((mcp[2]["ok"], mcp[2]["text"]), (True, "5"))
+        self.assertEqual(len({m["id"] for m in mcp}), 1)
+        self.assertEqual(len(self.engine.prompts), 2)
+        self.assertIn("<tool_response>\n5\n</tool_response>", self.engine.prompt_text(1))
+        self.assertEqual(chunks[-1]["choices"][0]["finish_reason"], "stop")
+
+    def test_nested_fence_only_runs_the_call_after_it(self):
+        quoted = call_script("fake__echo", text="quoted").split("<tool_call>", 1)[1]
+        actual = call_script("fake__echo", text="actual").split("<tool_call>", 1)[1]
+        self.start("</think>\n\n````markdown\n```xml\n<tool_call>" + quoted
+                   + "\n```\n````\n<tool_call>" + actual, "</think>\n\nDone.")
+        code, text = self.post({"strata_mcp": True})
+        self.assertEqual(code, 200, text)
+        chunks = self.chunks(text)
+        mcp = [c["strata_mcp"] for c in chunks if "strata_mcp" in c]
+        self.assertEqual([m["event"] for m in mcp], ["start", "call", "result"])
+        self.assertEqual(mcp[1]["arguments"], {"text": "actual"})
+        self.assertEqual((mcp[2]["ok"], mcp[2]["text"]), (True, "actual"))
+        self.assertEqual(len(self.engine.prompts), 2)
+        self.assertNotIn('"quoted"', Path(self.log.name).read_text())
+        content = "".join(c["choices"][0]["delta"].get("content") or "" for c in chunks)
+        self.assertIn("<tool_call>" + quoted, content)
+
+    def test_inline_code_only_runs_the_call_after_it(self):
+        quoted = call_script("fake__echo", text="quoted").split("<tool_call>", 1)[1]
+        actual = call_script("fake__echo", text="actual").split("<tool_call>", 1)[1]
+        self.start("</think>\n\nUse ``example `a`\n<tool_call>" + quoted
+                   + "\nend `` then <tool_call>" + actual, "</think>\n\nDone.")
+        code, text = self.post({"strata_mcp": True})
+        self.assertEqual(code, 200, text)
+        chunks = self.chunks(text)
+        mcp = [c["strata_mcp"] for c in chunks if "strata_mcp" in c]
+        self.assertEqual([m["event"] for m in mcp], ["start", "call", "result"])
+        self.assertEqual(mcp[1]["arguments"], {"text": "actual"})
+        self.assertEqual((mcp[2]["ok"], mcp[2]["text"]), (True, "actual"))
+        self.assertEqual(len(self.engine.prompts), 2)
+        self.assertNotIn('"quoted"', Path(self.log.name).read_text())
+        content = "".join(c["choices"][0]["delta"].get("content") or "" for c in chunks)
+        self.assertIn("<tool_call>" + quoted, content)
+
     def test_non_stream(self):
         self.start(call_script("fake__add", a=2, b=3), "</think>\n\n5.")
         code, text = self.post({"strata_mcp": True}, stream=False)

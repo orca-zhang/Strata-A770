@@ -1,0 +1,55 @@
+{
+  "complete": true,
+  "purpose": "Opt-in FP16/BF16 GPU widening with separate output staging before the same FP32 GEMM",
+  "compiler": "oneAPI 2025.3.2",
+  "oneMKL": "2025.3, DLL import on both test arms",
+  "sources": {
+    "include/strata/prefill/gemm.hpp": "0086abbd6d169177e449d47388a7639aea59e72dae3ebf14dca7ab9040f85da6",
+    "sycl/src/prefill/gemm.dp.cpp": "15e09007531e85916b516859846ab7382f894e64fa8072bb5002086c5d6e4519",
+    "sycl/src/prefill/gemm_parity.cpp": "e37f86e547bf98b38db0882c60b2fa412e803e3af2b88bc696927097a770b9d8",
+    "sycl/src/prefill/prefill.cpp": "602a42203460ff1775d2ec59c715da9dc205f42657988086e3d1a0fa6346cf46"
+  },
+  "source_origins": {
+    "include/strata/prefill/gemm.hpp": "G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-activation-grid\\baseline-source\\include\\strata\\prefill\\gemm.hpp",
+    "sycl/src/prefill/gemm.dp.cpp": "G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-activation-grid\\baseline-source\\gemm.dp.cpp",
+    "sycl/src/prefill/gemm_parity.cpp": "G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-activation-grid\\baseline-source\\gemm_parity.cpp",
+    "sycl/src/prefill/prefill.cpp": "G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-activation-grid\\baseline-source\\prefill.cpp"
+  },
+  "original_sources": {
+    "include/strata/prefill/gemm.hpp": "bf0327484da6963ba2f1df10e1cd6ac67371d4785a062c118e05d1edf0ffd0e6",
+    "sycl/src/prefill/gemm.dp.cpp": "49710ccce4b6fa9645a13b333fa41d4f43ca2ee2b5c8587181feb91cb1bd165a",
+    "sycl/src/prefill/prefill.cpp": "8589356f7894659dcabed440df80295b8c3da0f96b3053ebfbc8e07b3b7a3005"
+  },
+  "sampler_obj_sha256": "8179a1285c8234eb812da978004299c0ff8fc09cb98dc6579a18fafee928dd4d",
+  "reused_libraries": {
+    "strata_engine.lib": "53322fc27e5d3970695c9558d00cedff70325b2ab946052f82818d33b691b5f8",
+    "strata_prefill.lib": "db7030439dcbe4ac607bb3a2e426a7720a6ae060c9f29bc1f9bc4682fa944377",
+    "strata_spec.lib": "417e16e26147c87ea2a73bbd9b0d0d305a3477c90c721e90770ad5df136172c5",
+    "strata_kernels.lib": "66be7e63d2d994935e5da2150e1663c350334f4c50f656d05a4794a1c60bb173",
+    "strata_core.lib": "fe7a34a2cce8612bc1c802398ca0490b06052f9fab1a5bba8477718d8ab3e9ca"
+  },
+  "reused_units": {
+    "gemm": {
+      "from": "G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-weights-vector-merged\\build",
+      "obj_sha256": "334430740b4e6faca0729bf4b52e1be6a08324bd38cce4b9b0243db0e15ed141"
+    },
+    "prefill": {
+      "from": "G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-weights-vector-merged\\build",
+      "obj_sha256": "e1174ece7ee119133b388abac13d0d327f127c92619c5e61b9b01f3ab300a4b9"
+    }
+  },
+  "commands": [
+    [
+      "parity",
+      "C:\\PROGRA~2\\Intel\\oneAPI\\compiler\\2025.3\\bin\\icx.exe  /nologo -IG:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-activation-grid\\baseline\\include /TP -DSTRATA_NATIVE_EXPERTS=1 -DSTRATA_SYCL_SERIAL_Q8_1=0 -DSTRATA_VERSION=\\\"0.1.39-sycl\\\" -D_USE_STD_VECTOR_ALGORITHMS=0 -I\"C:\\Program Files (x86)\\Intel\\oneAPI\\mkl\\2025.3\\include\" -IG:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\source\\sycl\\include -IG:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\source\\sycl\\..\\include -IG:\\GitHub\\Strata\\build-sycl\\_deps\\strata_llamacpp-src\\ggml\\src\\..\\include /DWIN32 /D_WINDOWS /EHsc /O2 /Ob2 /DNDEBUG -Qstd:c++20 -MD -fsycl -fsycl-default-sub-group-size=32 -fsycl-device-code-split=per_kernel /fp:precise -Wno-unused-parameter -Wno-unused-variable -Wno-deprecated-declarations -Wall -Wextra -QMD -QMT G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-activation-grid\\baseline\\parity.obj -QMF G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-activation-grid\\baseline\\parity.obj.d /FoG:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-activation-grid\\baseline\\parity.obj /FdG:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-activation-grid\\baseline\\parity.pdb -c G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-activation-grid\\baseline\\gemm_parity.cpp"
+    ],
+    [
+      "link-parity",
+      "C:\\windows\\system32\\cmd.exe /C \"cd . && \"C:\\Program Files\\CMake\\bin\\cmake.exe\" -E vs_link_exe --msvc-ver=1944 --intdir=G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-activation-grid\\baseline\\parity --rc=\"C:\\PROGRA~2\\Windows Kits\\10\\bin\\10.0.19041.0\\x64\\rc.exe\" --mt=\"C:\\PROGRA~2\\Windows Kits\\10\\bin\\10.0.19041.0\\x64\\mt.exe\" --manifests  -- C:\\PROGRA~2\\Intel\\oneAPI\\compiler\\2025.3\\bin\\icx.exe /nologo G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-activation-grid\\baseline\\parity.obj G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\sampler-fp32\\sampler.obj G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-activation-grid\\baseline\\gemm.obj G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-activation-grid\\baseline\\prefill.obj  /Qoption,link,/machine:x64 /Qoption,link,/INCREMENTAL:NO /Qoption,link,/subsystem:console -fsycl -Xsycl-target-backend=spir64 -cl-fp32-correctly-rounded-divide-sqrt -fsycl-device-code-split=per_kernel  strata_engine.lib  strata_prefill.lib  strata_spec.lib  strata_engine.lib  strata_kernels.lib  strata_core.lib  strata_kernels_cpu.lib  ggml\\src\\ggml-cpu.lib  ggml\\src\\ggml-base.lib  \"C:\\Program Files\\LevelZeroSDK\\1.33.1\\lib\\ze_loader.lib\"  \"C:\\Program Files (x86)\\Intel\\oneAPI\\mkl\\2025.3\\lib\\mkl_sycl_blas_dll.lib\"  \"C:\\Program Files (x86)\\Intel\\oneAPI\\mkl\\2025.3\\lib\\mkl_intel_lp64.lib\"  \"C:\\Program Files (x86)\\Intel\\oneAPI\\mkl\\2025.3\\lib\\mkl_sequential.lib\"  \"C:\\Program Files (x86)\\Intel\\oneAPI\\mkl\\2025.3\\lib\\mkl_core.lib\"  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /link /out:G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-activation-grid\\baseline\\parity\\strata.exe /implib:G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-activation-grid\\baseline\\parity\\strata.lib /pdb:G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-activation-grid\\baseline\\parity\\strata.pdb /version:0.0 && cd .\""
+    ]
+  ],
+  "exe_sha256": {
+    "parity": "f23695bd668261415fc9aa57426d3e4f0aec3e22f027c6b7c8476a4d4dd3da03",
+    "model": "aac04876b23d1be890b8822170eea91a58937ac2bb396ff931bc17e6d8cea98a"
+  }
+}

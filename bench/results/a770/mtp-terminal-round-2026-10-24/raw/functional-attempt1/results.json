@@ -1,0 +1,3798 @@
+{
+  "complete": false,
+  "config": {
+    "exe": "G:\\GitHub\\Strata\\build-sycl-a770-unified-operators\\bin\\strata-unified-all-operators.exe",
+    "args": [
+      "--pack",
+      "G:\\GitHub\\Strata-data\\packs\\iq2_xs",
+      "--native",
+      "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00001-of-00002.gguf",
+      "--ple-gguf",
+      "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00002-of-00002.gguf",
+      "--expert-profile",
+      "G:\\GitHub\\Strata\\data\\expert-profile.bin",
+      "--expert-cache",
+      "auto",
+      "--prefill",
+      "8192",
+      "--spec",
+      "4",
+      "--spec-min-p",
+      "0.5",
+      "--mtp",
+      "G:\\GitHub\\Strata-data\\mtp\\rt-full-vocab-current",
+      "--max-context",
+      "8192",
+      "--stream-experts",
+      "--vram-reserve-mib",
+      "1536",
+      "--pcie-frac",
+      "0.16",
+      "--prompt-cache",
+      "0",
+      "--short-read",
+      "8192",
+      "--adapt-every",
+      "1",
+      "--adapt-swaps",
+      "32",
+      "--prefill-borrow",
+      "--mtp-window",
+      "1024",
+      "--mtp-hnorm",
+      "stream",
+      "--adapt-decay",
+      "0.5"
+    ],
+    "cwd": "G:\\GitHub\\Strata",
+    "tokenizer": "G:\\GitHub\\Strata-data\\packs\\iq2_xs\\tokenizer",
+    "model_name": "qwen3.8-flash-next-iq2_xs",
+    "log": "G:\\GitHub\\Strata\\strata-iq2_xs.log",
+    "port": 8080,
+    "backend": "sycl",
+    "env": {
+      "STRATA_SYCL_BIN": "build-sycl-a770-unified-operators\\bin\\strata-unified-all-operators.exe",
+      "ZES_ENABLE_SYSMAN": "1",
+      "STRATA_MIRROR_MIB": "49152",
+      "ONEAPI_DEVICE_SELECTOR": "level_zero:0",
+      "UR_L0_ENABLE_RELAXED_ALLOCATION_LIMITS": "1",
+      "STRATA_VERIFY_DEVICE_PLAN": "1",
+      "STRATA_VERIFY_NO_HOST": "1",
+      "STRATA_VERIFY_EAGER": "1",
+      "STRATA_STAGER_THREADS": "12",
+      "STRATA_VERIFY_ADAPT": "1",
+      "STRATA_ADAPT_COST_WEIGHTED": "1",
+      "STRATA_PREFILL_FIRST": "0",
+      "STRATA_GDN_SG16": "1",
+      "STRATA_IQ4_XS_SG16": "2",
+      "STRATA_VERIFY_FUSED_ACT": "1",
+      "STRATA_VERIFY_DESC_CACHE": "1",
+      "STRATA_SERVE_QUIET": "1",
+      "STRATA_GU_LANES": "16",
+      "STRATA_DOWN_LANES": "4",
+      "SYCL_PROGRAM_COMPILE_OPTIONS": "-cl-fp32-correctly-rounded-divide-sqrt",
+      "STRATA_MTP_LAST_DRAFT_MIN_P": "0.6",
+      "STRATA_GU_IQ2S_SG16": "1",
+      "STRATA_GU_IQ2S_SINGLE_GROUP": "1",
+      "STRATA_GDN_Q8_TAIL": "1",
+      "STRATA_QSA_Q8_TAIL": "1"
+    },
+    "lib_dirs": [
+      "C:\\Program Files (x86)\\Intel\\oneAPI\\mkl\\2025.3\\bin",
+      "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin"
+    ]
+  },
+  "prompt_ids": [
+    248045,
+    846,
+    198,
+    814,
+    20139,
+    3069,
+    279,
+    12515,
+    369,
+    6105,
+    303,
+    2250,
+    22157,
+    13,
+    248046,
+    198,
+    248045,
+    74455,
+    198,
+    248068,
+    271,
+    248069,
+    271
+  ],
+  "runs": [
+    {
+      "side": "baseline",
+      "threshold": 0,
+      "args": [
+        "--pack",
+        "G:\\GitHub\\Strata-data\\packs\\iq2_xs",
+        "--native",
+        "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00001-of-00002.gguf",
+        "--ple-gguf",
+        "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00002-of-00002.gguf",
+        "--expert-profile",
+        "G:\\GitHub\\Strata\\data\\expert-profile.bin",
+        "--expert-cache",
+        "5500",
+        "--prefill",
+        "8192",
+        "--spec",
+        "4",
+        "--spec-min-p",
+        "0",
+        "--mtp",
+        "G:\\GitHub\\Strata-data\\mtp\\rt-full-vocab-current",
+        "--max-context",
+        "8192",
+        "--stream-experts",
+        "--vram-reserve-mib",
+        "1536",
+        "--pcie-frac",
+        "0",
+        "--prompt-cache",
+        "0",
+        "--short-read",
+        "8192",
+        "--adapt-every",
+        "1",
+        "--adapt-swaps",
+        "0",
+        "--prefill-borrow",
+        "--mtp-window",
+        "1024",
+        "--mtp-hnorm",
+        "stream",
+        "--adapt-decay",
+        "0.5",
+        "--kv",
+        "int8"
+      ],
+      "runtime_info": "INFO context=8192 kv=int8 kv_resident=0 expert_slots=5771 expert_cache_mib=7922 expert_slots_primary=5771 expert_cache_primary_mib=7922 spec=6 mtp_max=4 lookup=3 vram_free_mib=2277 cvec=0 arena_mib=33812 pool_workers=21 pcie_frac=0.00 spec_min_p=0.00 conversation_cache_mib=0 conversation_cache_slots=4 conversation_cache_min_free_mib=2560 tail_role_token=-1 vram_elastic=0 engine=0.1.39-sycl",
+      "requests": [
+        {
+          "tokens": [
+            29108,
+            4009,
+            27891,
+            8964,
+            579,
+            16078,
+            321,
+            1100,
+            9872,
+            303,
+            660,
+            17425,
+            11,
+            694,
+            22602,
+            6105,
+            89661,
+            513,
+            35742,
+            1691,
+            777,
+            16025,
+            1056,
+            4860,
+            2438,
+            89661,
+            13,
+            1061,
+            24057,
+            11,
+            3750,
+            430
+          ],
+          "generated": 32,
+          "prompt_tokens": 23,
+          "prompt_ms": 944.6,
+          "decode_ms": 2091.8,
+          "finish": "length",
+          "accepted": 20,
+          "offered": 33,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 1015.5885999993188,
+          "done": "DONE 32 23 944.6 2091.8 length 20 33 0 0 0 0 0 0.0 23 0",
+          "name": "greedy",
+          "limit": 32,
+          "keys": "",
+          "trace": "strata trace: request 23 0\r\nstrata trace: prompt start 22 -1\r\nstrata trace: read 22 tokens (windows) in 941.1 ms\r\nstrata trace: prompt done (slots refilled) -1 -1\r\nstrata trace: window 22 1\r\nTC ROUND serve 1 1 0 0 1 32 0 0\r\nTC DRAFT\r\nstrata trace: window 23 4\r\nTC ROUND serve 2 4 2 1 4 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 2\r\nstrata trace: window 26 4\r\nTC ROUND serve 3 4 3 1 8 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 3\r\nstrata trace: window 30 4\r\nTC ROUND serve 4 4 1 1 10 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 1\r\nstrata trace: window 32 4\r\nTC ROUND serve 5 4 3 1 14 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 3\r\nstrata trace: window 36 4\r\nTC ROUND serve 6 4 0 1 15 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 0\r\nstrata trace: window 37 4\r\nTC ROUND serve 7 4 0 1 16 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 0\r\nstrata trace: window 38 4\r\nTC ROUND serve 8 4 3 1 20 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 3\r\nstrata trace: window 42 4\r\nTC ROUND serve 9 4 1 1 22 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 1\r\nstrata trace: window 44 3\r\nTC ROUND serve 10 3 2 1 25 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 3 2\r\nstrata trace: window 47 4\r\nTC ROUND serve 11 4 1 1 27 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 1\r\nstrata trace: window 49 3\r\nTC ROUND serve 12 3 2 1 30 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 3 2\r\nstrata trace: window 52 3\r\nTC ROUND serve 13 3 2 1 32 32 0 0\r\nTC OBSERVE 0 3 2\r\n",
+          "rounds": [
+            {
+              "path": "serve",
+              "round": 1,
+              "T": 1,
+              "accepted": 0,
+              "timed": 0,
+              "produced": 1,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": []
+            },
+            {
+              "path": "serve",
+              "round": 2,
+              "T": 4,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 4,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  2
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 3,
+              "T": 4,
+              "accepted": 3,
+              "timed": 1,
+              "produced": 8,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  3
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 4,
+              "T": 4,
+              "accepted": 1,
+              "timed": 1,
+              "produced": 10,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  1
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 5,
+              "T": 4,
+              "accepted": 3,
+              "timed": 1,
+              "produced": 14,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  3
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 6,
+              "T": 4,
+              "accepted": 0,
+              "timed": 1,
+              "produced": 15,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  0
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 7,
+              "T": 4,
+              "accepted": 0,
+              "timed": 1,
+              "produced": 16,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  0
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 8,
+              "T": 4,
+              "accepted": 3,
+              "timed": 1,
+              "produced": 20,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  3
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 9,
+              "T": 4,
+              "accepted": 1,
+              "timed": 1,
+              "produced": 22,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  1
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 10,
+              "T": 3,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 25,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  3,
+                  2
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 11,
+              "T": 4,
+              "accepted": 1,
+              "timed": 1,
+              "produced": 27,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  1
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 12,
+              "T": 3,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 30,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  3,
+                  2
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 13,
+              "T": 3,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 32,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 0,
+              "observations": [
+                [
+                  0,
+                  3,
+                  2
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "tokens": [
+            29108
+          ],
+          "generated": 1,
+          "prompt_tokens": 23,
+          "prompt_ms": 856.7,
+          "decode_ms": 67.0,
+          "finish": "length",
+          "accepted": 0,
+          "offered": 0,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 923.001099989051,
+          "done": "DONE 1 23 856.7 67.0 length 0 0 0 0 0 0 0 0.0 23 0",
+          "name": "cap-1",
+          "limit": 1,
+          "keys": "",
+          "trace": "strata trace: request 23 0\r\nstrata trace: prompt start 22 -1\r\nstrata trace: read 22 tokens (windows) in 854.8 ms\r\nstrata trace: prompt done (slots refilled) -1 -1\r\nstrata trace: window 22 1\r\nTC ROUND serve 14 1 0 0 1 1 0 0\r\n",
+          "rounds": [
+            {
+              "path": "serve",
+              "round": 14,
+              "T": 1,
+              "accepted": 0,
+              "timed": 0,
+              "produced": 1,
+              "limit": 1,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 0,
+              "observations": []
+            }
+          ]
+        },
+        {
+          "tokens": [
+            29108,
+            4009,
+            27891,
+            8964
+          ],
+          "generated": 4,
+          "prompt_tokens": 23,
+          "prompt_ms": 855.1,
+          "decode_ms": 220.2,
+          "finish": "length",
+          "accepted": 2,
+          "offered": 2,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 921.8665999942459,
+          "done": "DONE 4 23 855.1 220.2 length 2 2 0 0 0 0 0 0.0 23 0",
+          "name": "cap-4",
+          "limit": 4,
+          "keys": "",
+          "trace": "strata trace: request 23 0\r\nstrata trace: prompt start 22 -1\r\nstrata trace: read 22 tokens (windows) in 853.7 ms\r\nstrata trace: prompt done (slots refilled) -1 -1\r\nstrata trace: window 22 1\r\nTC ROUND serve 15 1 0 0 1 4 0 0\r\nTC DRAFT\r\nstrata trace: window 23 3\r\nTC ROUND serve 16 3 2 1 4 4 0 0\r\nTC OBSERVE 0 3 2\r\n",
+          "rounds": [
+            {
+              "path": "serve",
+              "round": 15,
+              "T": 1,
+              "accepted": 0,
+              "timed": 0,
+              "produced": 1,
+              "limit": 4,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": []
+            },
+            {
+              "path": "serve",
+              "round": 16,
+              "T": 3,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 4,
+              "limit": 4,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 0,
+              "observations": [
+                [
+                  0,
+                  3,
+                  2
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "tokens": [
+            29108,
+            4009,
+            27891,
+            8964,
+            579,
+            16078
+          ],
+          "generated": 6,
+          "prompt_tokens": 23,
+          "prompt_ms": 855.8,
+          "decode_ms": 374.4,
+          "finish": "length",
+          "accepted": 4,
+          "offered": 4,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 922.3095000052126,
+          "done": "DONE 6 23 855.8 374.4 length 4 4 0 0 0 0 0 0.0 23 0",
+          "name": "cap-6",
+          "limit": 6,
+          "keys": "",
+          "trace": "strata trace: request 23 0\r\nstrata trace: prompt start 22 -1\r\nstrata trace: read 22 tokens (windows) in 854.3 ms\r\nstrata trace: prompt done (slots refilled) -1 -1\r\nstrata trace: window 22 1\r\nTC ROUND serve 17 1 0 0 1 6 0 0\r\nTC DRAFT\r\nstrata trace: window 23 3\r\nTC ROUND serve 18 3 2 1 4 6 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 3 2\r\nstrata trace: window 26 3\r\nTC ROUND serve 19 3 2 1 6 6 0 0\r\nTC OBSERVE 0 3 2\r\n",
+          "rounds": [
+            {
+              "path": "serve",
+              "round": 17,
+              "T": 1,
+              "accepted": 0,
+              "timed": 0,
+              "produced": 1,
+              "limit": 6,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": []
+            },
+            {
+              "path": "serve",
+              "round": 18,
+              "T": 3,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 4,
+              "limit": 6,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  3,
+                  2
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 19,
+              "T": 3,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 6,
+              "limit": 6,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 0,
+              "observations": [
+                [
+                  0,
+                  3,
+                  2
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "tokens": [
+            29108,
+            4009,
+            5435,
+            660,
+            7736,
+            314,
+            279,
+            9155,
+            19142,
+            11,
+            694,
+            948,
+            424,
+            27891,
+            8964,
+            579,
+            16078,
+            11,
+            6605,
+            33470,
+            43000,
+            22602,
+            89661,
+            777,
+            13057,
+            1056,
+            4860,
+            5981,
+            4016,
+            310,
+            12870,
+            60845
+          ],
+          "generated": 32,
+          "prompt_tokens": 23,
+          "prompt_ms": 861.2,
+          "decode_ms": 2249.7,
+          "finish": "length",
+          "accepted": 20,
+          "offered": 28,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 938.2855000003474,
+          "done": "DONE 32 23 861.2 2249.7 length 20 28 0 0 0 0 0 0.0 23 0",
+          "name": "sampled",
+          "limit": 32,
+          "keys": "temperature=0.7 top_p=0.9 top_k=20 seed=1234 penalty_repeat=1.1 penalty_freq=0.1 penalty_present=0.2 penalty_last_n=128",
+          "trace": "strata trace: request 23 0\r\nstrata trace: prompt start 22 -1\r\nstrata trace: read 22 tokens (windows) in 859.7 ms\r\nstrata trace: prompt done (slots refilled) -1 -1\r\nstrata trace: window 22 1\r\nTC ROUND serve 20 1 0 0 1 32 0 0\r\nTC DRAFT\r\nstrata trace: window 23 4\r\nTC ROUND serve 21 4 1 1 3 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 1\r\nstrata trace: window 25 3\r\nTC ROUND serve 22 3 1 1 5 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 3 1\r\nstrata trace: window 27 3\r\nTC ROUND serve 23 3 0 1 6 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 3 0\r\nstrata trace: window 28 3\r\nTC ROUND serve 24 3 2 1 9 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 3 2\r\nstrata trace: window 31 3\r\nTC ROUND serve 25 3 1 1 11 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 3 1\r\nstrata trace: window 33 3\r\nTC ROUND serve 26 3 2 1 14 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 3 2\r\nstrata trace: window 36 3\r\nTC ROUND serve 27 3 2 1 17 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 3 2\r\nstrata trace: window 39 3\r\nTC ROUND serve 28 3 1 1 19 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 3 1\r\nstrata trace: window 41 4\r\nTC ROUND serve 29 4 2 1 22 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 2\r\nstrata trace: window 44 3\r\nTC ROUND serve 30 3 2 1 25 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 3 2\r\nstrata trace: window 47 3\r\nTC ROUND serve 31 3 2 1 28 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 3 2\r\nstrata trace: window 50 3\r\nTC ROUND serve 32 3 2 1 31 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 3 2\r\nstrata trace: window 53 3\r\nTC ROUND serve 33 3 2 1 32 32 0 0\r\nTC OBSERVE 0 3 2\r\n",
+          "rounds": [
+            {
+              "path": "serve",
+              "round": 20,
+              "T": 1,
+              "accepted": 0,
+              "timed": 0,
+              "produced": 1,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": []
+            },
+            {
+              "path": "serve",
+              "round": 21,
+              "T": 4,
+              "accepted": 1,
+              "timed": 1,
+              "produced": 3,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  1
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 22,
+              "T": 3,
+              "accepted": 1,
+              "timed": 1,
+              "produced": 5,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  3,
+                  1
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 23,
+              "T": 3,
+              "accepted": 0,
+              "timed": 1,
+              "produced": 6,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  3,
+                  0
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 24,
+              "T": 3,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 9,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  3,
+                  2
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 25,
+              "T": 3,
+              "accepted": 1,
+              "timed": 1,
+              "produced": 11,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  3,
+                  1
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 26,
+              "T": 3,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 14,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  3,
+                  2
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 27,
+              "T": 3,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 17,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  3,
+                  2
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 28,
+              "T": 3,
+              "accepted": 1,
+              "timed": 1,
+              "produced": 19,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  3,
+                  1
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 29,
+              "T": 4,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 22,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  2
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 30,
+              "T": 3,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 25,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  3,
+                  2
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 31,
+              "T": 3,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 28,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  3,
+                  2
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 32,
+              "T": 3,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 31,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  3,
+                  2
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 33,
+              "T": 3,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 32,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 0,
+              "observations": [
+                [
+                  0,
+                  3,
+                  2
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "tokens": [
+            29108,
+            4009,
+            5435,
+            660,
+            7736,
+            314,
+            279,
+            9155,
+            19142,
+            11,
+            694,
+            948,
+            424,
+            27891,
+            8964,
+            579,
+            16078,
+            11,
+            6605,
+            33470,
+            43000,
+            22602,
+            89661,
+            777,
+            13057,
+            1056,
+            4860,
+            5981,
+            4016,
+            310,
+            12870,
+            60845
+          ],
+          "generated": 32,
+          "prompt_tokens": 23,
+          "prompt_ms": 905.9,
+          "decode_ms": 2187.0,
+          "finish": "length",
+          "accepted": 21,
+          "offered": 30,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 975.4059000115376,
+          "done": "DONE 32 23 905.9 2187.0 length 21 30 0 0 0 0 0 0.0 23 0",
+          "name": "sampled-repeat",
+          "limit": 32,
+          "keys": "temperature=0.7 top_p=0.9 top_k=20 seed=1234 penalty_repeat=1.1 penalty_freq=0.1 penalty_present=0.2 penalty_last_n=128",
+          "trace": "strata trace: request 23 0\r\nstrata trace: prompt start 22 -1\r\nstrata trace: read 22 tokens (windows) in 904.4 ms\r\nstrata trace: prompt done (slots refilled) -1 -1\r\nstrata trace: window 22 1\r\nTC ROUND serve 34 1 0 0 1 32 0 0\r\nTC DRAFT\r\nstrata trace: window 23 3\r\nTC ROUND serve 35 3 1 1 3 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 3 1\r\nstrata trace: window 25 3\r\nTC ROUND serve 36 3 1 1 5 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 3 1\r\nstrata trace: window 27 3\r\nTC ROUND serve 37 3 0 1 6 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 3 0\r\nstrata trace: window 28 4\r\nTC ROUND serve 38 4 3 1 10 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 3\r\nstrata trace: window 32 4\r\nTC ROUND serve 39 4 1 1 12 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 1\r\nstrata trace: window 34 4\r\nTC ROUND serve 40 4 3 1 16 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 3\r\nstrata trace: window 38 4\r\nTC ROUND serve 41 4 2 1 19 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 2\r\nstrata trace: window 41 4\r\nTC ROUND serve 42 4 2 1 22 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 2\r\nstrata trace: window 44 4\r\nTC ROUND serve 43 4 2 1 25 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 2\r\nstrata trace: window 47 3\r\nTC ROUND serve 44 3 2 1 28 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 3 2\r\nstrata trace: window 50 3\r\nTC ROUND serve 45 3 2 1 31 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 3 2\r\nstrata trace: window 53 3\r\nTC ROUND serve 46 3 2 1 32 32 0 0\r\nTC OBSERVE 0 3 2\r\n",
+          "rounds": [
+            {
+              "path": "serve",
+              "round": 34,
+              "T": 1,
+              "accepted": 0,
+              "timed": 0,
+              "produced": 1,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": []
+            },
+            {
+              "path": "serve",
+              "round": 35,
+              "T": 3,
+              "accepted": 1,
+              "timed": 1,
+              "produced": 3,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  3,
+                  1
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 36,
+              "T": 3,
+              "accepted": 1,
+              "timed": 1,
+              "produced": 5,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  3,
+                  1
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 37,
+              "T": 3,
+              "accepted": 0,
+              "timed": 1,
+              "produced": 6,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  3,
+                  0
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 38,
+              "T": 4,
+              "accepted": 3,
+              "timed": 1,
+              "produced": 10,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  3
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 39,
+              "T": 4,
+              "accepted": 1,
+              "timed": 1,
+              "produced": 12,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  1
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 40,
+              "T": 4,
+              "accepted": 3,
+              "timed": 1,
+              "produced": 16,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  3
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 41,
+              "T": 4,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 19,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  2
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 42,
+              "T": 4,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 22,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  2
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 43,
+              "T": 4,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 25,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  2
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 44,
+              "T": 3,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 28,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  3,
+                  2
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 45,
+              "T": 3,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 31,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  3,
+                  2
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 46,
+              "T": 3,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 32,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 0,
+              "observations": [
+                [
+                  0,
+                  3,
+                  2
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "tokens": [
+            29108,
+            4009,
+            5435
+          ],
+          "generated": 3,
+          "prompt_tokens": 23,
+          "prompt_ms": 909.6,
+          "decode_ms": 244.5,
+          "finish": "cancel",
+          "accepted": 1,
+          "offered": 2,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 978.9624999975786,
+          "done": "DONE 3 23 909.6 244.5 cancel 1 2 0 0 0 0 0 0.0 23 0",
+          "name": "cancel-during-verify",
+          "limit": 128,
+          "keys": "temperature=0.7 top_p=0.9 top_k=20 seed=1234 penalty_repeat=1.1 penalty_freq=0.1 penalty_present=0.2 penalty_last_n=128",
+          "trace": "strata trace: request 23 0\r\nstrata trace: prompt start 22 -1\r\nstrata trace: read 22 tokens (windows) in 908.1 ms\r\nstrata trace: prompt done (slots refilled) -1 -1\r\nstrata trace: window 22 1\r\nTC ROUND serve 47 1 0 0 1 128 0 0\r\nTC DRAFT\r\nstrata trace: window 23 3\r\nTC ROUND serve 48 3 1 1 3 128 0 1\r\nTC DRAFT\r\nTC OBSERVE 0 3 1\r\n",
+          "rounds": [
+            {
+              "path": "serve",
+              "round": 47,
+              "T": 1,
+              "accepted": 0,
+              "timed": 0,
+              "produced": 1,
+              "limit": 128,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": []
+            },
+            {
+              "path": "serve",
+              "round": 48,
+              "T": 3,
+              "accepted": 1,
+              "timed": 1,
+              "produced": 3,
+              "limit": 128,
+              "eos": 0,
+              "cancel": 1,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  3,
+                  1
+                ]
+              ]
+            }
+          ],
+          "stop_sent_at": [
+            "strata trace: window 23 3"
+          ]
+        },
+        {
+          "tokens": [
+            29108,
+            4009,
+            27891,
+            8964,
+            579,
+            16078,
+            321,
+            1100,
+            9872,
+            303,
+            660,
+            17425,
+            11,
+            694,
+            22602,
+            6105,
+            89661,
+            513,
+            35742,
+            1691,
+            777,
+            16025,
+            1056,
+            4860,
+            2438,
+            89661,
+            13,
+            1061,
+            24057,
+            11,
+            3750,
+            430
+          ],
+          "generated": 32,
+          "prompt_tokens": 23,
+          "prompt_ms": 904.8,
+          "decode_ms": 2096.7,
+          "finish": "length",
+          "accepted": 20,
+          "offered": 29,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 973.014700008207,
+          "done": "DONE 32 23 904.8 2096.7 length 20 29 0 0 0 0 0 0.0 23 0",
+          "name": "recovery",
+          "limit": 32,
+          "keys": "",
+          "trace": "strata trace: request 23 0\r\nstrata trace: prompt start 22 -1\r\nstrata trace: read 22 tokens (windows) in 903.3 ms\r\nstrata trace: prompt done (slots refilled) -1 -1\r\nstrata trace: window 22 1\r\nTC ROUND serve 49 1 0 0 1 32 0 0\r\nTC DRAFT\r\nstrata trace: window 23 4\r\nTC ROUND serve 50 4 2 1 4 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 2\r\nstrata trace: window 26 3\r\nTC ROUND serve 51 3 2 1 7 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 3 2\r\nstrata trace: window 29 3\r\nTC ROUND serve 52 3 2 1 10 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 3 2\r\nstrata trace: window 32 3\r\nTC ROUND serve 53 3 2 1 13 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 3 2\r\nstrata trace: window 35 3\r\nTC ROUND serve 54 3 1 1 15 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 3 1\r\nstrata trace: window 37 3\r\nTC ROUND serve 55 3 0 1 16 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 3 0\r\nstrata trace: window 38 4\r\nTC ROUND serve 56 4 3 1 20 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 3\r\nstrata trace: window 42 4\r\nTC ROUND serve 57 4 1 1 22 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 1\r\nstrata trace: window 44 4\r\nTC ROUND serve 58 4 2 1 25 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 2\r\nstrata trace: window 47 4\r\nTC ROUND serve 59 4 1 1 27 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 1\r\nstrata trace: window 49 3\r\nTC ROUND serve 60 3 2 1 30 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 3 2\r\nstrata trace: window 52 3\r\nTC ROUND serve 61 3 2 1 32 32 0 0\r\nTC OBSERVE 0 3 2\r\n",
+          "rounds": [
+            {
+              "path": "serve",
+              "round": 49,
+              "T": 1,
+              "accepted": 0,
+              "timed": 0,
+              "produced": 1,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": []
+            },
+            {
+              "path": "serve",
+              "round": 50,
+              "T": 4,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 4,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  2
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 51,
+              "T": 3,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 7,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  3,
+                  2
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 52,
+              "T": 3,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 10,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  3,
+                  2
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 53,
+              "T": 3,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 13,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  3,
+                  2
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 54,
+              "T": 3,
+              "accepted": 1,
+              "timed": 1,
+              "produced": 15,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  3,
+                  1
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 55,
+              "T": 3,
+              "accepted": 0,
+              "timed": 1,
+              "produced": 16,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  3,
+                  0
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 56,
+              "T": 4,
+              "accepted": 3,
+              "timed": 1,
+              "produced": 20,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  3
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 57,
+              "T": 4,
+              "accepted": 1,
+              "timed": 1,
+              "produced": 22,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  1
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 58,
+              "T": 4,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 25,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  2
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 59,
+              "T": 4,
+              "accepted": 1,
+              "timed": 1,
+              "produced": 27,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  1
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 60,
+              "T": 3,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 30,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  3,
+                  2
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 61,
+              "T": 3,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 32,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 0,
+              "observations": [
+                [
+                  0,
+                  3,
+                  2
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "tokens": [
+            29108,
+            4009,
+            5435,
+            660,
+            7736,
+            314,
+            279,
+            9155,
+            19142,
+            11,
+            694,
+            948,
+            424,
+            27891,
+            8964,
+            579,
+            16078,
+            11,
+            6605,
+            33470,
+            43000,
+            22602,
+            89661,
+            777,
+            13057,
+            1056,
+            4860,
+            5981,
+            4016,
+            310,
+            12870,
+            60845
+          ],
+          "generated": 32,
+          "prompt_tokens": 23,
+          "prompt_ms": 909.9,
+          "decode_ms": 2048.3,
+          "finish": "length",
+          "accepted": 21,
+          "offered": 30,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 979.344499995932,
+          "done": "DONE 32 23 909.9 2048.3 length 21 30 0 0 0 0 0 0.0 23 0",
+          "name": "sampled-recovery",
+          "limit": 32,
+          "keys": "temperature=0.7 top_p=0.9 top_k=20 seed=1234 penalty_repeat=1.1 penalty_freq=0.1 penalty_present=0.2 penalty_last_n=128",
+          "trace": "strata trace: request 23 0\r\nstrata trace: prompt start 22 -1\r\nstrata trace: read 22 tokens (windows) in 908.5 ms\r\nstrata trace: prompt done (slots refilled) -1 -1\r\nstrata trace: window 22 1\r\nTC ROUND serve 62 1 0 0 1 32 0 0\r\nTC DRAFT\r\nstrata trace: window 23 3\r\nTC ROUND serve 63 3 1 1 3 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 3 1\r\nstrata trace: window 25 3\r\nTC ROUND serve 64 3 1 1 5 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 3 1\r\nstrata trace: window 27 4\r\nTC ROUND serve 65 4 0 1 6 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 0\r\nstrata trace: window 28 3\r\nTC ROUND serve 66 3 2 1 9 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 3 2\r\nstrata trace: window 31 4\r\nTC ROUND serve 67 4 1 1 11 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 1\r\nstrata trace: window 33 4\r\nTC ROUND serve 68 4 3 1 15 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 3\r\nstrata trace: window 37 4\r\nTC ROUND serve 69 4 3 1 19 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 3\r\nstrata trace: window 41 4\r\nTC ROUND serve 70 4 2 1 22 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 2\r\nstrata trace: window 44 4\r\nTC ROUND serve 71 4 2 1 25 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 2\r\nstrata trace: window 47 4\r\nTC ROUND serve 72 4 3 1 29 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 3\r\nstrata trace: window 51 4\r\nTC ROUND serve 73 4 3 1 32 32 0 0\r\nTC OBSERVE 0 4 3\r\n",
+          "rounds": [
+            {
+              "path": "serve",
+              "round": 62,
+              "T": 1,
+              "accepted": 0,
+              "timed": 0,
+              "produced": 1,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": []
+            },
+            {
+              "path": "serve",
+              "round": 63,
+              "T": 3,
+              "accepted": 1,
+              "timed": 1,
+              "produced": 3,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  3,
+                  1
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 64,
+              "T": 3,
+              "accepted": 1,
+              "timed": 1,
+              "produced": 5,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  3,
+                  1
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 65,
+              "T": 4,
+              "accepted": 0,
+              "timed": 1,
+              "produced": 6,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  0
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 66,
+              "T": 3,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 9,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  3,
+                  2
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 67,
+              "T": 4,
+              "accepted": 1,
+              "timed": 1,
+              "produced": 11,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  1
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 68,
+              "T": 4,
+              "accepted": 3,
+              "timed": 1,
+              "produced": 15,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  3
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 69,
+              "T": 4,
+              "accepted": 3,
+              "timed": 1,
+              "produced": 19,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  3
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 70,
+              "T": 4,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 22,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  2
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 71,
+              "T": 4,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 25,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  2
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 72,
+              "T": 4,
+              "accepted": 3,
+              "timed": 1,
+              "produced": 29,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  3
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 73,
+              "T": 4,
+              "accepted": 3,
+              "timed": 1,
+              "produced": 32,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 0,
+              "observations": [
+                [
+                  0,
+                  4,
+                  3
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "tokens": [
+            29108,
+            4009,
+            27891,
+            8964,
+            579,
+            16078
+          ],
+          "generated": 6,
+          "prompt_tokens": 23,
+          "prompt_ms": 907.3,
+          "decode_ms": 431.4,
+          "finish": "length",
+          "accepted": 5,
+          "offered": 6,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 976.1173000006238,
+          "done": "DONE 6 23 907.3 431.4 length 5 6 0 0 0 0 0 0.0 23 0",
+          "name": "threshold-request-0",
+          "limit": 6,
+          "keys": "spec_min_p=0",
+          "trace": "strata trace: request 23 0\r\nstrata trace: prompt start 22 -1\r\nstrata trace: read 22 tokens (windows) in 905.8 ms\r\nstrata trace: prompt done (slots refilled) -1 -1\r\nstrata trace: window 22 1\r\nTC ROUND serve 74 1 0 0 1 6 0 0\r\nTC DRAFT\r\nstrata trace: window 23 4\r\nTC ROUND serve 75 4 2 1 4 6 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 2\r\nstrata trace: window 26 4\r\nTC ROUND serve 76 4 3 1 6 6 0 0\r\nTC OBSERVE 0 4 3\r\n",
+          "rounds": [
+            {
+              "path": "serve",
+              "round": 74,
+              "T": 1,
+              "accepted": 0,
+              "timed": 0,
+              "produced": 1,
+              "limit": 6,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": []
+            },
+            {
+              "path": "serve",
+              "round": 75,
+              "T": 4,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 4,
+              "limit": 6,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  2
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 76,
+              "T": 4,
+              "accepted": 3,
+              "timed": 1,
+              "produced": 6,
+              "limit": 6,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 0,
+              "observations": [
+                [
+                  0,
+                  4,
+                  3
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "tokens": [
+            29108,
+            4009,
+            27891,
+            8964
+          ],
+          "generated": 4,
+          "prompt_tokens": 23,
+          "prompt_ms": 950.4,
+          "decode_ms": 248.1,
+          "finish": "stop",
+          "accepted": 2,
+          "offered": 3,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 1020.6194000056712,
+          "done": "DONE 4 23 950.4 248.1 stop 2 3 0 0 0 0 0 0.0 23 0",
+          "name": "forced-eos",
+          "limit": 16,
+          "keys": "",
+          "trace": "strata trace: request 23 0\r\nstrata trace: prompt start 22 -1\r\nstrata trace: read 22 tokens (windows) in 947.2 ms\r\nstrata trace: prompt done (slots refilled) -1 -1\r\nstrata trace: window 22 1\r\nTC ROUND serve 1 1 0 0 1 16 0 0\r\nTC DRAFT\r\nstrata trace: window 23 4\r\nTC ROUND serve 2 4 2 1 4 16 1 0\r\n",
+          "rounds": [
+            {
+              "path": "serve",
+              "round": 1,
+              "T": 1,
+              "accepted": 0,
+              "timed": 0,
+              "produced": 1,
+              "limit": 16,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": []
+            },
+            {
+              "path": "serve",
+              "round": 2,
+              "T": 4,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 4,
+              "limit": 16,
+              "eos": 1,
+              "cancel": 0,
+              "drafts": 0,
+              "observations": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "side": "candidate",
+      "threshold": 0,
+      "args": [
+        "--pack",
+        "G:\\GitHub\\Strata-data\\packs\\iq2_xs",
+        "--native",
+        "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00001-of-00002.gguf",
+        "--ple-gguf",
+        "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00002-of-00002.gguf",
+        "--expert-profile",
+        "G:\\GitHub\\Strata\\data\\expert-profile.bin",
+        "--expert-cache",
+        "5500",
+        "--prefill",
+        "8192",
+        "--spec",
+        "4",
+        "--spec-min-p",
+        "0",
+        "--mtp",
+        "G:\\GitHub\\Strata-data\\mtp\\rt-full-vocab-current",
+        "--max-context",
+        "8192",
+        "--stream-experts",
+        "--vram-reserve-mib",
+        "1536",
+        "--pcie-frac",
+        "0",
+        "--prompt-cache",
+        "0",
+        "--short-read",
+        "8192",
+        "--adapt-every",
+        "1",
+        "--adapt-swaps",
+        "0",
+        "--prefill-borrow",
+        "--mtp-window",
+        "1024",
+        "--mtp-hnorm",
+        "stream",
+        "--adapt-decay",
+        "0.5",
+        "--kv",
+        "int8"
+      ],
+      "runtime_info": "INFO context=8192 kv=int8 kv_resident=0 expert_slots=5771 expert_cache_mib=7922 expert_slots_primary=5771 expert_cache_primary_mib=7922 spec=6 mtp_max=4 lookup=3 vram_free_mib=2278 cvec=0 arena_mib=33812 pool_workers=21 pcie_frac=0.00 spec_min_p=0.00 conversation_cache_mib=0 conversation_cache_slots=4 conversation_cache_min_free_mib=2560 tail_role_token=-1 vram_elastic=0 engine=0.1.39-sycl",
+      "requests": [
+        {
+          "tokens": [
+            29108,
+            4009,
+            27891,
+            8964,
+            579,
+            16078,
+            321,
+            1100,
+            9872,
+            303,
+            660,
+            17425,
+            11,
+            694,
+            22602,
+            6105,
+            89661,
+            513,
+            35742,
+            1691,
+            777,
+            16025,
+            1056,
+            4860,
+            2438,
+            89661,
+            13,
+            1061,
+            24057,
+            11,
+            3750,
+            430
+          ],
+          "generated": 32,
+          "prompt_tokens": 23,
+          "prompt_ms": 952.4,
+          "decode_ms": 2092.4,
+          "finish": "length",
+          "accepted": 20,
+          "offered": 33,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 1022.9990000079852,
+          "done": "DONE 32 23 952.4 2092.4 length 20 33 0 0 0 0 0 0.0 23 0",
+          "name": "greedy",
+          "limit": 32,
+          "keys": "",
+          "trace": "strata trace: request 23 0\r\nstrata trace: prompt start 22 -1\r\nstrata trace: read 22 tokens (windows) in 948.9 ms\r\nstrata trace: prompt done (slots refilled) -1 -1\r\nstrata trace: window 22 1\r\nTC ROUND serve 1 1 0 0 1 32 0 0\r\nTC DRAFT\r\nstrata trace: window 23 4\r\nTC ROUND serve 2 4 2 1 4 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 2\r\nstrata trace: window 26 4\r\nTC ROUND serve 3 4 3 1 8 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 3\r\nstrata trace: window 30 4\r\nTC ROUND serve 4 4 1 1 10 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 1\r\nstrata trace: window 32 4\r\nTC ROUND serve 5 4 3 1 14 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 3\r\nstrata trace: window 36 4\r\nTC ROUND serve 6 4 0 1 15 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 0\r\nstrata trace: window 37 4\r\nTC ROUND serve 7 4 0 1 16 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 0\r\nstrata trace: window 38 4\r\nTC ROUND serve 8 4 3 1 20 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 3\r\nstrata trace: window 42 4\r\nTC ROUND serve 9 4 1 1 22 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 1\r\nstrata trace: window 44 3\r\nTC ROUND serve 10 3 2 1 25 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 3 2\r\nstrata trace: window 47 4\r\nTC ROUND serve 11 4 1 1 27 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 1\r\nstrata trace: window 49 3\r\nTC ROUND serve 12 3 2 1 30 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 3 2\r\nstrata trace: window 52 3\r\nTC ROUND serve 13 3 2 1 32 32 0 0\r\n",
+          "rounds": [
+            {
+              "path": "serve",
+              "round": 1,
+              "T": 1,
+              "accepted": 0,
+              "timed": 0,
+              "produced": 1,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": []
+            },
+            {
+              "path": "serve",
+              "round": 2,
+              "T": 4,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 4,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  2
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 3,
+              "T": 4,
+              "accepted": 3,
+              "timed": 1,
+              "produced": 8,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  3
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 4,
+              "T": 4,
+              "accepted": 1,
+              "timed": 1,
+              "produced": 10,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  1
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 5,
+              "T": 4,
+              "accepted": 3,
+              "timed": 1,
+              "produced": 14,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  3
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 6,
+              "T": 4,
+              "accepted": 0,
+              "timed": 1,
+              "produced": 15,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  0
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 7,
+              "T": 4,
+              "accepted": 0,
+              "timed": 1,
+              "produced": 16,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  0
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 8,
+              "T": 4,
+              "accepted": 3,
+              "timed": 1,
+              "produced": 20,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  3
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 9,
+              "T": 4,
+              "accepted": 1,
+              "timed": 1,
+              "produced": 22,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  1
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 10,
+              "T": 3,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 25,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  3,
+                  2
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 11,
+              "T": 4,
+              "accepted": 1,
+              "timed": 1,
+              "produced": 27,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  1
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 12,
+              "T": 3,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 30,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  3,
+                  2
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 13,
+              "T": 3,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 32,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 0,
+              "observations": []
+            }
+          ]
+        },
+        {
+          "tokens": [
+            29108
+          ],
+          "generated": 1,
+          "prompt_tokens": 23,
+          "prompt_ms": 854.2,
+          "decode_ms": 66.7,
+          "finish": "length",
+          "accepted": 0,
+          "offered": 0,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 920.130300000892,
+          "done": "DONE 1 23 854.2 66.7 length 0 0 0 0 0 0 0 0.0 23 0",
+          "name": "cap-1",
+          "limit": 1,
+          "keys": "",
+          "trace": "strata trace: request 23 0\r\nstrata trace: prompt start 22 -1\r\nstrata trace: read 22 tokens (windows) in 852.5 ms\r\nstrata trace: prompt done (slots refilled) -1 -1\r\nstrata trace: window 22 1\r\nTC ROUND serve 14 1 0 0 1 1 0 0\r\n",
+          "rounds": [
+            {
+              "path": "serve",
+              "round": 14,
+              "T": 1,
+              "accepted": 0,
+              "timed": 0,
+              "produced": 1,
+              "limit": 1,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 0,
+              "observations": []
+            }
+          ]
+        },
+        {
+          "tokens": [
+            29108,
+            4009,
+            27891,
+            8964
+          ],
+          "generated": 4,
+          "prompt_tokens": 23,
+          "prompt_ms": 855.6,
+          "decode_ms": 218.6,
+          "finish": "length",
+          "accepted": 2,
+          "offered": 2,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 921.2640000041574,
+          "done": "DONE 4 23 855.6 218.6 length 2 2 0 0 0 0 0 0.0 23 0",
+          "name": "cap-4",
+          "limit": 4,
+          "keys": "",
+          "trace": "strata trace: request 23 0\r\nstrata trace: prompt start 22 -1\r\nstrata trace: read 22 tokens (windows) in 854.1 ms\r\nstrata trace: prompt done (slots refilled) -1 -1\r\nstrata trace: window 22 1\r\nTC ROUND serve 15 1 0 0 1 4 0 0\r\nTC DRAFT\r\nstrata trace: window 23 3\r\nTC ROUND serve 16 3 2 1 4 4 0 0\r\n",
+          "rounds": [
+            {
+              "path": "serve",
+              "round": 15,
+              "T": 1,
+              "accepted": 0,
+              "timed": 0,
+              "produced": 1,
+              "limit": 4,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": []
+            },
+            {
+              "path": "serve",
+              "round": 16,
+              "T": 3,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 4,
+              "limit": 4,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 0,
+              "observations": []
+            }
+          ]
+        },
+        {
+          "tokens": [
+            29108,
+            4009,
+            27891,
+            8964,
+            579,
+            16078
+          ],
+          "generated": 6,
+          "prompt_tokens": 23,
+          "prompt_ms": 855.8,
+          "decode_ms": 373.1,
+          "finish": "length",
+          "accepted": 4,
+          "offered": 4,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 921.6946000087773,
+          "done": "DONE 6 23 855.8 373.1 length 4 4 0 0 0 0 0 0.0 23 0",
+          "name": "cap-6",
+          "limit": 6,
+          "keys": "",
+          "trace": "strata trace: request 23 0\r\nstrata trace: prompt start 22 -1\r\nstrata trace: read 22 tokens (windows) in 854.2 ms\r\nstrata trace: prompt done (slots refilled) -1 -1\r\nstrata trace: window 22 1\r\nTC ROUND serve 17 1 0 0 1 6 0 0\r\nTC DRAFT\r\nstrata trace: window 23 3\r\nTC ROUND serve 18 3 2 1 4 6 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 3 2\r\nstrata trace: window 26 3\r\nTC ROUND serve 19 3 2 1 6 6 0 0\r\n",
+          "rounds": [
+            {
+              "path": "serve",
+              "round": 17,
+              "T": 1,
+              "accepted": 0,
+              "timed": 0,
+              "produced": 1,
+              "limit": 6,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": []
+            },
+            {
+              "path": "serve",
+              "round": 18,
+              "T": 3,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 4,
+              "limit": 6,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  3,
+                  2
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 19,
+              "T": 3,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 6,
+              "limit": 6,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 0,
+              "observations": []
+            }
+          ]
+        },
+        {
+          "tokens": [
+            29108,
+            4009,
+            5435,
+            660,
+            7736,
+            314,
+            279,
+            9155,
+            19142,
+            11,
+            694,
+            948,
+            424,
+            27891,
+            8964,
+            579,
+            16078,
+            11,
+            6605,
+            33470,
+            43000,
+            22602,
+            89661,
+            777,
+            13057,
+            1056,
+            4860,
+            5981,
+            4016,
+            310,
+            12870,
+            60845
+          ],
+          "generated": 32,
+          "prompt_tokens": 23,
+          "prompt_ms": 861.7,
+          "decode_ms": 2174.9,
+          "finish": "length",
+          "accepted": 21,
+          "offered": 29,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 939.5179999992251,
+          "done": "DONE 32 23 861.7 2174.9 length 21 29 0 0 0 0 0 0.0 23 0",
+          "name": "sampled",
+          "limit": 32,
+          "keys": "temperature=0.7 top_p=0.9 top_k=20 seed=1234 penalty_repeat=1.1 penalty_freq=0.1 penalty_present=0.2 penalty_last_n=128",
+          "trace": "strata trace: request 23 0\r\nstrata trace: prompt start 22 -1\r\nstrata trace: read 22 tokens (windows) in 860.2 ms\r\nstrata trace: prompt done (slots refilled) -1 -1\r\nstrata trace: window 22 1\r\nTC ROUND serve 20 1 0 0 1 32 0 0\r\nTC DRAFT\r\nstrata trace: window 23 3\r\nTC ROUND serve 21 3 1 1 3 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 3 1\r\nstrata trace: window 25 3\r\nTC ROUND serve 22 3 1 1 5 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 3 1\r\nstrata trace: window 27 3\r\nTC ROUND serve 23 3 0 1 6 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 3 0\r\nstrata trace: window 28 4\r\nTC ROUND serve 24 4 3 1 10 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 3\r\nstrata trace: window 32 4\r\nTC ROUND serve 25 4 1 1 12 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 1\r\nstrata trace: window 34 4\r\nTC ROUND serve 26 4 3 1 16 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 3\r\nstrata trace: window 38 4\r\nTC ROUND serve 27 4 2 1 19 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 2\r\nstrata trace: window 41 4\r\nTC ROUND serve 28 4 2 1 22 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 2\r\nstrata trace: window 44 3\r\nTC ROUND serve 29 3 2 1 25 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 3 2\r\nstrata trace: window 47 3\r\nTC ROUND serve 30 3 2 1 28 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 3 2\r\nstrata trace: window 50 3\r\nTC ROUND serve 31 3 2 1 31 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 3 2\r\nstrata trace: window 53 3\r\nTC ROUND serve 32 3 2 1 32 32 0 0\r\n",
+          "rounds": [
+            {
+              "path": "serve",
+              "round": 20,
+              "T": 1,
+              "accepted": 0,
+              "timed": 0,
+              "produced": 1,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": []
+            },
+            {
+              "path": "serve",
+              "round": 21,
+              "T": 3,
+              "accepted": 1,
+              "timed": 1,
+              "produced": 3,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  3,
+                  1
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 22,
+              "T": 3,
+              "accepted": 1,
+              "timed": 1,
+              "produced": 5,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  3,
+                  1
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 23,
+              "T": 3,
+              "accepted": 0,
+              "timed": 1,
+              "produced": 6,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  3,
+                  0
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 24,
+              "T": 4,
+              "accepted": 3,
+              "timed": 1,
+              "produced": 10,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  3
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 25,
+              "T": 4,
+              "accepted": 1,
+              "timed": 1,
+              "produced": 12,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  1
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 26,
+              "T": 4,
+              "accepted": 3,
+              "timed": 1,
+              "produced": 16,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  3
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 27,
+              "T": 4,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 19,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  2
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 28,
+              "T": 4,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 22,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  2
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 29,
+              "T": 3,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 25,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  3,
+                  2
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 30,
+              "T": 3,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 28,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  3,
+                  2
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 31,
+              "T": 3,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 31,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  3,
+                  2
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 32,
+              "T": 3,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 32,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 0,
+              "observations": []
+            }
+          ]
+        },
+        {
+          "tokens": [
+            29108,
+            4009,
+            5435,
+            660,
+            7736,
+            314,
+            279,
+            9155,
+            19142,
+            11,
+            694,
+            948,
+            424,
+            27891,
+            8964,
+            579,
+            16078,
+            11,
+            6605,
+            33470,
+            43000,
+            22602,
+            89661,
+            777,
+            13057,
+            1056,
+            4860,
+            5981,
+            4016,
+            310,
+            12870,
+            60845
+          ],
+          "generated": 32,
+          "prompt_tokens": 23,
+          "prompt_ms": 908.7,
+          "decode_ms": 2216.1,
+          "finish": "length",
+          "accepted": 21,
+          "offered": 31,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 978.9447999937693,
+          "done": "DONE 32 23 908.7 2216.1 length 21 31 0 0 0 0 0 0.0 23 0",
+          "name": "sampled-repeat",
+          "limit": 32,
+          "keys": "temperature=0.7 top_p=0.9 top_k=20 seed=1234 penalty_repeat=1.1 penalty_freq=0.1 penalty_present=0.2 penalty_last_n=128",
+          "trace": "strata trace: request 23 0\r\nstrata trace: prompt start 22 -1\r\nstrata trace: read 22 tokens (windows) in 907.1 ms\r\nstrata trace: prompt done (slots refilled) -1 -1\r\nstrata trace: window 22 1\r\nTC ROUND serve 33 1 0 0 1 32 0 0\r\nTC DRAFT\r\nstrata trace: window 23 3\r\nTC ROUND serve 34 3 1 1 3 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 3 1\r\nstrata trace: window 25 4\r\nTC ROUND serve 35 4 1 1 5 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 1\r\nstrata trace: window 27 4\r\nTC ROUND serve 36 4 0 1 6 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 0\r\nstrata trace: window 28 4\r\nTC ROUND serve 37 4 3 1 10 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 3\r\nstrata trace: window 32 3\r\nTC ROUND serve 38 3 1 1 12 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 3 1\r\nstrata trace: window 34 4\r\nTC ROUND serve 39 4 3 1 16 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 3\r\nstrata trace: window 38 4\r\nTC ROUND serve 40 4 2 1 19 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 2\r\nstrata trace: window 41 4\r\nTC ROUND serve 41 4 2 1 22 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 2\r\nstrata trace: window 44 4\r\nTC ROUND serve 42 4 2 1 25 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 2\r\nstrata trace: window 47 3\r\nTC ROUND serve 43 3 2 1 28 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 3 2\r\nstrata trace: window 50 3\r\nTC ROUND serve 44 3 2 1 31 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 3 2\r\nstrata trace: window 53 3\r\nTC ROUND serve 45 3 2 1 32 32 0 0\r\n",
+          "rounds": [
+            {
+              "path": "serve",
+              "round": 33,
+              "T": 1,
+              "accepted": 0,
+              "timed": 0,
+              "produced": 1,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": []
+            },
+            {
+              "path": "serve",
+              "round": 34,
+              "T": 3,
+              "accepted": 1,
+              "timed": 1,
+              "produced": 3,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  3,
+                  1
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 35,
+              "T": 4,
+              "accepted": 1,
+              "timed": 1,
+              "produced": 5,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  1
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 36,
+              "T": 4,
+              "accepted": 0,
+              "timed": 1,
+              "produced": 6,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  0
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 37,
+              "T": 4,
+              "accepted": 3,
+              "timed": 1,
+              "produced": 10,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  3
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 38,
+              "T": 3,
+              "accepted": 1,
+              "timed": 1,
+              "produced": 12,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  3,
+                  1
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 39,
+              "T": 4,
+              "accepted": 3,
+              "timed": 1,
+              "produced": 16,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  3
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 40,
+              "T": 4,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 19,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  2
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 41,
+              "T": 4,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 22,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  2
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 42,
+              "T": 4,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 25,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  2
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 43,
+              "T": 3,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 28,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  3,
+                  2
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 44,
+              "T": 3,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 31,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  3,
+                  2
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 45,
+              "T": 3,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 32,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 0,
+              "observations": []
+            }
+          ]
+        },
+        {
+          "tokens": [
+            29108,
+            4009,
+            5435
+          ],
+          "generated": 3,
+          "prompt_tokens": 23,
+          "prompt_ms": 903.3,
+          "decode_ms": 234.5,
+          "finish": "cancel",
+          "accepted": 1,
+          "offered": 2,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 972.661000007065,
+          "done": "DONE 3 23 903.3 234.5 cancel 1 2 0 0 0 0 0 0.0 23 0",
+          "name": "cancel-during-verify",
+          "limit": 128,
+          "keys": "temperature=0.7 top_p=0.9 top_k=20 seed=1234 penalty_repeat=1.1 penalty_freq=0.1 penalty_present=0.2 penalty_last_n=128",
+          "trace": "strata trace: request 23 0\r\nstrata trace: prompt start 22 -1\r\nstrata trace: read 22 tokens (windows) in 901.8 ms\r\nstrata trace: prompt done (slots refilled) -1 -1\r\nstrata trace: window 22 1\r\nTC ROUND serve 46 1 0 0 1 128 0 0\r\nTC DRAFT\r\nstrata trace: window 23 3\r\nTC ROUND serve 47 3 1 1 3 128 0 1\r\n",
+          "rounds": [
+            {
+              "path": "serve",
+              "round": 46,
+              "T": 1,
+              "accepted": 0,
+              "timed": 0,
+              "produced": 1,
+              "limit": 128,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": []
+            },
+            {
+              "path": "serve",
+              "round": 47,
+              "T": 3,
+              "accepted": 1,
+              "timed": 1,
+              "produced": 3,
+              "limit": 128,
+              "eos": 0,
+              "cancel": 1,
+              "drafts": 0,
+              "observations": []
+            }
+          ],
+          "stop_sent_at": [
+            "strata trace: window 23 3"
+          ]
+        },
+        {
+          "tokens": [
+            29108,
+            4009,
+            27891,
+            8964,
+            579,
+            16078,
+            321,
+            1100,
+            9872,
+            303,
+            660,
+            17425,
+            11,
+            694,
+            22602,
+            6105,
+            89661,
+            513,
+            35742,
+            1691,
+            777,
+            16025,
+            1056,
+            4860,
+            2438,
+            89661,
+            13,
+            1061,
+            24057,
+            11,
+            3750,
+            430
+          ],
+          "generated": 32,
+          "prompt_tokens": 23,
+          "prompt_ms": 904.2,
+          "decode_ms": 1984.2,
+          "finish": "length",
+          "accepted": 20,
+          "offered": 24,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 972.7448000048753,
+          "done": "DONE 32 23 904.2 1984.2 length 20 24 0 0 0 0 0 0.0 23 0",
+          "name": "recovery",
+          "limit": 32,
+          "keys": "",
+          "trace": "strata trace: request 23 0\r\nstrata trace: prompt start 22 -1\r\nstrata trace: read 22 tokens (windows) in 902.9 ms\r\nstrata trace: prompt done (slots refilled) -1 -1\r\nstrata trace: window 22 1\r\nTC ROUND serve 48 1 0 0 1 32 0 0\r\nTC DRAFT\r\nstrata trace: window 23 3\r\nTC ROUND serve 49 3 2 1 4 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 3 2\r\nstrata trace: window 26 3\r\nTC ROUND serve 50 3 2 1 7 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 3 2\r\nstrata trace: window 29 3\r\nTC ROUND serve 51 3 2 1 10 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 3 2\r\nstrata trace: window 32 3\r\nTC ROUND serve 52 3 2 1 13 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 3 2\r\nstrata trace: window 35 3\r\nTC ROUND serve 53 3 1 1 15 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 3 1\r\nstrata trace: window 37 3\r\nTC ROUND serve 54 3 0 1 16 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 3 0\r\nstrata trace: window 38 3\r\nTC ROUND serve 55 3 2 1 19 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 3 2\r\nstrata trace: window 41 3\r\nTC ROUND serve 56 3 2 1 22 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 3 2\r\nstrata trace: window 44 3\r\nTC ROUND serve 57 3 2 1 25 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 3 2\r\nstrata trace: window 47 3\r\nTC ROUND serve 58 3 1 1 27 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 3 1\r\nstrata trace: window 49 3\r\nTC ROUND serve 59 3 2 1 30 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 3 2\r\nstrata trace: window 52 3\r\nTC ROUND serve 60 3 2 1 32 32 0 0\r\n",
+          "rounds": [
+            {
+              "path": "serve",
+              "round": 48,
+              "T": 1,
+              "accepted": 0,
+              "timed": 0,
+              "produced": 1,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": []
+            },
+            {
+              "path": "serve",
+              "round": 49,
+              "T": 3,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 4,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  3,
+                  2
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 50,
+              "T": 3,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 7,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  3,
+                  2
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 51,
+              "T": 3,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 10,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  3,
+                  2
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 52,
+              "T": 3,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 13,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  3,
+                  2
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 53,
+              "T": 3,
+              "accepted": 1,
+              "timed": 1,
+              "produced": 15,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  3,
+                  1
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 54,
+              "T": 3,
+              "accepted": 0,
+              "timed": 1,
+              "produced": 16,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  3,
+                  0
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 55,
+              "T": 3,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 19,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  3,
+                  2
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 56,
+              "T": 3,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 22,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  3,
+                  2
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 57,
+              "T": 3,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 25,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  3,
+                  2
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 58,
+              "T": 3,
+              "accepted": 1,
+              "timed": 1,
+              "produced": 27,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  3,
+                  1
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 59,
+              "T": 3,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 30,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  3,
+                  2
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 60,
+              "T": 3,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 32,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 0,
+              "observations": []
+            }
+          ]
+        },
+        {
+          "tokens": [
+            29108,
+            4009,
+            5435,
+            660,
+            7736,
+            314,
+            279,
+            9155,
+            19142,
+            11,
+            694,
+            948,
+            424,
+            27891,
+            8964,
+            579,
+            16078,
+            11,
+            6605,
+            33470,
+            43000,
+            22602,
+            89661,
+            777,
+            13057,
+            1056,
+            4860,
+            5981,
+            4016,
+            310,
+            12870,
+            60845
+          ],
+          "generated": 32,
+          "prompt_tokens": 23,
+          "prompt_ms": 908.4,
+          "decode_ms": 2065.8,
+          "finish": "length",
+          "accepted": 21,
+          "offered": 30,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 979.1719999921042,
+          "done": "DONE 32 23 908.4 2065.8 length 21 30 0 0 0 0 0 0.0 23 0",
+          "name": "sampled-recovery",
+          "limit": 32,
+          "keys": "temperature=0.7 top_p=0.9 top_k=20 seed=1234 penalty_repeat=1.1 penalty_freq=0.1 penalty_present=0.2 penalty_last_n=128",
+          "trace": "strata trace: request 23 0\r\nstrata trace: prompt start 22 -1\r\nstrata trace: read 22 tokens (windows) in 906.7 ms\r\nstrata trace: prompt done (slots refilled) -1 -1\r\nstrata trace: window 22 1\r\nTC ROUND serve 61 1 0 0 1 32 0 0\r\nTC DRAFT\r\nstrata trace: window 23 3\r\nTC ROUND serve 62 3 1 1 3 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 3 1\r\nstrata trace: window 25 3\r\nTC ROUND serve 63 3 1 1 5 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 3 1\r\nstrata trace: window 27 4\r\nTC ROUND serve 64 4 0 1 6 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 0\r\nstrata trace: window 28 3\r\nTC ROUND serve 65 3 2 1 9 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 3 2\r\nstrata trace: window 31 4\r\nTC ROUND serve 66 4 1 1 11 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 1\r\nstrata trace: window 33 4\r\nTC ROUND serve 67 4 3 1 15 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 3\r\nstrata trace: window 37 4\r\nTC ROUND serve 68 4 3 1 19 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 3\r\nstrata trace: window 41 4\r\nTC ROUND serve 69 4 2 1 22 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 2\r\nstrata trace: window 44 4\r\nTC ROUND serve 70 4 2 1 25 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 2\r\nstrata trace: window 47 4\r\nTC ROUND serve 71 4 3 1 29 32 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 3\r\nstrata trace: window 51 4\r\nTC ROUND serve 72 4 3 1 32 32 0 0\r\n",
+          "rounds": [
+            {
+              "path": "serve",
+              "round": 61,
+              "T": 1,
+              "accepted": 0,
+              "timed": 0,
+              "produced": 1,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": []
+            },
+            {
+              "path": "serve",
+              "round": 62,
+              "T": 3,
+              "accepted": 1,
+              "timed": 1,
+              "produced": 3,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  3,
+                  1
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 63,
+              "T": 3,
+              "accepted": 1,
+              "timed": 1,
+              "produced": 5,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  3,
+                  1
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 64,
+              "T": 4,
+              "accepted": 0,
+              "timed": 1,
+              "produced": 6,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  0
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 65,
+              "T": 3,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 9,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  3,
+                  2
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 66,
+              "T": 4,
+              "accepted": 1,
+              "timed": 1,
+              "produced": 11,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  1
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 67,
+              "T": 4,
+              "accepted": 3,
+              "timed": 1,
+              "produced": 15,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  3
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 68,
+              "T": 4,
+              "accepted": 3,
+              "timed": 1,
+              "produced": 19,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  3
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 69,
+              "T": 4,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 22,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  2
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 70,
+              "T": 4,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 25,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  2
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 71,
+              "T": 4,
+              "accepted": 3,
+              "timed": 1,
+              "produced": 29,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  3
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 72,
+              "T": 4,
+              "accepted": 3,
+              "timed": 1,
+              "produced": 32,
+              "limit": 32,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 0,
+              "observations": []
+            }
+          ]
+        },
+        {
+          "tokens": [
+            29108,
+            4009,
+            27891,
+            8964,
+            579,
+            16078
+          ],
+          "generated": 6,
+          "prompt_tokens": 23,
+          "prompt_ms": 912.2,
+          "decode_ms": 431.5,
+          "finish": "length",
+          "accepted": 5,
+          "offered": 6,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 980.5145999998786,
+          "done": "DONE 6 23 912.2 431.5 length 5 6 0 0 0 0 0 0.0 23 0",
+          "name": "threshold-request-0",
+          "limit": 6,
+          "keys": "spec_min_p=0",
+          "trace": "strata trace: request 23 0\r\nstrata trace: prompt start 22 -1\r\nstrata trace: read 22 tokens (windows) in 910.9 ms\r\nstrata trace: prompt done (slots refilled) -1 -1\r\nstrata trace: window 22 1\r\nTC ROUND serve 73 1 0 0 1 6 0 0\r\nTC DRAFT\r\nstrata trace: window 23 4\r\nTC ROUND serve 74 4 2 1 4 6 0 0\r\nTC DRAFT\r\nTC OBSERVE 0 4 2\r\nstrata trace: window 26 4\r\nTC ROUND serve 75 4 3 1 6 6 0 0\r\n",
+          "rounds": [
+            {
+              "path": "serve",
+              "round": 73,
+              "T": 1,
+              "accepted": 0,
+              "timed": 0,
+              "produced": 1,
+              "limit": 6,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": []
+            },
+            {
+              "path": "serve",
+              "round": 74,
+              "T": 4,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 4,
+              "limit": 6,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": [
+                [
+                  0,
+                  4,
+                  2
+                ]
+              ]
+            },
+            {
+              "path": "serve",
+              "round": 75,
+              "T": 4,
+              "accepted": 3,
+              "timed": 1,
+              "produced": 6,
+              "limit": 6,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 0,
+              "observations": []
+            }
+          ]
+        },
+        {
+          "tokens": [
+            29108,
+            4009,
+            27891,
+            8964
+          ],
+          "generated": 4,
+          "prompt_tokens": 23,
+          "prompt_ms": 947.1,
+          "decode_ms": 252.0,
+          "finish": "stop",
+          "accepted": 2,
+          "offered": 3,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 1019.9290000018664,
+          "done": "DONE 4 23 947.1 252.0 stop 2 3 0 0 0 0 0 0.0 23 0",
+          "name": "forced-eos",
+          "limit": 16,
+          "keys": "",
+          "trace": "strata trace: request 23 0\r\nstrata trace: prompt start 22 -1\r\nstrata trace: read 22 tokens (windows) in 943.9 ms\r\nstrata trace: prompt done (slots refilled) -1 -1\r\nstrata trace: window 22 1\r\nTC ROUND serve 1 1 0 0 1 16 0 0\r\nTC DRAFT\r\nstrata trace: window 23 4\r\nTC ROUND serve 2 4 2 1 4 16 1 0\r\n",
+          "rounds": [
+            {
+              "path": "serve",
+              "round": 1,
+              "T": 1,
+              "accepted": 0,
+              "timed": 0,
+              "produced": 1,
+              "limit": 16,
+              "eos": 0,
+              "cancel": 0,
+              "drafts": 1,
+              "observations": []
+            },
+            {
+              "path": "serve",
+              "round": 2,
+              "T": 4,
+              "accepted": 2,
+              "timed": 1,
+              "produced": 4,
+              "limit": 16,
+              "eos": 1,
+              "cancel": 0,
+              "drafts": 0,
+              "observations": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "scope": "Functional and invocation regression, not a performance measurement. Trace/private diagnostics enabled. Actual model, Q8 KV, reproducible CPU experts and coupled sampling, no production replacement."
+}

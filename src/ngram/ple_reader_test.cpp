@@ -291,6 +291,33 @@ int selftest(const std::string& dir, uint32_t rb) {
             CHECK(rd.cache_size() <= rd.cache_capacity(), "row cache exceeded its bound");
         }
     }
+    // Empty, single-row and larger tickets, including duplicate rows that extend a page read.
+    for (bool thr : {false, true}) {
+        ng::PleReader rd;
+        std::string err;
+        CHECK(rd.open(path, HEADER, N, 8, 0, err, thr, rb), "open: %s", err.c_str());
+        uint32_t cross = 0;
+        while ((HEADER + (uint64_t) cross * rb) / ng::PAGE ==
+               (HEADER + (uint64_t) cross * rb + rb - 1) / ng::PAGE) ++cross;
+        for (size_t n : {0u, 1u, 15u, 16u, 17u, 32u, 20000u}) {
+            std::vector<uint32_t> rows(n, cross - 1); // same starting page, shorter read first
+            if (n > 1) rows.back() = cross;
+            rd.reset_stats();
+            check_rows(rd, rows, N, rb, "ticket dedup");
+            const auto stats = rd.snapshot();
+            CHECK(stats.reads == (n > 0 ? 1u : 0u) && stats.dedup_rows == (n > 0 ? n - 1 : 0),
+                  "n=%zu: reads=%llu dedup=%llu", n, (unsigned long long) stats.reads,
+                  (unsigned long long) stats.dedup_rows);
+            CHECK(stats.bytes == (n == 0 ? 0u : n == 1 ? ng::PAGE : 2 * ng::PAGE),
+                  "n=%zu: straddling page length", n);
+        }
+        rd.close();
+        CHECK(rd.open(path, HEADER, N, 8, 8, err, thr, rb), "open: %s", err.c_str());
+        check_rows(rd, {16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1}, N, rb, "cache order");
+        rd.reset_stats();
+        check_rows(rd, {1, 2, 3, 4, 5, 6, 7, 8}, N, rb, "retained cache rows");
+        CHECK(rd.snapshot().cache_hits == 8 && rd.snapshot().reads == 0, "same-page cache replacement changed");
+    }
     // fault injection: a 3 ms delay must be observed, and must not change the bytes
     for (bool thr : {false, true}) {
         ng::PleReader rd;

@@ -1,0 +1,49 @@
+{
+  "complete": true,
+  "purpose": "Opt-in GPU widening before the same FP32 GEMM; no added device allocations",
+  "compiler": "oneAPI 2025.3.2",
+  "oneMKL": "2025.3, DLL import on both test arms",
+  "sources": {
+    "include/strata/prefill/gemm.hpp": "0086abbd6d169177e449d47388a7639aea59e72dae3ebf14dca7ab9040f85da6",
+    "sycl/src/prefill/gemm.dp.cpp": "21959ce4f3cfc13364e0bf036d4557ce6ab559f3b033c7837ca99b15ccd3ad77",
+    "sycl/src/prefill/gemm_parity.cpp": "5ed9c3e5ae2f6bd8c8f3846c9ca21aa182522f6d4a18f86bc453bcd926f79121",
+    "sycl/src/prefill/prefill.cpp": "0697919ce830d355110bc6c40e734f64c2b0a9d48d9c0af4bf30c6d32a95c531"
+  },
+  "original_sources": {
+    "include/strata/prefill/gemm.hpp": "bf0327484da6963ba2f1df10e1cd6ac67371d4785a062c118e05d1edf0ffd0e6",
+    "sycl/src/prefill/gemm.dp.cpp": "49710ccce4b6fa9645a13b333fa41d4f43ca2ee2b5c8587181feb91cb1bd165a",
+    "sycl/src/prefill/prefill.cpp": "8589356f7894659dcabed440df80295b8c3da0f96b3053ebfbc8e07b3b7a3005"
+  },
+  "sampler_obj_sha256": "8179a1285c8234eb812da978004299c0ff8fc09cb98dc6579a18fafee928dd4d",
+  "reused_libraries": {
+    "strata_engine.lib": "53322fc27e5d3970695c9558d00cedff70325b2ab946052f82818d33b691b5f8",
+    "strata_prefill.lib": "db7030439dcbe4ac607bb3a2e426a7720a6ae060c9f29bc1f9bc4682fa944377",
+    "strata_spec.lib": "417e16e26147c87ea2a73bbd9b0d0d305a3477c90c721e90770ad5df136172c5",
+    "strata_kernels.lib": "66be7e63d2d994935e5da2150e1663c350334f4c50f656d05a4794a1c60bb173",
+    "strata_core.lib": "fe7a34a2cce8612bc1c802398ca0490b06052f9fab1a5bba8477718d8ab3e9ca"
+  },
+  "reused_units": {
+    "gemm": {
+      "from": "build-sycl-deepinfer-20261023\\prefill-widen-f16",
+      "obj_sha256": "2d5378f083bb45fb1546357a4e4906a5c591d2ceab04c55e53efd58f521e4f2f"
+    },
+    "prefill": {
+      "from": "build-sycl-deepinfer-20261023\\prefill-widen-f16",
+      "obj_sha256": "d2dc25023ee066c03b9547cf9e4c4c8dc4aa6573a4c322b9d6c711bfd125a6d9"
+    }
+  },
+  "commands": [
+    [
+      "parity",
+      "C:\\PROGRA~2\\Intel\\oneAPI\\compiler\\2025.3\\bin\\icx.exe  /nologo -IG:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-tight-check\\include /TP -DSTRATA_NATIVE_EXPERTS=1 -DSTRATA_SYCL_SERIAL_Q8_1=0 -DSTRATA_VERSION=\\\"0.1.39-sycl\\\" -D_USE_STD_VECTOR_ALGORITHMS=0 -I\"C:\\Program Files (x86)\\Intel\\oneAPI\\mkl\\2025.3\\include\" -IG:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\source\\sycl\\include -IG:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\source\\sycl\\..\\include -IG:\\GitHub\\Strata\\build-sycl\\_deps\\strata_llamacpp-src\\ggml\\src\\..\\include /DWIN32 /D_WINDOWS /EHsc /O2 /Ob2 /DNDEBUG -Qstd:c++20 -MD -fsycl -fsycl-default-sub-group-size=32 -fsycl-device-code-split=per_kernel /fp:precise -Wno-unused-parameter -Wno-unused-variable -Wno-deprecated-declarations -Wall -Wextra -QMD -QMT G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-tight-check\\parity.obj -QMF G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-tight-check\\parity.obj.d /FoG:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-tight-check\\parity.obj /FdG:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-tight-check\\parity.pdb -c G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-tight-check\\gemm_parity.cpp"
+    ],
+    [
+      "link-parity",
+      "C:\\windows\\system32\\cmd.exe /C \"cd . && \"C:\\Program Files\\CMake\\bin\\cmake.exe\" -E vs_link_exe --msvc-ver=1944 --intdir=G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-tight-check\\parity --rc=\"C:\\PROGRA~2\\Windows Kits\\10\\bin\\10.0.19041.0\\x64\\rc.exe\" --mt=\"C:\\PROGRA~2\\Windows Kits\\10\\bin\\10.0.19041.0\\x64\\mt.exe\" --manifests  -- C:\\PROGRA~2\\Intel\\oneAPI\\compiler\\2025.3\\bin\\icx.exe /nologo G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-tight-check\\parity.obj G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\sampler-fp32\\sampler.obj G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-tight-check\\gemm.obj G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-tight-check\\prefill.obj  /Qoption,link,/machine:x64 /Qoption,link,/INCREMENTAL:NO /Qoption,link,/subsystem:console -fsycl -Xsycl-target-backend=spir64 -cl-fp32-correctly-rounded-divide-sqrt -fsycl-device-code-split=per_kernel  strata_engine.lib  strata_prefill.lib  strata_spec.lib  strata_engine.lib  strata_kernels.lib  strata_core.lib  strata_kernels_cpu.lib  ggml\\src\\ggml-cpu.lib  ggml\\src\\ggml-base.lib  \"C:\\Program Files\\LevelZeroSDK\\1.33.1\\lib\\ze_loader.lib\"  \"C:\\Program Files (x86)\\Intel\\oneAPI\\mkl\\2025.3\\lib\\mkl_sycl_blas_dll.lib\"  \"C:\\Program Files (x86)\\Intel\\oneAPI\\mkl\\2025.3\\lib\\mkl_intel_lp64.lib\"  \"C:\\Program Files (x86)\\Intel\\oneAPI\\mkl\\2025.3\\lib\\mkl_sequential.lib\"  \"C:\\Program Files (x86)\\Intel\\oneAPI\\mkl\\2025.3\\lib\\mkl_core.lib\"  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /link /out:G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-tight-check\\parity\\strata.exe /implib:G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-tight-check\\parity\\strata.lib /pdb:G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-tight-check\\parity\\strata.pdb /version:0.0 && cd .\""
+    ]
+  ],
+  "exe_sha256": {
+    "parity": "328b57f1bd0f10cb0cf006f48d8e0e4f8150cd16bd3407a53a88c6b51d4f5328",
+    "model": "77b570cb1cd8e84cc894ac78d806d9b9ecbc251831550ac42aedc28f2994fde1"
+  }
+}

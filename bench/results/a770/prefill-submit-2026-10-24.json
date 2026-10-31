@@ -1,0 +1,66 @@
+{
+  "date": "2026-10-24",
+  "hardware": "Intel Arc A770 16 GB, Xeon E5-2696 v4, Windows, PCIe 3.0 x16",
+  "model": "IQ2_XS",
+  "input_tokens": 2048,
+  "requested_output_tokens": 16,
+  "kv": "fp16",
+  "expert_slots": 4191,
+  "allocator_setting": "1;64M;shared:1M,8,64K",
+  "exe_sha256": "c4b6fb8fea2b0e35c5c2bcde1c1e608d2c134d2f239a0779cd3c4636c1328564",
+  "runs": [
+    {
+      "mode": "baseline",
+      "timeout": true,
+      "timeout_seconds": 150,
+      "wall_seconds": 159.84300000000076,
+      "competition": [],
+      "protocol_sha256": "01217feb8c1d7ce77d584e13e15cdac7dbc92155171d434ca395c8afd0bf3927",
+      "stderr_sha256": "9e49fa023683248dc51f073cc533a4d4a771493497babbec325f6fef045f6073",
+      "completed_requests": 0,
+      "generated_tokens": 0,
+      "expert_slots": 4191
+    },
+    {
+      "mode": "shared_pool",
+      "timeout": true,
+      "timeout_seconds": 150,
+      "wall_seconds": 158.60999999999876,
+      "competition": [],
+      "protocol_sha256": "bf8a99ba2073a86504b22b370fb0be43b9710fe44f89e4a1dc839f3dec8fa863",
+      "stderr_sha256": "551c022a7e2c022122379b045dc02456da634485fc080cb170126fb5af13c88a",
+      "completed_requests": 0,
+      "generated_tokens": 0,
+      "expert_slots": 4191
+    },
+    {
+      "mode": "baseline",
+      "timeout": true,
+      "timeout_seconds": 150,
+      "wall_seconds": 159.76599999999962,
+      "competition": [],
+      "protocol_sha256": "86e3b7ebf9ee04cdbeacf03ea7759ebeb55668e11a64f9078dd72f3c6f19ac2c",
+      "stderr_sha256": "aa473ad2796eca3c9f74630b58fc74425d3572fb49164419a9e6ee24bd885506",
+      "completed_requests": 0,
+      "generated_tokens": 0,
+      "expert_slots": 4191
+    }
+  ],
+  "whole_model_speedup_established": false,
+  "q2_model_tested": false,
+  "batch_gemm": {
+    "status": "compile_and_link_only_at_report_time",
+    "scope": "FP16 GEMM only; no expert transfer/dequantization or whole-model timing",
+    "source_sha256": "d0cb856564b629edfa92def3b27fece04b5f84077ae50256555d9047333ab8fc",
+    "exe_sha256": "de8a37e989139bc09a85cde35de5eb4350f5caee13800bd3d81e169356b6421c",
+    "run_command": "python -X utf8 build-sycl-a770-usm-pool-20261024/batch.py",
+    "planned_checks": "All FP32 outputs and padding vs single GEMM; independent exact CPU samples; A/B/A in fresh processes"
+  },
+  "evidence_sha256": {
+    "build-sycl-a770-usm-pool-20261024/results.json": "27ef497d0294d610ba348e59369b55a5dcf8f668d48ee76cc47bc83ffff2fbb9",
+    "build-sycl-a770-usm-pool-20261024/run.py": "69601108e6b64e7180902d59c41d55e321677590915843b0b9650735194b12f5",
+    "build-sycl-a770-usm-pool-20261024/batch-build.json": "b89d042814bc8665ba743813b2c63956a14611625c8fd74864a4a3b17792aa19",
+    "build-sycl-a770-usm-pool-20261024/batch_gemm.cpp": "d0cb856564b629edfa92def3b27fece04b5f84077ae50256555d9047333ab8fc",
+    "build-sycl-a770-usm-pool-20261024/batch.py": "6763c9b6cea0bf99c2c6dfcdd8e18e6ae939822e4a3be4f240f52ba36baabed1"
+  }
+}

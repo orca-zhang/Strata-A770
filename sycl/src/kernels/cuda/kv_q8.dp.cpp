@@ -8,9 +8,17 @@
 
 #include <cstdio>
 #include <cstdlib>
+#include <stdexcept>
 
 namespace strata::kernels {
 namespace {
+
+// ponytail: select this experiment at build time; the default keeps the original launch shape.
+#if defined(STRATA_SYCL_Q8_SINGLE_SUBGROUP) && STRATA_SYCL_Q8_SINGLE_SUBGROUP
+constexpr int APPEND_LANES = 32;
+#else
+constexpr int APPEND_LANES = 64;
+#endif
 
 void check(const char* what) {
     /*
@@ -29,27 +37,33 @@ void validate(const QsaShapes& s, const char* what) {
     }
 }
 
-// One block = one 64-value group of one KV head of K (blockIdx.z = 0) or V (1); 64 threads, one value each.
+// One block = one 64-value group of one KV head of K or V; 32 lanes optionally handle two values each.
 __dpct_inline__ void kv_append_q8_kernel(
     int8_t *__restrict__ k_q, int8_t *__restrict__ v_q,
     uint16_t *__restrict__ k_scale, uint16_t *__restrict__ v_scale,
     const int32_t *__restrict__ table, const int32_t *__restrict__ step,
     const float *__restrict__ kcur, const float *__restrict__ vcur,
-    int kv_heads, int head_dim, int page_size, KvHostPools host) {
+    int kv_heads, int head_dim, int page_size, KvHostPools host,
+    int step_stride = 0, int cur_stride = 0) {
     /*
     DPCT1098: The '*' expression is used instead of the __ldg call. These
     two expressions do not provide the exact same functionality. Check the
     generated code for potential precision and/or performance issues.
     */
     auto item_ct1 = sycl::ext::oneapi::this_work_item::get_nd_item<3>();
+    const size_t token = item_ct1.get_group(0) / 2;
+    step += token * step_stride;
+    kcur += token * cur_stride;
+    vcur += token * cur_stride;
     const long long pos = (long long)*(step + kStepPos);
     const int h = item_ct1.get_group(2), g = item_ct1.get_group(1),
               t = item_ct1.get_local_id(2);
-    const bool is_v = item_ct1.get_group(0) == 1;
+    const bool is_v = (item_ct1.get_group(0) & 1) != 0;
     const int groups = head_dim / KV_Q8_GROUP;
-    const float x = (is_v ? vcur : kcur)[h * head_dim + g * KV_Q8_GROUP + t];
-    // max |x| over the 64 values: two warps, then combine through shared memory in a fixed order
-    float a = sycl::fabs(x);
+    const float* src = (is_v ? vcur : kcur) + h * head_dim + g * KV_Q8_GROUP + t;
+    const float x[2] = {src[0], APPEND_LANES == 32 ? src[32] : 0.0f};
+    float a = sycl::fabs(x[0]);
+    if constexpr (APPEND_LANES == 32) a = sycl::fmax(a, sycl::fabs(x[1]));
     /*
 DPCT1108: '__shfl_xor_sync' was migrated with the experimental feature
 masked sub_group function which may not be supported by all compilers or
@@ -60,36 +74,36 @@ runtimes. You may need to adjust the code.
         a, dpct::experimental::permute_sub_group_by_xor(
                0xffffffffu, sycl::ext::oneapi::this_work_item::get_sub_group(),
                a, o));
-    auto &warp_max =
-        *sycl::ext::oneapi::group_local_memory_for_overwrite<float[2]>(
-            sycl::ext::oneapi::this_work_item::get_work_group<3>());
-    if ((t & 31) == 0) warp_max[t >> 5] = a;
-    /*
-    DPCT1065: Consider replacing sycl::nd_item::barrier() with
-    sycl::nd_item::barrier(sycl::access::fence_space::local_space) for better
-    performance if there is no access to global memory.
-    */
-    item_ct1.barrier();
-    const float amax = sycl::fmax(warp_max[0], warp_max[1]);
-    const uint16_t sbits = f16_from_f32(amax / 127.0f);
-    const float sf = f32_from_f16(sbits);                          // quantize against the STORED scale
-    int q = 0;
-    if (sf > 0.0f) {
-        q = sycl::vec<float, 1>{(x / sf)}
-                .convert<int, sycl::rounding_mode::rte>()[0];
-        q = q < -127 ? -127 : (q > 127 ? 127 : q);
+    if constexpr (APPEND_LANES == 64) {
+        auto &warp_max =
+            *sycl::ext::oneapi::group_local_memory_for_overwrite<float[2]>(
+                sycl::ext::oneapi::this_work_item::get_work_group<3>());
+        if ((t & 31) == 0) warp_max[t >> 5] = a;
+        item_ct1.barrier();
+        a = sycl::fmax(warp_max[0], warp_max[1]);
     }
+    const uint16_t sbits = f16_from_f32(a / 127.0f);
+    const float sf = f32_from_f16(sbits);                          // quantize against the STORED scale
     // KV streaming: the host copy (identity layout) always, the VRAM page only if the block is resident
     const long long page = (long long) table[pos / page_size];
-    if (page >= 0) {
-        const long long row = (page * kv_heads + h) * page_size + (pos % page_size);
-        (is_v ? v_q : k_q)[row * head_dim + g * KV_Q8_GROUP + t] = (int8_t) q;
-        if (t == 0) (is_v ? v_scale : k_scale)[row * groups + g] = sbits;
-    }
-    if (host.k_q != nullptr) {
-        const long long row = ((pos / page_size) * kv_heads + h) * page_size + (pos % page_size);
-        (is_v ? host.v_q : host.k_q)[row * head_dim + g * KV_Q8_GROUP + t] = (int8_t) q;
-        if (t == 0) (is_v ? host.v_scale : host.k_scale)[row * groups + g] = sbits;
+#pragma unroll
+    for (int i = 0; i < KV_Q8_GROUP / APPEND_LANES; ++i) {
+        int q = 0;
+        if (sf > 0.0f) {
+            q = sycl::vec<float, 1>{(x[i] / sf)}.convert<int, sycl::rounding_mode::rte>()[0];
+            q = q < -127 ? -127 : (q > 127 ? 127 : q);
+        }
+        const int d = g * KV_Q8_GROUP + t + i * 32;
+        if (page >= 0) {
+            const long long row = (page * kv_heads + h) * page_size + (pos % page_size);
+            (is_v ? v_q : k_q)[row * head_dim + d] = (int8_t) q;
+            if (t == 0 && i == 0) (is_v ? v_scale : k_scale)[row * groups + g] = sbits;
+        }
+        if (host.k_q != nullptr) {
+            const long long row = ((pos / page_size) * kv_heads + h) * page_size + (pos % page_size);
+            (is_v ? host.v_q : host.k_q)[row * head_dim + d] = (int8_t) q;
+            if (t == 0 && i == 0) (is_v ? host.v_scale : host.k_scale)[row * groups + g] = sbits;
+        }
     }
 }
 
@@ -160,8 +174,8 @@ void kv_append_q8_step(int8_t* k_q, int8_t* v_q, uint16_t* k_scale, uint16_t* v_
 
                 cgh.parallel_for<
                     dpct_kernel_name<class kv_append_q8_kernel_b60fdc>>(
-                    sycl::nd_range<3>(grid * sycl::range(1, 1, KV_Q8_GROUP),
-                                      sycl::range(1, 1, KV_Q8_GROUP)),
+                    sycl::nd_range<3>(grid * sycl::range(1, 1, APPEND_LANES),
+                                      sycl::range(1, 1, APPEND_LANES)),
                     exp_props,
                     [=](sycl::nd_item<3> item_ct1)
                         [[sycl::reqd_sub_group_size(32)]] {
@@ -173,6 +187,25 @@ void kv_append_q8_step(int8_t* k_q, int8_t* v_q, uint16_t* k_scale, uint16_t* v_
             });
     }
     check("kv_append_q8 launch");
+}
+
+void kv_append_q8_steps(int8_t* k_q, int8_t* v_q, uint16_t* k_scale, uint16_t* v_scale,
+                        const int32_t* table, const int32_t* steps, int step_stride,
+                        const float* kcur, const float* vcur, int cur_stride, int n_tok,
+                        const QsaShapes& s, void* stream, const KvHostPools* host) {
+    if (n_tok == 0) return;
+    if (n_tok < 0 || n_tok > 65535 || step_stride <= kStepPos || cur_stride < s.n_head_kv * s.head_dim ||
+        !k_q || !v_q || !k_scale || !v_scale || !table || !steps || !kcur || !vcur || !stream)
+        throw std::invalid_argument("kv_append_q8_steps: invalid arguments");
+    validate(s, "kv_append_q8_steps");
+    const KvHostPools hp = host ? *host : KvHostPools{};
+    q_of(stream)->parallel_for<class kv_q8_steps>(
+        sycl::nd_range<3>(sycl::range<3>(2 * n_tok, s.head_dim / KV_Q8_GROUP, s.n_head_kv * APPEND_LANES),
+                          sycl::range<3>(1, 1, APPEND_LANES)),
+        [=](sycl::nd_item<3>) [[sycl::reqd_sub_group_size(32)]] {
+            kv_append_q8_kernel(k_q, v_q, k_scale, v_scale, table, steps, kcur, vcur,
+                                (int)s.n_head_kv, (int)s.head_dim, (int)s.page_size, hp, step_stride, cur_stride);
+        });
 }
 
 void kv_gather_q8_step(const int8_t* k_q, const int8_t* v_q, const uint16_t* k_scale, const uint16_t* v_scale,

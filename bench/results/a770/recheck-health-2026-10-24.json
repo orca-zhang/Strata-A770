@@ -1,0 +1,440 @@
+{
+  "client_date": "2026-10-24",
+  "historical_verifier_output": "PASS historical calculations, 11808 tokens, failed-baseline evidence, report integrity",
+  "historical_tokens_reparsed": 11808,
+  "fresh_performance_comparison_completed": false,
+  "fresh_candidate_runs": 0,
+  "fresh_output_parity_assessed": false,
+  "adopted_candidates": [],
+  "health_runs": [
+    {
+      "label": "production",
+      "timeout_seconds": 180,
+      "timeout": true,
+      "completed_requests": 0,
+      "tokens": [],
+      "started_utc": "2026-10-23T16:42:39.428866+00:00",
+      "finished_utc": "2026-10-23T16:45:46.276903+00:00",
+      "env_overrides": {}
+    },
+    {
+      "label": "private_phase_sync",
+      "timeout_seconds": 180,
+      "timeout": true,
+      "completed_requests": 0,
+      "tokens": [],
+      "started_utc": "2026-10-23T16:45:48.119392+00:00",
+      "finished_utc": "2026-10-23T16:48:51.208066+00:00",
+      "env_overrides": {
+        "STRATA_PREFILL_SYNC": "1"
+      }
+    }
+  ],
+  "continuous_sync_marks": 9853,
+  "last_sync_phase_label": "gemm down",
+  "reported_utc": "2026-10-23T16:53:32.761768+00:00",
+  "health_runner_task_date": "2026-10-23",
+  "scope": "IQ2_XS baseline health; no Q2 measurement",
+  "resource_caveat": {
+    "external_compilation_observed_during_production": true,
+    "observed_process_ids": [
+      6460,
+      23864,
+      27320
+    ],
+    "source": "Direct Win32_Process tool snapshot after production start; later saved samples show only the health child; not continuous monitoring"
+  },
+  "historical_summary": [
+    {
+      "candidate": "每轮换入 16",
+      "input": "lower-swaps.json",
+      "rows": [
+        {
+          "prompt_index": 0,
+          "prompt_tokens": 2048,
+          "decode": {
+            "baseline_ms": 6017.430579574641,
+            "candidate_ms": 6044.9,
+            "throughput_change_pct": -0.45442307441575513,
+            "baseline_latency_drift_pct": 6.540533122920178
+          },
+          "prompt": {
+            "baseline_ms": 9559.667138556655,
+            "candidate_ms": 9897.5,
+            "throughput_change_pct": -3.4133150941484725,
+            "baseline_latency_drift_pct": 4.898326512245821
+          }
+        },
+        {
+          "prompt_index": 1,
+          "prompt_tokens": 2048,
+          "decode": {
+            "baseline_ms": 5981.849648729061,
+            "candidate_ms": 5913.9,
+            "throughput_change_pct": 1.148982037725732,
+            "baseline_latency_drift_pct": -0.06851718778722038
+          },
+          "prompt": {
+            "baseline_ms": 9066.369750898095,
+            "candidate_ms": 8690.8,
+            "throughput_change_pct": 4.3214635119677824,
+            "baseline_latency_drift_pct": 5.170405058422967
+          }
+        },
+        {
+          "prompt_index": 2,
+          "prompt_tokens": 8000,
+          "decode": {
+            "baseline_ms": 6627.602396040365,
+            "candidate_ms": 6706.5,
+            "throughput_change_pct": -1.1764348610994513,
+            "baseline_latency_drift_pct": 3.049565004288679
+          },
+          "prompt": {
+            "baseline_ms": 16011.60960771902,
+            "candidate_ms": 16327.1,
+            "throughput_change_pct": -1.9323112633656936,
+            "baseline_latency_drift_pct": 4.326331166552899
+          }
+        }
+      ],
+      "decode": {
+        "geomean_throughput_change_pct": -0.16534214510636192,
+        "max_abs_baseline_latency_drift_pct": 6.540533122920178
+      },
+      "prompt": {
+        "geomean_throughput_change_pct": -0.39702957437429687,
+        "max_abs_baseline_latency_drift_pct": 5.170405058422967
+      }
+    },
+    {
+      "candidate": "每轮换入 8",
+      "input": "lower-swaps.json",
+      "rows": [
+        {
+          "prompt_index": 0,
+          "prompt_tokens": 2048,
+          "decode": {
+            "baseline_ms": 6140.245859898446,
+            "candidate_ms": 6237.1,
+            "throughput_change_pct": -1.5528713681286943,
+            "baseline_latency_drift_pct": -2.2685192638985163
+          },
+          "prompt": {
+            "baseline_ms": 9922.516706965023,
+            "candidate_ms": 9228.2,
+            "throughput_change_pct": 7.5238584660608065,
+            "baseline_latency_drift_pct": 2.7045245633745107
+          }
+        },
+        {
+          "prompt_index": 1,
+          "prompt_tokens": 2048,
+          "decode": {
+            "baseline_ms": 5998.670225975087,
+            "candidate_ms": 6508.1,
+            "throughput_change_pct": -7.827626711711755,
+            "baseline_latency_drift_pct": 0.632128164821566
+          },
+          "prompt": {
+            "baseline_ms": 9196.29594021419,
+            "candidate_ms": 9210.8,
+            "throughput_change_pct": -0.15746797005482538,
+            "baseline_latency_drift_pct": -2.171481425713606
+          }
+        },
+        {
+          "prompt_index": 2,
+          "prompt_tokens": 8000,
+          "decode": {
+            "baseline_ms": 6562.466052483624,
+            "candidate_ms": 6714.6,
+            "throughput_change_pct": -2.2657186953262576,
+            "baseline_latency_drift_pct": -4.857384919514251
+          },
+          "prompt": {
+            "baseline_ms": 15883.627071610565,
+            "candidate_ms": 16456.7,
+            "throughput_change_pct": -3.482307682521013,
+            "baseline_latency_drift_pct": -5.673125722287098
+          }
+        }
+      ],
+      "decode": {
+        "geomean_throughput_change_pct": -3.923557034559466,
+        "max_abs_baseline_latency_drift_pct": 4.857384919514251
+      },
+      "prompt": {
+        "geomean_throughput_change_pct": 1.1911315038365844,
+        "max_abs_baseline_latency_drift_pct": 5.673125722287098
+      }
+    },
+    {
+      "candidate": "驻留表提前上传",
+      "input": "early-screen.json",
+      "rows": [
+        {
+          "prompt_index": 0,
+          "prompt_tokens": 2048,
+          "decode": {
+            "baseline_ms": 5896.128608671965,
+            "candidate_ms": 5822.0,
+            "throughput_change_pct": 1.2732498913082146,
+            "baseline_latency_drift_pct": -5.94766189121173
+          },
+          "prompt": {
+            "baseline_ms": 9515.194337479397,
+            "candidate_ms": 13045.1,
+            "throughput_change_pct": -27.05924571310763,
+            "baseline_latency_drift_pct": -8.039385632508257
+          }
+        },
+        {
+          "prompt_index": 1,
+          "prompt_tokens": 2048,
+          "decode": {
+            "baseline_ms": 5954.276029039971,
+            "candidate_ms": 6741.2,
+            "throughput_change_pct": -11.673351494689799,
+            "baseline_latency_drift_pct": 3.5861408816642015
+          },
+          "prompt": {
+            "baseline_ms": 8853.192268893747,
+            "candidate_ms": 8866.8,
+            "throughput_change_pct": -0.15346834377963914,
+            "baseline_latency_drift_pct": 0.264660973816655
+          }
+        },
+        {
+          "prompt_index": 2,
+          "prompt_tokens": 8000,
+          "decode": {
+            "baseline_ms": 6891.460359024058,
+            "candidate_ms": 6397.7,
+            "throughput_change_pct": 7.717779186646112,
+            "baseline_latency_drift_pct": 1.0253194096027096
+          },
+          "prompt": {
+            "baseline_ms": 16186.856552771449,
+            "candidate_ms": 15483.3,
+            "throughput_change_pct": 4.543970295553601,
+            "baseline_latency_drift_pct": 4.484171839577655
+          }
+        }
+      ],
+      "decode": {
+        "geomean_throughput_change_pct": -1.2300964069755338,
+        "max_abs_baseline_latency_drift_pct": 5.94766189121173
+      },
+      "prompt": {
+        "geomean_throughput_change_pct": -8.686692398433483,
+        "max_abs_baseline_latency_drift_pct": 8.039385632508257
+      }
+    },
+    {
+      "candidate": "每两轮换入一次",
+      "input": "early-screen.json",
+      "rows": [
+        {
+          "prompt_index": 0,
+          "prompt_tokens": 2048,
+          "decode": {
+            "baseline_ms": 5911.625137811091,
+            "candidate_ms": 6331.1,
+            "throughput_change_pct": -6.625623701867123,
+            "baseline_latency_drift_pct": 6.8834053269442474
+          },
+          "prompt": {
+            "baseline_ms": 9476.276831118854,
+            "candidate_ms": 9242.5,
+            "throughput_change_pct": 2.529367932040616,
+            "baseline_latency_drift_pct": 7.85450480563743
+          }
+        },
+        {
+          "prompt_index": 1,
+          "prompt_tokens": 2048,
+          "decode": {
+            "baseline_ms": 6234.928185632935,
+            "candidate_ms": 5883.1,
+            "throughput_change_pct": 5.9803196551636795,
+            "baseline_latency_drift_pct": 5.853038728733839
+          },
+          "prompt": {
+            "baseline_ms": 9081.064488814072,
+            "candidate_ms": 9182.1,
+            "throughput_change_pct": -1.1003529822799618,
+            "baseline_latency_drift_pct": 4.936321898724194
+          }
+        },
+        {
+          "prompt_index": 2,
+          "prompt_tokens": 8000,
+          "decode": {
+            "baseline_ms": 6856.039590755001,
+            "candidate_ms": 6642.5,
+            "throughput_change_pct": 3.214747320361333,
+            "baseline_latency_drift_pct": -2.0298266129614273
+          },
+          "prompt": {
+            "baseline_ms": 16792.21508140007,
+            "candidate_ms": 16174.1,
+            "throughput_change_pct": 3.8216350919066278,
+            "baseline_latency_drift_pct": 3.0007615225616124
+          }
+        }
+      ],
+      "decode": {
+        "geomean_throughput_change_pct": 0.7082148097378838,
+        "max_abs_baseline_latency_drift_pct": 6.8834053269442474
+      },
+      "prompt": {
+        "geomean_throughput_change_pct": 1.7287313888372458,
+        "max_abs_baseline_latency_drift_pct": 7.85450480563743
+      }
+    },
+    {
+      "candidate": "计算与拷贝固定批量 64",
+      "input": "native-screen.json",
+      "rows": [
+        {
+          "prompt_index": 0,
+          "prompt_tokens": 2048,
+          "decode": {
+            "baseline_ms": 5835.889443778044,
+            "candidate_ms": 5900.3,
+            "throughput_change_pct": -1.0916488351771392,
+            "baseline_latency_drift_pct": -0.3796818881477648
+          },
+          "prompt": {
+            "baseline_ms": 9507.087339453656,
+            "candidate_ms": 11372.7,
+            "throughput_change_pct": -16.404307337275625,
+            "baseline_latency_drift_pct": -4.580482091116467
+          }
+        },
+        {
+          "prompt_index": 1,
+          "prompt_tokens": 2048,
+          "decode": {
+            "baseline_ms": 6037.149999792949,
+            "candidate_ms": 6971.1,
+            "throughput_change_pct": -13.397455210900022,
+            "baseline_latency_drift_pct": 0.0016564244421868324
+          },
+          "prompt": {
+            "baseline_ms": 8816.31827919115,
+            "candidate_ms": 8017.5,
+            "throughput_change_pct": 9.963433479153716,
+            "baseline_latency_drift_pct": 0.5379462508671828
+          }
+        },
+        {
+          "prompt_index": 2,
+          "prompt_tokens": 8000,
+          "decode": {
+            "baseline_ms": 6531.434280462447,
+            "candidate_ms": 6549.1,
+            "throughput_change_pct": -0.26974270567793335,
+            "baseline_latency_drift_pct": 0.9012334286856882
+          },
+          "prompt": {
+            "baseline_ms": 17092.35618017598,
+            "candidate_ms": 15241.3,
+            "throughput_change_pct": 12.145001936685063,
+            "baseline_latency_drift_pct": -15.500615786728044
+          }
+        }
+      ],
+      "decode": {
+        "geomean_throughput_change_pct": -5.115155151046302,
+        "max_abs_baseline_latency_drift_pct": 0.9012334286856882
+      },
+      "prompt": {
+        "geomean_throughput_change_pct": 1.0192263977140126,
+        "max_abs_baseline_latency_drift_pct": 15.500615786728044
+      }
+    },
+    {
+      "candidate": "驱动内排序",
+      "input": "native-screen.json",
+      "rows": [
+        {
+          "prompt_index": 0,
+          "prompt_tokens": 2048,
+          "decode": {
+            "baseline_ms": 5953.625403063246,
+            "candidate_ms": 6160.3,
+            "throughput_change_pct": -3.354943703013713,
+            "baseline_latency_drift_pct": 4.4722565581650775
+          },
+          "prompt": {
+            "baseline_ms": 9368.143752099451,
+            "candidate_ms": 9814.9,
+            "throughput_change_pct": -4.551816604352044,
+            "baseline_latency_drift_pct": 1.7594865831072282
+          }
+        },
+        {
+          "prompt_index": 1,
+          "prompt_tokens": 2048,
+          "decode": {
+            "baseline_ms": 6259.603457088955,
+            "candidate_ms": 6622.1,
+            "throughput_change_pct": -5.474042115205835,
+            "baseline_latency_drift_pct": 7.503478433710997
+          },
+          "prompt": {
+            "baseline_ms": 8901.03926516449,
+            "candidate_ms": 9339.2,
+            "throughput_change_pct": -4.691630277063452,
+            "baseline_latency_drift_pct": 1.3857466063348367
+          }
+        },
+        {
+          "prompt_index": 2,
+          "prompt_tokens": 8000,
+          "decode": {
+            "baseline_ms": 6580.719760026254,
+            "candidate_ms": 6850.6,
+            "throughput_change_pct": -3.9395124510808732,
+            "baseline_latency_drift_pct": 0.608157541763199
+          },
+          "prompt": {
+            "baseline_ms": 15966.241383932538,
+            "candidate_ms": 16379.9,
+            "throughput_change_pct": -2.525403794085812,
+            "baseline_latency_drift_pct": 3.26376822663077
+          }
+        }
+      ],
+      "decode": {
+        "geomean_throughput_change_pct": -4.260349228352833,
+        "max_abs_baseline_latency_drift_pct": 7.503478433710997
+      },
+      "prompt": {
+        "geomean_throughput_change_pct": -3.928025265509638,
+        "max_abs_baseline_latency_drift_pct": 3.26376822663077
+      }
+    }
+  ],
+  "conclusion": "Historical arithmetic is correct; no fresh A/B confirmation or demonstrated stable gain; health timeouts do not establish deadlock.",
+  "evidence_sha256": {
+    "build-sycl-a770-recheck-followup-20261023\\busy-at-end.json": "3023a14eef111bb21c8e6a20fa6c977cc07f7ee4e9824d4f54e1d5eea41291f0",
+    "build-sycl-a770-recheck-followup-20261023\\health-resource-observation.json": "7e1f391d9996efc8b1ed17a6c142e50d61d78aa23b652b3171b30255feaa9a0a",
+    "build-sycl-a770-recheck-followup-20261023\\health-resource-samples.jsonl": "fad8f6652f746959b1cfc742a43465d2c658f2aaa533523dfa07ab401a7789c3",
+    "build-sycl-a770-recheck-followup-20261023\\health.json": "3cf50b85486b83cc5ad485b1e84d091b889ebeda72d579333e86991832f0c0dd",
+    "build-sycl-a770-recheck-followup-20261023\\health.partial.json": "af47073b1b2e26754a64e2a16d182e1f7e6c4407c0713c8c02820bd09c687f1f",
+    "build-sycl-a770-recheck-followup-20261023\\health.py": "f096b3ac92b7fd39429b6b9c51f355f79cf21bd61c0717c1ca63683d6ca00293",
+    "build-sycl-a770-recheck-followup-20261023\\pcie.json": "504d587c6ff3710b4b6feb359d7b7a5a5dde3e771c9ab2a4d41b375358e1407e",
+    "build-sycl-a770-recheck-followup-20261023\\private_phase_sync.protocol": "f3671e0aad558a021ac10b19fb92dc39ba9818ae0d8adeb770e8461d226fdfc8",
+    "build-sycl-a770-recheck-followup-20261023\\private_phase_sync.stderr": "62b21e7c01dee09ebd04da4564f61180258454a3d985d4f683776ea06f941ae3",
+    "build-sycl-a770-recheck-followup-20261023\\production.protocol": "be6b2798494779598ea2e3a2e1464d8c2274c22a3ff0f4487baded1d6fcd6703",
+    "build-sycl-a770-recheck-followup-20261023\\production.stderr": "ac8e0bffe587df90930a90c2c23ad6f80602bfefd6c0b0c28b7e69e5cc13fdbf",
+    "build-sycl-a770-recheck-followup-20261023\\verify_health.py": "8a0f04e597f68729f1ab820afef3094e10a89dd65c0c287956547d2892fabc36",
+    "bench\\results\\a770\\recheck-health-2026-10-24.md": "5f55b948195db6f5292dc282de4a74cd94099827cb5c536501c1070ccb220b0c",
+    "bench\\results\\a770\\queue-cache-followup-2026-10-21.json": "7f9065f2faf695c18c4b110d8e39192ce42f4ab920692bc08f1e0fab34ffb9a2",
+    "bench\\results\\a770\\recheck-2026-10-23.json": "cc0f0b6f0a19b229468e69b95ce95702f99f6606e5c1dba6fa329a6ee49c04f1",
+    "bench\\results\\a770\\recheck-followup-2026-10-23.json": "9be787c99a75f5e42dd6953eab4a4119d4088894dc76e10ba09dc20d427c0c16"
+  }
+}

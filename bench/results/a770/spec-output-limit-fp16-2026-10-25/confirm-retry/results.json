@@ -1,0 +1,1816 @@
+{
+  "complete": true,
+  "scope": "Fresh Short prompt, 4/6/16 output tokens; not the four-scenario model matrix.",
+  "primary_cap": 6,
+  "warmups_per_process": 2,
+  "retained_per_cap": 3,
+  "args": [
+    "--pack",
+    "G:\\GitHub\\Strata-data\\packs\\iq2_xs",
+    "--native",
+    "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00001-of-00002.gguf",
+    "--ple-gguf",
+    "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00002-of-00002.gguf",
+    "--expert-profile",
+    "G:\\GitHub\\Strata\\data\\expert-profile.bin",
+    "--expert-cache",
+    "4000",
+    "--prefill",
+    "8192",
+    "--spec",
+    "4",
+    "--spec-min-p",
+    "0.5",
+    "--mtp",
+    "G:\\GitHub\\Strata-data\\mtp\\rt-full-vocab-current",
+    "--max-context",
+    "8192",
+    "--stream-experts",
+    "--vram-reserve-mib",
+    "1536",
+    "--pcie-frac",
+    "0",
+    "--prompt-cache",
+    "0",
+    "--short-read",
+    "256",
+    "--adapt-every",
+    "1",
+    "--adapt-swaps",
+    "0",
+    "--prefill-borrow",
+    "--mtp-window",
+    "1024",
+    "--mtp-hnorm",
+    "stream",
+    "--adapt-decay",
+    "0.5",
+    "--kv",
+    "fp16",
+    "--stop-eos"
+  ],
+  "environment": {
+    "STRATA_SYCL_BIN": "build-sycl-a770-unified-operators\\bin\\strata-unified-all-operators.exe",
+    "ZES_ENABLE_SYSMAN": "1",
+    "STRATA_MIRROR_MIB": "49152",
+    "ONEAPI_DEVICE_SELECTOR": "level_zero:0",
+    "UR_L0_ENABLE_RELAXED_ALLOCATION_LIMITS": "1",
+    "STRATA_VERIFY_DEVICE_PLAN": "1",
+    "STRATA_VERIFY_NO_HOST": "1",
+    "STRATA_VERIFY_EAGER": "1",
+    "STRATA_STAGER_THREADS": "12",
+    "STRATA_VERIFY_ADAPT": "1",
+    "STRATA_ADAPT_COST_WEIGHTED": "1",
+    "STRATA_PREFILL_FIRST": "0",
+    "STRATA_GDN_SG16": "1",
+    "STRATA_IQ4_XS_SG16": "2",
+    "STRATA_VERIFY_FUSED_ACT": "1",
+    "STRATA_VERIFY_DESC_CACHE": "1",
+    "STRATA_SERVE_QUIET": "1",
+    "STRATA_GU_LANES": "16",
+    "STRATA_DOWN_LANES": "4",
+    "SYCL_PROGRAM_COMPILE_OPTIONS": "-cl-fp32-correctly-rounded-divide-sqrt",
+    "STRATA_MTP_LAST_DRAFT_MIN_P": "0.6",
+    "STRATA_GU_IQ2S_SG16": "1",
+    "STRATA_GU_IQ2S_SINGLE_GROUP": "1",
+    "STRATA_GDN_Q8_TAIL": "1",
+    "STRATA_QSA_Q8_TAIL": "1",
+    "STRATA_NO_BATCH_KV_STEP": "1",
+    "STRATA_MTP_CUM_MIN_P": "0",
+    "STRATA_IQ_MT_MIN": "1",
+    "STRATA_SPEC_COUPLED": "1"
+  },
+  "screen": [],
+  "confirm": [
+    {
+      "side": "baseline",
+      "runtime_info": "INFO context=8192 kv=fp16 kv_resident=0 expert_slots=4191 expert_cache_mib=5760 expert_slots_primary=4191 expert_cache_primary_mib=5760 spec=6 mtp_max=4 lookup=3 vram_free_mib=4406 cvec=0 arena_mib=33812 pool_workers=21 pcie_frac=0.00 spec_min_p=0.50 conversation_cache_mib=0 conversation_cache_slots=4 conversation_cache_min_free_mib=2560 tail_role_token=-1 vram_elastic=0 engine=0.1.39-sycl",
+      "warmup": [
+        {
+          "tokens": [
+            29108,
+            4009,
+            27891,
+            8964,
+            579,
+            16078,
+            321,
+            1100,
+            9872,
+            303,
+            660,
+            17425,
+            11,
+            694,
+            22602,
+            6105
+          ],
+          "generated": 16,
+          "prompt_tokens": 23,
+          "prompt_ms": 1016.4,
+          "decode_ms": 1108.3,
+          "finish": "length",
+          "accepted": 9,
+          "offered": 15,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 1094.8142999986885,
+          "done": "DONE 16 23 1016.4 1108.3 length 9 15 0 0 0 0 0 0.0 23 0"
+        },
+        {
+          "tokens": [
+            29108,
+            4009,
+            27891,
+            8964,
+            579,
+            16078,
+            321,
+            1100,
+            9872,
+            303,
+            660,
+            17425,
+            11,
+            694,
+            22602,
+            6105
+          ],
+          "generated": 16,
+          "prompt_tokens": 23,
+          "prompt_ms": 943.3,
+          "decode_ms": 1087.7,
+          "finish": "length",
+          "accepted": 9,
+          "offered": 15,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 1018.0097999982536,
+          "done": "DONE 16 23 943.3 1087.7 length 9 15 0 0 0 0 0 0.0 23 0"
+        }
+      ],
+      "samples": {
+        "4": [
+          {
+            "tokens": [
+              29108,
+              4009,
+              27891,
+              8964
+            ],
+            "generated": 4,
+            "prompt_tokens": 23,
+            "prompt_ms": 933.2,
+            "decode_ms": 259.5,
+            "finish": "length",
+            "accepted": 2,
+            "offered": 3,
+            "reused": 0,
+            "resume": 0,
+            "ttft_ms": 1007.5056999921799,
+            "done": "DONE 4 23 933.2 259.5 length 2 3 0 0 0 0 0 0.0 23 0"
+          },
+          {
+            "tokens": [
+              29108,
+              4009,
+              27891,
+              8964
+            ],
+            "generated": 4,
+            "prompt_tokens": 23,
+            "prompt_ms": 941.2,
+            "decode_ms": 265.4,
+            "finish": "length",
+            "accepted": 2,
+            "offered": 3,
+            "reused": 0,
+            "resume": 0,
+            "ttft_ms": 1017.1391000039876,
+            "done": "DONE 4 23 941.2 265.4 length 2 3 0 0 0 0 0 0.0 23 0"
+          },
+          {
+            "tokens": [
+              29108,
+              4009,
+              27891,
+              8964
+            ],
+            "generated": 4,
+            "prompt_tokens": 23,
+            "prompt_ms": 943.4,
+            "decode_ms": 259.6,
+            "finish": "length",
+            "accepted": 2,
+            "offered": 3,
+            "reused": 0,
+            "resume": 0,
+            "ttft_ms": 1018.275900001754,
+            "done": "DONE 4 23 943.4 259.6 length 2 3 0 0 0 0 0 0.0 23 0"
+          }
+        ],
+        "6": [
+          {
+            "tokens": [
+              29108,
+              4009,
+              27891,
+              8964,
+              579,
+              16078
+            ],
+            "generated": 6,
+            "prompt_tokens": 23,
+            "prompt_ms": 933.3,
+            "decode_ms": 449.3,
+            "finish": "length",
+            "accepted": 5,
+            "offered": 6,
+            "reused": 0,
+            "resume": 0,
+            "ttft_ms": 1008.2002999988617,
+            "done": "DONE 6 23 933.3 449.3 length 5 6 0 0 0 0 0 0.0 23 0"
+          },
+          {
+            "tokens": [
+              29108,
+              4009,
+              27891,
+              8964,
+              579,
+              16078
+            ],
+            "generated": 6,
+            "prompt_tokens": 23,
+            "prompt_ms": 942.0,
+            "decode_ms": 450.2,
+            "finish": "length",
+            "accepted": 5,
+            "offered": 6,
+            "reused": 0,
+            "resume": 0,
+            "ttft_ms": 1017.9424000089057,
+            "done": "DONE 6 23 942.0 450.2 length 5 6 0 0 0 0 0 0.0 23 0"
+          },
+          {
+            "tokens": [
+              29108,
+              4009,
+              27891,
+              8964,
+              579,
+              16078
+            ],
+            "generated": 6,
+            "prompt_tokens": 23,
+            "prompt_ms": 941.1,
+            "decode_ms": 443.7,
+            "finish": "length",
+            "accepted": 5,
+            "offered": 6,
+            "reused": 0,
+            "resume": 0,
+            "ttft_ms": 1015.735200009658,
+            "done": "DONE 6 23 941.1 443.7 length 5 6 0 0 0 0 0 0.0 23 0"
+          }
+        ],
+        "16": [
+          {
+            "tokens": [
+              29108,
+              4009,
+              27891,
+              8964,
+              579,
+              16078,
+              321,
+              1100,
+              9872,
+              303,
+              660,
+              17425,
+              11,
+              694,
+              22602,
+              6105
+            ],
+            "generated": 16,
+            "prompt_tokens": 23,
+            "prompt_ms": 935.1,
+            "decode_ms": 1088.1,
+            "finish": "length",
+            "accepted": 9,
+            "offered": 15,
+            "reused": 0,
+            "resume": 0,
+            "ttft_ms": 1009.6843999926932,
+            "done": "DONE 16 23 935.1 1088.1 length 9 15 0 0 0 0 0 0.0 23 0"
+          },
+          {
+            "tokens": [
+              29108,
+              4009,
+              27891,
+              8964,
+              579,
+              16078,
+              321,
+              1100,
+              9872,
+              303,
+              660,
+              17425,
+              11,
+              694,
+              22602,
+              6105
+            ],
+            "generated": 16,
+            "prompt_tokens": 23,
+            "prompt_ms": 950.4,
+            "decode_ms": 1087.6,
+            "finish": "length",
+            "accepted": 9,
+            "offered": 15,
+            "reused": 0,
+            "resume": 0,
+            "ttft_ms": 1026.4018000016222,
+            "done": "DONE 16 23 950.4 1087.6 length 9 15 0 0 0 0 0 0.0 23 0"
+          },
+          {
+            "tokens": [
+              29108,
+              4009,
+              27891,
+              8964,
+              579,
+              16078,
+              321,
+              1100,
+              9872,
+              303,
+              660,
+              17425,
+              11,
+              694,
+              22602,
+              6105
+            ],
+            "generated": 16,
+            "prompt_tokens": 23,
+            "prompt_ms": 934.2,
+            "decode_ms": 1094.4,
+            "finish": "length",
+            "accepted": 9,
+            "offered": 15,
+            "reused": 0,
+            "resume": 0,
+            "ttft_ms": 1009.1668999957619,
+            "done": "DONE 16 23 934.2 1094.4 length 9 15 0 0 0 0 0 0.0 23 0"
+          }
+        ]
+      },
+      "medians": {
+        "4": {
+          "decode_ms": 259.6,
+          "prompt_ms": 941.2,
+          "ttft_ms": 1017.1391000039876
+        },
+        "6": {
+          "decode_ms": 449.3,
+          "prompt_ms": 941.1,
+          "ttft_ms": 1015.735200009658
+        },
+        "16": {
+          "decode_ms": 1088.1,
+          "prompt_ms": 935.1,
+          "ttft_ms": 1009.6843999926932
+        }
+      }
+    },
+    {
+      "side": "candidate",
+      "runtime_info": "INFO context=8192 kv=fp16 kv_resident=0 expert_slots=4191 expert_cache_mib=5760 expert_slots_primary=4191 expert_cache_primary_mib=5760 spec=6 mtp_max=4 lookup=3 vram_free_mib=4402 cvec=0 arena_mib=33812 pool_workers=21 pcie_frac=0.00 spec_min_p=0.50 conversation_cache_mib=0 conversation_cache_slots=4 conversation_cache_min_free_mib=2560 tail_role_token=-1 vram_elastic=0 engine=0.1.39-sycl",
+      "warmup": [
+        {
+          "tokens": [
+            29108,
+            4009,
+            27891,
+            8964,
+            579,
+            16078,
+            321,
+            1100,
+            9872,
+            303,
+            660,
+            17425,
+            11,
+            694,
+            22602,
+            6105
+          ],
+          "generated": 16,
+          "prompt_tokens": 23,
+          "prompt_ms": 1020.2,
+          "decode_ms": 1021.7,
+          "finish": "length",
+          "accepted": 9,
+          "offered": 12,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 1098.6728999996558,
+          "done": "DONE 16 23 1020.2 1021.7 length 9 12 0 0 0 0 0 0.0 23 0"
+        },
+        {
+          "tokens": [
+            29108,
+            4009,
+            27891,
+            8964,
+            579,
+            16078,
+            321,
+            1100,
+            9872,
+            303,
+            660,
+            17425,
+            11,
+            694,
+            22602,
+            6105
+          ],
+          "generated": 16,
+          "prompt_tokens": 23,
+          "prompt_ms": 939.4,
+          "decode_ms": 1011.3,
+          "finish": "length",
+          "accepted": 9,
+          "offered": 12,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 1014.2728999926476,
+          "done": "DONE 16 23 939.4 1011.3 length 9 12 0 0 0 0 0 0.0 23 0"
+        }
+      ],
+      "samples": {
+        "4": [
+          {
+            "tokens": [
+              29108,
+              4009,
+              27891,
+              8964
+            ],
+            "generated": 4,
+            "prompt_tokens": 23,
+            "prompt_ms": 933.6,
+            "decode_ms": 242.4,
+            "finish": "length",
+            "accepted": 2,
+            "offered": 2,
+            "reused": 0,
+            "resume": 0,
+            "ttft_ms": 1007.9452000063611,
+            "done": "DONE 4 23 933.6 242.4 length 2 2 0 0 0 0 0 0.0 23 0"
+          },
+          {
+            "tokens": [
+              29108,
+              4009,
+              27891,
+              8964
+            ],
+            "generated": 4,
+            "prompt_tokens": 23,
+            "prompt_ms": 934.1,
+            "decode_ms": 239.3,
+            "finish": "length",
+            "accepted": 2,
+            "offered": 2,
+            "reused": 0,
+            "resume": 0,
+            "ttft_ms": 1008.3475999999791,
+            "done": "DONE 4 23 934.1 239.3 length 2 2 0 0 0 0 0 0.0 23 0"
+          },
+          {
+            "tokens": [
+              29108,
+              4009,
+              27891,
+              8964
+            ],
+            "generated": 4,
+            "prompt_tokens": 23,
+            "prompt_ms": 943.8,
+            "decode_ms": 241.0,
+            "finish": "length",
+            "accepted": 2,
+            "offered": 2,
+            "reused": 0,
+            "resume": 0,
+            "ttft_ms": 1019.4410000112839,
+            "done": "DONE 4 23 943.8 241.0 length 2 2 0 0 0 0 0 0.0 23 0"
+          }
+        ],
+        "6": [
+          {
+            "tokens": [
+              29108,
+              4009,
+              27891,
+              8964,
+              579,
+              16078
+            ],
+            "generated": 6,
+            "prompt_tokens": 23,
+            "prompt_ms": 936.0,
+            "decode_ms": 406.1,
+            "finish": "length",
+            "accepted": 3,
+            "offered": 4,
+            "reused": 0,
+            "resume": 0,
+            "ttft_ms": 1010.6107000028715,
+            "done": "DONE 6 23 936.0 406.1 length 3 4 0 0 0 0 0 0.0 23 0"
+          },
+          {
+            "tokens": [
+              29108,
+              4009,
+              27891,
+              8964,
+              579,
+              16078
+            ],
+            "generated": 6,
+            "prompt_tokens": 23,
+            "prompt_ms": 937.6,
+            "decode_ms": 397.7,
+            "finish": "length",
+            "accepted": 3,
+            "offered": 4,
+            "reused": 0,
+            "resume": 0,
+            "ttft_ms": 1011.9524999900023,
+            "done": "DONE 6 23 937.6 397.7 length 3 4 0 0 0 0 0 0.0 23 0"
+          },
+          {
+            "tokens": [
+              29108,
+              4009,
+              27891,
+              8964,
+              579,
+              16078
+            ],
+            "generated": 6,
+            "prompt_tokens": 23,
+            "prompt_ms": 942.0,
+            "decode_ms": 402.7,
+            "finish": "length",
+            "accepted": 3,
+            "offered": 4,
+            "reused": 0,
+            "resume": 0,
+            "ttft_ms": 1017.3853000014788,
+            "done": "DONE 6 23 942.0 402.7 length 3 4 0 0 0 0 0 0.0 23 0"
+          }
+        ],
+        "16": [
+          {
+            "tokens": [
+              29108,
+              4009,
+              27891,
+              8964,
+              579,
+              16078,
+              321,
+              1100,
+              9872,
+              303,
+              660,
+              17425,
+              11,
+              694,
+              22602,
+              6105
+            ],
+            "generated": 16,
+            "prompt_tokens": 23,
+            "prompt_ms": 933.9,
+            "decode_ms": 1008.9,
+            "finish": "length",
+            "accepted": 9,
+            "offered": 12,
+            "reused": 0,
+            "resume": 0,
+            "ttft_ms": 1008.5625999927288,
+            "done": "DONE 16 23 933.9 1008.9 length 9 12 0 0 0 0 0 0.0 23 0"
+          },
+          {
+            "tokens": [
+              29108,
+              4009,
+              27891,
+              8964,
+              579,
+              16078,
+              321,
+              1100,
+              9872,
+              303,
+              660,
+              17425,
+              11,
+              694,
+              22602,
+              6105
+            ],
+            "generated": 16,
+            "prompt_tokens": 23,
+            "prompt_ms": 943.6,
+            "decode_ms": 1020.2,
+            "finish": "length",
+            "accepted": 9,
+            "offered": 12,
+            "reused": 0,
+            "resume": 0,
+            "ttft_ms": 1018.6911000055261,
+            "done": "DONE 16 23 943.6 1020.2 length 9 12 0 0 0 0 0 0.0 23 0"
+          },
+          {
+            "tokens": [
+              29108,
+              4009,
+              27891,
+              8964,
+              579,
+              16078,
+              321,
+              1100,
+              9872,
+              303,
+              660,
+              17425,
+              11,
+              694,
+              22602,
+              6105
+            ],
+            "generated": 16,
+            "prompt_tokens": 23,
+            "prompt_ms": 936.7,
+            "decode_ms": 1011.1,
+            "finish": "length",
+            "accepted": 9,
+            "offered": 12,
+            "reused": 0,
+            "resume": 0,
+            "ttft_ms": 1011.0813000064809,
+            "done": "DONE 16 23 936.7 1011.1 length 9 12 0 0 0 0 0 0.0 23 0"
+          }
+        ]
+      },
+      "medians": {
+        "4": {
+          "decode_ms": 241.0,
+          "prompt_ms": 934.1,
+          "ttft_ms": 1008.3475999999791
+        },
+        "6": {
+          "decode_ms": 402.7,
+          "prompt_ms": 937.6,
+          "ttft_ms": 1011.9524999900023
+        },
+        "16": {
+          "decode_ms": 1011.1,
+          "prompt_ms": 936.7,
+          "ttft_ms": 1011.0813000064809
+        }
+      }
+    },
+    {
+      "side": "baseline",
+      "runtime_info": "INFO context=8192 kv=fp16 kv_resident=0 expert_slots=4191 expert_cache_mib=5760 expert_slots_primary=4191 expert_cache_primary_mib=5760 spec=6 mtp_max=4 lookup=3 vram_free_mib=4400 cvec=0 arena_mib=33812 pool_workers=21 pcie_frac=0.00 spec_min_p=0.50 conversation_cache_mib=0 conversation_cache_slots=4 conversation_cache_min_free_mib=2560 tail_role_token=-1 vram_elastic=0 engine=0.1.39-sycl",
+      "warmup": [
+        {
+          "tokens": [
+            29108,
+            4009,
+            27891,
+            8964,
+            579,
+            16078,
+            321,
+            1100,
+            9872,
+            303,
+            660,
+            17425,
+            11,
+            694,
+            22602,
+            6105
+          ],
+          "generated": 16,
+          "prompt_tokens": 23,
+          "prompt_ms": 1034.8,
+          "decode_ms": 1110.6,
+          "finish": "length",
+          "accepted": 9,
+          "offered": 15,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 1115.8829999912996,
+          "done": "DONE 16 23 1034.8 1110.6 length 9 15 0 0 0 0 0 0.0 23 0"
+        },
+        {
+          "tokens": [
+            29108,
+            4009,
+            27891,
+            8964,
+            579,
+            16078,
+            321,
+            1100,
+            9872,
+            303,
+            660,
+            17425,
+            11,
+            694,
+            22602,
+            6105
+          ],
+          "generated": 16,
+          "prompt_tokens": 23,
+          "prompt_ms": 937.5,
+          "decode_ms": 1093.9,
+          "finish": "length",
+          "accepted": 9,
+          "offered": 15,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 1012.3656000068877,
+          "done": "DONE 16 23 937.5 1093.9 length 9 15 0 0 0 0 0 0.0 23 0"
+        }
+      ],
+      "samples": {
+        "4": [
+          {
+            "tokens": [
+              29108,
+              4009,
+              27891,
+              8964
+            ],
+            "generated": 4,
+            "prompt_tokens": 23,
+            "prompt_ms": 939.7,
+            "decode_ms": 259.0,
+            "finish": "length",
+            "accepted": 2,
+            "offered": 3,
+            "reused": 0,
+            "resume": 0,
+            "ttft_ms": 1014.1317000088748,
+            "done": "DONE 4 23 939.7 259.0 length 2 3 0 0 0 0 0 0.0 23 0"
+          },
+          {
+            "tokens": [
+              29108,
+              4009,
+              27891,
+              8964
+            ],
+            "generated": 4,
+            "prompt_tokens": 23,
+            "prompt_ms": 939.5,
+            "decode_ms": 260.6,
+            "finish": "length",
+            "accepted": 2,
+            "offered": 3,
+            "reused": 0,
+            "resume": 0,
+            "ttft_ms": 1013.9858000038657,
+            "done": "DONE 4 23 939.5 260.6 length 2 3 0 0 0 0 0 0.0 23 0"
+          },
+          {
+            "tokens": [
+              29108,
+              4009,
+              27891,
+              8964
+            ],
+            "generated": 4,
+            "prompt_tokens": 23,
+            "prompt_ms": 937.9,
+            "decode_ms": 260.6,
+            "finish": "length",
+            "accepted": 2,
+            "offered": 3,
+            "reused": 0,
+            "resume": 0,
+            "ttft_ms": 1012.4898000067333,
+            "done": "DONE 4 23 937.9 260.6 length 2 3 0 0 0 0 0 0.0 23 0"
+          }
+        ],
+        "6": [
+          {
+            "tokens": [
+              29108,
+              4009,
+              27891,
+              8964,
+              579,
+              16078
+            ],
+            "generated": 6,
+            "prompt_tokens": 23,
+            "prompt_ms": 944.9,
+            "decode_ms": 449.4,
+            "finish": "length",
+            "accepted": 5,
+            "offered": 6,
+            "reused": 0,
+            "resume": 0,
+            "ttft_ms": 1019.7236000094563,
+            "done": "DONE 6 23 944.9 449.4 length 5 6 0 0 0 0 0 0.0 23 0"
+          },
+          {
+            "tokens": [
+              29108,
+              4009,
+              27891,
+              8964,
+              579,
+              16078
+            ],
+            "generated": 6,
+            "prompt_tokens": 23,
+            "prompt_ms": 936.8,
+            "decode_ms": 443.0,
+            "finish": "length",
+            "accepted": 5,
+            "offered": 6,
+            "reused": 0,
+            "resume": 0,
+            "ttft_ms": 1011.2108999892371,
+            "done": "DONE 6 23 936.8 443.0 length 5 6 0 0 0 0 0 0.0 23 0"
+          },
+          {
+            "tokens": [
+              29108,
+              4009,
+              27891,
+              8964,
+              579,
+              16078
+            ],
+            "generated": 6,
+            "prompt_tokens": 23,
+            "prompt_ms": 935.9,
+            "decode_ms": 446.5,
+            "finish": "length",
+            "accepted": 5,
+            "offered": 6,
+            "reused": 0,
+            "resume": 0,
+            "ttft_ms": 1010.1371999917319,
+            "done": "DONE 6 23 935.9 446.5 length 5 6 0 0 0 0 0 0.0 23 0"
+          }
+        ],
+        "16": [
+          {
+            "tokens": [
+              29108,
+              4009,
+              27891,
+              8964,
+              579,
+              16078,
+              321,
+              1100,
+              9872,
+              303,
+              660,
+              17425,
+              11,
+              694,
+              22602,
+              6105
+            ],
+            "generated": 16,
+            "prompt_tokens": 23,
+            "prompt_ms": 941.6,
+            "decode_ms": 1085.6,
+            "finish": "length",
+            "accepted": 9,
+            "offered": 15,
+            "reused": 0,
+            "resume": 0,
+            "ttft_ms": 1016.0744000022532,
+            "done": "DONE 16 23 941.6 1085.6 length 9 15 0 0 0 0 0 0.0 23 0"
+          },
+          {
+            "tokens": [
+              29108,
+              4009,
+              27891,
+              8964,
+              579,
+              16078,
+              321,
+              1100,
+              9872,
+              303,
+              660,
+              17425,
+              11,
+              694,
+              22602,
+              6105
+            ],
+            "generated": 16,
+            "prompt_tokens": 23,
+            "prompt_ms": 941.0,
+            "decode_ms": 1092.1,
+            "finish": "length",
+            "accepted": 9,
+            "offered": 15,
+            "reused": 0,
+            "resume": 0,
+            "ttft_ms": 1016.2782999977935,
+            "done": "DONE 16 23 941.0 1092.1 length 9 15 0 0 0 0 0 0.0 23 0"
+          },
+          {
+            "tokens": [
+              29108,
+              4009,
+              27891,
+              8964,
+              579,
+              16078,
+              321,
+              1100,
+              9872,
+              303,
+              660,
+              17425,
+              11,
+              694,
+              22602,
+              6105
+            ],
+            "generated": 16,
+            "prompt_tokens": 23,
+            "prompt_ms": 942.4,
+            "decode_ms": 1088.7,
+            "finish": "length",
+            "accepted": 9,
+            "offered": 15,
+            "reused": 0,
+            "resume": 0,
+            "ttft_ms": 1016.8005000014091,
+            "done": "DONE 16 23 942.4 1088.7 length 9 15 0 0 0 0 0 0.0 23 0"
+          }
+        ]
+      },
+      "medians": {
+        "4": {
+          "decode_ms": 260.6,
+          "prompt_ms": 939.5,
+          "ttft_ms": 1013.9858000038657
+        },
+        "6": {
+          "decode_ms": 446.5,
+          "prompt_ms": 936.8,
+          "ttft_ms": 1011.2108999892371
+        },
+        "16": {
+          "decode_ms": 1088.7,
+          "prompt_ms": 941.6,
+          "ttft_ms": 1016.2782999977935
+        }
+      }
+    },
+    {
+      "side": "candidate",
+      "runtime_info": "INFO context=8192 kv=fp16 kv_resident=0 expert_slots=4191 expert_cache_mib=5760 expert_slots_primary=4191 expert_cache_primary_mib=5760 spec=6 mtp_max=4 lookup=3 vram_free_mib=4414 cvec=0 arena_mib=33812 pool_workers=21 pcie_frac=0.00 spec_min_p=0.50 conversation_cache_mib=0 conversation_cache_slots=4 conversation_cache_min_free_mib=2560 tail_role_token=-1 vram_elastic=0 engine=0.1.39-sycl",
+      "warmup": [
+        {
+          "tokens": [
+            29108,
+            4009,
+            27891,
+            8964,
+            579,
+            16078,
+            321,
+            1100,
+            9872,
+            303,
+            660,
+            17425,
+            11,
+            694,
+            22602,
+            6105
+          ],
+          "generated": 16,
+          "prompt_tokens": 23,
+          "prompt_ms": 1022.1,
+          "decode_ms": 1029.7,
+          "finish": "length",
+          "accepted": 9,
+          "offered": 12,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 1101.968200004194,
+          "done": "DONE 16 23 1022.1 1029.7 length 9 12 0 0 0 0 0 0.0 23 0"
+        },
+        {
+          "tokens": [
+            29108,
+            4009,
+            27891,
+            8964,
+            579,
+            16078,
+            321,
+            1100,
+            9872,
+            303,
+            660,
+            17425,
+            11,
+            694,
+            22602,
+            6105
+          ],
+          "generated": 16,
+          "prompt_tokens": 23,
+          "prompt_ms": 934.7,
+          "decode_ms": 1008.1,
+          "finish": "length",
+          "accepted": 9,
+          "offered": 12,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 1009.3781000032322,
+          "done": "DONE 16 23 934.7 1008.1 length 9 12 0 0 0 0 0 0.0 23 0"
+        }
+      ],
+      "samples": {
+        "4": [
+          {
+            "tokens": [
+              29108,
+              4009,
+              27891,
+              8964
+            ],
+            "generated": 4,
+            "prompt_tokens": 23,
+            "prompt_ms": 941.0,
+            "decode_ms": 246.7,
+            "finish": "length",
+            "accepted": 2,
+            "offered": 2,
+            "reused": 0,
+            "resume": 0,
+            "ttft_ms": 1016.6061999916565,
+            "done": "DONE 4 23 941.0 246.7 length 2 2 0 0 0 0 0 0.0 23 0"
+          },
+          {
+            "tokens": [
+              29108,
+              4009,
+              27891,
+              8964
+            ],
+            "generated": 4,
+            "prompt_tokens": 23,
+            "prompt_ms": 937.2,
+            "decode_ms": 241.0,
+            "finish": "length",
+            "accepted": 2,
+            "offered": 2,
+            "reused": 0,
+            "resume": 0,
+            "ttft_ms": 1012.3380000004545,
+            "done": "DONE 4 23 937.2 241.0 length 2 2 0 0 0 0 0 0.0 23 0"
+          },
+          {
+            "tokens": [
+              29108,
+              4009,
+              27891,
+              8964
+            ],
+            "generated": 4,
+            "prompt_tokens": 23,
+            "prompt_ms": 934.1,
+            "decode_ms": 241.8,
+            "finish": "length",
+            "accepted": 2,
+            "offered": 2,
+            "reused": 0,
+            "resume": 0,
+            "ttft_ms": 1009.23279998824,
+            "done": "DONE 4 23 934.1 241.8 length 2 2 0 0 0 0 0 0.0 23 0"
+          }
+        ],
+        "6": [
+          {
+            "tokens": [
+              29108,
+              4009,
+              27891,
+              8964,
+              579,
+              16078
+            ],
+            "generated": 6,
+            "prompt_tokens": 23,
+            "prompt_ms": 937.4,
+            "decode_ms": 410.5,
+            "finish": "length",
+            "accepted": 3,
+            "offered": 4,
+            "reused": 0,
+            "resume": 0,
+            "ttft_ms": 1011.853499992867,
+            "done": "DONE 6 23 937.4 410.5 length 3 4 0 0 0 0 0 0.0 23 0"
+          },
+          {
+            "tokens": [
+              29108,
+              4009,
+              27891,
+              8964,
+              579,
+              16078
+            ],
+            "generated": 6,
+            "prompt_tokens": 23,
+            "prompt_ms": 945.4,
+            "decode_ms": 397.8,
+            "finish": "length",
+            "accepted": 3,
+            "offered": 4,
+            "reused": 0,
+            "resume": 0,
+            "ttft_ms": 1019.9560999899404,
+            "done": "DONE 6 23 945.4 397.8 length 3 4 0 0 0 0 0 0.0 23 0"
+          },
+          {
+            "tokens": [
+              29108,
+              4009,
+              27891,
+              8964,
+              579,
+              16078
+            ],
+            "generated": 6,
+            "prompt_tokens": 23,
+            "prompt_ms": 934.4,
+            "decode_ms": 398.8,
+            "finish": "length",
+            "accepted": 3,
+            "offered": 4,
+            "reused": 0,
+            "resume": 0,
+            "ttft_ms": 1009.2962000053376,
+            "done": "DONE 6 23 934.4 398.8 length 3 4 0 0 0 0 0 0.0 23 0"
+          }
+        ],
+        "16": [
+          {
+            "tokens": [
+              29108,
+              4009,
+              27891,
+              8964,
+              579,
+              16078,
+              321,
+              1100,
+              9872,
+              303,
+              660,
+              17425,
+              11,
+              694,
+              22602,
+              6105
+            ],
+            "generated": 16,
+            "prompt_tokens": 23,
+            "prompt_ms": 935.8,
+            "decode_ms": 1022.3,
+            "finish": "length",
+            "accepted": 9,
+            "offered": 12,
+            "reused": 0,
+            "resume": 0,
+            "ttft_ms": 1011.5432000020519,
+            "done": "DONE 16 23 935.8 1022.3 length 9 12 0 0 0 0 0 0.0 23 0"
+          },
+          {
+            "tokens": [
+              29108,
+              4009,
+              27891,
+              8964,
+              579,
+              16078,
+              321,
+              1100,
+              9872,
+              303,
+              660,
+              17425,
+              11,
+              694,
+              22602,
+              6105
+            ],
+            "generated": 16,
+            "prompt_tokens": 23,
+            "prompt_ms": 943.8,
+            "decode_ms": 1012.9,
+            "finish": "length",
+            "accepted": 9,
+            "offered": 12,
+            "reused": 0,
+            "resume": 0,
+            "ttft_ms": 1018.8602999987779,
+            "done": "DONE 16 23 943.8 1012.9 length 9 12 0 0 0 0 0 0.0 23 0"
+          },
+          {
+            "tokens": [
+              29108,
+              4009,
+              27891,
+              8964,
+              579,
+              16078,
+              321,
+              1100,
+              9872,
+              303,
+              660,
+              17425,
+              11,
+              694,
+              22602,
+              6105
+            ],
+            "generated": 16,
+            "prompt_tokens": 23,
+            "prompt_ms": 938.9,
+            "decode_ms": 1023.8,
+            "finish": "length",
+            "accepted": 9,
+            "offered": 12,
+            "reused": 0,
+            "resume": 0,
+            "ttft_ms": 1013.9546999998856,
+            "done": "DONE 16 23 938.9 1023.8 length 9 12 0 0 0 0 0 0.0 23 0"
+          }
+        ]
+      },
+      "medians": {
+        "4": {
+          "decode_ms": 241.8,
+          "prompt_ms": 937.2,
+          "ttft_ms": 1012.3380000004545
+        },
+        "6": {
+          "decode_ms": 398.8,
+          "prompt_ms": 937.4,
+          "ttft_ms": 1011.853499992867
+        },
+        "16": {
+          "decode_ms": 1022.3,
+          "prompt_ms": 938.9,
+          "ttft_ms": 1013.9546999998856
+        }
+      }
+    },
+    {
+      "side": "baseline",
+      "runtime_info": "INFO context=8192 kv=fp16 kv_resident=0 expert_slots=4191 expert_cache_mib=5760 expert_slots_primary=4191 expert_cache_primary_mib=5760 spec=6 mtp_max=4 lookup=3 vram_free_mib=4412 cvec=0 arena_mib=33812 pool_workers=21 pcie_frac=0.00 spec_min_p=0.50 conversation_cache_mib=0 conversation_cache_slots=4 conversation_cache_min_free_mib=2560 tail_role_token=-1 vram_elastic=0 engine=0.1.39-sycl",
+      "warmup": [
+        {
+          "tokens": [
+            29108,
+            4009,
+            27891,
+            8964,
+            579,
+            16078,
+            321,
+            1100,
+            9872,
+            303,
+            660,
+            17425,
+            11,
+            694,
+            22602,
+            6105
+          ],
+          "generated": 16,
+          "prompt_tokens": 23,
+          "prompt_ms": 1022.3,
+          "decode_ms": 1115.6,
+          "finish": "length",
+          "accepted": 9,
+          "offered": 15,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 1103.4118000097806,
+          "done": "DONE 16 23 1022.3 1115.6 length 9 15 0 0 0 0 0 0.0 23 0"
+        },
+        {
+          "tokens": [
+            29108,
+            4009,
+            27891,
+            8964,
+            579,
+            16078,
+            321,
+            1100,
+            9872,
+            303,
+            660,
+            17425,
+            11,
+            694,
+            22602,
+            6105
+          ],
+          "generated": 16,
+          "prompt_tokens": 23,
+          "prompt_ms": 935.3,
+          "decode_ms": 1084.7,
+          "finish": "length",
+          "accepted": 9,
+          "offered": 15,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 1010.0344000093173,
+          "done": "DONE 16 23 935.3 1084.7 length 9 15 0 0 0 0 0 0.0 23 0"
+        }
+      ],
+      "samples": {
+        "4": [
+          {
+            "tokens": [
+              29108,
+              4009,
+              27891,
+              8964
+            ],
+            "generated": 4,
+            "prompt_tokens": 23,
+            "prompt_ms": 933.8,
+            "decode_ms": 262.5,
+            "finish": "length",
+            "accepted": 2,
+            "offered": 3,
+            "reused": 0,
+            "resume": 0,
+            "ttft_ms": 1009.0271000080975,
+            "done": "DONE 4 23 933.8 262.5 length 2 3 0 0 0 0 0 0.0 23 0"
+          },
+          {
+            "tokens": [
+              29108,
+              4009,
+              27891,
+              8964
+            ],
+            "generated": 4,
+            "prompt_tokens": 23,
+            "prompt_ms": 941.2,
+            "decode_ms": 259.3,
+            "finish": "length",
+            "accepted": 2,
+            "offered": 3,
+            "reused": 0,
+            "resume": 0,
+            "ttft_ms": 1015.7369999942603,
+            "done": "DONE 4 23 941.2 259.3 length 2 3 0 0 0 0 0 0.0 23 0"
+          },
+          {
+            "tokens": [
+              29108,
+              4009,
+              27891,
+              8964
+            ],
+            "generated": 4,
+            "prompt_tokens": 23,
+            "prompt_ms": 935.6,
+            "decode_ms": 260.3,
+            "finish": "length",
+            "accepted": 2,
+            "offered": 3,
+            "reused": 0,
+            "resume": 0,
+            "ttft_ms": 1009.9874000006821,
+            "done": "DONE 4 23 935.6 260.3 length 2 3 0 0 0 0 0 0.0 23 0"
+          }
+        ],
+        "6": [
+          {
+            "tokens": [
+              29108,
+              4009,
+              27891,
+              8964,
+              579,
+              16078
+            ],
+            "generated": 6,
+            "prompt_tokens": 23,
+            "prompt_ms": 933.5,
+            "decode_ms": 448.7,
+            "finish": "length",
+            "accepted": 5,
+            "offered": 6,
+            "reused": 0,
+            "resume": 0,
+            "ttft_ms": 1007.9704000090715,
+            "done": "DONE 6 23 933.5 448.7 length 5 6 0 0 0 0 0 0.0 23 0"
+          },
+          {
+            "tokens": [
+              29108,
+              4009,
+              27891,
+              8964,
+              579,
+              16078
+            ],
+            "generated": 6,
+            "prompt_tokens": 23,
+            "prompt_ms": 947.4,
+            "decode_ms": 444.0,
+            "finish": "length",
+            "accepted": 5,
+            "offered": 6,
+            "reused": 0,
+            "resume": 0,
+            "ttft_ms": 1022.1751000062795,
+            "done": "DONE 6 23 947.4 444.0 length 5 6 0 0 0 0 0 0.0 23 0"
+          },
+          {
+            "tokens": [
+              29108,
+              4009,
+              27891,
+              8964,
+              579,
+              16078
+            ],
+            "generated": 6,
+            "prompt_tokens": 23,
+            "prompt_ms": 933.3,
+            "decode_ms": 442.7,
+            "finish": "length",
+            "accepted": 5,
+            "offered": 6,
+            "reused": 0,
+            "resume": 0,
+            "ttft_ms": 1007.463200003258,
+            "done": "DONE 6 23 933.3 442.7 length 5 6 0 0 0 0 0 0.0 23 0"
+          }
+        ],
+        "16": [
+          {
+            "tokens": [
+              29108,
+              4009,
+              27891,
+              8964,
+              579,
+              16078,
+              321,
+              1100,
+              9872,
+              303,
+              660,
+              17425,
+              11,
+              694,
+              22602,
+              6105
+            ],
+            "generated": 16,
+            "prompt_tokens": 23,
+            "prompt_ms": 933.7,
+            "decode_ms": 1096.4,
+            "finish": "length",
+            "accepted": 9,
+            "offered": 15,
+            "reused": 0,
+            "resume": 0,
+            "ttft_ms": 1007.9053999943426,
+            "done": "DONE 16 23 933.7 1096.4 length 9 15 0 0 0 0 0 0.0 23 0"
+          },
+          {
+            "tokens": [
+              29108,
+              4009,
+              27891,
+              8964,
+              579,
+              16078,
+              321,
+              1100,
+              9872,
+              303,
+              660,
+              17425,
+              11,
+              694,
+              22602,
+              6105
+            ],
+            "generated": 16,
+            "prompt_tokens": 23,
+            "prompt_ms": 944.1,
+            "decode_ms": 1089.7,
+            "finish": "length",
+            "accepted": 9,
+            "offered": 15,
+            "reused": 0,
+            "resume": 0,
+            "ttft_ms": 1019.3327000015415,
+            "done": "DONE 16 23 944.1 1089.7 length 9 15 0 0 0 0 0 0.0 23 0"
+          },
+          {
+            "tokens": [
+              29108,
+              4009,
+              27891,
+              8964,
+              579,
+              16078,
+              321,
+              1100,
+              9872,
+              303,
+              660,
+              17425,
+              11,
+              694,
+              22602,
+              6105
+            ],
+            "generated": 16,
+            "prompt_tokens": 23,
+            "prompt_ms": 935.3,
+            "decode_ms": 1098.2,
+            "finish": "length",
+            "accepted": 9,
+            "offered": 15,
+            "reused": 0,
+            "resume": 0,
+            "ttft_ms": 1009.8468999931356,
+            "done": "DONE 16 23 935.3 1098.2 length 9 15 0 0 0 0 0 0.0 23 0"
+          }
+        ]
+      },
+      "medians": {
+        "4": {
+          "decode_ms": 260.3,
+          "prompt_ms": 935.6,
+          "ttft_ms": 1009.9874000006821
+        },
+        "6": {
+          "decode_ms": 444.0,
+          "prompt_ms": 933.5,
+          "ttft_ms": 1007.9704000090715
+        },
+        "16": {
+          "decode_ms": 1096.4,
+          "prompt_ms": 935.3,
+          "ttft_ms": 1009.8468999931356
+        }
+      }
+    }
+  ],
+  "retry_reason": "Original confirmation has zero eligible cap6 pairs due to adjacent baseline drift >3%; one whole-block retry, identical parameters.",
+  "confirm_summary": {
+    "primary_passed": true,
+    "decode_regressions_over_2pct": [],
+    "comparisons": [
+      {
+        "candidate_run": 1,
+        "cap": 4,
+        "metric": "decode_ms",
+        "baseline": 260.0995194151654,
+        "candidate": 241.0,
+        "throughput_change_pct": 7.925111790525063,
+        "baseline_drift_pct": 0.38520801232666546,
+        "eligible": true
+      },
+      {
+        "candidate_run": 1,
+        "cap": 4,
+        "metric": "prompt_ms",
+        "baseline": 940.3496158344512,
+        "candidate": 934.1,
+        "throughput_change_pct": 0.669052118022817,
+        "baseline_drift_pct": -0.18062048448789225,
+        "eligible": true
+      },
+      {
+        "candidate_run": 1,
+        "cap": 4,
+        "metric": "ttft_ms",
+        "baseline": 1015.5612261369353,
+        "candidate": 1008.3475999999791,
+        "throughput_change_pct": 0.7153908173090473,
+        "baseline_drift_pct": -0.310016594594531,
+        "eligible": true
+      },
+      {
+        "candidate_run": 1,
+        "cap": 6,
+        "metric": "decode_ms",
+        "baseline": 447.89781200626555,
+        "candidate": 402.7,
+        "throughput_change_pct": 11.223693073321472,
+        "baseline_drift_pct": -0.6231916314266672,
+        "eligible": true
+      },
+      {
+        "candidate_run": 1,
+        "cap": 6,
+        "metric": "prompt_ms",
+        "baseline": 938.9475384706006,
+        "candidate": 937.6,
+        "throughput_change_pct": 0.143722106506039,
+        "baseline_drift_pct": -0.4569121241100871,
+        "eligible": true
+      },
+      {
+        "candidate_run": 1,
+        "cap": 6,
+        "metric": "ttft_ms",
+        "baseline": 1013.470525349659,
+        "candidate": 1011.9524999900023,
+        "throughput_change_pct": 0.150009546858354,
+        "baseline_drift_pct": -0.44542121021088343,
+        "eligible": true
+      },
+      {
+        "candidate_run": 1,
+        "cap": 16,
+        "metric": "decode_ms",
+        "baseline": 1088.3999586549055,
+        "candidate": 1011.1,
+        "throughput_change_pct": 7.645134868450754,
+        "baseline_drift_pct": 0.05514199062588432,
+        "eligible": true
+      },
+      {
+        "candidate_run": 1,
+        "cap": 16,
+        "metric": "prompt_ms",
+        "baseline": 938.3443717527164,
+        "candidate": 936.7,
+        "throughput_change_pct": 0.17554945582538561,
+        "baseline_drift_pct": 0.6951128221580616,
+        "eligible": true
+      },
+      {
+        "candidate_run": 1,
+        "cap": 16,
+        "metric": "ttft_ms",
+        "baseline": 1012.9759846900944,
+        "candidate": 1011.0813000064809,
+        "throughput_change_pct": 0.18739192225207812,
+        "baseline_drift_pct": 0.6530654534375291,
+        "eligible": true
+      },
+      {
+        "candidate_run": 3,
+        "cap": 4,
+        "metric": "decode_ms",
+        "baseline": 260.44995680552535,
+        "candidate": 241.8,
+        "throughput_change_pct": 7.712968075072513,
+        "baseline_drift_pct": -0.11511895625480051,
+        "eligible": true
+      },
+      {
+        "candidate_run": 3,
+        "cap": 4,
+        "metric": "prompt_ms",
+        "baseline": 937.5479721059611,
+        "candidate": 937.2,
+        "throughput_change_pct": 0.03712890588571938,
+        "baseline_drift_pct": -0.41511442256518816,
+        "eligible": true
+      },
+      {
+        "candidate_run": 3,
+        "cap": 4,
+        "metric": "ttft_ms",
+        "baseline": 1011.984625270323,
+        "candidate": 1012.3380000004545,
+        "throughput_change_pct": -0.03490679300108823,
+        "baseline_drift_pct": -0.39432504904589605,
+        "eligible": true
+      },
+      {
+        "candidate_run": 3,
+        "cap": 6,
+        "metric": "decode_ms",
+        "baseline": 445.2482453643136,
+        "candidate": 398.8,
+        "throughput_change_pct": 11.64700234812277,
+        "baseline_drift_pct": -0.5599104143337086,
+        "eligible": true
+      },
+      {
+        "candidate_run": 3,
+        "cap": 6,
+        "metric": "prompt_ms",
+        "baseline": 935.1485443500407,
+        "candidate": 937.4,
+        "throughput_change_pct": -0.24018088862378661,
+        "baseline_drift_pct": -0.3522630230572088,
+        "eligible": true
+      },
+      {
+        "candidate_run": 3,
+        "cap": 6,
+        "metric": "ttft_ms",
+        "baseline": 1009.58934986245,
+        "candidate": 1011.853499992867,
+        "throughput_change_pct": -0.22376264255971057,
+        "baseline_drift_pct": -0.32045738235220167,
+        "eligible": true
+      },
+      {
+        "candidate_run": 3,
+        "cap": 16,
+        "metric": "decode_ms",
+        "baseline": 1092.543216536536,
+        "candidate": 1022.3,
+        "throughput_change_pct": 6.871096208210514,
+        "baseline_drift_pct": 0.7072655460641064,
+        "eligible": true
+      },
+      {
+        "candidate_run": 3,
+        "cap": 16,
+        "metric": "prompt_ms",
+        "baseline": 938.4447133422406,
+        "candidate": 938.9,
+        "throughput_change_pct": -0.04849149619335913,
+        "baseline_drift_pct": -0.6690739167374726,
+        "eligible": true
+      },
+      {
+        "candidate_run": 3,
+        "cap": 16,
+        "metric": "ttft_ms",
+        "baseline": 1013.0574962868917,
+        "candidate": 1013.9546999998856,
+        "throughput_change_pct": -0.08848558155448716,
+        "baseline_drift_pct": -0.6328384660650443,
+        "eligible": true
+      }
+    ]
+  },
+  "confirm_passed": true,
+  "raw_sha256": {
+    "confirm-0-baseline.protocol": "994fb3bce4d7433fe92d30f5bac719f9ebd2b21519518a6e0f1283f812a7152a",
+    "confirm-0-baseline.stderr": "68a324a2bb2129f19f28daf029e326b98c2a6124023c0d6f72a4eb2e5d9436f8",
+    "confirm-1-candidate.protocol": "46c2b9017f583df2eea2dfc25f54a62978ad67a280a98045a32acb48eca7930e",
+    "confirm-1-candidate.stderr": "f6aadf7ee98ee82c8b00a7b887073f303652664c6d1b7e2030393a525304dfc4",
+    "confirm-2-baseline.protocol": "9715fc9baf9f075223e9747b8a34668169bc2e533eec115d80c9f9e42462c220",
+    "confirm-2-baseline.stderr": "e3bfdc05108d68e56299c6ceeca9f79f2675af1d7570f43884f14a0e9e5a3ae4",
+    "confirm-3-candidate.protocol": "e8116f0127504694b91d7adf61433ebca485d3d7da6bccab63f291b97b24f778",
+    "confirm-3-candidate.stderr": "321a89c9c032db92e81304787e7a22c233c3ae1d40b9bce9bf5bbe3bb85e139a",
+    "confirm-4-baseline.protocol": "43bf4c54ede39aaaec58b3e4d1eb3720b16fe6f512b9af7644282ca811efca48",
+    "confirm-4-baseline.stderr": "9be30cb696d8042742d12dbee3f0f0c9943e5a4caca693ff42bd5091dc2fddf4"
+  }
+}

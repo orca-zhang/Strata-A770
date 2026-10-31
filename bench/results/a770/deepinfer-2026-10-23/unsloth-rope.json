@@ -1,0 +1,28 @@
+{
+  "repo": "https://github.com/unslothai/unsloth",
+  "commit": "c5482a5b5714f70fd8e376d9be1f38d012af4b13",
+  "url": "https://raw.githubusercontent.com/unslothai/unsloth/c5482a5b5714f70fd8e376d9be1f38d012af4b13/unsloth/kernels/rope_embedding.py",
+  "sha256": "aecdee1f749feba5714e020bb1b44848dccf8a19d4b253208db26dfd17338d4a",
+  "device_type_sha256": "3834bdbf969fd804727acb314ec43bc41bc0bfa89138ed0838df91ccef5ae0b8",
+  "findings": {
+    "torch_xpu_detection": true,
+    "decode_rope_inplace_cuda_only": true,
+    "requires_torch_triton": true,
+    "strata_head_dim": 256,
+    "strata_rotated_dims": 64,
+    "direct_replacement": false,
+    "runtime_benchmark_of_unsloth": false,
+    "adopted": "Retain existing SYCL Norm/RoPE and Q8 store fusion; no upstream code imported."
+  },
+  "article": {
+    "url": "https://unsloth.ai/docs/zh/bo-ke/3x-faster-training-packing",
+    "html_sha256": "04df2867622ca213bf2e8c7d2cd9d6c22c92a0ace75191f4c5bdec2d6e6e7e67",
+    "claims": {
+      "rope_short_microbenchmark_speedup": 1.9,
+      "rope_long_microbenchmark_speedup": 2.3,
+      "training_usual_speedup": 3,
+      "training_includes_packing_and_mlp": true
+    },
+    "strata_measured_speedup_from_article": null
+  }
+}

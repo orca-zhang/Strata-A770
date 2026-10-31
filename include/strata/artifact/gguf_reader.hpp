@@ -26,9 +26,9 @@
 #include <limits>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <vector>
 #include <map>
-#include <set>
 #include <stdexcept>
 #include <algorithm>
 
@@ -355,10 +355,10 @@ public:
     uint64_t alignment() const { return alignment_; }
     const std::string& path() const { return path_; }
 
-    const TensorInfo* find(const std::string& name) const {
-        for (const auto& t : tensors_)
-            if (t.name == name) return &t;
-        return nullptr;
+    const TensorInfo* find(std::string_view name) const {
+        const auto it = std::lower_bound(index_.begin(), index_.end(), name,
+            [](const auto& entry, std::string_view key) { return entry.first < key; });
+        return it != index_.end() && it->first == name ? &tensors_[it->second] : nullptr;
     }
     uint64_t count_type(const char* tn) const {
         uint64_t n = 0;
@@ -434,14 +434,9 @@ private:
             meta_.emplace(std::move(key), read_value(c, t));
         }
         tensors_.reserve((size_t)n_tensors);
-        // GGUF has no index to arbitrate between two tensors of one name: find() is first-match, so a
-        // duplicate would silently win by position.  Refuse the file at open instead, naming both.
-        std::set<std::string> names;
         for (uint64_t i = 0; i < n_tensors; ++i) {
             TensorInfo t;
             t.name = c.str();
-            if (!names.insert(t.name).second)
-                throw std::runtime_error("GGUF: duplicate tensor name '" + t.name + "' in " + path_);
             const uint32_t nd = c.read<uint32_t>();
             if (nd == 0 || nd > 4) throw std::runtime_error("GGUF: bad n_dims for " + t.name);
             t.shape.resize(nd);
@@ -450,6 +445,14 @@ private:
             t.offset = c.read<uint64_t>();
             tensors_.push_back(std::move(t));
         }
+        // ponytail: the directory never changes; one sorted, borrowed-name index replaces per-name nodes.
+        // Build after the final tensor move so even short-string views stay valid; keep file order in tensors_.
+        index_.reserve(tensors_.size());
+        for (size_t i = 0; i < tensors_.size(); ++i) index_.emplace_back(tensors_[i].name, i);
+        std::sort(index_.begin(), index_.end(), [](const auto& a, const auto& b) { return a.first < b.first; });
+        for (size_t i = 1; i < index_.size(); ++i)
+            if (index_[i - 1].first == index_[i].first)
+                throw std::runtime_error("GGUF: duplicate tensor name '" + std::string(index_[i].first) + "' in " + path_);
         uint64_t align = 32;
         if (const MetaValue* a = get("general.alignment"))
             if (a->u) align = a->u;
@@ -469,6 +472,7 @@ private:
     int fd_ = -1;
 #endif
     std::vector<TensorInfo> tensors_;
+    std::vector<std::pair<std::string_view, size_t>> index_;
     std::map<std::string, MetaValue> meta_;
 };
 
@@ -504,14 +508,17 @@ public:
         if (paths.empty()) throw std::runtime_error("GGUF: a model needs at least one shard");
         for (const auto& p : paths) shards_.push_back(std::make_unique<GgufFile>(p));
         validate_split();
+        size_t count = 0;
+        for (const auto& shard : shards_) count += shard->tensors().size();
+        index_.reserve(count);
         for (size_t i = 0; i < shards_.size(); ++i)
-            for (const auto& t : shards_[i]->tensors()) {
-                const auto ins = index_.emplace(t.name, std::make_pair(i, &t));
-                if (!ins.second)
-                    throw std::runtime_error("GGUF: tensor " + t.name + " is in two shards (" +
-                                             shards_[ins.first->second.first]->path() + " and " +
-                                             shards_[i]->path() + ")");
-            }
+            for (const auto& t : shards_[i]->tensors()) index_.emplace_back(t.name, std::make_pair(i, &t));
+        std::sort(index_.begin(), index_.end(), [](const auto& a, const auto& b) { return a.first < b.first; });
+        for (size_t i = 1; i < index_.size(); ++i)
+            if (index_[i - 1].first == index_[i].first)
+                throw std::runtime_error("GGUF: tensor " + std::string(index_[i].first) + " is in two shards (" +
+                                         shards_[index_[i - 1].second.first]->path() + " and " +
+                                         shards_[index_[i].second.first]->path() + ")");
     }
     /// Opens every shard of the model that `any_shard` belongs to (throws when one is missing).
     static GgufModel open(const std::string& any_shard) { return GgufModel(gguf_split_paths(any_shard)); }
@@ -521,9 +528,10 @@ public:
     /// The metadata shard: general.architecture and the model's keys.
     const GgufFile& meta() const { return *shards_[0]; }
     /// The tensor named `name` (its shard index in `*shard`), or nullptr.
-    const TensorInfo* find(const std::string& name, size_t* shard = nullptr) const {
-        const auto it = index_.find(name);
-        if (it == index_.end()) return nullptr;
+    const TensorInfo* find(std::string_view name, size_t* shard = nullptr) const {
+        const auto it = std::lower_bound(index_.begin(), index_.end(), name,
+            [](const auto& entry, std::string_view key) { return entry.first < key; });
+        if (it == index_.end() || it->first != name) return nullptr;
         if (shard) *shard = it->second.first;
         return it->second.second;
     }
@@ -567,7 +575,8 @@ private:
     }
 
     std::vector<std::unique_ptr<GgufFile>> shards_;
-    std::map<std::string, std::pair<size_t, const TensorInfo*>> index_;
+    // Names and tensor pointers borrow the immutable shard directories, which outlive this index and model moves.
+    std::vector<std::pair<std::string_view, std::pair<size_t, const TensorInfo*>>> index_;
 };
 
 // ---- architecture guard (P1.S2). The engine is specialised to ONE model; anything else must be

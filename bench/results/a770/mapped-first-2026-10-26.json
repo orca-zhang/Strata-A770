@@ -1,0 +1,607 @@
+{
+  "complete": true,
+  "production_changed": false,
+  "target_achieved": false,
+  "rule": "ezpp-informed mixed-residency expert scheduling screen. Same frozen matched-ABI HC-arena engine and BF16 weights,6297slots,FP16KV,fullvocab,verify6/MTP4/lookup3,minp0.5,context/prefill8192,MTPwindow1024,promptcache0,reserve1536. Only B stable-partitions the real GPU plan: mapped experts first,then VRAM,first-occurrence order within each class,unchanged entry order and output scatter. No arithmetic,precision,weight layout or group-grid changes. Default-off;serial and missing-mirror fallback unchanged. Three device-plan runs:default,enabled,enabled with serial fallback;65checks each before model. Same EXE A1/B1/A2,30s settle,Short16,one warmup/case plus three retained interleaved cycles;keep24 original2K/full128 requests and require full originalBF16 outputs. First-use witnesses must show enabled real mirrored parallel path only in B. Both cases require>=1% gain and<=3% baseline time drift. Independent confirmation still required after positive screen. No production change or presumed40tok/s.",
+  "plan_checks": [
+    {
+      "label": "default",
+      "exit_code": 0,
+      "passes": 65
+    },
+    {
+      "label": "mapped-first",
+      "exit_code": 0,
+      "passes": 65
+    },
+    {
+      "label": "serial",
+      "exit_code": 0,
+      "passes": 65
+    }
+  ],
+  "comparison": {
+    "Code2K": {
+      "baseline": 4249.826443515076,
+      "candidate": 4320.2,
+      "throughput_change_pct": -1.6289420972391055,
+      "baseline_drift_pct": 0.6681304152796441,
+      "baseline_tps": 30.118877017982378,
+      "candidate_tps": 29.62825795102079,
+      "candidate_min_tps": 29.482897616031327
+    },
+    "Prose2K": {
+      "baseline": 4294.849915887632,
+      "candidate": 4345.0,
+      "throughput_change_pct": -1.1542021659923574,
+      "baseline_drift_pct": 0.03959012575687204,
+      "baseline_tps": 29.803136898101776,
+      "candidate_tps": 29.459148446490218,
+      "candidate_min_tps": 29.344337459880787
+    }
+  },
+  "passes_screen": false,
+  "adopted": false,
+  "minimum_gain_pct": 1,
+  "maximum_baseline_drift_pct": 3,
+  "runs": [
+    {
+      "label": "A1",
+      "exit_code": 0,
+      "expert_slots": 6297,
+      "free_mib": 2226,
+      "dispatch_witnesses": [
+        {
+          "entries": 60,
+          "active": 0,
+          "parallel": 1,
+          "mirror": 1
+        },
+        {
+          "entries": 40,
+          "active": 0,
+          "parallel": 1,
+          "mirror": 1
+        },
+        {
+          "entries": 10,
+          "active": 0,
+          "parallel": 1,
+          "mirror": 1
+        },
+        {
+          "entries": 20,
+          "active": 0,
+          "parallel": 1,
+          "mirror": 1
+        },
+        {
+          "entries": 30,
+          "active": 0,
+          "parallel": 1,
+          "mirror": 1
+        },
+        {
+          "entries": 50,
+          "active": 0,
+          "parallel": 1,
+          "mirror": 1
+        }
+      ],
+      "rows": [
+        {
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 50259.3,
+          "decode_ms": 6377.8,
+          "finish": "length",
+          "accepted": 75,
+          "offered": 98,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 50312.87019999945,
+          "case": "Code2K",
+          "warmup": true,
+          "host_start_ns": 12386906822400,
+          "host_end_ns": 12443546024200,
+          "output_sha256": "76252b2f9e9cc17646ecace8afbd0527b70a8487646e63301ec8af1779c32894"
+        },
+        {
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 51254.5,
+          "decode_ms": 4606.8,
+          "finish": "length",
+          "accepted": 72,
+          "offered": 99,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 51301.81210000046,
+          "case": "Prose2K",
+          "warmup": true,
+          "host_start_ns": 12444447417600,
+          "host_end_ns": 12500310968200,
+          "output_sha256": "00c1afb1bf8359fc114b4c24b5d2636601cd4c8851032d099546275062c0c016"
+        },
+        {
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 51486.9,
+          "decode_ms": 4261.0,
+          "finish": "length",
+          "accepted": 75,
+          "offered": 98,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 51529.148100000384,
+          "case": "Code2K",
+          "warmup": false,
+          "host_start_ns": 12501101207600,
+          "host_end_ns": 12556851037600,
+          "output_sha256": "76252b2f9e9cc17646ecace8afbd0527b70a8487646e63301ec8af1779c32894"
+        },
+        {
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 49910.4,
+          "decode_ms": 4294.0,
+          "finish": "length",
+          "accepted": 73,
+          "offered": 99,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 49952.640800000154,
+          "case": "Prose2K",
+          "warmup": false,
+          "host_start_ns": 12557649539900,
+          "host_end_ns": 12611856464600,
+          "output_sha256": "00c1afb1bf8359fc114b4c24b5d2636601cd4c8851032d099546275062c0c016"
+        },
+        {
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 51198.4,
+          "decode_ms": 4235.7,
+          "finish": "length",
+          "accepted": 75,
+          "offered": 98,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 51241.23810000128,
+          "case": "Code2K",
+          "warmup": false,
+          "host_start_ns": 12612707440400,
+          "host_end_ns": 12668143560300,
+          "output_sha256": "76252b2f9e9cc17646ecace8afbd0527b70a8487646e63301ec8af1779c32894"
+        },
+        {
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 49973.7,
+          "decode_ms": 4270.8,
+          "finish": "length",
+          "accepted": 73,
+          "offered": 98,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 50015.97799999945,
+          "case": "Prose2K",
+          "warmup": false,
+          "host_start_ns": 12668995872800,
+          "host_end_ns": 12723242426600,
+          "output_sha256": "00c1afb1bf8359fc114b4c24b5d2636601cd4c8851032d099546275062c0c016"
+        },
+        {
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 51131.3,
+          "decode_ms": 4231.2,
+          "finish": "length",
+          "accepted": 75,
+          "offered": 98,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 51174.728800000594,
+          "case": "Code2K",
+          "warmup": false,
+          "host_start_ns": 12724098712000,
+          "host_end_ns": 12779463627100,
+          "output_sha256": "76252b2f9e9cc17646ecace8afbd0527b70a8487646e63301ec8af1779c32894"
+        },
+        {
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 50091.0,
+          "decode_ms": 5234.4,
+          "finish": "length",
+          "accepted": 73,
+          "offered": 100,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 50133.57659999929,
+          "case": "Prose2K",
+          "warmup": false,
+          "host_start_ns": 12780251872900,
+          "host_end_ns": 12835579200600,
+          "output_sha256": "00c1afb1bf8359fc114b4c24b5d2636601cd4c8851032d099546275062c0c016"
+        }
+      ]
+    },
+    {
+      "label": "B1",
+      "exit_code": 0,
+      "expert_slots": 6297,
+      "free_mib": 2049,
+      "dispatch_witnesses": [
+        {
+          "entries": 60,
+          "active": 1,
+          "parallel": 1,
+          "mirror": 1
+        },
+        {
+          "entries": 40,
+          "active": 1,
+          "parallel": 1,
+          "mirror": 1
+        },
+        {
+          "entries": 10,
+          "active": 1,
+          "parallel": 1,
+          "mirror": 1
+        },
+        {
+          "entries": 20,
+          "active": 1,
+          "parallel": 1,
+          "mirror": 1
+        },
+        {
+          "entries": 30,
+          "active": 1,
+          "parallel": 1,
+          "mirror": 1
+        },
+        {
+          "entries": 50,
+          "active": 1,
+          "parallel": 1,
+          "mirror": 1
+        }
+      ],
+      "rows": [
+        {
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 51307.6,
+          "decode_ms": 5058.5,
+          "finish": "length",
+          "accepted": 75,
+          "offered": 98,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 51364.27839999851,
+          "case": "Code2K",
+          "warmup": true,
+          "host_start_ns": 12901903715000,
+          "host_end_ns": 12958272414100,
+          "output_sha256": "76252b2f9e9cc17646ecace8afbd0527b70a8487646e63301ec8af1779c32894"
+        },
+        {
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 50501.1,
+          "decode_ms": 4803.4,
+          "finish": "length",
+          "accepted": 72,
+          "offered": 100,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 50547.33549999946,
+          "case": "Prose2K",
+          "warmup": true,
+          "host_start_ns": 12959019381500,
+          "host_end_ns": 13014325908700,
+          "output_sha256": "00c1afb1bf8359fc114b4c24b5d2636601cd4c8851032d099546275062c0c016"
+        },
+        {
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 51127.0,
+          "decode_ms": 4341.5,
+          "finish": "length",
+          "accepted": 75,
+          "offered": 98,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 51170.86669999844,
+          "case": "Code2K",
+          "warmup": false,
+          "host_start_ns": 13015151962300,
+          "host_end_ns": 13070622915800,
+          "output_sha256": "76252b2f9e9cc17646ecace8afbd0527b70a8487646e63301ec8af1779c32894"
+        },
+        {
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 49856.2,
+          "decode_ms": 4338.0,
+          "finish": "length",
+          "accepted": 73,
+          "offered": 98,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 49897.70640000097,
+          "case": "Prose2K",
+          "warmup": false,
+          "host_start_ns": 13071462413100,
+          "host_end_ns": 13125658751000,
+          "output_sha256": "00c1afb1bf8359fc114b4c24b5d2636601cd4c8851032d099546275062c0c016"
+        },
+        {
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 50999.0,
+          "decode_ms": 4307.5,
+          "finish": "length",
+          "accepted": 75,
+          "offered": 98,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 51043.31309999907,
+          "case": "Code2K",
+          "warmup": false,
+          "host_start_ns": 13126498787600,
+          "host_end_ns": 13181807264100,
+          "output_sha256": "76252b2f9e9cc17646ecace8afbd0527b70a8487646e63301ec8af1779c32894"
+        },
+        {
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 49854.3,
+          "decode_ms": 4362.0,
+          "finish": "length",
+          "accepted": 73,
+          "offered": 98,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 49897.67109999957,
+          "case": "Prose2K",
+          "warmup": false,
+          "host_start_ns": 13182674318700,
+          "host_end_ns": 13236892700400,
+          "output_sha256": "00c1afb1bf8359fc114b4c24b5d2636601cd4c8851032d099546275062c0c016"
+        },
+        {
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 50904.2,
+          "decode_ms": 4320.2,
+          "finish": "length",
+          "accepted": 75,
+          "offered": 98,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 50947.578900000735,
+          "case": "Code2K",
+          "warmup": false,
+          "host_start_ns": 13237827459600,
+          "host_end_ns": 13293053975000,
+          "output_sha256": "76252b2f9e9cc17646ecace8afbd0527b70a8487646e63301ec8af1779c32894"
+        },
+        {
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 49864.6,
+          "decode_ms": 4345.0,
+          "finish": "length",
+          "accepted": 73,
+          "offered": 98,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 49908.4684999998,
+          "case": "Prose2K",
+          "warmup": false,
+          "host_start_ns": 13293924040500,
+          "host_end_ns": 13348135527400,
+          "output_sha256": "00c1afb1bf8359fc114b4c24b5d2636601cd4c8851032d099546275062c0c016"
+        }
+      ]
+    },
+    {
+      "label": "A2",
+      "exit_code": 0,
+      "expert_slots": 6297,
+      "free_mib": 2049,
+      "dispatch_witnesses": [
+        {
+          "entries": 60,
+          "active": 0,
+          "parallel": 1,
+          "mirror": 1
+        },
+        {
+          "entries": 40,
+          "active": 0,
+          "parallel": 1,
+          "mirror": 1
+        },
+        {
+          "entries": 10,
+          "active": 0,
+          "parallel": 1,
+          "mirror": 1
+        },
+        {
+          "entries": 20,
+          "active": 0,
+          "parallel": 1,
+          "mirror": 1
+        },
+        {
+          "entries": 30,
+          "active": 0,
+          "parallel": 1,
+          "mirror": 1
+        },
+        {
+          "entries": 50,
+          "active": 0,
+          "parallel": 1,
+          "mirror": 1
+        }
+      ],
+      "rows": [
+        {
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 51450.1,
+          "decode_ms": 4933.4,
+          "finish": "length",
+          "accepted": 75,
+          "offered": 98,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 51505.204900000535,
+          "case": "Code2K",
+          "warmup": true,
+          "host_start_ns": 13414182428800,
+          "host_end_ns": 13470568655500,
+          "output_sha256": "76252b2f9e9cc17646ecace8afbd0527b70a8487646e63301ec8af1779c32894"
+        },
+        {
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 49777.1,
+          "decode_ms": 4597.4,
+          "finish": "length",
+          "accepted": 72,
+          "offered": 99,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 49822.94080000065,
+          "case": "Prose2K",
+          "warmup": true,
+          "host_start_ns": 13471380600200,
+          "host_end_ns": 13525757588300,
+          "output_sha256": "00c1afb1bf8359fc114b4c24b5d2636601cd4c8851032d099546275062c0c016"
+        },
+        {
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 51047.5,
+          "decode_ms": 4262.0,
+          "finish": "length",
+          "accepted": 75,
+          "offered": 98,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 51088.4915000006,
+          "case": "Code2K",
+          "warmup": false,
+          "host_start_ns": 13526609286900,
+          "host_end_ns": 13581920838600,
+          "output_sha256": "76252b2f9e9cc17646ecace8afbd0527b70a8487646e63301ec8af1779c32894"
+        },
+        {
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 50029.1,
+          "decode_ms": 4273.0,
+          "finish": "length",
+          "accepted": 73,
+          "offered": 98,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 50070.863899998585,
+          "case": "Prose2K",
+          "warmup": false,
+          "host_start_ns": 13582818450000,
+          "host_end_ns": 13637123095900,
+          "output_sha256": "00c1afb1bf8359fc114b4c24b5d2636601cd4c8851032d099546275062c0c016"
+        },
+        {
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 51227.3,
+          "decode_ms": 4277.9,
+          "finish": "length",
+          "accepted": 75,
+          "offered": 98,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 51270.248699998774,
+          "case": "Code2K",
+          "warmup": false,
+          "host_start_ns": 13638032518500,
+          "host_end_ns": 13693539686500,
+          "output_sha256": "76252b2f9e9cc17646ecace8afbd0527b70a8487646e63301ec8af1779c32894"
+        },
+        {
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 49743.3,
+          "decode_ms": 4363.0,
+          "finish": "length",
+          "accepted": 73,
+          "offered": 100,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 49786.35519999989,
+          "case": "Prose2K",
+          "warmup": false,
+          "host_start_ns": 13694371663100,
+          "host_end_ns": 13748480366200,
+          "output_sha256": "00c1afb1bf8359fc114b4c24b5d2636601cd4c8851032d099546275062c0c016"
+        },
+        {
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 51089.1,
+          "decode_ms": 4264.0,
+          "finish": "length",
+          "accepted": 75,
+          "offered": 98,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 51132.38369999999,
+          "case": "Code2K",
+          "warmup": false,
+          "host_start_ns": 13749386794200,
+          "host_end_ns": 13804742324600,
+          "output_sha256": "76252b2f9e9cc17646ecace8afbd0527b70a8487646e63301ec8af1779c32894"
+        },
+        {
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 49941.6,
+          "decode_ms": 4295.7,
+          "finish": "length",
+          "accepted": 73,
+          "offered": 98,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 49983.769099999336,
+          "case": "Prose2K",
+          "warmup": false,
+          "host_start_ns": 13805599282500,
+          "host_end_ns": 13859838651800,
+          "output_sha256": "00c1afb1bf8359fc114b4c24b5d2636601cd4c8851032d099546275062c0c016"
+        }
+      ]
+    }
+  ],
+  "hardware": "A77016GB / PCIe3.0 / E5-2696v4 / Windows / DPC++2025.3.2 / driver32.0.101.9034",
+  "reference_sha256": {
+    "Code2K": "76252b2f9e9cc17646ecace8afbd0527b70a8487646e63301ec8af1779c32894",
+    "Prose2K": "00c1afb1bf8359fc114b4c24b5d2636601cd4c8851032d099546275062c0c016"
+  },
+  "fingerprint_format": "SHA256 of ASCII JSON integer array with separators comma and colon",
+  "raw_file": "build-sycl-a770-mapped-first-20261026/results.json",
+  "raw_sha256": "dd9cbbd75c7852ddbf2e5017e3fcddff691552154e1835549d87b53a2d571a1e",
+  "raw_audit": "The runner completed device-plan, full-output, dispatch and source/binary hash audit under its exclusive GPU lock and exited0. Publication reads only small reports/results; no large binary reads or GPU commands.",
+  "audited_exe_sha256": "e39bee1ed668ff14f2247a2994bf3568085589c2bdda5f0cb1983f35ee98542e",
+  "checker_sha256": "2c2240baff7e3f8315b6609131f4b52e34d766d447e9e82c4288de8512db4592",
+  "report_sha256": "e10cae8e4fb492fb75cadca8d7c7d80e4b217ae76e2f1be30cb0cb73bd2be1ef"
+}

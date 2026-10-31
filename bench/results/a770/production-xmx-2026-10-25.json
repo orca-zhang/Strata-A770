@@ -1,0 +1,2755 @@
+{
+  "build": {
+    "complete": true,
+    "scope": "Production main/decode objects and static oneMKL link retained; rebuild frozen prefill with matched Gemm layout and unchanged 32 MiB workspace; reuse validated XMX object.",
+    "source_sha256": {
+      "build-sycl-a770-production-xmx-v2-20261025/build.py": "c637f989cd7e13902559b89830416188d4cf63dc1908bd9d6a530cc5b6dea3cc",
+      "build-sycl-a770-production-xmx-v2-20261025/prefill.cpp": "8589356f7894659dcabed440df80295b8c3da0f96b3053ebfbc8e07b3b7a3005",
+      "build-sycl-a770-production-xmx-v2-20261025/include/strata/prefill/gemm.hpp": "0086abbd6d169177e449d47388a7639aea59e72dae3ebf14dca7ab9040f85da6",
+      "build-sycl-a770-native-xmx-20261024/integration/candidate.obj": "f6bc13eb3bd1a26d599c274248b5485904b81425e06c75ea189d5bf4fe231a01",
+      "build-sycl-a770-native-xmx-20261024/integration/candidate.dp.cpp": "89d900b7ff2bbfb27f3e2d796f08a54f985a8b761eb5065be6989f23ec80a1f6",
+      "build-sycl-a770-native-xmx-20261024/integration/parity.obj": "c24da4eca335bed6ff49aa90a1ea7d11fa3a5cb5464ac18c8b94ac08f558d158",
+      "build-sycl-a770-native-xmx-20261024/integration/gemm_parity.cpp": "e109d711b45c0a4ad92187592e4be41d92b35118c5f5d7b52b4c83dfde1c78d8",
+      "build-sycl-a770-native-xmx-20261024/integration/results.json": "b063ca2d94ae8721c285f8e5212b718f5a5ddaa0ef56b739f935b790bc0ffdb9",
+      "strata-iq2_xs.json": "da7090d500e14c4c05b2a6c76b67d01bd86c5aceaee3d2eaa8e37d638e22a902",
+      "build-sycl-a770-unified-operators/link-unified.cmd": "d29b6b327c6a6c523e435ca56d4a798a5680c93f55adc738b6443a428715fc59",
+      "build-sycl-a770-production-xmx-v2-20261025/link-model.cmd": "9dc6949e6ff0073d5f1811cd5af7a05914935f0f44175bdbb70abd15c007b838",
+      "build-sycl-a770-production-xmx-v2-20261025/link-parity.cmd": "73004760a8c12f16733ea67ce8c125a1de149639da8ab3f7026878c079e78334",
+      "build-sycl-a770-mtp-last-draft-v1/strata_core.lib": "3d67eaeacec6b63cb27214ec2bfbafc76e0ad1f28e77516cd394df81687fd7ad",
+      "build-sycl-a770-mtp-last-draft-v1/strata_engine.lib": "c9e18c3305588ad1601a73d4b6c6175d9d52d3ddb282a35700a9c23bfdf73a63",
+      "build-sycl-a770-mtp-last-draft-v1/strata_kernels.lib": "6434544b0c0253f07569d09984138da9cbeda4e7819b60d6da3d09c328e79250",
+      "build-sycl-a770-mtp-last-draft-v1/strata_kernels_cpu.lib": "de48bd73e939685de6e902e2308cd5a42732639ac56f78e643dc415983698087",
+      "build-sycl-a770-mtp-last-draft-v1/strata_prefill.lib": "a6017aa0703072300f061b0c2cab54c90e52062d25fbb1b880546604d84957fd",
+      "build-sycl-a770-mtp-last-draft-v1/strata_spec.lib": "ecb8d49d464ff9c5f9b5ea6a9b028ed1230e56daaa7c48bc9f1950cc28eba319",
+      "build-sycl-a770-mtp-last-draft-v1/ggml/src/ggml-base.lib": "621acde3cea1da2d7e931f21b7f8775d5c99958d27a45f4f760e8a863612bedc",
+      "build-sycl-a770-mtp-last-draft-v1/ggml/src/ggml-cpu.lib": "854656236406c685c251eaf8d22cc6f0fc07abc62695bb97a496038b5fe5776e",
+      "build-sycl-a770-mtp-last-draft-v1/CMakeFiles/strata.dir/src/program/generate.cpp.obj": "beb5590d94da2fef6ca117c57b14f8cfe777cd21b0c56f2a2655a8912f371ed4",
+      "build-sycl-a770-mtp-spec4-last-draft/mtp-last-draft.obj": "1ab36e23807530cd1c44f3aa43fb402437d7e7eaf7186ec6ea18b2df70a29994",
+      "build-sycl-a770-fused-act-recovery-v2/verify.obj": "a26c03c4624269da4f6c181a3ab538a87f06a5895a333e5e29032d4aa9ef4487",
+      "build-sycl-a770-fused-act-recovery-v2/activation.obj": "de02cd49cec58d93265e4a918fca1bfb78255c38d5158c4330438b6d7d6a92dc",
+      "build-sycl-a770-hc-up-fixed-streams/hc-streams.obj": "d65c0e0be0de9dfe9bcc0ab6b57f85ad398efad41a42138ebc757096a763d44a",
+      "build-sycl-a770-throughput-adopt/router.obj": "78b5669a0c4231477f8f0c6d84f6d812c783b16ef699846ea929fae4396bd256",
+      "build-sycl-a770-vram-down-sg16/iq.obj": "17cceb618ebf7707f4582747f206c1db5bdb25b8c92ae65ef25536130ca783bb",
+      "build-sycl-a770-unified-operators/bin/strata-unified-all-operators.exe": "8f0d866ded297cf5a409e84cf5dd61f437c56c8a89aaeb2a85569265b6a3e122",
+      "build-sycl-a770-production-xmx-20261025/prefill.obj": "fc7a8ba0717b2beef0dbe33306a437ec5ff34b7d3549b2d188f5d1c4a432b10d",
+      "build-sycl-a770-production-xmx-20261025/build.json": "fe607d27ce8ec4863a403232e6552b1804977d82619761718b7d0e3c2a9f2f1f"
+    },
+    "commands": [
+      [
+        "link-model",
+        [
+          "cmd",
+          "/d",
+          "/c",
+          "G:\\GitHub\\Strata\\build-sycl-a770-production-xmx-v2-20261025\\link-model.cmd"
+        ]
+      ],
+      [
+        "link-parity",
+        [
+          "cmd",
+          "/d",
+          "/c",
+          "G:\\GitHub\\Strata\\build-sycl-a770-production-xmx-v2-20261025\\link-parity.cmd"
+        ]
+      ]
+    ],
+    "level_zero_import": {
+      "path": "C:/Program Files/LevelZeroSDK/1.33.1/lib/ze_loader.lib",
+      "sha256": "49675fc7998fd94fcef141c30ac379de89e40c042f18899029d79d4f004546fe"
+    },
+    "parity": {
+      "checks": 1692,
+      "mismatched_cases": 0
+    },
+    "output_sha256": {
+      "prefill.obj": "fc7a8ba0717b2beef0dbe33306a437ec5ff34b7d3549b2d188f5d1c4a432b10d",
+      "bin/strata-parity.exe": "598f9f6047f937aeac417a39b5611ac44a33a70c735317f99e03464eec83a005",
+      "bin/strata-unified-all-operators.exe": "73996f4fab16c89531574d29bea70097cd5309d4db03c00af5829d78920e7890",
+      "parity.log": "68a94acd7b09ed999d3753ab7aee9fced93dc005c17aee633e336bac6ae58999"
+    }
+  },
+  "http_experiment": {
+    "rule": "Canary must pass exact old tool258 and >1025-token JSON retrieval before timing. Then production A / XMX B / production A, fixed cache 5500 (5771 actual), threshold1024, three identical short warmups and three retained requests per short case. A1 tests long once (180s limit); B tests long three times; no failed-request speed factor. Adoption needs all checks and identical control outputs; every HTTP/prefill/decode control must have absolute baseline drift <=3% and candidate throughput change >=-3%. Otherwise retain the production configuration.",
+    "cases": {
+      "tool258": {
+        "model": "qwen3.8-flash-next-iq2_xs",
+        "temperature": 0,
+        "thinking": {
+          "type": "disabled"
+        },
+        "max_tokens": 384,
+        "stream": false,
+        "messages": [
+          {
+            "role": "user",
+            "content": "record memory locality."
+          }
+        ],
+        "tools": [
+          {
+            "name": "record",
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "value": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "tool_choice": {
+          "type": "tool",
+          "name": "record"
+        }
+      },
+      "tool255": {
+        "model": "qwen3.8-flash-next-iq2_xs",
+        "temperature": 0,
+        "thinking": {
+          "type": "disabled"
+        },
+        "max_tokens": 384,
+        "stream": false,
+        "messages": [
+          {
+            "role": "user",
+            "content": "note"
+          }
+        ],
+        "tools": [
+          {
+            "name": "record",
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "value": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "tool_choice": {
+          "type": "tool",
+          "name": "record"
+        }
+      },
+      "long": {
+        "model": "qwen3.8-flash-next-iq2_xs",
+        "temperature": 0,
+        "thinking": {
+          "type": "disabled"
+        },
+        "max_tokens": 128,
+        "stream": false,
+        "messages": [
+          {
+            "role": "user",
+            "content": "Read the records below. Return only one JSON object with exactly the keys \"first\", \"middle\", \"last\". Their integer values must be the values of records row000, row053, row106, respectively. Do not include explanations or code fences.\n\nRecords (id,value):\nrow000,113\nrow001,150\nrow002,187\nrow003,224\nrow004,261\nrow005,298\nrow006,335\nrow007,372\nrow008,409\nrow009,446\nrow010,483\nrow011,520\nrow012,557\nrow013,594\nrow014,631\nrow015,668\nrow016,705\nrow017,742\nrow018,779\nrow019,816\nrow020,853\nrow021,890\nrow022,927\nrow023,964\nrow024,4\nrow025,41\nrow026,78\nrow027,115\nrow028,152\nrow029,189\nrow030,226\nrow031,263\nrow032,300\nrow033,337\nrow034,374\nrow035,411\nrow036,448\nrow037,485\nrow038,522\nrow039,559\nrow040,596\nrow041,633\nrow042,670\nrow043,707\nrow044,744\nrow045,781\nrow046,818\nrow047,855\nrow048,892\nrow049,929\nrow050,966\nrow051,6\nrow052,43\nrow053,80\nrow054,117\nrow055,154\nrow056,191\nrow057,228\nrow058,265\nrow059,302\nrow060,339\nrow061,376\nrow062,413\nrow063,450\nrow064,487\nrow065,524\nrow066,561\nrow067,598\nrow068,635\nrow069,672\nrow070,709\nrow071,746\nrow072,783\nrow073,820\nrow074,857\nrow075,894\nrow076,931\nrow077,968\nrow078,8\nrow079,45\nrow080,82\nrow081,119\nrow082,156\nrow083,193\nrow084,230\nrow085,267\nrow086,304\nrow087,341\nrow088,378\nrow089,415\nrow090,452\nrow091,489\nrow092,526\nrow093,563\nrow094,600\nrow095,637\nrow096,674\nrow097,711\nrow098,748\nrow099,785\nrow100,822\nrow101,859\nrow102,896\nrow103,933\nrow104,970\nrow105,10\nrow106,47\nAll records above are final. Return the requested JSON object only."
+          }
+        ]
+      }
+    },
+    "long_expected": {
+      "first": 113,
+      "middle": 80,
+      "last": 47
+    },
+    "runs": [
+      {
+        "label": "canary",
+        "candidate": true,
+        "threshold": 256,
+        "rows": [
+          {
+            "case": "tool255",
+            "warmup": true,
+            "reply": {
+              "id": "msg_d919e08d70384ece9a7e7f35",
+              "type": "message",
+              "role": "assistant",
+              "model": "qwen3.8-flash-next-iq2_xs",
+              "content": [
+                {
+                  "type": "tool_use",
+                  "id": "call_e5e10d5e4e9d46eb89158b61",
+                  "name": "record",
+                  "input": {
+                    "value": "note"
+                  }
+                }
+              ],
+              "stop_reason": "tool_use",
+              "stop_sequence": null,
+              "usage": {
+                "input_tokens": 255,
+                "output_tokens": 17,
+                "cache_read_input_tokens": 0
+              }
+            },
+            "wall_ms": 54392.11909999722,
+            "timings": {
+              "cache_n": 0,
+              "prompt_n": 255,
+              "prompt_ms": 44298.0,
+              "prompt_per_token_ms": 173.718,
+              "prompt_per_second": 5.8,
+              "predicted_n": 17,
+              "predicted_ms": 10071.6,
+              "predicted_per_token_ms": 592.447,
+              "predicted_per_second": 1.7,
+              "draft_n": 13,
+              "draft_n_accepted": 11,
+              "at": 1792885485
+            },
+            "valid": true
+          },
+          {
+            "case": "tool258",
+            "warmup": false,
+            "reply": {
+              "id": "msg_9a60578872cd42e0a73a0c01",
+              "type": "message",
+              "role": "assistant",
+              "model": "qwen3.8-flash-next-iq2_xs",
+              "content": [
+                {
+                  "type": "tool_use",
+                  "id": "call_414668126ac248a5b0650596",
+                  "name": "record",
+                  "input": {
+                    "value": "Memory locality: keeping data that is accessed together stored close together in memory improves cache performance and reduces latency. Spatial locality means accessing nearby memory addresses benefits from cache line prefetching. Temporal locality means recently accessed data is likely to be accessed again. Optimizing for memory locality involves structuring data contiguously, avoiding pointer chasing, and aligning data structures to cache line boundaries."
+                  }
+                }
+              ],
+              "stop_reason": "tool_use",
+              "stop_sequence": null,
+              "usage": {
+                "input_tokens": 258,
+                "output_tokens": 92,
+                "cache_read_input_tokens": 0
+              }
+            },
+            "wall_ms": 31546.079100007773,
+            "timings": {
+              "cache_n": 0,
+              "prompt_n": 258,
+              "prompt_ms": 24394.2,
+              "prompt_per_token_ms": 94.551,
+              "prompt_per_second": 10.6,
+              "predicted_n": 92,
+              "predicted_ms": 7131.7,
+              "predicted_per_token_ms": 77.518,
+              "predicted_per_second": 12.9,
+              "draft_n": 65,
+              "draft_n_accepted": 54,
+              "at": 1792885516
+            },
+            "valid": true
+          },
+          {
+            "case": "long",
+            "warmup": false,
+            "reply": {
+              "id": "msg_5976e2ab2f764b51895032c6",
+              "type": "message",
+              "role": "assistant",
+              "model": "qwen3.8-flash-next-iq2_xs",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "{\"first\": 113, \"middle\": 80, \"last\": 47}"
+                }
+              ],
+              "stop_reason": "end_turn",
+              "stop_sequence": null,
+              "usage": {
+                "input_tokens": 1038,
+                "output_tokens": 23,
+                "cache_read_input_tokens": 0
+              }
+            },
+            "wall_ms": 29343.087799992645,
+            "timings": {
+              "cache_n": 0,
+              "prompt_n": 1038,
+              "prompt_ms": 28021.8,
+              "prompt_per_token_ms": 26.996,
+              "prompt_per_second": 37.0,
+              "predicted_n": 23,
+              "predicted_ms": 1308.8,
+              "predicted_per_token_ms": 56.904,
+              "predicted_per_second": 17.6,
+              "draft_n": 18,
+              "draft_n_accepted": 18,
+              "at": 1792885546
+            },
+            "valid": true
+          }
+        ],
+        "cache": [
+          "5771",
+          "7.74"
+        ],
+        "metrics": {
+          "engine": {
+            "model": "qwen3.8-flash-next-iq2_xs",
+            "max_context": 8192,
+            "images": false,
+            "version": "0.1.39-sycl",
+            "context": 8192,
+            "kv": "fp16",
+            "kv_resident": 0,
+            "expert_slots": 5771,
+            "expert_cache_mib": 7922,
+            "expert_slots_primary": 5771,
+            "expert_cache_primary_mib": 7922,
+            "spec": 6,
+            "mtp_max": 4,
+            "lookup": 3,
+            "vram_free_mib": 2261,
+            "cvec": 0,
+            "arena_mib": 33812,
+            "pool_workers": 21,
+            "pcie_frac": "0.16",
+            "spec_min_p": "0.50",
+            "conversation_cache_mib": 0,
+            "conversation_cache_slots": 4,
+            "conversation_cache_min_free_mib": 2560,
+            "tail_role_token": -1,
+            "vram_elastic": 0,
+            "engine": "0.1.39-sycl"
+          },
+          "live": {
+            "state": "idle",
+            "queued": 0,
+            "phase": null,
+            "prompt_tokens": null,
+            "prompt_read": null,
+            "prompt_total": null,
+            "generated": null,
+            "max_tokens": null,
+            "elapsed_s": null,
+            "tok_s": null,
+            "tok_s_mean": null,
+            "prefill_tok_s_mean": null,
+            "tok_s_window_s": null
+          },
+          "requests": [],
+          "conversation_cache": {
+            "enabled": false,
+            "budget_mib": 0,
+            "slots": 4,
+            "parked": 0,
+            "bytes": 0,
+            "evictions": 0,
+            "parks": 0,
+            "restores": 0,
+            "last_event": null,
+            "last_tokens": null,
+            "last_at": null,
+            "requests": 0,
+            "requests_reused": 0,
+            "reused_tokens": 0,
+            "prompt_tokens": 0,
+            "last_reused": null,
+            "last_prompt": null
+          },
+          "requests_kept": 0,
+          "totals": {
+            "since": 1792885430.5528758,
+            "requests": 0,
+            "prompt_tokens": 0,
+            "reused": 0,
+            "output_tokens": 0,
+            "prompt_ms": 0.0,
+            "decode_ms": 0.0,
+            "drafts_offered": 0,
+            "drafts_accepted": 0
+          },
+          "hardware": {
+            "cpu": 0.0,
+            "ram_used": 61332094976,
+            "ram_total": 274766237696,
+            "disk_read_mb": null,
+            "disk_write_mb": null,
+            "tok_s": 0.0,
+            "tok_s_mean": 0,
+            "prefill_tok_s_mean": 0.0
+          },
+          "hardware_static": {
+            "gpu_name": null,
+            "gpu_count": 1,
+            "cpu_name": "Intel(R) Xeon(R) CPU E5-2696 v4 @ 2.20GHz",
+            "cores": 22,
+            "threads": 44,
+            "psutil": true
+          },
+          "history": {
+            "gpu_util": [
+              null
+            ],
+            "gpu_mem_used": [
+              null
+            ],
+            "gpu_temp": [
+              null
+            ],
+            "gpu_power": [
+              null
+            ],
+            "gpu_pcie_rx_mb": [
+              null
+            ],
+            "cpu": [
+              0.0
+            ],
+            "ram_used": [
+              61332094976
+            ],
+            "disk_read_mb": [
+              null
+            ],
+            "tok_s": [
+              0.0
+            ],
+            "prefill_tok_s_mean": [
+              0.0
+            ]
+          },
+          "time": 1792885430.9871678
+        },
+        "server_exit_code": 0,
+        "dispatch_counts": {
+          "False": 59812,
+          "True": 536
+        }
+      },
+      {
+        "label": "A1",
+        "candidate": false,
+        "threshold": 1024,
+        "rows": [
+          {
+            "case": "tool255",
+            "warmup": true,
+            "reply": {
+              "id": "msg_c74feae677d2422289b39790",
+              "type": "message",
+              "role": "assistant",
+              "model": "qwen3.8-flash-next-iq2_xs",
+              "content": [
+                {
+                  "type": "tool_use",
+                  "id": "call_28a0f43735654b50b0a69f20",
+                  "name": "record",
+                  "input": {
+                    "value": "note"
+                  }
+                }
+              ],
+              "stop_reason": "tool_use",
+              "stop_sequence": null,
+              "usage": {
+                "input_tokens": 255,
+                "output_tokens": 17,
+                "cache_read_input_tokens": 0
+              }
+            },
+            "wall_ms": 13267.006800000672,
+            "timings": {
+              "cache_n": 0,
+              "prompt_n": 255,
+              "prompt_ms": 12268.4,
+              "prompt_per_token_ms": 48.111,
+              "prompt_per_second": 20.8,
+              "predicted_n": 17,
+              "predicted_ms": 976.4,
+              "predicted_per_token_ms": 57.435,
+              "predicted_per_second": 17.4,
+              "draft_n": 14,
+              "draft_n_accepted": 11,
+              "at": 1792885591
+            },
+            "valid": true
+          },
+          {
+            "case": "tool255",
+            "warmup": true,
+            "reply": {
+              "id": "msg_53d5e6055253470fbf084f20",
+              "type": "message",
+              "role": "assistant",
+              "model": "qwen3.8-flash-next-iq2_xs",
+              "content": [
+                {
+                  "type": "tool_use",
+                  "id": "call_6c43f4a7725e4730aacb4c18",
+                  "name": "record",
+                  "input": {
+                    "value": "note"
+                  }
+                }
+              ],
+              "stop_reason": "tool_use",
+              "stop_sequence": null,
+              "usage": {
+                "input_tokens": 255,
+                "output_tokens": 17,
+                "cache_read_input_tokens": 0
+              }
+            },
+            "wall_ms": 12778.874600000563,
+            "timings": {
+              "cache_n": 0,
+              "prompt_n": 255,
+              "prompt_ms": 11894.5,
+              "prompt_per_token_ms": 46.645,
+              "prompt_per_second": 21.4,
+              "predicted_n": 17,
+              "predicted_ms": 864.7,
+              "predicted_per_token_ms": 50.865,
+              "predicted_per_second": 19.7,
+              "draft_n": 14,
+              "draft_n_accepted": 11,
+              "at": 1792885604
+            },
+            "valid": true
+          },
+          {
+            "case": "tool255",
+            "warmup": true,
+            "reply": {
+              "id": "msg_fb37661274a14e5c85854c90",
+              "type": "message",
+              "role": "assistant",
+              "model": "qwen3.8-flash-next-iq2_xs",
+              "content": [
+                {
+                  "type": "tool_use",
+                  "id": "call_e593f071389e4e55a2562dba",
+                  "name": "record",
+                  "input": {
+                    "value": "note"
+                  }
+                }
+              ],
+              "stop_reason": "tool_use",
+              "stop_sequence": null,
+              "usage": {
+                "input_tokens": 255,
+                "output_tokens": 17,
+                "cache_read_input_tokens": 0
+              }
+            },
+            "wall_ms": 12487.073799988138,
+            "timings": {
+              "cache_n": 0,
+              "prompt_n": 255,
+              "prompt_ms": 11674.5,
+              "prompt_per_token_ms": 45.782,
+              "prompt_per_second": 21.8,
+              "predicted_n": 17,
+              "predicted_ms": 792.3,
+              "predicted_per_token_ms": 46.606,
+              "predicted_per_second": 21.5,
+              "draft_n": 14,
+              "draft_n_accepted": 11,
+              "at": 1792885616
+            },
+            "valid": true
+          },
+          {
+            "case": "tool255",
+            "warmup": false,
+            "reply": {
+              "id": "msg_bcefdde586634d42aaee2e45",
+              "type": "message",
+              "role": "assistant",
+              "model": "qwen3.8-flash-next-iq2_xs",
+              "content": [
+                {
+                  "type": "tool_use",
+                  "id": "call_5b7cf8d5d5cc409c91ac98fd",
+                  "name": "record",
+                  "input": {
+                    "value": "note"
+                  }
+                }
+              ],
+              "stop_reason": "tool_use",
+              "stop_sequence": null,
+              "usage": {
+                "input_tokens": 255,
+                "output_tokens": 17,
+                "cache_read_input_tokens": 0
+              }
+            },
+            "wall_ms": 12262.295400010771,
+            "timings": {
+              "cache_n": 0,
+              "prompt_n": 255,
+              "prompt_ms": 11509.8,
+              "prompt_per_token_ms": 45.136,
+              "prompt_per_second": 22.2,
+              "predicted_n": 17,
+              "predicted_ms": 731.3,
+              "predicted_per_token_ms": 43.018,
+              "predicted_per_second": 23.2,
+              "draft_n": 14,
+              "draft_n_accepted": 11,
+              "at": 1792885629
+            },
+            "valid": true
+          },
+          {
+            "case": "tool255",
+            "warmup": false,
+            "reply": {
+              "id": "msg_a705010c32434c27a4b47e30",
+              "type": "message",
+              "role": "assistant",
+              "model": "qwen3.8-flash-next-iq2_xs",
+              "content": [
+                {
+                  "type": "tool_use",
+                  "id": "call_a9b46f93e90a4c118b24bde4",
+                  "name": "record",
+                  "input": {
+                    "value": "note"
+                  }
+                }
+              ],
+              "stop_reason": "tool_use",
+              "stop_sequence": null,
+              "usage": {
+                "input_tokens": 255,
+                "output_tokens": 17,
+                "cache_read_input_tokens": 0
+              }
+            },
+            "wall_ms": 12063.12180000532,
+            "timings": {
+              "cache_n": 0,
+              "prompt_n": 255,
+              "prompt_ms": 11356.0,
+              "prompt_per_token_ms": 44.533,
+              "prompt_per_second": 22.5,
+              "predicted_n": 17,
+              "predicted_ms": 674.1,
+              "predicted_per_token_ms": 39.653,
+              "predicted_per_second": 25.2,
+              "draft_n": 14,
+              "draft_n_accepted": 11,
+              "at": 1792885641
+            },
+            "valid": true
+          },
+          {
+            "case": "tool255",
+            "warmup": false,
+            "reply": {
+              "id": "msg_7e6ab89a547946da8cb2a71d",
+              "type": "message",
+              "role": "assistant",
+              "model": "qwen3.8-flash-next-iq2_xs",
+              "content": [
+                {
+                  "type": "tool_use",
+                  "id": "call_e0735fc79b7d4ba2bfbc9b7d",
+                  "name": "record",
+                  "input": {
+                    "value": "note"
+                  }
+                }
+              ],
+              "stop_reason": "tool_use",
+              "stop_sequence": null,
+              "usage": {
+                "input_tokens": 255,
+                "output_tokens": 17,
+                "cache_read_input_tokens": 0
+              }
+            },
+            "wall_ms": 11842.788300011307,
+            "timings": {
+              "cache_n": 0,
+              "prompt_n": 255,
+              "prompt_ms": 11194.4,
+              "prompt_per_token_ms": 43.9,
+              "prompt_per_second": 22.8,
+              "predicted_n": 17,
+              "predicted_ms": 638.6,
+              "predicted_per_token_ms": 37.565,
+              "predicted_per_second": 26.6,
+              "draft_n": 14,
+              "draft_n_accepted": 11,
+              "at": 1792885653
+            },
+            "valid": true
+          },
+          {
+            "case": "tool258",
+            "warmup": false,
+            "reply": {
+              "id": "msg_3390b1af371b4daebfae8a88",
+              "type": "message",
+              "role": "assistant",
+              "model": "qwen3.8-flash-next-iq2_xs",
+              "content": [
+                {
+                  "type": "tool_use",
+                  "id": "call_283cddcd6b734b64a221c004",
+                  "name": "record",
+                  "input": {
+                    "value": "Memory locality refers to how well a program's memory access patterns align with the physical organization of memory hierarchies (registers, caches, TLB, main memory). Good locality means frequently accessed data is stored close together in memory, reducing cache misses and improving performance.\n\nKey principles:\n1. **Temporal locality**: Accessing the same memory locations repeatedly within a short time window.\n2. **Spatial locality**: Accessing memory locations that are near each other in address space.\n3. **Cache line utilization**: Accessing data in contiguous blocks to maximize cache line efficiency.\n4. **TLB locality**: Keeping memory accesses within a small number of pages to reduce TLB misses.\n5. **Data structure layout**: Using arrays of structures vs. structures of arrays, padding, and alignment to improve locality.\n6. **Loop optimizations**: Loop fusion, blocking/tiling, and prefetching to improve locality.\n\nPractical implications:\n- Row-major vs. column-major traversal affects cache performance.\n- Pointer chasing (linked lists, trees) often has poor locality.\n- Memory pools and arena allocators improve locality by grouping allocations.\n- False sharing in multi-threaded programs can degrade locality.\n- NUMA architectures require careful data placement for locality."
+                  }
+                }
+              ],
+              "stop_reason": "tool_use",
+              "stop_sequence": null,
+              "usage": {
+                "input_tokens": 258,
+                "output_tokens": 276,
+                "cache_read_input_tokens": 0
+              }
+            },
+            "wall_ms": 23199.964100000216,
+            "timings": {
+              "cache_n": 0,
+              "prompt_n": 258,
+              "prompt_ms": 11187.3,
+              "prompt_per_token_ms": 43.362,
+              "prompt_per_second": 23.1,
+              "predicted_n": 276,
+              "predicted_ms": 11996.7,
+              "predicted_per_token_ms": 43.466,
+              "predicted_per_second": 23.0,
+              "draft_n": 242,
+              "draft_n_accepted": 160,
+              "at": 1792885676
+            },
+            "valid": true
+          },
+          {
+            "case": "tool258",
+            "warmup": false,
+            "reply": {
+              "id": "msg_684bfb6aa0ba45b3bafe2722",
+              "type": "message",
+              "role": "assistant",
+              "model": "qwen3.8-flash-next-iq2_xs",
+              "content": [
+                {
+                  "type": "tool_use",
+                  "id": "call_7912de7478da441d8a78fb0e",
+                  "name": "record",
+                  "input": {
+                    "value": "Memory locality refers to how well a program's memory access patterns align with the physical organization of memory hierarchies (registers, caches, TLB, main memory). Good locality means frequently accessed data is stored close together in memory, reducing cache misses and improving performance.\n\nKey principles:\n1. **Temporal locality**: Accessing the same memory locations repeatedly within a short time window.\n2. **Spatial locality**: Accessing memory locations that are near each other in address space.\n3. **Cache line utilization**: Accessing data in contiguous blocks to maximize cache line efficiency.\n4. **TLB locality**: Keeping memory accesses within a small number of pages to reduce TLB misses.\n5. **Data structure layout**: Using arrays of structures vs. structures of arrays, padding, and alignment to improve locality.\n6. **Loop optimizations**: Loop fusion, blocking/tiling, and prefetching to improve locality.\n\nPractical implications:\n- Row-major vs. column-major traversal affects cache performance.\n- Pointer chasing (linked lists, trees) often has poor locality.\n- Memory pools and arena allocators improve locality by grouping allocations.\n- False sharing in multi-threaded programs can degrade locality.\n- NUMA architectures require careful data placement for locality."
+                  }
+                }
+              ],
+              "stop_reason": "tool_use",
+              "stop_sequence": null,
+              "usage": {
+                "input_tokens": 258,
+                "output_tokens": 276,
+                "cache_read_input_tokens": 0
+              }
+            },
+            "wall_ms": 22089.87490000436,
+            "timings": {
+              "cache_n": 0,
+              "prompt_n": 258,
+              "prompt_ms": 11940.2,
+              "prompt_per_token_ms": 46.28,
+              "prompt_per_second": 21.6,
+              "predicted_n": 276,
+              "predicted_ms": 10132.9,
+              "predicted_per_token_ms": 36.713,
+              "predicted_per_second": 27.2,
+              "draft_n": 242,
+              "draft_n_accepted": 160,
+              "at": 1792885698
+            },
+            "valid": true
+          },
+          {
+            "case": "tool258",
+            "warmup": false,
+            "reply": {
+              "id": "msg_f8daf93293fa424d9801d3c9",
+              "type": "message",
+              "role": "assistant",
+              "model": "qwen3.8-flash-next-iq2_xs",
+              "content": [
+                {
+                  "type": "tool_use",
+                  "id": "call_1389927840984b8885f33617",
+                  "name": "record",
+                  "input": {
+                    "value": "Memory locality refers to how well a program's memory access patterns align with the physical organization of memory hierarchies (registers, caches, TLB, main memory). Good locality means frequently accessed data is stored close together in memory, reducing cache misses and improving performance.\n\nKey principles:\n1. **Temporal locality**: Accessing the same memory locations repeatedly within a short time window.\n2. **Spatial locality**: Accessing memory locations that are near each other in address space.\n3. **Cache line utilization**: Accessing data in contiguous blocks to maximize cache line efficiency.\n4. **TLB locality**: Keeping memory accesses within a small number of pages to reduce TLB misses.\n5. **Data structure layout**: Using arrays of structures vs. structures of arrays, padding, and alignment to improve locality.\n6. **Loop optimizations**: Loop fusion, blocking/tiling, and prefetching to improve locality.\n\nPractical implications:\n- Row-major vs. column-major traversal affects cache performance.\n- Pointer chasing (linked lists, trees) often has poor locality.\n- Memory pools and arena allocators improve locality by grouping allocations.\n- False sharing in multi-threaded programs can degrade locality.\n- NUMA architectures require careful data placement for locality."
+                  }
+                }
+              ],
+              "stop_reason": "tool_use",
+              "stop_sequence": null,
+              "usage": {
+                "input_tokens": 258,
+                "output_tokens": 276,
+                "cache_read_input_tokens": 0
+              }
+            },
+            "wall_ms": 22353.569999992033,
+            "timings": {
+              "cache_n": 0,
+              "prompt_n": 258,
+              "prompt_ms": 12066.9,
+              "prompt_per_token_ms": 46.771,
+              "prompt_per_second": 21.4,
+              "predicted_n": 276,
+              "predicted_ms": 10265.9,
+              "predicted_per_token_ms": 37.195,
+              "predicted_per_second": 26.9,
+              "draft_n": 243,
+              "draft_n_accepted": 159,
+              "at": 1792885720
+            },
+            "valid": true
+          },
+          {
+            "case": "long",
+            "warmup": false,
+            "wall_ms": 180017.23710000806,
+            "error": "TimeoutError: timed out"
+          }
+        ],
+        "cache": [
+          "5771",
+          "7.74"
+        ],
+        "metrics": {
+          "engine": {
+            "model": "qwen3.8-flash-next-iq2_xs",
+            "max_context": 8192,
+            "images": false,
+            "version": "0.1.39-sycl",
+            "context": 8192,
+            "kv": "fp16",
+            "kv_resident": 0,
+            "expert_slots": 5771,
+            "expert_cache_mib": 7922,
+            "expert_slots_primary": 5771,
+            "expert_cache_primary_mib": 7922,
+            "spec": 6,
+            "mtp_max": 4,
+            "lookup": 3,
+            "vram_free_mib": 2257,
+            "cvec": 0,
+            "arena_mib": 33812,
+            "pool_workers": 21,
+            "pcie_frac": "0.16",
+            "spec_min_p": "0.50",
+            "conversation_cache_mib": 0,
+            "conversation_cache_slots": 4,
+            "conversation_cache_min_free_mib": 2560,
+            "tail_role_token": -1,
+            "vram_elastic": 0,
+            "engine": "0.1.39-sycl"
+          },
+          "live": {
+            "state": "idle",
+            "queued": 0,
+            "phase": null,
+            "prompt_tokens": null,
+            "prompt_read": null,
+            "prompt_total": null,
+            "generated": null,
+            "max_tokens": null,
+            "elapsed_s": null,
+            "tok_s": null,
+            "tok_s_mean": null,
+            "prefill_tok_s_mean": null,
+            "tok_s_window_s": null
+          },
+          "requests": [],
+          "conversation_cache": {
+            "enabled": false,
+            "budget_mib": 0,
+            "slots": 4,
+            "parked": 0,
+            "bytes": 0,
+            "evictions": 0,
+            "parks": 0,
+            "restores": 0,
+            "last_event": null,
+            "last_tokens": null,
+            "last_at": null,
+            "requests": 0,
+            "requests_reused": 0,
+            "reused_tokens": 0,
+            "prompt_tokens": 0,
+            "last_reused": null,
+            "last_prompt": null
+          },
+          "requests_kept": 0,
+          "totals": {
+            "since": 1792885577.8226528,
+            "requests": 0,
+            "prompt_tokens": 0,
+            "reused": 0,
+            "output_tokens": 0,
+            "prompt_ms": 0.0,
+            "decode_ms": 0.0,
+            "drafts_offered": 0,
+            "drafts_accepted": 0
+          },
+          "hardware": {
+            "cpu": 0.0,
+            "ram_used": 61312684032,
+            "ram_total": 274766237696,
+            "disk_read_mb": null,
+            "disk_write_mb": null,
+            "tok_s": 0.0,
+            "tok_s_mean": 0,
+            "prefill_tok_s_mean": 0.0
+          },
+          "hardware_static": {
+            "gpu_name": null,
+            "gpu_count": 1,
+            "cpu_name": "Intel(R) Xeon(R) CPU E5-2696 v4 @ 2.20GHz",
+            "cores": 22,
+            "threads": 44,
+            "psutil": true
+          },
+          "history": {
+            "gpu_util": [
+              null
+            ],
+            "gpu_mem_used": [
+              null
+            ],
+            "gpu_temp": [
+              null
+            ],
+            "gpu_power": [
+              null
+            ],
+            "gpu_pcie_rx_mb": [
+              null
+            ],
+            "cpu": [
+              0.0
+            ],
+            "ram_used": [
+              61312684032
+            ],
+            "disk_read_mb": [
+              null
+            ],
+            "tok_s": [
+              0.0
+            ],
+            "prefill_tok_s_mean": [
+              0.0
+            ]
+          },
+          "time": 1792885578.3496459
+        },
+        "server_exit_code": 0
+      },
+      {
+        "label": "B",
+        "candidate": true,
+        "threshold": 1024,
+        "rows": [
+          {
+            "case": "tool255",
+            "warmup": true,
+            "reply": {
+              "id": "msg_82691c59a45540ff89448aca",
+              "type": "message",
+              "role": "assistant",
+              "model": "qwen3.8-flash-next-iq2_xs",
+              "content": [
+                {
+                  "type": "tool_use",
+                  "id": "call_944e0b4023694b19930a804e",
+                  "name": "record",
+                  "input": {
+                    "value": "note"
+                  }
+                }
+              ],
+              "stop_reason": "tool_use",
+              "stop_sequence": null,
+              "usage": {
+                "input_tokens": 255,
+                "output_tokens": 17,
+                "cache_read_input_tokens": 0
+              }
+            },
+            "wall_ms": 13264.937400002964,
+            "timings": {
+              "cache_n": 0,
+              "prompt_n": 255,
+              "prompt_ms": 12258.8,
+              "prompt_per_token_ms": 48.074,
+              "prompt_per_second": 20.8,
+              "predicted_n": 17,
+              "predicted_ms": 982.4,
+              "predicted_per_token_ms": 57.788,
+              "predicted_per_second": 17.3,
+              "draft_n": 14,
+              "draft_n_accepted": 11,
+              "at": 1792885965
+            },
+            "valid": true
+          },
+          {
+            "case": "tool255",
+            "warmup": true,
+            "reply": {
+              "id": "msg_3b1310d6c3cd440280439733",
+              "type": "message",
+              "role": "assistant",
+              "model": "qwen3.8-flash-next-iq2_xs",
+              "content": [
+                {
+                  "type": "tool_use",
+                  "id": "call_09af6cdde4fe45b9aab1c515",
+                  "name": "record",
+                  "input": {
+                    "value": "note"
+                  }
+                }
+              ],
+              "stop_reason": "tool_use",
+              "stop_sequence": null,
+              "usage": {
+                "input_tokens": 255,
+                "output_tokens": 17,
+                "cache_read_input_tokens": 0
+              }
+            },
+            "wall_ms": 12841.344100001152,
+            "timings": {
+              "cache_n": 0,
+              "prompt_n": 255,
+              "prompt_ms": 11950.9,
+              "prompt_per_token_ms": 46.866,
+              "prompt_per_second": 21.3,
+              "predicted_n": 17,
+              "predicted_ms": 871.4,
+              "predicted_per_token_ms": 51.259,
+              "predicted_per_second": 19.5,
+              "draft_n": 14,
+              "draft_n_accepted": 11,
+              "at": 1792885978
+            },
+            "valid": true
+          },
+          {
+            "case": "tool255",
+            "warmup": true,
+            "reply": {
+              "id": "msg_92b92199a99441629e3d737c",
+              "type": "message",
+              "role": "assistant",
+              "model": "qwen3.8-flash-next-iq2_xs",
+              "content": [
+                {
+                  "type": "tool_use",
+                  "id": "call_0e857bd1d3f1417b889633db",
+                  "name": "record",
+                  "input": {
+                    "value": "note"
+                  }
+                }
+              ],
+              "stop_reason": "tool_use",
+              "stop_sequence": null,
+              "usage": {
+                "input_tokens": 255,
+                "output_tokens": 17,
+                "cache_read_input_tokens": 0
+              }
+            },
+            "wall_ms": 12510.471700006747,
+            "timings": {
+              "cache_n": 0,
+              "prompt_n": 255,
+              "prompt_ms": 11701.4,
+              "prompt_per_token_ms": 45.888,
+              "prompt_per_second": 21.8,
+              "predicted_n": 17,
+              "predicted_ms": 789.7,
+              "predicted_per_token_ms": 46.453,
+              "predicted_per_second": 21.5,
+              "draft_n": 14,
+              "draft_n_accepted": 11,
+              "at": 1792885991
+            },
+            "valid": true
+          },
+          {
+            "case": "tool255",
+            "warmup": false,
+            "reply": {
+              "id": "msg_cd9c491d4a4e4f2cb74ce707",
+              "type": "message",
+              "role": "assistant",
+              "model": "qwen3.8-flash-next-iq2_xs",
+              "content": [
+                {
+                  "type": "tool_use",
+                  "id": "call_0d9e5beec1454b99a56547ab",
+                  "name": "record",
+                  "input": {
+                    "value": "note"
+                  }
+                }
+              ],
+              "stop_reason": "tool_use",
+              "stop_sequence": null,
+              "usage": {
+                "input_tokens": 255,
+                "output_tokens": 17,
+                "cache_read_input_tokens": 0
+              }
+            },
+            "wall_ms": 12333.665700003621,
+            "timings": {
+              "cache_n": 0,
+              "prompt_n": 255,
+              "prompt_ms": 11573.1,
+              "prompt_per_token_ms": 45.385,
+              "prompt_per_second": 22.0,
+              "predicted_n": 17,
+              "predicted_ms": 741.9,
+              "predicted_per_token_ms": 43.641,
+              "predicted_per_second": 22.9,
+              "draft_n": 14,
+              "draft_n_accepted": 11,
+              "at": 1792886003
+            },
+            "valid": true
+          },
+          {
+            "case": "tool255",
+            "warmup": false,
+            "reply": {
+              "id": "msg_753bdec0cc534765b6e055ac",
+              "type": "message",
+              "role": "assistant",
+              "model": "qwen3.8-flash-next-iq2_xs",
+              "content": [
+                {
+                  "type": "tool_use",
+                  "id": "call_8d36536ac2e04939b379ac6e",
+                  "name": "record",
+                  "input": {
+                    "value": "note"
+                  }
+                }
+              ],
+              "stop_reason": "tool_use",
+              "stop_sequence": null,
+              "usage": {
+                "input_tokens": 255,
+                "output_tokens": 17,
+                "cache_read_input_tokens": 0
+              }
+            },
+            "wall_ms": 12086.838799994439,
+            "timings": {
+              "cache_n": 0,
+              "prompt_n": 255,
+              "prompt_ms": 11384.7,
+              "prompt_per_token_ms": 44.646,
+              "prompt_per_second": 22.4,
+              "predicted_n": 17,
+              "predicted_ms": 680.7,
+              "predicted_per_token_ms": 40.041,
+              "predicted_per_second": 25.0,
+              "draft_n": 14,
+              "draft_n_accepted": 11,
+              "at": 1792886015
+            },
+            "valid": true
+          },
+          {
+            "case": "tool255",
+            "warmup": false,
+            "reply": {
+              "id": "msg_2b16d4749dfc4dba86cae463",
+              "type": "message",
+              "role": "assistant",
+              "model": "qwen3.8-flash-next-iq2_xs",
+              "content": [
+                {
+                  "type": "tool_use",
+                  "id": "call_539a8ccd88ad49258c88fc81",
+                  "name": "record",
+                  "input": {
+                    "value": "note"
+                  }
+                }
+              ],
+              "stop_reason": "tool_use",
+              "stop_sequence": null,
+              "usage": {
+                "input_tokens": 255,
+                "output_tokens": 17,
+                "cache_read_input_tokens": 0
+              }
+            },
+            "wall_ms": 11904.576400003862,
+            "timings": {
+              "cache_n": 0,
+              "prompt_n": 255,
+              "prompt_ms": 11227.9,
+              "prompt_per_token_ms": 44.031,
+              "prompt_per_second": 22.7,
+              "predicted_n": 17,
+              "predicted_ms": 643.1,
+              "predicted_per_token_ms": 37.829,
+              "predicted_per_second": 26.4,
+              "draft_n": 14,
+              "draft_n_accepted": 11,
+              "at": 1792886027
+            },
+            "valid": true
+          },
+          {
+            "case": "tool258",
+            "warmup": false,
+            "reply": {
+              "id": "msg_18ac2cb59b3c46df8430fd2a",
+              "type": "message",
+              "role": "assistant",
+              "model": "qwen3.8-flash-next-iq2_xs",
+              "content": [
+                {
+                  "type": "tool_use",
+                  "id": "call_cf143f5f041744589c3dc3e7",
+                  "name": "record",
+                  "input": {
+                    "value": "Memory locality refers to how well a program's memory access patterns align with the physical organization of memory hierarchies (registers, caches, TLB, main memory). Good locality means frequently accessed data is stored close together in memory, reducing cache misses and improving performance.\n\nKey principles:\n1. **Temporal locality**: Accessing the same memory locations repeatedly within a short time window.\n2. **Spatial locality**: Accessing memory locations that are near each other in address space.\n3. **Cache line utilization**: Accessing data in contiguous blocks to maximize cache line efficiency.\n4. **TLB locality**: Keeping memory accesses within a small number of pages to reduce TLB misses.\n5. **Data structure layout**: Using arrays of structures vs. structures of arrays, padding, and alignment to improve locality.\n6. **Loop optimizations**: Loop fusion, blocking/tiling, and prefetching to improve locality.\n\nPractical implications:\n- Row-major vs. column-major traversal affects cache performance.\n- Pointer chasing (linked lists, trees) often has poor locality.\n- Memory pools and arena allocators improve locality by grouping allocations.\n- False sharing in multi-threaded programs can degrade locality.\n- NUMA architectures require careful data placement for locality."
+                  }
+                }
+              ],
+              "stop_reason": "tool_use",
+              "stop_sequence": null,
+              "usage": {
+                "input_tokens": 258,
+                "output_tokens": 276,
+                "cache_read_input_tokens": 0
+              }
+            },
+            "wall_ms": 23266.727499998524,
+            "timings": {
+              "cache_n": 0,
+              "prompt_n": 258,
+              "prompt_ms": 11226.9,
+              "prompt_per_token_ms": 43.515,
+              "prompt_per_second": 23.0,
+              "predicted_n": 276,
+              "predicted_ms": 12019.8,
+              "predicted_per_token_ms": 43.55,
+              "predicted_per_second": 23.0,
+              "draft_n": 234,
+              "draft_n_accepted": 159,
+              "at": 1792886050
+            },
+            "valid": true
+          },
+          {
+            "case": "tool258",
+            "warmup": false,
+            "reply": {
+              "id": "msg_3c431bbe9c8c4e8496fd045c",
+              "type": "message",
+              "role": "assistant",
+              "model": "qwen3.8-flash-next-iq2_xs",
+              "content": [
+                {
+                  "type": "tool_use",
+                  "id": "call_05f89fb0906043b78e6e8ead",
+                  "name": "record",
+                  "input": {
+                    "value": "Memory locality refers to how well a program's memory access patterns align with the physical organization of memory hierarchies (registers, caches, TLB, main memory). Good locality means frequently accessed data is stored close together in memory, reducing cache misses and improving performance.\n\nKey principles:\n1. **Temporal locality**: Accessing the same memory locations repeatedly within a short time window.\n2. **Spatial locality**: Accessing memory locations that are near each other in address space.\n3. **Cache line utilization**: Accessing data in contiguous blocks to maximize cache line efficiency.\n4. **TLB locality**: Keeping memory accesses within a small number of pages to reduce TLB misses.\n5. **Data structure layout**: Using arrays of structures vs. structures of arrays, padding, and alignment to improve locality.\n6. **Loop optimizations**: Loop fusion, blocking/tiling, and prefetching to improve locality.\n\nPractical implications:\n- Row-major vs. column-major traversal affects cache performance.\n- Pointer chasing (linked lists, trees) often has poor locality.\n- Memory pools and arena allocators improve locality by grouping allocations.\n- False sharing in multi-threaded programs can degrade locality.\n- NUMA architectures require careful data placement for locality."
+                  }
+                }
+              ],
+              "stop_reason": "tool_use",
+              "stop_sequence": null,
+              "usage": {
+                "input_tokens": 258,
+                "output_tokens": 276,
+                "cache_read_input_tokens": 0
+              }
+            },
+            "wall_ms": 22222.05140000733,
+            "timings": {
+              "cache_n": 0,
+              "prompt_n": 258,
+              "prompt_ms": 11990.0,
+              "prompt_per_token_ms": 46.473,
+              "prompt_per_second": 21.5,
+              "predicted_n": 276,
+              "predicted_ms": 10212.6,
+              "predicted_per_token_ms": 37.002,
+              "predicted_per_second": 27.0,
+              "draft_n": 234,
+              "draft_n_accepted": 159,
+              "at": 1792886072
+            },
+            "valid": true
+          },
+          {
+            "case": "tool258",
+            "warmup": false,
+            "reply": {
+              "id": "msg_26e6bbb663c84ee1a2a0e307",
+              "type": "message",
+              "role": "assistant",
+              "model": "qwen3.8-flash-next-iq2_xs",
+              "content": [
+                {
+                  "type": "tool_use",
+                  "id": "call_c1fa31304de0444f92b4a138",
+                  "name": "record",
+                  "input": {
+                    "value": "Memory locality refers to how well a program's memory access patterns align with the physical organization of memory hierarchies (registers, caches, TLB, main memory). Good locality means frequently accessed data is stored close together in memory, reducing cache misses and improving performance.\n\nKey principles:\n1. **Temporal locality**: Accessing the same memory locations repeatedly within a short time window.\n2. **Spatial locality**: Accessing memory locations that are near each other in address space.\n3. **Cache line utilization**: Accessing data in contiguous blocks to maximize cache line efficiency.\n4. **TLB locality**: Keeping memory accesses within a small number of pages to reduce TLB misses.\n5. **Data structure layout**: Using arrays of structures vs. structures of arrays, padding, and alignment to improve locality.\n6. **Loop optimizations**: Loop fusion, blocking/tiling, and prefetching to improve locality.\n\nPractical implications:\n- Row-major vs. column-major traversal affects cache performance.\n- Pointer chasing (linked lists, trees) often has poor locality.\n- Memory pools and arena allocators improve locality by grouping allocations.\n- False sharing in multi-threaded programs can degrade locality.\n- NUMA architectures require careful data placement for locality."
+                  }
+                }
+              ],
+              "stop_reason": "tool_use",
+              "stop_sequence": null,
+              "usage": {
+                "input_tokens": 258,
+                "output_tokens": 276,
+                "cache_read_input_tokens": 0
+              }
+            },
+            "wall_ms": 22266.763600011473,
+            "timings": {
+              "cache_n": 0,
+              "prompt_n": 258,
+              "prompt_ms": 12072.3,
+              "prompt_per_token_ms": 46.792,
+              "prompt_per_second": 21.4,
+              "predicted_n": 276,
+              "predicted_ms": 10184.6,
+              "predicted_per_token_ms": 36.901,
+              "predicted_per_second": 27.1,
+              "draft_n": 234,
+              "draft_n_accepted": 156,
+              "at": 1792886095
+            },
+            "valid": true
+          },
+          {
+            "case": "long",
+            "warmup": false,
+            "reply": {
+              "id": "msg_98621179482c4059813e6a85",
+              "type": "message",
+              "role": "assistant",
+              "model": "qwen3.8-flash-next-iq2_xs",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "{\"first\": 113, \"middle\": 80, \"last\": 47}"
+                }
+              ],
+              "stop_reason": "end_turn",
+              "stop_sequence": null,
+              "usage": {
+                "input_tokens": 1038,
+                "output_tokens": 23,
+                "cache_read_input_tokens": 0
+              }
+            },
+            "wall_ms": 28838.50359999633,
+            "timings": {
+              "cache_n": 0,
+              "prompt_n": 1038,
+              "prompt_ms": 27359.5,
+              "prompt_per_token_ms": 26.358,
+              "prompt_per_second": 37.9,
+              "predicted_n": 23,
+              "predicted_ms": 1460.7,
+              "predicted_per_token_ms": 63.509,
+              "predicted_per_second": 15.7,
+              "draft_n": 18,
+              "draft_n_accepted": 18,
+              "at": 1792886124
+            },
+            "valid": true
+          },
+          {
+            "case": "long",
+            "warmup": false,
+            "reply": {
+              "id": "msg_a9788ceb7b1341b19ba38dd6",
+              "type": "message",
+              "role": "assistant",
+              "model": "qwen3.8-flash-next-iq2_xs",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "{\"first\": 113, \"middle\": 80, \"last\": 47}"
+                }
+              ],
+              "stop_reason": "end_turn",
+              "stop_sequence": null,
+              "usage": {
+                "input_tokens": 1038,
+                "output_tokens": 23,
+                "cache_read_input_tokens": 0
+              }
+            },
+            "wall_ms": 28594.809400005033,
+            "timings": {
+              "cache_n": 0,
+              "prompt_n": 1038,
+              "prompt_ms": 27280.2,
+              "prompt_per_token_ms": 26.282,
+              "prompt_per_second": 38.0,
+              "predicted_n": 23,
+              "predicted_ms": 1284.5,
+              "predicted_per_token_ms": 55.848,
+              "predicted_per_second": 17.9,
+              "draft_n": 18,
+              "draft_n_accepted": 18,
+              "at": 1792886152
+            },
+            "valid": true
+          },
+          {
+            "case": "long",
+            "warmup": false,
+            "reply": {
+              "id": "msg_0510772d2b34434ba7245b0a",
+              "type": "message",
+              "role": "assistant",
+              "model": "qwen3.8-flash-next-iq2_xs",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "{\"first\": 113, \"middle\": 80, \"last\": 47}"
+                }
+              ],
+              "stop_reason": "end_turn",
+              "stop_sequence": null,
+              "usage": {
+                "input_tokens": 1038,
+                "output_tokens": 23,
+                "cache_read_input_tokens": 0
+              }
+            },
+            "wall_ms": 28338.96759999334,
+            "timings": {
+              "cache_n": 0,
+              "prompt_n": 1038,
+              "prompt_ms": 27145.3,
+              "prompt_per_token_ms": 26.152,
+              "prompt_per_second": 38.2,
+              "predicted_n": 23,
+              "predicted_ms": 1162.0,
+              "predicted_per_token_ms": 50.522,
+              "predicted_per_second": 19.8,
+              "draft_n": 18,
+              "draft_n_accepted": 18,
+              "at": 1792886181
+            },
+            "valid": true
+          }
+        ],
+        "cache": [
+          "5771",
+          "7.74"
+        ],
+        "metrics": {
+          "engine": {
+            "model": "qwen3.8-flash-next-iq2_xs",
+            "max_context": 8192,
+            "images": false,
+            "version": "0.1.39-sycl",
+            "context": 8192,
+            "kv": "fp16",
+            "kv_resident": 0,
+            "expert_slots": 5771,
+            "expert_cache_mib": 7922,
+            "expert_slots_primary": 5771,
+            "expert_cache_primary_mib": 7922,
+            "spec": 6,
+            "mtp_max": 4,
+            "lookup": 3,
+            "vram_free_mib": 2264,
+            "cvec": 0,
+            "arena_mib": 33812,
+            "pool_workers": 21,
+            "pcie_frac": "0.16",
+            "spec_min_p": "0.50",
+            "conversation_cache_mib": 0,
+            "conversation_cache_slots": 4,
+            "conversation_cache_min_free_mib": 2560,
+            "tail_role_token": -1,
+            "vram_elastic": 0,
+            "engine": "0.1.39-sycl"
+          },
+          "live": {
+            "state": "idle",
+            "queued": 0,
+            "phase": null,
+            "prompt_tokens": null,
+            "prompt_read": null,
+            "prompt_total": null,
+            "generated": null,
+            "max_tokens": null,
+            "elapsed_s": null,
+            "tok_s": null,
+            "tok_s_mean": null,
+            "prefill_tok_s_mean": null,
+            "tok_s_window_s": null
+          },
+          "requests": [],
+          "conversation_cache": {
+            "enabled": false,
+            "budget_mib": 0,
+            "slots": 4,
+            "parked": 0,
+            "bytes": 0,
+            "evictions": 0,
+            "parks": 0,
+            "restores": 0,
+            "last_event": null,
+            "last_tokens": null,
+            "last_at": null,
+            "requests": 0,
+            "requests_reused": 0,
+            "reused_tokens": 0,
+            "prompt_tokens": 0,
+            "last_reused": null,
+            "last_prompt": null
+          },
+          "requests_kept": 0,
+          "totals": {
+            "since": 1792885952.071826,
+            "requests": 0,
+            "prompt_tokens": 0,
+            "reused": 0,
+            "output_tokens": 0,
+            "prompt_ms": 0.0,
+            "decode_ms": 0.0,
+            "drafts_offered": 0,
+            "drafts_accepted": 0
+          },
+          "hardware": {
+            "cpu": 0.0,
+            "ram_used": 61284872192,
+            "ram_total": 274766237696,
+            "disk_read_mb": null,
+            "disk_write_mb": null,
+            "tok_s": 0.0,
+            "tok_s_mean": 0,
+            "prefill_tok_s_mean": 0.0
+          },
+          "hardware_static": {
+            "gpu_name": null,
+            "gpu_count": 1,
+            "cpu_name": "Intel(R) Xeon(R) CPU E5-2696 v4 @ 2.20GHz",
+            "cores": 22,
+            "threads": 44,
+            "psutil": true
+          },
+          "history": {
+            "gpu_util": [
+              null
+            ],
+            "gpu_mem_used": [
+              null
+            ],
+            "gpu_temp": [
+              null
+            ],
+            "gpu_power": [
+              null
+            ],
+            "gpu_pcie_rx_mb": [
+              null
+            ],
+            "cpu": [
+              0.0
+            ],
+            "ram_used": [
+              61284872192
+            ],
+            "disk_read_mb": [
+              null
+            ],
+            "tok_s": [
+              0.0
+            ],
+            "prefill_tok_s_mean": [
+              0.0
+            ]
+          },
+          "time": 1792885952.3516147
+        },
+        "server_exit_code": 0
+      },
+      {
+        "label": "A2",
+        "candidate": false,
+        "threshold": 1024,
+        "rows": [
+          {
+            "case": "tool255",
+            "warmup": true,
+            "reply": {
+              "id": "msg_dc090920386e4212a142eed8",
+              "type": "message",
+              "role": "assistant",
+              "model": "qwen3.8-flash-next-iq2_xs",
+              "content": [
+                {
+                  "type": "tool_use",
+                  "id": "call_5a4bd813f22b4ee3985b1c88",
+                  "name": "record",
+                  "input": {
+                    "value": "note"
+                  }
+                }
+              ],
+              "stop_reason": "tool_use",
+              "stop_sequence": null,
+              "usage": {
+                "input_tokens": 255,
+                "output_tokens": 17,
+                "cache_read_input_tokens": 0
+              }
+            },
+            "wall_ms": 13231.962899997598,
+            "timings": {
+              "cache_n": 0,
+              "prompt_n": 255,
+              "prompt_ms": 12233.3,
+              "prompt_per_token_ms": 47.974,
+              "prompt_per_second": 20.8,
+              "predicted_n": 17,
+              "predicted_ms": 977.7,
+              "predicted_per_token_ms": 57.512,
+              "predicted_per_second": 17.4,
+              "draft_n": 14,
+              "draft_n_accepted": 11,
+              "at": 1792886225
+            },
+            "valid": true
+          },
+          {
+            "case": "tool255",
+            "warmup": true,
+            "reply": {
+              "id": "msg_533068bf85474705af7f8796",
+              "type": "message",
+              "role": "assistant",
+              "model": "qwen3.8-flash-next-iq2_xs",
+              "content": [
+                {
+                  "type": "tool_use",
+                  "id": "call_2b7aebf7ede143a599a9a580",
+                  "name": "record",
+                  "input": {
+                    "value": "note"
+                  }
+                }
+              ],
+              "stop_reason": "tool_use",
+              "stop_sequence": null,
+              "usage": {
+                "input_tokens": 255,
+                "output_tokens": 17,
+                "cache_read_input_tokens": 0
+              }
+            },
+            "wall_ms": 12831.239999999525,
+            "timings": {
+              "cache_n": 0,
+              "prompt_n": 255,
+              "prompt_ms": 11936.3,
+              "prompt_per_token_ms": 46.809,
+              "prompt_per_second": 21.4,
+              "predicted_n": 17,
+              "predicted_ms": 865.2,
+              "predicted_per_token_ms": 50.894,
+              "predicted_per_second": 19.6,
+              "draft_n": 14,
+              "draft_n_accepted": 11,
+              "at": 1792886238
+            },
+            "valid": true
+          },
+          {
+            "case": "tool255",
+            "warmup": true,
+            "reply": {
+              "id": "msg_7bc11fa45f9940318ee57a97",
+              "type": "message",
+              "role": "assistant",
+              "model": "qwen3.8-flash-next-iq2_xs",
+              "content": [
+                {
+                  "type": "tool_use",
+                  "id": "call_0dbad1df38104f32af1813f8",
+                  "name": "record",
+                  "input": {
+                    "value": "note"
+                  }
+                }
+              ],
+              "stop_reason": "tool_use",
+              "stop_sequence": null,
+              "usage": {
+                "input_tokens": 255,
+                "output_tokens": 17,
+                "cache_read_input_tokens": 0
+              }
+            },
+            "wall_ms": 12495.547300000908,
+            "timings": {
+              "cache_n": 0,
+              "prompt_n": 255,
+              "prompt_ms": 11679.6,
+              "prompt_per_token_ms": 45.802,
+              "prompt_per_second": 21.8,
+              "predicted_n": 17,
+              "predicted_ms": 783.5,
+              "predicted_per_token_ms": 46.088,
+              "predicted_per_second": 21.7,
+              "draft_n": 14,
+              "draft_n_accepted": 11,
+              "at": 1792886250
+            },
+            "valid": true
+          },
+          {
+            "case": "tool255",
+            "warmup": false,
+            "reply": {
+              "id": "msg_b09eeba6a604497aba71fee8",
+              "type": "message",
+              "role": "assistant",
+              "model": "qwen3.8-flash-next-iq2_xs",
+              "content": [
+                {
+                  "type": "tool_use",
+                  "id": "call_49f3716a8ba9462686a8af57",
+                  "name": "record",
+                  "input": {
+                    "value": "note"
+                  }
+                }
+              ],
+              "stop_reason": "tool_use",
+              "stop_sequence": null,
+              "usage": {
+                "input_tokens": 255,
+                "output_tokens": 17,
+                "cache_read_input_tokens": 0
+              }
+            },
+            "wall_ms": 12282.856599995284,
+            "timings": {
+              "cache_n": 0,
+              "prompt_n": 255,
+              "prompt_ms": 11514.4,
+              "prompt_per_token_ms": 45.155,
+              "prompt_per_second": 22.1,
+              "predicted_n": 17,
+              "predicted_ms": 735.1,
+              "predicted_per_token_ms": 43.241,
+              "predicted_per_second": 23.1,
+              "draft_n": 14,
+              "draft_n_accepted": 11,
+              "at": 1792886263
+            },
+            "valid": true
+          },
+          {
+            "case": "tool255",
+            "warmup": false,
+            "reply": {
+              "id": "msg_aac3b335481c48c5b13c00e6",
+              "type": "message",
+              "role": "assistant",
+              "model": "qwen3.8-flash-next-iq2_xs",
+              "content": [
+                {
+                  "type": "tool_use",
+                  "id": "call_e570d59b31b940fabdb24895",
+                  "name": "record",
+                  "input": {
+                    "value": "note"
+                  }
+                }
+              ],
+              "stop_reason": "tool_use",
+              "stop_sequence": null,
+              "usage": {
+                "input_tokens": 255,
+                "output_tokens": 17,
+                "cache_read_input_tokens": 0
+              }
+            },
+            "wall_ms": 12032.386799997767,
+            "timings": {
+              "cache_n": 0,
+              "prompt_n": 255,
+              "prompt_ms": 11329.2,
+              "prompt_per_token_ms": 44.428,
+              "prompt_per_second": 22.5,
+              "predicted_n": 17,
+              "predicted_ms": 676.5,
+              "predicted_per_token_ms": 39.794,
+              "predicted_per_second": 25.1,
+              "draft_n": 14,
+              "draft_n_accepted": 11,
+              "at": 1792886275
+            },
+            "valid": true
+          },
+          {
+            "case": "tool255",
+            "warmup": false,
+            "reply": {
+              "id": "msg_095134f56d5145d9a4f20b88",
+              "type": "message",
+              "role": "assistant",
+              "model": "qwen3.8-flash-next-iq2_xs",
+              "content": [
+                {
+                  "type": "tool_use",
+                  "id": "call_da19d09ea3d94c2a9150b2bb",
+                  "name": "record",
+                  "input": {
+                    "value": "note"
+                  }
+                }
+              ],
+              "stop_reason": "tool_use",
+              "stop_sequence": null,
+              "usage": {
+                "input_tokens": 255,
+                "output_tokens": 17,
+                "cache_read_input_tokens": 0
+              }
+            },
+            "wall_ms": 11876.580900003319,
+            "timings": {
+              "cache_n": 0,
+              "prompt_n": 255,
+              "prompt_ms": 11208.4,
+              "prompt_per_token_ms": 43.955,
+              "prompt_per_second": 22.8,
+              "predicted_n": 17,
+              "predicted_ms": 642.6,
+              "predicted_per_token_ms": 37.8,
+              "predicted_per_second": 26.5,
+              "draft_n": 14,
+              "draft_n_accepted": 11,
+              "at": 1792886287
+            },
+            "valid": true
+          },
+          {
+            "case": "tool258",
+            "warmup": false,
+            "reply": {
+              "id": "msg_7471d01668d34334961eecd5",
+              "type": "message",
+              "role": "assistant",
+              "model": "qwen3.8-flash-next-iq2_xs",
+              "content": [
+                {
+                  "type": "tool_use",
+                  "id": "call_bce67b18fd334a8e8423bbc1",
+                  "name": "record",
+                  "input": {
+                    "value": "Memory locality refers to how well a program's memory access patterns align with the physical organization of memory hierarchies (registers, caches, TLB, main memory). Good locality means frequently accessed data is stored close together in memory, reducing cache misses and improving performance.\n\nKey principles:\n1. **Temporal locality**: Accessing the same memory locations repeatedly within a short time window.\n2. **Spatial locality**: Accessing memory locations that are near each other in address space.\n3. **Cache line utilization**: Accessing data in contiguous blocks to maximize cache line efficiency.\n4. **TLB locality**: Keeping memory accesses within a small number of pages to reduce TLB misses.\n5. **Data structure layout**: Using arrays of structures vs. structures of arrays, padding, and alignment to improve locality.\n6. **Loop optimizations**: Loop fusion, blocking/tiling, and prefetching to improve locality.\n\nPractical implications:\n- Row-major vs. column-major traversal affects cache performance.\n- Pointer chasing (linked lists, trees) often has poor locality.\n- Memory pools and arena allocators improve locality by grouping allocations.\n- False sharing in multi-threaded programs can degrade locality.\n- NUMA architectures require careful data placement for locality."
+                  }
+                }
+              ],
+              "stop_reason": "tool_use",
+              "stop_sequence": null,
+              "usage": {
+                "input_tokens": 258,
+                "output_tokens": 276,
+                "cache_read_input_tokens": 0
+              }
+            },
+            "wall_ms": 23185.390900005586,
+            "timings": {
+              "cache_n": 0,
+              "prompt_n": 258,
+              "prompt_ms": 11183.9,
+              "prompt_per_token_ms": 43.348,
+              "prompt_per_second": 23.1,
+              "predicted_n": 276,
+              "predicted_ms": 11981.9,
+              "predicted_per_token_ms": 43.413,
+              "predicted_per_second": 23.0,
+              "draft_n": 242,
+              "draft_n_accepted": 160,
+              "at": 1792886310
+            },
+            "valid": true
+          },
+          {
+            "case": "tool258",
+            "warmup": false,
+            "reply": {
+              "id": "msg_e04ce2d15a2b486686ca8277",
+              "type": "message",
+              "role": "assistant",
+              "model": "qwen3.8-flash-next-iq2_xs",
+              "content": [
+                {
+                  "type": "tool_use",
+                  "id": "call_09d3415e1aa042b3b4928e85",
+                  "name": "record",
+                  "input": {
+                    "value": "Memory locality refers to how well a program's memory access patterns align with the physical organization of memory hierarchies (registers, caches, TLB, main memory). Good locality means frequently accessed data is stored close together in memory, reducing cache misses and improving performance.\n\nKey principles:\n1. **Temporal locality**: Accessing the same memory locations repeatedly within a short time window.\n2. **Spatial locality**: Accessing memory locations that are near each other in address space.\n3. **Cache line utilization**: Accessing data in contiguous blocks to maximize cache line efficiency.\n4. **TLB locality**: Keeping memory accesses within a small number of pages to reduce TLB misses.\n5. **Data structure layout**: Using arrays of structures vs. structures of arrays, padding, and alignment to improve locality.\n6. **Loop optimizations**: Loop fusion, blocking/tiling, and prefetching to improve locality.\n\nPractical implications:\n- Row-major vs. column-major traversal affects cache performance.\n- Pointer chasing (linked lists, trees) often has poor locality.\n- Memory pools and arena allocators improve locality by grouping allocations.\n- False sharing in multi-threaded programs can degrade locality.\n- NUMA architectures require careful data placement for locality."
+                  }
+                }
+              ],
+              "stop_reason": "tool_use",
+              "stop_sequence": null,
+              "usage": {
+                "input_tokens": 258,
+                "output_tokens": 276,
+                "cache_read_input_tokens": 0
+              }
+            },
+            "wall_ms": 22123.771599988686,
+            "timings": {
+              "cache_n": 0,
+              "prompt_n": 258,
+              "prompt_ms": 11936.6,
+              "prompt_per_token_ms": 46.266,
+              "prompt_per_second": 21.6,
+              "predicted_n": 276,
+              "predicted_ms": 10159.1,
+              "predicted_per_token_ms": 36.808,
+              "predicted_per_second": 27.2,
+              "draft_n": 242,
+              "draft_n_accepted": 160,
+              "at": 1792886332
+            },
+            "valid": true
+          },
+          {
+            "case": "tool258",
+            "warmup": false,
+            "reply": {
+              "id": "msg_187da41f2570487a94400405",
+              "type": "message",
+              "role": "assistant",
+              "model": "qwen3.8-flash-next-iq2_xs",
+              "content": [
+                {
+                  "type": "tool_use",
+                  "id": "call_7569a6763916497b88f269c8",
+                  "name": "record",
+                  "input": {
+                    "value": "Memory locality refers to how well a program's memory access patterns align with the physical organization of memory hierarchies (registers, caches, TLB, main memory). Good locality means frequently accessed data is stored close together in memory, reducing cache misses and improving performance.\n\nKey principles:\n1. **Temporal locality**: Accessing the same memory locations repeatedly within a short time window.\n2. **Spatial locality**: Accessing memory locations that are near each other in address space.\n3. **Cache line utilization**: Accessing data in contiguous blocks to maximize cache line efficiency.\n4. **TLB locality**: Keeping memory accesses within a small number of pages to reduce TLB misses.\n5. **Data structure layout**: Using arrays of structures vs. structures of arrays, padding, and alignment to improve locality.\n6. **Loop optimizations**: Loop fusion, blocking/tiling, and prefetching to improve locality.\n\nPractical implications:\n- Row-major vs. column-major traversal affects cache performance.\n- Pointer chasing (linked lists, trees) often has poor locality.\n- Memory pools and arena allocators improve locality by grouping allocations.\n- False sharing in multi-threaded programs can degrade locality.\n- NUMA architectures require careful data placement for locality."
+                  }
+                }
+              ],
+              "stop_reason": "tool_use",
+              "stop_sequence": null,
+              "usage": {
+                "input_tokens": 258,
+                "output_tokens": 276,
+                "cache_read_input_tokens": 0
+              }
+            },
+            "wall_ms": 22354.31019999669,
+            "timings": {
+              "cache_n": 0,
+              "prompt_n": 258,
+              "prompt_ms": 12050.4,
+              "prompt_per_token_ms": 46.707,
+              "prompt_per_second": 21.4,
+              "predicted_n": 276,
+              "predicted_ms": 10271.2,
+              "predicted_per_token_ms": 37.214,
+              "predicted_per_second": 26.9,
+              "draft_n": 243,
+              "draft_n_accepted": 159,
+              "at": 1792886354
+            },
+            "valid": true
+          }
+        ],
+        "cache": [
+          "5771",
+          "7.74"
+        ],
+        "metrics": {
+          "engine": {
+            "model": "qwen3.8-flash-next-iq2_xs",
+            "max_context": 8192,
+            "images": false,
+            "version": "0.1.39-sycl",
+            "context": 8192,
+            "kv": "fp16",
+            "kv_resident": 0,
+            "expert_slots": 5771,
+            "expert_cache_mib": 7922,
+            "expert_slots_primary": 5771,
+            "expert_cache_primary_mib": 7922,
+            "spec": 6,
+            "mtp_max": 4,
+            "lookup": 3,
+            "vram_free_mib": 2265,
+            "cvec": 0,
+            "arena_mib": 33812,
+            "pool_workers": 21,
+            "pcie_frac": "0.16",
+            "spec_min_p": "0.50",
+            "conversation_cache_mib": 0,
+            "conversation_cache_slots": 4,
+            "conversation_cache_min_free_mib": 2560,
+            "tail_role_token": -1,
+            "vram_elastic": 0,
+            "engine": "0.1.39-sycl"
+          },
+          "live": {
+            "state": "idle",
+            "queued": 0,
+            "phase": null,
+            "prompt_tokens": null,
+            "prompt_read": null,
+            "prompt_total": null,
+            "generated": null,
+            "max_tokens": null,
+            "elapsed_s": null,
+            "tok_s": null,
+            "tok_s_mean": null,
+            "prefill_tok_s_mean": null,
+            "tok_s_window_s": null
+          },
+          "requests": [],
+          "conversation_cache": {
+            "enabled": false,
+            "budget_mib": 0,
+            "slots": 4,
+            "parked": 0,
+            "bytes": 0,
+            "evictions": 0,
+            "parks": 0,
+            "restores": 0,
+            "last_event": null,
+            "last_tokens": null,
+            "last_at": null,
+            "requests": 0,
+            "requests_reused": 0,
+            "reused_tokens": 0,
+            "prompt_tokens": 0,
+            "last_reused": null,
+            "last_prompt": null
+          },
+          "requests_kept": 0,
+          "totals": {
+            "since": 1792886212.0642688,
+            "requests": 0,
+            "prompt_tokens": 0,
+            "reused": 0,
+            "output_tokens": 0,
+            "prompt_ms": 0.0,
+            "decode_ms": 0.0,
+            "drafts_offered": 0,
+            "drafts_accepted": 0
+          },
+          "hardware": {
+            "cpu": 0.0,
+            "ram_used": 61279477760,
+            "ram_total": 274766237696,
+            "disk_read_mb": null,
+            "disk_write_mb": null,
+            "tok_s": 0.0,
+            "tok_s_mean": 0,
+            "prefill_tok_s_mean": 0.0
+          },
+          "hardware_static": {
+            "gpu_name": null,
+            "gpu_count": 1,
+            "cpu_name": "Intel(R) Xeon(R) CPU E5-2696 v4 @ 2.20GHz",
+            "cores": 22,
+            "threads": 44,
+            "psutil": true
+          },
+          "history": {
+            "gpu_util": [
+              null
+            ],
+            "gpu_mem_used": [
+              null
+            ],
+            "gpu_temp": [
+              null
+            ],
+            "gpu_power": [
+              null
+            ],
+            "gpu_pcie_rx_mb": [
+              null
+            ],
+            "cpu": [
+              0.0
+            ],
+            "ram_used": [
+              61279477760
+            ],
+            "disk_read_mb": [
+              null
+            ],
+            "tok_s": [
+              0.0
+            ],
+            "prefill_tok_s_mean": [
+              0.0
+            ]
+          },
+          "time": 1792886212.3423274
+        },
+        "server_exit_code": 0
+      }
+    ],
+    "complete": true,
+    "source_sha256": {
+      "build-sycl-a770-production-xmx-v2-20261025/measure.py": "18ec5c7164e998f74c6417722f166a4bbb11abc26191904c76b573bc10f69c55",
+      "build-sycl-a770-production-xmx-v2-20261025/build.json": "fa92437ff61d4b000a6d49731b59221278a92bf2d08fa49ae3174d5d65ab0aee",
+      "strata-iq2_xs.json": "da7090d500e14c4c05b2a6c76b67d01bd86c5aceaee3d2eaa8e37d638e22a902",
+      "build-sycl-a770-unified-operators/bin/strata-unified-all-operators.exe": "8f0d866ded297cf5a409e84cf5dd61f437c56c8a89aaeb2a85569265b6a3e122",
+      "build-sycl-a770-production-xmx-v2-20261025/bin/strata-unified-all-operators.exe": "73996f4fab16c89531574d29bea70097cd5309d4db03c00af5829d78920e7890",
+      "build-sycl-a770-short-read-fix-v2-20261024/run.py": "a64a21fec956e73277e05fd40e89ae525acc13a3a7000f45830c3c9d9ea73a94",
+      "serve/frontend.py": "e0857ef350d5bd0468dba77c4c3e8aba556ff6c29e9951846f7f11eeab0c07b1",
+      "serve/mcp.py": "4cd9f18d427123e7080cb2a1b937b7c8ede401378c3485bc142db40b9655be0b",
+      "serve/mcp_fake_server.py": "484a5202e378fb61aa2baf4adea106f13f95696c1719a054d68c7a167e9e5325",
+      "serve/responses.py": "884756f4b33ebcd930249218568396b94f9e4c6cfec1c2c6d5c4b084ca17ab00",
+      "serve/runconfig.py": "b479b7f65067d1b85f8d3f36fca29772cf1307aecf2298d80e5e40f6955ffe4a",
+      "serve/server.py": "6d64d7d53f474270eabc9ab7137196060fe540ab18d39702458392ed3e3a4b67",
+      "serve/structured.py": "36af8fd3eef409b801cb5517fccca768634a95420d718281940c17a00a5527b8",
+      "serve/telemetry.py": "611ce7043ad316793569de52c0f9f4f57c3dd1ffa77f9e41ef85b65189a2873b",
+      "serve/winjob.py": "736ee937e58438a4599b25d576a97cb3680cb963f50976abecc25038ef20740f",
+      "serve/__init__.py": "5b38172f894574bf933b1e932a2dace1c113184f105bcd7db8718e6330f809c2",
+      "serve/_text_scan.cp311-win_amd64.pyd": "4aa73e98f9428ae6cc3923c253f387aee5e234f4113b93d98eb1facf846b1444"
+    },
+    "controls": {
+      "tool255": {
+        "http_ms": {
+          "baseline": 12047.744498998529,
+          "candidate": 12086.838799994439,
+          "throughput_change_pct": -0.32344520881611993,
+          "baseline_drift_pct": -0.25478479382956554
+        },
+        "prompt_ms": {
+          "baseline": 11342.592084704449,
+          "candidate": 11384.7,
+          "throughput_change_pct": -0.3698640745522619,
+          "baseline_drift_pct": -0.235998591053177
+        },
+        "predicted_ms": {
+          "baseline": 675.2989338063552,
+          "candidate": 680.7,
+          "throughput_change_pct": -0.79345764560671,
+          "baseline_drift_pct": 0.3560302625723155
+        }
+      },
+      "tool258": {
+        "http_ms": {
+          "baseline": 22353.940096930604,
+          "candidate": 22266.763600011473,
+          "throughput_change_pct": 0.39150950935271656,
+          "baseline_drift_pct": 0.003311327920574314
+        },
+        "prompt_ms": {
+          "baseline": 11938.399864303425,
+          "candidate": 11990.0,
+          "throughput_change_pct": -0.4303597639414125,
+          "baseline_drift_pct": -0.03015024873955774
+        },
+        "predicted_ms": {
+          "baseline": 10268.549658057851,
+          "candidate": 10212.6,
+          "throughput_change_pct": 0.5478493043676425,
+          "baseline_drift_pct": 0.05162723190368368
+        }
+      }
+    },
+    "adoption_eligible": true,
+    "artifact_sha256": {
+      "partial.json": "29acf14cf77ccc601ff0096f6728491ba0924079f766f3cc8ca240f5920e7b84",
+      "plan.json": "f328bd1e0e0af9e549d948aef36641a4ed594ae6b3fdd803ea63bd07f1aa7594",
+      "production-config-before.json": "da7090d500e14c4c05b2a6c76b67d01bd86c5aceaee3d2eaa8e37d638e22a902",
+      "A1/config.json": "ec2e66de0e95822b6a67ebec17c6b94f3097cdfeb227c2439142a33a13d4135e",
+      "A1/engine.log": "0ef2f1691e91a42d417c403eaae2c9539d2db82a79b852f4360140da77941f20",
+      "A1/server.log": "4c009433c08631c4b36380469194abdccb0bc04ae5223211fd78bff760e4cad5",
+      "A2/config.json": "aaed09c918e8e66195e3b8ae94256230c8a1ee436a22cb1b240ac97da5e5321c",
+      "A2/engine.log": "d46e80c0d0e5b48108c6cda4a4d813bb148f74bd8a129a5ae7deaa9d618e50be",
+      "A2/server.log": "a21dd9ca7d501469723a6f96f668dee822075f813f200bab6b414120025eb7b1",
+      "B/config.json": "4e0c9d60ae843e879cacf701fd7461cd54b9762710316d1ec2a5eed950d24d09",
+      "B/engine.log": "63099577982c1ae3b04a2a729266cac38c92ea29618995f5d3b2670ff2ae5fad",
+      "B/server.log": "630a9b87d63836ae21ebb2d43678fa9f41088e4a26dad034a3495411001b6c5e",
+      "canary/config.json": "9b64d8d118a9647b3eb6584bb9d7b94c14f1da01d1b062f8f530e6068902d02b",
+      "canary/engine.log": "a89e791f8f87e3f868d2c729d5e330fc91e2bbe473ecbffb600bb29deaa3ee74",
+      "canary/server.log": "9ff7b8723fe5a37d80d2059108920d0852d337ea0da51a07dc1719a6851f6691"
+    }
+  },
+  "summary": [
+    {
+      "run": "canary",
+      "case": "tool258",
+      "successes": 1,
+      "requests": 1,
+      "input_tokens": 258,
+      "output_tokens": 92,
+      "http_median_ms": 31546.079100007773,
+      "http_range_ms": [
+        31546.079100007773,
+        31546.079100007773
+      ],
+      "prompt_median_ms": 24394.2,
+      "decode_median_ms": 7131.7,
+      "equivalent_prefill_tps": 10.576284526649777,
+      "decode_tps": 12.900150034353661
+    },
+    {
+      "run": "canary",
+      "case": "long",
+      "successes": 1,
+      "requests": 1,
+      "input_tokens": 1038,
+      "output_tokens": 23,
+      "http_median_ms": 29343.087799992645,
+      "http_range_ms": [
+        29343.087799992645,
+        29343.087799992645
+      ],
+      "prompt_median_ms": 28021.8,
+      "decode_median_ms": 1308.8,
+      "equivalent_prefill_tps": 37.04258827056078,
+      "decode_tps": 17.573349633251834
+    },
+    {
+      "run": "A1",
+      "case": "tool255",
+      "successes": 3,
+      "requests": 3,
+      "input_tokens": 255,
+      "output_tokens": 17,
+      "http_median_ms": 12063.12180000532,
+      "http_range_ms": [
+        11842.788300011307,
+        12262.295400010771
+      ],
+      "prompt_median_ms": 11356.0,
+      "decode_median_ms": 674.1,
+      "equivalent_prefill_tps": 22.45508982035928,
+      "decode_tps": 25.218810265539236
+    },
+    {
+      "run": "A1",
+      "case": "tool258",
+      "successes": 3,
+      "requests": 3,
+      "input_tokens": 258,
+      "output_tokens": 276,
+      "http_median_ms": 22353.569999992033,
+      "http_range_ms": [
+        22089.87490000436,
+        23199.964100000216
+      ],
+      "prompt_median_ms": 11940.2,
+      "decode_median_ms": 10265.9,
+      "equivalent_prefill_tps": 21.607678263345672,
+      "decode_tps": 26.885124538520735
+    },
+    {
+      "run": "A1",
+      "case": "long",
+      "successes": 0,
+      "requests": 1
+    },
+    {
+      "run": "B",
+      "case": "tool255",
+      "successes": 3,
+      "requests": 3,
+      "input_tokens": 255,
+      "output_tokens": 17,
+      "http_median_ms": 12086.838799994439,
+      "http_range_ms": [
+        11904.576400003862,
+        12333.665700003621
+      ],
+      "prompt_median_ms": 11384.7,
+      "decode_median_ms": 680.7,
+      "equivalent_prefill_tps": 22.398482173443305,
+      "decode_tps": 24.974291170853533
+    },
+    {
+      "run": "B",
+      "case": "tool258",
+      "successes": 3,
+      "requests": 3,
+      "input_tokens": 258,
+      "output_tokens": 276,
+      "http_median_ms": 22266.763600011473,
+      "http_range_ms": [
+        22222.05140000733,
+        23266.727499998524
+      ],
+      "prompt_median_ms": 11990.0,
+      "decode_median_ms": 10212.6,
+      "equivalent_prefill_tps": 21.51793160967473,
+      "decode_tps": 27.025439163386405
+    },
+    {
+      "run": "B",
+      "case": "long",
+      "successes": 3,
+      "requests": 3,
+      "input_tokens": 1038,
+      "output_tokens": 23,
+      "http_median_ms": 28594.809400005033,
+      "http_range_ms": [
+        28338.96759999334,
+        28838.50359999633
+      ],
+      "prompt_median_ms": 27280.2,
+      "decode_median_ms": 1284.5,
+      "equivalent_prefill_tps": 38.04957441660985,
+      "decode_tps": 17.905799922148695
+    },
+    {
+      "run": "A2",
+      "case": "tool255",
+      "successes": 3,
+      "requests": 3,
+      "input_tokens": 255,
+      "output_tokens": 17,
+      "http_median_ms": 12032.386799997767,
+      "http_range_ms": [
+        11876.580900003319,
+        12282.856599995284
+      ],
+      "prompt_median_ms": 11329.2,
+      "decode_median_ms": 676.5,
+      "equivalent_prefill_tps": 22.50820887617837,
+      "decode_tps": 25.129342202512934
+    },
+    {
+      "run": "A2",
+      "case": "tool258",
+      "successes": 3,
+      "requests": 3,
+      "input_tokens": 258,
+      "output_tokens": 276,
+      "http_median_ms": 22354.31019999669,
+      "http_range_ms": [
+        22123.771599988686,
+        23185.390900005586
+      ],
+      "prompt_median_ms": 11936.6,
+      "decode_median_ms": 10271.2,
+      "equivalent_prefill_tps": 21.614194996900288,
+      "decode_tps": 26.871251655113326
+    }
+  ],
+  "production_auto_cache_validation": {
+    "complete": true,
+    "rule": "One tool255 initialization, then the exact tool258 and 1038-token retrieval with production auto-cache and threshold1024; all must validate, tool258 must match the fixed-cache control, server must exit cleanly. No timing gain is inferred from these single requests.",
+    "rows": [
+      {
+        "case": "tool255",
+        "warmup": true,
+        "reply": {
+          "id": "msg_0bad17cc8e4946d7b478b31c",
+          "type": "message",
+          "role": "assistant",
+          "model": "qwen3.8-flash-next-iq2_xs",
+          "content": [
+            {
+              "type": "tool_use",
+              "id": "call_1aac834607384f8da8a751ff",
+              "name": "record",
+              "input": {
+                "value": "note"
+              }
+            }
+          ],
+          "stop_reason": "tool_use",
+          "stop_sequence": null,
+          "usage": {
+            "input_tokens": 255,
+            "output_tokens": 17,
+            "cache_read_input_tokens": 0
+          }
+        },
+        "wall_ms": 12929.16050000349,
+        "timings": {
+          "cache_n": 0,
+          "prompt_n": 255,
+          "prompt_ms": 11956.1,
+          "prompt_per_token_ms": 46.887,
+          "prompt_per_second": 21.3,
+          "predicted_n": 17,
+          "predicted_ms": 949.1,
+          "predicted_per_token_ms": 55.829,
+          "predicted_per_second": 17.9,
+          "draft_n": 14,
+          "draft_n_accepted": 11,
+          "at": 1792887002
+        },
+        "valid": true
+      },
+      {
+        "case": "tool258",
+        "warmup": false,
+        "reply": {
+          "id": "msg_32d3df5e468b4ccf89229d55",
+          "type": "message",
+          "role": "assistant",
+          "model": "qwen3.8-flash-next-iq2_xs",
+          "content": [
+            {
+              "type": "tool_use",
+              "id": "call_089b4737cb4944acb559255f",
+              "name": "record",
+              "input": {
+                "value": "Memory locality refers to how well a program's memory access patterns align with the physical organization of memory hierarchies (registers, caches, TLB, main memory). Good locality means frequently accessed data is stored close together in memory, reducing cache misses and improving performance.\n\nKey principles:\n1. **Temporal locality**: Accessing the same memory locations repeatedly within a short time window.\n2. **Spatial locality**: Accessing memory locations that are near each other in address space.\n3. **Cache line utilization**: Accessing data in contiguous blocks to maximize cache line efficiency.\n4. **TLB locality**: Keeping memory accesses within a small number of pages to reduce TLB misses.\n5. **Data structure layout**: Using arrays of structures vs. structures of arrays, padding, and alignment to improve locality.\n6. **Loop optimizations**: Loop fusion, blocking/tiling, and prefetching to improve locality.\n\nPractical implications:\n- Row-major vs. column-major traversal affects cache performance.\n- Pointer chasing (linked lists, trees) often has poor locality.\n- Memory pools and arena allocators improve locality by grouping allocations.\n- False sharing in multi-threaded programs can degrade locality.\n- NUMA architectures require careful data placement for locality."
+              }
+            }
+          ],
+          "stop_reason": "tool_use",
+          "stop_sequence": null,
+          "usage": {
+            "input_tokens": 258,
+            "output_tokens": 276,
+            "cache_read_input_tokens": 0
+          }
+        },
+        "wall_ms": 22841.8124000018,
+        "timings": {
+          "cache_n": 0,
+          "prompt_n": 258,
+          "prompt_ms": 11730.1,
+          "prompt_per_token_ms": 45.466,
+          "prompt_per_second": 22.0,
+          "predicted_n": 276,
+          "predicted_ms": 11082.2,
+          "predicted_per_token_ms": 40.153,
+          "predicted_per_second": 24.9,
+          "draft_n": 234,
+          "draft_n_accepted": 159,
+          "at": 1792887024
+        },
+        "valid": true
+      },
+      {
+        "case": "long",
+        "warmup": false,
+        "reply": {
+          "id": "msg_618be27d3ec94f36a3bc418f",
+          "type": "message",
+          "role": "assistant",
+          "model": "qwen3.8-flash-next-iq2_xs",
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"first\": 113, \"middle\": 80, \"last\": 47}"
+            }
+          ],
+          "stop_reason": "end_turn",
+          "stop_sequence": null,
+          "usage": {
+            "input_tokens": 1038,
+            "output_tokens": 23,
+            "cache_read_input_tokens": 0
+          }
+        },
+        "wall_ms": 28815.632600002573,
+        "timings": {
+          "cache_n": 0,
+          "prompt_n": 1038,
+          "prompt_ms": 27383.7,
+          "prompt_per_token_ms": 26.381,
+          "prompt_per_second": 37.9,
+          "predicted_n": 23,
+          "predicted_ms": 1407.8,
+          "predicted_per_token_ms": 61.209,
+          "predicted_per_second": 16.3,
+          "draft_n": 18,
+          "draft_n_accepted": 18,
+          "at": 1792887053
+        },
+        "valid": true
+      }
+    ],
+    "source_sha256": {
+      "build-sycl-a770-production-xmx-v2-20261025/autocache.py": "2e783efc5a8d3862a83e191715ec74ad382a6540c9dfff5918b5b53be29c30ca",
+      "build-sycl-a770-production-xmx-v2-20261025/measure/results.json": "8ae20164060387da15375d25768a1b7c2d2b9689a1adc5f7dbf55ea9e7f161c2",
+      "build-sycl-a770-production-xmx-v2-20261025/auto-cache/config.json": "80d24379e4dd133f75f4240e6a05d660c7fe68a5f44016d4becebb6193d7bc03",
+      "strata-iq2_xs.json": "da7090d500e14c4c05b2a6c76b67d01bd86c5aceaee3d2eaa8e37d638e22a902",
+      "build-sycl-a770-production-xmx-v2-20261025/bin/strata-unified-all-operators.exe": "73996f4fab16c89531574d29bea70097cd5309d4db03c00af5829d78920e7890"
+    },
+    "cache": [
+      "6399",
+      "8.57"
+    ],
+    "metrics": {
+      "engine": {
+        "model": "qwen3.8-flash-next-iq2_xs",
+        "max_context": 8192,
+        "images": false,
+        "version": "0.1.39-sycl",
+        "context": 8192,
+        "kv": "fp16",
+        "kv_resident": 0,
+        "expert_slots": 6399,
+        "expert_cache_mib": 8780,
+        "expert_slots_primary": 6399,
+        "expert_cache_primary_mib": 8780,
+        "spec": 6,
+        "mtp_max": 4,
+        "lookup": 3,
+        "vram_free_mib": 1398,
+        "cvec": 0,
+        "arena_mib": 33812,
+        "pool_workers": 21,
+        "pcie_frac": "0.16",
+        "spec_min_p": "0.50",
+        "conversation_cache_mib": 0,
+        "conversation_cache_slots": 4,
+        "conversation_cache_min_free_mib": 2560,
+        "tail_role_token": -1,
+        "vram_elastic": 0,
+        "engine": "0.1.39-sycl"
+      },
+      "live": {
+        "state": "idle",
+        "queued": 0,
+        "phase": null,
+        "prompt_tokens": null,
+        "prompt_read": null,
+        "prompt_total": null,
+        "generated": null,
+        "max_tokens": null,
+        "elapsed_s": null,
+        "tok_s": null,
+        "tok_s_mean": null,
+        "prefill_tok_s_mean": null,
+        "tok_s_window_s": null
+      },
+      "requests": [],
+      "conversation_cache": {
+        "enabled": false,
+        "budget_mib": 0,
+        "slots": 4,
+        "parked": 0,
+        "bytes": 0,
+        "evictions": 0,
+        "parks": 0,
+        "restores": 0,
+        "last_event": null,
+        "last_tokens": null,
+        "last_at": null,
+        "requests": 0,
+        "requests_reused": 0,
+        "reused_tokens": 0,
+        "prompt_tokens": 0,
+        "last_reused": null,
+        "last_prompt": null
+      },
+      "requests_kept": 0,
+      "totals": {
+        "since": 1792886988.9505198,
+        "requests": 0,
+        "prompt_tokens": 0,
+        "reused": 0,
+        "output_tokens": 0,
+        "prompt_ms": 0.0,
+        "decode_ms": 0.0,
+        "drafts_offered": 0,
+        "drafts_accepted": 0
+      },
+      "hardware": {
+        "cpu": 0.0,
+        "ram_used": 61187416064,
+        "ram_total": 274766237696,
+        "disk_read_mb": null,
+        "disk_write_mb": null,
+        "tok_s": 0.0,
+        "tok_s_mean": 0,
+        "prefill_tok_s_mean": 0.0
+      },
+      "hardware_static": {
+        "gpu_name": null,
+        "gpu_count": 1,
+        "cpu_name": "Intel(R) Xeon(R) CPU E5-2696 v4 @ 2.20GHz",
+        "cores": 22,
+        "threads": 44,
+        "psutil": true
+      },
+      "history": {
+        "gpu_util": [
+          null
+        ],
+        "gpu_mem_used": [
+          null
+        ],
+        "gpu_temp": [
+          null
+        ],
+        "gpu_power": [
+          null
+        ],
+        "gpu_pcie_rx_mb": [
+          null
+        ],
+        "cpu": [
+          0.0
+        ],
+        "ram_used": [
+          61187416064
+        ],
+        "disk_read_mb": [
+          null
+        ],
+        "tok_s": [
+          0.0
+        ],
+        "prefill_tok_s_mean": [
+          0.0
+        ]
+      },
+      "time": 1792886989.1459255
+    },
+    "server_exit_code": 0,
+    "artifact_sha256": {
+      "config.json": "80d24379e4dd133f75f4240e6a05d660c7fe68a5f44016d4becebb6193d7bc03",
+      "engine.log": "4bb4697badc3690ed2b93b5a8d5270282c0f7360c7a93fa160b1e10ede89cdcb",
+      "partial.json": "05ce20809e14a6082c312d2618d49fb69379e6910aaa2b6a44197b49f9c4463b",
+      "plan.json": "02f4b2474b06efe4dd1d5841537d5abcc26f3142131e8318767cf7301c75b97f",
+      "production-config-before.json": "da7090d500e14c4c05b2a6c76b67d01bd86c5aceaee3d2eaa8e37d638e22a902",
+      "server.log": "744143f2d92a1e1828c1a255efd54545b7ef762fd95c82556522377afcbd20a1"
+    }
+  },
+  "production_configuration_update": {
+    "before_sha256": "da7090d500e14c4c05b2a6c76b67d01bd86c5aceaee3d2eaa8e37d638e22a902",
+    "after_sha256": "b001f19b5f97dfd74a7f9aca0e122f67e66d970a87bcf5024ebae7ab987c2291",
+    "configuration": {
+      "exe": "G:\\GitHub\\Strata\\build-sycl-a770-production-xmx-v2-20261025\\bin\\strata-unified-all-operators.exe",
+      "args": [
+        "--pack",
+        "G:\\GitHub\\Strata-data\\packs\\iq2_xs",
+        "--native",
+        "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00001-of-00002.gguf",
+        "--ple-gguf",
+        "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00002-of-00002.gguf",
+        "--expert-profile",
+        "G:\\GitHub\\Strata\\data\\expert-profile.bin",
+        "--expert-cache",
+        "auto",
+        "--prefill",
+        "8192",
+        "--spec",
+        "4",
+        "--spec-min-p",
+        "0.5",
+        "--mtp",
+        "G:\\GitHub\\Strata-data\\mtp\\rt-full-vocab-current",
+        "--max-context",
+        "8192",
+        "--stream-experts",
+        "--vram-reserve-mib",
+        "1536",
+        "--pcie-frac",
+        "0.16",
+        "--prompt-cache",
+        "0",
+        "--short-read",
+        "1024",
+        "--adapt-every",
+        "1",
+        "--adapt-swaps",
+        "32",
+        "--prefill-borrow",
+        "--mtp-window",
+        "1024",
+        "--mtp-hnorm",
+        "stream",
+        "--adapt-decay",
+        "0.5"
+      ],
+      "cwd": "G:\\GitHub\\Strata",
+      "tokenizer": "G:\\GitHub\\Strata-data\\packs\\iq2_xs\\tokenizer",
+      "model_name": "qwen3.8-flash-next-iq2_xs",
+      "log": "G:\\GitHub\\Strata\\strata-iq2_xs.log",
+      "port": 8080,
+      "backend": "sycl",
+      "env": {
+        "STRATA_SYCL_BIN": "build-sycl-a770-production-xmx-v2-20261025\\bin\\strata-unified-all-operators.exe",
+        "ZES_ENABLE_SYSMAN": "1",
+        "STRATA_MIRROR_MIB": "49152",
+        "ONEAPI_DEVICE_SELECTOR": "level_zero:0",
+        "UR_L0_ENABLE_RELAXED_ALLOCATION_LIMITS": "1",
+        "STRATA_VERIFY_DEVICE_PLAN": "1",
+        "STRATA_VERIFY_NO_HOST": "1",
+        "STRATA_VERIFY_EAGER": "1",
+        "STRATA_STAGER_THREADS": "12",
+        "STRATA_VERIFY_ADAPT": "1",
+        "STRATA_ADAPT_COST_WEIGHTED": "1",
+        "STRATA_PREFILL_FIRST": "0",
+        "STRATA_GDN_SG16": "1",
+        "STRATA_IQ4_XS_SG16": "2",
+        "STRATA_VERIFY_FUSED_ACT": "1",
+        "STRATA_VERIFY_DESC_CACHE": "1",
+        "STRATA_SERVE_QUIET": "1",
+        "STRATA_GU_LANES": "16",
+        "STRATA_DOWN_LANES": "4",
+        "SYCL_PROGRAM_COMPILE_OPTIONS": "-cl-fp32-correctly-rounded-divide-sqrt",
+        "STRATA_MTP_LAST_DRAFT_MIN_P": "0.6",
+        "STRATA_GU_IQ2S_SG16": "1",
+        "STRATA_GU_IQ2S_SINGLE_GROUP": "1",
+        "STRATA_GDN_Q8_TAIL": "1",
+        "STRATA_QSA_Q8_TAIL": "1",
+        "STRATA_PREFILL_NATIVE_XMX": "1"
+      },
+      "lib_dirs": [
+        "C:\\Program Files (x86)\\Intel\\oneAPI\\mkl\\2025.3\\bin",
+        "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin"
+      ]
+    }
+  },
+  "limits": [
+    "Only these IQ2_XS requests on A770/PCIe3.0; not broad quality, other quantizations or concurrent serving.",
+    "XMX changes floating-point reduction order. Random operator checks use 0.005 tolerance for bounded inputs; fallback and guards remain exact.",
+    "Canary enables dispatch logs and is excluded from performance comparisons. Timeouts do not produce an exact speed factor."
+  ],
+  "evidence_sha256": {
+    "build-sycl-a770-production-xmx-v2-20261025/build.json": "fa92437ff61d4b000a6d49731b59221278a92bf2d08fa49ae3174d5d65ab0aee",
+    "build-sycl-a770-production-xmx-v2-20261025/measure/results.json": "8ae20164060387da15375d25768a1b7c2d2b9689a1adc5f7dbf55ea9e7f161c2",
+    "build-sycl-a770-production-xmx-v2-20261025/audit.py": "4f93cd048aff27d97da4a656a39fbceb81c18db258e8b357fb97d8908806250b",
+    "build-sycl-a770-production-xmx-v2-20261025/auto-cache/results.json": "f81718d5928697619096ed64bc9719ef2cd2fcb39a3f092279319c157e456f30",
+    "build-sycl-a770-production-xmx-v2-20261025/production-config-after.json": "b001f19b5f97dfd74a7f9aca0e122f67e66d970a87bcf5024ebae7ab987c2291"
+  }
+}

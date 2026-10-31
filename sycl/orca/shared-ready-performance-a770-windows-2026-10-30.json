@@ -1,0 +1,5798 @@
+{
+  "complete": true,
+  "performance_comparison_valid": true,
+  "metrics": [
+    {
+      "spec": 1,
+      "case": "Short",
+      "prompt_ms": {
+        "medians_A0_B_A1": [
+          992.25,
+          992.0,
+          990.3
+        ],
+        "change_pct": -0.07313301373179648,
+        "baseline_drift_pct": -0.19652305366592016
+      },
+      "decode_ms": {
+        "medians_A0_B_A1": [
+          3147.2,
+          3107.0,
+          3157.55
+        ],
+        "change_pct": 1.460275259314603,
+        "baseline_drift_pct": 0.3288637519064608
+      },
+      "total_ms": {
+        "medians_A0_B_A1": [
+          4139.45,
+          4099.0,
+          4147.85
+        ],
+        "change_pct": 1.0892381420175123,
+        "baseline_drift_pct": 0.20292550942759835
+      }
+    },
+    {
+      "spec": 1,
+      "case": "Code2K",
+      "prompt_ms": {
+        "medians_A0_B_A1": [
+          33807.55,
+          33817.149999999994,
+          33960.5
+        ],
+        "change_pct": 0.1974994914027972,
+        "baseline_drift_pct": 0.4524137359849911
+      },
+      "decode_ms": {
+        "medians_A0_B_A1": [
+          3302.95,
+          3266.75,
+          3332.8
+        ],
+        "change_pct": 1.5639834946077347,
+        "baseline_drift_pct": 0.9037375679317172
+      },
+      "total_ms": {
+        "medians_A0_B_A1": [
+          37110.5,
+          37083.899999999994,
+          37293.3
+        ],
+        "change_pct": 0.317894615066483,
+        "baseline_drift_pct": 0.4925829616954758
+      }
+    },
+    {
+      "spec": 8,
+      "case": "Short",
+      "prompt_ms": {
+        "medians_A0_B_A1": [
+          583.0,
+          589.85,
+          594.1
+        ],
+        "change_pct": -0.22483151764396414,
+        "baseline_drift_pct": 1.9039451114922779
+      },
+      "decode_ms": {
+        "medians_A0_B_A1": [
+          2162.8,
+          2168.55,
+          2168.8500000000004
+        ],
+        "change_pct": -0.12575741875211488,
+        "baseline_drift_pct": 0.2797299796560182
+      },
+      "total_ms": {
+        "medians_A0_B_A1": [
+          2745.8,
+          2758.4,
+          2762.95
+        ],
+        "change_pct": -0.14640182719993788,
+        "baseline_drift_pct": 0.6245902833418082
+      }
+    },
+    {
+      "spec": 8,
+      "case": "Code2K",
+      "prompt_ms": {
+        "medians_A0_B_A1": [
+          34063.45,
+          34111.600000000006,
+          34212.95
+        ],
+        "change_pct": 0.0777394273797194,
+        "baseline_drift_pct": 0.4388868420550418
+      },
+      "decode_ms": {
+        "medians_A0_B_A1": [
+          1976.35,
+          1965.8,
+          1974.1
+        ],
+        "change_pct": 0.47943227312443604,
+        "baseline_drift_pct": -0.1138462316897293
+      },
+      "total_ms": {
+        "medians_A0_B_A1": [
+          36039.8,
+          36077.4,
+          36187.05
+        ],
+        "change_pct": 0.09964673093671994,
+        "baseline_drift_pct": 0.40857607422903897
+      }
+    }
+  ],
+  "linux_gpu_validated": false,
+  "physical_concurrency_proven": false,
+  "comparison": "Same frozen M4 images and QSA verifier; previous/new/previous shared-expert host scheduling; ready ops enabled throughout",
+  "auto_batch_enabled": true,
+  "retained": 2,
+  "baseline_exe_sha256": "cd5914cf52363980241329b55b0ccff530dcbd46ad5f497faf780b461bf51e42",
+  "candidate_exe_sha256": "936bc1688d9806c87b9d02ee1e3c5ec3df66858bacc0fd06bc2cbeb62e620e0b",
+  "component_results_sha256": "0bd335464745378050e2971dde67462cf404ab2d28ee96725a983f417a01c571",
+  "wide_results_sha256": "0c7d9d0d9b7201a6265f6b96875b2a7bda95705c5e0b20834b0e83839ec6a273",
+  "script_sha256": "7e56954ac3ffcc79245e938d7df2258d2d52504edbaa373254a023e004143453",
+  "runs": [
+    {
+      "label": "A0",
+      "spec": 1,
+      "args": [
+        "--pack",
+        "G:\\GitHub\\Strata-data\\packs\\iq2_xs",
+        "--native",
+        "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00001-of-00002.gguf",
+        "--ple-gguf",
+        "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00002-of-00002.gguf",
+        "--expert-profile",
+        "G:\\GitHub\\Strata\\data\\expert-profile.bin",
+        "--expert-cache",
+        "6000",
+        "--prefill",
+        "8192",
+        "--spec",
+        "2",
+        "--spec-min-p",
+        "0.5",
+        "--max-context",
+        "8192",
+        "--stream-experts",
+        "--vram-reserve-mib",
+        "1024",
+        "--pcie-frac",
+        "0.16",
+        "--prompt-cache",
+        "0",
+        "--short-read",
+        "1024",
+        "--adapt-every",
+        "1",
+        "--adapt-swaps",
+        "32",
+        "--prefill-borrow",
+        "--mtp-window",
+        "1024",
+        "--mtp-hnorm",
+        "stream",
+        "--adapt-decay",
+        "0.5",
+        "--suffix-draft",
+        "0"
+      ],
+      "rows": [
+        {
+          "tokens": [
+            29108,
+            4009,
+            27891,
+            8964,
+            579,
+            16078,
+            321,
+            1100,
+            9872,
+            303,
+            660,
+            17425,
+            11,
+            694,
+            22602,
+            6105,
+            89661,
+            513,
+            35742,
+            777,
+            28750,
+            1056,
+            4860,
+            2438,
+            89661,
+            4016,
+            310,
+            12870,
+            60845,
+            69377,
+            13,
+            1061,
+            10386,
+            2209,
+            69377,
+            10814,
+            6105,
+            3000,
+            310,
+            5372,
+            1004,
+            6213,
+            494,
+            660,
+            5306,
+            314,
+            279,
+            12515,
+            11,
+            3154,
+            424,
+            4833,
+            6105,
+            13,
+            50275,
+            11,
+            567,
+            42918,
+            279,
+            12515,
+            430,
+            6105,
+            4598,
+            1056
+          ],
+          "generated": 64,
+          "prompt_tokens": 23,
+          "prompt_ms": 1440.2,
+          "decode_ms": 3649.9,
+          "finish": "length",
+          "accepted": 0,
+          "offered": 0,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 1520.3317999985302,
+          "done": "DONE 64 23 1440.2 3649.9 length 0 0 0 0 0 0 0 0.0 23 0",
+          "case": "Short",
+          "iteration": 0,
+          "retained": false,
+          "mismatched_fields": [],
+          "same_workload_across_arms": true
+        },
+        {
+          "tokens": [
+            760,
+            3766,
+            1970,
+            41643,
+            10551,
+            264,
+            4281,
+            314,
+            12654,
+            5568,
+            11,
+            28853,
+            1510,
+            7945,
+            62,
+            15,
+            63,
+            1472,
+            1510,
+            7945,
+            62,
+            22,
+            17,
+            7561,
+            864,
+            4072,
+            264,
+            3050,
+            34780,
+            17454,
+            383,
+            449,
+            1879,
+            3759,
+            1510,
+            87,
+            27653,
+            1946,
+            3418,
+            279,
+            3558,
+            303,
+            7472,
+            11,
+            567,
+            1902,
+            22903,
+            279,
+            5759,
+            11,
+            279,
+            34780,
+            5215,
+            11,
+            279,
+            42441,
+            33633,
+            6197,
+            11,
+            321,
+            279,
+            4499,
+            52652,
+            23398
+          ],
+          "generated": 64,
+          "prompt_tokens": 2048,
+          "prompt_ms": 34014.3,
+          "decode_ms": 3652.7,
+          "finish": "length",
+          "accepted": 0,
+          "offered": 0,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 34070.79249999515,
+          "done": "DONE 64 2048 34014.3 3652.7 length 0 0 0 0 0 0 0 0.0 2048 0",
+          "case": "Code2K",
+          "iteration": 0,
+          "retained": false,
+          "mismatched_fields": [],
+          "same_workload_across_arms": true
+        },
+        {
+          "tokens": [
+            29108,
+            4009,
+            27891,
+            8964,
+            579,
+            16078,
+            321,
+            1100,
+            9872,
+            303,
+            660,
+            17425,
+            11,
+            694,
+            22602,
+            6105,
+            89661,
+            513,
+            35742,
+            777,
+            28750,
+            1056,
+            4860,
+            2438,
+            89661,
+            4016,
+            310,
+            12870,
+            60845,
+            69377,
+            13,
+            1061,
+            10386,
+            2209,
+            69377,
+            10814,
+            6105,
+            3000,
+            310,
+            5372,
+            1004,
+            6213,
+            494,
+            660,
+            5306,
+            314,
+            279,
+            12515,
+            11,
+            3154,
+            424,
+            4833,
+            6105,
+            13,
+            50275,
+            11,
+            567,
+            42918,
+            279,
+            12515,
+            430,
+            6105,
+            4598,
+            1056
+          ],
+          "generated": 64,
+          "prompt_tokens": 23,
+          "prompt_ms": 989.8,
+          "decode_ms": 3162.4,
+          "finish": "length",
+          "accepted": 0,
+          "offered": 0,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 1034.7745999970357,
+          "done": "DONE 64 23 989.8 3162.4 length 0 0 0 0 0 0 0 0.0 23 0",
+          "case": "Short",
+          "iteration": 1,
+          "retained": true,
+          "mismatched_fields": [],
+          "same_workload_across_arms": true
+        },
+        {
+          "tokens": [
+            760,
+            3766,
+            1970,
+            41643,
+            10551,
+            264,
+            4281,
+            314,
+            12654,
+            5568,
+            11,
+            28853,
+            1510,
+            7945,
+            62,
+            15,
+            63,
+            1472,
+            1510,
+            7945,
+            62,
+            22,
+            17,
+            7561,
+            864,
+            4072,
+            264,
+            3050,
+            34780,
+            17454,
+            383,
+            449,
+            1879,
+            3759,
+            1510,
+            87,
+            27653,
+            1946,
+            3418,
+            279,
+            3558,
+            303,
+            7472,
+            11,
+            567,
+            1902,
+            22903,
+            279,
+            5759,
+            11,
+            279,
+            34780,
+            5215,
+            11,
+            279,
+            42441,
+            33633,
+            6197,
+            11,
+            321,
+            279,
+            4499,
+            52652,
+            23398
+          ],
+          "generated": 64,
+          "prompt_tokens": 2048,
+          "prompt_ms": 33782.9,
+          "decode_ms": 3293.6,
+          "finish": "length",
+          "accepted": 0,
+          "offered": 0,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 33833.9316000056,
+          "done": "DONE 64 2048 33782.9 3293.6 length 0 0 0 0 0 0 0 0.0 2048 0",
+          "case": "Code2K",
+          "iteration": 1,
+          "retained": true,
+          "mismatched_fields": [],
+          "same_workload_across_arms": true
+        },
+        {
+          "tokens": [
+            29108,
+            4009,
+            27891,
+            8964,
+            579,
+            16078,
+            321,
+            1100,
+            9872,
+            303,
+            660,
+            17425,
+            11,
+            694,
+            22602,
+            6105,
+            89661,
+            513,
+            35742,
+            777,
+            28750,
+            1056,
+            4860,
+            2438,
+            89661,
+            4016,
+            310,
+            12870,
+            60845,
+            69377,
+            13,
+            1061,
+            10386,
+            2209,
+            69377,
+            10814,
+            6105,
+            3000,
+            310,
+            5372,
+            1004,
+            6213,
+            494,
+            660,
+            5306,
+            314,
+            279,
+            12515,
+            11,
+            3154,
+            424,
+            4833,
+            6105,
+            13,
+            50275,
+            11,
+            567,
+            42918,
+            279,
+            12515,
+            430,
+            6105,
+            4598,
+            1056
+          ],
+          "generated": 64,
+          "prompt_tokens": 23,
+          "prompt_ms": 994.7,
+          "decode_ms": 3132.0,
+          "finish": "length",
+          "accepted": 0,
+          "offered": 0,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 1038.8483999995515,
+          "done": "DONE 64 23 994.7 3132.0 length 0 0 0 0 0 0 0 0.0 23 0",
+          "case": "Short",
+          "iteration": 2,
+          "retained": true,
+          "mismatched_fields": [],
+          "same_workload_across_arms": true
+        },
+        {
+          "tokens": [
+            760,
+            3766,
+            1970,
+            41643,
+            10551,
+            264,
+            4281,
+            314,
+            12654,
+            5568,
+            11,
+            28853,
+            1510,
+            7945,
+            62,
+            15,
+            63,
+            1472,
+            1510,
+            7945,
+            62,
+            22,
+            17,
+            7561,
+            864,
+            4072,
+            264,
+            3050,
+            34780,
+            17454,
+            383,
+            449,
+            1879,
+            3759,
+            1510,
+            87,
+            27653,
+            1946,
+            3418,
+            279,
+            3558,
+            303,
+            7472,
+            11,
+            567,
+            1902,
+            22903,
+            279,
+            5759,
+            11,
+            279,
+            34780,
+            5215,
+            11,
+            279,
+            42441,
+            33633,
+            6197,
+            11,
+            321,
+            279,
+            4499,
+            52652,
+            23398
+          ],
+          "generated": 64,
+          "prompt_tokens": 2048,
+          "prompt_ms": 33832.2,
+          "decode_ms": 3312.3,
+          "finish": "length",
+          "accepted": 0,
+          "offered": 0,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 33880.783799999335,
+          "done": "DONE 64 2048 33832.2 3312.3 length 0 0 0 0 0 0 0 0.0 2048 0",
+          "case": "Code2K",
+          "iteration": 2,
+          "retained": true,
+          "mismatched_fields": [],
+          "same_workload_across_arms": true
+        }
+      ],
+      "modules_startup": [
+        {
+          "path": "G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-qsa-integration-1793373331920047900\\strata.exe",
+          "sha256": "cd5914cf52363980241329b55b0ccff530dcbd46ad5f497faf780b461bf51e42"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ntdll.dll",
+          "sha256": "36b1a62e4bf6bf7d68458fff6e8a33b39f6527ec6a46e55ecdd12cde83894c8d"
+        },
+        {
+          "path": "C:\\windows\\System32\\KERNEL32.DLL",
+          "sha256": "4636f65d449b1353100578c6cb139933cf2b134f5e246119d18968873a058bed"
+        },
+        {
+          "path": "C:\\windows\\System32\\KERNELBASE.dll",
+          "sha256": "b4ad8c8e3632104f4d2132ecb8979b8df279f0046dc42e79bed5acb744751871"
+        },
+        {
+          "path": "C:\\windows\\System32\\ADVAPI32.dll",
+          "sha256": "bde5f0e6f36a706a8a2e0fab1b362eea267aa6ee9f18aab1f899f38888c21280"
+        },
+        {
+          "path": "C:\\windows\\System32\\msvcrt.dll",
+          "sha256": "a7f4196d9476d36894ce17c3b0dd97504ca2cc31b3e0a774fee326e867565885"
+        },
+        {
+          "path": "C:\\windows\\System32\\sechost.dll",
+          "sha256": "54756c8bc96e3baf57ee58e4f73ca10183c8267d208efe7819a256eca53361a0"
+        },
+        {
+          "path": "C:\\windows\\System32\\RPCRT4.dll",
+          "sha256": "b9decb81fcf8ef9a6b674072da5676322b925c73b3c8c9253805db7510d9c493"
+        },
+        {
+          "path": "C:\\windows\\System32\\bcrypt.dll",
+          "sha256": "811af66dd7e323a74db80648610bbebb956093ae7bd91c5b950ed6aca13d8026"
+        },
+        {
+          "path": "C:\\windows\\System32\\ucrtbase.dll",
+          "sha256": "3c60056371f82e4744185b6f2fa0c69042b1e78804685944132974dd13f3b6d9"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ze_loader.dll",
+          "sha256": "a56a109788c97ed42275803202e42a44c591a24064a038e6aa3cbc5908f98b4b"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\MSVCP140.dll",
+          "sha256": "def46aa6a8f72f27bafac0c43334419486a4d1dcdb6c479a8ef7034b3e1fa4cb"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\MSVCP140_ATOMIC_WAIT.dll",
+          "sha256": "e7963645e0d1db08e300614d4c5fa7194bd8173e9ab7a5558859e6b232ed3241"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VCRUNTIME140.dll",
+          "sha256": "184146852727a9db4eea06178716bec3cdbb1015c911f6b0f915b184ad7775b2"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VCRUNTIME140_1.dll",
+          "sha256": "e6bfb3662ab4b1969a73441dbe35c96d51441b6bff8cf1fe7430bd5b246ca605"
+        },
+        {
+          "path": "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin\\libmmd.dll",
+          "sha256": "0e8e285e2d1cb7dbe6018371fd5fd9763e9b3a574f516ff000f606433fe3cc10"
+        },
+        {
+          "path": "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin\\svml_dispmd.dll",
+          "sha256": "03b6af2ab4dac88fa5d80ddded702aeb7cfd3f0460e63425ded73d7a755a1dce"
+        },
+        {
+          "path": "C:\\windows\\System32\\CFGMGR32.dll",
+          "sha256": "7fefd329b398827d6babf33973eaa2c0dc580fe1f3b291efa4793e795e4df8fa"
+        },
+        {
+          "path": "C:\\windows\\System32\\ole32.dll",
+          "sha256": "4a7b8ed9f2aeca875f948d9a1bce8b8d177744475f253704362792d7182d55f2"
+        },
+        {
+          "path": "C:\\windows\\System32\\combase.dll",
+          "sha256": "e1ed05c78ccd1056f106468b551f846a4f7e1d46d925223755c44f3191730993"
+        },
+        {
+          "path": "C:\\windows\\System32\\GDI32.dll",
+          "sha256": "b5f5a3f16d03366cdb02020fc4dadceb0892e243f8aa94d205e124045da9457f"
+        },
+        {
+          "path": "C:\\windows\\System32\\win32u.dll",
+          "sha256": "20ac4556b0b3fc82bd5632ffc623a45497184483e14a2841ac30213e162daf1f"
+        },
+        {
+          "path": "C:\\windows\\System32\\gdi32full.dll",
+          "sha256": "724754c47bcd7a2739816c7cefbc75382515538a15ccb73a8342043a16453772"
+        },
+        {
+          "path": "C:\\windows\\System32\\msvcp_win.dll",
+          "sha256": "2a7825c2925347e0cb767a0dcb611f3eb80d0f71cbec981069b227bdc7cb871a"
+        },
+        {
+          "path": "C:\\windows\\System32\\USER32.dll",
+          "sha256": "82870be1e008d5232cb175ebc815f645a2add4c0b164fd4ba20744192c1c81f7"
+        },
+        {
+          "path": "C:\\windows\\System32\\IMM32.DLL",
+          "sha256": "2a882bc0df58f4f6dd906889b1fb6d7b7bc70da7109e016e0f1e67b264d073b6"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\ze_intel_gpu64.dll",
+          "sha256": "e291d6c88c85d85751d3e2ba26d5510e1abb3a1f6d255f8f25b9aa2843ecf96d"
+        },
+        {
+          "path": "C:\\windows\\System32\\dxgi.dll",
+          "sha256": "d33765793e32eff65f9103efe2419184ab0b6289e69e69ce85aa7568f678c3b5"
+        },
+        {
+          "path": "C:\\windows\\System32\\WS2_32.dll",
+          "sha256": "5e9857a80a301ad21d0e0a0928a4ff2b5360c305a97bfc88886e3b686bf8d503"
+        },
+        {
+          "path": "C:\\windows\\System32\\SETUPAPI.dll",
+          "sha256": "3777075e8391c40c21fd5662845f5e2928d3cfd2b6abdf4003e087d2089cb853"
+        },
+        {
+          "path": "C:\\windows\\System32\\SHELL32.dll",
+          "sha256": "936c33a8283196a070aa6f844a65a29a8f99f760eae0016754c1cbf17d62bdb7"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VERSION.dll",
+          "sha256": "af45a728552ccfdcd9435c40ace60a9354d7c1b52abf507a2f1cb371dada4fde"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\WINMM.dll",
+          "sha256": "ead9055dc522bcab041c8eb7b875adb681a2f1fa851d4075789d78d0242711a0"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ze_tracing_layer.dll",
+          "sha256": "d3f8f8c4bd055c464495703761f5754c140137e4c457f60a168e35085ee2c51f"
+        },
+        {
+          "path": "C:\\windows\\System32\\bcryptPrimitives.dll",
+          "sha256": "f0a1662d0f55533a21d609f8dc737288ede77d314d90e885ca9e6ef79d429c3b"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmm2_64.dll",
+          "sha256": "db2ea2a6f271cc85d097dc13176e153e5ebf67775155df162b768a75ed863a2e"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmm64.dll",
+          "sha256": "db3b3d6fbc6aba6ba156080224916c1fefcb1080f0ea3927727f52626623c681"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmmstaging_64.dll",
+          "sha256": "994d22569552487dcadbc8b1aa6ac9bef0c24df23e67637b4e2a2f63952c1e70"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\windows.storage.dll",
+          "sha256": "718c890022323ed8e38a3beb7a143df9e5d680b006c3f1fd28754eeb7cd82010"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\Wldp.dll",
+          "sha256": "c2a7ed84bdd3cf931fdcc5782cea58c376b1a2841fcc6f954e65812deff50389"
+        },
+        {
+          "path": "C:\\windows\\System32\\OLEAUT32.dll",
+          "sha256": "4dd40579e7254dd553b49b229aa85b9c079586b034e37e564909da25eb298345"
+        },
+        {
+          "path": "C:\\windows\\System32\\SHCORE.dll",
+          "sha256": "63257882eb0d0d08ccc275287e11e7213ec26946185e3f3116316c249708a920"
+        },
+        {
+          "path": "C:\\windows\\System32\\shlwapi.dll",
+          "sha256": "eb70b465352f04f188cd12affd72b44f14770e6bfd98f6a6570b62ef21873297"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdfcl64.dll",
+          "sha256": "4aafd9f797a227cdab388853ba835a5670f384ca98395e859a4cf7810b8d68ae"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igc-default64.dll",
+          "sha256": "55559222a70929c46c7b4000e019bfe5126fa8c051037cfdf62ac6f29ba53a89"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\dxcore.dll",
+          "sha256": "c4976547ea4ecf3faa1c82e03acfc6344f944203a660f137d938bb53f3495f53"
+        },
+        {
+          "path": "C:\\windows\\System32\\kernel.appcore.dll",
+          "sha256": "abff38d9efaca07602acc2a31775f8790ac720261842dbb6d7d9e1a46bba91f8"
+        }
+      ],
+      "modules_workload": [
+        {
+          "path": "G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-qsa-integration-1793373331920047900\\strata.exe",
+          "sha256": "cd5914cf52363980241329b55b0ccff530dcbd46ad5f497faf780b461bf51e42"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ntdll.dll",
+          "sha256": "36b1a62e4bf6bf7d68458fff6e8a33b39f6527ec6a46e55ecdd12cde83894c8d"
+        },
+        {
+          "path": "C:\\windows\\System32\\KERNEL32.DLL",
+          "sha256": "4636f65d449b1353100578c6cb139933cf2b134f5e246119d18968873a058bed"
+        },
+        {
+          "path": "C:\\windows\\System32\\KERNELBASE.dll",
+          "sha256": "b4ad8c8e3632104f4d2132ecb8979b8df279f0046dc42e79bed5acb744751871"
+        },
+        {
+          "path": "C:\\windows\\System32\\ADVAPI32.dll",
+          "sha256": "bde5f0e6f36a706a8a2e0fab1b362eea267aa6ee9f18aab1f899f38888c21280"
+        },
+        {
+          "path": "C:\\windows\\System32\\msvcrt.dll",
+          "sha256": "a7f4196d9476d36894ce17c3b0dd97504ca2cc31b3e0a774fee326e867565885"
+        },
+        {
+          "path": "C:\\windows\\System32\\sechost.dll",
+          "sha256": "54756c8bc96e3baf57ee58e4f73ca10183c8267d208efe7819a256eca53361a0"
+        },
+        {
+          "path": "C:\\windows\\System32\\RPCRT4.dll",
+          "sha256": "b9decb81fcf8ef9a6b674072da5676322b925c73b3c8c9253805db7510d9c493"
+        },
+        {
+          "path": "C:\\windows\\System32\\bcrypt.dll",
+          "sha256": "811af66dd7e323a74db80648610bbebb956093ae7bd91c5b950ed6aca13d8026"
+        },
+        {
+          "path": "C:\\windows\\System32\\ucrtbase.dll",
+          "sha256": "3c60056371f82e4744185b6f2fa0c69042b1e78804685944132974dd13f3b6d9"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ze_loader.dll",
+          "sha256": "a56a109788c97ed42275803202e42a44c591a24064a038e6aa3cbc5908f98b4b"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\MSVCP140.dll",
+          "sha256": "def46aa6a8f72f27bafac0c43334419486a4d1dcdb6c479a8ef7034b3e1fa4cb"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\MSVCP140_ATOMIC_WAIT.dll",
+          "sha256": "e7963645e0d1db08e300614d4c5fa7194bd8173e9ab7a5558859e6b232ed3241"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VCRUNTIME140.dll",
+          "sha256": "184146852727a9db4eea06178716bec3cdbb1015c911f6b0f915b184ad7775b2"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VCRUNTIME140_1.dll",
+          "sha256": "e6bfb3662ab4b1969a73441dbe35c96d51441b6bff8cf1fe7430bd5b246ca605"
+        },
+        {
+          "path": "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin\\libmmd.dll",
+          "sha256": "0e8e285e2d1cb7dbe6018371fd5fd9763e9b3a574f516ff000f606433fe3cc10"
+        },
+        {
+          "path": "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin\\svml_dispmd.dll",
+          "sha256": "03b6af2ab4dac88fa5d80ddded702aeb7cfd3f0460e63425ded73d7a755a1dce"
+        },
+        {
+          "path": "C:\\windows\\System32\\CFGMGR32.dll",
+          "sha256": "7fefd329b398827d6babf33973eaa2c0dc580fe1f3b291efa4793e795e4df8fa"
+        },
+        {
+          "path": "C:\\windows\\System32\\ole32.dll",
+          "sha256": "4a7b8ed9f2aeca875f948d9a1bce8b8d177744475f253704362792d7182d55f2"
+        },
+        {
+          "path": "C:\\windows\\System32\\combase.dll",
+          "sha256": "e1ed05c78ccd1056f106468b551f846a4f7e1d46d925223755c44f3191730993"
+        },
+        {
+          "path": "C:\\windows\\System32\\GDI32.dll",
+          "sha256": "b5f5a3f16d03366cdb02020fc4dadceb0892e243f8aa94d205e124045da9457f"
+        },
+        {
+          "path": "C:\\windows\\System32\\win32u.dll",
+          "sha256": "20ac4556b0b3fc82bd5632ffc623a45497184483e14a2841ac30213e162daf1f"
+        },
+        {
+          "path": "C:\\windows\\System32\\gdi32full.dll",
+          "sha256": "724754c47bcd7a2739816c7cefbc75382515538a15ccb73a8342043a16453772"
+        },
+        {
+          "path": "C:\\windows\\System32\\msvcp_win.dll",
+          "sha256": "2a7825c2925347e0cb767a0dcb611f3eb80d0f71cbec981069b227bdc7cb871a"
+        },
+        {
+          "path": "C:\\windows\\System32\\USER32.dll",
+          "sha256": "82870be1e008d5232cb175ebc815f645a2add4c0b164fd4ba20744192c1c81f7"
+        },
+        {
+          "path": "C:\\windows\\System32\\IMM32.DLL",
+          "sha256": "2a882bc0df58f4f6dd906889b1fb6d7b7bc70da7109e016e0f1e67b264d073b6"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\ze_intel_gpu64.dll",
+          "sha256": "e291d6c88c85d85751d3e2ba26d5510e1abb3a1f6d255f8f25b9aa2843ecf96d"
+        },
+        {
+          "path": "C:\\windows\\System32\\dxgi.dll",
+          "sha256": "d33765793e32eff65f9103efe2419184ab0b6289e69e69ce85aa7568f678c3b5"
+        },
+        {
+          "path": "C:\\windows\\System32\\WS2_32.dll",
+          "sha256": "5e9857a80a301ad21d0e0a0928a4ff2b5360c305a97bfc88886e3b686bf8d503"
+        },
+        {
+          "path": "C:\\windows\\System32\\SETUPAPI.dll",
+          "sha256": "3777075e8391c40c21fd5662845f5e2928d3cfd2b6abdf4003e087d2089cb853"
+        },
+        {
+          "path": "C:\\windows\\System32\\SHELL32.dll",
+          "sha256": "936c33a8283196a070aa6f844a65a29a8f99f760eae0016754c1cbf17d62bdb7"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VERSION.dll",
+          "sha256": "af45a728552ccfdcd9435c40ace60a9354d7c1b52abf507a2f1cb371dada4fde"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\WINMM.dll",
+          "sha256": "ead9055dc522bcab041c8eb7b875adb681a2f1fa851d4075789d78d0242711a0"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ze_tracing_layer.dll",
+          "sha256": "d3f8f8c4bd055c464495703761f5754c140137e4c457f60a168e35085ee2c51f"
+        },
+        {
+          "path": "C:\\windows\\System32\\bcryptPrimitives.dll",
+          "sha256": "f0a1662d0f55533a21d609f8dc737288ede77d314d90e885ca9e6ef79d429c3b"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmm2_64.dll",
+          "sha256": "db2ea2a6f271cc85d097dc13176e153e5ebf67775155df162b768a75ed863a2e"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmm64.dll",
+          "sha256": "db3b3d6fbc6aba6ba156080224916c1fefcb1080f0ea3927727f52626623c681"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmmstaging_64.dll",
+          "sha256": "994d22569552487dcadbc8b1aa6ac9bef0c24df23e67637b4e2a2f63952c1e70"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\windows.storage.dll",
+          "sha256": "718c890022323ed8e38a3beb7a143df9e5d680b006c3f1fd28754eeb7cd82010"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\Wldp.dll",
+          "sha256": "c2a7ed84bdd3cf931fdcc5782cea58c376b1a2841fcc6f954e65812deff50389"
+        },
+        {
+          "path": "C:\\windows\\System32\\OLEAUT32.dll",
+          "sha256": "4dd40579e7254dd553b49b229aa85b9c079586b034e37e564909da25eb298345"
+        },
+        {
+          "path": "C:\\windows\\System32\\SHCORE.dll",
+          "sha256": "63257882eb0d0d08ccc275287e11e7213ec26946185e3f3116316c249708a920"
+        },
+        {
+          "path": "C:\\windows\\System32\\shlwapi.dll",
+          "sha256": "eb70b465352f04f188cd12affd72b44f14770e6bfd98f6a6570b62ef21873297"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdfcl64.dll",
+          "sha256": "4aafd9f797a227cdab388853ba835a5670f384ca98395e859a4cf7810b8d68ae"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igc-default64.dll",
+          "sha256": "55559222a70929c46c7b4000e019bfe5126fa8c051037cfdf62ac6f29ba53a89"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\dxcore.dll",
+          "sha256": "c4976547ea4ecf3faa1c82e03acfc6344f944203a660f137d938bb53f3495f53"
+        },
+        {
+          "path": "C:\\windows\\System32\\kernel.appcore.dll",
+          "sha256": "abff38d9efaca07602acc2a31775f8790ac720261842dbb6d7d9e1a46bba91f8"
+        }
+      ],
+      "exit_code": 0,
+      "log_sha256": "4ee13bf583fb4758ac741fae270af700012d612db9ec9a6876f8c375b22d22cd",
+      "actual_gdn_phase_witness": true,
+      "actual_qsa_phase_witness": true,
+      "actual_shared_phase_witness": false,
+      "post_zero_diagnostic_triggered": false
+    },
+    {
+      "label": "B",
+      "spec": 1,
+      "args": [
+        "--pack",
+        "G:\\GitHub\\Strata-data\\packs\\iq2_xs",
+        "--native",
+        "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00001-of-00002.gguf",
+        "--ple-gguf",
+        "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00002-of-00002.gguf",
+        "--expert-profile",
+        "G:\\GitHub\\Strata\\data\\expert-profile.bin",
+        "--expert-cache",
+        "6000",
+        "--prefill",
+        "8192",
+        "--spec",
+        "2",
+        "--spec-min-p",
+        "0.5",
+        "--max-context",
+        "8192",
+        "--stream-experts",
+        "--vram-reserve-mib",
+        "1024",
+        "--pcie-frac",
+        "0.16",
+        "--prompt-cache",
+        "0",
+        "--short-read",
+        "1024",
+        "--adapt-every",
+        "1",
+        "--adapt-swaps",
+        "32",
+        "--prefill-borrow",
+        "--mtp-window",
+        "1024",
+        "--mtp-hnorm",
+        "stream",
+        "--adapt-decay",
+        "0.5",
+        "--suffix-draft",
+        "0"
+      ],
+      "rows": [
+        {
+          "tokens": [
+            29108,
+            4009,
+            27891,
+            8964,
+            579,
+            16078,
+            321,
+            1100,
+            9872,
+            303,
+            660,
+            17425,
+            11,
+            694,
+            22602,
+            6105,
+            89661,
+            513,
+            35742,
+            777,
+            28750,
+            1056,
+            4860,
+            2438,
+            89661,
+            4016,
+            310,
+            12870,
+            60845,
+            69377,
+            13,
+            1061,
+            10386,
+            2209,
+            69377,
+            10814,
+            6105,
+            3000,
+            310,
+            5372,
+            1004,
+            6213,
+            494,
+            660,
+            5306,
+            314,
+            279,
+            12515,
+            11,
+            3154,
+            424,
+            4833,
+            6105,
+            13,
+            50275,
+            11,
+            567,
+            42918,
+            279,
+            12515,
+            430,
+            6105,
+            4598,
+            1056
+          ],
+          "generated": 64,
+          "prompt_tokens": 23,
+          "prompt_ms": 1468.4,
+          "decode_ms": 3613.4,
+          "finish": "length",
+          "accepted": 0,
+          "offered": 0,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 1548.3259999964503,
+          "done": "DONE 64 23 1468.4 3613.4 length 0 0 0 0 0 0 0 0.0 23 0",
+          "case": "Short",
+          "iteration": 0,
+          "retained": false,
+          "mismatched_fields": [],
+          "same_workload_across_arms": true
+        },
+        {
+          "tokens": [
+            760,
+            3766,
+            1970,
+            41643,
+            10551,
+            264,
+            4281,
+            314,
+            12654,
+            5568,
+            11,
+            28853,
+            1510,
+            7945,
+            62,
+            15,
+            63,
+            1472,
+            1510,
+            7945,
+            62,
+            22,
+            17,
+            7561,
+            864,
+            4072,
+            264,
+            3050,
+            34780,
+            17454,
+            383,
+            449,
+            1879,
+            3759,
+            1510,
+            87,
+            27653,
+            1946,
+            3418,
+            279,
+            3558,
+            303,
+            7472,
+            11,
+            567,
+            1902,
+            22903,
+            279,
+            5759,
+            11,
+            279,
+            34780,
+            5215,
+            11,
+            279,
+            42441,
+            33633,
+            6197,
+            11,
+            321,
+            279,
+            4499,
+            52652,
+            23398
+          ],
+          "generated": 64,
+          "prompt_tokens": 2048,
+          "prompt_ms": 34078.0,
+          "decode_ms": 3611.3,
+          "finish": "length",
+          "accepted": 0,
+          "offered": 0,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 34133.77760000003,
+          "done": "DONE 64 2048 34078.0 3611.3 length 0 0 0 0 0 0 0 0.0 2048 0",
+          "case": "Code2K",
+          "iteration": 0,
+          "retained": false,
+          "mismatched_fields": [],
+          "same_workload_across_arms": true
+        },
+        {
+          "tokens": [
+            29108,
+            4009,
+            27891,
+            8964,
+            579,
+            16078,
+            321,
+            1100,
+            9872,
+            303,
+            660,
+            17425,
+            11,
+            694,
+            22602,
+            6105,
+            89661,
+            513,
+            35742,
+            777,
+            28750,
+            1056,
+            4860,
+            2438,
+            89661,
+            4016,
+            310,
+            12870,
+            60845,
+            69377,
+            13,
+            1061,
+            10386,
+            2209,
+            69377,
+            10814,
+            6105,
+            3000,
+            310,
+            5372,
+            1004,
+            6213,
+            494,
+            660,
+            5306,
+            314,
+            279,
+            12515,
+            11,
+            3154,
+            424,
+            4833,
+            6105,
+            13,
+            50275,
+            11,
+            567,
+            42918,
+            279,
+            12515,
+            430,
+            6105,
+            4598,
+            1056
+          ],
+          "generated": 64,
+          "prompt_tokens": 23,
+          "prompt_ms": 989.2,
+          "decode_ms": 3116.3,
+          "finish": "length",
+          "accepted": 0,
+          "offered": 0,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 1033.7163000003784,
+          "done": "DONE 64 23 989.2 3116.3 length 0 0 0 0 0 0 0 0.0 23 0",
+          "case": "Short",
+          "iteration": 1,
+          "retained": true,
+          "mismatched_fields": [],
+          "same_workload_across_arms": true
+        },
+        {
+          "tokens": [
+            760,
+            3766,
+            1970,
+            41643,
+            10551,
+            264,
+            4281,
+            314,
+            12654,
+            5568,
+            11,
+            28853,
+            1510,
+            7945,
+            62,
+            15,
+            63,
+            1472,
+            1510,
+            7945,
+            62,
+            22,
+            17,
+            7561,
+            864,
+            4072,
+            264,
+            3050,
+            34780,
+            17454,
+            383,
+            449,
+            1879,
+            3759,
+            1510,
+            87,
+            27653,
+            1946,
+            3418,
+            279,
+            3558,
+            303,
+            7472,
+            11,
+            567,
+            1902,
+            22903,
+            279,
+            5759,
+            11,
+            279,
+            34780,
+            5215,
+            11,
+            279,
+            42441,
+            33633,
+            6197,
+            11,
+            321,
+            279,
+            4499,
+            52652,
+            23398
+          ],
+          "generated": 64,
+          "prompt_tokens": 2048,
+          "prompt_ms": 33757.2,
+          "decode_ms": 3262.9,
+          "finish": "length",
+          "accepted": 0,
+          "offered": 0,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 33806.61899999541,
+          "done": "DONE 64 2048 33757.2 3262.9 length 0 0 0 0 0 0 0 0.0 2048 0",
+          "case": "Code2K",
+          "iteration": 1,
+          "retained": true,
+          "mismatched_fields": [],
+          "same_workload_across_arms": true
+        },
+        {
+          "tokens": [
+            29108,
+            4009,
+            27891,
+            8964,
+            579,
+            16078,
+            321,
+            1100,
+            9872,
+            303,
+            660,
+            17425,
+            11,
+            694,
+            22602,
+            6105,
+            89661,
+            513,
+            35742,
+            777,
+            28750,
+            1056,
+            4860,
+            2438,
+            89661,
+            4016,
+            310,
+            12870,
+            60845,
+            69377,
+            13,
+            1061,
+            10386,
+            2209,
+            69377,
+            10814,
+            6105,
+            3000,
+            310,
+            5372,
+            1004,
+            6213,
+            494,
+            660,
+            5306,
+            314,
+            279,
+            12515,
+            11,
+            3154,
+            424,
+            4833,
+            6105,
+            13,
+            50275,
+            11,
+            567,
+            42918,
+            279,
+            12515,
+            430,
+            6105,
+            4598,
+            1056
+          ],
+          "generated": 64,
+          "prompt_tokens": 23,
+          "prompt_ms": 994.8,
+          "decode_ms": 3097.7,
+          "finish": "length",
+          "accepted": 0,
+          "offered": 0,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 1038.5135000033188,
+          "done": "DONE 64 23 994.8 3097.7 length 0 0 0 0 0 0 0 0.0 23 0",
+          "case": "Short",
+          "iteration": 2,
+          "retained": true,
+          "mismatched_fields": [],
+          "same_workload_across_arms": true
+        },
+        {
+          "tokens": [
+            760,
+            3766,
+            1970,
+            41643,
+            10551,
+            264,
+            4281,
+            314,
+            12654,
+            5568,
+            11,
+            28853,
+            1510,
+            7945,
+            62,
+            15,
+            63,
+            1472,
+            1510,
+            7945,
+            62,
+            22,
+            17,
+            7561,
+            864,
+            4072,
+            264,
+            3050,
+            34780,
+            17454,
+            383,
+            449,
+            1879,
+            3759,
+            1510,
+            87,
+            27653,
+            1946,
+            3418,
+            279,
+            3558,
+            303,
+            7472,
+            11,
+            567,
+            1902,
+            22903,
+            279,
+            5759,
+            11,
+            279,
+            34780,
+            5215,
+            11,
+            279,
+            42441,
+            33633,
+            6197,
+            11,
+            321,
+            279,
+            4499,
+            52652,
+            23398
+          ],
+          "generated": 64,
+          "prompt_tokens": 2048,
+          "prompt_ms": 33877.1,
+          "decode_ms": 3270.6,
+          "finish": "length",
+          "accepted": 0,
+          "offered": 0,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 33924.95939999935,
+          "done": "DONE 64 2048 33877.1 3270.6 length 0 0 0 0 0 0 0 0.0 2048 0",
+          "case": "Code2K",
+          "iteration": 2,
+          "retained": true,
+          "mismatched_fields": [],
+          "same_workload_across_arms": true
+        }
+      ],
+      "modules_startup": [
+        {
+          "path": "G:\\GitHub\\Strata\\build-orca-native-20261029\\real-shared-schedule-1793375236798237000\\strata.exe",
+          "sha256": "936bc1688d9806c87b9d02ee1e3c5ec3df66858bacc0fd06bc2cbeb62e620e0b"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ntdll.dll",
+          "sha256": "36b1a62e4bf6bf7d68458fff6e8a33b39f6527ec6a46e55ecdd12cde83894c8d"
+        },
+        {
+          "path": "C:\\windows\\System32\\KERNEL32.DLL",
+          "sha256": "4636f65d449b1353100578c6cb139933cf2b134f5e246119d18968873a058bed"
+        },
+        {
+          "path": "C:\\windows\\System32\\KERNELBASE.dll",
+          "sha256": "b4ad8c8e3632104f4d2132ecb8979b8df279f0046dc42e79bed5acb744751871"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\apphelp.dll",
+          "sha256": "9ac3ea9a7b061460d621983ae4bebf4d36cc47e81c51fc07ac2853e8879685b4"
+        },
+        {
+          "path": "C:\\windows\\System32\\ADVAPI32.dll",
+          "sha256": "bde5f0e6f36a706a8a2e0fab1b362eea267aa6ee9f18aab1f899f38888c21280"
+        },
+        {
+          "path": "C:\\windows\\System32\\msvcrt.dll",
+          "sha256": "a7f4196d9476d36894ce17c3b0dd97504ca2cc31b3e0a774fee326e867565885"
+        },
+        {
+          "path": "C:\\windows\\System32\\sechost.dll",
+          "sha256": "54756c8bc96e3baf57ee58e4f73ca10183c8267d208efe7819a256eca53361a0"
+        },
+        {
+          "path": "C:\\windows\\System32\\RPCRT4.dll",
+          "sha256": "b9decb81fcf8ef9a6b674072da5676322b925c73b3c8c9253805db7510d9c493"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ze_loader.dll",
+          "sha256": "a56a109788c97ed42275803202e42a44c591a24064a038e6aa3cbc5908f98b4b"
+        },
+        {
+          "path": "C:\\windows\\System32\\bcrypt.dll",
+          "sha256": "811af66dd7e323a74db80648610bbebb956093ae7bd91c5b950ed6aca13d8026"
+        },
+        {
+          "path": "C:\\windows\\System32\\ucrtbase.dll",
+          "sha256": "3c60056371f82e4744185b6f2fa0c69042b1e78804685944132974dd13f3b6d9"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\MSVCP140.dll",
+          "sha256": "def46aa6a8f72f27bafac0c43334419486a4d1dcdb6c479a8ef7034b3e1fa4cb"
+        },
+        {
+          "path": "C:\\windows\\System32\\CFGMGR32.dll",
+          "sha256": "7fefd329b398827d6babf33973eaa2c0dc580fe1f3b291efa4793e795e4df8fa"
+        },
+        {
+          "path": "C:\\windows\\System32\\ole32.dll",
+          "sha256": "4a7b8ed9f2aeca875f948d9a1bce8b8d177744475f253704362792d7182d55f2"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\MSVCP140_ATOMIC_WAIT.dll",
+          "sha256": "e7963645e0d1db08e300614d4c5fa7194bd8173e9ab7a5558859e6b232ed3241"
+        },
+        {
+          "path": "C:\\windows\\System32\\combase.dll",
+          "sha256": "e1ed05c78ccd1056f106468b551f846a4f7e1d46d925223755c44f3191730993"
+        },
+        {
+          "path": "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin\\libmmd.dll",
+          "sha256": "0e8e285e2d1cb7dbe6018371fd5fd9763e9b3a574f516ff000f606433fe3cc10"
+        },
+        {
+          "path": "C:\\windows\\System32\\GDI32.dll",
+          "sha256": "b5f5a3f16d03366cdb02020fc4dadceb0892e243f8aa94d205e124045da9457f"
+        },
+        {
+          "path": "C:\\windows\\System32\\win32u.dll",
+          "sha256": "20ac4556b0b3fc82bd5632ffc623a45497184483e14a2841ac30213e162daf1f"
+        },
+        {
+          "path": "C:\\windows\\System32\\gdi32full.dll",
+          "sha256": "724754c47bcd7a2739816c7cefbc75382515538a15ccb73a8342043a16453772"
+        },
+        {
+          "path": "C:\\windows\\System32\\msvcp_win.dll",
+          "sha256": "2a7825c2925347e0cb767a0dcb611f3eb80d0f71cbec981069b227bdc7cb871a"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VCRUNTIME140.dll",
+          "sha256": "184146852727a9db4eea06178716bec3cdbb1015c911f6b0f915b184ad7775b2"
+        },
+        {
+          "path": "C:\\windows\\System32\\USER32.dll",
+          "sha256": "82870be1e008d5232cb175ebc815f645a2add4c0b164fd4ba20744192c1c81f7"
+        },
+        {
+          "path": "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin\\svml_dispmd.dll",
+          "sha256": "03b6af2ab4dac88fa5d80ddded702aeb7cfd3f0460e63425ded73d7a755a1dce"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VCRUNTIME140_1.dll",
+          "sha256": "e6bfb3662ab4b1969a73441dbe35c96d51441b6bff8cf1fe7430bd5b246ca605"
+        },
+        {
+          "path": "C:\\windows\\System32\\IMM32.DLL",
+          "sha256": "2a882bc0df58f4f6dd906889b1fb6d7b7bc70da7109e016e0f1e67b264d073b6"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\ze_intel_gpu64.dll",
+          "sha256": "e291d6c88c85d85751d3e2ba26d5510e1abb3a1f6d255f8f25b9aa2843ecf96d"
+        },
+        {
+          "path": "C:\\windows\\System32\\dxgi.dll",
+          "sha256": "d33765793e32eff65f9103efe2419184ab0b6289e69e69ce85aa7568f678c3b5"
+        },
+        {
+          "path": "C:\\windows\\System32\\WS2_32.dll",
+          "sha256": "5e9857a80a301ad21d0e0a0928a4ff2b5360c305a97bfc88886e3b686bf8d503"
+        },
+        {
+          "path": "C:\\windows\\System32\\SETUPAPI.dll",
+          "sha256": "3777075e8391c40c21fd5662845f5e2928d3cfd2b6abdf4003e087d2089cb853"
+        },
+        {
+          "path": "C:\\windows\\System32\\SHELL32.dll",
+          "sha256": "936c33a8283196a070aa6f844a65a29a8f99f760eae0016754c1cbf17d62bdb7"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\WINMM.dll",
+          "sha256": "ead9055dc522bcab041c8eb7b875adb681a2f1fa851d4075789d78d0242711a0"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VERSION.dll",
+          "sha256": "af45a728552ccfdcd9435c40ace60a9354d7c1b52abf507a2f1cb371dada4fde"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ze_tracing_layer.dll",
+          "sha256": "d3f8f8c4bd055c464495703761f5754c140137e4c457f60a168e35085ee2c51f"
+        },
+        {
+          "path": "C:\\windows\\System32\\bcryptPrimitives.dll",
+          "sha256": "f0a1662d0f55533a21d609f8dc737288ede77d314d90e885ca9e6ef79d429c3b"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmm2_64.dll",
+          "sha256": "db2ea2a6f271cc85d097dc13176e153e5ebf67775155df162b768a75ed863a2e"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmm64.dll",
+          "sha256": "db3b3d6fbc6aba6ba156080224916c1fefcb1080f0ea3927727f52626623c681"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmmstaging_64.dll",
+          "sha256": "994d22569552487dcadbc8b1aa6ac9bef0c24df23e67637b4e2a2f63952c1e70"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\windows.storage.dll",
+          "sha256": "718c890022323ed8e38a3beb7a143df9e5d680b006c3f1fd28754eeb7cd82010"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\Wldp.dll",
+          "sha256": "c2a7ed84bdd3cf931fdcc5782cea58c376b1a2841fcc6f954e65812deff50389"
+        },
+        {
+          "path": "C:\\windows\\System32\\OLEAUT32.dll",
+          "sha256": "4dd40579e7254dd553b49b229aa85b9c079586b034e37e564909da25eb298345"
+        },
+        {
+          "path": "C:\\windows\\System32\\SHCORE.dll",
+          "sha256": "63257882eb0d0d08ccc275287e11e7213ec26946185e3f3116316c249708a920"
+        },
+        {
+          "path": "C:\\windows\\System32\\shlwapi.dll",
+          "sha256": "eb70b465352f04f188cd12affd72b44f14770e6bfd98f6a6570b62ef21873297"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdfcl64.dll",
+          "sha256": "4aafd9f797a227cdab388853ba835a5670f384ca98395e859a4cf7810b8d68ae"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igc-default64.dll",
+          "sha256": "55559222a70929c46c7b4000e019bfe5126fa8c051037cfdf62ac6f29ba53a89"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\dxcore.dll",
+          "sha256": "c4976547ea4ecf3faa1c82e03acfc6344f944203a660f137d938bb53f3495f53"
+        },
+        {
+          "path": "C:\\windows\\System32\\kernel.appcore.dll",
+          "sha256": "abff38d9efaca07602acc2a31775f8790ac720261842dbb6d7d9e1a46bba91f8"
+        }
+      ],
+      "modules_workload": [
+        {
+          "path": "G:\\GitHub\\Strata\\build-orca-native-20261029\\real-shared-schedule-1793375236798237000\\strata.exe",
+          "sha256": "936bc1688d9806c87b9d02ee1e3c5ec3df66858bacc0fd06bc2cbeb62e620e0b"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ntdll.dll",
+          "sha256": "36b1a62e4bf6bf7d68458fff6e8a33b39f6527ec6a46e55ecdd12cde83894c8d"
+        },
+        {
+          "path": "C:\\windows\\System32\\KERNEL32.DLL",
+          "sha256": "4636f65d449b1353100578c6cb139933cf2b134f5e246119d18968873a058bed"
+        },
+        {
+          "path": "C:\\windows\\System32\\KERNELBASE.dll",
+          "sha256": "b4ad8c8e3632104f4d2132ecb8979b8df279f0046dc42e79bed5acb744751871"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\apphelp.dll",
+          "sha256": "9ac3ea9a7b061460d621983ae4bebf4d36cc47e81c51fc07ac2853e8879685b4"
+        },
+        {
+          "path": "C:\\windows\\System32\\ADVAPI32.dll",
+          "sha256": "bde5f0e6f36a706a8a2e0fab1b362eea267aa6ee9f18aab1f899f38888c21280"
+        },
+        {
+          "path": "C:\\windows\\System32\\msvcrt.dll",
+          "sha256": "a7f4196d9476d36894ce17c3b0dd97504ca2cc31b3e0a774fee326e867565885"
+        },
+        {
+          "path": "C:\\windows\\System32\\sechost.dll",
+          "sha256": "54756c8bc96e3baf57ee58e4f73ca10183c8267d208efe7819a256eca53361a0"
+        },
+        {
+          "path": "C:\\windows\\System32\\RPCRT4.dll",
+          "sha256": "b9decb81fcf8ef9a6b674072da5676322b925c73b3c8c9253805db7510d9c493"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ze_loader.dll",
+          "sha256": "a56a109788c97ed42275803202e42a44c591a24064a038e6aa3cbc5908f98b4b"
+        },
+        {
+          "path": "C:\\windows\\System32\\bcrypt.dll",
+          "sha256": "811af66dd7e323a74db80648610bbebb956093ae7bd91c5b950ed6aca13d8026"
+        },
+        {
+          "path": "C:\\windows\\System32\\ucrtbase.dll",
+          "sha256": "3c60056371f82e4744185b6f2fa0c69042b1e78804685944132974dd13f3b6d9"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\MSVCP140.dll",
+          "sha256": "def46aa6a8f72f27bafac0c43334419486a4d1dcdb6c479a8ef7034b3e1fa4cb"
+        },
+        {
+          "path": "C:\\windows\\System32\\CFGMGR32.dll",
+          "sha256": "7fefd329b398827d6babf33973eaa2c0dc580fe1f3b291efa4793e795e4df8fa"
+        },
+        {
+          "path": "C:\\windows\\System32\\ole32.dll",
+          "sha256": "4a7b8ed9f2aeca875f948d9a1bce8b8d177744475f253704362792d7182d55f2"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\MSVCP140_ATOMIC_WAIT.dll",
+          "sha256": "e7963645e0d1db08e300614d4c5fa7194bd8173e9ab7a5558859e6b232ed3241"
+        },
+        {
+          "path": "C:\\windows\\System32\\combase.dll",
+          "sha256": "e1ed05c78ccd1056f106468b551f846a4f7e1d46d925223755c44f3191730993"
+        },
+        {
+          "path": "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin\\libmmd.dll",
+          "sha256": "0e8e285e2d1cb7dbe6018371fd5fd9763e9b3a574f516ff000f606433fe3cc10"
+        },
+        {
+          "path": "C:\\windows\\System32\\GDI32.dll",
+          "sha256": "b5f5a3f16d03366cdb02020fc4dadceb0892e243f8aa94d205e124045da9457f"
+        },
+        {
+          "path": "C:\\windows\\System32\\win32u.dll",
+          "sha256": "20ac4556b0b3fc82bd5632ffc623a45497184483e14a2841ac30213e162daf1f"
+        },
+        {
+          "path": "C:\\windows\\System32\\gdi32full.dll",
+          "sha256": "724754c47bcd7a2739816c7cefbc75382515538a15ccb73a8342043a16453772"
+        },
+        {
+          "path": "C:\\windows\\System32\\msvcp_win.dll",
+          "sha256": "2a7825c2925347e0cb767a0dcb611f3eb80d0f71cbec981069b227bdc7cb871a"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VCRUNTIME140.dll",
+          "sha256": "184146852727a9db4eea06178716bec3cdbb1015c911f6b0f915b184ad7775b2"
+        },
+        {
+          "path": "C:\\windows\\System32\\USER32.dll",
+          "sha256": "82870be1e008d5232cb175ebc815f645a2add4c0b164fd4ba20744192c1c81f7"
+        },
+        {
+          "path": "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin\\svml_dispmd.dll",
+          "sha256": "03b6af2ab4dac88fa5d80ddded702aeb7cfd3f0460e63425ded73d7a755a1dce"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VCRUNTIME140_1.dll",
+          "sha256": "e6bfb3662ab4b1969a73441dbe35c96d51441b6bff8cf1fe7430bd5b246ca605"
+        },
+        {
+          "path": "C:\\windows\\System32\\IMM32.DLL",
+          "sha256": "2a882bc0df58f4f6dd906889b1fb6d7b7bc70da7109e016e0f1e67b264d073b6"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\ze_intel_gpu64.dll",
+          "sha256": "e291d6c88c85d85751d3e2ba26d5510e1abb3a1f6d255f8f25b9aa2843ecf96d"
+        },
+        {
+          "path": "C:\\windows\\System32\\dxgi.dll",
+          "sha256": "d33765793e32eff65f9103efe2419184ab0b6289e69e69ce85aa7568f678c3b5"
+        },
+        {
+          "path": "C:\\windows\\System32\\WS2_32.dll",
+          "sha256": "5e9857a80a301ad21d0e0a0928a4ff2b5360c305a97bfc88886e3b686bf8d503"
+        },
+        {
+          "path": "C:\\windows\\System32\\SETUPAPI.dll",
+          "sha256": "3777075e8391c40c21fd5662845f5e2928d3cfd2b6abdf4003e087d2089cb853"
+        },
+        {
+          "path": "C:\\windows\\System32\\SHELL32.dll",
+          "sha256": "936c33a8283196a070aa6f844a65a29a8f99f760eae0016754c1cbf17d62bdb7"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\WINMM.dll",
+          "sha256": "ead9055dc522bcab041c8eb7b875adb681a2f1fa851d4075789d78d0242711a0"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VERSION.dll",
+          "sha256": "af45a728552ccfdcd9435c40ace60a9354d7c1b52abf507a2f1cb371dada4fde"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ze_tracing_layer.dll",
+          "sha256": "d3f8f8c4bd055c464495703761f5754c140137e4c457f60a168e35085ee2c51f"
+        },
+        {
+          "path": "C:\\windows\\System32\\bcryptPrimitives.dll",
+          "sha256": "f0a1662d0f55533a21d609f8dc737288ede77d314d90e885ca9e6ef79d429c3b"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmm2_64.dll",
+          "sha256": "db2ea2a6f271cc85d097dc13176e153e5ebf67775155df162b768a75ed863a2e"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmm64.dll",
+          "sha256": "db3b3d6fbc6aba6ba156080224916c1fefcb1080f0ea3927727f52626623c681"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmmstaging_64.dll",
+          "sha256": "994d22569552487dcadbc8b1aa6ac9bef0c24df23e67637b4e2a2f63952c1e70"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\windows.storage.dll",
+          "sha256": "718c890022323ed8e38a3beb7a143df9e5d680b006c3f1fd28754eeb7cd82010"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\Wldp.dll",
+          "sha256": "c2a7ed84bdd3cf931fdcc5782cea58c376b1a2841fcc6f954e65812deff50389"
+        },
+        {
+          "path": "C:\\windows\\System32\\OLEAUT32.dll",
+          "sha256": "4dd40579e7254dd553b49b229aa85b9c079586b034e37e564909da25eb298345"
+        },
+        {
+          "path": "C:\\windows\\System32\\SHCORE.dll",
+          "sha256": "63257882eb0d0d08ccc275287e11e7213ec26946185e3f3116316c249708a920"
+        },
+        {
+          "path": "C:\\windows\\System32\\shlwapi.dll",
+          "sha256": "eb70b465352f04f188cd12affd72b44f14770e6bfd98f6a6570b62ef21873297"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdfcl64.dll",
+          "sha256": "4aafd9f797a227cdab388853ba835a5670f384ca98395e859a4cf7810b8d68ae"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igc-default64.dll",
+          "sha256": "55559222a70929c46c7b4000e019bfe5126fa8c051037cfdf62ac6f29ba53a89"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\dxcore.dll",
+          "sha256": "c4976547ea4ecf3faa1c82e03acfc6344f944203a660f137d938bb53f3495f53"
+        },
+        {
+          "path": "C:\\windows\\System32\\kernel.appcore.dll",
+          "sha256": "abff38d9efaca07602acc2a31775f8790ac720261842dbb6d7d9e1a46bba91f8"
+        }
+      ],
+      "exit_code": 0,
+      "log_sha256": "572e8783ac16406adf25547e040020b6e45d8d214b7a6a81de47fd7045b4667b",
+      "actual_gdn_phase_witness": true,
+      "actual_qsa_phase_witness": true,
+      "actual_shared_phase_witness": true,
+      "post_zero_diagnostic_triggered": false
+    },
+    {
+      "label": "A1",
+      "spec": 1,
+      "args": [
+        "--pack",
+        "G:\\GitHub\\Strata-data\\packs\\iq2_xs",
+        "--native",
+        "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00001-of-00002.gguf",
+        "--ple-gguf",
+        "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00002-of-00002.gguf",
+        "--expert-profile",
+        "G:\\GitHub\\Strata\\data\\expert-profile.bin",
+        "--expert-cache",
+        "6000",
+        "--prefill",
+        "8192",
+        "--spec",
+        "2",
+        "--spec-min-p",
+        "0.5",
+        "--max-context",
+        "8192",
+        "--stream-experts",
+        "--vram-reserve-mib",
+        "1024",
+        "--pcie-frac",
+        "0.16",
+        "--prompt-cache",
+        "0",
+        "--short-read",
+        "1024",
+        "--adapt-every",
+        "1",
+        "--adapt-swaps",
+        "32",
+        "--prefill-borrow",
+        "--mtp-window",
+        "1024",
+        "--mtp-hnorm",
+        "stream",
+        "--adapt-decay",
+        "0.5",
+        "--suffix-draft",
+        "0"
+      ],
+      "rows": [
+        {
+          "tokens": [
+            29108,
+            4009,
+            27891,
+            8964,
+            579,
+            16078,
+            321,
+            1100,
+            9872,
+            303,
+            660,
+            17425,
+            11,
+            694,
+            22602,
+            6105,
+            89661,
+            513,
+            35742,
+            777,
+            28750,
+            1056,
+            4860,
+            2438,
+            89661,
+            4016,
+            310,
+            12870,
+            60845,
+            69377,
+            13,
+            1061,
+            10386,
+            2209,
+            69377,
+            10814,
+            6105,
+            3000,
+            310,
+            5372,
+            1004,
+            6213,
+            494,
+            660,
+            5306,
+            314,
+            279,
+            12515,
+            11,
+            3154,
+            424,
+            4833,
+            6105,
+            13,
+            50275,
+            11,
+            567,
+            42918,
+            279,
+            12515,
+            430,
+            6105,
+            4598,
+            1056
+          ],
+          "generated": 64,
+          "prompt_tokens": 23,
+          "prompt_ms": 1480.0,
+          "decode_ms": 3651.5,
+          "finish": "length",
+          "accepted": 0,
+          "offered": 0,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 1560.4024999993271,
+          "done": "DONE 64 23 1480.0 3651.5 length 0 0 0 0 0 0 0 0.0 23 0",
+          "case": "Short",
+          "iteration": 0,
+          "retained": false,
+          "mismatched_fields": [],
+          "same_workload_across_arms": true
+        },
+        {
+          "tokens": [
+            760,
+            3766,
+            1970,
+            41643,
+            10551,
+            264,
+            4281,
+            314,
+            12654,
+            5568,
+            11,
+            28853,
+            1510,
+            7945,
+            62,
+            15,
+            63,
+            1472,
+            1510,
+            7945,
+            62,
+            22,
+            17,
+            7561,
+            864,
+            4072,
+            264,
+            3050,
+            34780,
+            17454,
+            383,
+            449,
+            1879,
+            3759,
+            1510,
+            87,
+            27653,
+            1946,
+            3418,
+            279,
+            3558,
+            303,
+            7472,
+            11,
+            567,
+            1902,
+            22903,
+            279,
+            5759,
+            11,
+            279,
+            34780,
+            5215,
+            11,
+            279,
+            42441,
+            33633,
+            6197,
+            11,
+            321,
+            279,
+            4499,
+            52652,
+            23398
+          ],
+          "generated": 64,
+          "prompt_tokens": 2048,
+          "prompt_ms": 33946.8,
+          "decode_ms": 3647.9,
+          "finish": "length",
+          "accepted": 0,
+          "offered": 0,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 34003.236199998355,
+          "done": "DONE 64 2048 33946.8 3647.9 length 0 0 0 0 0 0 0 0.0 2048 0",
+          "case": "Code2K",
+          "iteration": 0,
+          "retained": false,
+          "mismatched_fields": [],
+          "same_workload_across_arms": true
+        },
+        {
+          "tokens": [
+            29108,
+            4009,
+            27891,
+            8964,
+            579,
+            16078,
+            321,
+            1100,
+            9872,
+            303,
+            660,
+            17425,
+            11,
+            694,
+            22602,
+            6105,
+            89661,
+            513,
+            35742,
+            777,
+            28750,
+            1056,
+            4860,
+            2438,
+            89661,
+            4016,
+            310,
+            12870,
+            60845,
+            69377,
+            13,
+            1061,
+            10386,
+            2209,
+            69377,
+            10814,
+            6105,
+            3000,
+            310,
+            5372,
+            1004,
+            6213,
+            494,
+            660,
+            5306,
+            314,
+            279,
+            12515,
+            11,
+            3154,
+            424,
+            4833,
+            6105,
+            13,
+            50275,
+            11,
+            567,
+            42918,
+            279,
+            12515,
+            430,
+            6105,
+            4598,
+            1056
+          ],
+          "generated": 64,
+          "prompt_tokens": 23,
+          "prompt_ms": 992.3,
+          "decode_ms": 3149.3,
+          "finish": "length",
+          "accepted": 0,
+          "offered": 0,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 1037.2226999970735,
+          "done": "DONE 64 23 992.3 3149.3 length 0 0 0 0 0 0 0 0.0 23 0",
+          "case": "Short",
+          "iteration": 1,
+          "retained": true,
+          "mismatched_fields": [],
+          "same_workload_across_arms": true
+        },
+        {
+          "tokens": [
+            760,
+            3766,
+            1970,
+            41643,
+            10551,
+            264,
+            4281,
+            314,
+            12654,
+            5568,
+            11,
+            28853,
+            1510,
+            7945,
+            62,
+            15,
+            63,
+            1472,
+            1510,
+            7945,
+            62,
+            22,
+            17,
+            7561,
+            864,
+            4072,
+            264,
+            3050,
+            34780,
+            17454,
+            383,
+            449,
+            1879,
+            3759,
+            1510,
+            87,
+            27653,
+            1946,
+            3418,
+            279,
+            3558,
+            303,
+            7472,
+            11,
+            567,
+            1902,
+            22903,
+            279,
+            5759,
+            11,
+            279,
+            34780,
+            5215,
+            11,
+            279,
+            42441,
+            33633,
+            6197,
+            11,
+            321,
+            279,
+            4499,
+            52652,
+            23398
+          ],
+          "generated": 64,
+          "prompt_tokens": 2048,
+          "prompt_ms": 33826.7,
+          "decode_ms": 3300.5,
+          "finish": "length",
+          "accepted": 0,
+          "offered": 0,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 33876.80510000064,
+          "done": "DONE 64 2048 33826.7 3300.5 length 0 0 0 0 0 0 0 0.0 2048 0",
+          "case": "Code2K",
+          "iteration": 1,
+          "retained": true,
+          "mismatched_fields": [],
+          "same_workload_across_arms": true
+        },
+        {
+          "tokens": [
+            29108,
+            4009,
+            27891,
+            8964,
+            579,
+            16078,
+            321,
+            1100,
+            9872,
+            303,
+            660,
+            17425,
+            11,
+            694,
+            22602,
+            6105,
+            89661,
+            513,
+            35742,
+            777,
+            28750,
+            1056,
+            4860,
+            2438,
+            89661,
+            4016,
+            310,
+            12870,
+            60845,
+            69377,
+            13,
+            1061,
+            10386,
+            2209,
+            69377,
+            10814,
+            6105,
+            3000,
+            310,
+            5372,
+            1004,
+            6213,
+            494,
+            660,
+            5306,
+            314,
+            279,
+            12515,
+            11,
+            3154,
+            424,
+            4833,
+            6105,
+            13,
+            50275,
+            11,
+            567,
+            42918,
+            279,
+            12515,
+            430,
+            6105,
+            4598,
+            1056
+          ],
+          "generated": 64,
+          "prompt_tokens": 23,
+          "prompt_ms": 988.3,
+          "decode_ms": 3165.8,
+          "finish": "length",
+          "accepted": 0,
+          "offered": 0,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 1032.452999999805,
+          "done": "DONE 64 23 988.3 3165.8 length 0 0 0 0 0 0 0 0.0 23 0",
+          "case": "Short",
+          "iteration": 2,
+          "retained": true,
+          "mismatched_fields": [],
+          "same_workload_across_arms": true
+        },
+        {
+          "tokens": [
+            760,
+            3766,
+            1970,
+            41643,
+            10551,
+            264,
+            4281,
+            314,
+            12654,
+            5568,
+            11,
+            28853,
+            1510,
+            7945,
+            62,
+            15,
+            63,
+            1472,
+            1510,
+            7945,
+            62,
+            22,
+            17,
+            7561,
+            864,
+            4072,
+            264,
+            3050,
+            34780,
+            17454,
+            383,
+            449,
+            1879,
+            3759,
+            1510,
+            87,
+            27653,
+            1946,
+            3418,
+            279,
+            3558,
+            303,
+            7472,
+            11,
+            567,
+            1902,
+            22903,
+            279,
+            5759,
+            11,
+            279,
+            34780,
+            5215,
+            11,
+            279,
+            42441,
+            33633,
+            6197,
+            11,
+            321,
+            279,
+            4499,
+            52652,
+            23398
+          ],
+          "generated": 64,
+          "prompt_tokens": 2048,
+          "prompt_ms": 34094.3,
+          "decode_ms": 3365.1,
+          "finish": "length",
+          "accepted": 0,
+          "offered": 0,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 34143.37109999906,
+          "done": "DONE 64 2048 34094.3 3365.1 length 0 0 0 0 0 0 0 0.0 2048 0",
+          "case": "Code2K",
+          "iteration": 2,
+          "retained": true,
+          "mismatched_fields": [],
+          "same_workload_across_arms": true
+        }
+      ],
+      "modules_startup": [
+        {
+          "path": "G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-qsa-integration-1793373331920047900\\strata.exe",
+          "sha256": "cd5914cf52363980241329b55b0ccff530dcbd46ad5f497faf780b461bf51e42"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ntdll.dll",
+          "sha256": "36b1a62e4bf6bf7d68458fff6e8a33b39f6527ec6a46e55ecdd12cde83894c8d"
+        },
+        {
+          "path": "C:\\windows\\System32\\KERNEL32.DLL",
+          "sha256": "4636f65d449b1353100578c6cb139933cf2b134f5e246119d18968873a058bed"
+        },
+        {
+          "path": "C:\\windows\\System32\\KERNELBASE.dll",
+          "sha256": "b4ad8c8e3632104f4d2132ecb8979b8df279f0046dc42e79bed5acb744751871"
+        },
+        {
+          "path": "C:\\windows\\System32\\ADVAPI32.dll",
+          "sha256": "bde5f0e6f36a706a8a2e0fab1b362eea267aa6ee9f18aab1f899f38888c21280"
+        },
+        {
+          "path": "C:\\windows\\System32\\msvcrt.dll",
+          "sha256": "a7f4196d9476d36894ce17c3b0dd97504ca2cc31b3e0a774fee326e867565885"
+        },
+        {
+          "path": "C:\\windows\\System32\\sechost.dll",
+          "sha256": "54756c8bc96e3baf57ee58e4f73ca10183c8267d208efe7819a256eca53361a0"
+        },
+        {
+          "path": "C:\\windows\\System32\\RPCRT4.dll",
+          "sha256": "b9decb81fcf8ef9a6b674072da5676322b925c73b3c8c9253805db7510d9c493"
+        },
+        {
+          "path": "C:\\windows\\System32\\bcrypt.dll",
+          "sha256": "811af66dd7e323a74db80648610bbebb956093ae7bd91c5b950ed6aca13d8026"
+        },
+        {
+          "path": "C:\\windows\\System32\\ucrtbase.dll",
+          "sha256": "3c60056371f82e4744185b6f2fa0c69042b1e78804685944132974dd13f3b6d9"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ze_loader.dll",
+          "sha256": "a56a109788c97ed42275803202e42a44c591a24064a038e6aa3cbc5908f98b4b"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\MSVCP140.dll",
+          "sha256": "def46aa6a8f72f27bafac0c43334419486a4d1dcdb6c479a8ef7034b3e1fa4cb"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\MSVCP140_ATOMIC_WAIT.dll",
+          "sha256": "e7963645e0d1db08e300614d4c5fa7194bd8173e9ab7a5558859e6b232ed3241"
+        },
+        {
+          "path": "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin\\svml_dispmd.dll",
+          "sha256": "03b6af2ab4dac88fa5d80ddded702aeb7cfd3f0460e63425ded73d7a755a1dce"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VCRUNTIME140.dll",
+          "sha256": "184146852727a9db4eea06178716bec3cdbb1015c911f6b0f915b184ad7775b2"
+        },
+        {
+          "path": "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin\\libmmd.dll",
+          "sha256": "0e8e285e2d1cb7dbe6018371fd5fd9763e9b3a574f516ff000f606433fe3cc10"
+        },
+        {
+          "path": "C:\\windows\\System32\\CFGMGR32.dll",
+          "sha256": "7fefd329b398827d6babf33973eaa2c0dc580fe1f3b291efa4793e795e4df8fa"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VCRUNTIME140_1.dll",
+          "sha256": "e6bfb3662ab4b1969a73441dbe35c96d51441b6bff8cf1fe7430bd5b246ca605"
+        },
+        {
+          "path": "C:\\windows\\System32\\ole32.dll",
+          "sha256": "4a7b8ed9f2aeca875f948d9a1bce8b8d177744475f253704362792d7182d55f2"
+        },
+        {
+          "path": "C:\\windows\\System32\\combase.dll",
+          "sha256": "e1ed05c78ccd1056f106468b551f846a4f7e1d46d925223755c44f3191730993"
+        },
+        {
+          "path": "C:\\windows\\System32\\GDI32.dll",
+          "sha256": "b5f5a3f16d03366cdb02020fc4dadceb0892e243f8aa94d205e124045da9457f"
+        },
+        {
+          "path": "C:\\windows\\System32\\win32u.dll",
+          "sha256": "20ac4556b0b3fc82bd5632ffc623a45497184483e14a2841ac30213e162daf1f"
+        },
+        {
+          "path": "C:\\windows\\System32\\gdi32full.dll",
+          "sha256": "724754c47bcd7a2739816c7cefbc75382515538a15ccb73a8342043a16453772"
+        },
+        {
+          "path": "C:\\windows\\System32\\msvcp_win.dll",
+          "sha256": "2a7825c2925347e0cb767a0dcb611f3eb80d0f71cbec981069b227bdc7cb871a"
+        },
+        {
+          "path": "C:\\windows\\System32\\USER32.dll",
+          "sha256": "82870be1e008d5232cb175ebc815f645a2add4c0b164fd4ba20744192c1c81f7"
+        },
+        {
+          "path": "C:\\windows\\System32\\IMM32.DLL",
+          "sha256": "2a882bc0df58f4f6dd906889b1fb6d7b7bc70da7109e016e0f1e67b264d073b6"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\ze_intel_gpu64.dll",
+          "sha256": "e291d6c88c85d85751d3e2ba26d5510e1abb3a1f6d255f8f25b9aa2843ecf96d"
+        },
+        {
+          "path": "C:\\windows\\System32\\dxgi.dll",
+          "sha256": "d33765793e32eff65f9103efe2419184ab0b6289e69e69ce85aa7568f678c3b5"
+        },
+        {
+          "path": "C:\\windows\\System32\\WS2_32.dll",
+          "sha256": "5e9857a80a301ad21d0e0a0928a4ff2b5360c305a97bfc88886e3b686bf8d503"
+        },
+        {
+          "path": "C:\\windows\\System32\\SETUPAPI.dll",
+          "sha256": "3777075e8391c40c21fd5662845f5e2928d3cfd2b6abdf4003e087d2089cb853"
+        },
+        {
+          "path": "C:\\windows\\System32\\SHELL32.dll",
+          "sha256": "936c33a8283196a070aa6f844a65a29a8f99f760eae0016754c1cbf17d62bdb7"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\WINMM.dll",
+          "sha256": "ead9055dc522bcab041c8eb7b875adb681a2f1fa851d4075789d78d0242711a0"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VERSION.dll",
+          "sha256": "af45a728552ccfdcd9435c40ace60a9354d7c1b52abf507a2f1cb371dada4fde"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ze_tracing_layer.dll",
+          "sha256": "d3f8f8c4bd055c464495703761f5754c140137e4c457f60a168e35085ee2c51f"
+        },
+        {
+          "path": "C:\\windows\\System32\\bcryptPrimitives.dll",
+          "sha256": "f0a1662d0f55533a21d609f8dc737288ede77d314d90e885ca9e6ef79d429c3b"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmm2_64.dll",
+          "sha256": "db2ea2a6f271cc85d097dc13176e153e5ebf67775155df162b768a75ed863a2e"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmm64.dll",
+          "sha256": "db3b3d6fbc6aba6ba156080224916c1fefcb1080f0ea3927727f52626623c681"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmmstaging_64.dll",
+          "sha256": "994d22569552487dcadbc8b1aa6ac9bef0c24df23e67637b4e2a2f63952c1e70"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\windows.storage.dll",
+          "sha256": "718c890022323ed8e38a3beb7a143df9e5d680b006c3f1fd28754eeb7cd82010"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\Wldp.dll",
+          "sha256": "c2a7ed84bdd3cf931fdcc5782cea58c376b1a2841fcc6f954e65812deff50389"
+        },
+        {
+          "path": "C:\\windows\\System32\\OLEAUT32.dll",
+          "sha256": "4dd40579e7254dd553b49b229aa85b9c079586b034e37e564909da25eb298345"
+        },
+        {
+          "path": "C:\\windows\\System32\\SHCORE.dll",
+          "sha256": "63257882eb0d0d08ccc275287e11e7213ec26946185e3f3116316c249708a920"
+        },
+        {
+          "path": "C:\\windows\\System32\\shlwapi.dll",
+          "sha256": "eb70b465352f04f188cd12affd72b44f14770e6bfd98f6a6570b62ef21873297"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdfcl64.dll",
+          "sha256": "4aafd9f797a227cdab388853ba835a5670f384ca98395e859a4cf7810b8d68ae"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igc-default64.dll",
+          "sha256": "55559222a70929c46c7b4000e019bfe5126fa8c051037cfdf62ac6f29ba53a89"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\dxcore.dll",
+          "sha256": "c4976547ea4ecf3faa1c82e03acfc6344f944203a660f137d938bb53f3495f53"
+        },
+        {
+          "path": "C:\\windows\\System32\\kernel.appcore.dll",
+          "sha256": "abff38d9efaca07602acc2a31775f8790ac720261842dbb6d7d9e1a46bba91f8"
+        }
+      ],
+      "modules_workload": [
+        {
+          "path": "G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-qsa-integration-1793373331920047900\\strata.exe",
+          "sha256": "cd5914cf52363980241329b55b0ccff530dcbd46ad5f497faf780b461bf51e42"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ntdll.dll",
+          "sha256": "36b1a62e4bf6bf7d68458fff6e8a33b39f6527ec6a46e55ecdd12cde83894c8d"
+        },
+        {
+          "path": "C:\\windows\\System32\\KERNEL32.DLL",
+          "sha256": "4636f65d449b1353100578c6cb139933cf2b134f5e246119d18968873a058bed"
+        },
+        {
+          "path": "C:\\windows\\System32\\KERNELBASE.dll",
+          "sha256": "b4ad8c8e3632104f4d2132ecb8979b8df279f0046dc42e79bed5acb744751871"
+        },
+        {
+          "path": "C:\\windows\\System32\\ADVAPI32.dll",
+          "sha256": "bde5f0e6f36a706a8a2e0fab1b362eea267aa6ee9f18aab1f899f38888c21280"
+        },
+        {
+          "path": "C:\\windows\\System32\\msvcrt.dll",
+          "sha256": "a7f4196d9476d36894ce17c3b0dd97504ca2cc31b3e0a774fee326e867565885"
+        },
+        {
+          "path": "C:\\windows\\System32\\sechost.dll",
+          "sha256": "54756c8bc96e3baf57ee58e4f73ca10183c8267d208efe7819a256eca53361a0"
+        },
+        {
+          "path": "C:\\windows\\System32\\RPCRT4.dll",
+          "sha256": "b9decb81fcf8ef9a6b674072da5676322b925c73b3c8c9253805db7510d9c493"
+        },
+        {
+          "path": "C:\\windows\\System32\\bcrypt.dll",
+          "sha256": "811af66dd7e323a74db80648610bbebb956093ae7bd91c5b950ed6aca13d8026"
+        },
+        {
+          "path": "C:\\windows\\System32\\ucrtbase.dll",
+          "sha256": "3c60056371f82e4744185b6f2fa0c69042b1e78804685944132974dd13f3b6d9"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ze_loader.dll",
+          "sha256": "a56a109788c97ed42275803202e42a44c591a24064a038e6aa3cbc5908f98b4b"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\MSVCP140.dll",
+          "sha256": "def46aa6a8f72f27bafac0c43334419486a4d1dcdb6c479a8ef7034b3e1fa4cb"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\MSVCP140_ATOMIC_WAIT.dll",
+          "sha256": "e7963645e0d1db08e300614d4c5fa7194bd8173e9ab7a5558859e6b232ed3241"
+        },
+        {
+          "path": "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin\\svml_dispmd.dll",
+          "sha256": "03b6af2ab4dac88fa5d80ddded702aeb7cfd3f0460e63425ded73d7a755a1dce"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VCRUNTIME140.dll",
+          "sha256": "184146852727a9db4eea06178716bec3cdbb1015c911f6b0f915b184ad7775b2"
+        },
+        {
+          "path": "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin\\libmmd.dll",
+          "sha256": "0e8e285e2d1cb7dbe6018371fd5fd9763e9b3a574f516ff000f606433fe3cc10"
+        },
+        {
+          "path": "C:\\windows\\System32\\CFGMGR32.dll",
+          "sha256": "7fefd329b398827d6babf33973eaa2c0dc580fe1f3b291efa4793e795e4df8fa"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VCRUNTIME140_1.dll",
+          "sha256": "e6bfb3662ab4b1969a73441dbe35c96d51441b6bff8cf1fe7430bd5b246ca605"
+        },
+        {
+          "path": "C:\\windows\\System32\\ole32.dll",
+          "sha256": "4a7b8ed9f2aeca875f948d9a1bce8b8d177744475f253704362792d7182d55f2"
+        },
+        {
+          "path": "C:\\windows\\System32\\combase.dll",
+          "sha256": "e1ed05c78ccd1056f106468b551f846a4f7e1d46d925223755c44f3191730993"
+        },
+        {
+          "path": "C:\\windows\\System32\\GDI32.dll",
+          "sha256": "b5f5a3f16d03366cdb02020fc4dadceb0892e243f8aa94d205e124045da9457f"
+        },
+        {
+          "path": "C:\\windows\\System32\\win32u.dll",
+          "sha256": "20ac4556b0b3fc82bd5632ffc623a45497184483e14a2841ac30213e162daf1f"
+        },
+        {
+          "path": "C:\\windows\\System32\\gdi32full.dll",
+          "sha256": "724754c47bcd7a2739816c7cefbc75382515538a15ccb73a8342043a16453772"
+        },
+        {
+          "path": "C:\\windows\\System32\\msvcp_win.dll",
+          "sha256": "2a7825c2925347e0cb767a0dcb611f3eb80d0f71cbec981069b227bdc7cb871a"
+        },
+        {
+          "path": "C:\\windows\\System32\\USER32.dll",
+          "sha256": "82870be1e008d5232cb175ebc815f645a2add4c0b164fd4ba20744192c1c81f7"
+        },
+        {
+          "path": "C:\\windows\\System32\\IMM32.DLL",
+          "sha256": "2a882bc0df58f4f6dd906889b1fb6d7b7bc70da7109e016e0f1e67b264d073b6"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\ze_intel_gpu64.dll",
+          "sha256": "e291d6c88c85d85751d3e2ba26d5510e1abb3a1f6d255f8f25b9aa2843ecf96d"
+        },
+        {
+          "path": "C:\\windows\\System32\\dxgi.dll",
+          "sha256": "d33765793e32eff65f9103efe2419184ab0b6289e69e69ce85aa7568f678c3b5"
+        },
+        {
+          "path": "C:\\windows\\System32\\WS2_32.dll",
+          "sha256": "5e9857a80a301ad21d0e0a0928a4ff2b5360c305a97bfc88886e3b686bf8d503"
+        },
+        {
+          "path": "C:\\windows\\System32\\SETUPAPI.dll",
+          "sha256": "3777075e8391c40c21fd5662845f5e2928d3cfd2b6abdf4003e087d2089cb853"
+        },
+        {
+          "path": "C:\\windows\\System32\\SHELL32.dll",
+          "sha256": "936c33a8283196a070aa6f844a65a29a8f99f760eae0016754c1cbf17d62bdb7"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\WINMM.dll",
+          "sha256": "ead9055dc522bcab041c8eb7b875adb681a2f1fa851d4075789d78d0242711a0"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VERSION.dll",
+          "sha256": "af45a728552ccfdcd9435c40ace60a9354d7c1b52abf507a2f1cb371dada4fde"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ze_tracing_layer.dll",
+          "sha256": "d3f8f8c4bd055c464495703761f5754c140137e4c457f60a168e35085ee2c51f"
+        },
+        {
+          "path": "C:\\windows\\System32\\bcryptPrimitives.dll",
+          "sha256": "f0a1662d0f55533a21d609f8dc737288ede77d314d90e885ca9e6ef79d429c3b"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmm2_64.dll",
+          "sha256": "db2ea2a6f271cc85d097dc13176e153e5ebf67775155df162b768a75ed863a2e"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmm64.dll",
+          "sha256": "db3b3d6fbc6aba6ba156080224916c1fefcb1080f0ea3927727f52626623c681"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmmstaging_64.dll",
+          "sha256": "994d22569552487dcadbc8b1aa6ac9bef0c24df23e67637b4e2a2f63952c1e70"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\windows.storage.dll",
+          "sha256": "718c890022323ed8e38a3beb7a143df9e5d680b006c3f1fd28754eeb7cd82010"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\Wldp.dll",
+          "sha256": "c2a7ed84bdd3cf931fdcc5782cea58c376b1a2841fcc6f954e65812deff50389"
+        },
+        {
+          "path": "C:\\windows\\System32\\OLEAUT32.dll",
+          "sha256": "4dd40579e7254dd553b49b229aa85b9c079586b034e37e564909da25eb298345"
+        },
+        {
+          "path": "C:\\windows\\System32\\SHCORE.dll",
+          "sha256": "63257882eb0d0d08ccc275287e11e7213ec26946185e3f3116316c249708a920"
+        },
+        {
+          "path": "C:\\windows\\System32\\shlwapi.dll",
+          "sha256": "eb70b465352f04f188cd12affd72b44f14770e6bfd98f6a6570b62ef21873297"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdfcl64.dll",
+          "sha256": "4aafd9f797a227cdab388853ba835a5670f384ca98395e859a4cf7810b8d68ae"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igc-default64.dll",
+          "sha256": "55559222a70929c46c7b4000e019bfe5126fa8c051037cfdf62ac6f29ba53a89"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\dxcore.dll",
+          "sha256": "c4976547ea4ecf3faa1c82e03acfc6344f944203a660f137d938bb53f3495f53"
+        },
+        {
+          "path": "C:\\windows\\System32\\kernel.appcore.dll",
+          "sha256": "abff38d9efaca07602acc2a31775f8790ac720261842dbb6d7d9e1a46bba91f8"
+        }
+      ],
+      "exit_code": 0,
+      "log_sha256": "901e68435370b7327e58011c51ef497b0594139d71592b4fb0e843f177252ae4",
+      "actual_gdn_phase_witness": true,
+      "actual_qsa_phase_witness": true,
+      "actual_shared_phase_witness": false,
+      "post_zero_diagnostic_triggered": false
+    },
+    {
+      "label": "A0",
+      "spec": 8,
+      "args": [
+        "--pack",
+        "G:\\GitHub\\Strata-data\\packs\\iq2_xs",
+        "--native",
+        "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00001-of-00002.gguf",
+        "--ple-gguf",
+        "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00002-of-00002.gguf",
+        "--expert-profile",
+        "G:\\GitHub\\Strata\\data\\expert-profile.bin",
+        "--expert-cache",
+        "6000",
+        "--prefill",
+        "8192",
+        "--spec",
+        "8",
+        "--spec-min-p",
+        "0.5",
+        "--mtp",
+        "G:\\GitHub\\Strata-data\\mtp\\rt-full-vocab-current",
+        "--max-context",
+        "8192",
+        "--stream-experts",
+        "--vram-reserve-mib",
+        "1024",
+        "--pcie-frac",
+        "0.16",
+        "--prompt-cache",
+        "0",
+        "--short-read",
+        "1024",
+        "--adapt-every",
+        "1",
+        "--adapt-swaps",
+        "32",
+        "--prefill-borrow",
+        "--mtp-window",
+        "1024",
+        "--mtp-hnorm",
+        "stream",
+        "--adapt-decay",
+        "0.5",
+        "--suffix-draft",
+        "0"
+      ],
+      "rows": [
+        {
+          "tokens": [
+            29108,
+            4009,
+            27891,
+            8964,
+            579,
+            16078,
+            321,
+            1100,
+            9872,
+            303,
+            660,
+            17425,
+            11,
+            694,
+            22602,
+            6105,
+            89661,
+            513,
+            35742,
+            777,
+            28750,
+            1056,
+            4860,
+            2438,
+            89661,
+            4016,
+            310,
+            12870,
+            60845,
+            69377,
+            13,
+            1061,
+            10386,
+            2209,
+            69377,
+            10814,
+            6105,
+            3000,
+            310,
+            5372,
+            1004,
+            6213,
+            494,
+            660,
+            5306,
+            314,
+            279,
+            12515,
+            11,
+            3154,
+            424,
+            4833,
+            6105,
+            13,
+            50275,
+            11,
+            567,
+            42918,
+            279,
+            12515,
+            430,
+            6105,
+            4598,
+            1056
+          ],
+          "generated": 64,
+          "prompt_tokens": 23,
+          "prompt_ms": 1057.2,
+          "decode_ms": 3020.8,
+          "finish": "length",
+          "accepted": 43,
+          "offered": 68,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 1134.18190000084,
+          "done": "DONE 64 23 1057.2 3020.8 length 43 68 0 0 0 0 0 0.0 23 0",
+          "case": "Short",
+          "iteration": 0,
+          "retained": false,
+          "mismatched_fields": [],
+          "same_workload_across_arms": true
+        },
+        {
+          "tokens": [
+            760,
+            3766,
+            1970,
+            41643,
+            10551,
+            264,
+            4281,
+            314,
+            12654,
+            5568,
+            11,
+            28853,
+            1510,
+            7945,
+            62,
+            15,
+            63,
+            1472,
+            1510,
+            7945,
+            62,
+            22,
+            17,
+            7561,
+            864,
+            4072,
+            264,
+            3050,
+            34780,
+            17454,
+            383,
+            449,
+            1879,
+            3759,
+            1510,
+            87,
+            27653,
+            1946,
+            3418,
+            279,
+            3558,
+            303,
+            7472,
+            11,
+            567,
+            1902,
+            22903,
+            279,
+            5759,
+            11,
+            279,
+            34780,
+            5215,
+            11,
+            279,
+            42441,
+            33633,
+            6197,
+            11,
+            321,
+            279,
+            4499,
+            52652,
+            23398
+          ],
+          "generated": 64,
+          "prompt_tokens": 2048,
+          "prompt_ms": 34014.3,
+          "decode_ms": 2373.0,
+          "finish": "length",
+          "accepted": 41,
+          "offered": 49,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 34068.01550000091,
+          "done": "DONE 64 2048 34014.3 2373.0 length 41 49 0 0 0 0 0 0.0 2048 0",
+          "case": "Code2K",
+          "iteration": 0,
+          "retained": false,
+          "mismatched_fields": [],
+          "same_workload_across_arms": true
+        },
+        {
+          "tokens": [
+            29108,
+            4009,
+            27891,
+            8964,
+            579,
+            16078,
+            321,
+            1100,
+            9872,
+            303,
+            660,
+            17425,
+            11,
+            694,
+            22602,
+            6105,
+            89661,
+            513,
+            35742,
+            777,
+            28750,
+            1056,
+            4860,
+            2438,
+            89661,
+            4016,
+            310,
+            12870,
+            60845,
+            69377,
+            13,
+            1061,
+            10386,
+            2209,
+            69377,
+            10814,
+            6105,
+            3000,
+            310,
+            5372,
+            1004,
+            6213,
+            494,
+            660,
+            5306,
+            314,
+            279,
+            12515,
+            11,
+            3154,
+            424,
+            4833,
+            6105,
+            13,
+            50275,
+            11,
+            567,
+            42918,
+            279,
+            12515,
+            430,
+            6105,
+            4598,
+            1056
+          ],
+          "generated": 64,
+          "prompt_tokens": 23,
+          "prompt_ms": 599.0,
+          "decode_ms": 2223.4,
+          "finish": "length",
+          "accepted": 43,
+          "offered": 68,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 641.4968999961275,
+          "done": "DONE 64 23 599.0 2223.4 length 43 68 0 0 0 0 0 0.0 23 0",
+          "case": "Short",
+          "iteration": 1,
+          "retained": true,
+          "mismatched_fields": [],
+          "same_workload_across_arms": true
+        },
+        {
+          "tokens": [
+            760,
+            3766,
+            1970,
+            41643,
+            10551,
+            264,
+            4281,
+            314,
+            12654,
+            5568,
+            11,
+            28853,
+            1510,
+            7945,
+            62,
+            15,
+            63,
+            1472,
+            1510,
+            7945,
+            62,
+            22,
+            17,
+            7561,
+            864,
+            4072,
+            264,
+            3050,
+            34780,
+            17454,
+            383,
+            449,
+            1879,
+            3759,
+            1510,
+            87,
+            27653,
+            1946,
+            3418,
+            279,
+            3558,
+            303,
+            7472,
+            11,
+            567,
+            1902,
+            22903,
+            279,
+            5759,
+            11,
+            279,
+            34780,
+            5215,
+            11,
+            279,
+            42441,
+            33633,
+            6197,
+            11,
+            321,
+            279,
+            4499,
+            52652,
+            23398
+          ],
+          "generated": 64,
+          "prompt_tokens": 2048,
+          "prompt_ms": 33947.9,
+          "decode_ms": 2035.9,
+          "finish": "length",
+          "accepted": 41,
+          "offered": 49,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 33992.485800001305,
+          "done": "DONE 64 2048 33947.9 2035.9 length 41 49 0 0 0 0 0 0.0 2048 0",
+          "case": "Code2K",
+          "iteration": 1,
+          "retained": true,
+          "mismatched_fields": [],
+          "same_workload_across_arms": true
+        },
+        {
+          "tokens": [
+            29108,
+            4009,
+            27891,
+            8964,
+            579,
+            16078,
+            321,
+            1100,
+            9872,
+            303,
+            660,
+            17425,
+            11,
+            694,
+            22602,
+            6105,
+            89661,
+            513,
+            35742,
+            777,
+            28750,
+            1056,
+            4860,
+            2438,
+            89661,
+            4016,
+            310,
+            12870,
+            60845,
+            69377,
+            13,
+            1061,
+            10386,
+            2209,
+            69377,
+            10814,
+            6105,
+            3000,
+            310,
+            5372,
+            1004,
+            6213,
+            494,
+            660,
+            5306,
+            314,
+            279,
+            12515,
+            11,
+            3154,
+            424,
+            4833,
+            6105,
+            13,
+            50275,
+            11,
+            567,
+            42918,
+            279,
+            12515,
+            430,
+            6105,
+            4598,
+            1056
+          ],
+          "generated": 64,
+          "prompt_tokens": 23,
+          "prompt_ms": 567.0,
+          "decode_ms": 2102.2,
+          "finish": "length",
+          "accepted": 43,
+          "offered": 68,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 605.1532999990741,
+          "done": "DONE 64 23 567.0 2102.2 length 43 68 0 0 0 0 0 0.0 23 0",
+          "case": "Short",
+          "iteration": 2,
+          "retained": true,
+          "mismatched_fields": [],
+          "same_workload_across_arms": true
+        },
+        {
+          "tokens": [
+            760,
+            3766,
+            1970,
+            41643,
+            10551,
+            264,
+            4281,
+            314,
+            12654,
+            5568,
+            11,
+            28853,
+            1510,
+            7945,
+            62,
+            15,
+            63,
+            1472,
+            1510,
+            7945,
+            62,
+            22,
+            17,
+            7561,
+            864,
+            4072,
+            264,
+            3050,
+            34780,
+            17454,
+            383,
+            449,
+            1879,
+            3759,
+            1510,
+            87,
+            27653,
+            1946,
+            3418,
+            279,
+            3558,
+            303,
+            7472,
+            11,
+            567,
+            1902,
+            22903,
+            279,
+            5759,
+            11,
+            279,
+            34780,
+            5215,
+            11,
+            279,
+            42441,
+            33633,
+            6197,
+            11,
+            321,
+            279,
+            4499,
+            52652,
+            23398
+          ],
+          "generated": 64,
+          "prompt_tokens": 2048,
+          "prompt_ms": 34179.0,
+          "decode_ms": 1916.8,
+          "finish": "length",
+          "accepted": 41,
+          "offered": 49,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 34222.3914999995,
+          "done": "DONE 64 2048 34179.0 1916.8 length 41 49 0 0 0 0 0 0.0 2048 0",
+          "case": "Code2K",
+          "iteration": 2,
+          "retained": true,
+          "mismatched_fields": [],
+          "same_workload_across_arms": true
+        }
+      ],
+      "modules_startup": [
+        {
+          "path": "G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-qsa-integration-1793373331920047900\\strata.exe",
+          "sha256": "cd5914cf52363980241329b55b0ccff530dcbd46ad5f497faf780b461bf51e42"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ntdll.dll",
+          "sha256": "36b1a62e4bf6bf7d68458fff6e8a33b39f6527ec6a46e55ecdd12cde83894c8d"
+        },
+        {
+          "path": "C:\\windows\\System32\\KERNEL32.DLL",
+          "sha256": "4636f65d449b1353100578c6cb139933cf2b134f5e246119d18968873a058bed"
+        },
+        {
+          "path": "C:\\windows\\System32\\KERNELBASE.dll",
+          "sha256": "b4ad8c8e3632104f4d2132ecb8979b8df279f0046dc42e79bed5acb744751871"
+        },
+        {
+          "path": "C:\\windows\\System32\\ADVAPI32.dll",
+          "sha256": "bde5f0e6f36a706a8a2e0fab1b362eea267aa6ee9f18aab1f899f38888c21280"
+        },
+        {
+          "path": "C:\\windows\\System32\\msvcrt.dll",
+          "sha256": "a7f4196d9476d36894ce17c3b0dd97504ca2cc31b3e0a774fee326e867565885"
+        },
+        {
+          "path": "C:\\windows\\System32\\sechost.dll",
+          "sha256": "54756c8bc96e3baf57ee58e4f73ca10183c8267d208efe7819a256eca53361a0"
+        },
+        {
+          "path": "C:\\windows\\System32\\RPCRT4.dll",
+          "sha256": "b9decb81fcf8ef9a6b674072da5676322b925c73b3c8c9253805db7510d9c493"
+        },
+        {
+          "path": "C:\\windows\\System32\\bcrypt.dll",
+          "sha256": "811af66dd7e323a74db80648610bbebb956093ae7bd91c5b950ed6aca13d8026"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ze_loader.dll",
+          "sha256": "a56a109788c97ed42275803202e42a44c591a24064a038e6aa3cbc5908f98b4b"
+        },
+        {
+          "path": "C:\\windows\\System32\\ucrtbase.dll",
+          "sha256": "3c60056371f82e4744185b6f2fa0c69042b1e78804685944132974dd13f3b6d9"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\MSVCP140.dll",
+          "sha256": "def46aa6a8f72f27bafac0c43334419486a4d1dcdb6c479a8ef7034b3e1fa4cb"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\MSVCP140_ATOMIC_WAIT.dll",
+          "sha256": "e7963645e0d1db08e300614d4c5fa7194bd8173e9ab7a5558859e6b232ed3241"
+        },
+        {
+          "path": "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin\\libmmd.dll",
+          "sha256": "0e8e285e2d1cb7dbe6018371fd5fd9763e9b3a574f516ff000f606433fe3cc10"
+        },
+        {
+          "path": "C:\\windows\\System32\\CFGMGR32.dll",
+          "sha256": "7fefd329b398827d6babf33973eaa2c0dc580fe1f3b291efa4793e795e4df8fa"
+        },
+        {
+          "path": "C:\\windows\\System32\\ole32.dll",
+          "sha256": "4a7b8ed9f2aeca875f948d9a1bce8b8d177744475f253704362792d7182d55f2"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VCRUNTIME140_1.dll",
+          "sha256": "e6bfb3662ab4b1969a73441dbe35c96d51441b6bff8cf1fe7430bd5b246ca605"
+        },
+        {
+          "path": "C:\\windows\\System32\\combase.dll",
+          "sha256": "e1ed05c78ccd1056f106468b551f846a4f7e1d46d925223755c44f3191730993"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VCRUNTIME140.dll",
+          "sha256": "184146852727a9db4eea06178716bec3cdbb1015c911f6b0f915b184ad7775b2"
+        },
+        {
+          "path": "C:\\windows\\System32\\GDI32.dll",
+          "sha256": "b5f5a3f16d03366cdb02020fc4dadceb0892e243f8aa94d205e124045da9457f"
+        },
+        {
+          "path": "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin\\svml_dispmd.dll",
+          "sha256": "03b6af2ab4dac88fa5d80ddded702aeb7cfd3f0460e63425ded73d7a755a1dce"
+        },
+        {
+          "path": "C:\\windows\\System32\\win32u.dll",
+          "sha256": "20ac4556b0b3fc82bd5632ffc623a45497184483e14a2841ac30213e162daf1f"
+        },
+        {
+          "path": "C:\\windows\\System32\\gdi32full.dll",
+          "sha256": "724754c47bcd7a2739816c7cefbc75382515538a15ccb73a8342043a16453772"
+        },
+        {
+          "path": "C:\\windows\\System32\\msvcp_win.dll",
+          "sha256": "2a7825c2925347e0cb767a0dcb611f3eb80d0f71cbec981069b227bdc7cb871a"
+        },
+        {
+          "path": "C:\\windows\\System32\\USER32.dll",
+          "sha256": "82870be1e008d5232cb175ebc815f645a2add4c0b164fd4ba20744192c1c81f7"
+        },
+        {
+          "path": "C:\\windows\\System32\\IMM32.DLL",
+          "sha256": "2a882bc0df58f4f6dd906889b1fb6d7b7bc70da7109e016e0f1e67b264d073b6"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\ze_intel_gpu64.dll",
+          "sha256": "e291d6c88c85d85751d3e2ba26d5510e1abb3a1f6d255f8f25b9aa2843ecf96d"
+        },
+        {
+          "path": "C:\\windows\\System32\\dxgi.dll",
+          "sha256": "d33765793e32eff65f9103efe2419184ab0b6289e69e69ce85aa7568f678c3b5"
+        },
+        {
+          "path": "C:\\windows\\System32\\WS2_32.dll",
+          "sha256": "5e9857a80a301ad21d0e0a0928a4ff2b5360c305a97bfc88886e3b686bf8d503"
+        },
+        {
+          "path": "C:\\windows\\System32\\SETUPAPI.dll",
+          "sha256": "3777075e8391c40c21fd5662845f5e2928d3cfd2b6abdf4003e087d2089cb853"
+        },
+        {
+          "path": "C:\\windows\\System32\\SHELL32.dll",
+          "sha256": "936c33a8283196a070aa6f844a65a29a8f99f760eae0016754c1cbf17d62bdb7"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VERSION.dll",
+          "sha256": "af45a728552ccfdcd9435c40ace60a9354d7c1b52abf507a2f1cb371dada4fde"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\WINMM.dll",
+          "sha256": "ead9055dc522bcab041c8eb7b875adb681a2f1fa851d4075789d78d0242711a0"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ze_tracing_layer.dll",
+          "sha256": "d3f8f8c4bd055c464495703761f5754c140137e4c457f60a168e35085ee2c51f"
+        },
+        {
+          "path": "C:\\windows\\System32\\bcryptPrimitives.dll",
+          "sha256": "f0a1662d0f55533a21d609f8dc737288ede77d314d90e885ca9e6ef79d429c3b"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmm2_64.dll",
+          "sha256": "db2ea2a6f271cc85d097dc13176e153e5ebf67775155df162b768a75ed863a2e"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmm64.dll",
+          "sha256": "db3b3d6fbc6aba6ba156080224916c1fefcb1080f0ea3927727f52626623c681"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmmstaging_64.dll",
+          "sha256": "994d22569552487dcadbc8b1aa6ac9bef0c24df23e67637b4e2a2f63952c1e70"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\windows.storage.dll",
+          "sha256": "718c890022323ed8e38a3beb7a143df9e5d680b006c3f1fd28754eeb7cd82010"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\Wldp.dll",
+          "sha256": "c2a7ed84bdd3cf931fdcc5782cea58c376b1a2841fcc6f954e65812deff50389"
+        },
+        {
+          "path": "C:\\windows\\System32\\OLEAUT32.dll",
+          "sha256": "4dd40579e7254dd553b49b229aa85b9c079586b034e37e564909da25eb298345"
+        },
+        {
+          "path": "C:\\windows\\System32\\SHCORE.dll",
+          "sha256": "63257882eb0d0d08ccc275287e11e7213ec26946185e3f3116316c249708a920"
+        },
+        {
+          "path": "C:\\windows\\System32\\shlwapi.dll",
+          "sha256": "eb70b465352f04f188cd12affd72b44f14770e6bfd98f6a6570b62ef21873297"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdfcl64.dll",
+          "sha256": "4aafd9f797a227cdab388853ba835a5670f384ca98395e859a4cf7810b8d68ae"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igc-default64.dll",
+          "sha256": "55559222a70929c46c7b4000e019bfe5126fa8c051037cfdf62ac6f29ba53a89"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\dxcore.dll",
+          "sha256": "c4976547ea4ecf3faa1c82e03acfc6344f944203a660f137d938bb53f3495f53"
+        },
+        {
+          "path": "C:\\windows\\System32\\kernel.appcore.dll",
+          "sha256": "abff38d9efaca07602acc2a31775f8790ac720261842dbb6d7d9e1a46bba91f8"
+        }
+      ],
+      "modules_workload": [
+        {
+          "path": "G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-qsa-integration-1793373331920047900\\strata.exe",
+          "sha256": "cd5914cf52363980241329b55b0ccff530dcbd46ad5f497faf780b461bf51e42"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ntdll.dll",
+          "sha256": "36b1a62e4bf6bf7d68458fff6e8a33b39f6527ec6a46e55ecdd12cde83894c8d"
+        },
+        {
+          "path": "C:\\windows\\System32\\KERNEL32.DLL",
+          "sha256": "4636f65d449b1353100578c6cb139933cf2b134f5e246119d18968873a058bed"
+        },
+        {
+          "path": "C:\\windows\\System32\\KERNELBASE.dll",
+          "sha256": "b4ad8c8e3632104f4d2132ecb8979b8df279f0046dc42e79bed5acb744751871"
+        },
+        {
+          "path": "C:\\windows\\System32\\ADVAPI32.dll",
+          "sha256": "bde5f0e6f36a706a8a2e0fab1b362eea267aa6ee9f18aab1f899f38888c21280"
+        },
+        {
+          "path": "C:\\windows\\System32\\msvcrt.dll",
+          "sha256": "a7f4196d9476d36894ce17c3b0dd97504ca2cc31b3e0a774fee326e867565885"
+        },
+        {
+          "path": "C:\\windows\\System32\\sechost.dll",
+          "sha256": "54756c8bc96e3baf57ee58e4f73ca10183c8267d208efe7819a256eca53361a0"
+        },
+        {
+          "path": "C:\\windows\\System32\\RPCRT4.dll",
+          "sha256": "b9decb81fcf8ef9a6b674072da5676322b925c73b3c8c9253805db7510d9c493"
+        },
+        {
+          "path": "C:\\windows\\System32\\bcrypt.dll",
+          "sha256": "811af66dd7e323a74db80648610bbebb956093ae7bd91c5b950ed6aca13d8026"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ze_loader.dll",
+          "sha256": "a56a109788c97ed42275803202e42a44c591a24064a038e6aa3cbc5908f98b4b"
+        },
+        {
+          "path": "C:\\windows\\System32\\ucrtbase.dll",
+          "sha256": "3c60056371f82e4744185b6f2fa0c69042b1e78804685944132974dd13f3b6d9"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\MSVCP140.dll",
+          "sha256": "def46aa6a8f72f27bafac0c43334419486a4d1dcdb6c479a8ef7034b3e1fa4cb"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\MSVCP140_ATOMIC_WAIT.dll",
+          "sha256": "e7963645e0d1db08e300614d4c5fa7194bd8173e9ab7a5558859e6b232ed3241"
+        },
+        {
+          "path": "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin\\libmmd.dll",
+          "sha256": "0e8e285e2d1cb7dbe6018371fd5fd9763e9b3a574f516ff000f606433fe3cc10"
+        },
+        {
+          "path": "C:\\windows\\System32\\CFGMGR32.dll",
+          "sha256": "7fefd329b398827d6babf33973eaa2c0dc580fe1f3b291efa4793e795e4df8fa"
+        },
+        {
+          "path": "C:\\windows\\System32\\ole32.dll",
+          "sha256": "4a7b8ed9f2aeca875f948d9a1bce8b8d177744475f253704362792d7182d55f2"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VCRUNTIME140_1.dll",
+          "sha256": "e6bfb3662ab4b1969a73441dbe35c96d51441b6bff8cf1fe7430bd5b246ca605"
+        },
+        {
+          "path": "C:\\windows\\System32\\combase.dll",
+          "sha256": "e1ed05c78ccd1056f106468b551f846a4f7e1d46d925223755c44f3191730993"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VCRUNTIME140.dll",
+          "sha256": "184146852727a9db4eea06178716bec3cdbb1015c911f6b0f915b184ad7775b2"
+        },
+        {
+          "path": "C:\\windows\\System32\\GDI32.dll",
+          "sha256": "b5f5a3f16d03366cdb02020fc4dadceb0892e243f8aa94d205e124045da9457f"
+        },
+        {
+          "path": "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin\\svml_dispmd.dll",
+          "sha256": "03b6af2ab4dac88fa5d80ddded702aeb7cfd3f0460e63425ded73d7a755a1dce"
+        },
+        {
+          "path": "C:\\windows\\System32\\win32u.dll",
+          "sha256": "20ac4556b0b3fc82bd5632ffc623a45497184483e14a2841ac30213e162daf1f"
+        },
+        {
+          "path": "C:\\windows\\System32\\gdi32full.dll",
+          "sha256": "724754c47bcd7a2739816c7cefbc75382515538a15ccb73a8342043a16453772"
+        },
+        {
+          "path": "C:\\windows\\System32\\msvcp_win.dll",
+          "sha256": "2a7825c2925347e0cb767a0dcb611f3eb80d0f71cbec981069b227bdc7cb871a"
+        },
+        {
+          "path": "C:\\windows\\System32\\USER32.dll",
+          "sha256": "82870be1e008d5232cb175ebc815f645a2add4c0b164fd4ba20744192c1c81f7"
+        },
+        {
+          "path": "C:\\windows\\System32\\IMM32.DLL",
+          "sha256": "2a882bc0df58f4f6dd906889b1fb6d7b7bc70da7109e016e0f1e67b264d073b6"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\ze_intel_gpu64.dll",
+          "sha256": "e291d6c88c85d85751d3e2ba26d5510e1abb3a1f6d255f8f25b9aa2843ecf96d"
+        },
+        {
+          "path": "C:\\windows\\System32\\dxgi.dll",
+          "sha256": "d33765793e32eff65f9103efe2419184ab0b6289e69e69ce85aa7568f678c3b5"
+        },
+        {
+          "path": "C:\\windows\\System32\\WS2_32.dll",
+          "sha256": "5e9857a80a301ad21d0e0a0928a4ff2b5360c305a97bfc88886e3b686bf8d503"
+        },
+        {
+          "path": "C:\\windows\\System32\\SETUPAPI.dll",
+          "sha256": "3777075e8391c40c21fd5662845f5e2928d3cfd2b6abdf4003e087d2089cb853"
+        },
+        {
+          "path": "C:\\windows\\System32\\SHELL32.dll",
+          "sha256": "936c33a8283196a070aa6f844a65a29a8f99f760eae0016754c1cbf17d62bdb7"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VERSION.dll",
+          "sha256": "af45a728552ccfdcd9435c40ace60a9354d7c1b52abf507a2f1cb371dada4fde"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\WINMM.dll",
+          "sha256": "ead9055dc522bcab041c8eb7b875adb681a2f1fa851d4075789d78d0242711a0"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ze_tracing_layer.dll",
+          "sha256": "d3f8f8c4bd055c464495703761f5754c140137e4c457f60a168e35085ee2c51f"
+        },
+        {
+          "path": "C:\\windows\\System32\\bcryptPrimitives.dll",
+          "sha256": "f0a1662d0f55533a21d609f8dc737288ede77d314d90e885ca9e6ef79d429c3b"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmm2_64.dll",
+          "sha256": "db2ea2a6f271cc85d097dc13176e153e5ebf67775155df162b768a75ed863a2e"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmm64.dll",
+          "sha256": "db3b3d6fbc6aba6ba156080224916c1fefcb1080f0ea3927727f52626623c681"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmmstaging_64.dll",
+          "sha256": "994d22569552487dcadbc8b1aa6ac9bef0c24df23e67637b4e2a2f63952c1e70"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\windows.storage.dll",
+          "sha256": "718c890022323ed8e38a3beb7a143df9e5d680b006c3f1fd28754eeb7cd82010"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\Wldp.dll",
+          "sha256": "c2a7ed84bdd3cf931fdcc5782cea58c376b1a2841fcc6f954e65812deff50389"
+        },
+        {
+          "path": "C:\\windows\\System32\\OLEAUT32.dll",
+          "sha256": "4dd40579e7254dd553b49b229aa85b9c079586b034e37e564909da25eb298345"
+        },
+        {
+          "path": "C:\\windows\\System32\\SHCORE.dll",
+          "sha256": "63257882eb0d0d08ccc275287e11e7213ec26946185e3f3116316c249708a920"
+        },
+        {
+          "path": "C:\\windows\\System32\\shlwapi.dll",
+          "sha256": "eb70b465352f04f188cd12affd72b44f14770e6bfd98f6a6570b62ef21873297"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdfcl64.dll",
+          "sha256": "4aafd9f797a227cdab388853ba835a5670f384ca98395e859a4cf7810b8d68ae"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igc-default64.dll",
+          "sha256": "55559222a70929c46c7b4000e019bfe5126fa8c051037cfdf62ac6f29ba53a89"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\dxcore.dll",
+          "sha256": "c4976547ea4ecf3faa1c82e03acfc6344f944203a660f137d938bb53f3495f53"
+        },
+        {
+          "path": "C:\\windows\\System32\\kernel.appcore.dll",
+          "sha256": "abff38d9efaca07602acc2a31775f8790ac720261842dbb6d7d9e1a46bba91f8"
+        }
+      ],
+      "exit_code": 0,
+      "log_sha256": "c8792fe8d6d12ce761b6bb524a7dd0157557c020bbeff352cd9033e365b1e75d",
+      "actual_gdn_phase_witness": true,
+      "actual_qsa_phase_witness": true,
+      "actual_shared_phase_witness": false,
+      "post_zero_diagnostic_triggered": false
+    },
+    {
+      "label": "B",
+      "spec": 8,
+      "args": [
+        "--pack",
+        "G:\\GitHub\\Strata-data\\packs\\iq2_xs",
+        "--native",
+        "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00001-of-00002.gguf",
+        "--ple-gguf",
+        "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00002-of-00002.gguf",
+        "--expert-profile",
+        "G:\\GitHub\\Strata\\data\\expert-profile.bin",
+        "--expert-cache",
+        "6000",
+        "--prefill",
+        "8192",
+        "--spec",
+        "8",
+        "--spec-min-p",
+        "0.5",
+        "--mtp",
+        "G:\\GitHub\\Strata-data\\mtp\\rt-full-vocab-current",
+        "--max-context",
+        "8192",
+        "--stream-experts",
+        "--vram-reserve-mib",
+        "1024",
+        "--pcie-frac",
+        "0.16",
+        "--prompt-cache",
+        "0",
+        "--short-read",
+        "1024",
+        "--adapt-every",
+        "1",
+        "--adapt-swaps",
+        "32",
+        "--prefill-borrow",
+        "--mtp-window",
+        "1024",
+        "--mtp-hnorm",
+        "stream",
+        "--adapt-decay",
+        "0.5",
+        "--suffix-draft",
+        "0"
+      ],
+      "rows": [
+        {
+          "tokens": [
+            29108,
+            4009,
+            27891,
+            8964,
+            579,
+            16078,
+            321,
+            1100,
+            9872,
+            303,
+            660,
+            17425,
+            11,
+            694,
+            22602,
+            6105,
+            89661,
+            513,
+            35742,
+            777,
+            28750,
+            1056,
+            4860,
+            2438,
+            89661,
+            4016,
+            310,
+            12870,
+            60845,
+            69377,
+            13,
+            1061,
+            10386,
+            2209,
+            69377,
+            10814,
+            6105,
+            3000,
+            310,
+            5372,
+            1004,
+            6213,
+            494,
+            660,
+            5306,
+            314,
+            279,
+            12515,
+            11,
+            3154,
+            424,
+            4833,
+            6105,
+            13,
+            50275,
+            11,
+            567,
+            42918,
+            279,
+            12515,
+            430,
+            6105,
+            4598,
+            1056
+          ],
+          "generated": 64,
+          "prompt_tokens": 23,
+          "prompt_ms": 1061.1,
+          "decode_ms": 3027.9,
+          "finish": "length",
+          "accepted": 43,
+          "offered": 68,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 1137.6897000009194,
+          "done": "DONE 64 23 1061.1 3027.9 length 43 68 0 0 0 0 0 0.0 23 0",
+          "case": "Short",
+          "iteration": 0,
+          "retained": false,
+          "mismatched_fields": [],
+          "same_workload_across_arms": true
+        },
+        {
+          "tokens": [
+            760,
+            3766,
+            1970,
+            41643,
+            10551,
+            264,
+            4281,
+            314,
+            12654,
+            5568,
+            11,
+            28853,
+            1510,
+            7945,
+            62,
+            15,
+            63,
+            1472,
+            1510,
+            7945,
+            62,
+            22,
+            17,
+            7561,
+            864,
+            4072,
+            264,
+            3050,
+            34780,
+            17454,
+            383,
+            449,
+            1879,
+            3759,
+            1510,
+            87,
+            27653,
+            1946,
+            3418,
+            279,
+            3558,
+            303,
+            7472,
+            11,
+            567,
+            1902,
+            22903,
+            279,
+            5759,
+            11,
+            279,
+            34780,
+            5215,
+            11,
+            279,
+            42441,
+            33633,
+            6197,
+            11,
+            321,
+            279,
+            4499,
+            52652,
+            23398
+          ],
+          "generated": 64,
+          "prompt_tokens": 2048,
+          "prompt_ms": 34398.7,
+          "decode_ms": 2348.0,
+          "finish": "length",
+          "accepted": 41,
+          "offered": 49,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 34452.32540000143,
+          "done": "DONE 64 2048 34398.7 2348.0 length 41 49 0 0 0 0 0 0.0 2048 0",
+          "case": "Code2K",
+          "iteration": 0,
+          "retained": false,
+          "mismatched_fields": [],
+          "same_workload_across_arms": true
+        },
+        {
+          "tokens": [
+            29108,
+            4009,
+            27891,
+            8964,
+            579,
+            16078,
+            321,
+            1100,
+            9872,
+            303,
+            660,
+            17425,
+            11,
+            694,
+            22602,
+            6105,
+            89661,
+            513,
+            35742,
+            777,
+            28750,
+            1056,
+            4860,
+            2438,
+            89661,
+            4016,
+            310,
+            12870,
+            60845,
+            69377,
+            13,
+            1061,
+            10386,
+            2209,
+            69377,
+            10814,
+            6105,
+            3000,
+            310,
+            5372,
+            1004,
+            6213,
+            494,
+            660,
+            5306,
+            314,
+            279,
+            12515,
+            11,
+            3154,
+            424,
+            4833,
+            6105,
+            13,
+            50275,
+            11,
+            567,
+            42918,
+            279,
+            12515,
+            430,
+            6105,
+            4598,
+            1056
+          ],
+          "generated": 64,
+          "prompt_tokens": 23,
+          "prompt_ms": 596.2,
+          "decode_ms": 2210.8,
+          "finish": "length",
+          "accepted": 43,
+          "offered": 68,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 638.1200999967405,
+          "done": "DONE 64 23 596.2 2210.8 length 43 68 0 0 0 0 0 0.0 23 0",
+          "case": "Short",
+          "iteration": 1,
+          "retained": true,
+          "mismatched_fields": [],
+          "same_workload_across_arms": true
+        },
+        {
+          "tokens": [
+            760,
+            3766,
+            1970,
+            41643,
+            10551,
+            264,
+            4281,
+            314,
+            12654,
+            5568,
+            11,
+            28853,
+            1510,
+            7945,
+            62,
+            15,
+            63,
+            1472,
+            1510,
+            7945,
+            62,
+            22,
+            17,
+            7561,
+            864,
+            4072,
+            264,
+            3050,
+            34780,
+            17454,
+            383,
+            449,
+            1879,
+            3759,
+            1510,
+            87,
+            27653,
+            1946,
+            3418,
+            279,
+            3558,
+            303,
+            7472,
+            11,
+            567,
+            1902,
+            22903,
+            279,
+            5759,
+            11,
+            279,
+            34780,
+            5215,
+            11,
+            279,
+            42441,
+            33633,
+            6197,
+            11,
+            321,
+            279,
+            4499,
+            52652,
+            23398
+          ],
+          "generated": 64,
+          "prompt_tokens": 2048,
+          "prompt_ms": 34202.8,
+          "decode_ms": 2025.1,
+          "finish": "length",
+          "accepted": 41,
+          "offered": 49,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 34248.43130000227,
+          "done": "DONE 64 2048 34202.8 2025.1 length 41 49 0 0 0 0 0 0.0 2048 0",
+          "case": "Code2K",
+          "iteration": 1,
+          "retained": true,
+          "mismatched_fields": [],
+          "same_workload_across_arms": true
+        },
+        {
+          "tokens": [
+            29108,
+            4009,
+            27891,
+            8964,
+            579,
+            16078,
+            321,
+            1100,
+            9872,
+            303,
+            660,
+            17425,
+            11,
+            694,
+            22602,
+            6105,
+            89661,
+            513,
+            35742,
+            777,
+            28750,
+            1056,
+            4860,
+            2438,
+            89661,
+            4016,
+            310,
+            12870,
+            60845,
+            69377,
+            13,
+            1061,
+            10386,
+            2209,
+            69377,
+            10814,
+            6105,
+            3000,
+            310,
+            5372,
+            1004,
+            6213,
+            494,
+            660,
+            5306,
+            314,
+            279,
+            12515,
+            11,
+            3154,
+            424,
+            4833,
+            6105,
+            13,
+            50275,
+            11,
+            567,
+            42918,
+            279,
+            12515,
+            430,
+            6105,
+            4598,
+            1056
+          ],
+          "generated": 64,
+          "prompt_tokens": 23,
+          "prompt_ms": 583.5,
+          "decode_ms": 2126.3,
+          "finish": "length",
+          "accepted": 43,
+          "offered": 68,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 621.6491000013775,
+          "done": "DONE 64 23 583.5 2126.3 length 43 68 0 0 0 0 0 0.0 23 0",
+          "case": "Short",
+          "iteration": 2,
+          "retained": true,
+          "mismatched_fields": [],
+          "same_workload_across_arms": true
+        },
+        {
+          "tokens": [
+            760,
+            3766,
+            1970,
+            41643,
+            10551,
+            264,
+            4281,
+            314,
+            12654,
+            5568,
+            11,
+            28853,
+            1510,
+            7945,
+            62,
+            15,
+            63,
+            1472,
+            1510,
+            7945,
+            62,
+            22,
+            17,
+            7561,
+            864,
+            4072,
+            264,
+            3050,
+            34780,
+            17454,
+            383,
+            449,
+            1879,
+            3759,
+            1510,
+            87,
+            27653,
+            1946,
+            3418,
+            279,
+            3558,
+            303,
+            7472,
+            11,
+            567,
+            1902,
+            22903,
+            279,
+            5759,
+            11,
+            279,
+            34780,
+            5215,
+            11,
+            279,
+            42441,
+            33633,
+            6197,
+            11,
+            321,
+            279,
+            4499,
+            52652,
+            23398
+          ],
+          "generated": 64,
+          "prompt_tokens": 2048,
+          "prompt_ms": 34020.4,
+          "decode_ms": 1906.5,
+          "finish": "length",
+          "accepted": 41,
+          "offered": 49,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 34062.78779999411,
+          "done": "DONE 64 2048 34020.4 1906.5 length 41 49 0 0 0 0 0 0.0 2048 0",
+          "case": "Code2K",
+          "iteration": 2,
+          "retained": true,
+          "mismatched_fields": [],
+          "same_workload_across_arms": true
+        }
+      ],
+      "modules_startup": [
+        {
+          "path": "G:\\GitHub\\Strata\\build-orca-native-20261029\\real-shared-schedule-1793375236798237000\\strata.exe",
+          "sha256": "936bc1688d9806c87b9d02ee1e3c5ec3df66858bacc0fd06bc2cbeb62e620e0b"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ntdll.dll",
+          "sha256": "36b1a62e4bf6bf7d68458fff6e8a33b39f6527ec6a46e55ecdd12cde83894c8d"
+        },
+        {
+          "path": "C:\\windows\\System32\\KERNEL32.DLL",
+          "sha256": "4636f65d449b1353100578c6cb139933cf2b134f5e246119d18968873a058bed"
+        },
+        {
+          "path": "C:\\windows\\System32\\KERNELBASE.dll",
+          "sha256": "b4ad8c8e3632104f4d2132ecb8979b8df279f0046dc42e79bed5acb744751871"
+        },
+        {
+          "path": "C:\\windows\\System32\\ADVAPI32.dll",
+          "sha256": "bde5f0e6f36a706a8a2e0fab1b362eea267aa6ee9f18aab1f899f38888c21280"
+        },
+        {
+          "path": "C:\\windows\\System32\\msvcrt.dll",
+          "sha256": "a7f4196d9476d36894ce17c3b0dd97504ca2cc31b3e0a774fee326e867565885"
+        },
+        {
+          "path": "C:\\windows\\System32\\sechost.dll",
+          "sha256": "54756c8bc96e3baf57ee58e4f73ca10183c8267d208efe7819a256eca53361a0"
+        },
+        {
+          "path": "C:\\windows\\System32\\RPCRT4.dll",
+          "sha256": "b9decb81fcf8ef9a6b674072da5676322b925c73b3c8c9253805db7510d9c493"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ze_loader.dll",
+          "sha256": "a56a109788c97ed42275803202e42a44c591a24064a038e6aa3cbc5908f98b4b"
+        },
+        {
+          "path": "C:\\windows\\System32\\bcrypt.dll",
+          "sha256": "811af66dd7e323a74db80648610bbebb956093ae7bd91c5b950ed6aca13d8026"
+        },
+        {
+          "path": "C:\\windows\\System32\\ucrtbase.dll",
+          "sha256": "3c60056371f82e4744185b6f2fa0c69042b1e78804685944132974dd13f3b6d9"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\MSVCP140.dll",
+          "sha256": "def46aa6a8f72f27bafac0c43334419486a4d1dcdb6c479a8ef7034b3e1fa4cb"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\MSVCP140_ATOMIC_WAIT.dll",
+          "sha256": "e7963645e0d1db08e300614d4c5fa7194bd8173e9ab7a5558859e6b232ed3241"
+        },
+        {
+          "path": "C:\\windows\\System32\\CFGMGR32.dll",
+          "sha256": "7fefd329b398827d6babf33973eaa2c0dc580fe1f3b291efa4793e795e4df8fa"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VCRUNTIME140.dll",
+          "sha256": "184146852727a9db4eea06178716bec3cdbb1015c911f6b0f915b184ad7775b2"
+        },
+        {
+          "path": "C:\\windows\\System32\\ole32.dll",
+          "sha256": "4a7b8ed9f2aeca875f948d9a1bce8b8d177744475f253704362792d7182d55f2"
+        },
+        {
+          "path": "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin\\libmmd.dll",
+          "sha256": "0e8e285e2d1cb7dbe6018371fd5fd9763e9b3a574f516ff000f606433fe3cc10"
+        },
+        {
+          "path": "C:\\windows\\System32\\combase.dll",
+          "sha256": "e1ed05c78ccd1056f106468b551f846a4f7e1d46d925223755c44f3191730993"
+        },
+        {
+          "path": "C:\\windows\\System32\\GDI32.dll",
+          "sha256": "b5f5a3f16d03366cdb02020fc4dadceb0892e243f8aa94d205e124045da9457f"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VCRUNTIME140_1.dll",
+          "sha256": "e6bfb3662ab4b1969a73441dbe35c96d51441b6bff8cf1fe7430bd5b246ca605"
+        },
+        {
+          "path": "C:\\windows\\System32\\win32u.dll",
+          "sha256": "20ac4556b0b3fc82bd5632ffc623a45497184483e14a2841ac30213e162daf1f"
+        },
+        {
+          "path": "C:\\windows\\System32\\gdi32full.dll",
+          "sha256": "724754c47bcd7a2739816c7cefbc75382515538a15ccb73a8342043a16453772"
+        },
+        {
+          "path": "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin\\svml_dispmd.dll",
+          "sha256": "03b6af2ab4dac88fa5d80ddded702aeb7cfd3f0460e63425ded73d7a755a1dce"
+        },
+        {
+          "path": "C:\\windows\\System32\\msvcp_win.dll",
+          "sha256": "2a7825c2925347e0cb767a0dcb611f3eb80d0f71cbec981069b227bdc7cb871a"
+        },
+        {
+          "path": "C:\\windows\\System32\\USER32.dll",
+          "sha256": "82870be1e008d5232cb175ebc815f645a2add4c0b164fd4ba20744192c1c81f7"
+        },
+        {
+          "path": "C:\\windows\\System32\\IMM32.DLL",
+          "sha256": "2a882bc0df58f4f6dd906889b1fb6d7b7bc70da7109e016e0f1e67b264d073b6"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\ze_intel_gpu64.dll",
+          "sha256": "e291d6c88c85d85751d3e2ba26d5510e1abb3a1f6d255f8f25b9aa2843ecf96d"
+        },
+        {
+          "path": "C:\\windows\\System32\\dxgi.dll",
+          "sha256": "d33765793e32eff65f9103efe2419184ab0b6289e69e69ce85aa7568f678c3b5"
+        },
+        {
+          "path": "C:\\windows\\System32\\WS2_32.dll",
+          "sha256": "5e9857a80a301ad21d0e0a0928a4ff2b5360c305a97bfc88886e3b686bf8d503"
+        },
+        {
+          "path": "C:\\windows\\System32\\SETUPAPI.dll",
+          "sha256": "3777075e8391c40c21fd5662845f5e2928d3cfd2b6abdf4003e087d2089cb853"
+        },
+        {
+          "path": "C:\\windows\\System32\\SHELL32.dll",
+          "sha256": "936c33a8283196a070aa6f844a65a29a8f99f760eae0016754c1cbf17d62bdb7"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VERSION.dll",
+          "sha256": "af45a728552ccfdcd9435c40ace60a9354d7c1b52abf507a2f1cb371dada4fde"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\WINMM.dll",
+          "sha256": "ead9055dc522bcab041c8eb7b875adb681a2f1fa851d4075789d78d0242711a0"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ze_tracing_layer.dll",
+          "sha256": "d3f8f8c4bd055c464495703761f5754c140137e4c457f60a168e35085ee2c51f"
+        },
+        {
+          "path": "C:\\windows\\System32\\bcryptPrimitives.dll",
+          "sha256": "f0a1662d0f55533a21d609f8dc737288ede77d314d90e885ca9e6ef79d429c3b"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmm2_64.dll",
+          "sha256": "db2ea2a6f271cc85d097dc13176e153e5ebf67775155df162b768a75ed863a2e"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmm64.dll",
+          "sha256": "db3b3d6fbc6aba6ba156080224916c1fefcb1080f0ea3927727f52626623c681"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmmstaging_64.dll",
+          "sha256": "994d22569552487dcadbc8b1aa6ac9bef0c24df23e67637b4e2a2f63952c1e70"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\windows.storage.dll",
+          "sha256": "718c890022323ed8e38a3beb7a143df9e5d680b006c3f1fd28754eeb7cd82010"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\Wldp.dll",
+          "sha256": "c2a7ed84bdd3cf931fdcc5782cea58c376b1a2841fcc6f954e65812deff50389"
+        },
+        {
+          "path": "C:\\windows\\System32\\OLEAUT32.dll",
+          "sha256": "4dd40579e7254dd553b49b229aa85b9c079586b034e37e564909da25eb298345"
+        },
+        {
+          "path": "C:\\windows\\System32\\SHCORE.dll",
+          "sha256": "63257882eb0d0d08ccc275287e11e7213ec26946185e3f3116316c249708a920"
+        },
+        {
+          "path": "C:\\windows\\System32\\shlwapi.dll",
+          "sha256": "eb70b465352f04f188cd12affd72b44f14770e6bfd98f6a6570b62ef21873297"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdfcl64.dll",
+          "sha256": "4aafd9f797a227cdab388853ba835a5670f384ca98395e859a4cf7810b8d68ae"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igc-default64.dll",
+          "sha256": "55559222a70929c46c7b4000e019bfe5126fa8c051037cfdf62ac6f29ba53a89"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\dxcore.dll",
+          "sha256": "c4976547ea4ecf3faa1c82e03acfc6344f944203a660f137d938bb53f3495f53"
+        },
+        {
+          "path": "C:\\windows\\System32\\kernel.appcore.dll",
+          "sha256": "abff38d9efaca07602acc2a31775f8790ac720261842dbb6d7d9e1a46bba91f8"
+        }
+      ],
+      "modules_workload": [
+        {
+          "path": "G:\\GitHub\\Strata\\build-orca-native-20261029\\real-shared-schedule-1793375236798237000\\strata.exe",
+          "sha256": "936bc1688d9806c87b9d02ee1e3c5ec3df66858bacc0fd06bc2cbeb62e620e0b"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ntdll.dll",
+          "sha256": "36b1a62e4bf6bf7d68458fff6e8a33b39f6527ec6a46e55ecdd12cde83894c8d"
+        },
+        {
+          "path": "C:\\windows\\System32\\KERNEL32.DLL",
+          "sha256": "4636f65d449b1353100578c6cb139933cf2b134f5e246119d18968873a058bed"
+        },
+        {
+          "path": "C:\\windows\\System32\\KERNELBASE.dll",
+          "sha256": "b4ad8c8e3632104f4d2132ecb8979b8df279f0046dc42e79bed5acb744751871"
+        },
+        {
+          "path": "C:\\windows\\System32\\ADVAPI32.dll",
+          "sha256": "bde5f0e6f36a706a8a2e0fab1b362eea267aa6ee9f18aab1f899f38888c21280"
+        },
+        {
+          "path": "C:\\windows\\System32\\msvcrt.dll",
+          "sha256": "a7f4196d9476d36894ce17c3b0dd97504ca2cc31b3e0a774fee326e867565885"
+        },
+        {
+          "path": "C:\\windows\\System32\\sechost.dll",
+          "sha256": "54756c8bc96e3baf57ee58e4f73ca10183c8267d208efe7819a256eca53361a0"
+        },
+        {
+          "path": "C:\\windows\\System32\\RPCRT4.dll",
+          "sha256": "b9decb81fcf8ef9a6b674072da5676322b925c73b3c8c9253805db7510d9c493"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ze_loader.dll",
+          "sha256": "a56a109788c97ed42275803202e42a44c591a24064a038e6aa3cbc5908f98b4b"
+        },
+        {
+          "path": "C:\\windows\\System32\\bcrypt.dll",
+          "sha256": "811af66dd7e323a74db80648610bbebb956093ae7bd91c5b950ed6aca13d8026"
+        },
+        {
+          "path": "C:\\windows\\System32\\ucrtbase.dll",
+          "sha256": "3c60056371f82e4744185b6f2fa0c69042b1e78804685944132974dd13f3b6d9"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\MSVCP140.dll",
+          "sha256": "def46aa6a8f72f27bafac0c43334419486a4d1dcdb6c479a8ef7034b3e1fa4cb"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\MSVCP140_ATOMIC_WAIT.dll",
+          "sha256": "e7963645e0d1db08e300614d4c5fa7194bd8173e9ab7a5558859e6b232ed3241"
+        },
+        {
+          "path": "C:\\windows\\System32\\CFGMGR32.dll",
+          "sha256": "7fefd329b398827d6babf33973eaa2c0dc580fe1f3b291efa4793e795e4df8fa"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VCRUNTIME140.dll",
+          "sha256": "184146852727a9db4eea06178716bec3cdbb1015c911f6b0f915b184ad7775b2"
+        },
+        {
+          "path": "C:\\windows\\System32\\ole32.dll",
+          "sha256": "4a7b8ed9f2aeca875f948d9a1bce8b8d177744475f253704362792d7182d55f2"
+        },
+        {
+          "path": "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin\\libmmd.dll",
+          "sha256": "0e8e285e2d1cb7dbe6018371fd5fd9763e9b3a574f516ff000f606433fe3cc10"
+        },
+        {
+          "path": "C:\\windows\\System32\\combase.dll",
+          "sha256": "e1ed05c78ccd1056f106468b551f846a4f7e1d46d925223755c44f3191730993"
+        },
+        {
+          "path": "C:\\windows\\System32\\GDI32.dll",
+          "sha256": "b5f5a3f16d03366cdb02020fc4dadceb0892e243f8aa94d205e124045da9457f"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VCRUNTIME140_1.dll",
+          "sha256": "e6bfb3662ab4b1969a73441dbe35c96d51441b6bff8cf1fe7430bd5b246ca605"
+        },
+        {
+          "path": "C:\\windows\\System32\\win32u.dll",
+          "sha256": "20ac4556b0b3fc82bd5632ffc623a45497184483e14a2841ac30213e162daf1f"
+        },
+        {
+          "path": "C:\\windows\\System32\\gdi32full.dll",
+          "sha256": "724754c47bcd7a2739816c7cefbc75382515538a15ccb73a8342043a16453772"
+        },
+        {
+          "path": "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin\\svml_dispmd.dll",
+          "sha256": "03b6af2ab4dac88fa5d80ddded702aeb7cfd3f0460e63425ded73d7a755a1dce"
+        },
+        {
+          "path": "C:\\windows\\System32\\msvcp_win.dll",
+          "sha256": "2a7825c2925347e0cb767a0dcb611f3eb80d0f71cbec981069b227bdc7cb871a"
+        },
+        {
+          "path": "C:\\windows\\System32\\USER32.dll",
+          "sha256": "82870be1e008d5232cb175ebc815f645a2add4c0b164fd4ba20744192c1c81f7"
+        },
+        {
+          "path": "C:\\windows\\System32\\IMM32.DLL",
+          "sha256": "2a882bc0df58f4f6dd906889b1fb6d7b7bc70da7109e016e0f1e67b264d073b6"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\ze_intel_gpu64.dll",
+          "sha256": "e291d6c88c85d85751d3e2ba26d5510e1abb3a1f6d255f8f25b9aa2843ecf96d"
+        },
+        {
+          "path": "C:\\windows\\System32\\dxgi.dll",
+          "sha256": "d33765793e32eff65f9103efe2419184ab0b6289e69e69ce85aa7568f678c3b5"
+        },
+        {
+          "path": "C:\\windows\\System32\\WS2_32.dll",
+          "sha256": "5e9857a80a301ad21d0e0a0928a4ff2b5360c305a97bfc88886e3b686bf8d503"
+        },
+        {
+          "path": "C:\\windows\\System32\\SETUPAPI.dll",
+          "sha256": "3777075e8391c40c21fd5662845f5e2928d3cfd2b6abdf4003e087d2089cb853"
+        },
+        {
+          "path": "C:\\windows\\System32\\SHELL32.dll",
+          "sha256": "936c33a8283196a070aa6f844a65a29a8f99f760eae0016754c1cbf17d62bdb7"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VERSION.dll",
+          "sha256": "af45a728552ccfdcd9435c40ace60a9354d7c1b52abf507a2f1cb371dada4fde"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\WINMM.dll",
+          "sha256": "ead9055dc522bcab041c8eb7b875adb681a2f1fa851d4075789d78d0242711a0"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ze_tracing_layer.dll",
+          "sha256": "d3f8f8c4bd055c464495703761f5754c140137e4c457f60a168e35085ee2c51f"
+        },
+        {
+          "path": "C:\\windows\\System32\\bcryptPrimitives.dll",
+          "sha256": "f0a1662d0f55533a21d609f8dc737288ede77d314d90e885ca9e6ef79d429c3b"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmm2_64.dll",
+          "sha256": "db2ea2a6f271cc85d097dc13176e153e5ebf67775155df162b768a75ed863a2e"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmm64.dll",
+          "sha256": "db3b3d6fbc6aba6ba156080224916c1fefcb1080f0ea3927727f52626623c681"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmmstaging_64.dll",
+          "sha256": "994d22569552487dcadbc8b1aa6ac9bef0c24df23e67637b4e2a2f63952c1e70"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\windows.storage.dll",
+          "sha256": "718c890022323ed8e38a3beb7a143df9e5d680b006c3f1fd28754eeb7cd82010"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\Wldp.dll",
+          "sha256": "c2a7ed84bdd3cf931fdcc5782cea58c376b1a2841fcc6f954e65812deff50389"
+        },
+        {
+          "path": "C:\\windows\\System32\\OLEAUT32.dll",
+          "sha256": "4dd40579e7254dd553b49b229aa85b9c079586b034e37e564909da25eb298345"
+        },
+        {
+          "path": "C:\\windows\\System32\\SHCORE.dll",
+          "sha256": "63257882eb0d0d08ccc275287e11e7213ec26946185e3f3116316c249708a920"
+        },
+        {
+          "path": "C:\\windows\\System32\\shlwapi.dll",
+          "sha256": "eb70b465352f04f188cd12affd72b44f14770e6bfd98f6a6570b62ef21873297"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdfcl64.dll",
+          "sha256": "4aafd9f797a227cdab388853ba835a5670f384ca98395e859a4cf7810b8d68ae"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igc-default64.dll",
+          "sha256": "55559222a70929c46c7b4000e019bfe5126fa8c051037cfdf62ac6f29ba53a89"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\dxcore.dll",
+          "sha256": "c4976547ea4ecf3faa1c82e03acfc6344f944203a660f137d938bb53f3495f53"
+        },
+        {
+          "path": "C:\\windows\\System32\\kernel.appcore.dll",
+          "sha256": "abff38d9efaca07602acc2a31775f8790ac720261842dbb6d7d9e1a46bba91f8"
+        }
+      ],
+      "exit_code": 0,
+      "log_sha256": "88a14dd0e9b360c621b2f172020252c0a2945599fbc554c4bfbde910090fb676",
+      "actual_gdn_phase_witness": true,
+      "actual_qsa_phase_witness": true,
+      "actual_shared_phase_witness": true,
+      "post_zero_diagnostic_triggered": false
+    },
+    {
+      "label": "A1",
+      "spec": 8,
+      "args": [
+        "--pack",
+        "G:\\GitHub\\Strata-data\\packs\\iq2_xs",
+        "--native",
+        "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00001-of-00002.gguf",
+        "--ple-gguf",
+        "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00002-of-00002.gguf",
+        "--expert-profile",
+        "G:\\GitHub\\Strata\\data\\expert-profile.bin",
+        "--expert-cache",
+        "6000",
+        "--prefill",
+        "8192",
+        "--spec",
+        "8",
+        "--spec-min-p",
+        "0.5",
+        "--mtp",
+        "G:\\GitHub\\Strata-data\\mtp\\rt-full-vocab-current",
+        "--max-context",
+        "8192",
+        "--stream-experts",
+        "--vram-reserve-mib",
+        "1024",
+        "--pcie-frac",
+        "0.16",
+        "--prompt-cache",
+        "0",
+        "--short-read",
+        "1024",
+        "--adapt-every",
+        "1",
+        "--adapt-swaps",
+        "32",
+        "--prefill-borrow",
+        "--mtp-window",
+        "1024",
+        "--mtp-hnorm",
+        "stream",
+        "--adapt-decay",
+        "0.5",
+        "--suffix-draft",
+        "0"
+      ],
+      "rows": [
+        {
+          "tokens": [
+            29108,
+            4009,
+            27891,
+            8964,
+            579,
+            16078,
+            321,
+            1100,
+            9872,
+            303,
+            660,
+            17425,
+            11,
+            694,
+            22602,
+            6105,
+            89661,
+            513,
+            35742,
+            777,
+            28750,
+            1056,
+            4860,
+            2438,
+            89661,
+            4016,
+            310,
+            12870,
+            60845,
+            69377,
+            13,
+            1061,
+            10386,
+            2209,
+            69377,
+            10814,
+            6105,
+            3000,
+            310,
+            5372,
+            1004,
+            6213,
+            494,
+            660,
+            5306,
+            314,
+            279,
+            12515,
+            11,
+            3154,
+            424,
+            4833,
+            6105,
+            13,
+            50275,
+            11,
+            567,
+            42918,
+            279,
+            12515,
+            430,
+            6105,
+            4598,
+            1056
+          ],
+          "generated": 64,
+          "prompt_tokens": 23,
+          "prompt_ms": 1085.5,
+          "decode_ms": 3057.0,
+          "finish": "length",
+          "accepted": 43,
+          "offered": 68,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 1166.2114999999176,
+          "done": "DONE 64 23 1085.5 3057.0 length 43 68 0 0 0 0 0 0.0 23 0",
+          "case": "Short",
+          "iteration": 0,
+          "retained": false,
+          "mismatched_fields": [],
+          "same_workload_across_arms": true
+        },
+        {
+          "tokens": [
+            760,
+            3766,
+            1970,
+            41643,
+            10551,
+            264,
+            4281,
+            314,
+            12654,
+            5568,
+            11,
+            28853,
+            1510,
+            7945,
+            62,
+            15,
+            63,
+            1472,
+            1510,
+            7945,
+            62,
+            22,
+            17,
+            7561,
+            864,
+            4072,
+            264,
+            3050,
+            34780,
+            17454,
+            383,
+            449,
+            1879,
+            3759,
+            1510,
+            87,
+            27653,
+            1946,
+            3418,
+            279,
+            3558,
+            303,
+            7472,
+            11,
+            567,
+            1902,
+            22903,
+            279,
+            5759,
+            11,
+            279,
+            34780,
+            5215,
+            11,
+            279,
+            42441,
+            33633,
+            6197,
+            11,
+            321,
+            279,
+            4499,
+            52652,
+            23398
+          ],
+          "generated": 64,
+          "prompt_tokens": 2048,
+          "prompt_ms": 34242.7,
+          "decode_ms": 2396.1,
+          "finish": "length",
+          "accepted": 41,
+          "offered": 49,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 34297.31739999988,
+          "done": "DONE 64 2048 34242.7 2396.1 length 41 49 0 0 0 0 0 0.0 2048 0",
+          "case": "Code2K",
+          "iteration": 0,
+          "retained": false,
+          "mismatched_fields": [],
+          "same_workload_across_arms": true
+        },
+        {
+          "tokens": [
+            29108,
+            4009,
+            27891,
+            8964,
+            579,
+            16078,
+            321,
+            1100,
+            9872,
+            303,
+            660,
+            17425,
+            11,
+            694,
+            22602,
+            6105,
+            89661,
+            513,
+            35742,
+            777,
+            28750,
+            1056,
+            4860,
+            2438,
+            89661,
+            4016,
+            310,
+            12870,
+            60845,
+            69377,
+            13,
+            1061,
+            10386,
+            2209,
+            69377,
+            10814,
+            6105,
+            3000,
+            310,
+            5372,
+            1004,
+            6213,
+            494,
+            660,
+            5306,
+            314,
+            279,
+            12515,
+            11,
+            3154,
+            424,
+            4833,
+            6105,
+            13,
+            50275,
+            11,
+            567,
+            42918,
+            279,
+            12515,
+            430,
+            6105,
+            4598,
+            1056
+          ],
+          "generated": 64,
+          "prompt_tokens": 23,
+          "prompt_ms": 603.2,
+          "decode_ms": 2243.3,
+          "finish": "length",
+          "accepted": 43,
+          "offered": 68,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 645.715000006021,
+          "done": "DONE 64 23 603.2 2243.3 length 43 68 0 0 0 0 0 0.0 23 0",
+          "case": "Short",
+          "iteration": 1,
+          "retained": true,
+          "mismatched_fields": [],
+          "same_workload_across_arms": true
+        },
+        {
+          "tokens": [
+            760,
+            3766,
+            1970,
+            41643,
+            10551,
+            264,
+            4281,
+            314,
+            12654,
+            5568,
+            11,
+            28853,
+            1510,
+            7945,
+            62,
+            15,
+            63,
+            1472,
+            1510,
+            7945,
+            62,
+            22,
+            17,
+            7561,
+            864,
+            4072,
+            264,
+            3050,
+            34780,
+            17454,
+            383,
+            449,
+            1879,
+            3759,
+            1510,
+            87,
+            27653,
+            1946,
+            3418,
+            279,
+            3558,
+            303,
+            7472,
+            11,
+            567,
+            1902,
+            22903,
+            279,
+            5759,
+            11,
+            279,
+            34780,
+            5215,
+            11,
+            279,
+            42441,
+            33633,
+            6197,
+            11,
+            321,
+            279,
+            4499,
+            52652,
+            23398
+          ],
+          "generated": 64,
+          "prompt_tokens": 2048,
+          "prompt_ms": 34357.0,
+          "decode_ms": 2025.8,
+          "finish": "length",
+          "accepted": 41,
+          "offered": 49,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 34400.87990000029,
+          "done": "DONE 64 2048 34357.0 2025.8 length 41 49 0 0 0 0 0 0.0 2048 0",
+          "case": "Code2K",
+          "iteration": 1,
+          "retained": true,
+          "mismatched_fields": [],
+          "same_workload_across_arms": true
+        },
+        {
+          "tokens": [
+            29108,
+            4009,
+            27891,
+            8964,
+            579,
+            16078,
+            321,
+            1100,
+            9872,
+            303,
+            660,
+            17425,
+            11,
+            694,
+            22602,
+            6105,
+            89661,
+            513,
+            35742,
+            777,
+            28750,
+            1056,
+            4860,
+            2438,
+            89661,
+            4016,
+            310,
+            12870,
+            60845,
+            69377,
+            13,
+            1061,
+            10386,
+            2209,
+            69377,
+            10814,
+            6105,
+            3000,
+            310,
+            5372,
+            1004,
+            6213,
+            494,
+            660,
+            5306,
+            314,
+            279,
+            12515,
+            11,
+            3154,
+            424,
+            4833,
+            6105,
+            13,
+            50275,
+            11,
+            567,
+            42918,
+            279,
+            12515,
+            430,
+            6105,
+            4598,
+            1056
+          ],
+          "generated": 64,
+          "prompt_tokens": 23,
+          "prompt_ms": 585.0,
+          "decode_ms": 2094.4,
+          "finish": "length",
+          "accepted": 43,
+          "offered": 68,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 623.2945000010659,
+          "done": "DONE 64 23 585.0 2094.4 length 43 68 0 0 0 0 0 0.0 23 0",
+          "case": "Short",
+          "iteration": 2,
+          "retained": true,
+          "mismatched_fields": [],
+          "same_workload_across_arms": true
+        },
+        {
+          "tokens": [
+            760,
+            3766,
+            1970,
+            41643,
+            10551,
+            264,
+            4281,
+            314,
+            12654,
+            5568,
+            11,
+            28853,
+            1510,
+            7945,
+            62,
+            15,
+            63,
+            1472,
+            1510,
+            7945,
+            62,
+            22,
+            17,
+            7561,
+            864,
+            4072,
+            264,
+            3050,
+            34780,
+            17454,
+            383,
+            449,
+            1879,
+            3759,
+            1510,
+            87,
+            27653,
+            1946,
+            3418,
+            279,
+            3558,
+            303,
+            7472,
+            11,
+            567,
+            1902,
+            22903,
+            279,
+            5759,
+            11,
+            279,
+            34780,
+            5215,
+            11,
+            279,
+            42441,
+            33633,
+            6197,
+            11,
+            321,
+            279,
+            4499,
+            52652,
+            23398
+          ],
+          "generated": 64,
+          "prompt_tokens": 2048,
+          "prompt_ms": 34068.9,
+          "decode_ms": 1922.4,
+          "finish": "length",
+          "accepted": 41,
+          "offered": 49,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 34112.31940000289,
+          "done": "DONE 64 2048 34068.9 1922.4 length 41 49 0 0 0 0 0 0.0 2048 0",
+          "case": "Code2K",
+          "iteration": 2,
+          "retained": true,
+          "mismatched_fields": [],
+          "same_workload_across_arms": true
+        }
+      ],
+      "modules_startup": [
+        {
+          "path": "G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-qsa-integration-1793373331920047900\\strata.exe",
+          "sha256": "cd5914cf52363980241329b55b0ccff530dcbd46ad5f497faf780b461bf51e42"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ntdll.dll",
+          "sha256": "36b1a62e4bf6bf7d68458fff6e8a33b39f6527ec6a46e55ecdd12cde83894c8d"
+        },
+        {
+          "path": "C:\\windows\\System32\\KERNEL32.DLL",
+          "sha256": "4636f65d449b1353100578c6cb139933cf2b134f5e246119d18968873a058bed"
+        },
+        {
+          "path": "C:\\windows\\System32\\KERNELBASE.dll",
+          "sha256": "b4ad8c8e3632104f4d2132ecb8979b8df279f0046dc42e79bed5acb744751871"
+        },
+        {
+          "path": "C:\\windows\\System32\\ADVAPI32.dll",
+          "sha256": "bde5f0e6f36a706a8a2e0fab1b362eea267aa6ee9f18aab1f899f38888c21280"
+        },
+        {
+          "path": "C:\\windows\\System32\\msvcrt.dll",
+          "sha256": "a7f4196d9476d36894ce17c3b0dd97504ca2cc31b3e0a774fee326e867565885"
+        },
+        {
+          "path": "C:\\windows\\System32\\sechost.dll",
+          "sha256": "54756c8bc96e3baf57ee58e4f73ca10183c8267d208efe7819a256eca53361a0"
+        },
+        {
+          "path": "C:\\windows\\System32\\RPCRT4.dll",
+          "sha256": "b9decb81fcf8ef9a6b674072da5676322b925c73b3c8c9253805db7510d9c493"
+        },
+        {
+          "path": "C:\\windows\\System32\\bcrypt.dll",
+          "sha256": "811af66dd7e323a74db80648610bbebb956093ae7bd91c5b950ed6aca13d8026"
+        },
+        {
+          "path": "C:\\windows\\System32\\ucrtbase.dll",
+          "sha256": "3c60056371f82e4744185b6f2fa0c69042b1e78804685944132974dd13f3b6d9"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ze_loader.dll",
+          "sha256": "a56a109788c97ed42275803202e42a44c591a24064a038e6aa3cbc5908f98b4b"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\MSVCP140_ATOMIC_WAIT.dll",
+          "sha256": "e7963645e0d1db08e300614d4c5fa7194bd8173e9ab7a5558859e6b232ed3241"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\MSVCP140.dll",
+          "sha256": "def46aa6a8f72f27bafac0c43334419486a4d1dcdb6c479a8ef7034b3e1fa4cb"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VCRUNTIME140.dll",
+          "sha256": "184146852727a9db4eea06178716bec3cdbb1015c911f6b0f915b184ad7775b2"
+        },
+        {
+          "path": "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin\\libmmd.dll",
+          "sha256": "0e8e285e2d1cb7dbe6018371fd5fd9763e9b3a574f516ff000f606433fe3cc10"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VCRUNTIME140_1.dll",
+          "sha256": "e6bfb3662ab4b1969a73441dbe35c96d51441b6bff8cf1fe7430bd5b246ca605"
+        },
+        {
+          "path": "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin\\svml_dispmd.dll",
+          "sha256": "03b6af2ab4dac88fa5d80ddded702aeb7cfd3f0460e63425ded73d7a755a1dce"
+        },
+        {
+          "path": "C:\\windows\\System32\\CFGMGR32.dll",
+          "sha256": "7fefd329b398827d6babf33973eaa2c0dc580fe1f3b291efa4793e795e4df8fa"
+        },
+        {
+          "path": "C:\\windows\\System32\\ole32.dll",
+          "sha256": "4a7b8ed9f2aeca875f948d9a1bce8b8d177744475f253704362792d7182d55f2"
+        },
+        {
+          "path": "C:\\windows\\System32\\combase.dll",
+          "sha256": "e1ed05c78ccd1056f106468b551f846a4f7e1d46d925223755c44f3191730993"
+        },
+        {
+          "path": "C:\\windows\\System32\\GDI32.dll",
+          "sha256": "b5f5a3f16d03366cdb02020fc4dadceb0892e243f8aa94d205e124045da9457f"
+        },
+        {
+          "path": "C:\\windows\\System32\\win32u.dll",
+          "sha256": "20ac4556b0b3fc82bd5632ffc623a45497184483e14a2841ac30213e162daf1f"
+        },
+        {
+          "path": "C:\\windows\\System32\\gdi32full.dll",
+          "sha256": "724754c47bcd7a2739816c7cefbc75382515538a15ccb73a8342043a16453772"
+        },
+        {
+          "path": "C:\\windows\\System32\\msvcp_win.dll",
+          "sha256": "2a7825c2925347e0cb767a0dcb611f3eb80d0f71cbec981069b227bdc7cb871a"
+        },
+        {
+          "path": "C:\\windows\\System32\\USER32.dll",
+          "sha256": "82870be1e008d5232cb175ebc815f645a2add4c0b164fd4ba20744192c1c81f7"
+        },
+        {
+          "path": "C:\\windows\\System32\\IMM32.DLL",
+          "sha256": "2a882bc0df58f4f6dd906889b1fb6d7b7bc70da7109e016e0f1e67b264d073b6"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\ze_intel_gpu64.dll",
+          "sha256": "e291d6c88c85d85751d3e2ba26d5510e1abb3a1f6d255f8f25b9aa2843ecf96d"
+        },
+        {
+          "path": "C:\\windows\\System32\\dxgi.dll",
+          "sha256": "d33765793e32eff65f9103efe2419184ab0b6289e69e69ce85aa7568f678c3b5"
+        },
+        {
+          "path": "C:\\windows\\System32\\WS2_32.dll",
+          "sha256": "5e9857a80a301ad21d0e0a0928a4ff2b5360c305a97bfc88886e3b686bf8d503"
+        },
+        {
+          "path": "C:\\windows\\System32\\SETUPAPI.dll",
+          "sha256": "3777075e8391c40c21fd5662845f5e2928d3cfd2b6abdf4003e087d2089cb853"
+        },
+        {
+          "path": "C:\\windows\\System32\\SHELL32.dll",
+          "sha256": "936c33a8283196a070aa6f844a65a29a8f99f760eae0016754c1cbf17d62bdb7"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\WINMM.dll",
+          "sha256": "ead9055dc522bcab041c8eb7b875adb681a2f1fa851d4075789d78d0242711a0"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VERSION.dll",
+          "sha256": "af45a728552ccfdcd9435c40ace60a9354d7c1b52abf507a2f1cb371dada4fde"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ze_tracing_layer.dll",
+          "sha256": "d3f8f8c4bd055c464495703761f5754c140137e4c457f60a168e35085ee2c51f"
+        },
+        {
+          "path": "C:\\windows\\System32\\bcryptPrimitives.dll",
+          "sha256": "f0a1662d0f55533a21d609f8dc737288ede77d314d90e885ca9e6ef79d429c3b"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmm2_64.dll",
+          "sha256": "db2ea2a6f271cc85d097dc13176e153e5ebf67775155df162b768a75ed863a2e"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmm64.dll",
+          "sha256": "db3b3d6fbc6aba6ba156080224916c1fefcb1080f0ea3927727f52626623c681"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmmstaging_64.dll",
+          "sha256": "994d22569552487dcadbc8b1aa6ac9bef0c24df23e67637b4e2a2f63952c1e70"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\windows.storage.dll",
+          "sha256": "718c890022323ed8e38a3beb7a143df9e5d680b006c3f1fd28754eeb7cd82010"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\Wldp.dll",
+          "sha256": "c2a7ed84bdd3cf931fdcc5782cea58c376b1a2841fcc6f954e65812deff50389"
+        },
+        {
+          "path": "C:\\windows\\System32\\OLEAUT32.dll",
+          "sha256": "4dd40579e7254dd553b49b229aa85b9c079586b034e37e564909da25eb298345"
+        },
+        {
+          "path": "C:\\windows\\System32\\SHCORE.dll",
+          "sha256": "63257882eb0d0d08ccc275287e11e7213ec26946185e3f3116316c249708a920"
+        },
+        {
+          "path": "C:\\windows\\System32\\shlwapi.dll",
+          "sha256": "eb70b465352f04f188cd12affd72b44f14770e6bfd98f6a6570b62ef21873297"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdfcl64.dll",
+          "sha256": "4aafd9f797a227cdab388853ba835a5670f384ca98395e859a4cf7810b8d68ae"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igc-default64.dll",
+          "sha256": "55559222a70929c46c7b4000e019bfe5126fa8c051037cfdf62ac6f29ba53a89"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\dxcore.dll",
+          "sha256": "c4976547ea4ecf3faa1c82e03acfc6344f944203a660f137d938bb53f3495f53"
+        },
+        {
+          "path": "C:\\windows\\System32\\kernel.appcore.dll",
+          "sha256": "abff38d9efaca07602acc2a31775f8790ac720261842dbb6d7d9e1a46bba91f8"
+        }
+      ],
+      "modules_workload": [
+        {
+          "path": "G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-qsa-integration-1793373331920047900\\strata.exe",
+          "sha256": "cd5914cf52363980241329b55b0ccff530dcbd46ad5f497faf780b461bf51e42"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ntdll.dll",
+          "sha256": "36b1a62e4bf6bf7d68458fff6e8a33b39f6527ec6a46e55ecdd12cde83894c8d"
+        },
+        {
+          "path": "C:\\windows\\System32\\KERNEL32.DLL",
+          "sha256": "4636f65d449b1353100578c6cb139933cf2b134f5e246119d18968873a058bed"
+        },
+        {
+          "path": "C:\\windows\\System32\\KERNELBASE.dll",
+          "sha256": "b4ad8c8e3632104f4d2132ecb8979b8df279f0046dc42e79bed5acb744751871"
+        },
+        {
+          "path": "C:\\windows\\System32\\ADVAPI32.dll",
+          "sha256": "bde5f0e6f36a706a8a2e0fab1b362eea267aa6ee9f18aab1f899f38888c21280"
+        },
+        {
+          "path": "C:\\windows\\System32\\msvcrt.dll",
+          "sha256": "a7f4196d9476d36894ce17c3b0dd97504ca2cc31b3e0a774fee326e867565885"
+        },
+        {
+          "path": "C:\\windows\\System32\\sechost.dll",
+          "sha256": "54756c8bc96e3baf57ee58e4f73ca10183c8267d208efe7819a256eca53361a0"
+        },
+        {
+          "path": "C:\\windows\\System32\\RPCRT4.dll",
+          "sha256": "b9decb81fcf8ef9a6b674072da5676322b925c73b3c8c9253805db7510d9c493"
+        },
+        {
+          "path": "C:\\windows\\System32\\bcrypt.dll",
+          "sha256": "811af66dd7e323a74db80648610bbebb956093ae7bd91c5b950ed6aca13d8026"
+        },
+        {
+          "path": "C:\\windows\\System32\\ucrtbase.dll",
+          "sha256": "3c60056371f82e4744185b6f2fa0c69042b1e78804685944132974dd13f3b6d9"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ze_loader.dll",
+          "sha256": "a56a109788c97ed42275803202e42a44c591a24064a038e6aa3cbc5908f98b4b"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\MSVCP140_ATOMIC_WAIT.dll",
+          "sha256": "e7963645e0d1db08e300614d4c5fa7194bd8173e9ab7a5558859e6b232ed3241"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\MSVCP140.dll",
+          "sha256": "def46aa6a8f72f27bafac0c43334419486a4d1dcdb6c479a8ef7034b3e1fa4cb"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VCRUNTIME140.dll",
+          "sha256": "184146852727a9db4eea06178716bec3cdbb1015c911f6b0f915b184ad7775b2"
+        },
+        {
+          "path": "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin\\libmmd.dll",
+          "sha256": "0e8e285e2d1cb7dbe6018371fd5fd9763e9b3a574f516ff000f606433fe3cc10"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VCRUNTIME140_1.dll",
+          "sha256": "e6bfb3662ab4b1969a73441dbe35c96d51441b6bff8cf1fe7430bd5b246ca605"
+        },
+        {
+          "path": "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin\\svml_dispmd.dll",
+          "sha256": "03b6af2ab4dac88fa5d80ddded702aeb7cfd3f0460e63425ded73d7a755a1dce"
+        },
+        {
+          "path": "C:\\windows\\System32\\CFGMGR32.dll",
+          "sha256": "7fefd329b398827d6babf33973eaa2c0dc580fe1f3b291efa4793e795e4df8fa"
+        },
+        {
+          "path": "C:\\windows\\System32\\ole32.dll",
+          "sha256": "4a7b8ed9f2aeca875f948d9a1bce8b8d177744475f253704362792d7182d55f2"
+        },
+        {
+          "path": "C:\\windows\\System32\\combase.dll",
+          "sha256": "e1ed05c78ccd1056f106468b551f846a4f7e1d46d925223755c44f3191730993"
+        },
+        {
+          "path": "C:\\windows\\System32\\GDI32.dll",
+          "sha256": "b5f5a3f16d03366cdb02020fc4dadceb0892e243f8aa94d205e124045da9457f"
+        },
+        {
+          "path": "C:\\windows\\System32\\win32u.dll",
+          "sha256": "20ac4556b0b3fc82bd5632ffc623a45497184483e14a2841ac30213e162daf1f"
+        },
+        {
+          "path": "C:\\windows\\System32\\gdi32full.dll",
+          "sha256": "724754c47bcd7a2739816c7cefbc75382515538a15ccb73a8342043a16453772"
+        },
+        {
+          "path": "C:\\windows\\System32\\msvcp_win.dll",
+          "sha256": "2a7825c2925347e0cb767a0dcb611f3eb80d0f71cbec981069b227bdc7cb871a"
+        },
+        {
+          "path": "C:\\windows\\System32\\USER32.dll",
+          "sha256": "82870be1e008d5232cb175ebc815f645a2add4c0b164fd4ba20744192c1c81f7"
+        },
+        {
+          "path": "C:\\windows\\System32\\IMM32.DLL",
+          "sha256": "2a882bc0df58f4f6dd906889b1fb6d7b7bc70da7109e016e0f1e67b264d073b6"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\ze_intel_gpu64.dll",
+          "sha256": "e291d6c88c85d85751d3e2ba26d5510e1abb3a1f6d255f8f25b9aa2843ecf96d"
+        },
+        {
+          "path": "C:\\windows\\System32\\dxgi.dll",
+          "sha256": "d33765793e32eff65f9103efe2419184ab0b6289e69e69ce85aa7568f678c3b5"
+        },
+        {
+          "path": "C:\\windows\\System32\\WS2_32.dll",
+          "sha256": "5e9857a80a301ad21d0e0a0928a4ff2b5360c305a97bfc88886e3b686bf8d503"
+        },
+        {
+          "path": "C:\\windows\\System32\\SETUPAPI.dll",
+          "sha256": "3777075e8391c40c21fd5662845f5e2928d3cfd2b6abdf4003e087d2089cb853"
+        },
+        {
+          "path": "C:\\windows\\System32\\SHELL32.dll",
+          "sha256": "936c33a8283196a070aa6f844a65a29a8f99f760eae0016754c1cbf17d62bdb7"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\WINMM.dll",
+          "sha256": "ead9055dc522bcab041c8eb7b875adb681a2f1fa851d4075789d78d0242711a0"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VERSION.dll",
+          "sha256": "af45a728552ccfdcd9435c40ace60a9354d7c1b52abf507a2f1cb371dada4fde"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ze_tracing_layer.dll",
+          "sha256": "d3f8f8c4bd055c464495703761f5754c140137e4c457f60a168e35085ee2c51f"
+        },
+        {
+          "path": "C:\\windows\\System32\\bcryptPrimitives.dll",
+          "sha256": "f0a1662d0f55533a21d609f8dc737288ede77d314d90e885ca9e6ef79d429c3b"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmm2_64.dll",
+          "sha256": "db2ea2a6f271cc85d097dc13176e153e5ebf67775155df162b768a75ed863a2e"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmm64.dll",
+          "sha256": "db3b3d6fbc6aba6ba156080224916c1fefcb1080f0ea3927727f52626623c681"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmmstaging_64.dll",
+          "sha256": "994d22569552487dcadbc8b1aa6ac9bef0c24df23e67637b4e2a2f63952c1e70"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\windows.storage.dll",
+          "sha256": "718c890022323ed8e38a3beb7a143df9e5d680b006c3f1fd28754eeb7cd82010"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\Wldp.dll",
+          "sha256": "c2a7ed84bdd3cf931fdcc5782cea58c376b1a2841fcc6f954e65812deff50389"
+        },
+        {
+          "path": "C:\\windows\\System32\\OLEAUT32.dll",
+          "sha256": "4dd40579e7254dd553b49b229aa85b9c079586b034e37e564909da25eb298345"
+        },
+        {
+          "path": "C:\\windows\\System32\\SHCORE.dll",
+          "sha256": "63257882eb0d0d08ccc275287e11e7213ec26946185e3f3116316c249708a920"
+        },
+        {
+          "path": "C:\\windows\\System32\\shlwapi.dll",
+          "sha256": "eb70b465352f04f188cd12affd72b44f14770e6bfd98f6a6570b62ef21873297"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdfcl64.dll",
+          "sha256": "4aafd9f797a227cdab388853ba835a5670f384ca98395e859a4cf7810b8d68ae"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igc-default64.dll",
+          "sha256": "55559222a70929c46c7b4000e019bfe5126fa8c051037cfdf62ac6f29ba53a89"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\dxcore.dll",
+          "sha256": "c4976547ea4ecf3faa1c82e03acfc6344f944203a660f137d938bb53f3495f53"
+        },
+        {
+          "path": "C:\\windows\\System32\\kernel.appcore.dll",
+          "sha256": "abff38d9efaca07602acc2a31775f8790ac720261842dbb6d7d9e1a46bba91f8"
+        }
+      ],
+      "exit_code": 0,
+      "log_sha256": "7b1c4269767d015d4f2fdb663d2b74cca93cce312703d4ddc10cac0ffeb09122",
+      "actual_gdn_phase_witness": true,
+      "actual_qsa_phase_witness": true,
+      "actual_shared_phase_witness": false,
+      "post_zero_diagnostic_triggered": false
+    }
+  ],
+  "executables_unchanged": true,
+  "images_unchanged": true,
+  "date": "2026-10-30",
+  "platform": "Arc A770 16GB; Windows driver 32.0.101.9034; IntelLLVM 2025.3.2; Level Zero SDK 1.33.1",
+  "local_run": "shared-ready-performance-1793375310880390400",
+  "raw_results_sha256": "2e2d5bf36021b1de9dbf8c1577a89a5e14a246c0a3c3454e31c2fc404a15d834",
+  "completed_requests": 36,
+  "generated_tokens": 2304,
+  "scope": "Previous/new/previous shared-expert scheduling with GDN/QSA scheduling enabled throughout;frozen M4 images and verifier. Exact tokens,accepted,offered,reused,finish across all references and arms. Native dependency audits passed;no post-zero diagnostic trigger.",
+  "limitations": [
+    "Incremental native shared scheduling comparison,not Orca versus SYCL and not combined GDN/QSA/shared speedup.",
+    "Two retained samples per case/arm;consider baseline drift alongside reported changes. No claim of a global optimum.",
+    "No hardware concurrency timeline or Linux GPU validation. Full migration and broader stability acceptance remain unfinished."
+  ]
+}

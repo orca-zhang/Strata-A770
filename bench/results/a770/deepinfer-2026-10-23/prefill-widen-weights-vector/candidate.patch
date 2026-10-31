@@ -1,0 +1,29 @@
+--- a/sycl/src/prefill/gemm.dp.cpp
++++ b/sycl/src/prefill/gemm.dp.cpp
+@@ -618,9 +618,23 @@
+     auto* xf = wf + nw;
+     // ponytail: use the existing bounded workspace; large products keep the original path.
+     // A770 oneMKL promotes 16-bit inputs to FP32 through host staging. Keep its FP32 GEMM and move only widening.
+-    q->parallel_for(sycl::range<1>(nw), [=](sycl::id<1> i) {
+-        const uint16_t v = W[i];
+-        wf[i] = bf16 ? sycl::bit_cast<float>(uint32_t(v) << 16) : float(sycl::bit_cast<sycl::half>(v));
++    q->parallel_for(sycl::range<1>((nw + 3) / 4), [=](sycl::id<1> p) {
++        const size_t i = p[0] * 4;
++        if (i + 4 <= nw) {
++            sycl::vec<uint16_t, 4> bits;
++            bits.load(0, sycl::address_space_cast<sycl::access::address_space::global_space,
++                sycl::access::decorated::no>(W + i));
++            const sycl::vec<float, 4> value = bf16
++                ? sycl::bit_cast<sycl::vec<float, 4>>(bits.convert<uint32_t>() << 16)
++                : sycl::bit_cast<sycl::vec<sycl::half, 4>>(bits).convert<float>();
++            value.store(0, sycl::address_space_cast<sycl::access::address_space::global_space,
++                sycl::access::decorated::no>(wf + i));
++        } else {
++            for (size_t j = i; j < nw; ++j) {
++                const uint16_t v = W[j];
++                wf[j] = bf16 ? sycl::bit_cast<float>(uint32_t(v) << 16) : float(sycl::bit_cast<sycl::half>(v));
++            }
++        }
+     });
+     q->parallel_for(sycl::range<1>((size_t) T * K), [=](sycl::id<1> i) {
+         const size_t offset = (size_t(i) / K) * ldx + size_t(i) % K;

@@ -42,10 +42,21 @@ class RecordingEngine(MockEngine):
 
 
 class TokenBatchParser(unittest.TestCase):
-    def test_token_batch_no_split_parser(self):
-        self.assertEqual(list(_token_batch("TB 3 10 -2 30\n")), [10, -2, 30])
-        with self.assertRaises(ValueError):
-            list(_token_batch("TB 2 10\n"))
+    def test_complete_batches(self):
+        for line, expected in [("TB 0\n", []), ("TB 3 10 -2 30\n", [10, -2, 30]),
+                               ("TB  2  0 2147483647\r\n", [0, 2147483647])]:
+            with self.subTest(line=line):
+                self.assertEqual(list(_token_batch(line)), expected)
+
+    def test_malformed_batch_returns_no_tokens(self):
+        for line in ("", "TB", "T 1 10", "TB -1", "TB 2 10\n", "TB 1 10 20\n",
+                     "TB 2 10 nope\n", "TB nope 10\n", "TB 1 10\ntrailing"):
+            with self.subTest(line=line):
+                seen = []
+                with self.assertRaises(ValueError):
+                    for token in _token_batch(line):
+                        seen.append(token)
+                self.assertEqual(seen, [])
 
 
 class StreamingGzip(unittest.TestCase):
@@ -76,7 +87,7 @@ class StreamingGzip(unittest.TestCase):
         if origin is not None:
             headers["Origin"] = origin
         return urllib.request.urlopen(urllib.request.Request(self.base + path, data=json.dumps(body).encode(),
-                                                             headers=headers), timeout=3)
+                                                             headers=headers), timeout=30)
 
     def test_negotiation(self):
         handler = object.__new__(make_handler(self.svc))
@@ -365,7 +376,7 @@ class FitMaxTokens(unittest.TestCase):
         self.assertIn("no room to answer", b["error"]["message"])
 
 
-class VisionTempFiles(unittest.TestCase):
+class VisionRequestFiles(unittest.TestCase):
     """A request's combined image file (req-*.sve, ~10 MB a picture) goes with the request: one refused after prepare()
     wrote it (the engine starting, no room) or whose answer never started left it in the vision directory for good."""
 
@@ -1027,6 +1038,167 @@ class ToolCallTerminators(unittest.TestCase):
                         streamed = "".join(e.text for e in evs if e.kind == "tool_args")
                         self.assertEqual(json.loads(streamed), {"path": "doc.md", "content": self.CONTENT})
 
+    def test_large_streamed_value_matches_complete_call(self):
+        for content in ("file contents caf\u00e9 \u6c49\u5b57\n" * 1000, self.CONTENT * 300):
+            with self.subTest(embedded_tags="</tool_call>" in content), mock.patch.object(self, "CONTENT", content):
+                evs = self.run_parser(True, 7)
+                calls = [e.call for e in evs if e.kind == "tool_call"]
+                self.assertEqual([c.arguments for c in calls], [{"path": "doc.md", "content": content}])
+                streamed = "".join(e.text for e in evs if e.kind == "tool_args")
+                self.assertEqual(json.loads(streamed), calls[0].arguments)
+
+    def test_parameter_followers_at_every_split(self):
+        from serve.frontend import PARAM_END, param_end
+        value = "literal </parameter> in docs </parameter> nope; caf\u00e9 \u6c49\u5b57"
+        for space in ("", " \r\n\t", "\u00a0\u2003\x1c"):
+            for follower, tag_length in (("<parameter=next>", 11), ("</function>", 11)):
+                text = value + PARAM_END + space + follower
+                closed = len(value) + len(PARAM_END)
+                complete = closed + len(space) + tag_length
+                for cut in range(len(value), len(text) + 1):
+                    for final in (False, True):
+                        with self.subTest(space=space, follower=follower, cut=cut, final=final):
+                            expected = -1 if cut < closed else len(value) if final or cut >= complete else -2
+                            self.assertEqual(param_end(text[:cut], final), expected)
+        for tail in (" no tag", "<parameterX", "</functionX>", "\u200b</function>"):
+            for final in (False, True):
+                self.assertEqual(param_end(value + PARAM_END + tail, final), -1)
+        self.assertEqual(param_end("a</parameter>\u2003<parameter=b>x</parameter></function>"), 1)
+
+    def test_raw_parameter_emits_when_its_follower_completes(self):
+        from serve.frontend import OutputParser
+        schema = [{"name": "write", "parameters": {"properties": {
+            "data": {"type": "array"}, "count": {"type": "integer"}}}}]
+        parser = OutputParser(thinking=False, tools=schema, stream_tools=True)
+        events = parser.feed("<tool_call><function=write><parameter=data>\n[")
+        for delta in ("1", ",2", "]", "\n</parameter>\u2003<parameter", ""):
+            self.assertEqual(parser.feed(delta), [])
+            self.assertEqual(parser.ss, "raw")
+        ready = parser.feed("=")
+        self.assertEqual([(e.kind, e.text) for e in ready], [("tool_args", "[1, 2]")])
+        events += ready + parser.feed("count>3\n</parameter>\u00a0</function")
+        self.assertEqual(parser.ss, "raw")
+        self.assertEqual(parser.feed(""), [])
+        ready = parser.feed(">")
+        self.assertEqual([(e.kind, e.text) for e in ready], [("tool_args", "3"), ("tool_args", "}")])
+        events += ready + parser.feed("</tool_call>") + parser.finish()
+        calls = [e.call for e in events if e.kind == "tool_call"]
+        self.assertEqual([c.arguments for c in calls], [{"data": [1, 2], "count": 3}])
+        self.assertEqual(json.loads("".join(e.text for e in events if e.kind == "tool_args")), calls[0].arguments)
+        self.assertEqual({e.call.id for e in events if e.call}, {calls[0].id})
+
+    def test_streamed_string_escaping_preserves_all_characters(self):
+        from serve.frontend import OutputParser
+        value = ('start:' + ''.join(chr(i) for i in range(32))
+                 + '"\\caf\u00e9 \u4e2d\u6587 \U0001f600 \ud800 \udfff literal </parameter> in text:end')
+        text = ('<tool_call><function=write><parameter=content>\n' + value
+                + '\n</parameter></function></tool_call>')
+        for step in (1, 7, 100_000):
+            with self.subTest(step=step):
+                parser = OutputParser(thinking=False, tools=self.SCHEMA, stream_tools=True)
+                events = []
+                for at in range(0, len(text), step):
+                    events += parser.feed(text[at:at + step])
+                events += parser.finish()
+                calls = [e.call for e in events if e.kind == "tool_call"]
+                self.assertEqual([c.arguments for c in calls], [{"content": value}])
+                self.assertEqual(json.loads("".join(e.text for e in events if e.kind == "tool_args")),
+                                 calls[0].arguments)
+                self.assertEqual({e.call.id for e in events if e.call}, {calls[0].id})
+
+    def test_parameter_cursor_keeps_names_values_and_duplicate_order(self):
+        from serve.frontend import parse_tool_call
+        value = 'literal </parameter> prose <parameter=example> "\\\u4e2d\U0001f600'
+        body = ('\u2003<function=write>\n<parameter=path>\n001\n</parameter>\u00a0'
+                '<parameter=data>\n[1,2]\n</parameter>\u2003'
+                '<parameter=data>\nfalse\n</parameter>\n'
+                '<parameter=content>\n' + value)
+        for ending in ('', '\n</parameter>', '\n</parameter>\n</function>\u2003'):
+            with self.subTest(ending=ending):
+                call = parse_tool_call(body + ending, self.SCHEMA[0])
+                self.assertEqual((call.name, call.arguments),
+                                 ('write', {'path': '001', 'data': False, 'content': value}))
+        for malformed in ('not a call', '<function=write', '<function=write><parameter=unfinished'):
+            with self.subTest(malformed=malformed), self.assertRaises(ValueError):
+                parse_tool_call(malformed)
+
+    def test_streamed_offsets_keep_mixed_parameter_boundaries(self):
+        from serve.frontend import OutputParser
+        data = ['literal </parameter> prose', 'x>y=z', '\u4e2d\U0001f600']
+        expected = {'path': '', 'data': data, 'content': '<\nends with </par', 'count': 3}
+        values = [('path', ''), ('data', json.dumps(data, ensure_ascii=False)),
+                  ('content', expected['content']), ('count', '3')]
+        for space in ('', '\n\t\u2003\x1c', ' ' * 4096):
+            text = '<tool_call><function=write>' + space
+            text += ''.join('<parameter=' + name + '>\n' + value + '\n</parameter>' + space
+                            for name, value in values)
+            text += '</function></tool_call>'
+            for step in (1, 7, len(text)):
+                with self.subTest(space=repr(space[:8]), step=step):
+                    parser = OutputParser(thinking=False, tools=self.SCHEMA, stream_tools=True)
+                    events = []
+                    for at in range(0, len(text), step):
+                        events += parser.feed(text[at:at + step]) + parser.feed('')
+                    events += parser.finish()
+                    calls = [e.call for e in events if e.kind == 'tool_call']
+                    self.assertEqual([c.arguments for c in calls], [expected])
+                    self.assertEqual(json.loads(''.join(e.text for e in events if e.kind == 'tool_args')), expected)
+                    self.assertEqual({e.call.id for e in events if e.call}, {calls[0].id})
+
+    def test_raw_cursor_keeps_split_terminators_and_pending_followers(self):
+        from serve.frontend import OutputParser
+        data = ['x>y=z', 'literal </parameter> text', '<parameter=example>', '\u4e2d\U0001f600'] * 5
+        text = ('<tool_call><function=write><parameter=data>' + json.dumps(data, ensure_ascii=False)
+                + '</parameter>\u2003\x1c<parameter=path>\n001\n</parameter>\u00a0</function></tool_call>')
+        for step in range(1, 17):
+            with self.subTest(step=step):
+                parser = OutputParser(thinking=False, tools=self.SCHEMA, stream_tools=True)
+                events = []
+                for at in range(0, len(text), step):
+                    events += parser.feed(text[at:at + step]) + parser.feed('')
+                events += parser.finish()
+                calls = [e.call for e in events if e.kind == 'tool_call']
+                expected = {'data': data, 'path': '001'}
+                self.assertEqual([c.arguments for c in calls], [expected])
+                self.assertEqual(json.loads(''.join(e.text for e in events if e.kind == 'tool_args')), expected)
+                self.assertEqual({e.call.id for e in events if e.call}, {calls[0].id})
+
+    def test_call_end_uses_verified_followers_with_unicode_whitespace(self):
+        from serve.frontend import call_end
+        for space in ("", "\n\t\u2003\x1c", " " * 4096, "\u2003" * 4096):
+            body = (space + '<function=write>' + space
+                    + '<parameter=content>quoted </parameter> prose </function> </tool_call></parameter>'
+                    + space + '<parameter=path>file.txt</parameter>' + space)
+            ending = '</function>' + space + '</tool_call>'
+            with self.subTest(space=repr(space[:8])):
+                self.assertEqual(call_end(body + ending + 'tail </tool_call>'),
+                                 len(body) + len('</function>') + len(space))
+                for cut in (0, 1, 10, 11, len(ending) - 1):
+                    self.assertEqual(call_end(body + ending[:cut]), -1)
+
+    def test_call_closing_at_every_split(self):
+        from serve.frontend import OutputParser
+        call = ("<tool_call><function=write><parameter=content>\n" + self.CONTENT
+                + "\n</parameter>\u2003</function>\u00a0</tool_call>")
+        for thinking in (False, True):
+            text = call + "\n" + call + ("</think>\n" if thinking else "") + "done"
+            for stream_tools in (False, True):
+                for cut in range(len(text) + 1):
+                    with self.subTest(thinking=thinking, stream_tools=stream_tools, cut=cut):
+                        parser = OutputParser(thinking=thinking, tools=self.SCHEMA, stream_tools=stream_tools)
+                        events = (parser.feed(text[:cut]) + parser.feed("")
+                                  + parser.feed(text[cut:]) + parser.finish())
+                        calls = [e.call for e in events if e.kind == "tool_call"]
+                        self.assertEqual([c.arguments for c in calls], [{"content": self.CONTENT}] * 2)
+                        self.assertEqual("".join(e.text for e in events if e.kind == "content"), "done")
+                        args = [e for e in events if e.kind == "tool_args"]
+                        if stream_tools and not thinking:
+                            for c in calls:
+                                self.assertEqual(json.loads("".join(e.text for e in args if e.call.id == c.id)),
+                                                 c.arguments)
+                        else:
+                            self.assertFalse(args)
+
 
 class ToolCallTagInProse(unittest.TestCase):
     """A reply that names the `<tool_call>` tag in its prose before the real call keeps the tag as content and still
@@ -1076,7 +1248,10 @@ class UnfinishedToolCall(unittest.TestCase):
         from serve.frontend import OutputParser
         schema = [{"name": "write", "parameters": {"properties": self.PROPS}}]
         for text, content in ((self.CUT, None), (self.WHOLE, "all of it"),
-                              (self.WHOLE[:-len("</tool_call>")], "all of it")):   # only </tool_call> missing: whole
+                              (self.WHOLE[:-len("</tool_call>")], "all of it"),   # only </tool_call> missing: whole
+                              (self.WHOLE[:-5], "all of it"),
+                              (self.WHOLE[:-len("</tool_call>")] + "<parameter=unfinished", "all of it"),
+                              (self.WHOLE.replace("all of it", "123")[:-len("</tool_call>")], "123")):
             for step in (1, 7, 10_000):
                 with self.subTest(end=text[-12:], step=step):
                     p = OutputParser(thinking=True, tools=schema, stream_tools=True)
@@ -1091,6 +1266,8 @@ class UnfinishedToolCall(unittest.TestCase):
                     else:
                         self.assertEqual(len(calls), 1)
                         self.assertEqual(json.loads(streamed), {"path": "notes.txt", "content": content})
+                        self.assertEqual(calls[0].call.arguments, json.loads(streamed))
+                        self.assertEqual([e.call.id for e in evs if e.kind == "tool_start"], [calls[0].call.id])
 
     def answers(self, script, max_tokens=500):
         """(finish reason, the call's arguments) from OpenAI and Anthropic, whole and streamed, for the model's `script`."""
@@ -1170,6 +1347,123 @@ class UnfinishedToolCall(unittest.TestCase):
         self.assertEqual((a["openai", True][0], json.loads(a["openai", True][1])), ("tool_calls", whole))
         self.assertEqual(a["anthropic", False], ("tool_use", [whole]))
         self.assertEqual((a["anthropic", True][0], json.loads(a["anthropic", True][1])), ("tool_use", whole))
+
+    def test_anthropic_collect_argument_chunks_and_unclosed_input(self):
+        from serve.server import anthropic_collect
+
+        def event(name, **data):
+            return name, {"type": name, **data}
+
+        raw = json.dumps({"text": 'quoted " slash \\ newline\n\u4e2d\U0001f600' * 100}, ensure_ascii=False)
+        for width in (1, 7, 64, len(raw)):
+            for text, closed, expected in ((raw, True, {"input": json.loads(raw)}),
+                                           ('{"x":', True, None), ('', True, {"input": {}}),
+                                           (raw[:20], False, {"input": {}, "_json": raw[:20]})):
+                block = {"type": "tool_use", "id": "call", "name": "write", "input": {}}
+                chunks = [event("message_start", message={"usage": {"input_tokens": 10}}), None,
+                          event("content_block_start", index=0, content_block=block)]
+                chunks += [event("content_block_delta", index=0,
+                    delta={"type": "input_json_delta", "partial_json": text[i:i + width]})
+                    for i in range(0, len(text), width)]
+                if not text:
+                    chunks.append(event("content_block_delta", index=0,
+                                        delta={"type": "input_json_delta", "partial_json": ""}))
+                if closed:
+                    chunks.append(event("content_block_stop", index=0))
+                chunks.append(event("message_delta", delta={"stop_reason": "end_turn"}, usage={"output_tokens": 2}))
+                with self.subTest(width=width, text=text[:20], closed=closed):
+                    reply = anthropic_collect(iter(chunks))
+                    self.assertEqual(reply["content"], [] if expected is None else [{**block, **expected}])
+                    self.assertEqual(reply["usage"], {"input_tokens": 10, "output_tokens": 2})
+                    self.assertNotIn("_json", block)
+
+    def test_anthropic_block_transitions_and_truncated_tool(self):
+        from serve.frontend import Event, ToolCall
+        from serve.server import anthropic_collect, anthropic_events
+
+        first, second = ToolCall("first", {"x": 1}, "c1"), ToolCall("second", {}, "c2")
+        events = [Event("reasoning", ""), Event("reasoning", "think"), Event("content", "answer"),
+                  Event("tool_call", call=first), Event("tool_start", call=second),
+                  Event("tool_args", '{"x":', second)]
+        run = [("ping", None)] + [("event", e) for e in events] + [
+            ("done", {"finish": "length", "completion_tokens": 6})]
+        svc = SimpleNamespace(model_for=lambda req: "m", run=lambda *a, **kw: iter(run))
+        chunks = list(anthropic_events(svc, {}, [1] * 10, True, None, 100, None))
+        starts = [e[1] for e in chunks if e is not None and e[0] == "content_block_start"]
+        self.assertEqual([e["index"] for e in starts], [0, 1, 2, 3])
+        self.assertEqual([e["content_block"] for e in starts], [
+            {"type": "thinking", "thinking": "", "signature": ""}, {"type": "text", "text": ""},
+            {"type": "tool_use", "id": "c1", "name": "first", "input": {}},
+            {"type": "tool_use", "id": "c2", "name": "second", "input": {}}])
+        reply = anthropic_collect(iter(chunks))
+        self.assertEqual(reply["content"], [{"type": "thinking", "thinking": "think", "signature": ""},
+            {"type": "text", "text": "answer"}, {"type": "tool_use", "id": "c1", "name": "first", "input": {"x": 1}}])
+        self.assertEqual(reply["stop_reason"], "max_tokens")
+        starts[2]["content_block"]["input"]["changed"] = True
+        self.assertEqual(starts[3]["content_block"]["input"], {})
+
+    def test_anthropic_collect_text_and_thinking_chunks(self):
+        from serve.server import anthropic_collect
+
+        def event(name, **data):
+            return name, {"type": name, **data}
+
+        text = 'quoted " slash \\ newline\n\u4e2d\U0001f600' * 100
+        for width in (1, 7, 64, len(text)):
+            for closed in (False, True):
+                blocks = [{"type": "thinking", "thinking": "initial ", "signature": "sig"},
+                          {"type": "text", "text": ""}, {"type": "text", "text": "untouched"}]
+                chunks = [event("message_start", message={"usage": {"input_tokens": 10}}), None]
+                expected = []
+                for index, block in enumerate(blocks):
+                    key = block["type"]
+                    value = text if index < 2 else ""
+                    expected.append({**block, key: block[key] + value})
+                    chunks.append(event("content_block_start", index=index, content_block=block))
+                    if value:
+                        chunks += [event("content_block_delta", index=index,
+                            delta={"type": key + "_delta", key: value[i:i + width]})
+                            for i in range(0, len(value), width)]
+                        chunks += [None, event("content_block_delta", index=index,
+                                               delta={"type": key + "_delta", key: ""})]
+                    if closed:
+                        chunks.append(event("content_block_stop", index=index))
+                chunks.append(event("message_delta", delta={"stop_reason": "max_tokens"},
+                                    usage={"output_tokens": 2}))
+                with self.subTest(width=width, closed=closed):
+                    reply = anthropic_collect(iter(chunks))
+                    self.assertEqual(reply["content"], expected)
+                    self.assertEqual([b[b["type"]] for b in blocks], ["initial ", "", "untouched"])
+                    self.assertEqual(reply["usage"], {"input_tokens": 10, "output_tokens": 2})
+                    self.assertEqual(reply["stop_reason"], "max_tokens")
+
+    def test_collect_interleaved_argument_chunks_without_changing_input(self):
+        from serve.server import openai_collect
+
+        def chunk(delta, finish=None):
+            return {"id": "c", "created": 1, "model": "m", "usage": {"completion_tokens": 2},
+                    "choices": [{"index": 0, "delta": delta, "finish_reason": finish}]}
+
+        value = {"text": 'quoted " slash \\ newline\n\u4e2d\U0001f600' * 100}
+        raw = json.dumps(value, ensure_ascii=False)
+        for width in (1, 7, 64, len(raw)):
+            chunks = [chunk({"reasoning_content": "think ", "tool_calls": [
+                {"index": 3, "id": "complete", "function": {"name": "wr"}},
+                {"index": 1, "id": "cut", "function": {"name": "read", "arguments": '{"x":'}}]}), None,
+                chunk({"content": "answer", "reasoning_content": "\u4e2d", "tool_calls": [
+                    {"index": 3, "function": {"name": "ite"}}]})]
+            chunks += [chunk({"tool_calls": [{"index": 3, "function": {"arguments": raw[i:i + width]}}]})
+                       for i in range(0, len(raw), width)]
+            chunks.append(chunk({}, "length"))
+            original = json.dumps(chunks)
+            with self.subTest(width=width):
+                reply = openai_collect(iter(chunks))
+                message = reply["choices"][0]["message"]
+                self.assertEqual(message["tool_calls"], [{"id": "complete", "type": "function",
+                    "function": {"name": "write", "arguments": raw}}])
+                self.assertEqual((message["content"], message["reasoning_content"]), ("answer", "think \u4e2d"))
+                self.assertEqual(reply["choices"][0]["finish_reason"], "length")
+                self.assertEqual(json.dumps(chunks), original)
 
 
 class ClientShapes(unittest.TestCase):
@@ -3157,6 +3451,7 @@ class RestartWindow(unittest.TestCase):
                                    lambda cmd, **kw: real([sys.executable, str(script), *cmd[1:]], **kw)):
                 gate.touch()
                 eng = StrataEngine("strata", ["--gate", str(gate)])
+                t = None
                 try:
                     self.assertEqual(eng.max_context, 4096)
                     self.assertTrue(eng.alive())
@@ -3171,10 +3466,10 @@ class RestartWindow(unittest.TestCase):
                     t = threading.Thread(target=eng.restart)
                     t.start()
                     deadline = time.time() + 10
-                    while eng.proc is old and time.time() < deadline:
+                    while (eng.proc is None or eng.proc is old or eng.max_context != 0) and time.time() < deadline:
                         time.sleep(0.005)
+                    self.assertIsNotNone(eng.proc, "restart never spawned the engine")
                     self.assertIsNot(eng.proc, old, "restart never started the engine")
-                    time.sleep(0.2)                       # the new engine is up, but has not said READY
                     self.assertEqual(eng.max_context, 0)
                     self.assertFalse(eng.alive(), "alive before READY: a request would plan with context 0")
                     gate.touch()
@@ -3190,6 +3485,8 @@ class RestartWindow(unittest.TestCase):
                     self.assertEqual(eng.max_context, 4096)
                 finally:
                     gate.touch()
+                    if t is not None:
+                        t.join(10)
                     eng.unload()
 
     def test_restart_retries_a_start_that_fails(self):
@@ -3239,6 +3536,7 @@ class RestartWindow(unittest.TestCase):
                 self.assertEqual(r.status, 200)
         finally:
             httpd.shutdown()
+            httpd.server_close()
 
     def test_context_zero_is_503(self):
         tok = ByteTokenizer()

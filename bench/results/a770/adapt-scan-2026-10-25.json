@@ -1,0 +1,179 @@
+{
+  "date": "2026-10-25",
+  "adopted": false,
+  "source_change_reverted": true,
+  "model_benchmark_executed": false,
+  "platform": {
+    "gpu": "Intel Arc A770 16 GB (not used by this CPU timing)",
+    "cpu": "Xeon E5-2696 v4",
+    "ram_gib": 256,
+    "os": "Windows",
+    "compiler": "DPC++ 2025.3.2"
+  },
+  "scope": "Offline score screen and CPU host-selection replay only; no new model throughput result.",
+  "score_replay": {
+    "expert_slots": 5771,
+    "decay": 0.5,
+    "swaps_per_window": 32,
+    "limitations": "Historical fixed routes; no prefill-tail heat, asynchronous DMA or future-route prediction.",
+    "modes": {
+      "entries": {
+        "code": {
+          "windows": 53,
+          "swaps": 1696,
+          "static_mapped_entries": 32667,
+          "static_mapped_blob_mib": 32066.5283203125,
+          "mapped_entries": 21673,
+          "mapped_blob_mib": 23704.19921875,
+          "mapped_entry_reduction": 0.3365475862491199,
+          "mapped_blob_byte_reduction": 0.26078061890676807,
+          "duplicate_entries_pct": 28.95331325301205
+        },
+        "prose": {
+          "windows": 62,
+          "swaps": 1984,
+          "static_mapped_entries": 35745,
+          "static_mapped_blob_mib": 37103.759765625,
+          "mapped_entries": 18081,
+          "mapped_blob_mib": 21620.1171875,
+          "mapped_entry_reduction": 0.4941670163659253,
+          "mapped_blob_byte_reduction": 0.41730656612513733,
+          "duplicate_entries_pct": 24.889053254437865
+        },
+        "long": {
+          "windows": 61,
+          "swaps": 1952,
+          "static_mapped_entries": 33998,
+          "static_mapped_blob_mib": 35799.31640625,
+          "mapped_entries": 22879,
+          "mapped_blob_mib": 26220.41015625,
+          "mapped_entry_reduction": 0.3270486499205836,
+          "mapped_blob_byte_reduction": 0.26757232292647,
+          "duplicate_entries_pct": 25.19469246031746
+        }
+      },
+      "unique": {
+        "code": {
+          "windows": 53,
+          "swaps": 1696,
+          "static_mapped_entries": 32667,
+          "static_mapped_blob_mib": 32066.5283203125,
+          "mapped_entries": 22151,
+          "mapped_blob_mib": 23800.5859375,
+          "mapped_entry_reduction": 0.3219150824991582,
+          "mapped_blob_byte_reduction": 0.2577747831085428,
+          "duplicate_entries_pct": 28.95331325301205
+        },
+        "prose": {
+          "windows": 62,
+          "swaps": 1982,
+          "static_mapped_entries": 35745,
+          "static_mapped_blob_mib": 37103.759765625,
+          "mapped_entries": 18234,
+          "mapped_blob_mib": 21351.416015625,
+          "mapped_entry_reduction": 0.4898866974402014,
+          "mapped_blob_byte_reduction": 0.4245484514104108,
+          "duplicate_entries_pct": 24.889053254437865
+        },
+        "long": {
+          "windows": 61,
+          "swaps": 1952,
+          "static_mapped_entries": 33998,
+          "static_mapped_blob_mib": 35799.31640625,
+          "mapped_entries": 23260,
+          "mapped_blob_mib": 26326.4404296875,
+          "mapped_entry_reduction": 0.31584210835931525,
+          "mapped_blob_byte_reduction": 0.2646105268900801,
+          "duplicate_entries_pct": 25.19469246031746
+        }
+      },
+      "half": {
+        "code": {
+          "windows": 53,
+          "swaps": 1696,
+          "static_mapped_entries": 32667,
+          "static_mapped_blob_mib": 32066.5283203125,
+          "mapped_entries": 21623,
+          "mapped_blob_mib": 23548.14453125,
+          "mapped_entry_reduction": 0.3380781828756849,
+          "mapped_blob_byte_reduction": 0.2656472101991328,
+          "duplicate_entries_pct": 28.95331325301205
+        },
+        "prose": {
+          "windows": 62,
+          "swaps": 1984,
+          "static_mapped_entries": 35745,
+          "static_mapped_blob_mib": 37103.759765625,
+          "mapped_entries": 17999,
+          "mapped_blob_mib": 21484.6435546875,
+          "mapped_entry_reduction": 0.4964610435025878,
+          "mapped_blob_byte_reduction": 0.42095777650565547,
+          "duplicate_entries_pct": 24.889053254437865
+        },
+        "long": {
+          "windows": 61,
+          "swaps": 1952,
+          "static_mapped_entries": 33998,
+          "static_mapped_blob_mib": 35799.31640625,
+          "mapped_entries": 22742,
+          "mapped_blob_mib": 26079.1748046875,
+          "mapped_entry_reduction": 0.33107829872345435,
+          "mapped_blob_byte_reduction": 0.2715175198112307,
+          "duplicate_entries_pct": 25.19469246031746
+        }
+      }
+    }
+  },
+  "scan_reference": {
+    "scope": "Python stable-score-sort reference; not native C++ load count or GPU traffic.",
+    "windows": 176,
+    "ordered_swaps": 5632,
+    "victim_visits": [
+      774107,
+      55591
+    ],
+    "visit_reduction_pct": 92.81869302305753
+  },
+  "native_check": {
+    "random_cases": 10000,
+    "recorded_windows": 176,
+    "total_exact_swap_list_checks": 10176,
+    "passed": true
+  },
+  "cpu_replay": {
+    "scope": "Includes sorting, container copies, residency reconstruction and selection; excludes GPU, DMA and complete cache.adapt.",
+    "order": [
+      "A1",
+      "B1",
+      "A2",
+      "B2",
+      "A3"
+    ],
+    "unit": "microseconds_per_window",
+    "repeats_per_window": 20,
+    "all_arm_means": [
+      264.245142,
+      261.653352,
+      245.834233,
+      244.036563,
+      268.649034
+    ],
+    "paired": [
+      {
+        "baseline": 254.87350157979563,
+        "candidate": 261.653352,
+        "throughput_change_pct": -2.5911574869502796,
+        "baseline_drift_pct": -6.967359498325221
+      },
+      {
+        "baseline": 256.9885779943944,
+        "candidate": 244.036563,
+        "throughput_change_pct": 5.307407560232846,
+        "baseline_drift_pct": 9.280563053234324
+      }
+    ],
+    "required_both_throughput_changes_pct": 5,
+    "passed": false
+  },
+  "validation": "Frozen inputs, archived native check, all timings, CPU gate and rollback were audited. Full logs, routes, source snapshots and binaries stay local."
+}

@@ -36,29 +36,14 @@ namespace {
 std::atomic<bool> enabled{false};
 __dpct_inline__ float warp_sum(float value) {
 #pragma unroll
-    /*
-    DPCT1108: '__shfl_xor_sync' was migrated with the experimental feature
-    masked sub_group function which may not be supported by all compilers or
-    runtimes. You may need to adjust the code.
-    */
-    for (int mask = 16; mask; mask >>= 1) value +=
-        dpct::experimental::permute_sub_group_by_xor(
-            0xffffffffu, sycl::ext::oneapi::this_work_item::get_sub_group(),
-            value, mask);
+    for (int mask = 16; mask; mask >>= 1)
+        value += sycl::permute_group_by_xor(sycl::ext::oneapi::this_work_item::get_sub_group(), value, mask);
     return value;
 }
 __dpct_inline__ float warp_max(float value) {
 #pragma unroll
-    /*
-    DPCT1108: '__shfl_xor_sync' was migrated with the experimental feature
-    masked sub_group function which may not be supported by all compilers or
-    runtimes. You may need to adjust the code.
-    */
-    for (int mask = 16; mask; mask >>= 1) value = sycl::fmax(
-        value,
-        dpct::experimental::permute_sub_group_by_xor(
-            0xffffffffu, sycl::ext::oneapi::this_work_item::get_sub_group(),
-            value, mask));
+    for (int mask = 16; mask; mask >>= 1)
+        value = sycl::fmax(value, sycl::permute_group_by_xor(sycl::ext::oneapi::this_work_item::get_sub_group(), value, mask));
     return value;
 }
 /*

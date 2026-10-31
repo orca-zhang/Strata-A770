@@ -1,0 +1,178 @@
+{
+  "complete": true,
+  "date": "2026-10-24T12:24:56",
+  "purpose": "Preserve original FP16 padded-output semantics by retaining the original oneMKL call for ldy != N",
+  "regression_cases_before_fix": 82,
+  "regression_valid_matrix_differences": 0,
+  "regression_padding_float_differences": 55772,
+  "source_sha256": {
+    "include/strata/prefill/gemm.hpp": "0086abbd6d169177e449d47388a7639aea59e72dae3ebf14dca7ab9040f85da6",
+    "sycl/src/prefill/gemm.dp.cpp": "a1617f643ccb0ac47bb14db85208b5c9e2bd91715a1ead38e848b30cf0b460f2",
+    "sycl/src/prefill/gemm_parity.cpp": "3635559b28d07861443ad9509ad1abf3c3e4c126939c30567d2f3544b7c11bbd",
+    "sycl/src/prefill/prefill.cpp": "0697919ce830d355110bc6c40e734f64c2b0a9d48d9c0af4bf30c6d32a95c531"
+  },
+  "unchanged_runtime_sources": {
+    "include/strata/prefill/gemm.hpp": "0086abbd6d169177e449d47388a7639aea59e72dae3ebf14dca7ab9040f85da6",
+    "sycl/src/prefill/prefill.cpp": "0697919ce830d355110bc6c40e734f64c2b0a9d48d9c0af4bf30c6d32a95c531",
+    "sycl/src/kernels/cuda/sampler.dp.cpp": "7a49a2c2b137f3bfbb7ac5383be0e347f50eb958dbcb0fb9249d4204740a2ec5"
+  },
+  "build_sha256": "e73c0e1fc8098565b877a00363e803182e905fcd7d3576fec966672fc9ce56ad",
+  "binary_sha256": {
+    "parity": "5f9e77136abcfa2c1086e12e0835a24bb85dda190dcbe137a39b012db480d431",
+    "model": "ae56b5aef6d3aade6750428ad780a3129399f7a29c39363ae1838bbb33bba61e"
+  },
+  "unchanged_dependencies": 96,
+  "production_unchanged": true,
+  "production_sha256": {
+    "exe": "8f0d866ded297cf5a409e84cf5dd61f437c56c8a89aaeb2a85569265b6a3e122",
+    "config": "1a755372f0e6c90c0bfa2af865d67b51f8df49c10aa1613b041b08da8184ca88"
+  },
+  "parity": [
+    {
+      "directory": "prefill-widen-f16-stride/build",
+      "checks_per_arm": 1015,
+      "result_sha256": "2d9ddb3628afbe6c975c35c517285844bcd2b832b31693fa53a92d6670e721c4"
+    },
+    {
+      "directory": "prefill-widen-f16-stride/arena0",
+      "checks_per_arm": 1015,
+      "result_sha256": "18ad253d7b2992ae6240e2fcaf84c93b010cfeeeaddf267f876ee3f4df4ae530"
+    },
+    {
+      "directory": "prefill-widen-f16-stride/arena4",
+      "checks_per_arm": 1015,
+      "result_sha256": "7901c2528ac86c57a46d70c53d186679685f59d0a92abdd0036b3fd3722ea86a"
+    }
+  ],
+  "total_comparisons": 6090,
+  "model_outputs": [
+    {
+      "case": "Short",
+      "arms": 2,
+      "generated": 8,
+      "input_tokens": 23,
+      "tokens": [
+        29108,
+        4009,
+        27891,
+        8964,
+        579,
+        16078,
+        321,
+        1100
+      ],
+      "accepted": 5,
+      "offered": 6,
+      "trace_batches": [
+        [
+          [
+            0,
+            22
+          ]
+        ],
+        [
+          [
+            0,
+            22
+          ]
+        ]
+      ],
+      "result_sha256": "a4f7569a78e5b30b75744ca49b7aab39f5b3f576dc5729845359c2117289477d"
+    },
+    {
+      "case": "Code2K-256",
+      "arms": 1,
+      "generated": 8,
+      "input_tokens": 256,
+      "tokens": [
+        760,
+        3766,
+        1970,
+        41643,
+        10551,
+        264,
+        4281,
+        314
+      ],
+      "accepted": 5,
+      "offered": 5,
+      "trace_batches": [
+        [
+          [
+            0,
+            255
+          ]
+        ]
+      ],
+      "result_sha256": "fcff2825430f1016f01ddf8dd30c4bbd13aa899369514cbc554305010125a9be"
+    },
+    {
+      "case": "Prose2K-512",
+      "arms": 1,
+      "generated": 8,
+      "input_tokens": 512,
+      "tokens": [
+        760,
+        3766,
+        1414,
+        17855,
+        264,
+        25450,
+        321,
+        13987
+      ],
+      "accepted": 3,
+      "offered": 3,
+      "trace_batches": [
+        [
+          [
+            0,
+            256
+          ],
+          [
+            256,
+            255
+          ]
+        ]
+      ],
+      "result_sha256": "ad6785d85702a00d7b4f14d73d77e0e3e5a0a0b10b601411a83125baba721c3f"
+    },
+    {
+      "case": "combined-Short",
+      "arms": 1,
+      "generated": 8,
+      "input_tokens": 23,
+      "tokens": [
+        29108,
+        4009,
+        27891,
+        8964,
+        579,
+        16078,
+        321,
+        1100
+      ],
+      "accepted": 5,
+      "offered": 6,
+      "trace_batches": [
+        [
+          [
+            0,
+            22
+          ]
+        ]
+      ],
+      "result_sha256": "ce2ce09042c207463b5335ce9c6b21c9602bfb32aeeb9e4bf33a95728e573b49"
+    }
+  ],
+  "expert_slots": 4191,
+  "expert_cache_mib": 5760,
+  "initial_probe_excluded": "Its unchanged-padding assertion was invalid for the original oneMKL fallback; replaced with reference-byte equality",
+  "interrupted_model_attempt_excluded": true,
+  "model_comparisons": "Short same-binary FP16 off/on and combined; Code FP16 on and Prose combined compared to frozen references",
+  "performance_measured": false,
+  "model_speed_claim": false,
+  "default_switch": "off",
+  "full_2k_8k_batch_validation": false,
+  "docs_sha256": "fd2a247340b1ebe57a63d49cc48278ee9e33da9e53c4910a1e68a95dffe9ab10"
+}

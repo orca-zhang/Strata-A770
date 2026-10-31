@@ -1,0 +1,41 @@
+{
+  "complete": false,
+  "functional_only": true,
+  "prior_failure_sha256": "b560e8ca95eeca9fa533212cc8b967e7626a466d2bd4883b94127f231a95aa1e",
+  "requested_expert_cache": 4000,
+  "expert_slots": 4191,
+  "expert_cache_mib": 5760,
+  "steps": [
+    [
+      "G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\build_prefill_widen.py",
+      "--reuse",
+      "build-sycl-deepinfer-20261023\\prefill-widen-f16-stride-before-fix",
+      "--checks",
+      "1015",
+      "--out",
+      "G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-f16-stride\\build"
+    ],
+    [
+      "G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\test_gemm_arena.py",
+      "--build-root",
+      "G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-f16-stride\\build",
+      "--offset-gib",
+      "0",
+      "--checks",
+      "1015",
+      "--out",
+      "G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-f16-stride\\arena0"
+    ],
+    [
+      "G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\test_gemm_arena.py",
+      "--build-root",
+      "G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-f16-stride\\build",
+      "--offset-gib",
+      "4",
+      "--checks",
+      "1015",
+      "--out",
+      "G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-f16-stride\\arena4"
+    ]
+  ]
+}

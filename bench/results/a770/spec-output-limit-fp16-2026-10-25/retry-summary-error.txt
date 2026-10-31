@@ -1,0 +1,15 @@
+The full five-process confirmation retry completed and saved complete=true,
+confirm_passed=true, all samples, comparisons and raw SHA256 values.
+The subsequent summary print failed before the final protection check:
+
+  File "build-sycl-window-limit-fp16-20261025/confirm_retry.py", line 84, in <module>
+    main(sys.argv[1] if len(sys.argv) > 1 else None)
+  File "build-sycl-window-limit-fp16-20261025/confirm_retry.py", line 76, in main
+    print('DONE predefined screen/confirmation', data['screen_passed'], data['confirm_passed'], flush=True)
+                                                 ~~~~^^^^^^^^^^^^^^^^^
+KeyError: 'screen_passed'
+
+The executed script is preserved byte-for-byte against retry-preregistered.json.
+postcheck.py validates the saved samples and protection hashes without GPU use
+or resampling. confirm_retry-replay.py fixes only the summary print; syntax
+checked, not rerun for replacement timing samples.

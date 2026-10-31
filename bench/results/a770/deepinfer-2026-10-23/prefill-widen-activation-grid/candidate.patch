@@ -1,0 +1,13 @@
+--- baseline/gemm.dp.cpp
++++ candidate/gemm.dp.cpp
+@@ -738,8 +738,8 @@
+             }
+         }
+     });
+-    q->parallel_for(sycl::range<1>((size_t) T * K), [=](sycl::id<1> i) {
+-        const size_t offset = (size_t(i) / K) * ldx + size_t(i) % K;
++    q->parallel_for(sycl::range<2>(size_t(T), size_t(K)), [=](sycl::id<2> i) {
++        const size_t offset = i[0] * ldx + i[1];
+         const uint16_t v = X[offset];
+         xf[offset] = bf16 ? sycl::bit_cast<float>(uint32_t(v) << 16) : float(sycl::bit_cast<sycl::half>(v));
+     });

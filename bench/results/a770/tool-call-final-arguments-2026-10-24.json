@@ -1,0 +1,403 @@
+{
+  "scope": "CPU correctness only, MockEngine and fake local MCP; no model inference or performance measurement",
+  "environment": "Intel Xeon E5-2696 v4; Windows; Python 3.11.9",
+  "before_fix": {
+    "tests": 2,
+    "failures": [
+      [
+        "serve.test_server.UnfinishedToolCall.test_parser (end='</function>\\n', step=1)",
+        "Traceback (most recent call last):\n  File \"G:\\GitHub\\Strata\\serve\\test_server.py\", line 1157, in test_parser\n    self.assertEqual(calls[0].call.arguments, json.loads(streamed))\nAssertionError: {} != {'path': 'notes.txt', 'content': 'all of it'}\n- {}\n+ {'content': 'all of it', 'path': 'notes.txt'}\n"
+      ],
+      [
+        "serve.test_server.UnfinishedToolCall.test_parser (end='</function>\\n', step=7)",
+        "Traceback (most recent call last):\n  File \"G:\\GitHub\\Strata\\serve\\test_server.py\", line 1157, in test_parser\n    self.assertEqual(calls[0].call.arguments, json.loads(streamed))\nAssertionError: {} != {'path': 'notes.txt', 'content': 'all of it'}\n- {}\n+ {'content': 'all of it', 'path': 'notes.txt'}\n"
+      ],
+      [
+        "serve.test_server.UnfinishedToolCall.test_parser (end='</function>\\n', step=10000)",
+        "Traceback (most recent call last):\n  File \"G:\\GitHub\\Strata\\serve\\test_server.py\", line 1157, in test_parser\n    self.assertEqual(calls[0].call.arguments, json.loads(streamed))\nAssertionError: {} != {'path': 'notes.txt', 'content': 'all of it'}\n- {}\n+ {'content': 'all of it', 'path': 'notes.txt'}\n"
+      ],
+      [
+        "serve.test_server.UnfinishedToolCall.test_parser (end='ion>\\n</tool_', step=1)",
+        "Traceback (most recent call last):\n  File \"G:\\GitHub\\Strata\\serve\\test_server.py\", line 1157, in test_parser\n    self.assertEqual(calls[0].call.arguments, json.loads(streamed))\nAssertionError: {} != {'path': 'notes.txt', 'content': 'all of it'}\n- {}\n+ {'content': 'all of it', 'path': 'notes.txt'}\n"
+      ],
+      [
+        "serve.test_server.UnfinishedToolCall.test_parser (end='ion>\\n</tool_', step=7)",
+        "Traceback (most recent call last):\n  File \"G:\\GitHub\\Strata\\serve\\test_server.py\", line 1157, in test_parser\n    self.assertEqual(calls[0].call.arguments, json.loads(streamed))\nAssertionError: {} != {'path': 'notes.txt', 'content': 'all of it'}\n- {}\n+ {'content': 'all of it', 'path': 'notes.txt'}\n"
+      ],
+      [
+        "serve.test_server.UnfinishedToolCall.test_parser (end='ion>\\n</tool_', step=10000)",
+        "Traceback (most recent call last):\n  File \"G:\\GitHub\\Strata\\serve\\test_server.py\", line 1157, in test_parser\n    self.assertEqual(calls[0].call.arguments, json.loads(streamed))\nAssertionError: {} != {'path': 'notes.txt', 'content': 'all of it'}\n- {}\n+ {'content': 'all of it', 'path': 'notes.txt'}\n"
+      ],
+      [
+        "serve.test_server.UnfinishedToolCall.test_parser (end='</function>\\n', step=1)",
+        "Traceback (most recent call last):\n  File \"G:\\GitHub\\Strata\\serve\\test_server.py\", line 1157, in test_parser\n    self.assertEqual(calls[0].call.arguments, json.loads(streamed))\nAssertionError: {} != {'path': 'notes.txt', 'content': '123'}\n- {}\n+ {'content': '123', 'path': 'notes.txt'}\n"
+      ],
+      [
+        "serve.test_server.UnfinishedToolCall.test_parser (end='</function>\\n', step=7)",
+        "Traceback (most recent call last):\n  File \"G:\\GitHub\\Strata\\serve\\test_server.py\", line 1157, in test_parser\n    self.assertEqual(calls[0].call.arguments, json.loads(streamed))\nAssertionError: {} != {'path': 'notes.txt', 'content': '123'}\n- {}\n+ {'content': '123', 'path': 'notes.txt'}\n"
+      ],
+      [
+        "serve.test_server.UnfinishedToolCall.test_parser (end='</function>\\n', step=10000)",
+        "Traceback (most recent call last):\n  File \"G:\\GitHub\\Strata\\serve\\test_server.py\", line 1157, in test_parser\n    self.assertEqual(calls[0].call.arguments, json.loads(streamed))\nAssertionError: {} != {'path': 'notes.txt', 'content': '123'}\n- {}\n+ {'content': '123', 'path': 'notes.txt'}\n"
+      ],
+      [
+        "serve.test_mcp.ToolLoop.test_call_without_outer_close_keeps_arguments",
+        "Traceback (most recent call last):\n  File \"G:\\GitHub\\Strata\\serve\\test_mcp.py\", line 322, in test_call_without_outer_close_keeps_arguments\n    self.assertEqual(mcp[1][\"arguments\"], {\"a\": 2, \"b\": 3})\nAssertionError: {} != {'a': 2, 'b': 3}\n- {}\n+ {'a': 2, 'b': 3}\n"
+      ]
+    ],
+    "errors": []
+  },
+  "after_fix_precheck": {
+    "tests": 7,
+    "seconds": 3.835586900000635,
+    "names": [
+      "serve.test_server.UnfinishedToolCall",
+      "serve.test_mcp.ToolLoop.test_call_without_outer_close_keeps_arguments",
+      "serve.test_mcp.ToolLoop.test_a_call_the_output_ends_inside_is_not_run"
+    ],
+    "failures": [],
+    "errors": [],
+    "skipped": []
+  },
+  "arguments": {
+    "cases": 2000,
+    "parses": 4000,
+    "seed": 20261024,
+    "seconds": 1.2332927000024938,
+    "sha256": {
+      "build-sycl-a770-final-call-20261024/arguments-check.py": "69450c2783de9f4e56e78bf0926ad10b7b55e407cab869bab7aae438f9a07ecf",
+      "serve/frontend.py": "3c804a61c21af2645c91abf1babf0cf57020ac834e8ca5e5f018d88e5e4f1391"
+    }
+  },
+  "http": [
+    {
+      "ending": "whole",
+      "api": "openai",
+      "stream": false,
+      "finish": "tool_calls",
+      "arguments": {
+        "path": "notes.txt",
+        "content": "all of it"
+      }
+    },
+    {
+      "ending": "whole",
+      "api": "openai",
+      "stream": true,
+      "finish": "tool_calls",
+      "arguments": {
+        "path": "notes.txt",
+        "content": "all of it"
+      }
+    },
+    {
+      "ending": "whole",
+      "api": "anthropic",
+      "stream": false,
+      "finish": "tool_use",
+      "arguments": {
+        "path": "notes.txt",
+        "content": "all of it"
+      }
+    },
+    {
+      "ending": "whole",
+      "api": "anthropic",
+      "stream": true,
+      "finish": "tool_use",
+      "arguments": {
+        "path": "notes.txt",
+        "content": "all of it"
+      }
+    },
+    {
+      "ending": "missing_close",
+      "api": "openai",
+      "stream": false,
+      "finish": "tool_calls",
+      "arguments": {
+        "path": "notes.txt",
+        "content": "all of it"
+      }
+    },
+    {
+      "ending": "missing_close",
+      "api": "openai",
+      "stream": true,
+      "finish": "tool_calls",
+      "arguments": {
+        "path": "notes.txt",
+        "content": "all of it"
+      }
+    },
+    {
+      "ending": "missing_close",
+      "api": "anthropic",
+      "stream": false,
+      "finish": "tool_use",
+      "arguments": {
+        "path": "notes.txt",
+        "content": "all of it"
+      }
+    },
+    {
+      "ending": "missing_close",
+      "api": "anthropic",
+      "stream": true,
+      "finish": "tool_use",
+      "arguments": {
+        "path": "notes.txt",
+        "content": "all of it"
+      }
+    },
+    {
+      "ending": "whole",
+      "api": "responses",
+      "stream": false,
+      "arguments": {
+        "cmd": "cat a.txt"
+      },
+      "status": "completed"
+    },
+    {
+      "ending": "whole",
+      "api": "responses",
+      "stream": true,
+      "arguments": {
+        "cmd": "cat a.txt"
+      },
+      "status": "completed"
+    },
+    {
+      "ending": "missing_close",
+      "api": "responses",
+      "stream": false,
+      "arguments": {
+        "cmd": "cat a.txt"
+      },
+      "status": "completed"
+    },
+    {
+      "ending": "missing_close",
+      "api": "responses",
+      "stream": true,
+      "arguments": {
+        "cmd": "cat a.txt"
+      },
+      "status": "completed"
+    }
+  ],
+  "http_requests": 12,
+  "first_regression": {
+    "tests": 468,
+    "seconds": 714.0838340999981,
+    "failures": [
+      [
+        "serve.test_slots.Slots.test_progress_ends_the_allowance",
+        "Traceback (most recent call last):\n  File \"G:\\GitHub\\Strata\\serve\\test_slots.py\", line 319, in test_progress_ends_the_allowance\n    self.assertEqual(s, 500, b)\nAssertionError: 200 != 500 : {'id_slot': 0, 'filename': 'reset.bin', 'n_saved': 1, 'n_written': 2, 'timings': {'save_ms': 1.0}}\n"
+      ]
+    ],
+    "errors": [
+      [
+        "serve.test_server.StreamingGzip.test_all_apis_and_unicode (path='/v1/messages', encoding='gzip')",
+        "Traceback (most recent call last):\n  File \"G:\\GitHub\\Strata\\serve\\test_server.py\", line 117, in test_all_apis_and_unicode\n    wire = response.read()\n           ^^^^^^^^^^^^^^^\n  File \"C:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\http\\client.py\", line 486, in read\n    s = self.fp.read()\n        ^^^^^^^^^^^^^^\n  File \"C:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\socket.py\", line 706, in readinto\n    return self._sock.recv_into(b)\n           ^^^^^^^^^^^^^^^^^^^^^^^\nTimeoutError: timed out\n"
+      ]
+    ],
+    "skipped": [
+      [
+        "serve.test_detok.Detok.test_constant_cost",
+        "no pack tokenizer here"
+      ],
+      [
+        "serve.test_detok.Detok.test_random_ids_and_broken_bytes",
+        "no pack tokenizer here"
+      ],
+      [
+        "serve.test_detok.Detok.test_text_with_split_characters",
+        "no pack tokenizer here"
+      ],
+      [
+        "serve.test_detok.HeapBpe.test_pack_vocab",
+        "no pack tokenizer here"
+      ],
+      [
+        "serve.test_detok.HeapBpe.test_speed_pack",
+        "no pack tokenizer here"
+      ],
+      [
+        "serve.test_slots.Slots.test_restore_of_a_link_reaches_the_engine_which_decides",
+        "symlinks need privileges on Windows"
+      ],
+      [
+        "serve.test_structured.Structured.test_invalid_generation_is_an_error_and_never_streams_content",
+        "jsonschema is not installed"
+      ],
+      [
+        "serve.test_structured.Structured.test_invalid_schema_is_400_and_local_refs_work",
+        "jsonschema is not installed"
+      ]
+    ],
+    "sha256": {
+      "serve/__init__.py": "5b38172f894574bf933b1e932a2dace1c113184f105bcd7db8718e6330f809c2",
+      "serve/frontend.py": "3c804a61c21af2645c91abf1babf0cf57020ac834e8ca5e5f018d88e5e4f1391",
+      "serve/mcp.py": "4cd9f18d427123e7080cb2a1b937b7c8ede401378c3485bc142db40b9655be0b",
+      "serve/mcp_fake_server.py": "484a5202e378fb61aa2baf4adea106f13f95696c1719a054d68c7a167e9e5325",
+      "serve/responses.py": "9f3bef6172df48a80918efb27ffed7be55e67d7c320a8e5a33682c7c12c3b604",
+      "serve/runconfig.py": "b479b7f65067d1b85f8d3f36fca29772cf1307aecf2298d80e5e40f6955ffe4a",
+      "serve/server.py": "219268dd6b70322a097d720cee7e589d129fce55df240fed48f5837cbd0ad6d5",
+      "serve/structured.py": "1324728a86ff7a1a23a6a0db144acc6a1d5764deb15badd167d36d619cf94e57",
+      "serve/telemetry.py": "611ce7043ad316793569de52c0f9f4f57c3dd1ffa77f9e41ef85b65189a2873b",
+      "serve/test_control_cancel.py": "a1eda9d7ee61b2d8da26579cf968f15e4d2870a839a7c47c2077e1df58aa3e36",
+      "serve/test_detok.py": "f666a94c12fa4697537cd600ec2c1fb0b1f8b52f2e765016425018a5b195c1c7",
+      "serve/test_fatal_recovery.py": "f14477565a472608bed122258066b91676a16ec76d97a4fb9b54ea62ae8639b6",
+      "serve/test_frontend.py": "62099f4db00daac9f324efa0ff6313e1e1a9cbb167ce7d62d7ec8dc1cd91f7f1",
+      "serve/test_lifecycle.py": "bc7334530c0900db675a7c73b079d3565a1e456c3d6cfdc04760e8479e4ec320",
+      "serve/test_mcp.py": "3382c9a2aa22dd516470d82a7ced0fe32ae4b448da8c1e66f16b13d7e4bb394a",
+      "serve/test_monitor.py": "7face289d89c1bec38b5fae0334fc2f88e2e98b7aa151b8ea640437d5890292a",
+      "serve/test_parallel.py": "2326d767050db0e752671991d7bf99e23a367d99227d914cc31409a348ca8873",
+      "serve/test_reasoning_loop_recovery.py": "4a89bf1fa248196efd728ef374b1274fc764577d63f400ad317866973e8e5a96",
+      "serve/test_reasoning_rescue.py": "e816896e9d4f74e8db0dc4cc3460d8698d25833c6beadce99619fc55df2d0b1e",
+      "serve/test_reasoning_tools.py": "3c009fe9fb7585b182b84b0fc45e4c7370965ebe7e6ff673302f8bf6315126d8",
+      "serve/test_responses.py": "cdd2f7e3aa47b6c2e479e20fd612932b66d574f76ee21c78cd9d4c4c20ca7927",
+      "serve/test_restart_waiters.py": "b35f1d486fc2d76854ff69fc1a62141881d47df98926b7f677bbaa21741421ab",
+      "serve/test_runconfig.py": "cd968de92873d64cb056d12b3639ccff67616b3fe308e7ed8cadf0a2ec717365",
+      "serve/test_security.py": "a6867eec898088f6eba83878ab5edc983896a6f7c55da91d77f931be314b3d05",
+      "serve/test_server.py": "e8853c02f425f21ef6e1f86e373d7a58e74b6d3e9bdb2d5635ea378ea14a2c64",
+      "serve/test_slots.py": "0b67a4dfe80239a721e2f7d67356d6168da0c1b07b17b1d5b696b869f7d95ee2",
+      "serve/test_structured.py": "74e4cba79bcc1bf6eaa1bc8bcfc6d0a6abf14385b92e719917f2e7bc2b8dc7ef",
+      "serve/test_vram.py": "a908f82e4bbc11621848cfe420cceb3eb4de92a2e6aeb9e16f130c5929a7d71b",
+      "serve/test_winjob.py": "e305a9aa79d53f6652e345c22ca55f6f3f8c4ccf20b05f67b6331328b6205f2e",
+      "serve/winjob.py": "736ee937e58438a4599b25d576a97cb3680cb963f50976abecc25038ef20740f"
+    },
+    "source_unchanged": true
+  },
+  "timing_precheck": {
+    "tests": 37,
+    "seconds": 6.5828138000069885,
+    "names": [
+      "serve.test_server.StreamingGzip",
+      "serve.test_slots.SessionTimeouts",
+      "serve.test_slots.Slots"
+    ],
+    "failures": [],
+    "errors": [],
+    "skipped": [
+      [
+        "serve.test_slots.Slots.test_restore_of_a_link_reaches_the_engine_which_decides",
+        "symlinks need privileges on Windows"
+      ]
+    ]
+  },
+  "regression": {
+    "tests": 468,
+    "seconds": 488.2495914000028,
+    "failures": [],
+    "errors": [],
+    "skipped": [
+      [
+        "serve.test_detok.Detok.test_constant_cost",
+        "no pack tokenizer here"
+      ],
+      [
+        "serve.test_detok.Detok.test_random_ids_and_broken_bytes",
+        "no pack tokenizer here"
+      ],
+      [
+        "serve.test_detok.Detok.test_text_with_split_characters",
+        "no pack tokenizer here"
+      ],
+      [
+        "serve.test_detok.HeapBpe.test_pack_vocab",
+        "no pack tokenizer here"
+      ],
+      [
+        "serve.test_detok.HeapBpe.test_speed_pack",
+        "no pack tokenizer here"
+      ],
+      [
+        "serve.test_slots.Slots.test_restore_of_a_link_reaches_the_engine_which_decides",
+        "symlinks need privileges on Windows"
+      ],
+      [
+        "serve.test_structured.Structured.test_invalid_generation_is_an_error_and_never_streams_content",
+        "jsonschema is not installed"
+      ],
+      [
+        "serve.test_structured.Structured.test_invalid_schema_is_400_and_local_refs_work",
+        "jsonschema is not installed"
+      ]
+    ],
+    "sha256": {
+      "serve/__init__.py": "5b38172f894574bf933b1e932a2dace1c113184f105bcd7db8718e6330f809c2",
+      "serve/frontend.py": "3c804a61c21af2645c91abf1babf0cf57020ac834e8ca5e5f018d88e5e4f1391",
+      "serve/mcp.py": "4cd9f18d427123e7080cb2a1b937b7c8ede401378c3485bc142db40b9655be0b",
+      "serve/mcp_fake_server.py": "484a5202e378fb61aa2baf4adea106f13f95696c1719a054d68c7a167e9e5325",
+      "serve/responses.py": "9f3bef6172df48a80918efb27ffed7be55e67d7c320a8e5a33682c7c12c3b604",
+      "serve/runconfig.py": "b479b7f65067d1b85f8d3f36fca29772cf1307aecf2298d80e5e40f6955ffe4a",
+      "serve/server.py": "219268dd6b70322a097d720cee7e589d129fce55df240fed48f5837cbd0ad6d5",
+      "serve/structured.py": "1324728a86ff7a1a23a6a0db144acc6a1d5764deb15badd167d36d619cf94e57",
+      "serve/telemetry.py": "611ce7043ad316793569de52c0f9f4f57c3dd1ffa77f9e41ef85b65189a2873b",
+      "serve/test_control_cancel.py": "a1eda9d7ee61b2d8da26579cf968f15e4d2870a839a7c47c2077e1df58aa3e36",
+      "serve/test_detok.py": "f666a94c12fa4697537cd600ec2c1fb0b1f8b52f2e765016425018a5b195c1c7",
+      "serve/test_fatal_recovery.py": "f14477565a472608bed122258066b91676a16ec76d97a4fb9b54ea62ae8639b6",
+      "serve/test_frontend.py": "62099f4db00daac9f324efa0ff6313e1e1a9cbb167ce7d62d7ec8dc1cd91f7f1",
+      "serve/test_lifecycle.py": "bc7334530c0900db675a7c73b079d3565a1e456c3d6cfdc04760e8479e4ec320",
+      "serve/test_mcp.py": "3382c9a2aa22dd516470d82a7ced0fe32ae4b448da8c1e66f16b13d7e4bb394a",
+      "serve/test_monitor.py": "7face289d89c1bec38b5fae0334fc2f88e2e98b7aa151b8ea640437d5890292a",
+      "serve/test_parallel.py": "2326d767050db0e752671991d7bf99e23a367d99227d914cc31409a348ca8873",
+      "serve/test_reasoning_loop_recovery.py": "4a89bf1fa248196efd728ef374b1274fc764577d63f400ad317866973e8e5a96",
+      "serve/test_reasoning_rescue.py": "e816896e9d4f74e8db0dc4cc3460d8698d25833c6beadce99619fc55df2d0b1e",
+      "serve/test_reasoning_tools.py": "3c009fe9fb7585b182b84b0fc45e4c7370965ebe7e6ff673302f8bf6315126d8",
+      "serve/test_responses.py": "cdd2f7e3aa47b6c2e479e20fd612932b66d574f76ee21c78cd9d4c4c20ca7927",
+      "serve/test_restart_waiters.py": "b35f1d486fc2d76854ff69fc1a62141881d47df98926b7f677bbaa21741421ab",
+      "serve/test_runconfig.py": "cd968de92873d64cb056d12b3639ccff67616b3fe308e7ed8cadf0a2ec717365",
+      "serve/test_security.py": "a6867eec898088f6eba83878ab5edc983896a6f7c55da91d77f931be314b3d05",
+      "serve/test_server.py": "974d15f9297879c534116c2f3d37d293592c3cec0d4152505ac4918f6941b4bb",
+      "serve/test_slots.py": "05a9e50fc921e8a25543881c8629ec75fa7ee918fefd94421ae8ef90fa929852",
+      "serve/test_structured.py": "74e4cba79bcc1bf6eaa1bc8bcfc6d0a6abf14385b92e719917f2e7bc2b8dc7ef",
+      "serve/test_vram.py": "a908f82e4bbc11621848cfe420cceb3eb4de92a2e6aeb9e16f130c5929a7d71b",
+      "serve/test_winjob.py": "e305a9aa79d53f6652e345c22ca55f6f3f8c4ccf20b05f67b6331328b6205f2e",
+      "serve/winjob.py": "736ee937e58438a4599b25d576a97cb3680cb963f50976abecc25038ef20740f"
+    },
+    "source_unchanged": true
+  },
+  "protected_files_unchanged": true,
+  "sha256": {
+    "build-sycl-a770-final-call-20261024/before/serve/frontend.py": "e7a093ae01802e4bbd1959c11aaaa5efae85ab932f5caa98cdb3c007c3936281",
+    "build-sycl-a770-final-call-20261024/before/serve/server.py": "219268dd6b70322a097d720cee7e589d129fce55df240fed48f5837cbd0ad6d5",
+    "build-sycl-a770-final-call-20261024/before/serve/test_mcp.py": "e8b90d95730751f639c821a9a6bbc87351d51ce682ee5f63796065e5c6d406e6",
+    "build-sycl-a770-final-call-20261024/before/serve/test_server.py": "3998d283e0cbf07a15a1c4117fb88df3a15a4a8d538704ce0a8231295b583977",
+    "build-sycl-a770-final-call-20261024/before/serve/test_slots.py": "0b67a4dfe80239a721e2f7d67356d6168da0c1b07b17b1d5b696b869f7d95ee2",
+    "build-sycl-a770-final-call-20261024/after/serve/frontend.py": "3c804a61c21af2645c91abf1babf0cf57020ac834e8ca5e5f018d88e5e4f1391",
+    "build-sycl-a770-final-call-20261024/after/serve/server.py": "219268dd6b70322a097d720cee7e589d129fce55df240fed48f5837cbd0ad6d5",
+    "build-sycl-a770-final-call-20261024/after/serve/test_mcp.py": "3382c9a2aa22dd516470d82a7ced0fe32ae4b448da8c1e66f16b13d7e4bb394a",
+    "build-sycl-a770-final-call-20261024/after/serve/test_server.py": "e8853c02f425f21ef6e1f86e373d7a58e74b6d3e9bdb2d5635ea378ea14a2c64",
+    "build-sycl-a770-final-call-20261024/after/serve/test_slots.py": "0b67a4dfe80239a721e2f7d67356d6168da0c1b07b17b1d5b696b869f7d95ee2",
+    "build-sycl-a770-final-call-20261024/after-final/serve/frontend.py": "3c804a61c21af2645c91abf1babf0cf57020ac834e8ca5e5f018d88e5e4f1391",
+    "build-sycl-a770-final-call-20261024/after-final/serve/server.py": "219268dd6b70322a097d720cee7e589d129fce55df240fed48f5837cbd0ad6d5",
+    "build-sycl-a770-final-call-20261024/after-final/serve/test_mcp.py": "3382c9a2aa22dd516470d82a7ced0fe32ae4b448da8c1e66f16b13d7e4bb394a",
+    "build-sycl-a770-final-call-20261024/after-final/serve/test_server.py": "974d15f9297879c534116c2f3d37d293592c3cec0d4152505ac4918f6941b4bb",
+    "build-sycl-a770-final-call-20261024/after-final/serve/test_slots.py": "05a9e50fc921e8a25543881c8629ec75fa7ee918fefd94421ae8ef90fa929852",
+    "build-sycl-a770-final-call-20261024/after-fix.json": "d637b6c7a7b5f29bb29d48d7296f3f98439812d0485a4805fa33818951ed570a",
+    "build-sycl-a770-final-call-20261024/arguments-check.json": "fa3942a6d39aa4829755c3239b2a80ac490071f3fde3e3d75a2d8efbce9612af",
+    "build-sycl-a770-final-call-20261024/before-fix.json": "8d405ad8573a17cebef4787e4309dd66379d15d3cb8b42b9f311823be076627d",
+    "build-sycl-a770-final-call-20261024/http-arguments.json": "0971aa8cc6b019940ad7212399248a783cd452c0a78844ae162355d96c32e0d4",
+    "build-sycl-a770-final-call-20261024/http-responses.json": "e18cd9937bb98ad8a67eaea636305e00fb534e865ca0109a22e291031174c1f8",
+    "build-sycl-a770-final-call-20261024/initial.json": "880e4f02e3ec7b687d920a0ac854375f334c4208243467786675625599ec4ab3",
+    "build-sycl-a770-final-call-20261024/regression-final.json": "0161e4ca87c5aefafb6f08461a3f9f8c40e7851f0ea321c0edf375bf37cb00b4",
+    "build-sycl-a770-final-call-20261024/regression.json": "cb599de36f4e15b545f1bf75eb95eb405ad3b46857171a84496b7c49569d1e4a",
+    "build-sycl-a770-final-call-20261024/timing-check.json": "f0ae6abca801518d954b5978659237a748d3eecfca927c518ed90393a581a837",
+    "build-sycl-a770-final-call-20261024/after-fix.log": "ff03b9fec31776feadacf33b757eaac7547b620c91832d3cac30c27c4ab364ed",
+    "build-sycl-a770-final-call-20261024/before-fix.log": "ae60a68abdac1f5ca3c7959001cef5a0241e20a2625b99c79d268b3a5a701627",
+    "build-sycl-a770-final-call-20261024/http-arguments.log": "90686dc01977d03ff8b7d53a02bee664dbda43b4feb8bae36cca256c5508f9f9",
+    "build-sycl-a770-final-call-20261024/http-responses.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-sycl-a770-final-call-20261024/regression-final.log": "61182023bdbf15db1eb6081473e808edca5eddf36c2818bcc382396ccf1fcac7",
+    "build-sycl-a770-final-call-20261024/regression.log": "b89744ab44634a71be4a7f997d026fb8b0d79b69c8c11ac00df96902fb70d5de",
+    "build-sycl-a770-final-call-20261024/timing-check.log": "4e6e6a09d9096c74173e41aa765aa7505e9d4ff970ee3b83b9c64fb3b623451e",
+    "build-sycl-a770-final-call-20261024/arguments-check.py": "69450c2783de9f4e56e78bf0926ad10b7b55e407cab869bab7aae438f9a07ecf",
+    "build-sycl-a770-final-call-20261024/check.py": "385ddf9ffb81e41f29b52e8dde11baed101df82d0821d5dc26f7896f0e0a0ac1",
+    "build-sycl-a770-final-call-20261024/regression-final.py": "c93b8bf24537de92957b1f4f8e1a73ff6d11c824055ac8e33ecc0f791b949c36",
+    "build-sycl-a770-final-call-20261024/regression.py": "eddc5406f9587ef28598bb5f02e95f2aa520a11cc5dba65b111879fe4e5c4161",
+    "bench/results/a770/tool-call-final-arguments-2026-10-24.md": "b88f5008496be5848cdf88661ce551523b06654fd0f26f111e06afe45da5f32a"
+  }
+}

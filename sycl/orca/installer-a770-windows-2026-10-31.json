@@ -1,0 +1,39 @@
+{
+  "complete": true,
+  "check_passed": true,
+  "date": "2026-10-31",
+  "scope": "CPU-only setup regression on Windows, with mocked Windows and Linux inventory/profiles; no production config or service changed",
+  "command": [
+    "python",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tools",
+    "-p",
+    "test_setup_*.py"
+  ],
+  "exit_code": 0,
+  "tests_passed": 350,
+  "linux_execution_validated": false,
+  "gpu_performance_measurement": false,
+  "source_sha256": {
+    "setup.py": "caffb82b82cb82f96e7c951521c198e3a1c6329bfc7c2a42a2d8750c8ef6fe4d",
+    "sycl/setup_intel.py": "a5f74cd478ffac8eabd44c22f8bfa47cb8d141603116af2ea1f4f96e9f254303",
+    "tools/test_setup_sycl.py": "f0daf8e71438b8512f8de4e933704bb6282f351ae564c767957721edbc885da2",
+    "tools/test_setup_intel_windows.py": "d4d6f5b4eac583711539806ffaf74f0aa7b96e6a2fa0dc99c5a3928ffacbf603",
+    "tools/test_setup_golden.py": "0d98c84d92b494a3bef1f060a704d54150438dcad7124b8838877d99ddbdcdc2"
+  },
+  "covered": [
+    "automatic native Arc routing and explicit backend/CUDA precedence",
+    "saved Intel profiles activate selected runtime before launch",
+    "backup before SYCL/Orca conversion",
+    "custom saved native executable/images/library directories",
+    "native conversion preserves engine arguments, sampling and custom environment",
+    "selectors and stale memory estimates removed",
+    "Linux /work paths, repeated/scaled control vectors, traversal refusal",
+    "repeated native starts do not rewrite config",
+    "explicit SYCL selection restores baseline",
+    "startup port, browser, host/API-key and VRAM reserve options are honored on existing profiles"
+  ]
+}

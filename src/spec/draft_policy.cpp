@@ -2,6 +2,7 @@
 #include "strata/spec/draft_policy.hpp"
 
 #include <algorithm>
+#include <cmath>
 
 namespace strata::spec {
 namespace {
@@ -20,6 +21,27 @@ constexpr double kPriorN = 4.0;
 constexpr int kProbes = 3;       // a lookup window size is tried this often before its guessed cost can veto it
 
 }  // namespace
+
+int mtp_confidence_window(int max_t, const float* probs, float min_p, float cumulative_min_p, float last_min_p) {
+    const int cap = std::clamp(max_t, 1, DraftPolicy::kMaxT);
+    if (min_p <= 0.0f && cumulative_min_p <= 0.0f) return cap;
+    if (probs == nullptr) return 1;
+    int t = 1;
+    double cumulative = 1.0;
+    while (t < cap) {
+        const float p = probs[t - 1];
+        const float floor = t == 4 && cap == 5 && last_min_p >= 0.0f ? last_min_p : min_p;
+        if (min_p > 0.0f && !(p >= floor)) break;
+        if (cumulative_min_p > 0.0f) {
+            // ponytail: confidence products are a heuristic; measured window costs remain a separate policy.
+            if (!(p >= 0.0f && p <= 1.0f)) break;
+            cumulative *= p;
+            if (cumulative < cumulative_min_p) break;
+        }
+        ++t;
+    }
+    return t;
+}
 
 DraftPolicy::DraftPolicy(int max_t, double margin)
     : max_t_(std::clamp(max_t, 1, kMaxT)), margin_(margin) {}
@@ -82,6 +104,7 @@ DraftPolicy::Pick DraftPolicy::choose(int t_mtp, int lookup_k, int match) const 
 }
 
 void DraftPolicy::observe(bool lookup, int t, int accepted, int match, double round_ms) {
+    if (!std::isfinite(round_ms) || round_ms <= 0 || t < 1 || t > max_t_ || accepted < 0 || accepted >= t) return;
     t = std::clamp(t, 1, kMaxT);
     if (round_ms > 0) {
         cost_[t] = cost_n_[t] > 0 ? (1.0 - kCostAlpha) * cost_[t] + kCostAlpha * round_ms : round_ms;
@@ -95,7 +118,28 @@ void DraftPolicy::observe(bool lookup, int t, int accepted, int match, double ro
         const double got = accepted + 1.0;
         mtp_tok_[t] = mtp_n_[t] > 0 ? (1.0 - kTokAlpha) * mtp_tok_[t] + kTokAlpha * got : got;
         mtp_n_[t] += 1.0;
+        ++mtp_rounds_;
+        // ponytail: learn every observed prefix; do not infer the unseen suffix after a shortened window.
+        for (int u = 1; u <= t; ++u) {
+            const double tokens = std::min(accepted, u - 1) + 1.0;
+            prefix_tok_[u] = prefix_n_[u] > 0 ? (1.0 - kTokAlpha) * prefix_tok_[u] + kTokAlpha * tokens : tokens;
+            prefix_n_[u] += 1.0;
+        }
     }
+}
+
+int DraftPolicy::choose_mtp(int threshold_t) const {
+    const int cap = std::clamp(threshold_t, 1, max_t_);
+    if (cap == 1 || mtp_rounds_ < 8 || (mtp_rounds_ + 1) % 16 == 0 || prefix_n_[cap] < 8) return cap;
+    int best_t = cap;
+    double best = prefix_tok_[cap] / cost_ms(cap);
+    const double floor = best * (1.0 + margin_);
+    for (int t = 1; t < cap; ++t) {
+        if (prefix_n_[t] < 8) continue;
+        const double rate = prefix_tok_[t] / cost_ms(t);
+        if (rate > floor && rate > best) { best = rate; best_t = t; }
+    }
+    return best_t;
 }
 
 double DraftPolicy::chain_rate(int match) const {
@@ -127,6 +171,8 @@ int DraftPolicy::chain(int t_mtp, double p_mtp, int k_avail, int match) const {
 }
 
 void DraftPolicy::observe_chain(int t_mtp, int k, int accepted, int match, double round_ms) {
+    if (!std::isfinite(round_ms) || round_ms <= 0 || t_mtp < 1 || k < 0 ||
+        t_mtp + k > max_t_ || accepted < 0 || accepted >= t_mtp + k) return;
     const int t = std::clamp(t_mtp + k, 1, kMaxT);
     if (round_ms > 0) {
         cost_[t] = cost_n_[t] > 0 ? (1.0 - kCostAlpha) * cost_[t] + kCostAlpha * round_ms : round_ms;

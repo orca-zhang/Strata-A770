@@ -61,16 +61,15 @@ __dpct_inline__ float softplus_dev(float x) {
 __dpct_inline__ void gdn_gate_kernel(const float *__restrict__ alpha,
                                      const float *__restrict__ dt,
                                      const float *__restrict__ ssm_a,
-                                     float *__restrict__ gate, int64_t h_v) {
+                                             float *__restrict__ gate, int64_t n,
+                                             int64_t h_v) {
     auto item_ct1 = sycl::ext::oneapi::this_work_item::get_nd_item<3>();
     const int64_t i =
         (int64_t)item_ct1.get_group(2) * item_ct1.get_local_range(2) +
         item_ct1.get_local_id(2);
-    if (i >= h_v) return;
-    const int64_t t = i / h_v;      // `n_tokens` is the leading dim; the real call has one token
+    if (i >= n) return;
     const int64_t h = i % h_v;
     gate[i] = softplus_dev(alpha[i] + dt[h]) * ssm_a[h];
-    (void) t;
 }
 
 __dpct_inline__ void scale_kernel(float *__restrict__ x, int64_t n, float s) {
@@ -237,7 +236,7 @@ void gdn_gate(const float* alpha, const float* dt, const float* ssm_a, float* ga
                                       sycl::range(1, 1, THREADS),
                                   sycl::range(1, 1, THREADS)),
                 exp_props, [=](sycl::nd_item<3> item_ct1) {
-                    gdn_gate_kernel(alpha, dt, ssm_a, gate, h_v);
+                    gdn_gate_kernel(alpha, dt, ssm_a, gate, n, h_v);
                 });
     }
     check_launch("gdn_gate");

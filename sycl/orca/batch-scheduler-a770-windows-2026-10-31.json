@@ -1,0 +1,221 @@
+{
+  "complete": true,
+  "check_passed": true,
+  "performance_measurement": false,
+  "linux_gpu_validated": false,
+  "commands": [
+    {
+      "label": "apply-scheduler",
+      "command": [
+        "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Python311\\python.exe",
+        "G:\\GitHub\\Strata\\build-orca-native-20261029\\port-batch-program.py",
+        "--apply"
+      ],
+      "exit_code": 0,
+      "log_sha256": "93bc6d81a1a902a6a253e2ef4dee5a5f619050bccf7439c5d3789d03bbdf3406"
+    },
+    {
+      "label": "build-and-components",
+      "command": [
+        "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Python311\\python.exe",
+        "G:\\GitHub\\Strata\\build-orca-native-20261029\\check-batch-scheduler-components.py"
+      ],
+      "exit_code": 0,
+      "log_sha256": "d82adc8164b8078b1265664a2a4f745bdb3d4a9ac5d317cc28e48a153687eec0"
+    },
+    {
+      "label": "plain-batch-2",
+      "command": [
+        "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Python311\\python.exe",
+        "G:\\GitHub\\Strata\\tools\\batch_test.py",
+        "--exe",
+        "G:\\GitHub\\Strata\\build-orca-native-20261029\\clean-root-orca-1793380617150969000\\build\\orca\\strata.exe",
+        "--config",
+        "G:\\GitHub\\Strata\\build-orca-native-20261029\\batch-scheduler-check-1793387058187693700\\config.json",
+        "--batch",
+        "2",
+        "--n",
+        "2",
+        "--max-new",
+        "64",
+        "--keys",
+        "temperature=0",
+        "--dump",
+        "G:\\GitHub\\Strata\\build-orca-native-20261029\\batch-scheduler-check-1793387058187693700\\plain-batch-2.json"
+      ],
+      "exit_code": 0,
+      "log_sha256": "fb895721f16347040eecf669266e6c83802cead80fa6b130c7ebedb3e9eb2a38"
+    },
+    {
+      "label": "plain-batch-4",
+      "command": [
+        "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Python311\\python.exe",
+        "G:\\GitHub\\Strata\\tools\\batch_test.py",
+        "--exe",
+        "G:\\GitHub\\Strata\\build-orca-native-20261029\\clean-root-orca-1793380617150969000\\build\\orca\\strata.exe",
+        "--config",
+        "G:\\GitHub\\Strata\\build-orca-native-20261029\\batch-scheduler-check-1793387058187693700\\config.json",
+        "--batch",
+        "4",
+        "--n",
+        "4",
+        "--max-new",
+        "64",
+        "--keys",
+        "temperature=0",
+        "--dump",
+        "G:\\GitHub\\Strata\\build-orca-native-20261029\\batch-scheduler-check-1793387058187693700\\plain-batch-4.json"
+      ],
+      "exit_code": 0,
+      "log_sha256": "a3da2ca45d2857b94573a69192caa52f4f233ff1eb7e0c15bc3292567ffb772a"
+    },
+    {
+      "label": "plain-batch-8",
+      "command": [
+        "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Python311\\python.exe",
+        "G:\\GitHub\\Strata\\tools\\batch_test.py",
+        "--exe",
+        "G:\\GitHub\\Strata\\build-orca-native-20261029\\clean-root-orca-1793380617150969000\\build\\orca\\strata.exe",
+        "--config",
+        "G:\\GitHub\\Strata\\build-orca-native-20261029\\batch-scheduler-check-1793387058187693700\\config.json",
+        "--batch",
+        "8",
+        "--n",
+        "8",
+        "--max-new",
+        "64",
+        "--keys",
+        "temperature=0",
+        "--dump",
+        "G:\\GitHub\\Strata\\build-orca-native-20261029\\batch-scheduler-check-1793387058187693700\\plain-batch-8.json"
+      ],
+      "exit_code": 0,
+      "log_sha256": "5e15256fa675fc2ee8174781316229e9e02198fe12b99686dc8625bb4d52a86b"
+    },
+    {
+      "label": "sampled-batch-2",
+      "command": [
+        "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Python311\\python.exe",
+        "G:\\GitHub\\Strata\\tools\\batch_test.py",
+        "--exe",
+        "G:\\GitHub\\Strata\\build-orca-native-20261029\\clean-root-orca-1793380617150969000\\build\\orca\\strata.exe",
+        "--config",
+        "G:\\GitHub\\Strata\\build-orca-native-20261029\\batch-scheduler-check-1793387058187693700\\config.json",
+        "--batch",
+        "2",
+        "--n",
+        "2",
+        "--max-new",
+        "64",
+        "--keys",
+        "temperature=0.7 top_k=20 seed=123",
+        "--dump",
+        "G:\\GitHub\\Strata\\build-orca-native-20261029\\batch-scheduler-check-1793387058187693700\\sampled-batch-2.json"
+      ],
+      "exit_code": 0,
+      "log_sha256": "2cefb2dca28e1d710c9830c83bf3f71fed00853cffacc9e18c88f3ca8b3b362f"
+    },
+    {
+      "label": "batch-interleave-fixed-placement",
+      "command": [
+        "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Python311\\python.exe",
+        "G:\\GitHub\\Strata\\tools\\batch_interleave_test.py",
+        "--exe",
+        "G:\\GitHub\\Strata\\build-orca-native-20261029\\clean-root-orca-1793380617150969000\\build\\orca\\strata.exe",
+        "--config",
+        "G:\\GitHub\\Strata\\build-orca-native-20261029\\batch-scheduler-check-1793387058187693700\\config.json",
+        "--max-new",
+        "64",
+        "--long",
+        "1200",
+        "--extra",
+        "--no-prefill-borrow --pcie-frac 0"
+      ],
+      "exit_code": 0,
+      "log_sha256": "5b2ed472ad05f0fe753c25e8573f6d4176a8a3db86ec22f7307e9e37f8e56060"
+    },
+    {
+      "label": "batch-interleave-default-placement",
+      "command": [
+        "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Python311\\python.exe",
+        "G:\\GitHub\\Strata\\tools\\batch_interleave_test.py",
+        "--exe",
+        "G:\\GitHub\\Strata\\build-orca-native-20261029\\clean-root-orca-1793380617150969000\\build\\orca\\strata.exe",
+        "--config",
+        "G:\\GitHub\\Strata\\build-orca-native-20261029\\batch-scheduler-check-1793387058187693700\\config.json",
+        "--max-new",
+        "64",
+        "--long",
+        "1200",
+        "--extra",
+        ""
+      ],
+      "exit_code": 0,
+      "log_sha256": "bf2d709b98d0a08a6d02746f33b05f6434e3c1211a91c8ea268acae58f33512a"
+    }
+  ],
+  "tests": [
+    {
+      "label": "plain-batch-2",
+      "slots": 2,
+      "matched_tokens": 128,
+      "full_slot_window_captured": true,
+      "dump_sha256": "f27d521b50c305c1bf67d6e9899e2114b40c5908ca2d643ef617b00f3d7ed2e0"
+    },
+    {
+      "label": "plain-batch-4",
+      "slots": 4,
+      "matched_tokens": 256,
+      "full_slot_window_captured": true,
+      "dump_sha256": "15653a7de16d7f32ea17f948315e043de3d4db3208c19272ff11daced5926796"
+    },
+    {
+      "label": "plain-batch-8",
+      "slots": 8,
+      "matched_tokens": 512,
+      "full_slot_window_captured": true,
+      "dump_sha256": "d7b903dd762ad9555815fee7a9a7a6ad7e89f70d3e3f5655545700d1be963e3c"
+    },
+    {
+      "label": "sampled-batch-2",
+      "slots": 2,
+      "matched_tokens": 128,
+      "dump_sha256": "ab7f5f8a44b56c20440edfa3134d9e292868276af7377c2c23e7382ba136eb43"
+    },
+    {
+      "label": "batch-interleave-fixed-placement",
+      "check_passed": true
+    },
+    {
+      "label": "batch-interleave-default-placement",
+      "check_passed": true
+    }
+  ],
+  "session-files-http-1793384783257983500": {
+    "result": "G:\\GitHub\\Strata\\build-orca-native-20261029\\session-files-http-1793384783257983500\\results.json",
+    "sha256": "f2ba2e1fa80831e283294969a24260ff678c0bcacd930c048d4f64aff7e6e846"
+  },
+  "batch-verifier-regression-1793385923602147600": {
+    "result": "G:\\GitHub\\Strata\\build-orca-native-20261029\\batch-verifier-regression-1793385923602147600\\results.json",
+    "sha256": "e51a916d2b4a302cdda2db3b951ecc3e325db82b6748cf0f313cb8a53238447b"
+  },
+  "previous_exe_sha256": "1407a8e4cb936262f3bfc0a359edc7676edba56d7a8837abcbbd6920c0e31940",
+  "exe_sha256": "f5c335812e55ab004281259e123d5cc8e1648dcec6d9ca59f338e9374ec51b05",
+  "source_sha256": {
+    "sycl/src/program/generate.cpp": "0d462dc6e3515e4984b6f4e1cee3016d6e4dacbb63fd616a2c9c1c1f5100150d",
+    "sycl/src/core/verify.cpp": "ab94b2929afcb5155672811f47046d78c64a0e7db7e7fc09f9eae0e28274e9b8",
+    "sycl/include/strata/core/verify.hpp": "4e177b06f428342906f62164b784c63939147a9fb1a91f5f877776fdfb482653"
+  },
+  "exe_unchanged": true,
+  "images_unchanged": true,
+  "source_unchanged": true,
+  "date": "2026-10-31",
+  "scope": "Native independent-slot BGEN scheduler: 2/4/8-slot parity, fixed-seed sampling, interleaved prefill, yielding, resume and return to solo",
+  "full_model_speedup_established": false,
+  "original_report": "build-orca-native-20261029\\batch-scheduler-check-1793387058187693700\\results.json",
+  "original_report_sha256": "d02759f93201ec1bddd2dbf6195909058e77d9195b18f98649d62a9bdc6880f2",
+  "image_manifest": {
+    "count": 5362,
+    "sha256": "5948166f6647283c137127493347fe7991ef91e1ec22ba2583add2ec5abb061a"
+  }
+}

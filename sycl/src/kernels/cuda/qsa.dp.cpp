@@ -57,6 +57,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <stdexcept>
 
 namespace strata::kernels {
 namespace {
@@ -129,13 +130,18 @@ kv_append_kernel(uint16_t *__restrict__ k_pool, uint16_t *__restrict__ v_pool,
                  const int32_t *__restrict__ table,
                  const int32_t *__restrict__ step,
                  const float *__restrict__ kcur, const float *__restrict__ vcur,
-                 int kv_heads, int head_dim, int page_size, KvHostPools host) {
+                 int kv_heads, int head_dim, int page_size, KvHostPools host,
+                 int step_stride = 0) {
     /*
     DPCT1098: The '*' expression is used instead of the __ldg call. These
     two expressions do not provide the exact same functionality. Check the
     generated code for potential precision and/or performance issues.
     */
     auto item_ct1 = sycl::ext::oneapi::this_work_item::get_nd_item<3>();
+    const size_t token = item_ct1.get_group(1);
+    step += token * step_stride;
+    kcur += token * kv_heads * head_dim;
+    vcur += token * kv_heads * head_dim;
     const long long pos = (long long)*(step + kStepPos);
     const int i = item_ct1.get_group(2) * item_ct1.get_local_range(2) +
                   item_ct1.get_local_id(2);
@@ -892,6 +898,24 @@ void kv_append_step(uint16_t* k_pool, uint16_t* v_pool, const int32_t* page_tabl
     }
     check_launch("kv_append");
     if (stream == nullptr) check_sync("kv_append");
+}
+
+void kv_append_steps(uint16_t* k_pool, uint16_t* v_pool, const int32_t* table, const int32_t* steps,
+                     int step_stride, int n_tok, const float* kcur, const float* vcur,
+                     const QsaShapes& s, void* stream, const KvHostPools* host) {
+    if (n_tok == 0) return;
+    if (n_tok < 0 || n_tok > 65535 || step_stride <= kStepPos || !k_pool || !v_pool || !table ||
+        !steps || !kcur || !vcur || !stream)
+        throw std::invalid_argument("kv_append_steps: invalid arguments");
+    validate(s, "kv_append_steps");
+    const KvHostPools hp = host ? *host : KvHostPools{};
+    const size_t width = grid_for(s.n_head_kv * s.head_dim, THREADS) * THREADS;
+    q_of(stream)->parallel_for<class kv_fp16_steps>(
+        sycl::nd_range<3>(sycl::range<3>(1, n_tok, width), sycl::range<3>(1, 1, THREADS)),
+        [=](sycl::nd_item<3>) {
+            kv_append_kernel(k_pool, v_pool, table, steps, kcur, vcur,
+                              (int)s.n_head_kv, (int)s.head_dim, (int)s.page_size, hp, step_stride);
+        });
 }
 
 void qsa_index_step(const float* pooled, const float* q_idx, const float* bias, const QsaShapes& s,

@@ -1,0 +1,513 @@
+{
+  "complete": true,
+  "adopted": false,
+  "date": "2026-10-26",
+  "hardware": "Intel Arc A770",
+  "model": "Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS",
+  "context": 8192,
+  "key_storage": "FP16 in every arm",
+  "baseline_expert_slots": 5771,
+  "quality_only": true,
+  "physical_memory_or_speed_measured": false,
+  "baseline_repeat_exact": true,
+  "baseline_full_raw_tsv_identical": true,
+  "production_config_matches_start": true,
+  "baseline_aggregate_ppl": 1.3867410829402285,
+  "quality_protocol": "K stays FP16 in every arm. V roundtrip before all FP16 append paths, including MTP. Identical fixed expert budget and adapt-swaps0. Frozen seven-case/502-target teacher forcing; baseline/V8/V3/V3+4res/V4/V4+4res/baseline. Predeclared diagnostic gate: aggregate PPL increase <=1%, every case <=3%. Full baseline scores must repeat exactly. No physical VRAM or throughput claim; FP16 cache pools retained. Reference-inspired codec uses archived upstream 128-value WHT/signs/thresholds/centroids/matched norm, with optional top4 FP16 residuals per256. Not broad capability validation.",
+  "args": [
+    "--pack",
+    "G:\\GitHub\\Strata-data\\packs\\iq2_xs",
+    "--native",
+    "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00001-of-00002.gguf",
+    "--ple-gguf",
+    "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00002-of-00002.gguf",
+    "--expert-profile",
+    "G:\\GitHub\\Strata\\data\\expert-profile.bin",
+    "--expert-cache",
+    "5500",
+    "--prefill",
+    "8192",
+    "--spec",
+    "4",
+    "--spec-min-p",
+    "0.5",
+    "--mtp",
+    "G:\\GitHub\\Strata-data\\mtp\\rt-full-vocab-current",
+    "--max-context",
+    "8192",
+    "--stream-experts",
+    "--vram-reserve-mib",
+    "1536",
+    "--pcie-frac",
+    "0",
+    "--prompt-cache",
+    "1",
+    "--short-read",
+    "256",
+    "--adapt-every",
+    "1",
+    "--adapt-swaps",
+    "0",
+    "--prefill-borrow",
+    "--mtp-window",
+    "1024",
+    "--mtp-hnorm",
+    "stream",
+    "--adapt-decay",
+    "0.5"
+  ],
+  "checks": {
+    "passed": true,
+    "vectors": 37,
+    "modes": [
+      {
+        "bits": 0,
+        "residuals": 0,
+        "max_abs_vs_numpy": 0.0,
+        "squared_error": 0.0
+      },
+      {
+        "bits": 8,
+        "residuals": 0,
+        "max_abs_vs_numpy": 0.0,
+        "squared_error": 7.111865400233255
+      },
+      {
+        "bits": 3,
+        "residuals": 0,
+        "max_abs_vs_numpy": 7.93359981798858e-06,
+        "squared_error": 2394.69238134278
+      },
+      {
+        "bits": 3,
+        "residuals": 4,
+        "max_abs_vs_numpy": 7.371137186851229e-06,
+        "squared_error": 1936.2127672796169
+      },
+      {
+        "bits": 3,
+        "residuals": 8,
+        "max_abs_vs_numpy": 4.363864727308098e-05,
+        "squared_error": 1772.3354042314686
+      },
+      {
+        "bits": 4,
+        "residuals": 0,
+        "max_abs_vs_numpy": 5.265701870094119e-06,
+        "squared_error": 634.6756366042134
+      },
+      {
+        "bits": 4,
+        "residuals": 4,
+        "max_abs_vs_numpy": 5.312604707707891e-06,
+        "squared_error": 521.1741325058397
+      }
+    ]
+  },
+  "comparison": [
+    {
+      "mode": "V8",
+      "aggregate_ppl": 1.385487627288841,
+      "top1_agreement": 0.9820717131474104,
+      "targets": 502,
+      "aggregate_ppl_change_pct": -0.09038858564208253,
+      "cases": {
+        "followup": {
+          "tokens": 6,
+          "baseline_ppl": 1.0003811137720735,
+          "candidate_ppl": 1.0002787503436588,
+          "ppl_change_pct": -0.010232443116491057,
+          "top1_agreement": 1.0
+        },
+        "long": {
+          "tokens": 128,
+          "baseline_ppl": 1.518766890128563,
+          "candidate_ppl": 1.5077476287508738,
+          "ppl_change_pct": -0.7255400054682671,
+          "top1_agreement": 0.9609375
+        },
+        "code": {
+          "tokens": 128,
+          "baseline_ppl": 1.4181571864997202,
+          "candidate_ppl": 1.4217894705470222,
+          "ppl_change_pct": 0.2561270416199047,
+          "top1_agreement": 0.984375
+        },
+        "prose": {
+          "tokens": 128,
+          "baseline_ppl": 1.6356695926050708,
+          "candidate_ppl": 1.637815662096469,
+          "ppl_change_pct": 0.13120433986794103,
+          "top1_agreement": 0.984375
+        },
+        "memory": {
+          "tokens": 6,
+          "baseline_ppl": 1.0005036381164427,
+          "candidate_ppl": 1.0005076154598112,
+          "ppl_change_pct": 0.00039753412349812845,
+          "top1_agreement": 1.0
+        },
+        "short": {
+          "tokens": 75,
+          "baseline_ppl": 1.0313063230504322,
+          "candidate_ppl": 1.0316430405031844,
+          "ppl_change_pct": 0.032649606157384346,
+          "top1_agreement": 1.0
+        },
+        "gcd": {
+          "tokens": 31,
+          "baseline_ppl": 1.0203090332274376,
+          "candidate_ppl": 1.0189595858986722,
+          "ppl_change_pct": -0.13225868681146974,
+          "top1_agreement": 1.0
+        }
+      },
+      "passes_screen": true
+    },
+    {
+      "mode": "V3",
+      "aggregate_ppl": 1.4005746797911367,
+      "top1_agreement": 0.9601593625498008,
+      "targets": 502,
+      "aggregate_ppl_change_pct": 0.9975616227924725,
+      "cases": {
+        "followup": {
+          "tokens": 6,
+          "baseline_ppl": 1.0003811137720735,
+          "candidate_ppl": 1.0004011589427357,
+          "ppl_change_pct": 0.00200375340820377,
+          "top1_agreement": 1.0
+        },
+        "long": {
+          "tokens": 128,
+          "baseline_ppl": 1.518766890128563,
+          "candidate_ppl": 1.5325585134036002,
+          "ppl_change_pct": 0.9080803225747055,
+          "top1_agreement": 0.9375
+        },
+        "code": {
+          "tokens": 128,
+          "baseline_ppl": 1.4181571864997202,
+          "candidate_ppl": 1.4489347890828004,
+          "ppl_change_pct": 2.1702532607859157,
+          "top1_agreement": 0.9765625
+        },
+        "prose": {
+          "tokens": 128,
+          "baseline_ppl": 1.6356695926050708,
+          "candidate_ppl": 1.6537776055140394,
+          "ppl_change_pct": 1.1070703393176489,
+          "top1_agreement": 0.9296875
+        },
+        "memory": {
+          "tokens": 6,
+          "baseline_ppl": 1.0005036381164427,
+          "candidate_ppl": 1.0013014725145784,
+          "ppl_change_pct": 0.07974327805918957,
+          "top1_agreement": 1.0
+        },
+        "short": {
+          "tokens": 75,
+          "baseline_ppl": 1.0313063230504322,
+          "candidate_ppl": 1.026411509403221,
+          "ppl_change_pct": -0.47462267396299573,
+          "top1_agreement": 1.0
+        },
+        "gcd": {
+          "tokens": 31,
+          "baseline_ppl": 1.0203090332274376,
+          "candidate_ppl": 1.0209769963170108,
+          "ppl_change_pct": 0.06546674270445214,
+          "top1_agreement": 1.0
+        }
+      },
+      "passes_screen": true
+    },
+    {
+      "mode": "V3R4",
+      "aggregate_ppl": 1.3962213559178978,
+      "top1_agreement": 0.9701195219123506,
+      "targets": 502,
+      "aggregate_ppl_change_pct": 0.6836368442744173,
+      "cases": {
+        "followup": {
+          "tokens": 6,
+          "baseline_ppl": 1.0003811137720735,
+          "candidate_ppl": 1.0002898479978157,
+          "ppl_change_pct": -0.009123100486541691,
+          "top1_agreement": 1.0
+        },
+        "long": {
+          "tokens": 128,
+          "baseline_ppl": 1.518766890128563,
+          "candidate_ppl": 1.5357649701689489,
+          "ppl_change_pct": 1.1192026999579314,
+          "top1_agreement": 0.9609375
+        },
+        "code": {
+          "tokens": 128,
+          "baseline_ppl": 1.4181571864997202,
+          "candidate_ppl": 1.4302387119717133,
+          "ppl_change_pct": 0.8519172336468854,
+          "top1_agreement": 0.984375
+        },
+        "prose": {
+          "tokens": 128,
+          "baseline_ppl": 1.6356695926050708,
+          "candidate_ppl": 1.6472782581995757,
+          "ppl_change_pct": 0.7097194718901711,
+          "top1_agreement": 0.9375
+        },
+        "memory": {
+          "tokens": 6,
+          "baseline_ppl": 1.0005036381164427,
+          "candidate_ppl": 1.0018083886661475,
+          "ppl_change_pct": 0.13040937583807036,
+          "top1_agreement": 1.0
+        },
+        "short": {
+          "tokens": 75,
+          "baseline_ppl": 1.0313063230504322,
+          "candidate_ppl": 1.030462786264911,
+          "ppl_change_pct": -0.08179303924233942,
+          "top1_agreement": 1.0
+        },
+        "gcd": {
+          "tokens": 31,
+          "baseline_ppl": 1.0203090332274376,
+          "candidate_ppl": 1.0222391557940371,
+          "ppl_change_pct": 0.18917038894521399,
+          "top1_agreement": 1.0
+        }
+      },
+      "passes_screen": true
+    },
+    {
+      "mode": "V4",
+      "aggregate_ppl": 1.3900348183589397,
+      "top1_agreement": 0.9701195219123506,
+      "targets": 502,
+      "aggregate_ppl_change_pct": 0.2375162500939021,
+      "cases": {
+        "followup": {
+          "tokens": 6,
+          "baseline_ppl": 1.0003811137720735,
+          "candidate_ppl": 1.0002997767574076,
+          "ppl_change_pct": -0.008130602781908018,
+          "top1_agreement": 1.0
+        },
+        "long": {
+          "tokens": 128,
+          "baseline_ppl": 1.518766890128563,
+          "candidate_ppl": 1.4995839446936292,
+          "ppl_change_pct": -1.2630605499511318,
+          "top1_agreement": 0.953125
+        },
+        "code": {
+          "tokens": 128,
+          "baseline_ppl": 1.4181571864997202,
+          "candidate_ppl": 1.4344087460506596,
+          "ppl_change_pct": 1.1459632053236048,
+          "top1_agreement": 0.96875
+        },
+        "prose": {
+          "tokens": 128,
+          "baseline_ppl": 1.6356695926050708,
+          "candidate_ppl": 1.6533399705784453,
+          "ppl_change_pct": 1.0803146340350684,
+          "top1_agreement": 0.9609375
+        },
+        "memory": {
+          "tokens": 6,
+          "baseline_ppl": 1.0005036381164427,
+          "candidate_ppl": 1.0006187133241762,
+          "ppl_change_pct": 0.01150172806469472,
+          "top1_agreement": 1.0
+        },
+        "short": {
+          "tokens": 75,
+          "baseline_ppl": 1.0313063230504322,
+          "candidate_ppl": 1.0328881467378284,
+          "ppl_change_pct": 0.15338058654747666,
+          "top1_agreement": 1.0
+        },
+        "gcd": {
+          "tokens": 31,
+          "baseline_ppl": 1.0203090332274376,
+          "candidate_ppl": 1.016003355596428,
+          "ppl_change_pct": -0.42199740380518397,
+          "top1_agreement": 1.0
+        }
+      },
+      "passes_screen": true
+    },
+    {
+      "mode": "V4R4",
+      "aggregate_ppl": 1.3925051989464863,
+      "top1_agreement": 0.9741035856573705,
+      "targets": 502,
+      "aggregate_ppl_change_pct": 0.41565913616957223,
+      "cases": {
+        "followup": {
+          "tokens": 6,
+          "baseline_ppl": 1.0003811137720735,
+          "candidate_ppl": 1.0003225128294166,
+          "ppl_change_pct": -0.005857861753911074,
+          "top1_agreement": 1.0
+        },
+        "long": {
+          "tokens": 128,
+          "baseline_ppl": 1.518766890128563,
+          "candidate_ppl": 1.5200013771936827,
+          "ppl_change_pct": 0.08128219499275981,
+          "top1_agreement": 0.9609375
+        },
+        "code": {
+          "tokens": 128,
+          "baseline_ppl": 1.4181571864997202,
+          "candidate_ppl": 1.4345658932286072,
+          "ppl_change_pct": 1.1570442885380452,
+          "top1_agreement": 0.9765625
+        },
+        "prose": {
+          "tokens": 128,
+          "baseline_ppl": 1.6356695926050708,
+          "candidate_ppl": 1.643595690827097,
+          "ppl_change_pct": 0.48457819707967803,
+          "top1_agreement": 0.9609375
+        },
+        "memory": {
+          "tokens": 6,
+          "baseline_ppl": 1.0005036381164427,
+          "candidate_ppl": 1.0006042011226752,
+          "ppl_change_pct": 0.010051238436458065,
+          "top1_agreement": 1.0
+        },
+        "short": {
+          "tokens": 75,
+          "baseline_ppl": 1.0313063230504322,
+          "candidate_ppl": 1.030445492455357,
+          "ppl_change_pct": -0.08346992312905417,
+          "top1_agreement": 1.0
+        },
+        "gcd": {
+          "tokens": 31,
+          "baseline_ppl": 1.0203090332274376,
+          "candidate_ppl": 1.0186445245534688,
+          "ppl_change_pct": -0.16313769845823486,
+          "top1_agreement": 1.0
+        }
+      },
+      "passes_screen": true
+    }
+  ],
+  "theoretical_capacity": {
+    "context": 8192,
+    "qsa_layers": 12,
+    "kv_heads": 2,
+    "head_dim": 256,
+    "key_bits": 16,
+    "baseline_expert_slots": 5771,
+    "measured": false,
+    "assumption": "Only main-model KV layout bytes; excludes MTP, scratch, indexer and allocator overhead. Freed bytes buy consecutive next profile entries, 256-byte padded expert blobs. Pools retained as FP16 in actual quality run.",
+    "profile_sha256": "8f59b4aa8873209dff11c11e37bcda9529a1335b724a1afeea37bf6388975baf",
+    "native_index_sha256": "48df605acb89c7e8c3176a51cec777c2ed344ea439e8f3a37e5ce4f9dcb6946c",
+    "modes": [
+      {
+        "mode": "FP16",
+        "main_kv_mib": 192,
+        "saved_vs_fp16_mib": 0,
+        "saved_vs_k16_v8_mib": -46.5,
+        "extra_profile_slots_vs_fp16": 0,
+        "extra_profile_slots_vs_k16_v8": -34
+      },
+      {
+        "mode": "V8",
+        "main_kv_mib": 145.5,
+        "saved_vs_fp16_mib": 46.5,
+        "saved_vs_k16_v8_mib": 0.0,
+        "extra_profile_slots_vs_fp16": 34,
+        "extra_profile_slots_vs_k16_v8": 0
+      },
+      {
+        "mode": "V3",
+        "main_kv_mib": 114.75,
+        "saved_vs_fp16_mib": 77.25,
+        "saved_vs_k16_v8_mib": 30.75,
+        "extra_profile_slots_vs_fp16": 56,
+        "extra_profile_slots_vs_k16_v8": 22
+      },
+      {
+        "mode": "V3R4",
+        "main_kv_mib": 117,
+        "saved_vs_fp16_mib": 75,
+        "saved_vs_k16_v8_mib": 28.5,
+        "extra_profile_slots_vs_fp16": 54,
+        "extra_profile_slots_vs_k16_v8": 20
+      },
+      {
+        "mode": "V4",
+        "main_kv_mib": 120.75,
+        "saved_vs_fp16_mib": 71.25,
+        "saved_vs_k16_v8_mib": 24.75,
+        "extra_profile_slots_vs_fp16": 52,
+        "extra_profile_slots_vs_k16_v8": 18
+      },
+      {
+        "mode": "V4R4",
+        "main_kv_mib": 123,
+        "saved_vs_fp16_mib": 69,
+        "saved_vs_k16_v8_mib": 22.5,
+        "extra_profile_slots_vs_fp16": 50,
+        "extra_profile_slots_vs_k16_v8": 16
+      }
+    ]
+  },
+  "upstream": {
+    "repository": "https://github.com/TheTom/llama-cpp-turboquant",
+    "commit": "643956891dfdf51aecdbd05ca508dd21e21e8195",
+    "sha256": {
+      "ggml/src/ggml-turbo-quant.c": "3d27af2e55c4ca23904feb96887bab99ac3d81fe814738c9b6220023f3240312",
+      "ggml/src/ggml-common.h": "5f694da247c440b73c2fc5f04f143033326f2bd5b9434ff9083820dbf37d7aea",
+      "LICENSE": "94f29bbed6a22c35b992c5c6ebf0e7c92f13b836b90f36f461c9cf2f0f1d010d"
+    }
+  },
+  "files_sha256": {
+    "build-sycl-a770-v-only-turboquant-20261025/build.json": "4d2d3d180026de25d055b9bff629b289b543f06cfccb1883a444432eccfca574",
+    "build-sycl-a770-v-only-turboquant-20261025/run.py": "862251f4808d1d8391e3a70ca8829003805c5621e5575704d52e6a4b8ecd7918",
+    "build-sycl-a770-v-only-turboquant-20261025/resume.py": "ddce45c293d89cdedd7aec9c0960a2b4b85378d3ab10f2463fc7019c329da706",
+    "build-sycl-a770-v-only-turboquant-20261025/codec.cpp": "8f77e00088731280f038cf7a0d396740dce73a1fe7ad25567e3fc77fdcbc53db",
+    "build-sycl-a770-v-only-turboquant-20261025/check.cpp": "0e8e6815c64766e560a4343b2f213455b2ce6fa1dacfed94091a6c9b2c33f7e9",
+    "build-sycl-a770-v-only-turboquant-20261025/qsa.cpp": "25df10850d07fa4cee5462263d71a9042e9044049442e897b6aa0e691f9c66b7",
+    "build-sycl-a770-v-only-turboquant-20261025/prefill-kernels.cpp": "167ac7bfdc3e84d1131cdcf4565450dec22f442b2ccf448ed4def69d96b495fa",
+    "build-sycl-a770-v-only-turboquant-20261025/value_roundtrip.hpp": "9c8bedc1a0ef24032674aa252641796b37153d45d51bd5399d6e3ded52d91219",
+    "build-sycl-a770-v-only-turboquant-20261025/tables.hpp": "139a24fe60b30e483e7765adbfb36f801d3d109e40c71852fad41fae9efc58c4",
+    "build-sycl-a770-v-only-turboquant-20261025/upstream.json": "04b7da671227625e6a686ebaf1721d97db55b39a7641382223c3bb0c18336172",
+    "build-sycl-a770-v-only-turboquant-20261025/resident-slot-estimate.json": "ff38e426a8cbf67b00dd7fbfe39dd0ae77fa72c1d6428ce68ec3e054bd42b27f",
+    "build-sycl-a770-v-only-turboquant-20261025/checks/results.json": "5754172202494fba117e8af49b5a47befcce4ac00cebda924b8a6891b982109d",
+    "build-sycl-a770-v-only-turboquant-20261025/quality/results.json": "e7a478b428bee67d1bb825c97ff41af103e4a3be1a4ab7e4e61731abe7e3764d",
+    "build-sycl-a770-v-only-turboquant-20261025/quality/protocol.json": "5d07bec3d6e6f20a4c4b6aab4652a435d32f7211afcf7e8fe13479024e5ca1c6",
+    "bench/results/2026-10-15-a770-expert-prune-model-v3/corpus.json": "82f46f664fcb74592732c091621f19e11047cdadd173f41fe87557b40e60e752",
+    "build-sycl-a770-v-only-turboquant-20261025/quality/A1.protocol": "c7b006f6985ac7150671c7a3080cd311d98bbec2308caa98bf8047d395d669ff",
+    "build-sycl-a770-v-only-turboquant-20261025/quality/A1.stderr": "06178f30a704ee9b76b914aa173c493083f4d9ebd8541164bdfeeef83908975a",
+    "build-sycl-a770-v-only-turboquant-20261025/quality/A1.tsv": "32c47b63ec346071183527b0f24a88daf47e7fa023d3893c7178fbd635ee8732",
+    "build-sycl-a770-v-only-turboquant-20261025/quality/A2.protocol": "7211020f70a532bf3ec1bbf517f5de6eacc949e3d0be23bdc8bd8ce677e8363e",
+    "build-sycl-a770-v-only-turboquant-20261025/quality/A2.stderr": "9ef8929bcd323ccc2f4ac557bc6c0221b34f76018f6afc389950f2015b8ec3a1",
+    "build-sycl-a770-v-only-turboquant-20261025/quality/A2.tsv": "32c47b63ec346071183527b0f24a88daf47e7fa023d3893c7178fbd635ee8732",
+    "build-sycl-a770-v-only-turboquant-20261025/quality/V3.protocol": "c7e3402f2d2c8b8bc25a8b05d139ab10bfbf50c27e5bb827be406e87c67a92fc",
+    "build-sycl-a770-v-only-turboquant-20261025/quality/V3.stderr": "d58c2686356bdd15dcd67558ef60059cd7a93557c6c91816894c96ec18a6f3a7",
+    "build-sycl-a770-v-only-turboquant-20261025/quality/V3.tsv": "46c52a2c3ae74715afe8a247dc85c6720fa58175fb1b9545dcf841c9ad22a51c",
+    "build-sycl-a770-v-only-turboquant-20261025/quality/V3R4.protocol": "89fe50f0ddf30a2639a7f3454ad435cfe4b46cae8ae5153559a320f567c7601e",
+    "build-sycl-a770-v-only-turboquant-20261025/quality/V3R4.stderr": "d4dad04d4a96def8dc15ad63c66b8aa378d5636e6bba92f9b8a77a690661bab9",
+    "build-sycl-a770-v-only-turboquant-20261025/quality/V3R4.tsv": "dd556e3b4de5cc901bf9db4befdb6c6413af421690b3f79c692184f7a7340a8a",
+    "build-sycl-a770-v-only-turboquant-20261025/quality/V4.protocol": "8c6d0d6c22d95b3653388a9a240b3858ebac9cfd3063dbb22bb41b050eee72e7",
+    "build-sycl-a770-v-only-turboquant-20261025/quality/V4.stderr": "3969fe6bce3a4b56526a9c95fdda9f3b7608457f6a6c09329e85bd10324d6cb7",
+    "build-sycl-a770-v-only-turboquant-20261025/quality/V4.tsv": "d498571efc46a18a65fd015c9364a62ed088fd04af1d8a8afd6c9da2a9c4cb15",
+    "build-sycl-a770-v-only-turboquant-20261025/quality/V4R4.protocol": "4126c0c2ffb4cc10c931c20eb767d8a0d52fe3a7a450af5182f157a8fecf12c0",
+    "build-sycl-a770-v-only-turboquant-20261025/quality/V4R4.stderr": "a1b91a0fd0f38f7e55c85ef595d6ac525996e275187892837043a4ffa42d3c27",
+    "build-sycl-a770-v-only-turboquant-20261025/quality/V4R4.tsv": "3e585988b63543499a7b546b99bb805fc3de1eb05f8a00b13a1978a753c84a0c",
+    "build-sycl-a770-v-only-turboquant-20261025/quality/V8.protocol": "b521ef4045a7554d9d4e55771a31a595418143c5ecdc3a5b9d204c1fa90779ca",
+    "build-sycl-a770-v-only-turboquant-20261025/quality/V8.stderr": "cbbf55bf7320a2eaa95211647feaacfa2b0e6f7d252b1bd2c0226ddb614ff3e9",
+    "build-sycl-a770-v-only-turboquant-20261025/quality/V8.tsv": "79e1bdf53b4877b4bee62a08ec96ab33228754c701c87759be4dd85ae7930c08"
+  }
+}

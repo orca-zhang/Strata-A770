@@ -2,6 +2,7 @@
 #include <sycl/sycl.hpp>
 #include <dpct/dpct.hpp>
 #include "strata/core/verify.hpp"
+#include "strata/orca_replay.hpp"
 #if defined(_WIN32)
 #include <intrin.h>
 #endif
@@ -48,7 +49,9 @@
 #include <algorithm>
 #include <atomic>
 #include <map>
+#include <memory>
 #include <optional>
+#include <type_traits>
 #include <string>
 #include <thread>
 #include <vector>
@@ -105,6 +108,9 @@ const bool g_doorbell_store = env_on("STRATA_DOORBELL_STORE");
 const bool g_trace = env_on("STRATA_VERIFY_TRACE");
 const bool g_gdn_q8_tail = env_on("STRATA_GDN_Q8_TAIL");
 const bool g_qsa_q8_tail = env_on("STRATA_QSA_Q8_TAIL");
+// Keep the scalar default until the native-prefill/model acceptance is complete; =0 opts in.
+const bool g_no_batch_kv = std::getenv("STRATA_NO_BATCH_KV_STEP") == nullptr || env_on("STRATA_NO_BATCH_KV_STEP");
+const bool g_fused_kv_store = env_on("STRATA_QSA_FUSED_KV_STORE");
 const bool g_verify_no_host = env_on("STRATA_VERIFY_NO_HOST");
 const bool g_verify_host_mix = env_on("STRATA_VERIFY_HOST_MIX");
 const bool g_verify_cpu_q2 = env_on("STRATA_VERIFY_CPU_Q2");
@@ -346,7 +352,7 @@ bool Verifier::release_gpu_waits(int timeout_ms) try {
     // SYCL port: no cudaStreamQuery; a queue with nothing left to run reports ext_oneapi_empty()
     for (dpct::queue_ptr q : {cs_, copy_}) {
         if (q == nullptr) continue;
-        while (!q->ext_oneapi_empty()) {
+        while (!verify_queue_empty(q)) {
             if (ms_since(t0) > timeout_ms) {
                 trace_ev("RELEASE-NOT-DRAINED", -1, -1, (int64_t) ms_since(t0));
                 return false;
@@ -440,17 +446,22 @@ Verifier::~Verifier() try {
         slot.compare_exchange_strong(me, nullptr);
     }
     signal_all_l0_events();
-    if (cs_) cs_->wait();
+    if (cs_) { cs_->wait(); (void) wait_verify_queue(cs_, l0_sync_, UINT64_MAX); }
     if (copy_) copy_->wait();
     destroy_l0_events();
     for (auto& e : exec_)
-        if (e) delete (e);
-    if (commit_exec_) delete (commit_exec_);
+        if (e) { forget_orca_handle(e); delete (e); }
+    if (commit_exec_) { forget_orca_handle(commit_exec_); delete (commit_exec_); }
+    for (auto* graphs : {&exec_bm_, &commit_bm_})
+        for (auto& [key, graph] : *graphs)
+            if (graph) { forget_orca_handle(graph); delete graph; }
     if (cs_) {
         if (prof_queue_owned_) { delete cs_; cs_ = nullptr; }
         else dpct::get_current_device().destroy_queue(cs_);
     }
     if (copy_) dpct::get_current_device().destroy_queue(copy_);
+    if (arena_b_) sycl::free(arena_b_, dpct::get_in_order_queue());
+    if (h_commitb_) sycl::free(h_commitb_, dpct::get_in_order_queue());
     if (arena_) sycl::free(arena_, dpct::get_in_order_queue());
     void* hosts[] = {h_tok_, h_step_, h_pos_, h_commit_, h_ple_, h_out_, h_x_, h_ids_, h_w_, h_seq_, h_flag_, h_ymiss_,
                      h_flagA_, h_plan_, h_flagB_, h_skip_};
@@ -762,11 +773,21 @@ bool Verifier::init(const WeightTable &wt, const ModelGeometry &g,
         err = "verify: stream create failed";
         return false;
     }
+    check_orca_replay(*cs_);
+    if (orca_replay_enabled() && (g_verify_eager || !g_verify_no_host)) {
+        err = "verify: Orca L0 replay requires command graphs and STRATA_VERIFY_NO_HOST=1";
+        return false;
+    }
+    l0_sync_.init(cs_, "verify");
     // E-6: a layer whose routed experts are all resident is planned on the device (STRATA_VERIFY_DEVICE_PLAN=1: on;
     // exact, but neutral on RIBPC 1-2 GPUs: off by default)
     {
         const char* v = std::getenv("STRATA_VERIFY_DEVICE_PLAN");
         device_plan_ = v != nullptr && std::atoi(v) != 0;
+    }
+    if (orca_replay_enabled() && !device_plan_) {
+        err = "verify: Orca L0 replay requires STRATA_VERIFY_DEVICE_PLAN=1";
+        return false;
     }
     if (device_plan_) {
         bool ok2 = true;
@@ -851,7 +872,7 @@ bool Verifier::record_window(int T, dpct::queue_ptr cs, std::string &err) {
     const int64_t TS = (s.idx_block - 1) * ID;
     const bool ple_on = ss.ple.ready() && ple_stage();
     auto Rt = [&](int t) { return R_ + (size_t) t * HC * N; };
-    const int G = (split_ && T >= 2) ? 2 : 1;
+    const int G = (split_ && T >= 2 && !batch_rec_) ? 2 : 1;
     static const bool dec_batch = [] { const char* v = std::getenv("STRATA_DEC_BATCH"); return v == nullptr || std::atoi(v) != 0; }();
     // EAGER samples in-order queue events. They add barriers but never wait; profile_report reads them after the
     // request's existing window waits. Graph mode keeps the device timestamp path below.
@@ -880,7 +901,10 @@ bool Verifier::record_window(int T, dpct::queue_ptr cs, std::string &err) {
         if (event_sample && grp == 0) prof_marks_.push_back({cs->ext_oneapi_submit_barrier(), l, i});
     };
     const int tb_[2] = {0, (T + 1) / 2}, te_[2] = {G == 2 ? (T + 1) / 2 : T, T};
-    groups_[T] = G;
+    if (!batch_rec_) groups_[T] = G;
+    auto slot_ss = [&](int t) -> SessionState& { return batch_rec_ ? *slots_[(size_t) brow_[t]] : ss; };
+    const int hrow0 = batch_rec_ ? row_base_ : 0;
+    const int64_t nQall = g.n_qsa_layers();
     const int32_t* pos_k = pos_ + MT * NH;
     const int32_t* pos_i = pos_ + MT * (NH + NKV);
     const int64_t HB = Verifier::handoff_floats(g);
@@ -900,9 +924,9 @@ bool Verifier::record_window(int T, dpct::queue_ptr cs, std::string &err) {
     // residual, pending write and inject (see set_stage)
     if (lb_ > 0) {
         for (int t = 0; t < T; ++t) {
-            copy_from_mapped(Rt(t), hand_in_ + (size_t) t * HB, HC * N, cs);
-            copy_from_mapped(bo_ + (size_t) t * N, hand_in_ + (size_t) t * HB + HC * N, N, cs);
-            copy_from_mapped(inj2_ + (size_t) t * HC, hand_in_ + (size_t) t * HB + HC * N + N, HC, cs);
+            copy_from_mapped(Rt(t), hand_in_ + (size_t) (hrow0 + t) * HB, HC * N, cs);
+            copy_from_mapped(bo_ + (size_t) t * N, hand_in_ + (size_t) (hrow0 + t) * HB + HC * N, N, cs);
+            copy_from_mapped(inj2_ + (size_t) t * HC, hand_in_ + (size_t) (hrow0 + t) * HB + HC * N + N, HC, cs);
         }
     } else if (const NativeEmbed* ne = native_embed()) {       // plan v0.3 P6: the GGUF-form table
         ne->gather_dev(tok_, T, emb_, cs);
@@ -957,17 +981,19 @@ bool Verifier::record_window(int T, dpct::queue_ptr cs, std::string &err) {
                 po.normalized = normalized;
                 po.result = Rt(t);
                 try {
-                    ple_block(ple_ + t * N, Rt(t), ss.ple.hist, ss.ple.w, po, ss.ple.scratch, cs);
-                    ple_history_advance(ss.ple.hist, normalized, cs);
+                    float* hist = batch_rec_ ? slot_ss(t).ple_hist : ss.ple.hist;
+                    ple_block(ple_ + t * N, Rt(t), hist, ss.ple.w, po, ss.ple.scratch, cs);
+                    ple_history_advance(hist, normalized, cs);
                 } catch (const std::exception& e) {
                     err = std::string("verify PLE: ") + e.what();
                     return false;
                 }
-                copy_from_mapped(hist_snap_ + (size_t) t * HS, ss.ple.hist, HS, cs);
+                copy_from_mapped(hist_snap_ + (size_t) t * HS,
+                                 batch_rec_ ? slot_ss(t).ple_hist : ss.ple.hist, HS, cs);
             }
             pending = false;
         }
-        auto gr_read_group = [&](int half, bool apply, float* inj_prev, float* inj_out) {
+        auto gr_read_group = [&](int half, bool apply, float* inj_prev, float* inj_out) -> bool {
             FusedGrArgs fa[kFusedGrMaxT];
             for (int t = tb; t < te; ++t) {
                 FusedGrArgs& a = fa[t - tb];
@@ -977,16 +1003,21 @@ bool Verifier::record_window(int T, dpct::queue_ptr cs, std::string &err) {
                 a.w_up = (const uint16_t*) wu[half]->data; a.w_inject = (const uint16_t*) wi[half]->data;
                 a.eps = EPS; a.lo = lo_ + t * g.hc_lr; a.rs = rs_ + t * HC;
                 a.inject_out = inj_out + t * HC; a.mixed = mixed_ + t * N;
+                if (half == 0) a.q8_mixed = (uint8_t*) (xq_ + (size_t) (t - tb) * (N / 32) * 36);
+                else if (strata::kernels::cpu::expert_layout().native) {
+                    a.q8_mixed = (uint8_t*) (nat_xq_ + (size_t) (t - tb) * (N / 32) * 36);
+                }
             }
-            fused_gr_read_multi(fa, n, xn_ + (size_t) tb * HC * N, cs,
+            return fused_gr_read_multi(fa, n, xn_ + (size_t) tb * HC * N, cs,
                                 (prof_on_ && grp == 0) ? prof_ : nullptr,
                                 (int) (l * kProfPer + (half == 0 ? 27 : 30)));
         };
+        bool q8_attn = false;
         {
 #ifdef STRATA_EZPP
             EZPP_EX("verify.submit.pre.hc0");
 #endif
-            gr_read_group(0, pending, inj2_, inj_);
+            q8_attn = gr_read_group(0, pending, inj2_, inj_);
             stamp(l, 1, grp);
             phase_done();
         }
@@ -1019,11 +1050,38 @@ bool Verifier::record_window(int T, dpct::queue_ptr cs, std::string &err) {
                 float* hb = h_L_ + (size_t) gi * MT * C;
                 float* gate = gate_L_ + (size_t) gi * MT * HV;
                 float* beta = beta_L_ + (size_t) gi * MT * HV;
+                bool ready_gdn = false;
+#ifdef STRATA_ORCA_NATIVE
+                // ponytail: only audited primitive launch paths; audit other
+                // formats' internal dependencies before widening eligibility.
+                auto phase_mmvq = [](int type) { return type == 8 || type == 14 || type == 21 || type == 23; };
+                ready_gdn = cs->allows_independent() && !prof_on_ && !trace_m_ &&
+                            phase_mmvq(wqkv->native_type) && phase_mmvq(wg->native_type);
+#endif
                 {
 #ifdef STRATA_EZPP
                 EZPP_EX("verify.submit.pre.attn.gdn.input");
 #endif
-                native_quantize_q8_1(xm, xq_, (int) N, n, cs);
+                if (!q8_attn) native_quantize_q8_1(xm, xq_, (int) N, n, cs);
+#ifdef STRATA_ORCA_NATIVE
+                if (ready_gdn) {
+                    static const bool logged = [&] {
+                        std::fprintf(stderr, "strata: Orca GDN independent projections enabled (qkv=%d gate=%d)\n",
+                                     wqkv->native_type, wg->native_type);
+                        return true;
+                    }();
+                    (void)logged;
+                    // These are single-launch operators with disjoint outputs.
+                    // Join before conv/recurrence and before xq_ can be reused.
+                    cs->independent([&] {
+                        native_mmvq(wqkv->native_type, wqkv->native_data, xq_, qkv + (size_t) tb * C, (int) N, (int) C, n, cs);
+                        gdn_ab_multi(xm, (const uint16_t*) wa->data, (const uint16_t*) wb->data, (const float*) wdt->data,
+                                     (const float*) wsa->data, gate + (size_t) tb * HV, beta + (size_t) tb * HV,
+                                     (int) N, (int) HV, n, cs);
+                        native_mmvq(wg->native_type, wg->native_data, xq_, z_ + (size_t) tb * ZV, (int) N, (int) ZV, n, cs);
+                    });
+                } else
+#endif
                 native_mmvq(wqkv->native_type, wqkv->native_data, xq_, qkv + (size_t) tb * C, (int) N, (int) C, n, cs);
                 }
                 stamp(l, 2, grp);
@@ -1031,15 +1089,39 @@ bool Verifier::record_window(int T, dpct::queue_ptr cs, std::string &err) {
 #ifdef STRATA_EZPP
                 EZPP_EX("verify.submit.pre.attn.gdn.state");
 #endif
+                if (batch_rec_) {   // contiguous rows may be proposals for the same slot
+                    for (int t = tb; t < te;) {
+                        const int first = t;
+                        while (t < te && brow_[t] == brow_[first]) ++t;
+                        SessionState& sx = slot_ss(first);
+                        const float* cx = sx.gdn_state + (size_t) (gi - sx.gdn_ord0) * gdn_floats +
+                                          (uint64_t) g.ssm_state_size * g.ssm_v_heads * g.ssm_state_size;
+                        gdn_conv_l2_multi(cx, qkv + (size_t) first * C, (const float*) wc->data,
+                                          hb + (size_t) first * C, (int) C, (int) (2 * HK), EPS, t - first, cs, 0);
+                    }
+                } else
                 gdn_conv_l2_multi(conv, qkv, (const float*) wc->data, hb, (int) C, (int) (2 * HK), EPS, n, cs, tb);
                 stamp(l, 3, grp);
-                gdn_ab_multi(xm, (const uint16_t*) wa->data, (const uint16_t*) wb->data, (const float*) wdt->data,
+                if (!ready_gdn) gdn_ab_multi(xm, (const uint16_t*) wa->data, (const uint16_t*) wb->data, (const float*) wdt->data,
                              (const float*) wsa->data, gate + (size_t) tb * HV, beta + (size_t) tb * HV, (int) N, (int) HV,
                              n, cs);
                 stamp(l, 4, grp);
-                native_mmvq(wg->native_type, wg->native_data, xq_, z_ + (size_t) tb * ZV, (int) N, (int) ZV, n, cs);
+                if (!ready_gdn) native_mmvq(wg->native_type, wg->native_data, xq_, z_ + (size_t) tb * ZV, (int) N, (int) ZV, n, cs);
                 stamp(l, 5, grp);
                 // the recurrence from the untouched state over tokens [0, te); outputs only for this group's
+                if (batch_rec_) {   // each slot's recurrence over its own proposed-token group
+                    for (int t = tb; t < te;) {
+                        const int first = t;
+                        while (t < te && brow_[t] == brow_[first]) ++t;
+                        SessionState& sx = slot_ss(first);
+                        float* stx = sx.gdn_state + (size_t) (gi - sx.gdn_ord0) * gdn_floats;
+                        gdn_step_norm_multi(stx, hb + (size_t) first * C, (int) C, gate + (size_t) first * HV,
+                                            beta + (size_t) first * HV, z_ + (size_t) first * ZV,
+                                            (const float*) wnm->data, EPS, y_ + (size_t) first * ZV,
+                                            (int) HK, (int) HV, t - first, nullptr, cs, 0,
+                                            g_gdn_q8_tail ? (void*) (xq_ + (size_t) (first - tb) * (ZV / 32) * 36) : nullptr);
+                    }
+                } else
                 gdn_step_norm_multi(state, hb, (int) C, gate, beta, z_, (const float*) wnm->data, EPS, y_, (int) HK,
                                     (int) HV, te, nullptr, cs, tb, g_gdn_q8_tail ? (void*) xq_ : nullptr);
                 }
@@ -1088,19 +1170,58 @@ bool Verifier::record_window(int T, dpct::queue_ptr cs, std::string &err) {
                 // the per-token GEMVs / norms / RoPEs / copies of this layer as one launch over the
                 // window's rows each - row-wise identical arithmetic (STRATA_DEC_BATCH=0: token by token)
                 const bool qb = dec_batch && n > 1 && native_qsa_enabled() && native_rope_enabled() && !st.kv_q4;
+                const bool fused_kv = g_fused_kv_store && fuse_nr && HD == 256 && s.n_rot == 64 &&
+                                      st.kv_int8 && !st.kv_q4 && !st.kv_hybrid && !st.kv_rot;
+                bool ready_qsa = false;
+#ifdef STRATA_ORCA_NATIVE
+                // ponytail: use only the primitive MMVQ paths audited by the
+                // real-weight scheduling check; other formats retain ordering.
+                auto phase_mmvq = [](int type) { return type == 8 || type == 14 || type == 21 || type == 23; };
+                ready_qsa = cs->allows_independent() && !prof_on_ && !trace_m_ &&
+                            phase_mmvq(wq->native_type) && phase_mmvq(wk->native_type) && phase_mmvq(wv->native_type);
+#endif
                 {
 #ifdef STRATA_EZPP
                 EZPP_EX("verify.submit.pre.attn.qsa.kv_projection");
 #endif
-                native_quantize_q8_1(xm, xq_, (int) N, n, cs);
-                if (qb) bf16_gemv_fp32_mmvf_multi(mixed_ + tb * N, N, (const uint16_t*) wik->data, idx_raw + tb * ID, ID, N, ID, n, cs);
-                else for (int t = tb; t < te; ++t)
-                    bf16_gemv_fp32_mmvf(mixed_ + t * N, (const uint16_t*) wik->data, idx_raw + t * ID, (int) N, (int) ID, cs);
+                if (!q8_attn) native_quantize_q8_1(xm, xq_, (int) N, n, cs);
+#ifdef STRATA_ORCA_NATIVE
+                if (ready_qsa) {
+                    static const bool logged = [&] {
+                        std::fprintf(stderr, "strata: Orca QSA independent projections enabled (q=%d k=%d v=%d)\n",
+                                     wq->native_type, wk->native_type, wv->native_type);
+                        return true;
+                    }();
+                    (void)logged;
+                    // All five outputs are disjoint. Join before normalization,
+                    // KV/index updates and the later reuse of xq_ by attention.
+                    cs->independent([&] {
+                        if (qb) bf16_gemv_fp32_mmvf_multi(xm, N, (const uint16_t*) wik->data, idx_raw + tb * ID, ID, N, ID, n, cs);
+                        else for (int t = tb; t < te; ++t)
+                            bf16_gemv_fp32_mmvf(mixed_ + t * N, (const uint16_t*) wik->data, idx_raw + t * ID, (int) N, (int) ID, cs);
+                        native_mmvq(wk->native_type, wk->native_data, xq_, kcur_ + tb * NKV * HD, (int) N, (int) (NKV * HD), n, cs);
+                        native_mmvq(wv->native_type, wv->native_data, xq_, vcur_ + tb * NKV * HD, (int) N, (int) (NKV * HD), n, cs);
+                        native_mmvq(wq->native_type, wq->native_data, xq_, qfull_ + tb * NH * 2 * HD, (int) N, (int) (NH * 2 * HD), n, cs);
+                        if (qb) bf16_gemv_fp32_mmvf_multi(xm, N, (const uint16_t*) wiq->data, qidx_ + tb * IQ * ID, IQ * ID, N, IQ * ID, n, cs);
+                        else for (int t = tb; t < te; ++t)
+                            bf16_gemv_fp32_mmvf(mixed_ + t * N, (const uint16_t*) wiq->data, qidx_ + t * IQ * ID, (int) N, (int) (IQ * ID), cs);
+                    });
+                }
+#endif
+                if (!ready_qsa) {
+                    if (qb) bf16_gemv_fp32_mmvf_multi(mixed_ + tb * N, N, (const uint16_t*) wik->data, idx_raw + tb * ID, ID, N, ID, n, cs);
+                    else for (int t = tb; t < te; ++t)
+                        bf16_gemv_fp32_mmvf(mixed_ + t * N, (const uint16_t*) wik->data, idx_raw + t * ID, (int) N, (int) ID, cs);
+                }
                 stamp(l, 7, grp);
-                native_mmvq(wk->native_type, wk->native_data, xq_, kcur_ + tb * NKV * HD, (int) N, (int) (NKV * HD), n, cs);
-                native_mmvq(wv->native_type, wv->native_data, xq_, vcur_ + tb * NKV * HD, (int) N, (int) (NKV * HD), n, cs);
-                if (qb) norm_rope(kcur_ + tb * NKV * HD, wkn, (int) (n * NKV), (int) HD, pos_k + tb * NKV);
-                else for (int t = tb; t < te; ++t) norm_rope(kcur_ + t * NKV * HD, wkn, (int) NKV, (int) HD, pos_ + t * NH);
+                if (!ready_qsa) {
+                    native_mmvq(wk->native_type, wk->native_data, xq_, kcur_ + tb * NKV * HD, (int) N, (int) (NKV * HD), n, cs);
+                    native_mmvq(wv->native_type, wv->native_data, xq_, vcur_ + tb * NKV * HD, (int) N, (int) (NKV * HD), n, cs);
+                }
+                if (!fused_kv || batch_rec_) {
+                    if (qb) norm_rope(kcur_ + tb * NKV * HD, wkn, (int) (n * NKV), (int) HD, pos_k + tb * NKV);
+                    else for (int t = tb; t < te; ++t) norm_rope(kcur_ + t * NKV * HD, wkn, (int) NKV, (int) HD, pos_ + t * NH);
+                }
                 if (st.kv_rot) {   // K and V rotated before they are stored (kv_q4.hpp)
                     fwht256_inplace_cuda(kcur_ + tb * NKV * HD, (int64_t) n * NKV, cs);
                     fwht256_inplace_cuda(vcur_ + tb * NKV * HD, (int64_t) n * NKV, cs);
@@ -1113,14 +1234,46 @@ bool Verifier::record_window(int T, dpct::queue_ptr cs, std::string &err) {
 #ifdef STRATA_EZPP
                 EZPP_EX("verify.submit.pre.attn.qsa.kv_store");
 #endif
+                if (batch_rec_) {   // snapshot each slot's indexer tail before its first proposed row
+                    for (int t = tb; t < te; ++t)
+                        if (t == tb || brow_[t] != brow_[t - 1])
+                            copy_from_mapped(tail_snap_b_ + ((size_t) brow_[t] * nQall + qi) * TS,
+                                             slot_ss(t).qsa_states[qi].idx_tail, TS, cs);
+                } else
                 if (grp == 0) copy_from_mapped(tail_snap_ + (size_t) qi * TS, st.idx_tail, TS, cs);
+                const bool batch_kv = dec_batch && !g_no_batch_kv && n > 1 && !batch_rec_;
+                if (fused_kv && !batch_rec_) {
+                    native_qsa_norm_rope_store_q8_steps(kcur_ + tb * NKV * HD, vcur_ + tb * NKV * HD,
+                        (const float*)wkn->data, qb ? pos_k + tb * NKV : pos_ + tb * NH, (int)(qb ? NKV : NH),
+                        step_ + tb * kStepCount, kStepCount, n, st.k_q, st.v_q, st.k_scale, st.v_scale,
+                        st.page_table, s, EPS, rope_scaling(), cs, &st.host);
+                } else if (batch_kv) {
+                    const int32_t* steps = step_ + tb * kStepCount;
+                    const float* kc = kcur_ + tb * NKV * HD;
+                    const float* vc = vcur_ + tb * NKV * HD;
+                    if (st.kv_hybrid) {
+                        const KvHostPools hk = kv_hybrid_k_half(st.host), hv = kv_hybrid_v_half(st.host);
+                        kv_append_q8_steps(st.k_q, st.k_q, st.k_scale, st.k_scale, st.page_table, steps, kStepCount,
+                                           kc, kc, (int)(NKV * HD), n, s, cs, st.host.present() ? &hk : nullptr);
+                        kv_append_q4_steps(st.v_q4, st.v_q4, st.page_table, steps, kStepCount, n, vc, vc, s, cs,
+                                           st.host.present() ? &hv : nullptr);
+                    } else if (st.kv_q4)
+                        kv_append_q4_steps(st.k_q4, st.v_q4, st.page_table, steps, kStepCount, n, kc, vc, s, cs, &st.host);
+                    else if (st.kv_int8)
+                        kv_append_q8_steps(st.k_q, st.v_q, st.k_scale, st.v_scale, st.page_table, steps, kStepCount,
+                                           kc, vc, (int)(NKV * HD), n, s, cs, &st.host);
+                    else
+                        kv_append_steps(st.k_pool, st.v_pool, st.page_table, steps, kStepCount, n, kc, vc, s, cs, &st.host);
+                } else
                 for (int t = tb; t < te; ++t) {
+                    const QsaState& st = slot_ss(t).qsa_states[qi];
                     const int32_t* step_t = step_ + t * kStepCount;
                     if (st.kv_hybrid) {   // K8V4: the unused half's lanes folded onto the used pool (layer.cpp)
+                        const KvHostPools hk = kv_hybrid_k_half(st.host), hv = kv_hybrid_v_half(st.host);
                         kv_append_q8_step(st.k_q, st.k_q, st.k_scale, st.k_scale, st.page_table, step_t,
-                                          kcur_ + t * NKV * HD, kcur_ + t * NKV * HD, s, cs, nullptr);
+                                          kcur_ + t * NKV * HD, kcur_ + t * NKV * HD, s, cs, st.host.present() ? &hk : nullptr);
                         kv_append_q4_step(st.v_q4, st.v_q4, st.page_table, step_t, vcur_ + t * NKV * HD,
-                                          vcur_ + t * NKV * HD, s, cs, nullptr);
+                                          vcur_ + t * NKV * HD, s, cs, st.host.present() ? &hv : nullptr);
                     } else if (st.kv_q4)
                         kv_append_q4_step(st.k_q4, st.v_q4, st.page_table, step_t, kcur_ + t * NKV * HD,
                                           vcur_ + t * NKV * HD, s, cs, &st.host);
@@ -1132,17 +1285,25 @@ bool Verifier::record_window(int T, dpct::queue_ptr cs, std::string &err) {
                                        vcur_ + t * NKV * HD, s, cs, &st.host);
                 }
                 const QsaIndexerBuffers ib{st.idx_tail, st.idx_dead, st.idx_pooled, st.idx_block_pos};
-                for (int t = tb; t < te; ++t)
+                if (batch_kv)
+                    native_qsa_indexer_append_steps(idx_raw + tb * ID, step_ + tb * kStepCount + kStepPos, kStepCount,
+                                                   n, 0, (const float*) wikn->data, EPS, ib, s, st.max_cells,
+                                                   rope_scaling(), cs);
+                else
+                for (int t = tb; t < te; ++t) {
+                    const QsaState& sx = slot_ss(t).qsa_states[qi];
+                    const QsaIndexerBuffers row_ib{sx.idx_tail, sx.idx_dead, sx.idx_pooled, sx.idx_block_pos};
                     native_qsa_indexer_append(idx_raw + t * ID, step_ + t * kStepCount + kStepPos, 0,
-                                              (const float*) wikn->data, EPS, ib, s, st.max_cells,
+                                              (const float*) wikn->data, EPS, row_ib, s, sx.max_cells,
                                               rope_scaling(), cs);
+                }
                 }
                 stamp(l, 9, grp);
                 {
 #ifdef STRATA_EZPP
                 EZPP_EX("verify.submit.pre.attn.qsa.query");
 #endif
-                native_mmvq(wq->native_type, wq->native_data, xq_, qfull_ + tb * NH * 2 * HD, (int) N, (int) (NH * 2 * HD),
+                if (!ready_qsa) native_mmvq(wq->native_type, wq->native_data, xq_, qfull_ + tb * NH * 2 * HD, (int) N, (int) (NH * 2 * HD),
                             n, cs);
                 if (qb) {
                     if (fuse_nr) {
@@ -1169,7 +1330,7 @@ bool Verifier::record_window(int T, dpct::queue_ptr cs, std::string &err) {
                     norm_rope(qcur_ + tb * NH * HD, wqn, (int) (n * NH), (int) HD, pos_ + tb * NH);
                     }
                     if (st.kv_rot) fwht256_inplace_cuda(qcur_ + tb * NH * HD, (int64_t) n * NH, cs);   // <Hq, Hk> = <q, k>
-                    bf16_gemv_fp32_mmvf_multi(mixed_ + tb * N, N, (const uint16_t*) wiq->data, qidx_ + tb * IQ * ID, IQ * ID,
+                    if (!ready_qsa) bf16_gemv_fp32_mmvf_multi(mixed_ + tb * N, N, (const uint16_t*) wiq->data, qidx_ + tb * IQ * ID, IQ * ID,
                                               N, IQ * ID, n, cs);
                     norm_rope(qidx_ + tb * IQ * ID, wiqn, (int) (n * IQ), (int) ID, pos_i + tb * IQ);
                 } else {
@@ -1200,7 +1361,7 @@ bool Verifier::record_window(int T, dpct::queue_ptr cs, std::string &err) {
                 }
                 for (int t = tb; t < te; ++t) {
                     float* qx = qidx_ + t * IQ * ID;
-                    bf16_gemv_fp32_mmvf(mixed_ + t * N, (const uint16_t*) wiq->data, qx, (int) N, (int) (IQ * ID), cs);
+                    if (!ready_qsa) bf16_gemv_fp32_mmvf(mixed_ + t * N, (const uint16_t*) wiq->data, qx, (int) N, (int) (IQ * ID), cs);
                     norm_rope(qx, wiqn, (int) IQ, (int) ID, pos_ + t * NH);
                 }
                 }
@@ -1212,6 +1373,25 @@ bool Verifier::record_window(int T, dpct::queue_ptr cs, std::string &err) {
 #ifdef STRATA_EZPP
                 EZPP_EX("verify.submit.pre.attn.qsa.select");
 #endif
+                if (batch_rec_) {   // each row selects and attends over its own slot's K/V
+                    for (int t = tb; t < te; ++t) {
+                        const QsaState& sx = slot_ss(t).qsa_states[qi];
+                        qsa_block_scores(sx.idx_pooled, sx.idx_dead, qidx_ + t * IQ * ID, step_ + t * kStepCount, 1,
+                                         max_blocks_, s, scores_ + (size_t) t * max_blocks_, cs);
+                        qsa_block_topk(scores_ + (size_t) t * max_blocks_, step_ + t * kStepCount, 1, max_blocks_, cap_, s,
+                                       sel_ + (size_t) t * cap_, cs);
+                        const bool host = qsa_host_attn_enabled(sx);
+                        if (!host) qsa_kv_resolve(sx, *g_, sel_ + (size_t) t * cap_, step_ + t * kStepCount, 1, cap_, cs);
+                        const QsaAttnPools px = host ? qsa_host_attn_pools(sx) : qsa_attn_pools(sx);
+                        if (host)
+                            qsa_decode_attn_host_batch(qcur_ + t * NH * HD, px, sel_ + (size_t) t * cap_,
+                                step_ + t * kStepCount, cap_, s, attn_scratch_ + (size_t) t * attn_scratch_floats_,
+                                attn_ + t * NH * HD, 1, cs);
+                        else qsa_decode_attn_batch(qcur_ + t * NH * HD, px, sel_ + (size_t) t * cap_, step_ + t * kStepCount,
+                                              cap_, s, attn_scratch_ + (size_t) t * attn_scratch_floats_,
+                                              attn_ + t * NH * HD, 1, cs);
+                    }
+                } else {
                 qsa_block_scores(st.idx_pooled, st.idx_dead, qidx_ + tb * IQ * ID, step_ + tb * kStepCount, n, max_blocks_,
                                  s, scores_ + (size_t) tb * max_blocks_, cs);
                 qsa_block_topk(scores_ + (size_t) tb * max_blocks_, step_ + tb * kStepCount, n, max_blocks_, cap_, s,
@@ -1220,11 +1400,13 @@ bool Verifier::record_window(int T, dpct::queue_ptr cs, std::string &err) {
                 // KV streaming: the n selections' blocks resident, unless the SYCL A/B path reads host KV directly.
                 if (!host_attn) qsa_kv_resolve(st, *g_, sel_ + (size_t) tb * cap_, step_ + tb * kStepCount, n, cap_, cs);
                 }
+                }
                 stamp(l, 12, grp);
                 {
 #ifdef STRATA_EZPP
                 EZPP_EX("verify.submit.pre.attn.qsa.attend");
 #endif
+                if (!batch_rec_) {
                 const QsaAttnPools pools = host_attn ? qsa_host_attn_pools(st) : qsa_attn_pools(st);
                 if (host_attn)
                     qsa_decode_attn_host_batch(qcur_ + tb * NH * HD, pools, sel_ + (size_t) tb * cap_,
@@ -1236,6 +1418,7 @@ bool Verifier::record_window(int T, dpct::queue_ptr cs, std::string &err) {
                                           step_ + tb * kStepCount, cap_, s,
                                           attn_scratch_ + (size_t) tb * attn_scratch_floats_, attn_ + tb * NH * HD,
                                           n, cs);
+                }
                 stamp(l, 13, grp);
                 if (st.kv_rot || st.kv_hybrid) fwht256_inplace_cuda(attn_ + tb * NH * HD, (int64_t) n * NH, cs);   // back: H^-1 = H
                 if (qb)
@@ -1270,11 +1453,12 @@ bool Verifier::record_window(int T, dpct::queue_ptr cs, std::string &err) {
         phase_done();
         }
         stamp(l, 16, grp);
+        bool q8_ffn = false;
         {
 #ifdef STRATA_EZPP
             EZPP_EX("verify.submit.pre.hc1");
 #endif
-            gr_read_group(1, true, inj_, inj2_);
+            q8_ffn = gr_read_group(1, true, inj_, inj2_);
             event_stamp(l, 30, grp);
             phase_done();
         }
@@ -1375,7 +1559,7 @@ bool Verifier::record_window(int T, dpct::queue_ptr cs, std::string &err) {
             EZPP_EX("verify.submit.pre.shared.routed_quant");
         #endif
         if (strata::kernels::cpu::expert_layout().native) {
-            if (!fused_act)
+            if (!fused_act && !q8_ffn)
                 quantize_q8_1_rows(xm, n, N, nat_xq_ + (size_t) tb * (N / 32) * 36, cs);
         } else
             quantize_q8_0_scaled(xm, hit_xq_ + (size_t) tb * (N / 32) * 34, hit_xs_ + (size_t) tb * (N / 32), (int64_t) n * N, cs);
@@ -1537,9 +1721,9 @@ bool Verifier::record_window(int T, dpct::queue_ptr cs, std::string &err) {
         }
     if (le_ < g.n_layers) {   // a layer split's earlier stage: hand the residual on, no head
         for (int t = 0; t < T; ++t) {
-            copy_from_mapped(hand_out_ + (size_t) t * HB, Rt(t), HC * N, cs);
-            copy_from_mapped(hand_out_ + (size_t) t * HB + HC * N, bo_ + (size_t) t * N, N, cs);
-            copy_from_mapped(hand_out_ + (size_t) t * HB + HC * N + N, inj2_ + (size_t) t * HC, HC, cs);
+            copy_from_mapped(hand_out_ + (size_t) (hrow0 + t) * HB, Rt(t), HC * N, cs);
+            copy_from_mapped(hand_out_ + (size_t) (hrow0 + t) * HB + HC * N, bo_ + (size_t) t * N, N, cs);
+            copy_from_mapped(hand_out_ + (size_t) (hrow0 + t) * HB + HC * N + N, inj2_ + (size_t) t * HC, HC, cs);
         }
         return true;
     }
@@ -1691,6 +1875,7 @@ bool Verifier::capture(int T, std::string &err) try {
     }
     std::string rerr;
     const bool ok = record_window(T, cs_, rerr);
+    auto orca_handle = record_orca_handle(*cs_);
     dpct::experimental::command_graph_ptr graph = nullptr;
     const dpct::err0 ce =
         DPCT_CHECK_ERROR(dpct::experimental::end_recording(cs_, &graph));
@@ -1764,6 +1949,7 @@ bool Verifier::capture(int T, std::string &err) try {
     /*
     DPCT1007: Migration of cudaGraphUpload is not supported.
     */
+    bind_orca_handle(exec_[T], orca_handle);
     const dpct::err0 ue = 0;   // no cudaGraphUpload on SYCL: a finalized command_graph is already resident
     const dpct::err0 us = DPCT_CHECK_ERROR(cs_->wait());
     std::fprintf(
@@ -1859,6 +2045,7 @@ bool Verifier::capture_commit(std::string &err) try {
         return false;
     }
     bool ok = record_commit(err);
+    auto orca_handle = record_orca_handle(*cs_);
     dpct::experimental::command_graph_ptr graph = nullptr;
     const dpct::err0 ce =
         DPCT_CHECK_ERROR(dpct::experimental::end_recording(cs_, &graph));
@@ -1882,6 +2069,7 @@ bool Verifier::capture_commit(std::string &err) try {
         return false;
     }
     delete (graph);
+    bind_orca_handle(commit_exec_, orca_handle);
     return true;
 }
 catch (sycl::exception const &exc) {
@@ -1939,6 +2127,7 @@ bool Verifier::run(int T, const int32_t *tokens, int64_t pos0, PoolMultiFn pool,
     SessionState& ss = *ss_;
     if (released_.load()) { err = "verify: an earlier window never finished on the GPU (#267); restart the engine"; return false; }
     if (pos0 + T > ss.qsa_states[ss.qsa_primary()].max_cells) { err = "verify: the window runs past the context"; return false; }
+    last_batch_ = false;
     if (!capture(T, err) || !capture_commit(err)) return false;
     VDBG("captured; staging\n");
     const Clock::time_point t0 = Clock::now();
@@ -1976,6 +2165,16 @@ bool Verifier::run(int T, const int32_t *tokens, int64_t pos0, PoolMultiFn pool,
     last_pos0_ = pos0;
     for (int t = 0; t < T; ++t) last_tokens_[t] = tokens[t];
     ms_host += ms_since(t0);
+    return execute_window(T, tokens, pos0, pool, user, out, t0, err);
+}
+catch (const std::exception& e) { err = std::string("verify: ") + e.what(); return false; }
+
+bool Verifier::execute_window(int T, const int32_t* tokens, int64_t pos0, PoolMultiFn pool,
+                              void* user, int32_t* out, Clock::time_point t0, std::string& err) try {
+    using namespace strata::kernels;
+    const ModelGeometry& g = *g_;
+    SessionState& ss = *ss_;
+    auto* execution = last_batch_ ? exec_bm_.at(bkey(last_rows_, T, row_base_)) : exec_[T];
     VDBG("staged; launching\n");
     static Clock::time_point t_prev_end;   // SYCL port timing: where does a round's wall clock go?
     const Clock::time_point t_launch = Clock::now();
@@ -1997,13 +2196,13 @@ bool Verifier::run(int T, const int32_t *tokens, int64_t pos0, PoolMultiFn pool,
         EZPP_EX("verify.submit");
 #endif
 #if STRATA_SYCL_VERIFY_GRAPH_EVENT_WAIT
-        if (!g_verify_eager && g_verify_no_host)
-            le = DPCT_CHECK_ERROR(graph_done.emplace(cs_->ext_oneapi_graph(*exec_[T])));
+        if (!g_verify_eager && g_verify_no_host && !orca_replay_enabled())
+            le = DPCT_CHECK_ERROR(graph_done.emplace(cs_->ext_oneapi_graph(*execution)));
         else
 #endif
         le = (g_verify_eager)
                  ? (record_window(T, cs_, err) ? 0 : 1)   // SYCL port: eager replay of the window body
-                 : DPCT_CHECK_ERROR((cs_)->ext_oneapi_graph(*exec_[T]));
+                 : DPCT_CHECK_ERROR(submit_verify_graph(*cs_, *execution));
     }
     const Clock::time_point t_submitted = Clock::now();
     /*
@@ -2022,11 +2221,11 @@ bool Verifier::run(int T, const int32_t *tokens, int64_t pos0, PoolMultiFn pool,
         if (err.empty()) err = "verify: launch failed";
         return false;
     }
-    (void)DPCT_CHECK_ERROR(((cs_)->ext_oneapi_empty()));
+    if (!g_verify_no_host) { (void)DPCT_CHECK_ERROR((verify_queue_empty(cs_))); }
     VDBG("launched\n");
     const uint32_t* const seq = h_seq_;
     volatile uint32_t* const flag = h_flag_;
-    const int G = groups_[T] > 0 ? groups_[T] : 1;
+    const int G = last_batch_ ? 1 : (groups_[T] > 0 ? groups_[T] : 1);
     const int gtb[2] = {0, (T + 1) / 2}, gte[2] = {G == 2 ? (T + 1) / 2 : T, T};
     // SYCL port: with every routed expert resident the GPU takes its own plan (`device_plan_`) and skips every
     // host flag, so the host has nothing to do per layer - and on this platform a kernel's writes to host-mapped
@@ -2062,7 +2261,7 @@ bool Verifier::run(int T, const int32_t *tokens, int64_t pos0, PoolMultiFn pool,
                 // SYCL port fix: cudaStreamQuery's answer (0 finished, 1 still running) was lost in the migration
                 // (DPCT_CHECK_ERROR of ext_oneapi_empty() is always 0), so ANY wait over 2 ms was reported as
                 // "graph finished". Layers whose GPU time exceeds 2 ms (host-mirrored experts read over PCIe) failed that way.
-                const dpct::err0 q = cs_->ext_oneapi_empty() ? 0 : 1;
+                const dpct::err0 q = verify_queue_empty(cs_) ? 0 : 1;
                 if (q != 1 && pending()) {
                     trace_ev("NEVER-RANG", k, l, (int64_t) q);
                     trace_dump(stderr);
@@ -2083,7 +2282,7 @@ bool Verifier::run(int T, const int32_t *tokens, int64_t pos0, PoolMultiFn pool,
             }
             if (now - a > std::chrono::seconds(20)) {
                 // #267: the caller ends the engine; no spin kernel may outlive it
-                trace_ev("TIMEOUT", k, l, (int64_t) !cs_->ext_oneapi_empty());   // SYCL port: 1 = still running
+                trace_ev("TIMEOUT", k, l, (int64_t) !verify_queue_empty(cs_));   // SYCL port: 1 = still running
                 if (g_trace) {
                     diag(stderr);   // the words and the breadcrumbs before the release ...
                     const bool drained = release_gpu_waits(5000);
@@ -2161,7 +2360,7 @@ bool Verifier::run(int T, const int32_t *tokens, int64_t pos0, PoolMultiFn pool,
             se = DPCT_CHECK_ERROR(graph_done->wait_and_throw());
         else
 #endif
-        se = DPCT_CHECK_ERROR(cs_->wait());
+        se = wait_verify_queue(cs_, l0_sync_) ? 0 : 1;
     }
     trace_ev("SYNCED", -1, -1, (int64_t) se);
     if (l0_event_error_.load(std::memory_order_acquire) != 0) {
@@ -2199,7 +2398,7 @@ bool Verifier::run(int T, const int32_t *tokens, int64_t pos0, PoolMultiFn pool,
         return false;
     }
     if ((device_plan_ || l0_events_) && g_dbg) {
-        const int Gd = groups_[T] > 0 ? groups_[T] : 1;
+        const int Gd = last_batch_ ? 1 : (groups_[T] > 0 ? groups_[T] : 1);
         const size_t decisions = (size_t) (le_ - lb_) * Gd;
         std::vector<uint32_t> sk(decisions, 0);
         std::vector<int32_t> id0((size_t) ss.k, 0);
@@ -2269,6 +2468,21 @@ bool Verifier::run(int T, const int32_t *tokens, int64_t pos0, PoolMultiFn pool,
                 .memcpy(prof_h_.data(), prof_, prof_h_.size() * 8)
                 .wait();
         const int64_t L = g.n_layers;
+#if defined(STRATA_ORCA_NATIVE)
+        const auto& clock = cs_->runtime().properties();
+        if (!clock.timerResolution || !clock.timestampValidBits || clock.timestampValidBits > 64) {
+            err = "verify: invalid Level Zero timestamp properties";
+            return false;
+        }
+        const uint64_t mask = clock.timestampValidBits == 64 ? UINT64_MAX :
+                              (uint64_t{1} << clock.timestampValidBits) - 1;
+        const auto first_stamp = std::find_if(prof_h_.begin(), prof_h_.end(), [](auto tick) { return tick != 0; });
+        if (first_stamp == prof_h_.end()) { err = "verify: Level Zero timestamps are all zero"; return false; }
+        const uint64_t origin = *first_stamp;
+        // ponytail: one window is shorter than a device-clock wrap; rebase before scaling to avoid overflow.
+        for (auto& tick : prof_h_)
+            if (tick) tick = 1 + ((tick - origin) & mask) * clock.timerResolution;
+#endif
         auto at = [&](int64_t l, int i) { return prof_h_[(size_t) (l * kProfPer + i)]; };
         // D8: the derived columns below read stamps the hc-read kernels write themselves or the next
         // layer's first.  A slot no kernel stamped is 0 and its unsigned difference wrapped to ~1e19 ns -
@@ -2313,21 +2527,27 @@ bool Verifier::run(int T, const int32_t *tokens, int64_t pos0, PoolMultiFn pool,
     // the drafts were. Exact: a rejected row's draw is discarded, and no kept decision depends on a reused draw.
     if (le_ < g.n_layers) {   // a layer split's earlier stage: the hand-off is written (synced above)
         ++windows;
-        return next_ == nullptr || next_->run(T, tokens, pos0, pool, next_user_, out, err);
+        return next_ == nullptr || (last_batch_
+            ? next_->run_slot_rows(last_rows_, T, tokens, last_pos_b_, pool, next_user_, out, err)
+            : next_->run(T, tokens, pos0, pool, next_user_, out, err));
     }
     const bool sampled = !sampling_.greedy && sampling_.temperature > 0.0f;
-    if (head_sampling_ && (sampled || hist_d_ != nullptr)) {
+    if (last_batch_ && !sample_rows(T, err)) return false;
+    if (!last_batch_ && head_sampling_ && (sampled || hist_d_ != nullptr)) {
         SamplerParams sp = sampling_;
         sp.counter = (uint64_t) pos0;
         sample_tokens(head_logits_, T, (int) n_vocab_, hist_d_, hist_len_, sp, m_out_, cs_);
-        if (DPCT_CHECK_ERROR(cs_->wait()) !=
-            0) { // m_out_ is the mapped h_out_: synced, it is readable
+        if (!wait_verify_queue(cs_, l0_sync_)) { // m_out_ is the mapped h_out_: synced, it is readable
             err = "verify: the head sampling failed";
             return false;
         }
     }
     for (int t = 0; t < T; ++t) out[t] = ((volatile int32_t*) h_out_)[t];
-    if (static const bool dbg = std::getenv("STRATA_DBG_NAN") != nullptr; dbg) {   // debug: the first non-finite head
+    // Inspect only after an all-zero result, so this mode adds no GPU work or
+    // readback before the failure it is meant to diagnose.
+    static const bool zero_diag = std::getenv("STRATA_VERIFY_ZERO_DIAG") != nullptr;
+    const bool all_zero = zero_diag && std::all_of(out, out + T, [](int32_t token) { return token == 0; });
+    if (static const bool dbg = std::getenv("STRATA_DBG_NAN") != nullptr; dbg || all_zero) {   // debug: the first non-finite head
         static bool reported = false;
         if (!reported) {
             std::vector<float> h((size_t) T * (size_t) n_vocab_);
@@ -2337,10 +2557,17 @@ bool Verifier::run(int T, const int32_t *tokens, int64_t pos0, PoolMultiFn pool,
             for (int t = 0; t < T && !reported; ++t) {
                 int64_t bad = 0;
                 for (int64_t v = 0; v < n_vocab_; ++v) bad += !std::isfinite(h[(size_t) t * n_vocab_ + v]);
-                if (bad) {
+                if (bad || all_zero) {
                     reported = true;
                     std::fprintf(stderr, "strata dbg: verify window at position %lld, row %d: %lld of %lld logits non-finite "
                                          "(token out %d)\n", (long long) pos0, t, (long long) bad, (long long) n_vocab_, out[t]);
+                    if (all_zero) {
+                        std::vector<float> residual((size_t) g.hc * g.n_embd);
+                        cs_->memcpy(residual.data(), R_ + (size_t) t * residual.size(), residual.size() * sizeof(float)).wait_and_throw();
+                        const auto invalid = std::count_if(residual.begin(), residual.end(), [](float v) { return !std::isfinite(v); });
+                        std::fprintf(stderr, "strata dbg: zero output: final residual %zu values, %lld non-finite; logits first4=%g %g %g %g\n",
+                                     residual.size(), (long long) invalid, h[0], h[1], h[2], h[3]);
+                    }
                 }
             }
         }
@@ -2369,7 +2596,7 @@ void Verifier::set_plan_slot(int grp) {
     sink_.ptr = (unsigned long long*) (base + ptr_off);
     sink_.ptr2 = sink_.ptr + cap;
     sink_.start2 = base + ptr_off + 4 * cap;
-    const int G = groups_[last_t_] > 0 ? groups_[last_t_] : 1;
+    const int G = last_batch_ ? 1 : (groups_[last_t_] > 0 ? groups_[last_t_] : 1);
     const int64_t per = G == 2 ? kStagingBlobs / 2 : kStagingBlobs;
     sink_.staging = (unsigned long long) (staging_ + (size_t) (grp * per) * strata::kernels::cpu::expert_layout().max_blob);
     sink_.staging_cap = per;
@@ -2512,7 +2739,7 @@ bool Verifier::commit(int n_keep, std::string &err, bool wait) try {
         return next_ == nullptr || next_->commit(n_keep, err);
     }
     const dpct::err0 le =
-        DPCT_CHECK_ERROR((cs_)->ext_oneapi_graph(*commit_exec_));
+        DPCT_CHECK_ERROR(submit_verify_graph(*cs_, *commit_exec_));
     /*
     DPCT1009: SYCL reports errors using exceptions and does not use error
     codes. Please replace the "get_error_string_dummy(...)" with a real
@@ -2556,7 +2783,7 @@ bool Verifier::commit_finish(std::string &err) try {
     const OnDevice on_device(device_);
     const int n_keep = pending_commit_;
     pending_commit_ = 0;
-    const dpct::err0 se = DPCT_CHECK_ERROR(cs_->wait());
+    const dpct::err0 se = wait_verify_queue(cs_, l0_sync_) ? 0 : 1;
     if (se != 0) {
         err = std::string("verify: commit: ") + dpct::get_error_string_dummy(se);
         return false;
@@ -2584,6 +2811,7 @@ bool Verifier::commit_finish(std::string &err) try {
             auto& dev = dpct::get_current_device();
             dev.destroy_queue(cs_);
             cs_ = dev.create_queue(true);
+            l0_sync_.init(cs_, "verify");
         }
         if (cs_ == nullptr) {
             err = "verify: failed to renew the Level Zero event queue";
@@ -2603,6 +2831,354 @@ catch (sycl::exception const &exc) {
 bool Verifier::wait_commit(std::string& err) {
     if (!commit_finish(err)) return false;
     return next_ == nullptr || next_->wait_commit(err);
+}
+
+
+// Independent slot windows; arithmetic and prefix state follow the upstream implementation.
+bool Verifier::init_slots(const std::vector<SessionState*>& slots, std::string& err) {
+    const OnDevice on_device(device_);
+    if (g_ == nullptr || ss_ == nullptr) { err = "verify: init_slots before init"; return false; }
+    if (!slots_.empty() || h_commitb_) { err = "verify: init_slots called twice"; return false; }
+    if (slots.empty() || slots.size() > 8 || g_verify_eager) {
+        err = "verify: init_slots needs 1..8 sessions and recorded command lists";
+        return false;
+    }
+    for (size_t i = 0; i < slots.size(); ++i) {
+        SessionState* x = slots[i];
+        for (size_t j = 0; j < i; ++j)
+            if (x == slots[j]) { err = "verify: slot sessions must be independent"; return false; }
+        if (x == nullptr || x->layer_lo != ss_->layer_lo || x->layer_hi != ss_->layer_hi ||
+            x->max_cells != ss_->max_cells || x->gdn_ord0 != ss_->gdn_ord0 || x->qsa_ord0 != ss_->qsa_ord0) {
+            err = "verify: a slot's session is not carved like the stage's own (layer range, context)";
+            return false;
+        }
+    }
+    const strata::kernels::QsaShapes s = shapes_of(*g_);
+    const int64_t S = (int64_t) slots.size(), CB = 2 + max_t_;
+    const int64_t TS = (s.idx_block - 1) * g_->idx_key_dim, nQ = g_->n_qsa_layers();
+    void* d = nullptr;
+    if (!mapped((size_t) (S * CB * 4 + 16), (void**) &h_commitb_, (void**) &m_commitb_)) {
+        err = "verify: the batch commit staging failed";
+        return false;
+    }
+    const uint64_t a = ((uint64_t) S * CB * 4 + 255) & ~255ull;
+    if (!(d = sycl::malloc_device(a + (uint64_t) S * std::max<int64_t>(nQ, 1) * TS * 4, *cs_))) {
+        err = "verify: the batch buffers do not fit";
+        return false;
+    }
+    arena_b_ = d;
+    commitb_ = (int32_t*) d;
+    tail_snap_b_ = (float*) ((uint8_t*) d + a);
+    slots_ = slots;
+    slot_sp_.assign(slots.size(), sampling_);   // greedy until set_slot_sampling
+    std::fprintf(stderr, "strata verify: batch windows of up to %lld sequences (layers [%lld, %lld))\n", (long long) S,
+                 (long long) lb_, (long long) le_);
+    return true;
+}
+
+bool Verifier::capture_batch(const int* rows, int S, int hbase, std::string& err) {
+    auto& ex = exec_bm_[bkey(rows, S, hbase)];
+    if (ex) return true;
+    dpct::experimental::begin_recording(cs_);
+    batch_rec_ = true;
+    row_base_ = hbase;
+    std::copy_n(rows, S, brow_);
+    const bool ok = record_window(S, cs_, err);
+    batch_rec_ = false;
+    row_base_ = 0;
+    auto handle = record_orca_handle(*cs_);
+    dpct::experimental::command_graph_ptr graph = nullptr;
+    dpct::experimental::end_recording(cs_, &graph);
+    std::unique_ptr<std::remove_pointer_t<decltype(graph)>> owner(graph);
+    if (!ok) return false;
+    ex = new sycl::ext::oneapi::experimental::command_graph<
+        sycl::ext::oneapi::experimental::graph_state::executable>(graph->finalize());
+    bind_orca_handle(ex, handle);
+    std::fprintf(stderr, "strata verify: captured batch rows=%d slots=", S);
+    for (int t = 0; t < S; ++t) std::fprintf(stderr, "%s%d", t ? "," : "", rows[t]);
+    std::fprintf(stderr, "\n");
+    return true;
+}
+
+bool Verifier::capture_commit_batch(const int* rows, int S, int hbase, std::string& err) {
+    dpct::experimental::command_graph_exec_ptr& cex = commit_bm_[bkey(rows, S, hbase)];
+    if (cex != nullptr) return true;
+    using namespace strata::kernels;
+    const ModelGeometry& g = *g_;
+    const QsaShapes s = shapes_of(g);
+    const int64_t C = g.ssm_conv_channels, HV = g.ssm_v_heads, ZV = g.ssm_value_dim, ID = g.idx_key_dim, MT = max_t_;
+    const int64_t CB = 2 + MT, nQ = g.n_qsa_layers();
+    const uint64_t gdn_floats = (uint64_t) g.ssm_state_size * g.ssm_v_heads * g.ssm_state_size +
+                                (uint64_t) g.ssm_conv_channels * (g.ssm_d_conv - 1);
+    const int64_t TS = (s.idx_block - 1) * ID;
+    const int64_t HS = (int64_t) NG_HIST * NG_HC_DIM;
+    if (DPCT_CHECK_ERROR(dpct::experimental::begin_recording(cs_)) != 0) {
+        err = "verify: begin batch commit capture failed";
+        return false;
+    }
+    bool ok = true;
+    try {
+        for (int t = 0; t < S; ++t)
+            if (t == 0 || rows[t] != rows[t - 1])
+                copy_i32_from_mapped(commitb_ + (size_t) rows[t] * CB, m_commitb_ + (size_t) rows[t] * CB, CB, cs_);
+        int64_t qsa_index = 0, gdn_index = 0;
+        for (int64_t l = 0; l < lb_; ++l) (is_qsa_layer(g, l) ? qsa_index : gdn_index) += 1;
+        for (int64_t l = lb_; l < le_ && ok; ++l) {
+            const LayerView v(*wt_, l);
+            if (!is_qsa_layer(g, l)) {
+                const WeightRef* wnm = need(v, "ssm_norm.weight", err);
+                if (!wnm) { ok = false; break; }
+                for (int t = 0; t < S;) {
+                    const int first = t;
+                    while (t < S && rows[t] == rows[first]) ++t;
+                    SessionState& sx = *slots_[(size_t) rows[first]];
+                    const int32_t* keep = commitb_ + (size_t) rows[first] * CB;
+                    float* state = sx.gdn_state + (size_t) (gdn_index - sx.gdn_ord0) * gdn_floats;
+                    float* conv = state + (uint64_t) g.ssm_state_size * g.ssm_v_heads * g.ssm_state_size;
+                    gdn_conv_commit(conv, qkv_L_ + (size_t) gdn_index * MT * C + (size_t) first * C,
+                                    (int) C, keep, cs_);
+                    gdn_step_norm_multi(state, h_L_ + (size_t) gdn_index * MT * C + (size_t) first * C, (int) C,
+                                        gate_L_ + (size_t) gdn_index * MT * HV + (size_t) first * HV,
+                                        beta_L_ + (size_t) gdn_index * MT * HV + (size_t) first * HV,
+                                        z_ + (size_t) first * ZV, (const float*) wnm->data, EPS,
+                                        y_dummy_ + (size_t) first * ZV, (int) g.ssm_k_heads,
+                                        (int) HV, t - first, keep, cs_,
+                                        t - first > 1 ? t - first : 0);   // a 1-row group keeps the 0.1.39 kernel
+                }
+                ++gdn_index;
+            } else {
+                const WeightRef* wikn = need(v, "indexer.k_norm.weight", err);
+                if (!wikn) { ok = false; break; }
+                for (int t = 0; t < S;) {
+                    const int first = t;
+                    while (t < S && rows[t] == rows[first]) ++t;
+                    const QsaState& st = slots_[(size_t) rows[first]]->qsa_states[qsa_index];
+                    copy_from_mapped(st.idx_tail, tail_snap_b_ + ((size_t) rows[first] * nQ + qsa_index) * TS,
+                                     TS, cs_);
+                    const QsaIndexerBuffers ib{st.idx_tail, st.idx_dead, st.idx_pooled, st.idx_block_pos};
+                    for (int u = first; u < t; ++u)
+                        native_qsa_indexer_append(idx_raw_L_ + (size_t) (qsa_index * MT + u) * ID,
+                                                  commitb_ + (size_t) rows[first] * CB + 2 + (u - first),
+                                                  0, (const float*) wikn->data, EPS, ib, s, st.max_cells,
+                                                  rope_scaling(), cs_);
+                }
+                ++qsa_index;
+            }
+        }
+        if (ok && ss_->ple.ready() && ple_stage())
+            for (int t = 0; t < S;) {
+                const int first = t;
+                while (t < S && rows[t] == rows[first]) ++t;
+                copy_indexed(slots_[(size_t) rows[first]]->ple_hist, hist_snap_ + (size_t) first * HS,
+                             HS, commitb_ + (size_t) rows[first] * CB + 1, HS, cs_);
+            }
+    } catch (const std::exception& e) {
+        err = std::string("verify batch commit: ") + e.what();
+        ok = false;
+    }
+    auto handle = record_orca_handle(*cs_);
+    dpct::experimental::command_graph_ptr graph = nullptr;
+    dpct::experimental::end_recording(cs_, &graph);
+    std::unique_ptr<std::remove_pointer_t<decltype(graph)>> owner(graph);
+    if (!ok) return false;
+    cex = new sycl::ext::oneapi::experimental::command_graph<
+        sycl::ext::oneapi::experimental::graph_state::executable>(graph->finalize());
+    bind_orca_handle(cex, handle);
+    return true;
+}
+
+bool Verifier::stage_batch(const int* rows, int S, int hbase, const int32_t* tokens, const int64_t* pos,
+                           std::string& err) {
+    using namespace strata::kernels;
+    if (!rows || !tokens || !pos || slots_.empty() || S < 1 || S > 8 || S > max_t_ || hbase < 0 ||
+        (next_ != nullptr && hbase + S > (int) slots_.size())) {
+        err = "verify: batch rows out of range (init_slots)";
+        return false;
+    }
+    for (int t = 0; t < S; ++t) {
+        if (rows[t] < 0 || rows[t] >= (int) slots_.size()) {
+            err = "verify: a batch row's slot is out of range";
+            return false;
+        }
+        if (pos[t] < 0 || pos[t] >= slots_[(size_t) rows[t]]->max_cells || pos[t] > INT32_MAX ||
+            tokens[t] < 0 || tokens[t] >= n_vocab_) {
+            err = "verify: a batch row's position or token is out of range";
+            return false;
+        }
+        for (int u = 0; u < t - 1; ++u)
+            if (rows[u] == rows[t] && rows[t - 1] != rows[t]) {
+                err = "verify: a slot's proposed rows must be contiguous";
+                return false;
+            }
+        if (t > 0 && rows[t] == rows[t - 1] && pos[t] != pos[t - 1] + 1) {
+            err = "verify: proposed rows must have consecutive positions";
+            return false;
+        }
+        if (t > 0 && rows[t] == rows[t - 1] && next_ != nullptr) {
+            err = "verify: grouped slot rows do not support a layer split yet";
+            return false;
+        }
+    }
+    if (released_.load()) { err = "verify: an earlier window never finished on the GPU (#267); restart the engine"; return false; }
+    const ModelGeometry& g = *g_;
+    if (!wait_commit(err)) return false;
+    // --batch-mtp only (limit 0 = 0.1.39: no eviction): slot rotation creates new layouts; bound the captured graph
+    // pairs, evicting the least recently used layout.
+    if (batch_graph_limit_ > 0) {
+        const auto key = bkey(rows, S, hbase);
+        if (exec_bm_.find(key) == exec_bm_.end() && exec_bm_.size() >= batch_graph_limit_) {
+            if (!wait_verify_queue(cs_, l0_sync_)) {
+                err = "verify: synchronizing before batch graph eviction failed";
+                return false;
+            }
+            auto old = exec_bm_.begin();
+            uint64_t oldest = UINT64_MAX;
+            for (auto it = exec_bm_.begin(); it != exec_bm_.end(); ++it) {
+                const auto u = bm_used_.find(it->first);
+                const uint64_t t = u == bm_used_.end() ? 0 : u->second;
+                if (t < oldest) { oldest = t; old = it; }
+            }
+            const auto old_key = old->first;
+            if (old->second) { forget_orca_handle(old->second); delete old->second; }
+            exec_bm_.erase(old);
+            bm_used_.erase(old_key);
+            auto commit_old = commit_bm_.find(old_key);
+            if (commit_old != commit_bm_.end()) {
+                if (commit_old->second) { forget_orca_handle(commit_old->second); delete commit_old->second; }
+                commit_bm_.erase(commit_old);
+            }
+        }
+        bm_used_[key] = ++bm_tick_;
+    }
+    if (!capture_batch(rows, S, hbase, err) || !capture_commit_batch(rows, S, hbase, err)) return false;
+    const Clock::time_point t0 = Clock::now();
+    const QsaShapes s = shapes_of(g);
+    for (int t = 0; t < S; ++t) {
+        h_tok_[t] = tokens[t];
+        qsa_step_fill(h_step_ + t * kStepCount, pos[t], s);
+        for (int64_t h = 0; h < g.n_head; ++h) h_pos_[t * g.n_head + h] = (int32_t) pos[t];
+        int32_t* pk = h_pos_ + (size_t) max_t_ * g.n_head;
+        int32_t* pi = pk + (size_t) max_t_ * g.n_head_kv;
+        for (int64_t h = 0; h < g.n_head_kv; ++h) pk[t * g.n_head_kv + h] = (int32_t) pos[t];
+        for (int64_t h = 0; h < g.idx_q_heads; ++h) pi[t * g.idx_q_heads + h] = (int32_t) pos[t];
+    }
+    if (ss_->ple.ready() && ple_stage()) {
+        uint32_t ple_rows[kVerifyMaxT * PLE_N_HEADS];   // (not `rows`: that is the slots of the window's rows)
+        for (int t = 0; t < S; ++t) {
+            const SessionState& sx = *slots_[(size_t) rows[t]];
+            int32_t prev[2] = {sx.ple_prev[0], sx.ple_prev[1]};
+            if (t > 0 && rows[t] == rows[t - 1]) {
+                prev[0] = t > 1 && rows[t - 2] == rows[t] ? tokens[t - 2] : sx.ple_prev[1];
+                prev[1] = tokens[t - 1];
+            }
+            ngram_rows(&tokens[t], prev, 1, ss_->ple.consts, ple_rows + t * PLE_N_HEADS);
+        }
+        if (!ss_->ple.table->gather_batch(ple_rows, (size_t) S, h_ple_, err)) return false;
+    }
+    // Each slot owns a contiguous group. The default commit keeps all its rows; speculative
+    // decoding may change the prefix length after comparing the draft with these picks.
+    const int64_t CB = 2 + max_t_;
+    for (int t = 0; t < S;) {
+        const int first = t;
+        while (t < S && rows[t] == rows[first]) ++t;
+        int32_t* c = h_commitb_ + (size_t) rows[first] * CB;
+        c[0] = t - first;
+        c[1] = t - first - 1;
+        for (int64_t j = 0; j < max_t_; ++j)
+            c[2 + j] = j < t - first ? (int32_t) pos[first + j] : -1;
+    }
+    std::memset(h_skip_, 0, skip_words_ * sizeof(*h_skip_));
+    if (l0_events_ && !reset_l0_events((size_t) (le_ - lb_), err)) return false;
+    if (trace_h_) std::memset(trace_h_, 0, trace_n_ * 8);
+    last_pos0_ = pos[0];
+    *(volatile uint32_t*) h_seq_ = 0;
+    *(volatile uint32_t*) h_flag_ = 0;
+    *(volatile uint32_t*) h_flagA_ = 0;
+    *(volatile uint32_t*) h_flagB_ = 0;
+    std::atomic_thread_fence(std::memory_order_seq_cst);
+    last_t_ = S;
+    for (int t = 0; t < S; ++t) last_rows_[t] = rows[t];
+    row_base_ = hbase;   // the graphs' key (and nothing else) reads it until the next stage_batch
+    last_batch_ = true;
+    for (int t = 0; t < S; ++t) { last_tokens_[t] = tokens[t]; last_pos_b_[t] = pos[t]; }
+    ms_host += ms_since(t0);
+    return true;
+}
+
+bool Verifier::run_slots(int S, const int32_t* tokens, const int64_t* pos, PoolMultiFn pool, void* user, int32_t* out,
+                         std::string& err) {
+    int rows[8] = {};
+    for (int t = 0; t < S && t < 8; ++t) rows[t] = t;
+    return run_slot_rows(rows, S, tokens, pos, pool, user, out, err);
+}
+
+bool Verifier::run_slot_rows(const int* rows, int S, const int32_t* tokens, const int64_t* pos,
+                              PoolMultiFn pool, void* user, int32_t* out, std::string& err) try {
+    const OnDevice on_device(device_);
+    if (!out) { err = "verify: null batch output"; return false; }
+    const auto t0 = Clock::now();
+    if (!stage_batch(rows, S, 0, tokens, pos, err)) return false;
+    return execute_window(S, tokens, pos[0], pool, user, out, t0, err);
+} catch (const std::exception& e) { err = std::string("verify batch: ") + e.what(); return false; }
+
+bool Verifier::commit_slots(std::string& err) {
+    if (!last_batch_ || last_t_ < 1) { err = "verify: commit_slots without a batch window"; return false; }
+    std::array<int, 8> keep{};
+    for (int t = 0; t < last_t_; ++t) ++keep[(size_t) last_rows_[t]];
+    return commit_slot_prefixes(keep.data(), err);
+}
+bool Verifier::commit_slot_prefixes(const int* keep, std::string& err) {
+    const OnDevice on_device(device_);
+    if (!keep || !last_batch_ || last_t_ < 1) { err = "verify: commit_slots without a batch window"; return false; }
+    const int S = last_t_;
+    const Clock::time_point t0 = Clock::now();
+    const int64_t CB = 2 + max_t_;
+    // One prefix per slot: rejected draft rows must not enter recurrent state.
+    for (int t = 0; t < S;) {
+        const int first = t;
+        while (t < S && last_rows_[t] == last_rows_[first]) ++t;
+        const int n = keep[last_rows_[first]];
+        if (n < 1 || n > t - first) {
+            err = "verify: accepted prefix is outside its slot group";
+            return false;
+        }
+        int32_t* c = h_commitb_ + (size_t) last_rows_[first] * CB;
+        c[0] = n;
+        c[1] = n - 1;
+        for (int j = 0; j < max_t_; ++j)
+            c[2 + j] = j < n ? (int32_t) last_pos_b_[first + j] : -1;
+    }
+    std::atomic_thread_fence(std::memory_order_seq_cst);
+    submit_verify_graph(*cs_, *commit_bm_.at(bkey(last_rows_, S, row_base_)));
+    if (!wait_verify_queue(cs_, l0_sync_)) { err = "verify: batch commit timed out"; return false; }
+    if (ple_stage())
+        for (int t = 0; t < S;) {
+            const int first = t;
+            while (t < S && last_rows_[t] == last_rows_[first]) ++t;
+            SessionState& sx = *slots_[(size_t) last_rows_[first]];
+            for (int u = first; u < first + keep[last_rows_[first]]; ++u) {
+                sx.ple_prev[0] = sx.ple_prev[1];
+                sx.ple_prev[1] = last_tokens_[u];
+            }
+        }
+    ms_commit += ms_since(t0);
+    return next_ == nullptr || next_->commit_slot_prefixes(keep, err);
+}
+
+bool Verifier::sample_rows(int S, std::string& err) {
+    bool any = false;
+    for (int t = 0; t < S; ++t) {
+        strata::kernels::SamplerParams sp = slot_sp_[(size_t) last_rows_[t]];
+        const bool penalized = hist_d_ != nullptr && hist_len_ > 0 && sp.penalty_last_n > 0;
+        if ((sp.greedy || sp.temperature <= 0.0f) && !penalized) continue;
+        sp.counter = (uint64_t) last_pos_b_[t];   // Philox(seed, position): the solo window's draw for this position
+        const int32_t* history = penalized ? hist_d_ + (size_t) t * hist_len_ : nullptr;
+        strata::kernels::sample_tokens(head_logits_ + (size_t) t * (size_t) n_vocab_, 1, (int) n_vocab_, history, penalized ? hist_len_ : 0, sp,
+                                       m_out_ + t, cs_);
+        any = true;
+    }
+    if (any && !wait_verify_queue(cs_, l0_sync_)) { err = "verify batch: the row sampling failed"; return false; }
+    return true;
 }
 
 bool Verifier::copy_logits(int t, float* host) const {

@@ -1,0 +1,1059 @@
+{
+  "scope": "Regex-free literal marker restoration; CPU complete prompt preparation with actual model tokenizer; no real model generation or HTTP performance",
+  "environment": {
+    "os": "Windows 10 19045",
+    "cpu": "Xeon E5-2696 v4",
+    "python": "CPython 3.11.9 x64",
+    "pinned_logical_cpu": 42
+  },
+  "notes": [
+    "Native SSE2 scanner unchanged. No new native API/dependency.",
+    "Ordinary requests skip marker restoration. No benefit claimed for them.",
+    "Large variation for dense-marker helper timings; no fixed improvement ratio claimed.",
+    "A/B/A, seven samples per arm; discard absolute A drift >3%."
+  ],
+  "records": {
+    "initial.json": {
+      "sources": {
+        "serve/frontend.py": "6e8ec9a5a39a32f3fab92039de6e263202d9e0209f1622622bbb8a9f32ec22e1",
+        "serve/_text_scan.c": "13ec60c676306b9ee5dae5121d75e8a9c5a5f0b8bcfc3960df301232c0596071",
+        "serve/test_text_scan.py": "5393e48bdead6238cfcb9274a1b06ce89484a8fb9dacb214725c1b755ba065ed",
+        "serve/test_server.py": "974d15f9297879c534116c2f3d37d293592c3cec0d4152505ac4918f6941b4bb",
+        "tools/build_text_scan.py": "bb5c978894e9244485a626f59a90662e95f01801f67211ec28c8815cc474b28a"
+      },
+      "protected": {
+        "strata-iq2_xs.json": "1a755372f0e6c90c0bfa2af865d67b51f8df49c10aa1613b041b08da8184ca88",
+        "build-sycl-a770-unified-operators/bin/strata-unified-all-operators.exe": "8f0d866ded297cf5a409e84cf5dd61f437c56c8a89aaeb2a85569265b6a3e122"
+      }
+    },
+    "differential.json": {
+      "result": "passed",
+      "seed": 20261024,
+      "generated_marker_comparisons": 50000,
+      "custom_marker_comparisons": 30000,
+      "empty_mapping_identity": true,
+      "sha256": {
+        "build-sycl-a770-marker-scan-20261024/differential.py": "e713ce74b3787fdceb03fb0bf7b934edc29365b6820468cd899f36b1d1691927",
+        "build-sycl-a770-marker-scan-20261024/before/serve/frontend.py": "6e8ec9a5a39a32f3fab92039de6e263202d9e0209f1622622bbb8a9f32ec22e1",
+        "serve/frontend.py": "c95a6b9f7ece8b122de38e5ca6aed51e4d112f786163d32b0306b8c6fe3b4067"
+      }
+    },
+    "timing-1.json": {
+      "scope": "CPU only; no model generation or HTTP speed measurement",
+      "cases": [
+        {
+          "name": "ascii_no_marks",
+          "scope": "unmark_think_literals",
+          "input_chars": 64000,
+          "calls_per_sample": 30,
+          "baseline_ms": 3.010274821959126,
+          "candidate_ms": 0.0085000002097028,
+          "elapsed_change_pct": -99.71763374733438,
+          "baseline_drift_pct": 0.3716404032995113,
+          "accepted": true,
+          "samples_s": [
+            [
+              0.003131746666622348,
+              0.002941563333539913,
+              0.002976443333318457,
+              0.0030230166667024605,
+              0.003028176666703075,
+              0.0029878899998342,
+              0.003004696666418264
+            ],
+            [
+              8.543333387933672e-06,
+              6.836666822588692e-06,
+              7.140000040332476e-06,
+              8.5000002097028e-06,
+              8.526666594358782e-06,
+              7.643333325783412e-06,
+              8.656666614115238e-06
+            ],
+            [
+              0.003016356666921638,
+              0.003015863333227268,
+              0.002988066666875966,
+              0.0031147133331008567,
+              0.0030158433330749784,
+              0.002941420000085297,
+              0.0030397566665972893
+            ]
+          ],
+          "restored_spans": 0
+        },
+        {
+          "name": "cjk_no_marks",
+          "scope": "unmark_think_literals",
+          "input_chars": 63000,
+          "calls_per_sample": 30,
+          "baseline_ms": 3.672617888800454,
+          "candidate_ms": 0.005903333173288654,
+          "elapsed_change_pct": -99.8392608936723,
+          "baseline_drift_pct": -3.772170448995127,
+          "accepted": false,
+          "samples_s": [
+            [
+              0.0038451166668285928,
+              0.003899463333558136,
+              0.0037850166666127433,
+              0.003634746666648425,
+              0.003619503333175089,
+              0.003622433333172618,
+              0.003743909999805813
+            ],
+            [
+              8.826666453387589e-06,
+              5.903333173288653e-06,
+              5.879999662283808e-06,
+              7.67666642786935e-06,
+              7.563333201687783e-06,
+              5.856666636342803e-06,
+              5.883333020998786e-06
+            ],
+            [
+              0.003552286666914976,
+              0.003531056666300477,
+              0.0035587066663235116,
+              0.003627096666605212,
+              0.0036814566667696153,
+              0.0036080766663265725,
+              0.0036026833331561647
+            ]
+          ],
+          "restored_spans": 0
+        },
+        {
+          "name": "one_mark",
+          "scope": "unmark_think_literals",
+          "input_chars": 64001,
+          "calls_per_sample": 30,
+          "baseline_ms": 3.4417033739438385,
+          "candidate_ms": 0.5364866665331647,
+          "elapsed_change_pct": -84.41217594186782,
+          "baseline_drift_pct": 1.9673311237957236,
+          "accepted": true,
+          "samples_s": [
+            [
+              0.0034715366666205226,
+              0.003375140000328732,
+              0.0033660166668899667,
+              0.003408339999926587,
+              0.0035352600001109145,
+              0.0033622033336238627,
+              0.0034612499997213795
+            ],
+            [
+              0.0005298633336982069,
+              0.0005364866665331647,
+              0.0005217166666019087,
+              0.000549696666712407,
+              0.0005461933333814766,
+              0.0005520100001983034,
+              0.0005318333331767159
+            ],
+            [
+              0.0034786200000477643,
+              0.0034337700000226807,
+              0.0034171466667127486,
+              0.0035415499999847575,
+              0.0034602300002006814,
+              0.003475393333549922,
+              0.0035529499999635544
+            ]
+          ],
+          "restored_spans": 1
+        },
+        {
+          "name": "sparse_marks",
+          "scope": "unmark_think_literals",
+          "input_chars": 64080,
+          "calls_per_sample": 30,
+          "baseline_ms": 3.5814430124048755,
+          "candidate_ms": 0.5747966667210372,
+          "elapsed_change_pct": -83.95069627716703,
+          "baseline_drift_pct": -0.7242580020265232,
+          "accepted": true,
+          "samples_s": [
+            [
+              0.0036364166662679054,
+              0.0036057900001954597,
+              0.0035944833332905548,
+              0.003748026666774725,
+              0.0035513999998026216,
+              0.003555906666830803,
+              0.003593176666860624
+            ],
+            [
+              0.0005682833332684822,
+              0.000549210000220531,
+              0.0005900233334007984,
+              0.0005616966664092615,
+              0.0006221366667887196,
+              0.0006051800000326087,
+              0.0005747966667210372
+            ],
+            [
+              0.0037147533332851407,
+              0.0035693766665644945,
+              0.003624903333062927,
+              0.003476793333053744,
+              0.003519353333589,
+              0.0035684500001176883,
+              0.0034346266664215365
+            ]
+          ],
+          "restored_spans": 32
+        },
+        {
+          "name": "dense_marks",
+          "scope": "unmark_think_literals",
+          "input_chars": 29000,
+          "calls_per_sample": 30,
+          "baseline_ms": 49.4698451882895,
+          "candidate_ms": 27.43162666641486,
+          "elapsed_change_pct": -44.54879217429111,
+          "baseline_drift_pct": -1.541040787836967,
+          "accepted": true,
+          "samples_s": [
+            [
+              0.04985548333352199,
+              0.050713483333432424,
+              0.050972126666359446,
+              0.04943048999994062,
+              0.04961316666691952,
+              0.04990944000019226,
+              0.0480244366665526
+            ],
+            [
+              0.02740295666687113,
+              0.027778153333444303,
+              0.028005176666677775,
+              0.027683619999637206,
+              0.027386716666903035,
+              0.027388959999855918,
+              0.02743162666641486
+            ],
+            [
+              0.04908719000037915,
+              0.04962800333354001,
+              0.048935253333669,
+              0.04904605999957615,
+              0.04989983666697905,
+              0.04927068999968469,
+              0.04843390333359518
+            ]
+          ],
+          "restored_spans": 29000
+        },
+        {
+          "name": "ordinary_64k",
+          "scope": "Service.encode_prompt, actual 248320-token vocabulary and merges",
+          "input_chars": 64000,
+          "calls_per_sample": 1,
+          "baseline_ms": 120.39227911627977,
+          "candidate_ms": 116.8039000040153,
+          "elapsed_change_pct": -2.980572457473507,
+          "baseline_drift_pct": -4.421041186698482,
+          "accepted": false,
+          "samples_s": [
+            [
+              0.12753220000013243,
+              0.12314520000654738,
+              0.12523390000569634,
+              0.12444390000018757,
+              0.12184459999843966,
+              0.11977259999548551,
+              0.1189709999889601
+            ],
+            [
+              0.11764660000335425,
+              0.11503950000042096,
+              0.11627210000006016,
+              0.11678359999496024,
+              0.1168039000040153,
+              0.11816620000172406,
+              0.1215991000062786
+            ],
+            [
+              0.11737049999646842,
+              0.11566970001149457,
+              0.1177008999948157,
+              0.11785059999965597,
+              0.11708769999677315,
+              0.1201129000110086,
+              0.11778590000176337
+            ]
+          ],
+          "prompt_tokens": 19371,
+          "token_ids_sha256": "e7ae60c82646473e3668aac30cc737126ccfd863da65f275b9690bbdec8903f0"
+        },
+        {
+          "name": "one_quote_64k",
+          "scope": "Service.encode_prompt, actual 248320-token vocabulary and merges",
+          "input_chars": 64028,
+          "calls_per_sample": 1,
+          "baseline_ms": 122.56206940265335,
+          "candidate_ms": 119.92290000489447,
+          "elapsed_change_pct": -2.153332928059837,
+          "baseline_drift_pct": -0.141216331370142,
+          "accepted": true,
+          "samples_s": [
+            [
+              0.12088080000830814,
+              0.12264869999489747,
+              0.12435289999120869,
+              0.12009490000491496,
+              0.12181029999919701,
+              0.12275450000015553,
+              0.12506340000254568
+            ],
+            [
+              0.12095219999901019,
+              0.1172904999984894,
+              0.11873119999654591,
+              0.12129219999769703,
+              0.11992290000489447,
+              0.11883330000273418,
+              0.12084679999679793
+            ],
+            [
+              0.12068779999390244,
+              0.1172017000062624,
+              0.12517519999528304,
+              0.12611029999970924,
+              0.12327100000402424,
+              0.1215169000060996,
+              0.1224755000002915
+            ]
+          ],
+          "prompt_tokens": 19379,
+          "token_ids_sha256": "d09703968e29581926ed4dc499b6a3130d3bc6dc1b679605f81f9636018ffb3c"
+        },
+        {
+          "name": "sparse_quotes_64k",
+          "scope": "Service.encode_prompt, actual 248320-token vocabulary and merges",
+          "input_chars": 64176,
+          "calls_per_sample": 1,
+          "baseline_ms": 124.86594357903624,
+          "candidate_ms": 123.10379999689758,
+          "elapsed_change_pct": -1.4112283394737468,
+          "baseline_drift_pct": -0.1899432516487276,
+          "accepted": true,
+          "samples_s": [
+            [
+              0.12389500001154374,
+              0.12279880000278354,
+              0.12498469999991357,
+              0.12573640000482555,
+              0.1274115999985952,
+              0.12258419999852777,
+              0.12617230000614654
+            ],
+            [
+              0.1210949999949662,
+              0.12457030000223313,
+              0.1236776000005193,
+              0.12206300000252668,
+              0.12124100000073668,
+              0.12651149999874178,
+              0.12310379999689758
+            ],
+            [
+              0.1237944000022253,
+              0.12491849999059923,
+              0.12474729999667034,
+              0.12868370000796858,
+              0.12902199999371078,
+              0.1237132000096608,
+              0.12320119999640156
+            ]
+          ],
+          "prompt_tokens": 19443,
+          "token_ids_sha256": "71094f652d33d0693a5fb0a33f7075111c126e0b94ba096142dc5a7081ec1a69"
+        },
+        {
+          "name": "short_quoted",
+          "scope": "Service.encode_prompt, actual 248320-token vocabulary and merges",
+          "input_chars": 42,
+          "calls_per_sample": 15,
+          "baseline_ms": 0.8689625245936842,
+          "candidate_ms": 0.8550133332998181,
+          "elapsed_change_pct": -1.6052696058887594,
+          "baseline_drift_pct": 4.855017288846164,
+          "accepted": false,
+          "samples_s": [
+            [
+              0.0008754466670022036,
+              0.0008663600000242392,
+              0.0008486066663560148,
+              0.0008343800000147894,
+              0.0008124800001193459,
+              0.0008365066663827747,
+              0.0008644266665214673
+            ],
+            [
+              0.0008221666668153678,
+              0.0008524599999266987,
+              0.0008621733325223128,
+              0.0008550133332998181,
+              0.0008556733334747454,
+              0.0008393800002522766,
+              0.0008707399994212513
+            ],
+            [
+              0.0008948666664461295,
+              0.0009363933330556999,
+              0.000901053332684872,
+              0.000887226666479061,
+              0.0008452533336821943,
+              0.0008740066667087376,
+              0.0008898066667219003
+            ]
+          ],
+          "prompt_tokens": 65,
+          "token_ids_sha256": "92b5e7829b83fe5748b0fe69bb0cec388e4e45039ceb5ba0637135982e874095"
+        },
+        {
+          "name": "dense_quoted",
+          "scope": "Service.encode_prompt, actual 248320-token vocabulary and merges",
+          "input_chars": 1280,
+          "calls_per_sample": 15,
+          "baseline_ms": 5.065531095095893,
+          "candidate_ms": 4.931146667028467,
+          "elapsed_change_pct": -2.65291882617259,
+          "baseline_drift_pct": 2.636778901963588,
+          "accepted": true,
+          "samples_s": [
+            [
+              0.005147379999592279,
+              0.00497790666607519,
+              0.005000040000110554,
+              0.0050226733331025265,
+              0.004902799999884641,
+              0.004900013333341727,
+              0.005069326666610626
+            ],
+            [
+              0.004802413333284979,
+              0.0047306399996159595,
+              0.004911073333156916,
+              0.004931146667028467,
+              0.005048866667008648,
+              0.005452033333131112,
+              0.005070113333446594
+            ],
+            [
+              0.005157546667032875,
+              0.005131879999923209,
+              0.005187299999912891,
+              0.005195340000015373,
+              0.005056606666767038,
+              0.005064373333395148,
+              0.005077940000531574
+            ]
+          ],
+          "prompt_tokens": 564,
+          "token_ids_sha256": "a0f55b3f380d18d05e9dc62b29c24afb7747b9e8bdaaaf42bd71738d819209e5"
+        }
+      ],
+      "method": "CPU affinity, warm both, A/B/A; 7 samples per arm; B median / geometric mean of A medians; reject >3% A drift",
+      "cpu_affinity": [
+        42
+      ],
+      "python": "3.11.9 (tags/v3.11.9:de54cf5, Apr  2 2024, 10:12:12) [MSC v.1938 64 bit (AMD64)]",
+      "marker_count": 29,
+      "tokenizer": {
+        "path": "G:\\GitHub\\Strata-data\\packs\\iq2_xs\\tokenizer",
+        "vocab_size": 248320,
+        "merges": 247587,
+        "sha256": {
+          "chat_template.jinja": "12827f24b742ea4e80cdc12dbcf9622227056b9f797252a3149263d4f9aaadce",
+          "merges.txt": "080cf95432173729d160346b7882bd2a644b07f7a3813a3eb73f4e66787bfde9",
+          "token_type.json": "5088c8c298fc06af8382ddb3b76c888703ac2634e82263b97eedcc2ad202738b",
+          "tokenizer.json": "87be2ac47d8bc7393b7435df6ccd276740019a393941a2585d5edce59f450c54",
+          "vocab.json": "4ba64f0332abcfb0b600b7df1537d1e836e68009d5fb7cdb77339738dc6365c4"
+        }
+      },
+      "sha256": {
+        "build-sycl-a770-marker-scan-20261024/before/serve/frontend.py": "6e8ec9a5a39a32f3fab92039de6e263202d9e0209f1622622bbb8a9f32ec22e1",
+        "build-sycl-a770-marker-scan-20261024/after/serve/frontend.py": "c95a6b9f7ece8b122de38e5ca6aed51e4d112f786163d32b0306b8c6fe3b4067",
+        "build-sycl-a770-marker-scan-20261024/bench.py": "e308c139cde76e0599e06c8d8e4f3523a39b4062c8ce92622f48646ab0d91322",
+        "serve/frontend.py": "c95a6b9f7ece8b122de38e5ca6aed51e4d112f786163d32b0306b8c6fe3b4067",
+        "serve/server.py": "219268dd6b70322a097d720cee7e589d129fce55df240fed48f5837cbd0ad6d5",
+        "tools/strata_tokenizer.py": "cccf8d5e59c1d585e30ddf8b4d05b968e9b76145261016e4a124d56dba845150"
+      }
+    },
+    "timing-2.json": {
+      "scope": "CPU only; no model generation or HTTP speed measurement",
+      "cases": [
+        {
+          "name": "ascii_no_marks",
+          "scope": "unmark_think_literals",
+          "input_chars": 64000,
+          "calls_per_sample": 30,
+          "baseline_ms": 2.8671292769765415,
+          "candidate_ms": 0.006570000065645824,
+          "elapsed_change_pct": -99.77085093028752,
+          "baseline_drift_pct": 1.9892944582318162,
+          "accepted": true,
+          "samples_s": [
+            [
+              0.00288124333358913,
+              0.0027980366663541644,
+              0.002791606666869484,
+              0.00288424333363461,
+              0.002792076667052849,
+              0.002839029999934913,
+              0.0029160900002655884
+            ],
+            [
+              6.693333367972324e-06,
+              7.499999871167044e-06,
+              7.256666625229021e-06,
+              6.570000065645824e-06,
+              5.963333630158256e-06,
+              6.410000302518407e-06,
+              6.333333537137756e-06
+            ],
+            [
+              0.0028113366667336472,
+              0.002851556666913287,
+              0.0029122033335928182,
+              0.0029126733332911197,
+              0.003029249999963213,
+              0.0028955066663911566,
+              0.0028638200000083696
+            ]
+          ],
+          "restored_spans": 0
+        },
+        {
+          "name": "cjk_no_marks",
+          "scope": "unmark_think_literals",
+          "input_chars": 63000,
+          "calls_per_sample": 30,
+          "baseline_ms": 3.6405155938745843,
+          "candidate_ms": 0.007913332956377417,
+          "elapsed_change_pct": -99.78263153247599,
+          "baseline_drift_pct": -0.4115463189235169,
+          "accepted": true,
+          "samples_s": [
+            [
+              0.0037198933336185292,
+              0.003701263333399159,
+              0.003793986666520747,
+              0.0036080499999419165,
+              0.003592603333527222,
+              0.003648029999749269,
+              0.0035771300002428084
+            ],
+            [
+              8.32666652665163e-06,
+              7.913332956377417e-06,
+              6.380000074083606e-06,
+              6.376666715368629e-06,
+              6.763333415923019e-06,
+              8.953333114429067e-06,
+              7.97333341324702e-06
+            ],
+            [
+              0.0035523466668867815,
+              0.0035725566670104553,
+              0.0037434033331616473,
+              0.0036330166665720755,
+              0.0036838499998945434,
+              0.003573826666494521,
+              0.0036886466667056085
+            ]
+          ],
+          "restored_spans": 0
+        },
+        {
+          "name": "one_mark",
+          "scope": "unmark_think_literals",
+          "input_chars": 64001,
+          "calls_per_sample": 30,
+          "baseline_ms": 3.3930412862853894,
+          "candidate_ms": 0.5474499999157463,
+          "elapsed_change_pct": -83.8655072625102,
+          "baseline_drift_pct": -2.336371463021125,
+          "accepted": true,
+          "samples_s": [
+            [
+              0.0034333866666808413,
+              0.0034425600000152676,
+              0.0033600333331075187,
+              0.003250643333012704,
+              0.003367373333700622,
+              0.003439216666932528,
+              0.003537480000037855
+            ],
+            [
+              0.000589383333378161,
+              0.0005792800002382137,
+              0.0005474499999157463,
+              0.000529406666464638,
+              0.0005360566666543794,
+              0.0005273633335794633,
+              0.0005575266666710376
+            ],
+            [
+              0.0035613700000491615,
+              0.0034132966665007796,
+              0.0033895600000202345,
+              0.003353170000385338,
+              0.0033271066664989726,
+              0.0032959166666842064,
+              0.0033198399997975987
+            ]
+          ],
+          "restored_spans": 1
+        },
+        {
+          "name": "sparse_marks",
+          "scope": "unmark_think_literals",
+          "input_chars": 64080,
+          "calls_per_sample": 30,
+          "baseline_ms": 3.4282238382965127,
+          "candidate_ms": 0.5798000003172396,
+          "elapsed_change_pct": -83.08745205490017,
+          "baseline_drift_pct": -1.9304022960699885,
+          "accepted": true,
+          "samples_s": [
+            [
+              0.0034912333333826004,
+              0.0034314766666890743,
+              0.0034641733334865423,
+              0.00346180000002884,
+              0.0034652499996203306,
+              0.0033402666667825542,
+              0.0034243700002358915
+            ],
+            [
+              0.0005879433335697589,
+              0.0005863966662824775,
+              0.0005921599998449286,
+              0.0005781266668539804,
+              0.0005589333333773539,
+              0.0005678133330851172,
+              0.0005798000003172395
+            ],
+            [
+              0.003343676667039593,
+              0.003462093333170439,
+              0.0034750666663361093,
+              0.0033806466667253214,
+              0.0033015300000746113,
+              0.003394973333342932,
+              0.0034641733330014785
+            ]
+          ],
+          "restored_spans": 32
+        },
+        {
+          "name": "dense_marks",
+          "scope": "unmark_think_literals",
+          "input_chars": 29000,
+          "calls_per_sample": 30,
+          "baseline_ms": 31.635900642262918,
+          "candidate_ms": 30.11853000013313,
+          "elapsed_change_pct": -4.796356706540883,
+          "baseline_drift_pct": 0.9864252566132325,
+          "accepted": true,
+          "samples_s": [
+            [
+              0.03149203333305195,
+              0.03148101333354134,
+              0.03141953666684761,
+              0.03158464333343242,
+              0.03086870999977691,
+              0.030830623333167752,
+              0.03284717666683719
+            ],
+            [
+              0.030817626666491075,
+              0.030290010000074592,
+              0.03011853000013313,
+              0.029939176666569742,
+              0.030260430000392566,
+              0.028897489999750784,
+              0.02810259333346039
+            ],
+            [
+              0.031840223333468504,
+              0.03213531333312858,
+              0.0315701299996969,
+              0.03179155000010117,
+              0.03208649000007426,
+              0.031186113333387767,
+              0.03069952666652777
+            ]
+          ],
+          "restored_spans": 29000
+        },
+        {
+          "name": "ordinary_64k",
+          "scope": "Service.encode_prompt, actual 248320-token vocabulary and merges",
+          "input_chars": 64000,
+          "calls_per_sample": 1,
+          "baseline_ms": 119.92265693951823,
+          "candidate_ms": 117.76570000802167,
+          "elapsed_change_pct": -1.7986233682134034,
+          "baseline_drift_pct": 3.657418403021939,
+          "accepted": false,
+          "samples_s": [
+            [
+              0.1185395999928005,
+              0.11778800000320189,
+              0.1195886000059545,
+              0.11605860000418033,
+              0.1175364999944577,
+              0.1179209000110859,
+              0.11518629999773111
+            ],
+            [
+              0.11486770000192337,
+              0.12018220000027213,
+              0.11984359999769367,
+              0.11776570000802167,
+              0.11602450000646058,
+              0.11886499999673106,
+              0.11657410000043456
+            ],
+            [
+              0.12263070000335574,
+              0.1220445000071777,
+              0.12209599999187049,
+              0.12398420000681654,
+              0.11746680000214837,
+              0.11876960001245607,
+              0.12342960000387393
+            ]
+          ],
+          "prompt_tokens": 19371,
+          "token_ids_sha256": "e7ae60c82646473e3668aac30cc737126ccfd863da65f275b9690bbdec8903f0"
+        },
+        {
+          "name": "one_quote_64k",
+          "scope": "Service.encode_prompt, actual 248320-token vocabulary and merges",
+          "input_chars": 64028,
+          "calls_per_sample": 1,
+          "baseline_ms": 123.95359394804379,
+          "candidate_ms": 123.22300000232644,
+          "elapsed_change_pct": -0.5894092478057389,
+          "baseline_drift_pct": -3.9337845766036827,
+          "accepted": false,
+          "samples_s": [
+            [
+              0.12567500000295695,
+              0.12915950000751764,
+              0.12969230000453535,
+              0.12834780001139734,
+              0.1264660000015283,
+              0.12538179999683052,
+              0.12277309999626596
+            ],
+            [
+              0.11844989999372046,
+              0.11802610001177527,
+              0.1263741000002483,
+              0.1269151000014972,
+              0.12322300000232644,
+              0.12548729999980424,
+              0.12274150000303052
+            ],
+            [
+              0.11863650000304915,
+              0.12149109999882057,
+              0.12664230000518728,
+              0.12072589999297634,
+              0.11929679999593645,
+              0.1237358999933349,
+              0.12792199999967124
+            ]
+          ],
+          "prompt_tokens": 19379,
+          "token_ids_sha256": "d09703968e29581926ed4dc499b6a3130d3bc6dc1b679605f81f9636018ffb3c"
+        },
+        {
+          "name": "sparse_quotes_64k",
+          "scope": "Service.encode_prompt, actual 248320-token vocabulary and merges",
+          "input_chars": 64176,
+          "calls_per_sample": 1,
+          "baseline_ms": 124.8531396799565,
+          "candidate_ms": 123.5791000071913,
+          "elapsed_change_pct": -1.0204306243567607,
+          "baseline_drift_pct": -1.530050218754364,
+          "accepted": true,
+          "samples_s": [
+            [
+              0.12519939999037888,
+              0.12702260000514798,
+              0.12581939999654423,
+              0.1266155999910552,
+              0.12333279999438673,
+              0.12495769999804907,
+              0.12680130000808276
+            ],
+            [
+              0.1235791000071913,
+              0.11992820000159554,
+              0.12111670000012964,
+              0.12232049999875017,
+              0.1326754999900004,
+              0.13258620000851806,
+              0.13867060000484344
+            ],
+            [
+              0.13144050000119023,
+              0.12389429999166168,
+              0.1210158999892883,
+              0.12826979999954347,
+              0.1253244999970775,
+              0.12171809999563266,
+              0.12290220000431873
+            ]
+          ],
+          "prompt_tokens": 19443,
+          "token_ids_sha256": "71094f652d33d0693a5fb0a33f7075111c126e0b94ba096142dc5a7081ec1a69"
+        },
+        {
+          "name": "short_quoted",
+          "scope": "Service.encode_prompt, actual 248320-token vocabulary and merges",
+          "input_chars": 42,
+          "calls_per_sample": 15,
+          "baseline_ms": 0.8324093707855086,
+          "candidate_ms": 0.7883333339123055,
+          "elapsed_change_pct": -5.294995277577231,
+          "baseline_drift_pct": -1.0056256555857068,
+          "accepted": true,
+          "samples_s": [
+            [
+              0.0008366266663263862,
+              0.0007936066666540379,
+              0.0008627600007457658,
+              0.0008264533331384883,
+              0.0008380000004156803,
+              0.0009070666662106911,
+              0.0008221066663584982
+            ],
+            [
+              0.0007883333339123056,
+              0.0007936466669586176,
+              0.0007587533327750862,
+              0.000782039999224556,
+              0.0007685266667976975,
+              0.0008708333334652707,
+              0.0008265999999518196
+            ],
+            [
+              0.0008065266660802687,
+              0.0008676466667869438,
+              0.0008939200003320972,
+              0.0008282133339283366,
+              0.0007808466665058708,
+              0.0007820533336295436,
+              0.000886753333422045
+            ]
+          ],
+          "prompt_tokens": 65,
+          "token_ids_sha256": "92b5e7829b83fe5748b0fe69bb0cec388e4e45039ceb5ba0637135982e874095"
+        },
+        {
+          "name": "dense_quoted",
+          "scope": "Service.encode_prompt, actual 248320-token vocabulary and merges",
+          "input_chars": 1280,
+          "calls_per_sample": 15,
+          "baseline_ms": 4.819590889479261,
+          "candidate_ms": 4.7606733336579055,
+          "elapsed_change_pct": -1.222459689472133,
+          "baseline_drift_pct": 0.2016031363873294,
+          "accepted": true,
+          "samples_s": [
+            [
+              0.004770906666332546,
+              0.004961579999265571,
+              0.004787459999594527,
+              0.004896680000820197,
+              0.004814739999710582,
+              0.004964760000196596,
+              0.004626960000799348
+            ],
+            [
+              0.004768139999941923,
+              0.0048968866661501425,
+              0.004848739999579266,
+              0.004662646666596023,
+              0.004760673333657905,
+              0.0047153333337822305,
+              0.004628486667449276
+            ],
+            [
+              0.00479050000042965,
+              0.004840646666707471,
+              0.004824446666558894,
+              0.004787140000068272,
+              0.0048673933333096405,
+              0.00474272666615434,
+              0.005023959999865231
+            ]
+          ],
+          "prompt_tokens": 564,
+          "token_ids_sha256": "a0f55b3f380d18d05e9dc62b29c24afb7747b9e8bdaaaf42bd71738d819209e5"
+        }
+      ],
+      "method": "CPU affinity, warm both, A/B/A; 7 samples per arm; B median / geometric mean of A medians; reject >3% A drift",
+      "cpu_affinity": [
+        42
+      ],
+      "python": "3.11.9 (tags/v3.11.9:de54cf5, Apr  2 2024, 10:12:12) [MSC v.1938 64 bit (AMD64)]",
+      "marker_count": 29,
+      "tokenizer": {
+        "path": "G:\\GitHub\\Strata-data\\packs\\iq2_xs\\tokenizer",
+        "vocab_size": 248320,
+        "merges": 247587,
+        "sha256": {
+          "chat_template.jinja": "12827f24b742ea4e80cdc12dbcf9622227056b9f797252a3149263d4f9aaadce",
+          "merges.txt": "080cf95432173729d160346b7882bd2a644b07f7a3813a3eb73f4e66787bfde9",
+          "token_type.json": "5088c8c298fc06af8382ddb3b76c888703ac2634e82263b97eedcc2ad202738b",
+          "tokenizer.json": "87be2ac47d8bc7393b7435df6ccd276740019a393941a2585d5edce59f450c54",
+          "vocab.json": "4ba64f0332abcfb0b600b7df1537d1e836e68009d5fb7cdb77339738dc6365c4"
+        }
+      },
+      "sha256": {
+        "build-sycl-a770-marker-scan-20261024/before/serve/frontend.py": "6e8ec9a5a39a32f3fab92039de6e263202d9e0209f1622622bbb8a9f32ec22e1",
+        "build-sycl-a770-marker-scan-20261024/after/serve/frontend.py": "c95a6b9f7ece8b122de38e5ca6aed51e4d112f786163d32b0306b8c6fe3b4067",
+        "build-sycl-a770-marker-scan-20261024/bench.py": "e308c139cde76e0599e06c8d8e4f3523a39b4062c8ce92622f48646ab0d91322",
+        "serve/frontend.py": "c95a6b9f7ece8b122de38e5ca6aed51e4d112f786163d32b0306b8c6fe3b4067",
+        "serve/server.py": "219268dd6b70322a097d720cee7e589d129fce55df240fed48f5837cbd0ad6d5",
+        "tools/strata_tokenizer.py": "cccf8d5e59c1d585e30ddf8b4d05b968e9b76145261016e4a124d56dba845150"
+      }
+    },
+    "targeted-native.json": {
+      "tests": 90,
+      "seconds": 30.952094199994463,
+      "mode": "native",
+      "failures": [],
+      "errors": [],
+      "skipped": [],
+      "source_unchanged": true,
+      "sha256": {
+        "serve/__init__.py": "5b38172f894574bf933b1e932a2dace1c113184f105bcd7db8718e6330f809c2",
+        "serve/frontend.py": "c95a6b9f7ece8b122de38e5ca6aed51e4d112f786163d32b0306b8c6fe3b4067",
+        "serve/mcp.py": "4cd9f18d427123e7080cb2a1b937b7c8ede401378c3485bc142db40b9655be0b",
+        "serve/mcp_fake_server.py": "484a5202e378fb61aa2baf4adea106f13f95696c1719a054d68c7a167e9e5325",
+        "serve/responses.py": "9f3bef6172df48a80918efb27ffed7be55e67d7c320a8e5a33682c7c12c3b604",
+        "serve/runconfig.py": "b479b7f65067d1b85f8d3f36fca29772cf1307aecf2298d80e5e40f6955ffe4a",
+        "serve/server.py": "219268dd6b70322a097d720cee7e589d129fce55df240fed48f5837cbd0ad6d5",
+        "serve/structured.py": "1324728a86ff7a1a23a6a0db144acc6a1d5764deb15badd167d36d619cf94e57",
+        "serve/telemetry.py": "611ce7043ad316793569de52c0f9f4f57c3dd1ffa77f9e41ef85b65189a2873b",
+        "serve/test_control_cancel.py": "a1eda9d7ee61b2d8da26579cf968f15e4d2870a839a7c47c2077e1df58aa3e36",
+        "serve/test_detok.py": "f666a94c12fa4697537cd600ec2c1fb0b1f8b52f2e765016425018a5b195c1c7",
+        "serve/test_fatal_recovery.py": "f14477565a472608bed122258066b91676a16ec76d97a4fb9b54ea62ae8639b6",
+        "serve/test_frontend.py": "62099f4db00daac9f324efa0ff6313e1e1a9cbb167ce7d62d7ec8dc1cd91f7f1",
+        "serve/test_lifecycle.py": "bc7334530c0900db675a7c73b079d3565a1e456c3d6cfdc04760e8479e4ec320",
+        "serve/test_mcp.py": "6a02008f1910404743cfde66933c6fbcf29572b5cc71f7e224e24402ef3fb6d6",
+        "serve/test_monitor.py": "7face289d89c1bec38b5fae0334fc2f88e2e98b7aa151b8ea640437d5890292a",
+        "serve/test_parallel.py": "2326d767050db0e752671991d7bf99e23a367d99227d914cc31409a348ca8873",
+        "serve/test_reasoning_loop_recovery.py": "4a89bf1fa248196efd728ef374b1274fc764577d63f400ad317866973e8e5a96",
+        "serve/test_reasoning_rescue.py": "95ec0df327cc6c2601dbd9f0b0163c01800a299a4429e45e5888ce3831f893b5",
+        "serve/test_reasoning_tools.py": "3c009fe9fb7585b182b84b0fc45e4c7370965ebe7e6ff673302f8bf6315126d8",
+        "serve/test_responses.py": "cdd2f7e3aa47b6c2e479e20fd612932b66d574f76ee21c78cd9d4c4c20ca7927",
+        "serve/test_restart_waiters.py": "b35f1d486fc2d76854ff69fc1a62141881d47df98926b7f677bbaa21741421ab",
+        "serve/test_runconfig.py": "cd968de92873d64cb056d12b3639ccff67616b3fe308e7ed8cadf0a2ec717365",
+        "serve/test_security.py": "a6867eec898088f6eba83878ab5edc983896a6f7c55da91d77f931be314b3d05",
+        "serve/test_server.py": "974d15f9297879c534116c2f3d37d293592c3cec0d4152505ac4918f6941b4bb",
+        "serve/test_slots.py": "12c1407453bff494a4987507c2a3326762a6b097572f6f82fbf090fa81d16ba9",
+        "serve/test_structured.py": "74e4cba79bcc1bf6eaa1bc8bcfc6d0a6abf14385b92e719917f2e7bc2b8dc7ef",
+        "serve/test_text_scan.py": "0c170ec31dc83b59a774e83ea0ee62c40df65152b43694ebdf15a0e0283d8027",
+        "serve/test_vram.py": "a908f82e4bbc11621848cfe420cceb3eb4de92a2e6aeb9e16f130c5929a7d71b",
+        "serve/test_winjob.py": "e305a9aa79d53f6652e345c22ca55f6f3f8c4ccf20b05f67b6331328b6205f2e",
+        "serve/winjob.py": "736ee937e58438a4599b25d576a97cb3680cb963f50976abecc25038ef20740f",
+        "serve/_text_scan.c": "13ec60c676306b9ee5dae5121d75e8a9c5a5f0b8bcfc3960df301232c0596071"
+      }
+    },
+    "targeted-fallback.json": {
+      "tests": 26,
+      "seconds": 1.043992699997034,
+      "mode": "fallback",
+      "failures": [],
+      "errors": [],
+      "skipped": [
+        [
+          "serve.test_text_scan.TextScan.test_native_matches_python_at_boundaries",
+          "build optional scanner with tools/build_text_scan.py"
+        ],
+        [
+          "serve.test_text_scan.TextScan.test_native_rejects_invalid_arguments",
+          "optional scanner not built"
+        ]
+      ],
+      "source_unchanged": true,
+      "sha256": {
+        "serve/__init__.py": "5b38172f894574bf933b1e932a2dace1c113184f105bcd7db8718e6330f809c2",
+        "serve/frontend.py": "c95a6b9f7ece8b122de38e5ca6aed51e4d112f786163d32b0306b8c6fe3b4067",
+        "serve/mcp.py": "4cd9f18d427123e7080cb2a1b937b7c8ede401378c3485bc142db40b9655be0b",
+        "serve/mcp_fake_server.py": "484a5202e378fb61aa2baf4adea106f13f95696c1719a054d68c7a167e9e5325",
+        "serve/responses.py": "9f3bef6172df48a80918efb27ffed7be55e67d7c320a8e5a33682c7c12c3b604",
+        "serve/runconfig.py": "b479b7f65067d1b85f8d3f36fca29772cf1307aecf2298d80e5e40f6955ffe4a",
+        "serve/server.py": "219268dd6b70322a097d720cee7e589d129fce55df240fed48f5837cbd0ad6d5",
+        "serve/structured.py": "1324728a86ff7a1a23a6a0db144acc6a1d5764deb15badd167d36d619cf94e57",
+        "serve/telemetry.py": "611ce7043ad316793569de52c0f9f4f57c3dd1ffa77f9e41ef85b65189a2873b",
+        "serve/test_control_cancel.py": "a1eda9d7ee61b2d8da26579cf968f15e4d2870a839a7c47c2077e1df58aa3e36",
+        "serve/test_detok.py": "f666a94c12fa4697537cd600ec2c1fb0b1f8b52f2e765016425018a5b195c1c7",
+        "serve/test_fatal_recovery.py": "f14477565a472608bed122258066b91676a16ec76d97a4fb9b54ea62ae8639b6",
+        "serve/test_frontend.py": "62099f4db00daac9f324efa0ff6313e1e1a9cbb167ce7d62d7ec8dc1cd91f7f1",
+        "serve/test_lifecycle.py": "bc7334530c0900db675a7c73b079d3565a1e456c3d6cfdc04760e8479e4ec320",
+        "serve/test_mcp.py": "6a02008f1910404743cfde66933c6fbcf29572b5cc71f7e224e24402ef3fb6d6",
+        "serve/test_monitor.py": "7face289d89c1bec38b5fae0334fc2f88e2e98b7aa151b8ea640437d5890292a",
+        "serve/test_parallel.py": "2326d767050db0e752671991d7bf99e23a367d99227d914cc31409a348ca8873",
+        "serve/test_reasoning_loop_recovery.py": "4a89bf1fa248196efd728ef374b1274fc764577d63f400ad317866973e8e5a96",
+        "serve/test_reasoning_rescue.py": "95ec0df327cc6c2601dbd9f0b0163c01800a299a4429e45e5888ce3831f893b5",
+        "serve/test_reasoning_tools.py": "3c009fe9fb7585b182b84b0fc45e4c7370965ebe7e6ff673302f8bf6315126d8",
+        "serve/test_responses.py": "cdd2f7e3aa47b6c2e479e20fd612932b66d574f76ee21c78cd9d4c4c20ca7927",
+        "serve/test_restart_waiters.py": "b35f1d486fc2d76854ff69fc1a62141881d47df98926b7f677bbaa21741421ab",
+        "serve/test_runconfig.py": "cd968de92873d64cb056d12b3639ccff67616b3fe308e7ed8cadf0a2ec717365",
+        "serve/test_security.py": "a6867eec898088f6eba83878ab5edc983896a6f7c55da91d77f931be314b3d05",
+        "serve/test_server.py": "974d15f9297879c534116c2f3d37d293592c3cec0d4152505ac4918f6941b4bb",
+        "serve/test_slots.py": "12c1407453bff494a4987507c2a3326762a6b097572f6f82fbf090fa81d16ba9",
+        "serve/test_structured.py": "74e4cba79bcc1bf6eaa1bc8bcfc6d0a6abf14385b92e719917f2e7bc2b8dc7ef",
+        "serve/test_text_scan.py": "0c170ec31dc83b59a774e83ea0ee62c40df65152b43694ebdf15a0e0283d8027",
+        "serve/test_vram.py": "a908f82e4bbc11621848cfe420cceb3eb4de92a2e6aeb9e16f130c5929a7d71b",
+        "serve/test_winjob.py": "e305a9aa79d53f6652e345c22ca55f6f3f8c4ccf20b05f67b6331328b6205f2e",
+        "serve/winjob.py": "736ee937e58438a4599b25d576a97cb3680cb963f50976abecc25038ef20740f",
+        "serve/_text_scan.c": "13ec60c676306b9ee5dae5121d75e8a9c5a5f0b8bcfc3960df301232c0596071"
+      }
+    }
+  },
+  "native_unchanged": {
+    "serve/_text_scan.c": "13ec60c676306b9ee5dae5121d75e8a9c5a5f0b8bcfc3960df301232c0596071",
+    "serve/_text_scan.cp311-win_amd64.pyd": "a9d087635549ed2226c8059b0706f759182a8c8be3bc9b6e57943e7992afee8b"
+  },
+  "sha256": {
+    "build-sycl-a770-marker-scan-20261024/initial.json": "c093cd122cee38bd65ca817e017d0776374682831e63e751d1b63e26f550006f",
+    "build-sycl-a770-marker-scan-20261024/differential.json": "05b58fb25d923edec1948aed307335179273450d7e5262bb0b4689ba837bc51c",
+    "build-sycl-a770-marker-scan-20261024/timing-1.json": "e7778b6da95d22bb6835d5d1e947154126e2c7a2a549ee30cab2a4d816395702",
+    "build-sycl-a770-marker-scan-20261024/timing-2.json": "dfd24418bbf900f867759617f79b7ea840b18c8ffe820b5e8356f459dd1e7207",
+    "build-sycl-a770-marker-scan-20261024/targeted-native.json": "b25e27616ddc24739bbc00e377ce3fdcad8295d93f8e97d9cff85db51adca5b3",
+    "build-sycl-a770-marker-scan-20261024/targeted-fallback.json": "bf632a9edbfa0efa9af56c7eee96036c3dbfa9c61e8adc6e441b3f5f4f801a4d",
+    "build-sycl-a770-marker-scan-20261024/bench.py": "e308c139cde76e0599e06c8d8e4f3523a39b4062c8ce92622f48646ab0d91322",
+    "build-sycl-a770-marker-scan-20261024/candidate.py": "79552a92c2941487296f6f06c0a0dfdc21851616b45be86ac22f045c82c1bdc8",
+    "build-sycl-a770-marker-scan-20261024/differential.py": "e713ce74b3787fdceb03fb0bf7b934edc29365b6820468cd899f36b1d1691927",
+    "build-sycl-a770-marker-scan-20261024/targeted.py": "db12f3aa3080cf0d19af41aef0d0fa2c378013764f77a55388a0b58c1d3588f4",
+    "build-sycl-a770-marker-scan-20261024/check.py": "e7fddb5830851cf98e549cb7acca2ba3bd8b46661b862da0e147d66312bb1794",
+    "build-sycl-a770-marker-scan-20261024/before/serve/frontend.py": "6e8ec9a5a39a32f3fab92039de6e263202d9e0209f1622622bbb8a9f32ec22e1",
+    "build-sycl-a770-marker-scan-20261024/before/serve/_text_scan.c": "13ec60c676306b9ee5dae5121d75e8a9c5a5f0b8bcfc3960df301232c0596071",
+    "build-sycl-a770-marker-scan-20261024/before/serve/test_text_scan.py": "5393e48bdead6238cfcb9274a1b06ce89484a8fb9dacb214725c1b755ba065ed",
+    "build-sycl-a770-marker-scan-20261024/before/serve/test_server.py": "974d15f9297879c534116c2f3d37d293592c3cec0d4152505ac4918f6941b4bb",
+    "build-sycl-a770-marker-scan-20261024/before/tools/build_text_scan.py": "bb5c978894e9244485a626f59a90662e95f01801f67211ec28c8815cc474b28a",
+    "build-sycl-a770-marker-scan-20261024/after/serve/frontend.py": "c95a6b9f7ece8b122de38e5ca6aed51e4d112f786163d32b0306b8c6fe3b4067",
+    "build-sycl-a770-marker-scan-20261024/after/serve/_text_scan.c": "13ec60c676306b9ee5dae5121d75e8a9c5a5f0b8bcfc3960df301232c0596071",
+    "build-sycl-a770-marker-scan-20261024/after/serve/test_text_scan.py": "0c170ec31dc83b59a774e83ea0ee62c40df65152b43694ebdf15a0e0283d8027",
+    "build-sycl-a770-marker-scan-20261024/after/serve/test_server.py": "974d15f9297879c534116c2f3d37d293592c3cec0d4152505ac4918f6941b4bb",
+    "build-sycl-a770-marker-scan-20261024/after/tools/build_text_scan.py": "bb5c978894e9244485a626f59a90662e95f01801f67211ec28c8815cc474b28a",
+    "serve/frontend.py": "c95a6b9f7ece8b122de38e5ca6aed51e4d112f786163d32b0306b8c6fe3b4067",
+    "serve/test_text_scan.py": "0c170ec31dc83b59a774e83ea0ee62c40df65152b43694ebdf15a0e0283d8027",
+    "bench/results/a770/marker-restore-2026-10-24.md": "5dce7ef7f396b4120ff3ae758dd479253121faee2a2e578fc2f42280dc6931ef"
+  }
+}

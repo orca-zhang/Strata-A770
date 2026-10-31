@@ -40,6 +40,11 @@ public:
     void f16(const uint16_t* X, const uint16_t* W, float* Y, int64_t T, int64_t N, int64_t K, int64_t ldy = 0,
              float beta = 0.0f);
 
+    /// The contiguous 2560/640 expert chain; false enqueues nothing. finish waits after down.
+    /// With finish=false, keep inputs, outputs and workspace alive until the in-order queue completes.
+    bool f16_expert(const uint16_t* X, const uint16_t* Wgu, const uint16_t* Wd,
+                    float* GU, uint16_t* H, float* Y, int64_t T, bool finish = true);
+
     /// W given as native GGUF blocks of `ggml_type`, dequantized to FP16 in the scratch, X in FP16.  `ldx` (> K) is
     /// X's padded row stride, taken only by STRATA_PF_PAD's path (0 = K).
     /// On an MMQ build a beta = 0 product whose type is covered, whose K is a multiple of 256 values and whose matrix fits
@@ -59,12 +64,21 @@ public:
     int64_t scratch_elems() const { return scratch_elems_; }
     void* stream() const { return stream_; }
 
+#ifdef STRATA_ORCA_NATIVE
+    // Consecutive independent products sharing weights are batched by default.
+    // Inputs/outputs must stay alive until the queue completes, as for kernels.
+    void set_auto_batch(bool enabled);
+    struct BatchStats { uint64_t requests, products, merged_requests; };
+    BatchStats batch_stats() const;
+#endif
+
 private:
     void* handle_ = nullptr;
     void* stream_ = nullptr;
     uint16_t* scratch_ = nullptr;
     int64_t scratch_elems_ = 0;
     void* workspace_ = nullptr;
+    size_t workspace_bytes_ = 0;  // SYCL: reuse the otherwise unused cuBLAS workspace for GPU widening.
     bool external_ = false;
     void* hipblaslt_state_ = nullptr;
     bool f16_io_ = false;

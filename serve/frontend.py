@@ -20,10 +20,17 @@ import os
 import re
 import uuid
 from dataclasses import dataclass, field
+from json.encoder import encode_basestring_ascii
 from pathlib import Path
 
 import jinja2
 from jinja2.sandbox import ImmutableSandboxedEnvironment
+
+try:
+    from . import _text_scan
+    _text_scan.parameter_end("", False, 0)
+except (ImportError, TypeError):
+    _text_scan = None  # ponytail: missing/stale optional scanner uses Python until rebuilt
 
 KEEP_EMPTY_TURNS = os.environ.get("STRATA_KEEP_EMPTY_TURNS") == "1"  # ponytail: env is fixed for this process
 
@@ -223,23 +230,24 @@ def mark_think_literals(messages: list[dict], tools: list[dict] | None, tags: di
     return out, _mark_deep(tools, tags), True
 
 
-_THINK_MARK_RE = re.compile("|".join(THINK_MARKS))
-
-
 def unmark_think_literals(prompt: str, tags: dict[str, str] = LITERAL_TAGS) -> tuple[str, list[tuple[int, int]]]:
     """The rendered prompt with THINK_TAGS' marks turned back into the tags' text, and the (start, end) spans of those
     tags in it: the server encodes them as ordinary text (the tokenizer's encode_plain_spans)."""
     marks = THINK_MARKS if tags is LITERAL_TAGS else {v: k for k, v in tags.items()}
-    mark_re = _THINK_MARK_RE if tags is LITERAL_TAGS else re.compile("|".join(map(re.escape, marks)))
+    if not marks:
+        return prompt, []
+    if _text_scan is not None and all(len(mark) == 1 for mark in marks):
+        return _text_scan.restore_markers(prompt, marks)
+    # ponytail: one forward regex iterator for unbuilt extensions and arbitrary multi-character markers
     out, spans, pos, n = [], [], 0, 0
-    for m in mark_re.finditer(prompt):
-        out.append(prompt[pos:m.start()])
-        n += m.start() - pos
-        tag = marks[m.group(0)]
+    for match in re.finditer("|".join(map(re.escape, marks)), prompt):
+        out.append(prompt[pos:match.start()])
+        n += match.start() - pos
+        tag = marks[match.group()]
         out.append(tag)
         spans.append((n, n + len(tag)))
         n += len(tag)
-        pos = m.end()
+        pos = match.end()
     out.append(prompt[pos:])
     return "".join(out), spans
 
@@ -466,20 +474,28 @@ PARAM_END_PREFIXES = _tag_prefixes(PARAM_END)
 THINK_END_PREFIXES = _tag_prefixes(THINK_END)
 CALL_START_PREFIXES = _tag_prefixes(CALL_START)
 THINK_CALL_PREFIXES = THINK_END_PREFIXES + CALL_START_PREFIXES
+_PARAM_FOLLOW_RE = re.compile(r"</parameter>\s*(?=<parameter=|</function>)")
 
 
-def param_end(text: str, final: bool = False) -> int:
+def param_end(text: str, final: bool = False, start: int = 0) -> int:
     """Where a parameter value in `text` ends: the first `</parameter>` followed (after whitespace) by the next
     `<parameter=` or `</function>` - the same text inside a value (a file that documents the call format, #210) is
-    part of the value.  -1: none yet; -2: a candidate whose follower has not arrived (streaming; `final` accepts it)."""
-    at = text.find(PARAM_END)
-    while at >= 0:
+    part of the value. Search from `start` (0..len(text)), returning an absolute offset.
+    -1: none yet; -2: a candidate whose follower has not arrived (streaming; `final` accepts it)."""
+    if _text_scan is not None:
+        return _text_scan.parameter_end(text, final, start)
+    if start and not 0 <= start <= len(text):
+        raise ValueError("start must be within text")
+    at = text.find(PARAM_END, start)
+    if at >= 0:
+        match = _PARAM_FOLLOW_RE.search(text, at)
+        if match:
+            return match.start()
+        # Only the last candidate can still be waiting for its follower.
+        at = text.rfind(PARAM_END, at)
         after = text[at + len(PARAM_END):].lstrip()
-        if after.startswith(("<parameter=", FUNC_END)):
-            return at
         if not after or "<parameter=".startswith(after) or FUNC_END.startswith(after):
             return at if final else -2
-        at = text.find(PARAM_END, at + 1)
     return -1
 
 
@@ -487,6 +503,8 @@ def call_end(text: str) -> int:
     """Where a tool call's body ends (#210): the `</tool_call>` after the call's own `</function>`, found by walking
     its parameters with param_end, so a value may contain either tag.  -1: not complete yet.  A body that is not in
     the call format ends at the first `</tool_call>`, as before."""
+    if CALL_END not in text:
+        return -1
     s = text.lstrip()
     pos = len(text) - len(s)
     if not s.startswith("<function="):
@@ -494,29 +512,27 @@ def call_end(text: str) -> int:
     gt = text.find(">", pos)
     if gt < 0:
         return -1
-    pos = gt + 1
+    s = text[gt + 1:].lstrip()
+    pos = len(text) - len(s)
     while True:
-        rest = text[pos:]
-        s = rest.lstrip()
-        pos += len(rest) - len(s)
-        if s.startswith("<parameter="):
+        if text.startswith("<parameter=", pos):
             gt = text.find(">", pos)
             if gt < 0:
                 return -1
-            end = param_end(text[gt + 1:])
+            end = param_end(text, start=gt + 1)
             if end < 0:
                 return -1
-            pos = gt + 1 + end + len(PARAM_END)
-        elif s.startswith(FUNC_END):
+            # param_end already verified whitespace followed by a complete parameter/function tag.
+            pos = text.find("<", end + len(PARAM_END))
+        elif text.startswith(FUNC_END, pos):
             rest = text[pos + len(FUNC_END):]
             s = rest.lstrip()
             if s.startswith(CALL_END):
                 return pos + len(FUNC_END) + len(rest) - len(s)
             return -1 if CALL_END.startswith(s) else text.find(CALL_END, pos)
-        elif not s or "<parameter=".startswith(s) or FUNC_END.startswith(s):
-            return -1
         else:
-            return text.find(CALL_END, pos)
+            s = text[pos:pos + len(FUNC_END)]
+            return -1 if "<parameter=".startswith(s) or FUNC_END.startswith(s) else text.find(CALL_END, pos)
 
 
 def tool_choice_of(tool_choice) -> tuple[str, str | None]:
@@ -569,19 +585,25 @@ def parse_tool_call(body: str, schema: dict | None = None) -> ToolCall:
     when the tool's schema says the parameter is not a string (or, without a schema, when they parse as JSON
     objects/arrays/numbers/booleans)."""
     body = body.strip()
-    if not body.startswith("<function=") or ">" not in body:
+    gt = body.find(">", len(FUNC_START)) if body.startswith(FUNC_START) else -1
+    if gt < 0:
         raise ValueError("malformed tool call: " + body[:80])
-    name = body[len("<function="):body.index(">")]
-    rest = body[body.index(">") + 1:]
+    name = body[len(FUNC_START):gt]
+    pos = gt + 1
     props = ((schema or {}).get("parameters") or {}).get("properties") or {}
     args = {}
-    while "<parameter=" in rest:
-        rest = rest[rest.index("<parameter=") + len("<parameter="):]
-        pname = rest[:rest.index(">")]
-        rest = rest[rest.index(">") + 1:]
-        end = param_end(rest, final=True)
-        value = rest[:end] if end >= 0 else rest
-        rest = rest[end + len(PARAM_END):] if end >= 0 else ""
+    while (pos := body.find("<parameter=", pos)) >= 0:
+        pos += len("<parameter=")
+        gt = body.index(">", pos)
+        pname = body[pos:gt]
+        pos = gt + 1
+        end = param_end(body, final=True, start=pos)
+        if end >= 0:
+            value = body[pos:end]
+            pos = end + len(PARAM_END)
+        else:
+            value = body[pos:]
+            pos = len(body)
         if value.startswith("\n"):
             value = value[1:]
         if value.endswith("\n"):
@@ -623,6 +645,23 @@ class OutputParser:
         self.fence, self.line, self.ticks = "", "", 0
         self._reset_scan()
 
+    def _ticks_after(self, text: str) -> int:
+        """The open inline-code delimiter's length after `text`; only an equal run closes it."""
+        if _text_scan is not None:
+            return _text_scan.backticks(text, self.ticks)
+        ticks = self.ticks
+        if "`" not in text:
+            return ticks
+        if ticks <= 1 and "``" not in text:
+            return (ticks + text.count("`")) % 2
+        for run in re.finditer(r"`+", text):
+            length = run.end() - run.start()
+            if not ticks:
+                ticks = length
+            elif ticks == length:
+                ticks = 0
+        return ticks
+
     def _track(self, text: str) -> str:
         """Follow the reasoning text that has gone out: the open code fence, the current line, and the backticks of
         the current paragraph.  Returns the text."""
@@ -635,24 +674,26 @@ class OutputParser:
             line, self.line = self.line + text[start:end], ""
             s = line.lstrip()
             if self.fence:
-                if len(s) >= 3 and s[0] == self.fence and s[1] == self.fence and s[2] == self.fence:
+                if s.startswith(self.fence) and not s[len(self.fence):].lstrip(self.fence[0]).strip():
                     self.fence = ""
-            elif len(s) >= 3 and s[0] in "`~" and s[1] == s[0] and s[2] == s[0] and s.find(s[0] * 3, 3) < 0:
-                self.fence = s[0]
+            elif (len(s) >= 3 and s[0] in "`~" and s[1] == s[0] and s[2] == s[0]
+                  and (s[0] == "~" or "`" not in s.lstrip("`"))):
+                self.fence = s[:len(s) - len(s.lstrip(s[0]))]
+                self.ticks = 0
             elif not s:
                 self.ticks = 0
             else:
-                self.ticks += line.count("`")
+                self.ticks = self._ticks_after(line)
             start = end + 1
 
     def _opener_ok(self) -> bool:
         """The reasoning text so far puts a `<tool_call>` at the start of a line, outside a code fence and outside
         inline code."""
-        return not self.fence and not self.line.strip() and self.ticks % 2 == 0
+        return not self.fence and not self.line.strip() and not self.ticks
 
     def _in_code(self) -> bool:
         """The text so far leaves the next character inside a code fence or inline code."""
-        return bool(self.fence) or (self.ticks + self.line.count("`")) % 2 == 1
+        return bool(self.fence) or bool(self._ticks_after(self.line))
 
     def _release(self, deliver: bool) -> list[Event]:
         """Settle the calls waiting in self.pending: events for real calls, or all of it back as reasoning text."""
@@ -671,6 +712,7 @@ class OutputParser:
 
     def _reset_scan(self):
         self.sp = 0                  # how much of self.buf (the call body) the scanner has consumed
+        self.sraw = 0                # raw parameter: search here while sp keeps the whole value
         self.ss = "name"             # name -> between -> str|raw -> ... -> done
         self.scall = None            # the ToolCall being streamed (its id is reused by the final event)
         self.sfirst = True
@@ -678,44 +720,45 @@ class OutputParser:
         self.sdeclared = {}
 
     def _scan(self) -> list[Event]:
-        """Advance the streaming view of the call body in self.buf (see stream_tools)."""
+        """Advance the streaming view of the call body in text (see stream_tools)."""
         out = []
+        text = self.buf
 
         def args(s):
             if s:
                 out.append(Event("tool_args", s, call=self.scall))
         while True:
-            rest = self.buf[self.sp:]
             if self.ss == "name":
-                a = rest.find("<function=")
-                b = rest.find(">", a + 10) if a >= 0 else -1
+                a = text.find("<function=", self.sp)
+                b = text.find(">", a + 10) if a >= 0 else -1
                 if b < 0:
                     return out
-                name = rest[a + 10:b]
+                name = text[a + 10:b]
                 self.scall = ToolCall(name=name, arguments={})
                 props = ((self.schemas.get(name) or {}).get("parameters") or {}).get("properties") or {}
                 self.sdeclared = {k: (v or {}).get("type") for k, v in props.items()}
                 out.append(Event("tool_start", call=self.scall))
                 args("{")
-                self.sp += b + 1
+                self.sp = b + 1
                 self.ss = "between"
             elif self.ss == "between":
-                stripped = rest.lstrip()
-                self.sp += len(rest) - len(stripped)
-                if stripped.startswith("<parameter="):
-                    b = stripped.find(">")
+                if self.sp < len(text) and text[self.sp].isspace():
+                    self.sp = len(text) - len(text[self.sp:].lstrip())
+                if text.startswith("<parameter=", self.sp):
+                    b = text.find(">", self.sp)
                     if b < 0:
                         return out
-                    pname = stripped[11:b]
-                    args(("" if self.sfirst else ",") + json.dumps(pname) + ":")
+                    pname = text[self.sp + 11:b]
+                    args(("" if self.sfirst else ",") + encode_basestring_ascii(pname) + ":")
                     self.sfirst = False
-                    self.sp += b + 1
+                    self.sp = b + 1
                     if self.sdeclared.get(pname) == "string":
                         args('"')
                         self.ss, self.sval_started = "str", False
                     else:
                         self.ss = "raw"
-                elif stripped.startswith("</function>"):
+                        self.sraw = self.sp
+                elif text.startswith("</function>", self.sp):
                     args("}")
                     self.sp += len("</function>")
                     self.ss = "done"
@@ -723,34 +766,39 @@ class OutputParser:
                     return out          # a tag still arriving (or trailing text): wait
             elif self.ss == "str":
                 if not self.sval_started:
-                    if not rest:
+                    if self.sp == len(text):
                         return out
-                    if rest[0] == "\n":          # the value's leading newline is not part of it
+                    if text[self.sp] == "\n":  # the value's leading newline is not part of it
                         self.sp += 1
-                        rest = rest[1:]
                     self.sval_started = True
-                end = param_end(rest)
+                end = param_end(text, False, self.sp)
                 if end >= 0:
-                    value = rest[:end]
+                    value = text[self.sp:end]
                     if value.endswith("\n"):
                         value = value[:-1]
-                    args(json.dumps(value)[1:-1] + '"')
-                    self.sp += end + len(PARAM_END)
+                    args(encode_basestring_ascii(value)[1:-1] + '"')
+                    # param_end verified a complete follower; skip its whitespace without copying the tail.
+                    self.sp = text.find("<", end + len(PARAM_END))
                     self.ss = "between"
                     continue
                 # an undecided </parameter> (-2) is held from its start, like a tag still arriving
-                safe = rest.find(PARAM_END) if end == -2 else len(rest) - self._hold(rest, PARAM_END_PREFIXES)
-                if safe > 0 and rest[safe - 1] == "\n":   # may be the trailing newline before </parameter>
+                # Emitted text never ends with a held prefix, so only the buffer's suffix matters.
+                safe = (text.find(PARAM_END, self.sp) if end == -2 else
+                        len(text) - self._hold(text, PARAM_END_PREFIXES))
+                if safe > self.sp and text[safe - 1] == "\n":  # may be the trailing newline before </parameter>
                     safe -= 1
-                if safe > 0:
-                    args(json.dumps(rest[:safe])[1:-1])
-                    self.sp += safe
+                if safe > self.sp:
+                    args(encode_basestring_ascii(text[self.sp:safe])[1:-1])
+                    self.sp = safe
                 return out
             elif self.ss == "raw":
-                end = param_end(rest)
+                end = param_end(text, False, self.sraw)
                 if end < 0:
+                    # Keep a split terminator; an undecided follower keeps the old cursor.
+                    if end == -1 and len(text) - self.sraw >= len(PARAM_END):
+                        self.sraw = len(text) - len(PARAM_END) + 1
                     return out
-                value = rest[:end]
+                value = text[self.sp:end]
                 if value.startswith("\n"):
                     value = value[1:]
                 if value.endswith("\n"):
@@ -760,7 +808,7 @@ class OutputParser:
                 except ValueError:
                     v = value
                 args(json.dumps(v, ensure_ascii=False))
-                self.sp += end + len(PARAM_END)
+                self.sp = text.find("<", end + len(PARAM_END))
                 self.ss = "between"
             else:
                 return out
@@ -774,7 +822,7 @@ class OutputParser:
         if self.ss == "str":
             tail += '"'
         elif self.ss == "raw":
-            tail += json.dumps(self.buf[self.sp:].strip("\n"))
+            tail += encode_basestring_ascii(self.buf[self.sp:].strip("\n"))
         tail += "}"
         out.append(Event("tool_args", tail, call=self.scall))
         self.ss = "done"
@@ -782,6 +830,8 @@ class OutputParser:
 
     def _hold(self, text: str, prefixes: tuple[str, ...]) -> int:
         """Length of the longest suffix of `text` that is a proper tag prefix."""
+        if not text.endswith(prefixes):
+            return 0
         best = 0
         for prefix in prefixes:
             if text.endswith(prefix):
@@ -795,29 +845,36 @@ class OutputParser:
             if self.state == "rcall":
                 # #804: a `<tool_call>` inside the reasoning, with tools declared.  It is held whole (never streamed
                 # as a call) until it ends: a declared name is then a tool call, anything else stays reasoning text.
-                body = self.buf[len(CALL_START):]
-                end, think = call_end(body), body.find(THINK_END)
+                end = think = -1
+                if ">" in delta:
+                    # Only new text and the tag overlap can complete an end tag; keep offsets in self.buf.
+                    if self.buf.find(CALL_END, 1 - len(delta) - len(CALL_END)) >= 0:
+                        end = call_end(self.buf[len(CALL_START):])
+                        if end >= 0:
+                            end += len(CALL_START)
+                    think = self.buf.find(THINK_END, 1 - len(delta) - len(THINK_END))
                 if end >= 0 and (think < 0 or think >= end):
                     call = None
                     try:
-                        name = body[:end].strip()[len("<function="):].split(">", 1)[0]
+                        body = self.buf[len(CALL_START):end]
+                        name = body.strip()[len("<function="):].split(">", 1)[0]
                         if name in self.schemas:
-                            call = parse_tool_call(body[:end], self.schemas.get(name))
+                            call = parse_tool_call(body, self.schemas.get(name))
                     except ValueError:
                         pass
-                    raw = self.buf[:len(CALL_START) + end + len(CALL_END)]
+                    raw = self.buf[:end + len(CALL_END)]
                     if call is not None or self.pending:
                         self.pending.append([raw, call])    # settled by what follows it (see __init__)
                     else:
                         out.append(Event("reasoning", self._track(raw)))
-                    self.buf = body[end + len(CALL_END):]
+                    self.buf = self.buf[end + len(CALL_END):]
                     self.state = "reasoning"
                 elif think >= 0:                     # the thinking ended inside it: it never was a call
                     out += self._release(False)
-                    out.append(Event("reasoning", self._track(self.buf[:len(CALL_START) + think])))
-                    self.buf = body[think:]
+                    out.append(Event("reasoning", self._track(self.buf[:think])))
+                    self.buf = self.buf[think:]
                     self.state = "reasoning"
-                elif len(body) > RCALL_MAX:          # a tag in the prose that never closes: stop holding the thinking back
+                elif len(self.buf) - len(CALL_START) > RCALL_MAX:  # never closes: stop holding the thinking back
                     out += self._release(False)
                     out.append(Event("reasoning", self._track(self.buf)))
                     self.buf = ""
@@ -910,19 +967,21 @@ class OutputParser:
                         out.append(Event("content", self._track(self.buf[:j])))
                         self.buf = self.buf[j:]
                     return out
-                if i and self.buf[:i].strip():
+                if i and self.buf[:i].strip("\n"):
                     out.append(Event("content", self._track(self.buf[:i].rstrip("\n"))))
                 self.buf = self.buf[i + len(CALL_START):]
                 self.state = "call"
             else:
-                i = call_end(self.buf)
+                # A call can only finish with a newly completed end tag; include its split prefix in the check.
+                i = (call_end(self.buf) if ">" in delta
+                     and CALL_END in self.buf[-(len(delta) + len(CALL_END) - 1):] else -1)
                 if self.stream_tools:
                     if i >= 0:
                         whole, self.buf = self.buf, self.buf[:i]     # scan only the body
                         out += self._scan()
                         out += self._close_scan()
                         self.buf = whole
-                    else:
+                    elif self.ss != "raw" or ">" in delta or "=" in delta:
                         out += self._scan()
                 if i < 0:
                     return out
@@ -947,6 +1006,8 @@ class OutputParser:
         if self.state == "call" and self.stream_tools and self.scall is not None:
             out += self._scan()                 # the output ended inside a call that was already announced
             if self.ss == "done":               # only its </tool_call> is missing: the call itself is whole
+                self.scall.arguments = parse_tool_call(self.buf[:self.sp],
+                                                      self.schemas.get(self.scall.name)).arguments
                 out.append(Event("tool_call", call=self.scall))
             self.buf = ""
             self._reset_scan()

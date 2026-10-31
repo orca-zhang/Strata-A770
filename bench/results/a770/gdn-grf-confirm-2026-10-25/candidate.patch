@@ -1,0 +1,85 @@
+--- a/sycl/src/kernels/cuda/verify_kernels.dp.cpp
++++ b/sycl/src/kernels/cuda/verify_kernels.dp.cpp
+@@ -248,8 +248,8 @@
+         sycl::nd_item::barrier(sycl::access::fence_space::local_space) for
+         better performance if there is no access to global memory.
+         */
+-        item_ct1.barrier(); // the previous token is done with sk/sq/red/wsum
+-        if (tid < S) { sk[tid] = ht[qk + qh * S + tid]; sq[tid] = ht[qh * S + tid]; }
++        if (t > 0) item_ct1.barrier(sycl::access::fence_space::local_space); // retire the previous token before reusing local memory
++        if (tid < S) { sk[tid] = ht[qk + qh * S + tid]; if (t >= t_out_begin) sq[tid] = ht[qh * S + tid]; }
+         /*
+         DPCT1118: SYCL group functions and algorithms must be encountered in
+         converged control flow. You may need to adjust the code.
+@@ -259,7 +259,7 @@
+         sycl::nd_item::barrier(sycl::access::fence_space::local_space) for
+         better performance if there is no access to global memory.
+         */
+-        item_ct1.barrier();
++        item_ct1.barrier(sycl::access::fence_space::local_space);
+         const float g = sycl::native::exp(gate[(size_t)t * h_v + head]);
+         float kv = 0.0f;
+ #pragma unroll
+@@ -275,9 +275,16 @@
+         sycl::nd_item::barrier(sycl::access::fence_space::local_space) for
+         better performance if there is no access to global memory.
+         */
+-        item_ct1.barrier();
++        item_ct1.barrier(sycl::access::fence_space::local_space);
+         const float kv_col = red[0][col] + red[1][col] + red[2][col] + red[3][col];
+         const float delta = (ht[2 * qk + head * S + col] - g * kv_col) * beta[(size_t) t * h_v + head];
++        if (t < t_out_begin) {
++            // ponytail: replay needs only the ordered state updates.
++#pragma unroll
++            for (int r = 0; r < RPG; ++r)
++                s[r] = sycl::fma((float)g, s[r], sk[rg * RPG + r] * delta);
++            continue;
++        }
+         float o = 0.0f;
+ #pragma unroll
+         for (int r = 0; r < RPG; ++r) {
+@@ -293,7 +300,7 @@
+         sycl::nd_item::barrier(sycl::access::fence_space::local_space) for
+         better performance if there is no access to global memory.
+         */
+-        item_ct1.barrier();
++        item_ct1.barrier(sycl::access::fence_space::local_space);
+         red[rg][col] = o;
+         /*
+         DPCT1118: SYCL group functions and algorithms must be encountered in
+@@ -304,14 +311,13 @@
+         sycl::nd_item::barrier(sycl::access::fence_space::local_space) for
+         better performance if there is no access to global memory.
+         */
+-        item_ct1.barrier();
++        item_ct1.barrier(sycl::access::fence_space::local_space);
+         float oc = 0.0f, sq_part = 0.0f;
+         if (rg == 0) {
+             oc = (red[0][col] + red[1][col] + red[2][col] + red[3][col]) *
+                  sycl::rsqrt((float)S);
+             sq_part = oc * oc;
+         }
+-        if (t < t_out_begin) continue;   // a replayed token: its state update is needed, its output is not
+         /*
+ DPCT1108: '__shfl_xor_sync' was migrated with the experimental feature
+ masked sub_group function which may not be supported by all compilers or
+@@ -342,7 +348,7 @@
+         sycl::nd_item::barrier(sycl::access::fence_space::local_space) for
+         better performance if there is no access to global memory.
+         */
+-        item_ct1.barrier();
++        item_ct1.barrier(sycl::access::fence_space::local_space);
+         float yv = 0.0f;
+         if (rg == 0) {
+             const float ss = wsum[0] + wsum[1] + wsum[2] + wsum[3];
+@@ -1333,7 +1339,9 @@
+                 sycl::nd_range<3>(sycl::range(1, 1, (unsigned) h_v) *
+                                       sycl::range(1, RG, S),
+                                   sycl::range(1, RG, S)),
+-                exp_props,
++                sycl::ext::oneapi::experimental::properties{
++                    sycl::ext::oneapi::experimental::use_root_sync,
++                    sycl::ext::intel::experimental::grf_size<256>},
+                 [=](sycl::nd_item<3> item)
+                     [[sycl::reqd_sub_group_size(SG)]] {
+                         gdn_step_norm_multi_kernel<SG, Q>(

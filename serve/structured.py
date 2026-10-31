@@ -151,43 +151,6 @@ def prepare_format(response_format, messages):
     return messages, validator
 
 
-def _extract_json(text: str) -> str:
-    s = (text or "").strip()
-    if not s:
-        return ""
-    if s.startswith("```"):
-        first = s.find("\n")
-        if first != -1:
-            end = s.find("```", first + 1)
-            if end != -1:
-                s = s[first + 1:end].strip()
-    start = s.find("{")
-    if start == -1:
-        return s
-    depth = 0
-    in_str = False
-    esc = False
-    for i in range(start, len(s)):
-        ch = s[i]
-        if in_str:
-            if esc:
-                esc = False
-            elif ch == "\\":
-                esc = True
-            elif ch == "\"":
-                in_str = False
-        else:
-            if ch == "\"":
-                in_str = True
-            elif ch == "{":
-                depth += 1
-            elif ch == "}":
-                depth -= 1
-                if depth == 0:
-                    return s[start:i + 1]
-    return s[start:]
-
-
 def validated_json(text, validator, finish):
     def pairs(items):
         obj = {}
@@ -203,9 +166,24 @@ def validated_json(text, validator, finish):
     if finish != "stop":
         raise StructuredOutputError(f"structured output was incomplete (finish_reason={finish}); increase the output budget")
     try:
-        value = json.loads(_extract_json(text), object_pairs_hook=pairs, parse_constant=constant)
+        text = (text or "").strip()
+        if text.startswith("```"):
+            first = text.find("\n")
+            if first != -1:
+                end = text.find("```", first + 1)
+                if end != -1:
+                    text = text[first + 1:end].strip()
+        start = text.find("{")
+        # Decode the first object directly; other JSON shapes still require the whole input to be valid.
+        if start == -1:
+            value = json.loads(text, object_pairs_hook=pairs, parse_constant=constant)
+        else:
+            value = json.JSONDecoder(object_pairs_hook=pairs, parse_constant=constant).raw_decode(text, start)[0]
         canonical = json.dumps(value, ensure_ascii=False, allow_nan=False, separators=(",", ":"))
     except (ValueError, TypeError) as exc:
+        if isinstance(exc, json.JSONDecodeError) and start > 0:
+            # Keep offsets relative to the object as before; only error reporting needs this slice.
+            exc = json.JSONDecodeError(exc.msg, text[start:], exc.pos - start)
         raise StructuredOutputError(f"model did not return valid JSON: {exc}") from exc
     try:
         error = next(validator.iter_errors(value), None)

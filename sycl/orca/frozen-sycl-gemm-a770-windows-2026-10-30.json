@@ -1,0 +1,115 @@
+{
+  "complete": true,
+  "performance_measurement": false,
+  "full_model_stability_established": false,
+  "linux_gpu_validated": false,
+  "exe_sha256": "8c47d8f2abacd901ef7f8849c4c27d3ddd9119ea1bf249b3a78acbb00596dc89",
+  "script_sha256": "48728a46fc57aa2a4d200245df21265b30e83d726efcdf3a920b87b55335db55",
+  "fixture_sha256": {
+    "bad-nsg0.f32": "48c71c4ad37ba58ef5635b5d3b4a52edbd14f4f74cabc11c5984d1873faac695",
+    "bad-nsg8.f32": "50df750e18e85fbf17d30058fe6982b81d3c72a9d6b96b5e70bd6a952879e967",
+    "bound.f32": "6a2e5964eeabbab8ef1aea32ae7634559786b341773a1c81c44dd697a28628e3",
+    "expected.f32": "daf35e45b63be2537082a43cb67ffac6bc12c4126540ee95c583cff5eec7dc13",
+    "weights.f16": "4e44607e38fc802827eebea03250588e7770635cfa7c51974413caa70e6ef2b7",
+    "x.f16": "78cea826d2278a27589782254cc6db26c6766be2ac826038312ee7afa3fab67a"
+  },
+  "runs": [
+    {
+      "process": 0,
+      "exit_code": 0,
+      "log": "RESULT case=0 rows=703 nsg=8 calls=2048 bad_cells=0 guards=1\nRESULT case=0 rows=703 nsg=0 calls=2048 bad_cells=0 guards=1\nCOMPLETE direct16/native8 real/synthetic diagnostic;not a model or speed acceptance\n",
+      "log_sha256": "25281861c4d4c2c6f04822a6cc7fb98a9244b0d7f8dcd8cfc599af14c20b7adc",
+      "observations": [
+        {
+          "case": 0,
+          "rows": 703,
+          "nsg": 8,
+          "calls": 2048,
+          "bad_cells": 0,
+          "guards": 1
+        },
+        {
+          "case": 0,
+          "rows": 703,
+          "nsg": 0,
+          "calls": 2048,
+          "bad_cells": 0,
+          "guards": 1
+        }
+      ],
+      "captures": [],
+      "captures_sha256": {}
+    },
+    {
+      "process": 1,
+      "exit_code": 0,
+      "log": "RESULT case=0 rows=703 nsg=8 calls=2048 bad_cells=0 guards=1\nRESULT case=0 rows=703 nsg=0 calls=2048 bad_cells=0 guards=1\nCOMPLETE direct16/native8 real/synthetic diagnostic;not a model or speed acceptance\n",
+      "log_sha256": "25281861c4d4c2c6f04822a6cc7fb98a9244b0d7f8dcd8cfc599af14c20b7adc",
+      "observations": [
+        {
+          "case": 0,
+          "rows": 703,
+          "nsg": 8,
+          "calls": 2048,
+          "bad_cells": 0,
+          "guards": 1
+        },
+        {
+          "case": 0,
+          "rows": 703,
+          "nsg": 0,
+          "calls": 2048,
+          "bad_cells": 0,
+          "guards": 1
+        }
+      ],
+      "captures": [],
+      "captures_sha256": {}
+    },
+    {
+      "process": 2,
+      "exit_code": 0,
+      "log": "RESULT case=0 rows=703 nsg=8 calls=2048 bad_cells=0 guards=1\nRESULT case=0 rows=703 nsg=0 calls=2048 bad_cells=0 guards=1\nCOMPLETE direct16/native8 real/synthetic diagnostic;not a model or speed acceptance\n",
+      "log_sha256": "25281861c4d4c2c6f04822a6cc7fb98a9244b0d7f8dcd8cfc599af14c20b7adc",
+      "observations": [
+        {
+          "case": 0,
+          "rows": 703,
+          "nsg": 8,
+          "calls": 2048,
+          "bad_cells": 0,
+          "guards": 1
+        },
+        {
+          "case": 0,
+          "rows": 703,
+          "nsg": 0,
+          "calls": 2048,
+          "bad_cells": 0,
+          "guards": 1
+        }
+      ],
+      "captures": [],
+      "captures_sha256": {}
+    }
+  ],
+  "check_passed": true,
+  "date": "2026-10-30",
+  "platform": {
+    "gpu": "Intel Arc A770 16 GB",
+    "os": "Windows",
+    "driver": "32.0.101.9034",
+    "compiler": "IntelLLVM 2025.3.2"
+  },
+  "local_run": "frozen-sycl-gemm-1793348868238284300",
+  "results_sha256": "c3b262fdf877c0787fdcf819279c60cb3ebb6cadc1a304d164edb5d0f9bd5e80",
+  "total_calls": 12288,
+  "joint_matrix_calls": 6144,
+  "esimd_calls": 6144,
+  "notes": [
+    "The unchanged historical SYCL executable checks the frozen real FP16 703x1280x2560 fixture in native joint-matrix NSG8 and independent ESIMD paths.",
+    "All outputs are checked on the GPU after every launch against the existing CPU64 oracle and conservative FP32 bound; counters are read after eight launches.",
+    "Three fresh processes observed no failures. The executable hash equals the historical failing run. These passes do not clear the saved historical bad outputs or either backend full-model failures.",
+    "This is a numerical diagnostic with extra checking kernels and host waits, not a performance or complete-model acceptance."
+  ]
+}

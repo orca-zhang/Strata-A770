@@ -1,0 +1,163 @@
+{
+  "date": "2026-10-24",
+  "scope": "Markdown tool-call fences; CPU correctness only",
+  "environment": {
+    "os": "Windows",
+    "python": "3.11.9",
+    "cpu": "Intel Xeon E5-2696 v4",
+    "engine": "MockEngine and fake local MCP"
+  },
+  "reproduction": {
+    "tests": 3,
+    "failure_entries_including_subtests": 57,
+    "errors": 0,
+    "artifacts": [
+      "build-sycl-a770-tool-fences-20261024/before-fix.log",
+      "build-sycl-a770-tool-fences-20261024/before-fix.json"
+    ]
+  },
+  "targeted": {
+    "tests": 49,
+    "seconds": 14.779528999999457,
+    "failures": [],
+    "errors": [],
+    "skipped": [],
+    "sha256": {
+      "serve/frontend.py": "9033a1c97fb48e725cd47d32e9e8009ff7d80cb47f89d33083dbfe6e40a795dd",
+      "serve/test_reasoning_rescue.py": "d65b9bd6066f4e8e1d07b763c52d6a1d1b80ec21163dddc7d65df1887b1c766f",
+      "serve/test_mcp.py": "72afcf066ee3e9c7e00627746c8e715a6f9bbf583955b6c180a1a0f6bf6b66d0"
+    }
+  },
+  "regression": {
+    "tests": 470,
+    "seconds": 629.112209400002,
+    "failures": [
+      [
+        "serve.test_slots.Slots.test_slot_work_counts_as_activity_and_shows_in_status",
+        "Traceback (most recent call last):\n  File \"G:\\GitHub\\Strata\\serve\\test_slots.py\", line 441, in test_slot_work_counts_as_activity_and_shows_in_status\n    self.assertTrue(seen.get(\"busy\"))\nAssertionError: False is not true\n"
+      ]
+    ],
+    "errors": [],
+    "skipped": [
+      [
+        "serve.test_detok.Detok.test_constant_cost",
+        "no pack tokenizer here"
+      ],
+      [
+        "serve.test_detok.Detok.test_random_ids_and_broken_bytes",
+        "no pack tokenizer here"
+      ],
+      [
+        "serve.test_detok.Detok.test_text_with_split_characters",
+        "no pack tokenizer here"
+      ],
+      [
+        "serve.test_detok.HeapBpe.test_pack_vocab",
+        "no pack tokenizer here"
+      ],
+      [
+        "serve.test_detok.HeapBpe.test_speed_pack",
+        "no pack tokenizer here"
+      ],
+      [
+        "serve.test_slots.Slots.test_restore_of_a_link_reaches_the_engine_which_decides",
+        "symlinks need privileges on Windows"
+      ],
+      [
+        "serve.test_structured.Structured.test_invalid_generation_is_an_error_and_never_streams_content",
+        "jsonschema is not installed"
+      ],
+      [
+        "serve.test_structured.Structured.test_invalid_schema_is_400_and_local_refs_work",
+        "jsonschema is not installed"
+      ]
+    ],
+    "sha256": {
+      "serve/__init__.py": "5b38172f894574bf933b1e932a2dace1c113184f105bcd7db8718e6330f809c2",
+      "serve/frontend.py": "9033a1c97fb48e725cd47d32e9e8009ff7d80cb47f89d33083dbfe6e40a795dd",
+      "serve/mcp.py": "4cd9f18d427123e7080cb2a1b937b7c8ede401378c3485bc142db40b9655be0b",
+      "serve/mcp_fake_server.py": "484a5202e378fb61aa2baf4adea106f13f95696c1719a054d68c7a167e9e5325",
+      "serve/responses.py": "9f3bef6172df48a80918efb27ffed7be55e67d7c320a8e5a33682c7c12c3b604",
+      "serve/runconfig.py": "b479b7f65067d1b85f8d3f36fca29772cf1307aecf2298d80e5e40f6955ffe4a",
+      "serve/server.py": "219268dd6b70322a097d720cee7e589d129fce55df240fed48f5837cbd0ad6d5",
+      "serve/structured.py": "1324728a86ff7a1a23a6a0db144acc6a1d5764deb15badd167d36d619cf94e57",
+      "serve/telemetry.py": "611ce7043ad316793569de52c0f9f4f57c3dd1ffa77f9e41ef85b65189a2873b",
+      "serve/test_control_cancel.py": "a1eda9d7ee61b2d8da26579cf968f15e4d2870a839a7c47c2077e1df58aa3e36",
+      "serve/test_detok.py": "f666a94c12fa4697537cd600ec2c1fb0b1f8b52f2e765016425018a5b195c1c7",
+      "serve/test_fatal_recovery.py": "f14477565a472608bed122258066b91676a16ec76d97a4fb9b54ea62ae8639b6",
+      "serve/test_frontend.py": "62099f4db00daac9f324efa0ff6313e1e1a9cbb167ce7d62d7ec8dc1cd91f7f1",
+      "serve/test_lifecycle.py": "bc7334530c0900db675a7c73b079d3565a1e456c3d6cfdc04760e8479e4ec320",
+      "serve/test_mcp.py": "72afcf066ee3e9c7e00627746c8e715a6f9bbf583955b6c180a1a0f6bf6b66d0",
+      "serve/test_monitor.py": "7face289d89c1bec38b5fae0334fc2f88e2e98b7aa151b8ea640437d5890292a",
+      "serve/test_parallel.py": "2326d767050db0e752671991d7bf99e23a367d99227d914cc31409a348ca8873",
+      "serve/test_reasoning_loop_recovery.py": "4a89bf1fa248196efd728ef374b1274fc764577d63f400ad317866973e8e5a96",
+      "serve/test_reasoning_rescue.py": "d65b9bd6066f4e8e1d07b763c52d6a1d1b80ec21163dddc7d65df1887b1c766f",
+      "serve/test_reasoning_tools.py": "3c009fe9fb7585b182b84b0fc45e4c7370965ebe7e6ff673302f8bf6315126d8",
+      "serve/test_responses.py": "cdd2f7e3aa47b6c2e479e20fd612932b66d574f76ee21c78cd9d4c4c20ca7927",
+      "serve/test_restart_waiters.py": "b35f1d486fc2d76854ff69fc1a62141881d47df98926b7f677bbaa21741421ab",
+      "serve/test_runconfig.py": "cd968de92873d64cb056d12b3639ccff67616b3fe308e7ed8cadf0a2ec717365",
+      "serve/test_security.py": "a6867eec898088f6eba83878ab5edc983896a6f7c55da91d77f931be314b3d05",
+      "serve/test_server.py": "974d15f9297879c534116c2f3d37d293592c3cec0d4152505ac4918f6941b4bb",
+      "serve/test_slots.py": "05a9e50fc921e8a25543881c8629ec75fa7ee918fefd94421ae8ef90fa929852",
+      "serve/test_structured.py": "74e4cba79bcc1bf6eaa1bc8bcfc6d0a6abf14385b92e719917f2e7bc2b8dc7ef",
+      "serve/test_vram.py": "a908f82e4bbc11621848cfe420cceb3eb4de92a2e6aeb9e16f130c5929a7d71b",
+      "serve/test_winjob.py": "e305a9aa79d53f6652e345c22ca55f6f3f8c4ccf20b05f67b6331328b6205f2e",
+      "serve/winjob.py": "736ee937e58438a4599b25d576a97cb3680cb963f50976abecc25038ef20740f"
+    },
+    "source_unchanged": true
+  },
+  "session_follow_up": {
+    "tests": 32,
+    "seconds": 4.736231199996837,
+    "failures": [],
+    "errors": [],
+    "skipped": [
+      [
+        "serve.test_slots.Slots.test_restore_of_a_link_reaches_the_engine_which_decides",
+        "symlinks need privileges on Windows"
+      ]
+    ]
+  },
+  "final_full_suite_rerun": false,
+  "final_sources": {
+    "serve/frontend.py": "9033a1c97fb48e725cd47d32e9e8009ff7d80cb47f89d33083dbfe6e40a795dd",
+    "serve/test_mcp.py": "72afcf066ee3e9c7e00627746c8e715a6f9bbf583955b6c180a1a0f6bf6b66d0",
+    "serve/test_reasoning_rescue.py": "d65b9bd6066f4e8e1d07b763c52d6a1d1b80ec21163dddc7d65df1887b1c766f",
+    "serve/test_slots.py": "12c1407453bff494a4987507c2a3326762a6b097572f6f82fbf090fa81d16ba9"
+  },
+  "protected": {
+    "strata-iq2_xs.json": "1a755372f0e6c90c0bfa2af865d67b51f8df49c10aa1613b041b08da8184ca88",
+    "build-sycl-a770-unified-operators/bin/strata-unified-all-operators.exe": "8f0d866ded297cf5a409e84cf5dd61f437c56c8a89aaeb2a85569265b6a3e122"
+  },
+  "sha256": {
+    "build-sycl-a770-tool-fences-20261024/after/serve/frontend.py": "9033a1c97fb48e725cd47d32e9e8009ff7d80cb47f89d33083dbfe6e40a795dd",
+    "build-sycl-a770-tool-fences-20261024/after/serve/test_mcp.py": "72afcf066ee3e9c7e00627746c8e715a6f9bbf583955b6c180a1a0f6bf6b66d0",
+    "build-sycl-a770-tool-fences-20261024/after/serve/test_reasoning_rescue.py": "d65b9bd6066f4e8e1d07b763c52d6a1d1b80ec21163dddc7d65df1887b1c766f",
+    "build-sycl-a770-tool-fences-20261024/after-final/serve/frontend.py": "9033a1c97fb48e725cd47d32e9e8009ff7d80cb47f89d33083dbfe6e40a795dd",
+    "build-sycl-a770-tool-fences-20261024/after-final/serve/test_mcp.py": "72afcf066ee3e9c7e00627746c8e715a6f9bbf583955b6c180a1a0f6bf6b66d0",
+    "build-sycl-a770-tool-fences-20261024/after-final/serve/test_reasoning_rescue.py": "d65b9bd6066f4e8e1d07b763c52d6a1d1b80ec21163dddc7d65df1887b1c766f",
+    "build-sycl-a770-tool-fences-20261024/after-final/serve/test_slots.py": "12c1407453bff494a4987507c2a3326762a6b097572f6f82fbf090fa81d16ba9",
+    "build-sycl-a770-tool-fences-20261024/after-fix.json": "a948493137d9d9ddd197d4a208c949b21f316ab0ea2540f76409268d00beb61f",
+    "build-sycl-a770-tool-fences-20261024/after-fix.log": "d465c00fe2d65b2d462be0877424b06cf1545eef63eea54a25d91074065e677b",
+    "build-sycl-a770-tool-fences-20261024/before/serve/frontend.py": "3c804a61c21af2645c91abf1babf0cf57020ac834e8ca5e5f018d88e5e4f1391",
+    "build-sycl-a770-tool-fences-20261024/before/serve/test_mcp.py": "3382c9a2aa22dd516470d82a7ced0fe32ae4b448da8c1e66f16b13d7e4bb394a",
+    "build-sycl-a770-tool-fences-20261024/before/serve/test_reasoning_rescue.py": "e816896e9d4f74e8db0dc4cc3460d8698d25833c6beadce99619fc55df2d0b1e",
+    "build-sycl-a770-tool-fences-20261024/before/serve/test_slots.py": "05a9e50fc921e8a25543881c8629ec75fa7ee918fefd94421ae8ef90fa929852",
+    "build-sycl-a770-tool-fences-20261024/before-fix.json": "0f0ff762412edd2e05b85de601938b3a90559fedc7013a6f267feab8303052d0",
+    "build-sycl-a770-tool-fences-20261024/before-fix.log": "400062cfd71852eb52b3a40bc18466fb6a42bef5e7b25e86968578a888e87808",
+    "build-sycl-a770-tool-fences-20261024/check.py": "2b8e0599d88762cc6678f58f8706d997555fe009214500ab24191d444470f903",
+    "build-sycl-a770-tool-fences-20261024/initial.json": "aa6d6f5d69095bbdbdc544a6eb05c77814fb10f35d8d1f9f9a5e1e0f22d7c937",
+    "build-sycl-a770-tool-fences-20261024/regression.json": "753b0ff43dee9921de999528a2a46df2281d72e95d99266f46e03b7308f6e68b",
+    "build-sycl-a770-tool-fences-20261024/regression.log": "6402fb523debdb8bd145ac4ed40767b83f08f5e682c0c423bacd9efc00c9b6cf",
+    "build-sycl-a770-tool-fences-20261024/regression.py": "3eb96e7053486a462dfb7139d3494ad5e41341bfb21cf06c60d5c8ae839f1672",
+    "build-sycl-a770-tool-fences-20261024/slot-before.json": "d7001f2d8e0c682660d28084ec8302cde99b15c4bddf06d107880b73cbda262c",
+    "build-sycl-a770-tool-fences-20261024/timing-check.json": "7e0ac9779fbaa327b7b5f11c1ef700394f6f09579f78018d5ec39fe97471f81b",
+    "build-sycl-a770-tool-fences-20261024/timing-check.log": "1575cd05688d798bb1853e24a0b00c3304434f8ce89362d67f6189f48628546e",
+    "bench/results/a770/tool-call-fences-2026-10-24.md": "90cb3fe98b978758344bbb31af3069200f9a839f8c73d99c7097578a5ea38f79"
+  },
+  "notes": [
+    "The 470-test full run has one preserved test-scheduling failure; it is not an all-green run.",
+    "After correcting that test, all 32 session-module checks completed: 31 passed and one conditional skip.",
+    "No model prefill, decode or HTTP throughput benchmark was performed."
+  ]
+}

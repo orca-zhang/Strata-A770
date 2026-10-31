@@ -1,0 +1,2620 @@
+{
+  "complete": true,
+  "adopted": false,
+  "production_changed": false,
+  "model_tested": false,
+  "cohorts": {
+    "subset4": {
+      "data": {
+        "complete": true,
+        "adopted": false,
+        "production_changed": false,
+        "gpu_speed_tested": true,
+        "model_tested": false,
+        "rule": "Full IQ2_S/Q2 expert chain; unchanged GU,SwiGLU,Q8 and payload.0 frozen,1 rebuilt control,2 exact-int16 activation LUT+Down4.64-entry extra LUT scratch327680bytes;table build included each chain.No timing claims outside measured fixtures.8banks/240 real experts;graph16chains,warm4,5batches*2replays.T1/4/6;A1/C1/B1/C2/A2 in VRAM,mixed every8th mapped,all mapped.Gain>=1%,drift<=3% vs both original/control;confirm any passing candidate independently.Quantization/row layout unchanged.All48 eager bank/shape outputs+Q8+guards and3graphs checked each timing worker;random/outlier group lengths1..7 edge checks.No retries/exclusions.",
+        "files_sha256": {
+          "bench\\results\\a770\\check_q2_activation_lut_20261030.py": "6c8dbed59afcc92b5b40e67cbbf5ababd9289dbcadaf881a4ede5f2acbbeefcc",
+          "bench\\results\\a770\\q2-activation-lut-2026-10-30.hpp": "49e632a6a303ed38414cead9eb658f42eab795c7423f467b904be689361d2cfa",
+          "build-sycl-a770-down-unroll-20261028\\schedule.cpp": "b46cab76c6782032def67fd86839fbd57ecc6eae7bd5ec6e5f8185f3e726c356",
+          "build-sycl-a770-down-unroll-20261028\\worker.cpp": "e6da7de301a97d565371fc2c601ca075663aa0cfb7007d1aa339e8aba1ea5423",
+          "build-sycl-a770-q2-activation-lut-20261030\\schedule.cpp": "3e81d2f279d565b9329a72394314a0e440da375e8ca3fa178c1779c0eaeb79d4",
+          "build-sycl-a770-q2-activation-lut-20261030\\worker.cpp": "2090eeddb63117adfd753c7ba80214369f8e140c0c990ba58208a7a6f35b8941",
+          "build-sycl-a770-vram-down-sg16\\iq.obj": "17cceb618ebf7707f4582747f206c1db5bdb25b8c92ae65ef25536130ca783bb",
+          "build-sycl-a770-q2-activation-lut-20261030\\schedule.obj": "6df2e751e45199f86b943d19f2bee5763dd64815f794f61445def302d63e9a25",
+          "build-sycl-a770-q2-activation-lut-20261030\\worker.obj": "e422db8c32706717f04ff3e7513edf458a8aef47ad8f98bd7eeae5c296d41bbf",
+          "build-sycl-a770-q2-activation-lut-20261030\\probe.exe": "42b4ae294c92ca46cbbb0be22bb20ed2fbf9564f092aa431c0ba5b9696a5edd3",
+          "build-sycl-a770-q2-dpas-20261021\\experts-22.bin": "cbb9e5ad404788373c3816f4df554d23f6daeed8858b54be68202e38d90f1752",
+          "build-sycl-a770-q2-activation-lut-20261030\\check-random-0-mixed8.stdout": "06fb28e9b498a3663081ff7752c05d84ebb21c354198d18127fca60bd0bf1c93",
+          "build-sycl-a770-q2-activation-lut-20261030\\check-random-0-mixed8.stderr": "97bdc7bd7f7aace079b2e6c6d21f5fcfd6221fcf62918f8a89078ed6182c87e9",
+          "build-sycl-a770-q2-activation-lut-20261030\\check-random-1-mixed8.stdout": "06fb28e9b498a3663081ff7752c05d84ebb21c354198d18127fca60bd0bf1c93",
+          "build-sycl-a770-q2-activation-lut-20261030\\check-random-1-mixed8.stderr": "ecbe51d90d732781f844b079ecda3be14e32190b9ba7a4857980843bc8708910",
+          "build-sycl-a770-q2-activation-lut-20261030\\check-random-2-mixed8.stdout": "06fb28e9b498a3663081ff7752c05d84ebb21c354198d18127fca60bd0bf1c93",
+          "build-sycl-a770-q2-activation-lut-20261030\\check-random-2-mixed8.stderr": "4e992933e0b4ac0de2f516ffff2c0339067f6097f9cf48e2d31c95c1475df536",
+          "build-sycl-a770-q2-activation-lut-20261030\\check-outlier-0-mixed8.stdout": "06fb28e9b498a3663081ff7752c05d84ebb21c354198d18127fca60bd0bf1c93",
+          "build-sycl-a770-q2-activation-lut-20261030\\check-outlier-0-mixed8.stderr": "97bdc7bd7f7aace079b2e6c6d21f5fcfd6221fcf62918f8a89078ed6182c87e9",
+          "build-sycl-a770-q2-activation-lut-20261030\\check-outlier-1-mixed8.stdout": "06fb28e9b498a3663081ff7752c05d84ebb21c354198d18127fca60bd0bf1c93",
+          "build-sycl-a770-q2-activation-lut-20261030\\check-outlier-1-mixed8.stderr": "ecbe51d90d732781f844b079ecda3be14e32190b9ba7a4857980843bc8708910",
+          "build-sycl-a770-q2-activation-lut-20261030\\check-outlier-2-mixed8.stdout": "06fb28e9b498a3663081ff7752c05d84ebb21c354198d18127fca60bd0bf1c93",
+          "build-sycl-a770-q2-activation-lut-20261030\\check-outlier-2-mixed8.stderr": "4e992933e0b4ac0de2f516ffff2c0339067f6097f9cf48e2d31c95c1475df536",
+          "build-sycl-a770-q2-activation-lut-20261030\\A1-vram.stdout": "e832930e73416c35264686f9aa383dba092c51e811e501c29c5379a729efd419",
+          "build-sycl-a770-q2-activation-lut-20261030\\A1-vram.stderr": "7a3e3a67d612c25bf77b45fe17e5c7c42ab8507f5404ee7135e9e5d73593add3",
+          "build-sycl-a770-q2-activation-lut-20261030\\A1-mixed8.stdout": "345a3c4824e94566210fd378aa6c96df2c5c447e57a313ae40954054c8985269",
+          "build-sycl-a770-q2-activation-lut-20261030\\A1-mixed8.stderr": "7a3e3a67d612c25bf77b45fe17e5c7c42ab8507f5404ee7135e9e5d73593add3",
+          "build-sycl-a770-q2-activation-lut-20261030\\A1-mapped.stdout": "a61c6e476a4137760e2d38528a3994434b6518e7e6f01300e4a2e9f9022995bf",
+          "build-sycl-a770-q2-activation-lut-20261030\\A1-mapped.stderr": "7a3e3a67d612c25bf77b45fe17e5c7c42ab8507f5404ee7135e9e5d73593add3",
+          "build-sycl-a770-q2-activation-lut-20261030\\C1-vram.stdout": "4966d3fcc347b7ecbb8dd07b32ec5d767781bc1e3946f9dbb3112a92ab371c61",
+          "build-sycl-a770-q2-activation-lut-20261030\\C1-vram.stderr": "b5e1a3aacd1fc4e8a7bf68f8497cc2aef8f1b22eabd38561407aaba5fd03a2ad",
+          "build-sycl-a770-q2-activation-lut-20261030\\C1-mixed8.stdout": "33c75a618b400ca6ab5d5cd732990af60d672b0993dec0162cb5ae5fa30aa06a",
+          "build-sycl-a770-q2-activation-lut-20261030\\C1-mixed8.stderr": "b5e1a3aacd1fc4e8a7bf68f8497cc2aef8f1b22eabd38561407aaba5fd03a2ad",
+          "build-sycl-a770-q2-activation-lut-20261030\\C1-mapped.stdout": "594c67ef203f4ec8bad6bfdc0a1a919e1211c83c989a493785509e731e05ee27",
+          "build-sycl-a770-q2-activation-lut-20261030\\C1-mapped.stderr": "b5e1a3aacd1fc4e8a7bf68f8497cc2aef8f1b22eabd38561407aaba5fd03a2ad",
+          "build-sycl-a770-q2-activation-lut-20261030\\B1-vram.stdout": "f32ec10e3aa965f65b0bc231b437cd71569f2da1679fa8a544835746f58f82d4",
+          "build-sycl-a770-q2-activation-lut-20261030\\B1-vram.stderr": "08a18a116c21164bc472f47d1d6321612132ab887826a6163862fa9acbc615c3",
+          "build-sycl-a770-q2-activation-lut-20261030\\B1-mixed8.stdout": "c22f50899d3d6b90721b37dcb7ef8612f28a2fde80bf73959edba806b9246855",
+          "build-sycl-a770-q2-activation-lut-20261030\\B1-mixed8.stderr": "08a18a116c21164bc472f47d1d6321612132ab887826a6163862fa9acbc615c3",
+          "build-sycl-a770-q2-activation-lut-20261030\\B1-mapped.stdout": "ae1d78d7dcc0b73846a9dd6d6e53789c637b4c687f81a42b7301d686e139742b",
+          "build-sycl-a770-q2-activation-lut-20261030\\B1-mapped.stderr": "08a18a116c21164bc472f47d1d6321612132ab887826a6163862fa9acbc615c3",
+          "build-sycl-a770-q2-activation-lut-20261030\\C2-vram.stdout": "c2dd0df97e340bc912084c1a91c7187545cdea307e976debd76f90ed9c96b708",
+          "build-sycl-a770-q2-activation-lut-20261030\\C2-vram.stderr": "b5e1a3aacd1fc4e8a7bf68f8497cc2aef8f1b22eabd38561407aaba5fd03a2ad",
+          "build-sycl-a770-q2-activation-lut-20261030\\C2-mixed8.stdout": "01fe5826090cee63389e5e6353f61b4e2f3d57bd5ce183aff3bafabfdf3a954a",
+          "build-sycl-a770-q2-activation-lut-20261030\\C2-mixed8.stderr": "b5e1a3aacd1fc4e8a7bf68f8497cc2aef8f1b22eabd38561407aaba5fd03a2ad",
+          "build-sycl-a770-q2-activation-lut-20261030\\C2-mapped.stdout": "40620dc9b76bfdedf881b403da58584c72a82a61fd79220272fba646505234cb",
+          "build-sycl-a770-q2-activation-lut-20261030\\C2-mapped.stderr": "b5e1a3aacd1fc4e8a7bf68f8497cc2aef8f1b22eabd38561407aaba5fd03a2ad",
+          "build-sycl-a770-q2-activation-lut-20261030\\A2-vram.stdout": "1b832b9fd2727de11f99c7a9aebf256be843e892b372137ccc3f499493c50cc4",
+          "build-sycl-a770-q2-activation-lut-20261030\\A2-vram.stderr": "7a3e3a67d612c25bf77b45fe17e5c7c42ab8507f5404ee7135e9e5d73593add3",
+          "build-sycl-a770-q2-activation-lut-20261030\\A2-mixed8.stdout": "0af6a76665af51c5e9caa7090ecf0732920d8f5faff04c821e19a7963bb2a30d",
+          "build-sycl-a770-q2-activation-lut-20261030\\A2-mixed8.stderr": "7a3e3a67d612c25bf77b45fe17e5c7c42ab8507f5404ee7135e9e5d73593add3",
+          "build-sycl-a770-q2-activation-lut-20261030\\A2-mapped.stdout": "70545435a8ac7ef2fd8d07b81ff4b0ce7ded35bb891864c9750061fce3e91a23",
+          "build-sycl-a770-q2-activation-lut-20261030\\A2-mapped.stderr": "7a3e3a67d612c25bf77b45fe17e5c7c42ab8507f5404ee7135e9e5d73593add3"
+        },
+        "checks": [
+          {
+            "label": "check-random-0",
+            "mode": 0,
+            "layout": "mixed8",
+            "exit_code": 0,
+            "stem": "check-random-0-mixed8"
+          },
+          {
+            "label": "check-random-1",
+            "mode": 1,
+            "layout": "mixed8",
+            "exit_code": 0,
+            "stem": "check-random-1-mixed8"
+          },
+          {
+            "label": "check-random-2",
+            "mode": 2,
+            "layout": "mixed8",
+            "exit_code": 0,
+            "stem": "check-random-2-mixed8"
+          },
+          {
+            "label": "check-outlier-0",
+            "mode": 0,
+            "layout": "mixed8",
+            "exit_code": 0,
+            "stem": "check-outlier-0-mixed8"
+          },
+          {
+            "label": "check-outlier-1",
+            "mode": 1,
+            "layout": "mixed8",
+            "exit_code": 0,
+            "stem": "check-outlier-1-mixed8"
+          },
+          {
+            "label": "check-outlier-2",
+            "mode": 2,
+            "layout": "mixed8",
+            "exit_code": 0,
+            "stem": "check-outlier-2-mixed8"
+          }
+        ],
+        "runs": [
+          {
+            "label": "A1",
+            "mode": 0,
+            "layout": "vram",
+            "exit_code": 0,
+            "stem": "A1-vram",
+            "rows": [
+              {
+                "T": 1,
+                "groups": 10,
+                "entries": 10,
+                "grid_groups": 0,
+                "us": 92.325,
+                "checks": 8
+              },
+              {
+                "T": 4,
+                "groups": 20,
+                "entries": 40,
+                "grid_groups": 0,
+                "us": 188.003125,
+                "checks": 32
+              },
+              {
+                "T": 6,
+                "groups": 30,
+                "entries": 60,
+                "grid_groups": 0,
+                "us": 250.525,
+                "checks": 48
+              }
+            ],
+            "samples": [
+              {
+                "T": 1,
+                "us": [
+                  92.325,
+                  91.790625,
+                  90.90625,
+                  115.56875,
+                  99.471875
+                ]
+              },
+              {
+                "T": 4,
+                "us": [
+                  162.821875,
+                  195.159375,
+                  188.003125,
+                  163.85,
+                  210.4375
+                ]
+              },
+              {
+                "T": 6,
+                "us": [
+                  266.859375,
+                  230.70625,
+                  250.525,
+                  230.70625,
+                  274.921875
+                ]
+              }
+            ]
+          },
+          {
+            "label": "A1",
+            "mode": 0,
+            "layout": "mixed8",
+            "exit_code": 0,
+            "stem": "A1-mixed8",
+            "rows": [
+              {
+                "T": 1,
+                "groups": 10,
+                "entries": 10,
+                "grid_groups": 0,
+                "us": 255.396875,
+                "checks": 8
+              },
+              {
+                "T": 4,
+                "groups": 20,
+                "entries": 40,
+                "grid_groups": 0,
+                "us": 464.225,
+                "checks": 32
+              },
+              {
+                "T": 6,
+                "groups": 30,
+                "entries": 60,
+                "grid_groups": 0,
+                "us": 667.734375,
+                "checks": 48
+              }
+            ],
+            "samples": [
+              {
+                "T": 1,
+                "us": [
+                  258.1,
+                  234.65,
+                  281.503125,
+                  235.34375,
+                  255.396875
+                ]
+              },
+              {
+                "T": 4,
+                "us": [
+                  444.6,
+                  464.225,
+                  473.7375,
+                  477.115625,
+                  458.325
+                ]
+              },
+              {
+                "T": 6,
+                "us": [
+                  667.734375,
+                  692.171875,
+                  659.490625,
+                  640.321875,
+                  752.00625
+                ]
+              }
+            ]
+          },
+          {
+            "label": "A1",
+            "mode": 0,
+            "layout": "mapped",
+            "exit_code": 0,
+            "stem": "A1-mapped",
+            "rows": [
+              {
+                "T": 1,
+                "groups": 10,
+                "entries": 10,
+                "grid_groups": 0,
+                "us": 1677.09375,
+                "checks": 8
+              },
+              {
+                "T": 4,
+                "groups": 20,
+                "entries": 40,
+                "grid_groups": 0,
+                "us": 3304.484375,
+                "checks": 32
+              },
+              {
+                "T": 6,
+                "groups": 30,
+                "entries": 60,
+                "grid_groups": 0,
+                "us": 4996.740625,
+                "checks": 48
+              }
+            ],
+            "samples": [
+              {
+                "T": 1,
+                "us": [
+                  1702.378125,
+                  1701.225,
+                  1676.021875,
+                  1677.09375,
+                  1664.353125
+                ]
+              },
+              {
+                "T": 4,
+                "us": [
+                  3286.2375,
+                  3312.490625,
+                  3384.528125,
+                  3296.51875,
+                  3304.484375
+                ]
+              },
+              {
+                "T": 6,
+                "us": [
+                  4961.94375,
+                  5026.76875,
+                  4982.5,
+                  4996.740625,
+                  5009.025
+                ]
+              }
+            ]
+          },
+          {
+            "label": "C1",
+            "mode": 1,
+            "layout": "vram",
+            "exit_code": 0,
+            "stem": "C1-vram",
+            "rows": [
+              {
+                "T": 1,
+                "groups": 10,
+                "entries": 10,
+                "grid_groups": 0,
+                "us": 86.078125,
+                "checks": 8
+              },
+              {
+                "T": 4,
+                "groups": 20,
+                "entries": 40,
+                "grid_groups": 0,
+                "us": 161.865625,
+                "checks": 32
+              },
+              {
+                "T": 6,
+                "groups": 30,
+                "entries": 60,
+                "grid_groups": 0,
+                "us": 226.8625,
+                "checks": 48
+              }
+            ],
+            "samples": [
+              {
+                "T": 1,
+                "us": [
+                  85.775,
+                  86.078125,
+                  86.04375,
+                  94.5625,
+                  108.9
+                ]
+              },
+              {
+                "T": 4,
+                "us": [
+                  159.446875,
+                  196.68125,
+                  155.546875,
+                  161.865625,
+                  199.365625
+                ]
+              },
+              {
+                "T": 6,
+                "us": [
+                  256.7375,
+                  218.478125,
+                  226.8625,
+                  218.921875,
+                  252.878125
+                ]
+              }
+            ]
+          },
+          {
+            "label": "C1",
+            "mode": 1,
+            "layout": "mixed8",
+            "exit_code": 0,
+            "stem": "C1-mixed8",
+            "rows": [
+              {
+                "T": 1,
+                "groups": 10,
+                "entries": 10,
+                "grid_groups": 0,
+                "us": 260.39375,
+                "checks": 8
+              },
+              {
+                "T": 4,
+                "groups": 20,
+                "entries": 40,
+                "grid_groups": 0,
+                "us": 435.509375,
+                "checks": 32
+              },
+              {
+                "T": 6,
+                "groups": 30,
+                "entries": 60,
+                "grid_groups": 0,
+                "us": 660.7375,
+                "checks": 48
+              }
+            ],
+            "samples": [
+              {
+                "T": 1,
+                "us": [
+                  260.39375,
+                  244.35625,
+                  287.109375,
+                  237.540625,
+                  265.83125
+                ]
+              },
+              {
+                "T": 4,
+                "us": [
+                  435.025,
+                  435.084375,
+                  457.971875,
+                  435.509375,
+                  477.24375
+                ]
+              },
+              {
+                "T": 6,
+                "us": [
+                  660.7375,
+                  687.71875,
+                  643.603125,
+                  631.69375,
+                  664.6
+                ]
+              }
+            ]
+          },
+          {
+            "label": "C1",
+            "mode": 1,
+            "layout": "mapped",
+            "exit_code": 0,
+            "stem": "C1-mapped",
+            "rows": [
+              {
+                "T": 1,
+                "groups": 10,
+                "entries": 10,
+                "grid_groups": 0,
+                "us": 1712.1125,
+                "checks": 8
+              },
+              {
+                "T": 4,
+                "groups": 20,
+                "entries": 40,
+                "grid_groups": 0,
+                "us": 3328.478125,
+                "checks": 32
+              },
+              {
+                "T": 6,
+                "groups": 30,
+                "entries": 60,
+                "grid_groups": 0,
+                "us": 4904.55625,
+                "checks": 48
+              }
+            ],
+            "samples": [
+              {
+                "T": 1,
+                "us": [
+                  1711.440625,
+                  1860.328125,
+                  1719.69375,
+                  1712.1125,
+                  1689.34375
+                ]
+              },
+              {
+                "T": 4,
+                "us": [
+                  3362.903125,
+                  3293.0125,
+                  3349.409375,
+                  3328.478125,
+                  3302.846875
+                ]
+              },
+              {
+                "T": 6,
+                "us": [
+                  4923.184375,
+                  4900.9,
+                  4942.775,
+                  4904.55625,
+                  4870.765625
+                ]
+              }
+            ]
+          },
+          {
+            "label": "B1",
+            "mode": 2,
+            "layout": "vram",
+            "exit_code": 0,
+            "stem": "B1-vram",
+            "rows": [
+              {
+                "T": 1,
+                "groups": 10,
+                "entries": 10,
+                "grid_groups": 0,
+                "us": 112.621875,
+                "checks": 8
+              },
+              {
+                "T": 4,
+                "groups": 20,
+                "entries": 40,
+                "grid_groups": 0,
+                "us": 266.021875,
+                "checks": 32
+              },
+              {
+                "T": 6,
+                "groups": 30,
+                "entries": 60,
+                "grid_groups": 0,
+                "us": 382.865625,
+                "checks": 48
+              }
+            ],
+            "samples": [
+              {
+                "T": 1,
+                "us": [
+                  118.396875,
+                  113.978125,
+                  112.621875,
+                  111.48125,
+                  111.265625
+                ]
+              },
+              {
+                "T": 4,
+                "us": [
+                  266.021875,
+                  307.8625,
+                  265.46875,
+                  318.53125,
+                  265.88125
+                ]
+              },
+              {
+                "T": 6,
+                "us": [
+                  382.865625,
+                  364.35625,
+                  378.91875,
+                  404.496875,
+                  429.015625
+                ]
+              }
+            ]
+          },
+          {
+            "label": "B1",
+            "mode": 2,
+            "layout": "mixed8",
+            "exit_code": 0,
+            "stem": "B1-mixed8",
+            "rows": [
+              {
+                "T": 1,
+                "groups": 10,
+                "entries": 10,
+                "grid_groups": 0,
+                "us": 263.734375,
+                "checks": 8
+              },
+              {
+                "T": 4,
+                "groups": 20,
+                "entries": 40,
+                "grid_groups": 0,
+                "us": 533.440625,
+                "checks": 32
+              },
+              {
+                "T": 6,
+                "groups": 30,
+                "entries": 60,
+                "grid_groups": 0,
+                "us": 743.675,
+                "checks": 48
+              }
+            ],
+            "samples": [
+              {
+                "T": 1,
+                "us": [
+                  263.45,
+                  263.734375,
+                  276.6625,
+                  248.7,
+                  281.884375
+                ]
+              },
+              {
+                "T": 4,
+                "us": [
+                  533.440625,
+                  512.478125,
+                  562.034375,
+                  528.9625,
+                  537.315625
+                ]
+              },
+              {
+                "T": 6,
+                "us": [
+                  769.821875,
+                  729.2125,
+                  815.65625,
+                  740.1875,
+                  743.675
+                ]
+              }
+            ]
+          },
+          {
+            "label": "B1",
+            "mode": 2,
+            "layout": "mapped",
+            "exit_code": 0,
+            "stem": "B1-mapped",
+            "rows": [
+              {
+                "T": 1,
+                "groups": 10,
+                "entries": 10,
+                "grid_groups": 0,
+                "us": 1682.475,
+                "checks": 8
+              },
+              {
+                "T": 4,
+                "groups": 20,
+                "entries": 40,
+                "grid_groups": 0,
+                "us": 3320.396875,
+                "checks": 32
+              },
+              {
+                "T": 6,
+                "groups": 30,
+                "entries": 60,
+                "grid_groups": 0,
+                "us": 4949.303125,
+                "checks": 48
+              }
+            ],
+            "samples": [
+              {
+                "T": 1,
+                "us": [
+                  1682.475,
+                  1759.5625,
+                  1671.525,
+                  1657.046875,
+                  1685.85
+                ]
+              },
+              {
+                "T": 4,
+                "us": [
+                  3320.396875,
+                  3372.578125,
+                  3314.621875,
+                  3300.45625,
+                  3337.971875
+                ]
+              },
+              {
+                "T": 6,
+                "us": [
+                  4971.98125,
+                  4932.69375,
+                  4949.303125,
+                  4921.79375,
+                  4958.6875
+                ]
+              }
+            ]
+          },
+          {
+            "label": "C2",
+            "mode": 1,
+            "layout": "vram",
+            "exit_code": 0,
+            "stem": "C2-vram",
+            "rows": [
+              {
+                "T": 1,
+                "groups": 10,
+                "entries": 10,
+                "grid_groups": 0,
+                "us": 92.740625,
+                "checks": 8
+              },
+              {
+                "T": 4,
+                "groups": 20,
+                "entries": 40,
+                "grid_groups": 0,
+                "us": 159.846875,
+                "checks": 32
+              },
+              {
+                "T": 6,
+                "groups": 30,
+                "entries": 60,
+                "grid_groups": 0,
+                "us": 237.271875,
+                "checks": 48
+              }
+            ],
+            "samples": [
+              {
+                "T": 1,
+                "us": [
+                  123.375,
+                  92.740625,
+                  86.3375,
+                  86.05,
+                  108.203125
+                ]
+              },
+              {
+                "T": 4,
+                "us": [
+                  156.871875,
+                  195.0875,
+                  159.846875,
+                  159.353125,
+                  184.984375
+                ]
+              },
+              {
+                "T": 6,
+                "us": [
+                  242.509375,
+                  218.225,
+                  269.34375,
+                  218.225,
+                  237.271875
+                ]
+              }
+            ]
+          },
+          {
+            "label": "C2",
+            "mode": 1,
+            "layout": "mixed8",
+            "exit_code": 0,
+            "stem": "C2-mixed8",
+            "rows": [
+              {
+                "T": 1,
+                "groups": 10,
+                "entries": 10,
+                "grid_groups": 0,
+                "us": 248.565625,
+                "checks": 8
+              },
+              {
+                "T": 4,
+                "groups": 20,
+                "entries": 40,
+                "grid_groups": 0,
+                "us": 461.396875,
+                "checks": 32
+              },
+              {
+                "T": 6,
+                "groups": 30,
+                "entries": 60,
+                "grid_groups": 0,
+                "us": 656.63125,
+                "checks": 48
+              }
+            ],
+            "samples": [
+              {
+                "T": 1,
+                "us": [
+                  241.584375,
+                  260.246875,
+                  293.034375,
+                  235.09375,
+                  248.565625
+                ]
+              },
+              {
+                "T": 4,
+                "us": [
+                  471.98125,
+                  469.596875,
+                  428.44375,
+                  461.396875,
+                  437.5
+                ]
+              },
+              {
+                "T": 6,
+                "us": [
+                  658.771875,
+                  639.809375,
+                  656.63125,
+                  682.703125,
+                  644.296875
+                ]
+              }
+            ]
+          },
+          {
+            "label": "C2",
+            "mode": 1,
+            "layout": "mapped",
+            "exit_code": 0,
+            "stem": "C2-mapped",
+            "rows": [
+              {
+                "T": 1,
+                "groups": 10,
+                "entries": 10,
+                "grid_groups": 0,
+                "us": 1680.19375,
+                "checks": 8
+              },
+              {
+                "T": 4,
+                "groups": 20,
+                "entries": 40,
+                "grid_groups": 0,
+                "us": 3296.775,
+                "checks": 32
+              },
+              {
+                "T": 6,
+                "groups": 30,
+                "entries": 60,
+                "grid_groups": 0,
+                "us": 4958.078125,
+                "checks": 48
+              }
+            ],
+            "samples": [
+              {
+                "T": 1,
+                "us": [
+                  1722.4375,
+                  1713.95625,
+                  1650.540625,
+                  1665.3125,
+                  1680.19375
+                ]
+              },
+              {
+                "T": 4,
+                "us": [
+                  3296.775,
+                  3308.321875,
+                  3314.990625,
+                  3290.103125,
+                  3277.421875
+                ]
+              },
+              {
+                "T": 6,
+                "us": [
+                  4994.309375,
+                  4982.075,
+                  4951.246875,
+                  4946.375,
+                  4958.078125
+                ]
+              }
+            ]
+          },
+          {
+            "label": "A2",
+            "mode": 0,
+            "layout": "vram",
+            "exit_code": 0,
+            "stem": "A2-vram",
+            "rows": [
+              {
+                "T": 1,
+                "groups": 10,
+                "entries": 10,
+                "grid_groups": 0,
+                "us": 90.603125,
+                "checks": 8
+              },
+              {
+                "T": 4,
+                "groups": 20,
+                "entries": 40,
+                "grid_groups": 0,
+                "us": 172.784375,
+                "checks": 32
+              },
+              {
+                "T": 6,
+                "groups": 30,
+                "entries": 60,
+                "grid_groups": 0,
+                "us": 256.1125,
+                "checks": 48
+              }
+            ],
+            "samples": [
+              {
+                "T": 1,
+                "us": [
+                  89.859375,
+                  90.603125,
+                  121.40625,
+                  92.478125,
+                  90.140625
+                ]
+              },
+              {
+                "T": 4,
+                "us": [
+                  172.784375,
+                  204.2625,
+                  169.8125,
+                  164.090625,
+                  189.109375
+                ]
+              },
+              {
+                "T": 6,
+                "us": [
+                  256.1125,
+                  230.54375,
+                  264.740625,
+                  230.525,
+                  261.034375
+                ]
+              }
+            ]
+          },
+          {
+            "label": "A2",
+            "mode": 0,
+            "layout": "mixed8",
+            "exit_code": 0,
+            "stem": "A2-mixed8",
+            "rows": [
+              {
+                "T": 1,
+                "groups": 10,
+                "entries": 10,
+                "grid_groups": 0,
+                "us": 242.653125,
+                "checks": 8
+              },
+              {
+                "T": 4,
+                "groups": 20,
+                "entries": 40,
+                "grid_groups": 0,
+                "us": 464.925,
+                "checks": 32
+              },
+              {
+                "T": 6,
+                "groups": 30,
+                "entries": 60,
+                "grid_groups": 0,
+                "us": 664.028125,
+                "checks": 48
+              }
+            ],
+            "samples": [
+              {
+                "T": 1,
+                "us": [
+                  273.459375,
+                  237.809375,
+                  242.653125,
+                  242.3125,
+                  281.25625
+                ]
+              },
+              {
+                "T": 4,
+                "us": [
+                  445.63125,
+                  469.609375,
+                  451.303125,
+                  484.2125,
+                  464.925
+                ]
+              },
+              {
+                "T": 6,
+                "us": [
+                  664.028125,
+                  679.25,
+                  661.675,
+                  647.51875,
+                  693.190625
+                ]
+              }
+            ]
+          },
+          {
+            "label": "A2",
+            "mode": 0,
+            "layout": "mapped",
+            "exit_code": 0,
+            "stem": "A2-mapped",
+            "rows": [
+              {
+                "T": 1,
+                "groups": 10,
+                "entries": 10,
+                "grid_groups": 0,
+                "us": 1703.709375,
+                "checks": 8
+              },
+              {
+                "T": 4,
+                "groups": 20,
+                "entries": 40,
+                "grid_groups": 0,
+                "us": 3334.5,
+                "checks": 32
+              },
+              {
+                "T": 6,
+                "groups": 30,
+                "entries": 60,
+                "grid_groups": 0,
+                "us": 4974.640625,
+                "checks": 48
+              }
+            ],
+            "samples": [
+              {
+                "T": 1,
+                "us": [
+                  1906.359375,
+                  1703.709375,
+                  1719.2375,
+                  1674.128125,
+                  1679.5625
+                ]
+              },
+              {
+                "T": 4,
+                "us": [
+                  3394.259375,
+                  3334.5,
+                  3331.309375,
+                  3367.6875,
+                  3327.7
+                ]
+              },
+              {
+                "T": 6,
+                "us": [
+                  4959.79375,
+                  4984.9125,
+                  4944.859375,
+                  4974.640625,
+                  4986.571875
+                ]
+              }
+            ]
+          }
+        ],
+        "comparison": {
+          "vram": {
+            "1": {
+              "vs_original": {
+                "baseline": 91.46001047247371,
+                "candidate": 112.621875,
+                "throughput_change_pct": -18.790190207298796,
+                "baseline_drift_pct": -1.8650148930408839
+              },
+              "vs_control": {
+                "baseline": 89.34729493011037,
+                "candidate": 112.621875,
+                "throughput_change_pct": -20.6661273130905,
+                "baseline_drift_pct": 7.740061717190039
+              }
+            },
+            "4": {
+              "vs_original": {
+                "baseline": 180.2331890944947,
+                "candidate": 266.021875,
+                "throughput_change_pct": -32.24873364474456,
+                "baseline_drift_pct": -8.0949452302987
+              },
+              "vs_control": {
+                "baseline": 160.85308304838884,
+                "candidate": 266.021875,
+                "throughput_change_pct": -39.533888689270825,
+                "baseline_drift_pct": -1.2471764774021565
+              }
+            },
+            "6": {
+              "vs_original": {
+                "baseline": 253.30334396233306,
+                "candidate": 382.865625,
+                "throughput_change_pct": -33.840144577530815,
+                "baseline_drift_pct": 2.2303163356950373
+              },
+              "vs_control": {
+                "baseline": 232.00881608720712,
+                "candidate": 382.865625,
+                "throughput_change_pct": -39.4020249043755,
+                "baseline_drift_pct": 4.588407074769951
+              }
+            }
+          },
+          "mixed8": {
+            "1": {
+              "vs_original": {
+                "baseline": 248.94346714461975,
+                "candidate": 263.734375,
+                "throughput_change_pct": -5.6082593918143075,
+                "baseline_drift_pct": -4.989783058230457
+              },
+              "vs_control": {
+                "baseline": 254.41095734037037,
+                "candidate": 263.734375,
+                "throughput_change_pct": -3.53515451280465,
+                "baseline_drift_pct": -4.542399731176339
+              }
+            },
+            "4": {
+              "vs_original": {
+                "baseline": 464.57486815905145,
+                "candidate": 533.440625,
+                "throughput_change_pct": -12.90973233261874,
+                "baseline_drift_pct": 0.15078894932414322
+              },
+              "vs_control": {
+                "baseline": 448.266287666386,
+                "candidate": 533.440625,
+                "throughput_change_pct": -15.966976143523748,
+                "baseline_drift_pct": 5.944188916713911
+              }
+            },
+            "6": {
+              "vs_original": {
+                "baseline": 665.8786714029043,
+                "candidate": 743.675,
+                "throughput_change_pct": -10.461065465034547,
+                "baseline_drift_pct": -0.5550485550485429
+              },
+              "vs_control": {
+                "baseline": 658.6811751878711,
+                "candidate": 743.675,
+                "throughput_change_pct": -11.428893644687378,
+                "baseline_drift_pct": -0.6214646512419764
+              }
+            }
+          },
+          "mapped": {
+            "1": {
+              "vs_original": {
+                "baseline": 1690.3491783146185,
+                "candidate": 1682.475,
+                "throughput_change_pct": 0.4680116087679487,
+                "baseline_drift_pct": 1.5870087763429908
+              },
+              "vs_control": {
+                "baseline": 1696.0780411870423,
+                "candidate": 1682.475,
+                "throughput_change_pct": 0.8085137186016,
+                "baseline_drift_pct": -1.8642904598850873
+              }
+            },
+            "4": {
+              "vs_original": {
+                "baseline": 3319.4582612886547,
+                "candidate": 3320.396875,
+                "throughput_change_pct": -0.028268118140095666,
+                "baseline_drift_pct": 0.9083300628407454
+              },
+              "vs_control": {
+                "baseline": 3312.58863587782,
+                "candidate": 3320.396875,
+                "throughput_change_pct": -0.2351598142068534,
+                "baseline_drift_pct": -0.952481098249669
+              }
+            },
+            "6": {
+              "vs_original": {
+                "baseline": 4985.67837969046,
+                "candidate": 4949.303125,
+                "throughput_change_pct": 0.7349570994494181,
+                "baseline_drift_pct": -0.44228831669644864
+              },
+              "vs_control": {
+                "baseline": 4931.24457474551,
+                "candidate": 4949.303125,
+                "throughput_change_pct": -0.36487056457044087,
+                "baseline_drift_pct": 1.0912684506371173
+              }
+            }
+          }
+        },
+        "archived_files": {
+          "bench\\results\\a770\\check_q2_activation_lut_20261030.py": "build-sycl-a770-q2-activation-lut-20261030\\frozen\\check_q2_activation_lut_20261030.py",
+          "bench\\results\\a770\\q2-activation-lut-2026-10-30.hpp": "build-sycl-a770-q2-activation-lut-20261030\\frozen\\q2-activation-lut-2026-10-30.hpp"
+        }
+      },
+      "gates": [
+        {
+          "layout": "vram",
+          "T": 1,
+          "vs_original_pct": -18.790190207298796,
+          "vs_control_pct": -20.6661273130905,
+          "max_abs_drift_pct": 7.740061717190039,
+          "stable": false,
+          "passed": false
+        },
+        {
+          "layout": "vram",
+          "T": 4,
+          "vs_original_pct": -32.24873364474456,
+          "vs_control_pct": -39.533888689270825,
+          "max_abs_drift_pct": 8.0949452302987,
+          "stable": false,
+          "passed": false
+        },
+        {
+          "layout": "vram",
+          "T": 6,
+          "vs_original_pct": -33.840144577530815,
+          "vs_control_pct": -39.4020249043755,
+          "max_abs_drift_pct": 4.588407074769951,
+          "stable": false,
+          "passed": false
+        },
+        {
+          "layout": "mixed8",
+          "T": 1,
+          "vs_original_pct": -5.6082593918143075,
+          "vs_control_pct": -3.53515451280465,
+          "max_abs_drift_pct": 4.989783058230457,
+          "stable": false,
+          "passed": false
+        },
+        {
+          "layout": "mixed8",
+          "T": 4,
+          "vs_original_pct": -12.90973233261874,
+          "vs_control_pct": -15.966976143523748,
+          "max_abs_drift_pct": 5.944188916713911,
+          "stable": false,
+          "passed": false
+        },
+        {
+          "layout": "mixed8",
+          "T": 6,
+          "vs_original_pct": -10.461065465034547,
+          "vs_control_pct": -11.428893644687378,
+          "max_abs_drift_pct": 0.6214646512419764,
+          "stable": true,
+          "passed": false
+        },
+        {
+          "layout": "mapped",
+          "T": 1,
+          "vs_original_pct": 0.4680116087679487,
+          "vs_control_pct": 0.8085137186016,
+          "max_abs_drift_pct": 1.8642904598850873,
+          "stable": true,
+          "passed": false
+        },
+        {
+          "layout": "mapped",
+          "T": 4,
+          "vs_original_pct": -0.028268118140095666,
+          "vs_control_pct": -0.2351598142068534,
+          "max_abs_drift_pct": 0.952481098249669,
+          "stable": true,
+          "passed": false
+        },
+        {
+          "layout": "mapped",
+          "T": 6,
+          "vs_original_pct": 0.7349570994494181,
+          "vs_control_pct": -0.36487056457044087,
+          "max_abs_drift_pct": 1.0912684506371173,
+          "stable": true,
+          "passed": false
+        }
+      ]
+    },
+    "direct2": {
+      "data": {
+        "complete": true,
+        "adopted": false,
+        "production_changed": false,
+        "gpu_speed_tested": true,
+        "model_tested": false,
+        "rule": "Full IQ2_S/Q2 expert chain; unchanged GU,SwiGLU,Q8 and payload.0 frozen,1 rebuilt control,2 exact-int16 direct two-activation LUT+Down4.64-entry extra LUT scratch655360bytes;table build included each chain.No timing claims outside measured fixtures.8banks/240 real experts;graph16chains,warm4,5batches*2replays.T1/4/6;A1/C1/B1/C2/A2 in VRAM,mixed every8th mapped,all mapped.Gain>=1%,drift<=3% vs both original/control;confirm any passing candidate independently.Quantization/row layout unchanged.All48 eager bank/shape outputs+Q8+guards and3graphs checked each timing worker;random/outlier group lengths1..7 edge checks.No retries/exclusions.",
+        "files_sha256": {
+          "bench\\results\\a770\\check_q2_activation_lut_20261030.py": "3a3d92530d4f32155fc47ac4235c49de3f2049978273146ed75c4ca819f7493b",
+          "bench\\results\\a770\\q2-activation-lut-2026-10-30.hpp": "09a0ff123aace4099825dca2a53da66cdc8b3cd1f09cf6e7973c191d5cd0cb1f",
+          "build-sycl-a770-down-unroll-20261028\\schedule.cpp": "b46cab76c6782032def67fd86839fbd57ecc6eae7bd5ec6e5f8185f3e726c356",
+          "build-sycl-a770-down-unroll-20261028\\worker.cpp": "e6da7de301a97d565371fc2c601ca075663aa0cfb7007d1aa339e8aba1ea5423",
+          "build-sycl-a770-q2-activation-lut-20261030-pair\\schedule.cpp": "8dfca0676c65fca653a7c2a0d581490305b7c9b4cac8ccc7b7825611caae0ffa",
+          "build-sycl-a770-q2-activation-lut-20261030-pair\\worker.cpp": "41e5ca1058fbc729c9a7623da848e7caedc66b61d883c76c34d9deac6f6d9b0f",
+          "build-sycl-a770-vram-down-sg16\\iq.obj": "17cceb618ebf7707f4582747f206c1db5bdb25b8c92ae65ef25536130ca783bb",
+          "build-sycl-a770-q2-activation-lut-20261030-pair\\schedule.obj": "2c4edc9927f665e569a2eef8b312501b9d41c4d6dc0878a34a771dc953638333",
+          "build-sycl-a770-q2-activation-lut-20261030-pair\\worker.obj": "a65c1c1498ea54627d807d2187cf4707d77c542d0735e7f1824b03595ff2f520",
+          "build-sycl-a770-q2-activation-lut-20261030-pair\\probe.exe": "c9e81f1002f06a0b42b2b2a229835656d9f3f20c6f85481a0fb260dc3931536c",
+          "build-sycl-a770-q2-dpas-20261021\\experts-22.bin": "cbb9e5ad404788373c3816f4df554d23f6daeed8858b54be68202e38d90f1752",
+          "build-sycl-a770-q2-activation-lut-20261030-pair\\check-random-0-mixed8.stdout": "06fb28e9b498a3663081ff7752c05d84ebb21c354198d18127fca60bd0bf1c93",
+          "build-sycl-a770-q2-activation-lut-20261030-pair\\check-random-0-mixed8.stderr": "97bdc7bd7f7aace079b2e6c6d21f5fcfd6221fcf62918f8a89078ed6182c87e9",
+          "build-sycl-a770-q2-activation-lut-20261030-pair\\check-random-1-mixed8.stdout": "06fb28e9b498a3663081ff7752c05d84ebb21c354198d18127fca60bd0bf1c93",
+          "build-sycl-a770-q2-activation-lut-20261030-pair\\check-random-1-mixed8.stderr": "ecbe51d90d732781f844b079ecda3be14e32190b9ba7a4857980843bc8708910",
+          "build-sycl-a770-q2-activation-lut-20261030-pair\\check-random-2-mixed8.stdout": "06fb28e9b498a3663081ff7752c05d84ebb21c354198d18127fca60bd0bf1c93",
+          "build-sycl-a770-q2-activation-lut-20261030-pair\\check-random-2-mixed8.stderr": "4e992933e0b4ac0de2f516ffff2c0339067f6097f9cf48e2d31c95c1475df536",
+          "build-sycl-a770-q2-activation-lut-20261030-pair\\check-outlier-0-mixed8.stdout": "06fb28e9b498a3663081ff7752c05d84ebb21c354198d18127fca60bd0bf1c93",
+          "build-sycl-a770-q2-activation-lut-20261030-pair\\check-outlier-0-mixed8.stderr": "97bdc7bd7f7aace079b2e6c6d21f5fcfd6221fcf62918f8a89078ed6182c87e9",
+          "build-sycl-a770-q2-activation-lut-20261030-pair\\check-outlier-1-mixed8.stdout": "06fb28e9b498a3663081ff7752c05d84ebb21c354198d18127fca60bd0bf1c93",
+          "build-sycl-a770-q2-activation-lut-20261030-pair\\check-outlier-1-mixed8.stderr": "ecbe51d90d732781f844b079ecda3be14e32190b9ba7a4857980843bc8708910",
+          "build-sycl-a770-q2-activation-lut-20261030-pair\\check-outlier-2-mixed8.stdout": "06fb28e9b498a3663081ff7752c05d84ebb21c354198d18127fca60bd0bf1c93",
+          "build-sycl-a770-q2-activation-lut-20261030-pair\\check-outlier-2-mixed8.stderr": "4e992933e0b4ac0de2f516ffff2c0339067f6097f9cf48e2d31c95c1475df536",
+          "build-sycl-a770-q2-activation-lut-20261030-pair\\A1-vram.stdout": "b4ba7ec3567ad02f855cd111ad69d823980205a1923d7d6f960450f99675af1e",
+          "build-sycl-a770-q2-activation-lut-20261030-pair\\A1-vram.stderr": "7a3e3a67d612c25bf77b45fe17e5c7c42ab8507f5404ee7135e9e5d73593add3",
+          "build-sycl-a770-q2-activation-lut-20261030-pair\\A1-mixed8.stdout": "56566d8bb2c33e16a87a0200108c822106e22e63736d184abc08abefc715ae75",
+          "build-sycl-a770-q2-activation-lut-20261030-pair\\A1-mixed8.stderr": "7a3e3a67d612c25bf77b45fe17e5c7c42ab8507f5404ee7135e9e5d73593add3",
+          "build-sycl-a770-q2-activation-lut-20261030-pair\\A1-mapped.stdout": "c12c698b008fa15614392c3a02de426323d2cfa00a826f073df93a44964ededa",
+          "build-sycl-a770-q2-activation-lut-20261030-pair\\A1-mapped.stderr": "7a3e3a67d612c25bf77b45fe17e5c7c42ab8507f5404ee7135e9e5d73593add3",
+          "build-sycl-a770-q2-activation-lut-20261030-pair\\C1-vram.stdout": "fd6e70101540def9bff19353517d1dc9a67b511cb4bad2b94654f5fd81c60733",
+          "build-sycl-a770-q2-activation-lut-20261030-pair\\C1-vram.stderr": "b5e1a3aacd1fc4e8a7bf68f8497cc2aef8f1b22eabd38561407aaba5fd03a2ad",
+          "build-sycl-a770-q2-activation-lut-20261030-pair\\C1-mixed8.stdout": "191a9209f348844d58ae3a8406b0434f9042dc50d2081540c73fedd8c9c3bab6",
+          "build-sycl-a770-q2-activation-lut-20261030-pair\\C1-mixed8.stderr": "b5e1a3aacd1fc4e8a7bf68f8497cc2aef8f1b22eabd38561407aaba5fd03a2ad",
+          "build-sycl-a770-q2-activation-lut-20261030-pair\\C1-mapped.stdout": "8c73923de2593d69abe1a256a32b872a771d4d5eddfebe42b2817a22f9534bd7",
+          "build-sycl-a770-q2-activation-lut-20261030-pair\\C1-mapped.stderr": "b5e1a3aacd1fc4e8a7bf68f8497cc2aef8f1b22eabd38561407aaba5fd03a2ad",
+          "build-sycl-a770-q2-activation-lut-20261030-pair\\B1-vram.stdout": "be8bb9110127236643570a53fa8afaa24bcb0cf52e2fb09301e65eac676ce4e1",
+          "build-sycl-a770-q2-activation-lut-20261030-pair\\B1-vram.stderr": "08a18a116c21164bc472f47d1d6321612132ab887826a6163862fa9acbc615c3",
+          "build-sycl-a770-q2-activation-lut-20261030-pair\\B1-mixed8.stdout": "d20df6f52a6c9d36e16543904239156a738f51f794e9820f07a6940f73350c58",
+          "build-sycl-a770-q2-activation-lut-20261030-pair\\B1-mixed8.stderr": "08a18a116c21164bc472f47d1d6321612132ab887826a6163862fa9acbc615c3",
+          "build-sycl-a770-q2-activation-lut-20261030-pair\\B1-mapped.stdout": "0f87ce4b15a782be48855ac39b7deee9a38bec8f459ff22d54a9b0ab70b9039d",
+          "build-sycl-a770-q2-activation-lut-20261030-pair\\B1-mapped.stderr": "08a18a116c21164bc472f47d1d6321612132ab887826a6163862fa9acbc615c3",
+          "build-sycl-a770-q2-activation-lut-20261030-pair\\C2-vram.stdout": "b17c3a3cf0bb7b2b9c818d3e907a1baf47c35d6a26781fada82850a9ba75bec7",
+          "build-sycl-a770-q2-activation-lut-20261030-pair\\C2-vram.stderr": "b5e1a3aacd1fc4e8a7bf68f8497cc2aef8f1b22eabd38561407aaba5fd03a2ad",
+          "build-sycl-a770-q2-activation-lut-20261030-pair\\C2-mixed8.stdout": "fa074c3cf90da7a8a03493a91d715bcb822e24c563bac2b736a6f6ec623c70f4",
+          "build-sycl-a770-q2-activation-lut-20261030-pair\\C2-mixed8.stderr": "b5e1a3aacd1fc4e8a7bf68f8497cc2aef8f1b22eabd38561407aaba5fd03a2ad",
+          "build-sycl-a770-q2-activation-lut-20261030-pair\\C2-mapped.stdout": "092626826447e7265df54c0ab480c3bf3b870cd38040a2ba1fa99fb004f7ba19",
+          "build-sycl-a770-q2-activation-lut-20261030-pair\\C2-mapped.stderr": "b5e1a3aacd1fc4e8a7bf68f8497cc2aef8f1b22eabd38561407aaba5fd03a2ad",
+          "build-sycl-a770-q2-activation-lut-20261030-pair\\A2-vram.stdout": "014b27b88d31ae001eaac8a1579ba5a16d09d0ac0c5f6ad2a27c23f342a264e5",
+          "build-sycl-a770-q2-activation-lut-20261030-pair\\A2-vram.stderr": "7a3e3a67d612c25bf77b45fe17e5c7c42ab8507f5404ee7135e9e5d73593add3",
+          "build-sycl-a770-q2-activation-lut-20261030-pair\\A2-mixed8.stdout": "ffaafc86a3161992e9ebb21d4236648eb77a82052e8ba4bbf6ca2de33ae09f96",
+          "build-sycl-a770-q2-activation-lut-20261030-pair\\A2-mixed8.stderr": "7a3e3a67d612c25bf77b45fe17e5c7c42ab8507f5404ee7135e9e5d73593add3",
+          "build-sycl-a770-q2-activation-lut-20261030-pair\\A2-mapped.stdout": "3375078265c429e96052a799aadd0a138cbd3360f926e39af7a54575898d465a",
+          "build-sycl-a770-q2-activation-lut-20261030-pair\\A2-mapped.stderr": "7a3e3a67d612c25bf77b45fe17e5c7c42ab8507f5404ee7135e9e5d73593add3"
+        },
+        "checks": [
+          {
+            "label": "check-random-0",
+            "mode": 0,
+            "layout": "mixed8",
+            "exit_code": 0,
+            "stem": "check-random-0-mixed8"
+          },
+          {
+            "label": "check-random-1",
+            "mode": 1,
+            "layout": "mixed8",
+            "exit_code": 0,
+            "stem": "check-random-1-mixed8"
+          },
+          {
+            "label": "check-random-2",
+            "mode": 2,
+            "layout": "mixed8",
+            "exit_code": 0,
+            "stem": "check-random-2-mixed8"
+          },
+          {
+            "label": "check-outlier-0",
+            "mode": 0,
+            "layout": "mixed8",
+            "exit_code": 0,
+            "stem": "check-outlier-0-mixed8"
+          },
+          {
+            "label": "check-outlier-1",
+            "mode": 1,
+            "layout": "mixed8",
+            "exit_code": 0,
+            "stem": "check-outlier-1-mixed8"
+          },
+          {
+            "label": "check-outlier-2",
+            "mode": 2,
+            "layout": "mixed8",
+            "exit_code": 0,
+            "stem": "check-outlier-2-mixed8"
+          }
+        ],
+        "runs": [
+          {
+            "label": "A1",
+            "mode": 0,
+            "layout": "vram",
+            "exit_code": 0,
+            "stem": "A1-vram",
+            "rows": [
+              {
+                "T": 1,
+                "groups": 10,
+                "entries": 10,
+                "grid_groups": 0,
+                "us": 91.071875,
+                "checks": 8
+              },
+              {
+                "T": 4,
+                "groups": 20,
+                "entries": 40,
+                "grid_groups": 0,
+                "us": 166.725,
+                "checks": 32
+              },
+              {
+                "T": 6,
+                "groups": 30,
+                "entries": 60,
+                "grid_groups": 0,
+                "us": 230.378125,
+                "checks": 48
+              }
+            ],
+            "samples": [
+              {
+                "T": 1,
+                "us": [
+                  91.7,
+                  91.071875,
+                  90.715625,
+                  97.715625,
+                  90.253125
+                ]
+              },
+              {
+                "T": 4,
+                "us": [
+                  165.165625,
+                  174.4625,
+                  172.85,
+                  165.659375,
+                  166.725
+                ]
+              },
+              {
+                "T": 6,
+                "us": [
+                  229.4125,
+                  236.184375,
+                  230.159375,
+                  240.021875,
+                  230.378125
+                ]
+              }
+            ]
+          },
+          {
+            "label": "A1",
+            "mode": 0,
+            "layout": "mixed8",
+            "exit_code": 0,
+            "stem": "A1-mixed8",
+            "rows": [
+              {
+                "T": 1,
+                "groups": 10,
+                "entries": 10,
+                "grid_groups": 0,
+                "us": 237.359375,
+                "checks": 8
+              },
+              {
+                "T": 4,
+                "groups": 20,
+                "entries": 40,
+                "grid_groups": 0,
+                "us": 445.171875,
+                "checks": 32
+              },
+              {
+                "T": 6,
+                "groups": 30,
+                "entries": 60,
+                "grid_groups": 0,
+                "us": 645.640625,
+                "checks": 48
+              }
+            ],
+            "samples": [
+              {
+                "T": 1,
+                "us": [
+                  237.359375,
+                  236.040625,
+                  245.2125,
+                  232.475,
+                  239.346875
+                ]
+              },
+              {
+                "T": 4,
+                "us": [
+                  442.36875,
+                  433.8375,
+                  450.371875,
+                  448.4625,
+                  445.171875
+                ]
+              },
+              {
+                "T": 6,
+                "us": [
+                  641.553125,
+                  641.06875,
+                  645.640625,
+                  652.78125,
+                  653.190625
+                ]
+              }
+            ]
+          },
+          {
+            "label": "A1",
+            "mode": 0,
+            "layout": "mapped",
+            "exit_code": 0,
+            "stem": "A1-mapped",
+            "rows": [
+              {
+                "T": 1,
+                "groups": 10,
+                "entries": 10,
+                "grid_groups": 0,
+                "us": 1650.546875,
+                "checks": 8
+              },
+              {
+                "T": 4,
+                "groups": 20,
+                "entries": 40,
+                "grid_groups": 0,
+                "us": 3229.38125,
+                "checks": 32
+              },
+              {
+                "T": 6,
+                "groups": 30,
+                "entries": 60,
+                "grid_groups": 0,
+                "us": 4793.6,
+                "checks": 48
+              }
+            ],
+            "samples": [
+              {
+                "T": 1,
+                "us": [
+                  1637.715625,
+                  1657.671875,
+                  1618.678125,
+                  1650.546875,
+                  1680.0875
+                ]
+              },
+              {
+                "T": 4,
+                "us": [
+                  3253.490625,
+                  3243.728125,
+                  3229.38125,
+                  3205.0875,
+                  3189.55
+                ]
+              },
+              {
+                "T": 6,
+                "us": [
+                  4799.3125,
+                  4797.871875,
+                  4793.6,
+                  4764.0625,
+                  4769.690625
+                ]
+              }
+            ]
+          },
+          {
+            "label": "C1",
+            "mode": 1,
+            "layout": "vram",
+            "exit_code": 0,
+            "stem": "C1-vram",
+            "rows": [
+              {
+                "T": 1,
+                "groups": 10,
+                "entries": 10,
+                "grid_groups": 0,
+                "us": 91.04375,
+                "checks": 8
+              },
+              {
+                "T": 4,
+                "groups": 20,
+                "entries": 40,
+                "grid_groups": 0,
+                "us": 164.6125,
+                "checks": 32
+              },
+              {
+                "T": 6,
+                "groups": 30,
+                "entries": 60,
+                "grid_groups": 0,
+                "us": 220.75625,
+                "checks": 48
+              }
+            ],
+            "samples": [
+              {
+                "T": 1,
+                "us": [
+                  85.6375,
+                  92.071875,
+                  91.04375,
+                  91.465625,
+                  86.040625
+                ]
+              },
+              {
+                "T": 4,
+                "us": [
+                  164.6125,
+                  156.546875,
+                  167.290625,
+                  167.7875,
+                  158.5625
+                ]
+              },
+              {
+                "T": 6,
+                "us": [
+                  219.865625,
+                  235.440625,
+                  217.503125,
+                  234.65625,
+                  220.75625
+                ]
+              }
+            ]
+          },
+          {
+            "label": "C1",
+            "mode": 1,
+            "layout": "mixed8",
+            "exit_code": 0,
+            "stem": "C1-mixed8",
+            "rows": [
+              {
+                "T": 1,
+                "groups": 10,
+                "entries": 10,
+                "grid_groups": 0,
+                "us": 240.078125,
+                "checks": 8
+              },
+              {
+                "T": 4,
+                "groups": 20,
+                "entries": 40,
+                "grid_groups": 0,
+                "us": 451.540625,
+                "checks": 32
+              },
+              {
+                "T": 6,
+                "groups": 30,
+                "entries": 60,
+                "grid_groups": 0,
+                "us": 637.5875,
+                "checks": 48
+              }
+            ],
+            "samples": [
+              {
+                "T": 1,
+                "us": [
+                  236.15,
+                  243.696875,
+                  231.80625,
+                  240.078125,
+                  246.265625
+                ]
+              },
+              {
+                "T": 4,
+                "us": [
+                  463.54375,
+                  453.375,
+                  437.940625,
+                  451.540625,
+                  427.865625
+                ]
+              },
+              {
+                "T": 6,
+                "us": [
+                  630.5,
+                  637.5875,
+                  644.471875,
+                  636.146875,
+                  638.003125
+                ]
+              }
+            ]
+          },
+          {
+            "label": "C1",
+            "mode": 1,
+            "layout": "mapped",
+            "exit_code": 0,
+            "stem": "C1-mapped",
+            "rows": [
+              {
+                "T": 1,
+                "groups": 10,
+                "entries": 10,
+                "grid_groups": 0,
+                "us": 1615.55625,
+                "checks": 8
+              },
+              {
+                "T": 4,
+                "groups": 20,
+                "entries": 40,
+                "grid_groups": 0,
+                "us": 3237.11875,
+                "checks": 32
+              },
+              {
+                "T": 6,
+                "groups": 30,
+                "entries": 60,
+                "grid_groups": 0,
+                "us": 4790.665625,
+                "checks": 48
+              }
+            ],
+            "samples": [
+              {
+                "T": 1,
+                "us": [
+                  1627.765625,
+                  1620.6,
+                  1615.55625,
+                  1608.203125,
+                  1607.95
+                ]
+              },
+              {
+                "T": 4,
+                "us": [
+                  3237.11875,
+                  3258.425,
+                  3221.896875,
+                  3209.121875,
+                  3239.059375
+                ]
+              },
+              {
+                "T": 6,
+                "us": [
+                  4767.278125,
+                  4759.034375,
+                  4790.665625,
+                  4816.8375,
+                  4826.534375
+                ]
+              }
+            ]
+          },
+          {
+            "label": "B1",
+            "mode": 2,
+            "layout": "vram",
+            "exit_code": 0,
+            "stem": "B1-vram",
+            "rows": [
+              {
+                "T": 1,
+                "groups": 10,
+                "entries": 10,
+                "grid_groups": 0,
+                "us": 109.43125,
+                "checks": 8
+              },
+              {
+                "T": 4,
+                "groups": 20,
+                "entries": 40,
+                "grid_groups": 0,
+                "us": 246.446875,
+                "checks": 32
+              },
+              {
+                "T": 6,
+                "groups": 30,
+                "entries": 60,
+                "grid_groups": 0,
+                "us": 346.590625,
+                "checks": 48
+              }
+            ],
+            "samples": [
+              {
+                "T": 1,
+                "us": [
+                  108.334375,
+                  109.43125,
+                  115.021875,
+                  117.665625,
+                  108.08125
+                ]
+              },
+              {
+                "T": 4,
+                "us": [
+                  242.80625,
+                  256.284375,
+                  238.471875,
+                  246.446875,
+                  253.88125
+                ]
+              },
+              {
+                "T": 6,
+                "us": [
+                  336.634375,
+                  354.934375,
+                  347.525,
+                  336.65625,
+                  346.590625
+                ]
+              }
+            ]
+          },
+          {
+            "label": "B1",
+            "mode": 2,
+            "layout": "mixed8",
+            "exit_code": 0,
+            "stem": "B1-mixed8",
+            "rows": [
+              {
+                "T": 1,
+                "groups": 10,
+                "entries": 10,
+                "grid_groups": 0,
+                "us": 250.275,
+                "checks": 8
+              },
+              {
+                "T": 4,
+                "groups": 20,
+                "entries": 40,
+                "grid_groups": 0,
+                "us": 492.41875,
+                "checks": 32
+              },
+              {
+                "T": 6,
+                "groups": 30,
+                "entries": 60,
+                "grid_groups": 0,
+                "us": 698.78125,
+                "checks": 48
+              }
+            ],
+            "samples": [
+              {
+                "T": 1,
+                "us": [
+                  250.275,
+                  245.046875,
+                  255.846875,
+                  249.496875,
+                  250.4625
+                ]
+              },
+              {
+                "T": 4,
+                "us": [
+                  496.78125,
+                  498.796875,
+                  489.278125,
+                  485.428125,
+                  492.41875
+                ]
+              },
+              {
+                "T": 6,
+                "us": [
+                  697.321875,
+                  707.078125,
+                  698.78125,
+                  696.965625,
+                  702.85
+                ]
+              }
+            ]
+          },
+          {
+            "label": "B1",
+            "mode": 2,
+            "layout": "mapped",
+            "exit_code": 0,
+            "stem": "B1-mapped",
+            "rows": [
+              {
+                "T": 1,
+                "groups": 10,
+                "entries": 10,
+                "grid_groups": 0,
+                "us": 1637.846875,
+                "checks": 8
+              },
+              {
+                "T": 4,
+                "groups": 20,
+                "entries": 40,
+                "grid_groups": 0,
+                "us": 3233.20625,
+                "checks": 32
+              },
+              {
+                "T": 6,
+                "groups": 30,
+                "entries": 60,
+                "grid_groups": 0,
+                "us": 4778.234375,
+                "checks": 48
+              }
+            ],
+            "samples": [
+              {
+                "T": 1,
+                "us": [
+                  1662.146875,
+                  1637.846875,
+                  1652.90625,
+                  1621.740625,
+                  1609.896875
+                ]
+              },
+              {
+                "T": 4,
+                "us": [
+                  3220.33125,
+                  3233.20625,
+                  3232.0875,
+                  3302.48125,
+                  3270.296875
+                ]
+              },
+              {
+                "T": 6,
+                "us": [
+                  4814.153125,
+                  4787.259375,
+                  4760.090625,
+                  4766.1,
+                  4778.234375
+                ]
+              }
+            ]
+          },
+          {
+            "label": "C2",
+            "mode": 1,
+            "layout": "vram",
+            "exit_code": 0,
+            "stem": "C2-vram",
+            "rows": [
+              {
+                "T": 1,
+                "groups": 10,
+                "entries": 10,
+                "grid_groups": 0,
+                "us": 85.634375,
+                "checks": 8
+              },
+              {
+                "T": 4,
+                "groups": 20,
+                "entries": 40,
+                "grid_groups": 0,
+                "us": 158.928125,
+                "checks": 32
+              },
+              {
+                "T": 6,
+                "groups": 30,
+                "entries": 60,
+                "grid_groups": 0,
+                "us": 228.828125,
+                "checks": 48
+              }
+            ],
+            "samples": [
+              {
+                "T": 1,
+                "us": [
+                  85.603125,
+                  85.634375,
+                  86.025,
+                  93.728125,
+                  85.14375
+                ]
+              },
+              {
+                "T": 4,
+                "us": [
+                  164.003125,
+                  157.975,
+                  158.928125,
+                  170.765625,
+                  158.7875
+                ]
+              },
+              {
+                "T": 6,
+                "us": [
+                  217.259375,
+                  240.2375,
+                  217.84375,
+                  228.828125,
+                  231.434375
+                ]
+              }
+            ]
+          },
+          {
+            "label": "C2",
+            "mode": 1,
+            "layout": "mixed8",
+            "exit_code": 0,
+            "stem": "C2-mixed8",
+            "rows": [
+              {
+                "T": 1,
+                "groups": 10,
+                "entries": 10,
+                "grid_groups": 0,
+                "us": 235.10625,
+                "checks": 8
+              },
+              {
+                "T": 4,
+                "groups": 20,
+                "entries": 40,
+                "grid_groups": 0,
+                "us": 438.246875,
+                "checks": 32
+              },
+              {
+                "T": 6,
+                "groups": 30,
+                "entries": 60,
+                "grid_groups": 0,
+                "us": 630.65625,
+                "checks": 48
+              }
+            ],
+            "samples": [
+              {
+                "T": 1,
+                "us": [
+                  243.678125,
+                  232.028125,
+                  235.10625,
+                  238.4875,
+                  232.70625
+                ]
+              },
+              {
+                "T": 4,
+                "us": [
+                  441.559375,
+                  438.246875,
+                  441.578125,
+                  434.234375,
+                  434.58125
+                ]
+              },
+              {
+                "T": 6,
+                "us": [
+                  630.5,
+                  630.65625,
+                  646.134375,
+                  638.71875,
+                  627.3125
+                ]
+              }
+            ]
+          },
+          {
+            "label": "C2",
+            "mode": 1,
+            "layout": "mapped",
+            "exit_code": 0,
+            "stem": "C2-mapped",
+            "rows": [
+              {
+                "T": 1,
+                "groups": 10,
+                "entries": 10,
+                "grid_groups": 0,
+                "us": 1633.75,
+                "checks": 8
+              },
+              {
+                "T": 4,
+                "groups": 20,
+                "entries": 40,
+                "grid_groups": 0,
+                "us": 3192.109375,
+                "checks": 32
+              },
+              {
+                "T": 6,
+                "groups": 30,
+                "entries": 60,
+                "grid_groups": 0,
+                "us": 4761.18125,
+                "checks": 48
+              }
+            ],
+            "samples": [
+              {
+                "T": 1,
+                "us": [
+                  1642.171875,
+                  1630.515625,
+                  1633.75,
+                  1623.228125,
+                  1798.425
+                ]
+              },
+              {
+                "T": 4,
+                "us": [
+                  3209.5,
+                  3181.0,
+                  3198.340625,
+                  3192.109375,
+                  3182.875
+                ]
+              },
+              {
+                "T": 6,
+                "us": [
+                  4758.559375,
+                  4753.859375,
+                  4787.146875,
+                  4761.18125,
+                  4776.184375
+                ]
+              }
+            ]
+          },
+          {
+            "label": "A2",
+            "mode": 0,
+            "layout": "vram",
+            "exit_code": 0,
+            "stem": "A2-vram",
+            "rows": [
+              {
+                "T": 1,
+                "groups": 10,
+                "entries": 10,
+                "grid_groups": 0,
+                "us": 89.3125,
+                "checks": 8
+              },
+              {
+                "T": 4,
+                "groups": 20,
+                "entries": 40,
+                "grid_groups": 0,
+                "us": 165.065625,
+                "checks": 32
+              },
+              {
+                "T": 6,
+                "groups": 30,
+                "entries": 60,
+                "grid_groups": 0,
+                "us": 238.896875,
+                "checks": 48
+              }
+            ],
+            "samples": [
+              {
+                "T": 1,
+                "us": [
+                  89.103125,
+                  89.3125,
+                  89.3125,
+                  95.171875,
+                  89.575
+                ]
+              },
+              {
+                "T": 4,
+                "us": [
+                  163.765625,
+                  169.3125,
+                  163.365625,
+                  165.065625,
+                  165.190625
+                ]
+              },
+              {
+                "T": 6,
+                "us": [
+                  245.29375,
+                  229.396875,
+                  243.553125,
+                  233.215625,
+                  238.896875
+                ]
+              }
+            ]
+          },
+          {
+            "label": "A2",
+            "mode": 0,
+            "layout": "mixed8",
+            "exit_code": 0,
+            "stem": "A2-mixed8",
+            "rows": [
+              {
+                "T": 1,
+                "groups": 10,
+                "entries": 10,
+                "grid_groups": 0,
+                "us": 245.328125,
+                "checks": 8
+              },
+              {
+                "T": 4,
+                "groups": 20,
+                "entries": 40,
+                "grid_groups": 0,
+                "us": 448.571875,
+                "checks": 32
+              },
+              {
+                "T": 6,
+                "groups": 30,
+                "entries": 60,
+                "grid_groups": 0,
+                "us": 652.509375,
+                "checks": 48
+              }
+            ],
+            "samples": [
+              {
+                "T": 1,
+                "us": [
+                  251.725,
+                  234.428125,
+                  251.653125,
+                  238.865625,
+                  245.328125
+                ]
+              },
+              {
+                "T": 4,
+                "us": [
+                  463.940625,
+                  444.465625,
+                  448.571875,
+                  458.7875,
+                  444.53125
+                ]
+              },
+              {
+                "T": 6,
+                "us": [
+                  658.7125,
+                  640.51875,
+                  638.725,
+                  663.7,
+                  652.509375
+                ]
+              }
+            ]
+          },
+          {
+            "label": "A2",
+            "mode": 0,
+            "layout": "mapped",
+            "exit_code": 0,
+            "stem": "A2-mapped",
+            "rows": [
+              {
+                "T": 1,
+                "groups": 10,
+                "entries": 10,
+                "grid_groups": 0,
+                "us": 1648.446875,
+                "checks": 8
+              },
+              {
+                "T": 4,
+                "groups": 20,
+                "entries": 40,
+                "grid_groups": 0,
+                "us": 3188.25,
+                "checks": 32
+              },
+              {
+                "T": 6,
+                "groups": 30,
+                "entries": 60,
+                "grid_groups": 0,
+                "us": 4801.1,
+                "checks": 48
+              }
+            ],
+            "samples": [
+              {
+                "T": 1,
+                "us": [
+                  1650.25,
+                  1648.446875,
+                  1634.296875,
+                  1770.921875,
+                  1608.6375
+                ]
+              },
+              {
+                "T": 4,
+                "us": [
+                  3211.7875,
+                  3190.446875,
+                  3188.25,
+                  3187.215625,
+                  3183.084375
+                ]
+              },
+              {
+                "T": 6,
+                "us": [
+                  4822.575,
+                  4808.803125,
+                  4772.2875,
+                  4770.321875,
+                  4801.1
+                ]
+              }
+            ]
+          }
+        ],
+        "lut_group": 2,
+        "extra_scratch_bytes": 655360,
+        "comparison": {
+          "vram": {
+            "1": {
+              "vs_original": {
+                "baseline": 90.18789739170938,
+                "candidate": 109.43125,
+                "throughput_change_pct": -17.584878732803123,
+                "baseline_drift_pct": -1.9318532752290452
+              },
+              "vs_control": {
+                "baseline": 88.29764792397502,
+                "candidate": 109.43125,
+                "throughput_change_pct": -19.312218471437536,
+                "baseline_drift_pct": -5.9415116358893405
+              }
+            },
+            "4": {
+              "vs_original": {
+                "baseline": 165.89323774079824,
+                "candidate": 246.446875,
+                "throughput_change_pct": -32.686004746135154,
+                "baseline_drift_pct": -0.9952766531713841
+              },
+              "vs_control": {
+                "baseline": 161.7453429826111,
+                "candidate": 246.446875,
+                "throughput_change_pct": -34.36908340484695,
+                "baseline_drift_pct": -3.4531855114283694
+              }
+            },
+            "6": {
+              "vs_original": {
+                "baseline": 234.59883659314974,
+                "candidate": 346.590625,
+                "throughput_change_pct": -32.312411337395595,
+                "baseline_drift_pct": 3.6977252072001088
+              },
+              "vs_control": {
+                "baseline": 224.75595380218797,
+                "candidate": 346.590625,
+                "throughput_change_pct": -35.152327388489525,
+                "baseline_drift_pct": 3.656464992497388
+              }
+            }
+          },
+          "mixed8": {
+            "1": {
+              "vs_original": {
+                "baseline": 241.31085847910342,
+                "candidate": 250.275,
+                "throughput_change_pct": -3.5817167199666766,
+                "baseline_drift_pct": 3.3572510038838876
+              },
+              "vs_control": {
+                "baseline": 237.57918190738272,
+                "candidate": 250.275,
+                "throughput_change_pct": -5.0727472151102955,
+                "baseline_drift_pct": -2.070940449072567
+              }
+            },
+            "4": {
+              "vs_original": {
+                "baseline": 446.8686413992546,
+                "candidate": 492.41875,
+                "throughput_change_pct": -9.25027907664876,
+                "baseline_drift_pct": 0.7637499561264915
+              },
+              "vs_control": {
+                "baseline": 444.84409385963176,
+                "candidate": 492.41875,
+                "throughput_change_pct": -9.66142254744935,
+                "baseline_drift_pct": -2.9440872568221255
+              }
+            },
+            "6": {
+              "vs_original": {
+                "baseline": 649.0659139820542,
+                "candidate": 698.78125,
+                "throughput_change_pct": -7.114577847923909,
+                "baseline_drift_pct": 1.0638658309334303
+              },
+              "vs_control": {
+                "baseline": 634.1124047019384,
+                "candidate": 698.78125,
+                "throughput_change_pct": -9.25451925020334,
+                "baseline_drift_pct": -1.0871056913756894
+              }
+            }
+          },
+          "mapped": {
+            "1": {
+              "vs_original": {
+                "baseline": 1649.4965408071535,
+                "candidate": 1637.846875,
+                "throughput_change_pct": 0.7112793011955665,
+                "baseline_drift_pct": -0.12723055805367034
+              },
+              "vs_control": {
+                "baseline": 1624.6276568609499,
+                "candidate": 1637.846875,
+                "throughput_change_pct": -0.8071095253669558,
+                "baseline_drift_pct": 1.126160107393348
+              }
+            },
+            "4": {
+              "vs_original": {
+                "baseline": 3208.749720734308,
+                "candidate": 3233.20625,
+                "throughput_change_pct": -0.7564172333791586,
+                "baseline_drift_pct": -1.2736572989020756
+              },
+              "vs_control": {
+                "baseline": 3214.535286765924,
+                "candidate": 3233.20625,
+                "throughput_change_pct": -0.5774751683124468,
+                "baseline_drift_pct": -1.390414701345144
+              }
+            },
+            "6": {
+              "vs_original": {
+                "baseline": 4797.348534346864,
+                "candidate": 4778.234375,
+                "throughput_change_pct": 0.4000255710952638,
+                "baseline_drift_pct": 0.15645861148196882
+              },
+              "vs_control": {
+                "baseline": 4775.900684558833,
+                "candidate": 4778.234375,
+                "throughput_change_pct": -0.04884001616533018,
+                "baseline_drift_pct": -0.6154546634633884
+              }
+            }
+          }
+        }
+      },
+      "gates": [
+        {
+          "layout": "vram",
+          "T": 1,
+          "vs_original_pct": -17.584878732803123,
+          "vs_control_pct": -19.312218471437536,
+          "max_abs_drift_pct": 5.9415116358893405,
+          "stable": false,
+          "passed": false
+        },
+        {
+          "layout": "vram",
+          "T": 4,
+          "vs_original_pct": -32.686004746135154,
+          "vs_control_pct": -34.36908340484695,
+          "max_abs_drift_pct": 3.4531855114283694,
+          "stable": false,
+          "passed": false
+        },
+        {
+          "layout": "vram",
+          "T": 6,
+          "vs_original_pct": -32.312411337395595,
+          "vs_control_pct": -35.152327388489525,
+          "max_abs_drift_pct": 3.6977252072001088,
+          "stable": false,
+          "passed": false
+        },
+        {
+          "layout": "mixed8",
+          "T": 1,
+          "vs_original_pct": -3.5817167199666766,
+          "vs_control_pct": -5.0727472151102955,
+          "max_abs_drift_pct": 3.3572510038838876,
+          "stable": false,
+          "passed": false
+        },
+        {
+          "layout": "mixed8",
+          "T": 4,
+          "vs_original_pct": -9.25027907664876,
+          "vs_control_pct": -9.66142254744935,
+          "max_abs_drift_pct": 2.9440872568221255,
+          "stable": true,
+          "passed": false
+        },
+        {
+          "layout": "mixed8",
+          "T": 6,
+          "vs_original_pct": -7.114577847923909,
+          "vs_control_pct": -9.25451925020334,
+          "max_abs_drift_pct": 1.0871056913756894,
+          "stable": true,
+          "passed": false
+        },
+        {
+          "layout": "mapped",
+          "T": 1,
+          "vs_original_pct": 0.7112793011955665,
+          "vs_control_pct": -0.8071095253669558,
+          "max_abs_drift_pct": 1.126160107393348,
+          "stable": true,
+          "passed": false
+        },
+        {
+          "layout": "mapped",
+          "T": 4,
+          "vs_original_pct": -0.7564172333791586,
+          "vs_control_pct": -0.5774751683124468,
+          "max_abs_drift_pct": 1.390414701345144,
+          "stable": true,
+          "passed": false
+        },
+        {
+          "layout": "mapped",
+          "T": 6,
+          "vs_original_pct": 0.4000255710952638,
+          "vs_control_pct": -0.04884001616533018,
+          "max_abs_drift_pct": 0.6154546634633884,
+          "stable": true,
+          "passed": false
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,31 @@
+--- a/experiment-eager.cpp
++++ b/experiment-eager.cpp
+@@ -26,7 +26,8 @@
+ }
+ int main(int argc,char** argv) try {
+     using namespace strata::kernels;
+-    constexpr int S=128,HK=16,HV=48,C=10240,L=40,MAXT=6,PAD=32;
++    constexpr int S=128,HK=16,HV=48,C=10240,L=40,MAXT=6;
++    int PAD=32;
+     constexpr size_t SS=size_t(S)*HV*S,HS=C*3,STRIDE=SS+HS;
+     const bool bench=argc==3&&std::string(argv[1])=="--bench";
+     const int mode=argc==3?std::atoi(argv[2]):1;
+@@ -85,7 +86,7 @@
+             }
+         }
+         if(std::memcmp(got.data(),initial.data(),PAD*4)||
+-           std::memcmp(got.data()+PAD+L*STRIDE,initial.data()+PAD+L*STRIDE,PAD*4))
++           std::memcmp(got.data()+PAD+L*STRIDE,initial.data()+PAD+L*STRIDE,(initial.size()-PAD-L*STRIDE)*4))
+             throw std::runtime_error("guard changed");
+         ++checks;
+         std::printf("check T=%d keep=%d first=%d ord0=%d layers=%d graph=%d hash=%016llx\n",
+@@ -96,6 +97,9 @@
+             check(T,keep,0,0,1,false);check(T,keep,5,3,3,false);check(T,keep,3,3,36,false);
+         }
+         for(int T:{4,6})check(T,T,5,3,3,true);
++        PAD=33;  // Exercise 4-byte-only aligned state and its entire guard region.
++        for(int T:{4,6})for(int keep=-1;keep<=T;++keep)check(T,keep,5,3,3,false);
++        PAD=32;
+         reset(2);
+         for(int T:{0,1,2,3,5,7,8}){
+             if(gdn_commit_layers_variant_esimd(mode,state+PAD,qkv,h,C,g,b,HK,HV,T,3,keep_d,&q))throw std::runtime_error("invalid T accepted");++checks;

@@ -1,0 +1,141 @@
+{
+  "complete": true,
+  "speed_acceptance": false,
+  "production_changed": false,
+  "device": "A770 16GB / PCIe3.0 / Windows / driver32.0.101.9034 / DPC++2025.3.2 / VTune2026.4",
+  "scope": "Only warm Code/Prose2048/full128 decode; eager diagnostic changes scheduling and profiler overhead. Kernel-time sums are not graph or end-to-end time shares. Original graph replay kernel attribution failed coverage.",
+  "spec_min_p": 0.5,
+  "production_spec_min_p": 0.8,
+  "expert_slots": 6297,
+  "probe_coverage": {
+    "report-eager-paused": 20,
+    "report-graph-paused": 1,
+    "report-graph-unpaused": 1
+  },
+  "full_outputs_checked": 10,
+  "long_prefill_48layer_scans": 8,
+  "graph_kernel_calls": 0,
+  "eager_kernel_calls": 260498,
+  "eager_kernel_seconds": 9.572915,
+  "eager_decode_windows": {
+    "4": 55,
+    "5": 57
+  },
+  "groups": {
+    "IQ2_S GU": {
+      "seconds": 1.7001249999999999,
+      "calls": 3808,
+      "kernel_time_share_pct": 17.759741938584014
+    },
+    "Other GU": {
+      "seconds": 0.615318,
+      "calls": 1568,
+      "kernel_time_share_pct": 6.427697310589304
+    },
+    "Down": {
+      "seconds": 1.084449,
+      "calls": 5376,
+      "kernel_time_share_pct": 11.328304910259833
+    },
+    "SwiGLU/Q8": {
+      "seconds": 0.040734,
+      "calls": 5376,
+      "kernel_time_share_pct": 0.4255130229402434
+    },
+    "Native MMVQ wide": {
+      "seconds": 1.474196,
+      "calls": 24743,
+      "kernel_time_share_pct": 15.399656217568003
+    },
+    "GR four kernels": {
+      "seconds": 1.3050239999999995,
+      "calls": 45715,
+      "kernel_time_share_pct": 13.632462003475426
+    },
+    "GDN step/norm": {
+      "seconds": 0.492454,
+      "calls": 9789,
+      "kernel_time_share_pct": 5.144242897800723
+    },
+    "Other kernels": {
+      "seconds": 2.8606149999999997,
+      "calls": 164123,
+      "kernel_time_share_pct": 29.882381698782446
+    }
+  },
+  "gu_local_size": "256 x 1",
+  "baseline_iq_object_sha256": "17cceb618ebf7707f4582747f206c1db5bdb25b8c92ae65ef25536130ca783bb",
+  "hardware_operator_iq_object_sha256": "25cf6cbd9d51082c93e29f3d4d154637eb91b3ec33a8dfc6721f17663a4d45ff",
+  "workers": {
+    "graph": {
+      "free_mib": 2192,
+      "full_outputs": 5,
+      "long_prefill_scans": [
+        [
+          48,
+          0,
+          0
+        ],
+        [
+          48,
+          0,
+          0
+        ],
+        [
+          48,
+          0,
+          0
+        ],
+        [
+          48,
+          0,
+          0
+        ]
+      ],
+      "profiled_decode_ms": [
+        9311.198,
+        9585.814
+      ]
+    },
+    "eager": {
+      "free_mib": 2211,
+      "full_outputs": 5,
+      "long_prefill_scans": [
+        [
+          48,
+          0,
+          0
+        ],
+        [
+          48,
+          0,
+          0
+        ],
+        [
+          48,
+          0,
+          0
+        ],
+        [
+          48,
+          0,
+          0
+        ]
+      ],
+      "profiled_decode_ms": [
+        9693.284,
+        10335.308
+      ]
+    }
+  },
+  "files_sha256": {
+    "build-sycl-a770-decode-gpu-eager-profile-20261028/audit-results.json": "fed8544a5be0818db0660ef775adda1c2a626b9b4398b4c40c48d1bb1bf96ad6",
+    "build-sycl-a770-decode-gpu-eager-profile-20261028/audit.py": "f3629da3e1922ed9ae544820180795e059e600995fd1f3a3f06a9448c7b1b5cb",
+    "build-sycl-a770-decode-gpu-eager-profile-20261028/report.csv": "6e6e2a31a373fc3512c80bec9e59f2498016535a361aea9f39b4b4bc32845d49",
+    "build-sycl-a770-decode-gpu-eager-profile-20261028/profile.stderr": "61f245ac133c8043377b2efeb074544189fab0f70047eb37260eb4827e2606a5",
+    "build-sycl-a770-decode-gpu-profile-20261028/report.csv": "36cd1a30a8d072f5275b517c1a742babd0bdbe27a3232a6c149537dd9daa8c08",
+    "build-sycl-a770-graph-profiler-check-v2-20261028/finish-results.json": "a77a623c4006d2bfdea3265485ac01eee2ce08f6278ac545d1bec2e09cbf7511",
+    "build-sycl-a770-vram-down-sg16/iq.obj": "17cceb618ebf7707f4582747f206c1db5bdb25b8c92ae65ef25536130ca783bb",
+    "build-sycl-a770-weight-cache-hint-20261025/baseline.obj": "25cf6cbd9d51082c93e29f3d4d154637eb91b3ec33a8dfc6721f17663a4d45ff"
+  }
+}

@@ -15,6 +15,8 @@ logs/
 __pycache__/
 .pytest_cache/
 *.pyc
+/serve/_text_scan*.pyd
+/serve/_text_scan*.so
 
 # plan v0.3 P1 (repository hygiene, review E1): profiler captures and large diagnostic dumps stay out of git.
 *.nsys-rep
@@ -72,3 +74,7 @@ gpu-experiment.lock
 bench/results/20??-??-??*
 # Local hardware diagnostics stay outside published benchmark summaries.
 /bench/results/a770/link-*.json
+# Native-XMX raw manifests contain local paths and requests; publish the summary instead.
+/bench/results/a770/native-xmx-2026-10-24.json
+/bench/results/a770/native-xmx-vs-half-2026-10-24.json
+/bench/results/a770/native-xmx-model-2026-10-24.json

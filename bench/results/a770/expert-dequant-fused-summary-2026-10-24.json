@@ -1,0 +1,2286 @@
+{
+  "date": "2026-10-24",
+  "hardware": "Intel Arc A770 16GB;Xeon E5-2696 v4;PCIe3.0x16;Windows",
+  "driver": "32.0.101.9034",
+  "compiler": "DPC++2025.3.2",
+  "oneMKL": "2025.3",
+  "rule": "Only merge GU and down dequant submissions;original decoder,FP16 rounding and FP32 XMX accumulation. Private frozen baseline IQ source avoids unrelated live grouped/decode changes. Corrected GDN XMX,HC,chain,batch8 on. 1067checks/process:all16mixed low-bit pairs,9dimensions,full GU/D and chain GU/H/Y bytes,guards,invalid dimensions/types, 8changing weight banks,mixed1/2/3/7/8/9/16/17chains,two reused dequant buffers. 30timed shapes:GU16/22,down42,N2560,F640,T1/2/4/6/7/8/9/16/22/32/40/64/65/128/256;128warmups,median7samples x128calls,8raw banks,2dequant buffers,128MiB workspace. Screen and one independent confirmation,A/B/A/B/A each. Complete expert-chain timing is primary;each B round needs>=15of30stable shapes(abs adjacent A drift<=3%),stable median gain>=3%,minimum>=-3%. Isolated dequant timing diagnostic only. No resampling. Only both passing stages proceed to same-EXE IQ2_XS Code256 A/B/A/B/A;all32IDs equal corrected XMX reference,4191slots/5760MiB,both prefill gains>=3%,abs drift<=3%. Defaultoff;production/config untouched.",
+  "checks": 5335,
+  "operator_passed": false,
+  "model_tested": false,
+  "adopted": false,
+  "production_executable_and_config_changed": false,
+  "scope": "Complete dequant+XMX expert chain,synthetic weights at actual model dimensions;no whole-model speed claim.",
+  "raw_weight_banks": 8,
+  "dequant_buffers": 2,
+  "dequant_buffer_total_bytes": 19660800,
+  "workspace_bytes": 134217728,
+  "cohorts": [
+    {
+      "name": "screen",
+      "groups": [
+        {
+          "round": 1,
+          "stable_cases": 30,
+          "median_pct": 3.898967012420518,
+          "minimum_pct": -17.858120254950947,
+          "passed": false
+        },
+        {
+          "round": 3,
+          "stable_cases": 30,
+          "median_pct": 3.700689509692212,
+          "minimum_pct": -16.944968583685238,
+          "passed": false
+        }
+      ],
+      "per_type": [
+        {
+          "gu": 16,
+          "down": 42,
+          "round": 1,
+          "stable_chain_cases": 15,
+          "chain_median_gain_pct": 15.818931608213616,
+          "chain_minimum_gain_pct": -3.5887446088162744,
+          "stable_dequant_cases": 14,
+          "dequant_median_gain_pct": 23.381155195575253
+        },
+        {
+          "gu": 16,
+          "down": 42,
+          "round": 3,
+          "stable_chain_cases": 15,
+          "chain_median_gain_pct": 15.958426539822511,
+          "chain_minimum_gain_pct": -3.662224940238523,
+          "stable_dequant_cases": 15,
+          "dequant_median_gain_pct": 23.73825902899842
+        },
+        {
+          "gu": 22,
+          "down": 42,
+          "round": 1,
+          "stable_chain_cases": 15,
+          "chain_median_gain_pct": 3.1634226830866474,
+          "chain_minimum_gain_pct": -17.858120254950947,
+          "stable_dequant_cases": 15,
+          "dequant_median_gain_pct": 21.086152323600338
+        },
+        {
+          "gu": 22,
+          "down": 42,
+          "round": 3,
+          "stable_chain_cases": 15,
+          "chain_median_gain_pct": 1.5414805015566468,
+          "chain_minimum_gain_pct": -16.944968583685238,
+          "stable_dequant_cases": 15,
+          "dequant_median_gain_pct": 19.78457957510633
+        }
+      ],
+      "pairs": [
+        {
+          "round": 1,
+          "gu": 16,
+          "down": 42,
+          "T": 1,
+          "baseline": 384.1059949742663,
+          "candidate": 331.038281,
+          "throughput_change_pct": 16.03068799595002,
+          "baseline_drift_pct": -0.22997753076291483,
+          "dequant": {
+            "baseline": 72.71257279715283,
+            "candidate": 57.729687,
+            "throughput_change_pct": 25.953519888567623,
+            "baseline_drift_pct": 5.67152675060747
+          }
+        },
+        {
+          "round": 1,
+          "gu": 16,
+          "down": 42,
+          "T": 2,
+          "baseline": 383.0768848419361,
+          "candidate": 331.110937,
+          "throughput_change_pct": 15.694422030503974,
+          "baseline_drift_pct": 0.11937674437991763,
+          "dequant": {
+            "baseline": 70.5788388828408,
+            "candidate": 57.017969,
+            "throughput_change_pct": 23.78350214971845,
+            "baseline_drift_pct": 0.7232051190899424
+          }
+        },
+        {
+          "round": 1,
+          "gu": 16,
+          "down": 42,
+          "T": 4,
+          "baseline": 382.5784112574572,
+          "candidate": 329.639844,
+          "throughput_change_pct": 16.05951714303604,
+          "baseline_drift_pct": 0.14775013631187495,
+          "dequant": {
+            "baseline": 70.2999773540593,
+            "candidate": 56.996094,
+            "throughput_change_pct": 23.34174575903272,
+            "baseline_drift_pct": 0.6880321156162106
+          }
+        },
+        {
+          "round": 1,
+          "gu": 16,
+          "down": 42,
+          "T": 6,
+          "baseline": 383.5210918483705,
+          "candidate": 327.533594,
+          "throughput_change_pct": 17.093665771691956,
+          "baseline_drift_pct": 0.02118751972215449,
+          "dequant": {
+            "baseline": 70.37803256803686,
+            "candidate": 57.269531,
+            "throughput_change_pct": 22.889137276219106,
+            "baseline_drift_pct": -0.3236188384449168
+          }
+        },
+        {
+          "round": 1,
+          "gu": 16,
+          "down": 42,
+          "T": 7,
+          "baseline": 382.90180391438,
+          "candidate": 329.113281,
+          "throughput_change_pct": 16.34346774185027,
+          "baseline_drift_pct": 0.17664544768452028,
+          "dequant": {
+            "baseline": 70.16561579700313,
+            "candidate": 56.571875,
+            "throughput_change_pct": 24.02915016870686,
+            "baseline_drift_pct": -0.10238233730468504
+          }
+        },
+        {
+          "round": 1,
+          "gu": 16,
+          "down": 42,
+          "T": 8,
+          "baseline": 344.21052391320876,
+          "candidate": 279.142969,
+          "throughput_change_pct": 23.309759563820066,
+          "baseline_drift_pct": -0.3095587903611974,
+          "dequant": {
+            "baseline": 69.97844246467925,
+            "candidate": 57.463281,
+            "throughput_change_pct": 21.779406338944064,
+            "baseline_drift_pct": 1.37699205412114
+          }
+        },
+        {
+          "round": 1,
+          "gu": 16,
+          "down": 42,
+          "T": 9,
+          "baseline": 390.60387038487437,
+          "candidate": 340.646875,
+          "throughput_change_pct": 14.665332064142467,
+          "baseline_drift_pct": 0.08604151598359255,
+          "dequant": {
+            "baseline": 70.20266046782933,
+            "candidate": 56.773438,
+            "throughput_change_pct": 23.654058906612875,
+            "baseline_drift_pct": 0.29087693045817264
+          }
+        },
+        {
+          "round": 1,
+          "gu": 16,
+          "down": 42,
+          "T": 16,
+          "baseline": 352.2311869770779,
+          "candidate": 294.653125,
+          "throughput_change_pct": 19.540964304070396,
+          "baseline_drift_pct": -0.3204305593693224,
+          "dequant": {
+            "baseline": 70.49254459281437,
+            "candidate": 56.989844,
+            "throughput_change_pct": 23.693169949393745,
+            "baseline_drift_pct": -0.19597169961235172
+          }
+        },
+        {
+          "round": 1,
+          "gu": 16,
+          "down": 42,
+          "T": 22,
+          "baseline": 403.8171824184878,
+          "candidate": 348.6625,
+          "throughput_change_pct": 15.818931608213616,
+          "baseline_drift_pct": 0.03173350051470791,
+          "dequant": {
+            "baseline": 70.35350537136492,
+            "candidate": 56.724219,
+            "throughput_change_pct": 24.027279020562496,
+            "baseline_drift_pct": 0.10999668860818268
+          }
+        },
+        {
+          "round": 1,
+          "gu": 16,
+          "down": 42,
+          "T": 32,
+          "baseline": 381.8738162026659,
+          "candidate": 369.73125,
+          "throughput_change_pct": 3.2841601034983903,
+          "baseline_drift_pct": 0.04972616271261554,
+          "dequant": {
+            "baseline": 70.5218084619928,
+            "candidate": 57.230469,
+            "throughput_change_pct": 23.22423648492695,
+            "baseline_drift_pct": 0.2751153709620313
+          }
+        },
+        {
+          "round": 1,
+          "gu": 16,
+          "down": 42,
+          "T": 40,
+          "baseline": 392.60663151722235,
+          "candidate": 378.529688,
+          "throughput_change_pct": 3.7188479433672095,
+          "baseline_drift_pct": 0.04279217961880022,
+          "dequant": {
+            "baseline": 70.0948848372021,
+            "candidate": 57.432031,
+            "throughput_change_pct": 22.048417262489117,
+            "baseline_drift_pct": 0.9710046289097329
+          }
+        },
+        {
+          "round": 1,
+          "gu": 16,
+          "down": 42,
+          "T": 64,
+          "baseline": 426.7591492575174,
+          "candidate": 442.644531,
+          "throughput_change_pct": -3.5887446088162744,
+          "baseline_drift_pct": 0.6411281213077435,
+          "dequant": {
+            "baseline": 70.37460925606445,
+            "candidate": 57.1625,
+            "throughput_change_pct": 23.113246019793475,
+            "baseline_drift_pct": 0.016653699262803023
+          }
+        },
+        {
+          "round": 1,
+          "gu": 16,
+          "down": 42,
+          "T": 65,
+          "baseline": 476.00078443621027,
+          "candidate": 393.466406,
+          "throughput_change_pct": 20.97621986976197,
+          "baseline_drift_pct": 0.25554479839080546,
+          "dequant": {
+            "baseline": 70.55350654542322,
+            "candidate": 57.332813,
+            "throughput_change_pct": 23.059558486033495,
+            "baseline_drift_pct": 0.10081543896989231
+          }
+        },
+        {
+          "round": 1,
+          "gu": 16,
+          "down": 42,
+          "T": 128,
+          "baseline": 549.6845578989258,
+          "candidate": 514.680469,
+          "throughput_change_pct": 6.80113021714952,
+          "baseline_drift_pct": 0.173972463218508,
+          "dequant": {
+            "baseline": 70.19568157989643,
+            "candidate": 56.661719,
+            "throughput_change_pct": 23.88554886571026,
+            "baseline_drift_pct": -0.683237389294078
+          }
+        },
+        {
+          "round": 1,
+          "gu": 16,
+          "down": 42,
+          "T": 256,
+          "baseline": 774.1345535167736,
+          "candidate": 725.334375,
+          "throughput_change_pct": 6.727956125996859,
+          "baseline_drift_pct": -0.31990527184133644,
+          "dequant": {
+            "baseline": 70.02767192157303,
+            "candidate": 56.739063,
+            "throughput_change_pct": 23.42056463211779,
+            "baseline_drift_pct": -1.5057906614817207
+          }
+        },
+        {
+          "round": 1,
+          "gu": 22,
+          "down": 42,
+          "T": 1,
+          "baseline": 292.45566068091847,
+          "candidate": 282.473437,
+          "throughput_change_pct": 3.5338627896960295,
+          "baseline_drift_pct": -0.2329365707881892,
+          "dequant": {
+            "baseline": 55.95507798772601,
+            "candidate": 46.039062,
+            "throughput_change_pct": 21.538266760791092,
+            "baseline_drift_pct": 0.0041891624152023965
+          }
+        },
+        {
+          "round": 1,
+          "gu": 22,
+          "down": 42,
+          "T": 2,
+          "baseline": 290.48668645763263,
+          "candidate": 280.735156,
+          "throughput_change_pct": 3.4735693942202994,
+          "baseline_drift_pct": -0.09462391019792182,
+          "dequant": {
+            "baseline": 55.60848284137355,
+            "candidate": 46.278906,
+            "throughput_change_pct": 20.159458482820547,
+            "baseline_drift_pct": 0.3997916596693907
+          }
+        },
+        {
+          "round": 1,
+          "gu": 22,
+          "down": 42,
+          "T": 4,
+          "baseline": 292.01366943050783,
+          "candidate": 280.591406,
+          "throughput_change_pct": 4.070781637021281,
+          "baseline_drift_pct": 0.023813706597008988,
+          "dequant": {
+            "baseline": 56.041015498639474,
+            "candidate": 46.330469,
+            "throughput_change_pct": 20.959309733384046,
+            "baseline_drift_pct": 0.001393631851898114
+          }
+        },
+        {
+          "round": 1,
+          "gu": 22,
+          "down": 42,
+          "T": 6,
+          "baseline": 292.31687858836835,
+          "candidate": 280.479688,
+          "throughput_change_pct": 4.220337904956728,
+          "baseline_drift_pct": -0.4365507104009181,
+          "dequant": {
+            "baseline": 56.05292429718208,
+            "candidate": 45.938281,
+            "throughput_change_pct": 22.017896788915703,
+            "baseline_drift_pct": -0.5337781484570425
+          }
+        },
+        {
+          "round": 1,
+          "gu": 22,
+          "down": 42,
+          "T": 7,
+          "baseline": 292.40116974329976,
+          "candidate": 281.894531,
+          "throughput_change_pct": 3.7271523878197543,
+          "baseline_drift_pct": -0.024844966873260876,
+          "dequant": {
+            "baseline": 55.500231930545446,
+            "candidate": 46.328125,
+            "throughput_change_pct": 19.798139748900788,
+            "baseline_drift_pct": -0.8856874628056066
+          }
+        },
+        {
+          "round": 1,
+          "gu": 22,
+          "down": 42,
+          "T": 8,
+          "baseline": 270.4106855430909,
+          "candidate": 265.724219,
+          "throughput_change_pct": 1.7636580364136512,
+          "baseline_drift_pct": -0.43501941051603543,
+          "dequant": {
+            "baseline": 56.10920681191724,
+            "candidate": 46.389063,
+            "throughput_change_pct": 20.953524782160905,
+            "baseline_drift_pct": 0.8965030489510584
+          }
+        },
+        {
+          "round": 1,
+          "gu": 22,
+          "down": 42,
+          "T": 9,
+          "baseline": 304.13866549757483,
+          "candidate": 294.8125,
+          "throughput_change_pct": 3.1634226830866474,
+          "baseline_drift_pct": 0.04136534635752476,
+          "dequant": {
+            "baseline": 56.0223612581396,
+            "candidate": 46.046094,
+            "throughput_change_pct": 21.665827416630833,
+            "baseline_drift_pct": 1.9601216627239015
+          }
+        },
+        {
+          "round": 1,
+          "gu": 22,
+          "down": 42,
+          "T": 16,
+          "baseline": 277.9216503080724,
+          "candidate": 281.525781,
+          "throughput_change_pct": -1.2802133712676245,
+          "baseline_drift_pct": 0.4216995537927648,
+          "dequant": {
+            "baseline": 55.83236026479178,
+            "candidate": 45.967188,
+            "throughput_change_pct": 21.461335126246528,
+            "baseline_drift_pct": 1.3381780482307981
+          }
+        },
+        {
+          "round": 1,
+          "gu": 22,
+          "down": 42,
+          "T": 22,
+          "baseline": 315.55115191388836,
+          "candidate": 319.936719,
+          "throughput_change_pct": -1.3707607866390692,
+          "baseline_drift_pct": -0.548125140859268,
+          "dequant": {
+            "baseline": 56.38526626012851,
+            "candidate": 46.0125,
+            "throughput_change_pct": 22.54336595518285,
+            "baseline_drift_pct": -1.4251716183959262
+          }
+        },
+        {
+          "round": 1,
+          "gu": 22,
+          "down": 42,
+          "T": 32,
+          "baseline": 325.705056709644,
+          "candidate": 358.239844,
+          "throughput_change_pct": -9.081844980469567,
+          "baseline_drift_pct": 0.0731852860303972,
+          "dequant": {
+            "baseline": 55.52573396380051,
+            "candidate": 46.189844,
+            "throughput_change_pct": 20.21199717366551,
+            "baseline_drift_pct": -0.26136165911712084
+          }
+        },
+        {
+          "round": 1,
+          "gu": 22,
+          "down": 42,
+          "T": 40,
+          "baseline": 334.36280932054535,
+          "candidate": 365.689062,
+          "throughput_change_pct": -8.566363048467284,
+          "baseline_drift_pct": 0.549185358607085,
+          "dequant": {
+            "baseline": 55.20572583210912,
+            "candidate": 45.901562,
+            "throughput_change_pct": 20.269819646026676,
+            "baseline_drift_pct": -0.4391481362271743
+          }
+        },
+        {
+          "round": 1,
+          "gu": 22,
+          "down": 42,
+          "T": 64,
+          "baseline": 353.75491438510267,
+          "candidate": 430.663281,
+          "throughput_change_pct": -17.858120254950947,
+          "baseline_drift_pct": 0.19254086565756445,
+          "dequant": {
+            "baseline": 55.807436904647496,
+            "candidate": 46.035938,
+            "throughput_change_pct": 21.225806031469354,
+            "baseline_drift_pct": 1.2962310614329953
+          }
+        },
+        {
+          "round": 1,
+          "gu": 22,
+          "down": 42,
+          "T": 65,
+          "baseline": 473.6038002847428,
+          "candidate": 353.603125,
+          "throughput_change_pct": 33.936542637948364,
+          "baseline_drift_pct": 0.13403608732995842,
+          "dequant": {
+            "baseline": 55.832146744444316,
+            "candidate": 46.115625,
+            "throughput_change_pct": 21.069912300753412,
+            "baseline_drift_pct": 0.981482125428168
+          }
+        },
+        {
+          "round": 1,
+          "gu": 22,
+          "down": 42,
+          "T": 128,
+          "baseline": 477.50309866293935,
+          "candidate": 500.467969,
+          "throughput_change_pct": -4.588679348040481,
+          "baseline_drift_pct": 0.06644844119938487,
+          "dequant": {
+            "baseline": 56.269112773572324,
+            "candidate": 46.470312,
+            "throughput_change_pct": 21.086152323600338,
+            "baseline_drift_pct": -0.19834709276520535
+          }
+        },
+        {
+          "round": 1,
+          "gu": 22,
+          "down": 42,
+          "T": 256,
+          "baseline": 703.3059401733489,
+          "candidate": 680.839062,
+          "throughput_change_pct": 3.2998809009799235,
+          "baseline_drift_pct": 0.18790569125402,
+          "dequant": {
+            "baseline": 55.94156418221195,
+            "candidate": 46.163281,
+            "throughput_change_pct": 21.181950178567142,
+            "baseline_drift_pct": -1.7524665572291376
+          }
+        },
+        {
+          "round": 3,
+          "gu": 16,
+          "down": 42,
+          "T": 1,
+          "baseline": 383.5195037664317,
+          "candidate": 331.561719,
+          "throughput_change_pct": 15.670622327311467,
+          "baseline_drift_pct": -0.07534247500096125,
+          "dequant": {
+            "baseline": 73.61844695106198,
+            "candidate": 57.445312,
+            "throughput_change_pct": 28.153968336114144,
+            "baseline_drift_pct": -2.9945136664933925
+          }
+        },
+        {
+          "round": 3,
+          "gu": 16,
+          "down": 42,
+          "T": 2,
+          "baseline": 383.43825849869637,
+          "candidate": 330.315625,
+          "throughput_change_pct": 16.08238589945492,
+          "baseline_drift_pct": 0.06929851553982846,
+          "dequant": {
+            "baseline": 70.8347659903043,
+            "candidate": 57.052344,
+            "throughput_change_pct": 24.157503485403353,
+            "baseline_drift_pct": 0.003309164292852884
+          }
+        },
+        {
+          "round": 3,
+          "gu": 16,
+          "down": 42,
+          "T": 4,
+          "baseline": 382.92733774195824,
+          "candidate": 330.228125,
+          "throughput_change_pct": 15.958426539822511,
+          "baseline_drift_pct": 0.034689618909844455,
+          "dequant": {
+            "baseline": 70.76526978314054,
+            "candidate": 57.338281,
+            "throughput_change_pct": 23.41714566423876,
+            "baseline_drift_pct": 0.6357089054902065
+          }
+        },
+        {
+          "round": 3,
+          "gu": 16,
+          "down": 42,
+          "T": 6,
+          "baseline": 382.9682909384634,
+          "candidate": 326.635156,
+          "throughput_change_pct": 17.24650084464987,
+          "baseline_drift_pct": -0.30919091798103926,
+          "dequant": {
+            "baseline": 70.42676462387242,
+            "candidate": 57.439844,
+            "throughput_change_pct": 22.609602881011327,
+            "baseline_drift_pct": 0.4636538092545939
+          }
+        },
+        {
+          "round": 3,
+          "gu": 16,
+          "down": 42,
+          "T": 7,
+          "baseline": 383.30351071160135,
+          "candidate": 329.925781,
+          "throughput_change_pct": 16.17870829912542,
+          "baseline_drift_pct": 0.03322827779879134,
+          "dequant": {
+            "baseline": 70.28342548922897,
+            "candidate": 56.584375,
+            "throughput_change_pct": 24.209952816884474,
+            "baseline_drift_pct": 0.43891825099806603
+          }
+        },
+        {
+          "round": 3,
+          "gu": 16,
+          "down": 42,
+          "T": 8,
+          "baseline": 344.80245533725537,
+          "candidate": 278.557031,
+          "throughput_change_pct": 23.781637856865068,
+          "baseline_drift_pct": 0.6558203615540048,
+          "dequant": {
+            "baseline": 70.45429686896323,
+            "candidate": 56.797656,
+            "throughput_change_pct": 24.0443740653016,
+            "baseline_drift_pct": -0.012197234591426742
+          }
+        },
+        {
+          "round": 3,
+          "gu": 16,
+          "down": 42,
+          "T": 9,
+          "baseline": 390.66404762336236,
+          "candidate": 340.483594,
+          "throughput_change_pct": 14.73799457819467,
+          "baseline_drift_pct": -0.05517925260103418,
+          "dequant": {
+            "baseline": 70.43035668445816,
+            "candidate": 56.767187,
+            "throughput_change_pct": 24.06878058702848,
+            "baseline_drift_pct": 0.35781682154680805
+          }
+        },
+        {
+          "round": 3,
+          "gu": 16,
+          "down": 42,
+          "T": 16,
+          "baseline": 352.25146632345616,
+          "candidate": 294.280469,
+          "throughput_change_pct": 19.699233700574315,
+          "baseline_drift_pct": 0.33301275868813374,
+          "dequant": {
+            "baseline": 70.01168729104215,
+            "candidate": 56.580469,
+            "throughput_change_pct": 23.73825902899842,
+            "baseline_drift_pct": -1.1659385331343808
+          }
+        },
+        {
+          "round": 3,
+          "gu": 16,
+          "down": 42,
+          "T": 22,
+          "baseline": 404.402788264683,
+          "candidate": 347.4,
+          "throughput_change_pct": 16.40840191844648,
+          "baseline_drift_pct": 0.2584299221615183,
+          "dequant": {
+            "baseline": 70.0232521765092,
+            "candidate": 58.209375,
+            "throughput_change_pct": 20.295488787689607,
+            "baseline_drift_pct": -1.0454824901876991
+          }
+        },
+        {
+          "round": 3,
+          "gu": 16,
+          "down": 42,
+          "T": 32,
+          "baseline": 382.0238240295852,
+          "candidate": 372.878906,
+          "throughput_change_pct": 2.452516858002496,
+          "baseline_drift_pct": 0.02883900842673981,
+          "dequant": {
+            "baseline": 70.45449647977587,
+            "candidate": 57.530469,
+            "throughput_change_pct": 22.46466560141527,
+            "baseline_drift_pct": -0.46464288875122106
+          }
+        },
+        {
+          "round": 3,
+          "gu": 16,
+          "down": 42,
+          "T": 40,
+          "baseline": 392.48002152574196,
+          "candidate": 377.715625,
+          "throughput_change_pct": 3.9088657043885755,
+          "baseline_drift_pct": -0.10723301581239131,
+          "dequant": {
+            "baseline": 70.18118543130879,
+            "candidate": 56.872656,
+            "throughput_change_pct": 23.400576599251476,
+            "baseline_drift_pct": -0.7176453258795901
+          }
+        },
+        {
+          "round": 3,
+          "gu": 16,
+          "down": 42,
+          "T": 64,
+          "baseline": 427.18803721619474,
+          "candidate": 443.427344,
+          "throughput_change_pct": -3.662224940238523,
+          "baseline_drift_pct": -0.43722627737226016,
+          "dequant": {
+            "baseline": 70.37499978749584,
+            "candidate": 56.710938,
+            "throughput_change_pct": 24.09422638626757,
+            "baseline_drift_pct": -0.015541243409455952
+          }
+        },
+        {
+          "round": 3,
+          "gu": 16,
+          "down": 42,
+          "T": 65,
+          "baseline": 475.78053065827334,
+          "candidate": 392.764844,
+          "throughput_change_pct": 21.136231494861946,
+          "baseline_drift_pct": -0.34717963981991673,
+          "dequant": {
+            "baseline": 70.3558643045915,
+            "candidate": 57.447656,
+            "throughput_change_pct": 22.46951260220522,
+            "baseline_drift_pct": -0.6596276913270249
+          }
+        },
+        {
+          "round": 3,
+          "gu": 16,
+          "down": 42,
+          "T": 128,
+          "baseline": 550.2320271067357,
+          "candidate": 518.565625,
+          "throughput_change_pct": 6.106537066882467,
+          "baseline_drift_pct": 0.025276713698230147,
+          "dequant": {
+            "baseline": 70.21397586899934,
+            "candidate": 56.538281,
+            "throughput_change_pct": 24.188381088203492,
+            "baseline_drift_pct": 0.7404267420464405
+          }
+        },
+        {
+          "round": 3,
+          "gu": 16,
+          "down": 42,
+          "T": 256,
+          "baseline": 773.9278263310624,
+          "candidate": 731.45625,
+          "throughput_change_pct": 5.806441100347759,
+          "baseline_drift_pct": 0.26735910610962144,
+          "dequant": {
+            "baseline": 69.87787022439132,
+            "candidate": 56.925,
+            "throughput_change_pct": 22.75427356063473,
+            "baseline_drift_pct": 1.094899443565911
+          }
+        },
+        {
+          "round": 3,
+          "gu": 22,
+          "down": 42,
+          "T": 1,
+          "baseline": 292.7559375080438,
+          "candidate": 297.535937,
+          "throughput_change_pct": -1.6065284550673242,
+          "baseline_drift_pct": 0.43941416410868683,
+          "dequant": {
+            "baseline": 56.21774847395838,
+            "candidate": 46.982813,
+            "throughput_change_pct": 19.655986698706982,
+            "baseline_drift_pct": 0.9368372612532205
+          }
+        },
+        {
+          "round": 3,
+          "gu": 22,
+          "down": 42,
+          "T": 2,
+          "baseline": 290.43631543678373,
+          "candidate": 282.207031,
+          "throughput_change_pct": 2.916045148706359,
+          "baseline_drift_pct": 0.06000326110744414,
+          "dequant": {
+            "baseline": 55.71679643289735,
+            "candidate": 46.710938,
+            "throughput_change_pct": 19.279977706500674,
+            "baseline_drift_pct": -0.009815229780030243
+          }
+        },
+        {
+          "round": 3,
+          "gu": 22,
+          "down": 42,
+          "T": 4,
+          "baseline": 291.84133256655383,
+          "candidate": 282.149219,
+          "throughput_change_pct": 3.4351020360449125,
+          "baseline_drift_pct": -0.14177853655145123,
+          "dequant": {
+            "baseline": 55.895513098101176,
+            "candidate": 47.19375,
+            "throughput_change_pct": 18.43838028997733,
+            "baseline_drift_pct": -0.5199833851420532
+          }
+        },
+        {
+          "round": 3,
+          "gu": 22,
+          "down": 42,
+          "T": 6,
+          "baseline": 291.526913804696,
+          "candidate": 282.439844,
+          "throughput_change_pct": 3.2173469847604164,
+          "baseline_drift_pct": -0.10365672777140622,
+          "dequant": {
+            "baseline": 55.87108431799718,
+            "candidate": 46.642969,
+            "throughput_change_pct": 19.78457957510633,
+            "baseline_drift_pct": -0.11459645592264422
+          }
+        },
+        {
+          "round": 3,
+          "gu": 22,
+          "down": 42,
+          "T": 7,
+          "baseline": 292.08033056356146,
+          "candidate": 280.48125,
+          "throughput_change_pct": 4.135421017826135,
+          "baseline_drift_pct": -0.19453433327298875,
+          "dequant": {
+            "baseline": 55.562031363996674,
+            "candidate": 46.696875,
+            "throughput_change_pct": 18.984474579929977,
+            "baseline_drift_pct": 1.1184168590723687
+          }
+        },
+        {
+          "round": 3,
+          "gu": 22,
+          "down": 42,
+          "T": 8,
+          "baseline": 269.79492065367333,
+          "candidate": 265.699219,
+          "throughput_change_pct": 1.5414805015566468,
+          "baseline_drift_pct": -0.019978365356765337,
+          "dequant": {
+            "baseline": 55.818490584723236,
+            "candidate": 45.960938,
+            "throughput_change_pct": 21.447674946762916,
+            "baseline_drift_pct": -1.9129205391127724
+          }
+        },
+        {
+          "round": 3,
+          "gu": 22,
+          "down": 42,
+          "T": 9,
+          "baseline": 302.28222654685635,
+          "candidate": 292.08125,
+          "throughput_change_pct": 3.4925133149958487,
+          "baseline_drift_pct": -1.2579037932162196,
+          "dequant": {
+            "baseline": 56.042868113670366,
+            "candidate": 46.189844,
+            "throughput_change_pct": 21.33158127503172,
+            "baseline_drift_pct": -1.8506242404154216
+          }
+        },
+        {
+          "round": 3,
+          "gu": 22,
+          "down": 42,
+          "T": 16,
+          "baseline": 278.16737087956034,
+          "candidate": 280.910156,
+          "throughput_change_pct": -0.9763922954923787,
+          "baseline_drift_pct": -0.24376619777328745,
+          "dequant": {
+            "baseline": 55.85437680069262,
+            "candidate": 45.888281,
+            "throughput_change_pct": 21.718172011482896,
+            "baseline_drift_pct": -1.2426668259890805
+          }
+        },
+        {
+          "round": 3,
+          "gu": 22,
+          "down": 42,
+          "T": 22,
+          "baseline": 315.199969392071,
+          "candidate": 319.135938,
+          "throughput_change_pct": -1.233320393997428,
+          "baseline_drift_pct": 0.32746031401620357,
+          "dequant": {
+            "baseline": 55.61559724288162,
+            "candidate": 46.405469,
+            "throughput_change_pct": 19.847075013683458,
+            "baseline_drift_pct": -1.3048276151324312
+          }
+        },
+        {
+          "round": 3,
+          "gu": 22,
+          "down": 42,
+          "T": 32,
+          "baseline": 328.7633065248834,
+          "candidate": 357.638281,
+          "throughput_change_pct": -8.07379299396549,
+          "baseline_drift_pct": 1.8122308458598635,
+          "dequant": {
+            "baseline": 55.47772904170645,
+            "candidate": 46.64375,
+            "throughput_change_pct": 18.93925561668275,
+            "baseline_drift_pct": 0.08875784728092917
+          }
+        },
+        {
+          "round": 3,
+          "gu": 22,
+          "down": 42,
+          "T": 40,
+          "baseline": 336.39618799647735,
+          "candidate": 364.895312,
+          "throughput_change_pct": -7.8102192783234825,
+          "baseline_drift_pct": 0.6671200433710833,
+          "dequant": {
+            "baseline": 55.32758807279715,
+            "candidate": 46.860937,
+            "throughput_change_pct": 18.067609430850993,
+            "baseline_drift_pct": 0.8850059567708568
+          }
+        },
+        {
+          "round": 3,
+          "gu": 22,
+          "down": 42,
+          "T": 64,
+          "baseline": 358.2046704694975,
+          "candidate": 431.285937,
+          "throughput_change_pct": -16.944968583685238,
+          "baseline_drift_pct": 2.33451466875112,
+          "dequant": {
+            "baseline": 56.02834245293222,
+            "candidate": 46.55625,
+            "throughput_change_pct": 20.34547982909325,
+            "baseline_drift_pct": -0.49655703235415016
+          }
+        },
+        {
+          "round": 3,
+          "gu": 22,
+          "down": 42,
+          "T": 65,
+          "baseline": 474.5608966270503,
+          "candidate": 355.325,
+          "throughput_change_pct": 33.55685544981364,
+          "baseline_drift_pct": 0.27018611667875003,
+          "dequant": {
+            "baseline": 56.35491448143596,
+            "candidate": 45.969531,
+            "throughput_change_pct": 22.59188478872225,
+            "baseline_drift_pct": 0.891178719136998
+          }
+        },
+        {
+          "round": 3,
+          "gu": 22,
+          "down": 42,
+          "T": 128,
+          "baseline": 478.19345403516087,
+          "candidate": 499.830469,
+          "throughput_change_pct": -4.3288707485415685,
+          "baseline_drift_pct": 0.22276476378044752,
+          "dequant": {
+            "baseline": 56.27223458626155,
+            "candidate": 45.976562,
+            "throughput_change_pct": 22.39330680328282,
+            "baseline_drift_pct": 0.2098596593214319
+          }
+        },
+        {
+          "round": 3,
+          "gu": 22,
+          "down": 42,
+          "T": 256,
+          "baseline": 704.663326527415,
+          "candidate": 681.364063,
+          "throughput_change_pct": 3.419502846221434,
+          "baseline_drift_pct": 0.19809624267781434,
+          "dequant": {
+            "baseline": 55.683878464024836,
+            "candidate": 46.652344,
+            "throughput_change_pct": 19.35922976137028,
+            "baseline_drift_pct": 0.8481850754290976
+          }
+        }
+      ],
+      "runs": [
+        {
+          "enabled": false,
+          "rows": [
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 1,
+              "us": 384.548437,
+              "dq_us": 70.734375,
+              "hash": "6514548f29c10c9f"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 2,
+              "us": 382.848437,
+              "dq_us": 70.325,
+              "hash": "651160c315c2aa0a"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 4,
+              "us": 382.296094,
+              "dq_us": 70.059375,
+              "hash": "6feaaadb7481c694"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 6,
+              "us": 383.480469,
+              "dq_us": 70.492188,
+              "hash": "b8e737a9463c7847"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 7,
+              "us": 382.564062,
+              "dq_us": 70.201562,
+              "hash": "68fc2be2dbbc5689"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 8,
+              "us": 344.744531,
+              "dq_us": 69.501563,
+              "hash": "e6558b94cd61009c"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 9,
+              "us": 390.435938,
+              "dq_us": 70.100781,
+              "hash": "5099d0218a3e9d47"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 16,
+              "us": 352.796875,
+              "dq_us": 70.561719,
+              "hash": "44eb8103e44f737d"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 22,
+              "us": 403.753125,
+              "dq_us": 70.314844,
+              "hash": "fae76817cb5506fa"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 32,
+              "us": 381.778906,
+              "dq_us": 70.425,
+              "hash": "7d159dd916bbe4ac"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 40,
+              "us": 392.522656,
+              "dq_us": 69.757031,
+              "hash": "ef9297ca1c47cf99"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 64,
+              "us": 425.397656,
+              "dq_us": 70.36875,
+              "hash": "1e798df22363e39f"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 65,
+              "us": 475.39375,
+              "dq_us": 70.517969,
+              "hash": "0fc0c9ea11b66909"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 128,
+              "us": 549.207031,
+              "dq_us": 70.436719,
+              "hash": "3121bdb06d993ba7"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 256,
+              "us": 775.375781,
+              "dq_us": 70.560937,
+              "hash": "bf458358817d5f77"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 1,
+              "us": 292.796875,
+              "dq_us": 55.953906,
+              "hash": "d9f91ca7a7d3d071"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 2,
+              "us": 290.624219,
+              "dq_us": 55.497656,
+              "hash": "bfabe29c8a53b3c2"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 4,
+              "us": 291.978906,
+              "dq_us": 56.040625,
+              "hash": "9881780acbc573fd"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 6,
+              "us": 292.957031,
+              "dq_us": 56.203125,
+              "hash": "7ee4d046b41f46dc"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 7,
+              "us": 292.4375,
+              "dq_us": 55.747656,
+              "hash": "6c8e58c2eebc5a6c"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 8,
+              "us": 271.000781,
+              "dq_us": 55.859375,
+              "hash": "55bd563c535d858d"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 9,
+              "us": 304.075781,
+              "dq_us": 55.48125,
+              "hash": "61e3a29365f59aa1"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 16,
+              "us": 277.3375,
+              "dq_us": 55.4625,
+              "hash": "e1f6f1c19d3273da"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 22,
+              "us": 316.419531,
+              "dq_us": 56.791406,
+              "hash": "a0d40b6394a7b151"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 32,
+              "us": 325.585938,
+              "dq_us": 55.598438,
+              "hash": "299436bb85edb941"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 40,
+              "us": 333.448438,
+              "dq_us": 55.327344,
+              "hash": "233822f9f1fdc191"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 64,
+              "us": 353.414844,
+              "dq_us": 55.449219,
+              "hash": "9b75d0e88681c64c"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 65,
+              "us": 473.286719,
+              "dq_us": 55.560156,
+              "hash": "e5a6a7d61cea3b34"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 128,
+              "us": 477.344531,
+              "dq_us": 56.325,
+              "hash": "26ef85e10694032c"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 256,
+              "us": 702.646094,
+              "dq_us": 56.438281,
+              "hash": "6d44255e7d8ad63c"
+            }
+          ],
+          "summary": {
+            "checks": 1067
+          }
+        },
+        {
+          "enabled": true,
+          "rows": [
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 1,
+              "us": 331.038281,
+              "dq_us": 57.729687,
+              "hash": "6514548f29c10c9f"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 2,
+              "us": 331.110937,
+              "dq_us": 57.017969,
+              "hash": "651160c315c2aa0a"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 4,
+              "us": 329.639844,
+              "dq_us": 56.996094,
+              "hash": "6feaaadb7481c694"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 6,
+              "us": 327.533594,
+              "dq_us": 57.269531,
+              "hash": "b8e737a9463c7847"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 7,
+              "us": 329.113281,
+              "dq_us": 56.571875,
+              "hash": "68fc2be2dbbc5689"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 8,
+              "us": 279.142969,
+              "dq_us": 57.463281,
+              "hash": "e6558b94cd61009c"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 9,
+              "us": 340.646875,
+              "dq_us": 56.773438,
+              "hash": "5099d0218a3e9d47"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 16,
+              "us": 294.653125,
+              "dq_us": 56.989844,
+              "hash": "44eb8103e44f737d"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 22,
+              "us": 348.6625,
+              "dq_us": 56.724219,
+              "hash": "fae76817cb5506fa"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 32,
+              "us": 369.73125,
+              "dq_us": 57.230469,
+              "hash": "7d159dd916bbe4ac"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 40,
+              "us": 378.529688,
+              "dq_us": 57.432031,
+              "hash": "ef9297ca1c47cf99"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 64,
+              "us": 442.644531,
+              "dq_us": 57.1625,
+              "hash": "1e798df22363e39f"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 65,
+              "us": 393.466406,
+              "dq_us": 57.332813,
+              "hash": "0fc0c9ea11b66909"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 128,
+              "us": 514.680469,
+              "dq_us": 56.661719,
+              "hash": "3121bdb06d993ba7"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 256,
+              "us": 725.334375,
+              "dq_us": 56.739063,
+              "hash": "bf458358817d5f77"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 1,
+              "us": 282.473437,
+              "dq_us": 46.039062,
+              "hash": "d9f91ca7a7d3d071"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 2,
+              "us": 280.735156,
+              "dq_us": 46.278906,
+              "hash": "bfabe29c8a53b3c2"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 4,
+              "us": 280.591406,
+              "dq_us": 46.330469,
+              "hash": "9881780acbc573fd"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 6,
+              "us": 280.479688,
+              "dq_us": 45.938281,
+              "hash": "7ee4d046b41f46dc"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 7,
+              "us": 281.894531,
+              "dq_us": 46.328125,
+              "hash": "6c8e58c2eebc5a6c"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 8,
+              "us": 265.724219,
+              "dq_us": 46.389063,
+              "hash": "55bd563c535d858d"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 9,
+              "us": 294.8125,
+              "dq_us": 46.046094,
+              "hash": "61e3a29365f59aa1"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 16,
+              "us": 281.525781,
+              "dq_us": 45.967188,
+              "hash": "e1f6f1c19d3273da"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 22,
+              "us": 319.936719,
+              "dq_us": 46.0125,
+              "hash": "a0d40b6394a7b151"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 32,
+              "us": 358.239844,
+              "dq_us": 46.189844,
+              "hash": "299436bb85edb941"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 40,
+              "us": 365.689062,
+              "dq_us": 45.901562,
+              "hash": "233822f9f1fdc191"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 64,
+              "us": 430.663281,
+              "dq_us": 46.035938,
+              "hash": "9b75d0e88681c64c"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 65,
+              "us": 353.603125,
+              "dq_us": 46.115625,
+              "hash": "e5a6a7d61cea3b34"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 128,
+              "us": 500.467969,
+              "dq_us": 46.470312,
+              "hash": "26ef85e10694032c"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 256,
+              "us": 680.839062,
+              "dq_us": 46.163281,
+              "hash": "6d44255e7d8ad63c"
+            }
+          ],
+          "summary": {
+            "checks": 1067
+          }
+        },
+        {
+          "enabled": false,
+          "rows": [
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 1,
+              "us": 383.664062,
+              "dq_us": 74.746094,
+              "hash": "6514548f29c10c9f"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 2,
+              "us": 383.305469,
+              "dq_us": 70.833594,
+              "hash": "651160c315c2aa0a"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 4,
+              "us": 382.860937,
+              "dq_us": 70.541406,
+              "hash": "6feaaadb7481c694"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 6,
+              "us": 383.561719,
+              "dq_us": 70.264062,
+              "hash": "b8e737a9463c7847"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 7,
+              "us": 383.239844,
+              "dq_us": 70.129688,
+              "hash": "68fc2be2dbbc5689"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 8,
+              "us": 343.677344,
+              "dq_us": 70.458594,
+              "hash": "e6558b94cd61009c"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 9,
+              "us": 390.771875,
+              "dq_us": 70.304688,
+              "hash": "5099d0218a3e9d47"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 16,
+              "us": 351.666406,
+              "dq_us": 70.423438,
+              "hash": "44eb8103e44f737d"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 22,
+              "us": 403.88125,
+              "dq_us": 70.392188,
+              "hash": "fae76817cb5506fa"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 32,
+              "us": 381.96875,
+              "dq_us": 70.61875,
+              "hash": "7d159dd916bbe4ac"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 40,
+              "us": 392.690625,
+              "dq_us": 70.434375,
+              "hash": "ef9297ca1c47cf99"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 64,
+              "us": 428.125,
+              "dq_us": 70.380469,
+              "hash": "1e798df22363e39f"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 65,
+              "us": 476.608594,
+              "dq_us": 70.589062,
+              "hash": "0fc0c9ea11b66909"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 128,
+              "us": 550.1625,
+              "dq_us": 69.955469,
+              "hash": "3121bdb06d993ba7"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 256,
+              "us": 772.895313,
+              "dq_us": 69.498437,
+              "hash": "bf458358817d5f77"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 1,
+              "us": 292.114844,
+              "dq_us": 55.95625,
+              "hash": "d9f91ca7a7d3d071"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 2,
+              "us": 290.349219,
+              "dq_us": 55.719531,
+              "hash": "bfabe29c8a53b3c2"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 4,
+              "us": 292.048437,
+              "dq_us": 56.041406,
+              "hash": "9881780acbc573fd"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 6,
+              "us": 291.678125,
+              "dq_us": 55.903125,
+              "hash": "7ee4d046b41f46dc"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 7,
+              "us": 292.364844,
+              "dq_us": 55.253906,
+              "hash": "6c8e58c2eebc5a6c"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 8,
+              "us": 269.821875,
+              "dq_us": 56.360156,
+              "hash": "55bd563c535d858d"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 9,
+              "us": 304.201563,
+              "dq_us": 56.56875,
+              "hash": "61e3a29365f59aa1"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 16,
+              "us": 278.507031,
+              "dq_us": 56.204687,
+              "hash": "e1f6f1c19d3273da"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 22,
+              "us": 314.685156,
+              "dq_us": 55.982031,
+              "hash": "a0d40b6394a7b151"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 32,
+              "us": 325.824219,
+              "dq_us": 55.453125,
+              "hash": "299436bb85edb941"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 40,
+              "us": 335.279688,
+              "dq_us": 55.084375,
+              "hash": "233822f9f1fdc191"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 64,
+              "us": 354.095312,
+              "dq_us": 56.167969,
+              "hash": "9b75d0e88681c64c"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 65,
+              "us": 473.921094,
+              "dq_us": 56.105469,
+              "hash": "e5a6a7d61cea3b34"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 128,
+              "us": 477.661719,
+              "dq_us": 56.213281,
+              "hash": "26ef85e10694032c"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 256,
+              "us": 703.966406,
+              "dq_us": 55.449219,
+              "hash": "6d44255e7d8ad63c"
+            }
+          ],
+          "summary": {
+            "checks": 1067
+          }
+        },
+        {
+          "enabled": true,
+          "rows": [
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 1,
+              "us": 331.561719,
+              "dq_us": 57.445312,
+              "hash": "6514548f29c10c9f"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 2,
+              "us": 330.315625,
+              "dq_us": 57.052344,
+              "hash": "651160c315c2aa0a"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 4,
+              "us": 330.228125,
+              "dq_us": 57.338281,
+              "hash": "6feaaadb7481c694"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 6,
+              "us": 326.635156,
+              "dq_us": 57.439844,
+              "hash": "b8e737a9463c7847"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 7,
+              "us": 329.925781,
+              "dq_us": 56.584375,
+              "hash": "68fc2be2dbbc5689"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 8,
+              "us": 278.557031,
+              "dq_us": 56.797656,
+              "hash": "e6558b94cd61009c"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 9,
+              "us": 340.483594,
+              "dq_us": 56.767187,
+              "hash": "5099d0218a3e9d47"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 16,
+              "us": 294.280469,
+              "dq_us": 56.580469,
+              "hash": "44eb8103e44f737d"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 22,
+              "us": 347.4,
+              "dq_us": 58.209375,
+              "hash": "fae76817cb5506fa"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 32,
+              "us": 372.878906,
+              "dq_us": 57.530469,
+              "hash": "7d159dd916bbe4ac"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 40,
+              "us": 377.715625,
+              "dq_us": 56.872656,
+              "hash": "ef9297ca1c47cf99"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 64,
+              "us": 443.427344,
+              "dq_us": 56.710938,
+              "hash": "1e798df22363e39f"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 65,
+              "us": 392.764844,
+              "dq_us": 57.447656,
+              "hash": "0fc0c9ea11b66909"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 128,
+              "us": 518.565625,
+              "dq_us": 56.538281,
+              "hash": "3121bdb06d993ba7"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 256,
+              "us": 731.45625,
+              "dq_us": 56.925,
+              "hash": "bf458358817d5f77"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 1,
+              "us": 297.535937,
+              "dq_us": 46.982813,
+              "hash": "d9f91ca7a7d3d071"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 2,
+              "us": 282.207031,
+              "dq_us": 46.710938,
+              "hash": "bfabe29c8a53b3c2"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 4,
+              "us": 282.149219,
+              "dq_us": 47.19375,
+              "hash": "9881780acbc573fd"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 6,
+              "us": 282.439844,
+              "dq_us": 46.642969,
+              "hash": "7ee4d046b41f46dc"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 7,
+              "us": 280.48125,
+              "dq_us": 46.696875,
+              "hash": "6c8e58c2eebc5a6c"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 8,
+              "us": 265.699219,
+              "dq_us": 45.960938,
+              "hash": "55bd563c535d858d"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 9,
+              "us": 292.08125,
+              "dq_us": 46.189844,
+              "hash": "61e3a29365f59aa1"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 16,
+              "us": 280.910156,
+              "dq_us": 45.888281,
+              "hash": "e1f6f1c19d3273da"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 22,
+              "us": 319.135938,
+              "dq_us": 46.405469,
+              "hash": "a0d40b6394a7b151"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 32,
+              "us": 357.638281,
+              "dq_us": 46.64375,
+              "hash": "299436bb85edb941"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 40,
+              "us": 364.895312,
+              "dq_us": 46.860937,
+              "hash": "233822f9f1fdc191"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 64,
+              "us": 431.285937,
+              "dq_us": 46.55625,
+              "hash": "9b75d0e88681c64c"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 65,
+              "us": 355.325,
+              "dq_us": 45.969531,
+              "hash": "e5a6a7d61cea3b34"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 128,
+              "us": 499.830469,
+              "dq_us": 45.976562,
+              "hash": "26ef85e10694032c"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 256,
+              "us": 681.364063,
+              "dq_us": 46.652344,
+              "hash": "6d44255e7d8ad63c"
+            }
+          ],
+          "summary": {
+            "checks": 1067
+          }
+        },
+        {
+          "enabled": false,
+          "rows": [
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 1,
+              "us": 383.375,
+              "dq_us": 72.507812,
+              "hash": "6514548f29c10c9f"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 2,
+              "us": 383.571094,
+              "dq_us": 70.835938,
+              "hash": "651160c315c2aa0a"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 4,
+              "us": 382.99375,
+              "dq_us": 70.989844,
+              "hash": "6feaaadb7481c694"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 6,
+              "us": 382.375781,
+              "dq_us": 70.589844,
+              "hash": "b8e737a9463c7847"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 7,
+              "us": 383.367188,
+              "dq_us": 70.4375,
+              "hash": "68fc2be2dbbc5689"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 8,
+              "us": 345.93125,
+              "dq_us": 70.45,
+              "hash": "e6558b94cd61009c"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 9,
+              "us": 390.55625,
+              "dq_us": 70.55625,
+              "hash": "5099d0218a3e9d47"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 16,
+              "us": 352.8375,
+              "dq_us": 69.602344,
+              "hash": "44eb8103e44f737d"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 22,
+              "us": 404.925,
+              "dq_us": 69.65625,
+              "hash": "fae76817cb5506fa"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 32,
+              "us": 382.078906,
+              "dq_us": 70.290625,
+              "hash": "7d159dd916bbe4ac"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 40,
+              "us": 392.269531,
+              "dq_us": 69.928906,
+              "hash": "ef9297ca1c47cf99"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 64,
+              "us": 426.253125,
+              "dq_us": 70.369531,
+              "hash": "1e798df22363e39f"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 65,
+              "us": 474.953906,
+              "dq_us": 70.123437,
+              "hash": "0fc0c9ea11b66909"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 128,
+              "us": 550.301563,
+              "dq_us": 70.473438,
+              "hash": "3121bdb06d993ba7"
+            },
+            {
+              "gu": 16,
+              "down": 42,
+              "T": 256,
+              "us": 774.961719,
+              "dq_us": 70.259375,
+              "hash": "bf458358817d5f77"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 1,
+              "us": 293.398438,
+              "dq_us": 56.480469,
+              "hash": "d9f91ca7a7d3d071"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 2,
+              "us": 290.523438,
+              "dq_us": 55.714062,
+              "hash": "bfabe29c8a53b3c2"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 4,
+              "us": 291.634375,
+              "dq_us": 55.75,
+              "hash": "9881780acbc573fd"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 6,
+              "us": 291.375781,
+              "dq_us": 55.839062,
+              "hash": "7ee4d046b41f46dc"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 7,
+              "us": 291.796094,
+              "dq_us": 55.871875,
+              "hash": "6c8e58c2eebc5a6c"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 8,
+              "us": 269.767969,
+              "dq_us": 55.282031,
+              "hash": "55bd563c535d858d"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 9,
+              "us": 300.375,
+              "dq_us": 55.521875,
+              "hash": "61e3a29365f59aa1"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 16,
+              "us": 277.828125,
+              "dq_us": 55.50625,
+              "hash": "e1f6f1c19d3273da"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 22,
+              "us": 315.715625,
+              "dq_us": 55.251562,
+              "hash": "a0d40b6394a7b151"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 32,
+              "us": 331.728906,
+              "dq_us": 55.502344,
+              "hash": "299436bb85edb941"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 40,
+              "us": 337.516406,
+              "dq_us": 55.571875,
+              "hash": "233822f9f1fdc191"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 64,
+              "us": 362.361719,
+              "dq_us": 55.889063,
+              "hash": "9b75d0e88681c64c"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 65,
+              "us": 475.201563,
+              "dq_us": 56.605469,
+              "hash": "e5a6a7d61cea3b34"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 128,
+              "us": 478.725781,
+              "dq_us": 56.33125,
+              "hash": "26ef85e10694032c"
+            },
+            {
+              "gu": 22,
+              "down": 42,
+              "T": 256,
+              "us": 705.360937,
+              "dq_us": 55.919531,
+              "hash": "6d44255e7d8ad63c"
+            }
+          ],
+          "summary": {
+            "checks": 1067
+          }
+        }
+      ]
+    }
+  ],
+  "evidence_sha256": "7c9b51031562198eb8af5dfb64cdd16f2167655a44292367fc7f62df7ee3d79f"
+}

@@ -1,0 +1,266 @@
+{
+  "complete": true,
+  "date": "2026-10-24",
+  "status": "source_retained_opt_in",
+  "change": "Vectorize only FP16/BF16 weight widening in groups of four; scalar tail, activation conversion and FP32 GEMM unchanged.",
+  "hardware": "A770 16GB, Xeon E5-2696 v4, PCIe3.0x16, Windows, driver32.0.101.9034, DPC++2025.3.2, oneMKL2025.3",
+  "operator_scope": {
+    "T": 4,
+    "K": 2560,
+    "N": [
+      1280,
+      4096,
+      12288
+    ],
+    "ldy": "N",
+    "f16_ldx": 2560,
+    "bf16_ldx": "2560 for N4096; 2573 otherwise",
+    "warmups": 4,
+    "batches": 5,
+    "calls_per_batch": 16,
+    "independent_processes": 30,
+    "paired_comparisons": 36,
+    "eligible_pairs": 34,
+    "excluded_pairs": 2,
+    "positive_eligible_pairs": 30,
+    "timing": "Synchronous complete GEMM API call, including allocations, conversion, copies, waits and release; total_us median. No profiler.",
+    "pool": "1;512M;host:128M,8,64K;device:128M,8,64K;shared:128M,8,64K"
+  },
+  "adoption_rule": "Exact parity; screen and independent confirmation must each have positive median throughput gain across drift-eligible shapes for both candidate rounds; no shape geometric mean regression worse than 1%. Adjacent baseline drift must be <=3%; no 3% gain requirement.",
+  "phases": [
+    {
+      "label": "screen",
+      "candidate_round_medians_pct": {
+        "1": 0.913793872399693,
+        "3": 0.6378892394436009
+      },
+      "cases": [
+        {
+          "bf16": false,
+          "n": 1280,
+          "eligible_pairs": 2,
+          "descriptive_gain_pct": 0.5545142571144579
+        },
+        {
+          "bf16": false,
+          "n": 4096,
+          "eligible_pairs": 2,
+          "descriptive_gain_pct": 0.8989556820077071
+        },
+        {
+          "bf16": false,
+          "n": 12288,
+          "eligible_pairs": 2,
+          "descriptive_gain_pct": 0.9394548275985626
+        },
+        {
+          "bf16": true,
+          "n": 1280,
+          "eligible_pairs": 2,
+          "descriptive_gain_pct": 0.03408866509324593
+        },
+        {
+          "bf16": true,
+          "n": 4096,
+          "eligible_pairs": 2,
+          "descriptive_gain_pct": 0.8402659374079358
+        },
+        {
+          "bf16": true,
+          "n": 12288,
+          "eligible_pairs": 2,
+          "descriptive_gain_pct": 0.7863826901505444
+        }
+      ],
+      "excluded": []
+    },
+    {
+      "label": "confirm",
+      "candidate_round_medians_pct": {
+        "1": 1.0957871442524691,
+        "3": 0.053817235290853915
+      },
+      "cases": [
+        {
+          "bf16": false,
+          "n": 1280,
+          "eligible_pairs": 2,
+          "descriptive_gain_pct": 1.126941980587004
+        },
+        {
+          "bf16": false,
+          "n": 4096,
+          "eligible_pairs": 2,
+          "descriptive_gain_pct": -0.9958292271857849
+        },
+        {
+          "bf16": false,
+          "n": 12288,
+          "eligible_pairs": 1,
+          "descriptive_gain_pct": 0.2510997038714047
+        },
+        {
+          "bf16": true,
+          "n": 1280,
+          "eligible_pairs": 1,
+          "descriptive_gain_pct": 0.06272159375206865
+        },
+        {
+          "bf16": true,
+          "n": 4096,
+          "eligible_pairs": 2,
+          "descriptive_gain_pct": 0.9002463831628393
+        },
+        {
+          "bf16": true,
+          "n": 12288,
+          "eligible_pairs": 2,
+          "descriptive_gain_pct": 0.32067111813789406
+        }
+      ],
+      "excluded": [
+        {
+          "shape": "small",
+          "candidate_run": 1,
+          "bf16": true,
+          "n": 1280,
+          "baseline": 6802.926184520251,
+          "candidate": 6636.89375,
+          "throughput_change_pct": 2.5016587695147363,
+          "baseline_drift_pct": -4.529222935974175,
+          "eligible": false
+        },
+        {
+          "shape": "large",
+          "candidate_run": 1,
+          "bf16": false,
+          "n": 12288,
+          "baseline": 16731.383598691486,
+          "candidate": 16493.3625,
+          "throughput_change_pct": 1.4431326461871397,
+          "baseline_drift_pct": -3.630463003028994,
+          "eligible": false
+        }
+      ]
+    },
+    {
+      "label": "repeat",
+      "candidate_round_medians_pct": {
+        "1": 1.1368482591484375,
+        "3": 0.9383420625626693
+      },
+      "cases": [
+        {
+          "bf16": false,
+          "n": 1280,
+          "eligible_pairs": 2,
+          "descriptive_gain_pct": -0.23085746584445843
+        },
+        {
+          "bf16": false,
+          "n": 4096,
+          "eligible_pairs": 2,
+          "descriptive_gain_pct": 1.1064717671806168
+        },
+        {
+          "bf16": false,
+          "n": 12288,
+          "eligible_pairs": 2,
+          "descriptive_gain_pct": 0.9951686208219401
+        },
+        {
+          "bf16": true,
+          "n": 1280,
+          "eligible_pairs": 2,
+          "descriptive_gain_pct": 1.0085609699493236
+        },
+        {
+          "bf16": true,
+          "n": 4096,
+          "eligible_pairs": 2,
+          "descriptive_gain_pct": 1.4566024740482408
+        },
+        {
+          "bf16": true,
+          "n": 12288,
+          "eligible_pairs": 2,
+          "descriptive_gain_pct": 0.9685917686012457
+        }
+      ],
+      "excluded": []
+    }
+  ],
+  "combined_cases": [
+    {
+      "bf16": false,
+      "n": 1280,
+      "eligible_pairs": 6,
+      "descriptive_gain_pct": 0.4819903314698948
+    },
+    {
+      "bf16": false,
+      "n": 4096,
+      "eligible_pairs": 6,
+      "descriptive_gain_pct": 0.3320545864686997
+    },
+    {
+      "bf16": false,
+      "n": 12288,
+      "eligible_pairs": 5,
+      "descriptive_gain_pct": 0.8236580755361711
+    },
+    {
+      "bf16": true,
+      "n": 1280,
+      "eligible_pairs": 5,
+      "descriptive_gain_pct": 0.42849251760797014
+    },
+    {
+      "bf16": true,
+      "n": 4096,
+      "eligible_pairs": 6,
+      "descriptive_gain_pct": 1.0653244653735738
+    },
+    {
+      "bf16": true,
+      "n": 12288,
+      "eligible_pairs": 6,
+      "descriptive_gain_pct": 0.6915119353633203
+    }
+  ],
+  "limitations": "Descriptive geometric gains only; within each phase pairs share the middle baseline. Some eligible observations are negative. No confidence interval or full-model speed claim. Operator timing used the frozen pre-XMX source; the final combined source was separately rebuilt and functionally checked with native XMX disabled.",
+  "correctness": {
+    "isolated_layout_checks": 2840,
+    "merged_normal_checks": 2030,
+    "merged_4GiB_checks": 270,
+    "layout_checks_total": 5140,
+    "timed_run_comparisons": 270,
+    "mismatched_cases": 0,
+    "model_requests": 6,
+    "model_generated_tokens": 208,
+    "greedy_tokens_per_side": 8,
+    "seeded_tokens_per_side": [
+      48,
+      48
+    ],
+    "actual_expert_slots": 4191,
+    "actual_expert_cache_mib": 5760,
+    "outputs_acceptance_and_proposals_equal": true,
+    "sampling_snapshot_prefix_tokens": 16
+  },
+  "default_enabled": false,
+  "new_flags": false,
+  "model_performance_acceptance": false,
+  "production_updated": false,
+  "sources_sha256": {
+    "include/strata/prefill/gemm.hpp": "0086abbd6d169177e449d47388a7639aea59e72dae3ebf14dca7ab9040f85da6",
+    "sycl/src/prefill/gemm.dp.cpp": "15e09007531e85916b516859846ab7382f894e64fa8072bb5002086c5d6e4519",
+    "sycl/src/prefill/gemm_parity.cpp": "e109d711b45c0a4ad92187592e4be41d92b35118c5f5d7b52b4c83dfde1c78d8",
+    "sycl/src/prefill/prefill.cpp": "602a42203460ff1775d2ec59c715da9dc205f42657988086e3d1a0fa6346cf46"
+  },
+  "production_sha256": {
+    "G:\\GitHub\\Strata\\build-sycl-a770-unified-operators\\bin\\strata-unified-all-operators.exe": "8f0d866ded297cf5a409e84cf5dd61f437c56c8a89aaeb2a85569265b6a3e122",
+    "G:\\GitHub\\Strata\\strata-iq2_xs.json": "1a755372f0e6c90c0bfa2af865d67b51f8df49c10aa1613b041b08da8184ca88"
+  },
+  "unchanged_dependencies": 96
+}

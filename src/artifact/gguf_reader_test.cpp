@@ -3,8 +3,7 @@
 //
 //   1. two tensors with distinct names: the file opens and find() sees both;
 //   2. the same name twice: refused at open, and the error names the tensor and the file - GGUF has no
-//      index to say which of the two a name means, and find() is first-match, so the alternative is a
-//      lookup that silently picks by position.
+//      index to say which of the two a name means, so the lookup must not silently pick one.
 //
 // The fixture is a minimal GGUF v3 written here (header, no metadata, two F32[8] tensors, 32-byte
 // alignment), so the test needs neither gguf-py nor a shard.  The file is closed before it is removed:
@@ -12,10 +11,13 @@
 #include "strata/artifact/gguf_reader.hpp"
 
 #include <cstdint>
+#include <algorithm>
+#include <chrono>
 #include <cstdio>
 #include <cstring>
 #include <filesystem>
 #include <fstream>
+#include <random>
 #include <string>
 #include <vector>
 
@@ -57,7 +59,7 @@ std::filesystem::path write_gguf(const std::vector<std::string>& names) {
 }
 }  // namespace
 
-int main() {
+int main(int argc, char** argv) {
     std::printf("gguf_reader_test\n");
     {
         const auto path = write_gguf({"blk.0.attn_q.weight", "blk.0.attn_k.weight"});
@@ -87,6 +89,60 @@ int main() {
         check(err.find("blk.0.attn_q.weight") != std::string::npos, "  the error names the tensor");
         check(err.find(path.filename().string()) != std::string::npos, "  the error names the file");
         if (!err.empty()) std::printf("  (%s)\n", err.c_str());
+    }
+    {
+        // Shuffled long names, SSO names and embedded NULs exercise borrowed-name lifetimes and exact comparisons.
+        std::vector<std::string> names = {"", "a", "aa", "z", std::string("a\0b", 3), std::string("a\0c", 3)};
+        for (int i = 0; i < 4096; ++i) names.push_back("blk." + std::to_string(i) + ".ffn_gate_exps.weight");
+        std::shuffle(names.begin(), names.end(), std::mt19937(42));
+        const auto path = write_gguf(names);
+        {
+            strata::GgufFile g(path.string());
+            auto model = strata::GgufModel::open(path.string());
+            auto moved = std::move(model);
+            bool correct = true;
+            for (size_t i = 0; i < names.size(); ++i) {
+                const auto* t = g.find(names[i]);
+                size_t shard = 99;
+                const auto* m = moved.find(names[i], &shard);
+                correct &= t == &g.tensors()[i] && t->offset == i * 32 &&
+                           m == &moved.shard(0).tensors()[i] && shard == 0;
+            }
+            size_t shard = 99;
+            check(correct, "shuffled directory: exact names, offsets, file order and model moves");
+            const std::string wrapped = "[blk.17.ffn_gate_exps.weight]";
+            const std::string_view borrowed(wrapped.data() + 1, wrapped.size() - 2);
+            check(g.find(borrowed) && moved.find(borrowed), "borrowed, non-null-terminated names work without a string copy");
+            check(!g.find("absent") && !g.find("zz") && !g.find(std::string("a\0", 2)) &&
+                  !moved.find("absent", &shard) && shard == 99, "missing names and strict prefixes do not match");
+            if (argc == 2 && std::strcmp(argv[1], "--bench") == 0) {
+                constexpr size_t queries = 200000;
+                auto bench = [&](const char* label, const auto& index) {
+                    uint64_t sum = 0;
+                    const auto start = std::chrono::steady_clock::now();
+                    for (size_t i = 0; i < queries; ++i) {
+                        const auto* t = index.find(names[(i * 997) % names.size()]);
+                        if (t) sum += t->offset;
+                    }
+                    const double ns = std::chrono::duration<double, std::nano>(
+                        std::chrono::steady_clock::now() - start).count() / queries;
+                    std::printf("BENCH %s entries=%zu queries=%zu ns/lookup=%.2f checksum=%llu\n",
+                                label, names.size(), queries, ns, (unsigned long long) sum);
+                };
+                bench("GgufFile", g);
+                bench("GgufModel", moved);
+            }
+        }
+        std::filesystem::remove(path);
+    }
+    {
+        const auto path = write_gguf({});
+        {
+            strata::GgufFile g(path.string());
+            strata::GgufModel model({path.string()});
+            check(!g.find("") && !model.find(""), "empty tensor directories return nullptr");
+        }
+        std::filesystem::remove(path);
     }
     std::printf(g_fail ? "gguf_reader_test: %d FAILED\n" : "gguf_reader_test: all passed\n", g_fail);
     return g_fail ? 1 : 0;

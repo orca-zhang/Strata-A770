@@ -1,0 +1,124 @@
+--- a/sycl/src/prefill/gemm.dp.cpp
++++ b/sycl/src/prefill/gemm.dp.cpp
+@@ -378,7 +378,13 @@
+     note(DPCT_CHECK_ERROR(h->set_queue(strata::q_of(stream))),
+          "cublasSetStream");
+     // A fixed workspace so the handle never allocates on the way (and graphs could capture it later).
+-    const size_t ws = 32u << 20;
++    // ponytail: keep the old budget unless GPU widening is explicitly enabled.
++    const size_t ws = [] {
++        const char* f16 = std::getenv("STRATA_PREFILL_GPU_WIDEN");
++        const char* bf16 = std::getenv("STRATA_PREFILL_BF16_GPU_WIDEN");
++        return ((f16 && std::strcmp(f16, "1") == 0) || (bf16 && std::strcmp(bf16, "1") == 0))
++                   ? 128u << 20 : 32u << 20;
++    }();
+     workspace_bytes_ = ws;
+     /*
+     DPCT1000: Error handling if-stmt was detected but could not be
+@@ -396,7 +402,7 @@
+         /*
+         DPCT1001: The statement could not be removed.
+         */
+-        err = std::string("prefill gemm: workspace of 32 MiB: ") +
++        err = std::string("prefill gemm: workspace of ") + std::to_string(ws >> 20) + " MiB: " +
+               dpct::get_error_string_dummy(e);
+         return false;
+     }
+--- a/sycl/src/prefill/prefill.cpp
++++ b/sycl/src/prefill/prefill.cpp
+@@ -675,7 +675,13 @@
+ 
+ namespace {
+ constexpr int64_t GEMM_SCRATCH = 32ll << 20;        // FP16 elements for the largest dequantized dense weight
+-constexpr size_t GEMM_WS = 32u << 20;               // cuBLAS workspace
++// ponytail: bytes_needed, init and relayout must count the same widening workspace.
++const size_t GEMM_WS = [] {
++        const char* f16 = std::getenv("STRATA_PREFILL_GPU_WIDEN");
++        const char* bf16 = std::getenv("STRATA_PREFILL_BF16_GPU_WIDEN");
++        return ((f16 && std::strcmp(f16, "1") == 0) || (bf16 && std::strcmp(bf16, "1") == 0))
++                   ? 128u << 20 : 32u << 20;
++    }();
+ 
+ // THE ATTENTION HALF AND THE MoE HALF SHARE THEIR BUFFERS.  A layer runs its attention (GDN or QSA), writes it back
+ // into the residual, and only then its MoE, so the three sets of scratch are never live at once: one region the size
+--- a/sycl/src/prefill/gemm_parity.cpp
++++ b/sycl/src/prefill/gemm_parity.cpp
+@@ -19,6 +19,7 @@
+ 
+ int main(int argc, char** argv) try {
+     const bool bench_only = argc > 1 && std::strcmp(argv[1], "--bench") == 0;
++    const bool large = argc > 1 && std::strcmp(argv[argc - 1], "--large") == 0;
+     auto& q = dpct::get_in_order_queue();
+     if (!q.is_in_order()) throw std::runtime_error("in-order queue required");
+     std::printf("DEVICE %s\n", q.get_device().get_info<sycl::info::device::name>().c_str());
+@@ -28,9 +29,9 @@
+     std::string error;
+     const char* arena_flag = std::getenv("STRATA_GEMM_SHARED_ARENA");
+     const size_t arena_offset = arena_flag && std::strcmp(arena_flag,"4")==0 ? size_t(4)<<30 : 0;
+-    auto* arena = arena_flag ? sycl::malloc_device<uint8_t>(arena_offset+(256u<<20),q) : nullptr;
++    auto* arena = arena_flag ? sycl::malloc_device<uint8_t>(arena_offset+(512u<<20),q) : nullptr;
+     if (std::getenv("STRATA_GEMM_SHARED_ARENA") && !arena) throw std::runtime_error("arena allocation failed");
+-    if (!(arena ? gemm.init_external(&q,nullptr,0,arena+arena_offset+(64u<<20),32u<<20,error) : gemm.init(&q,0,error)))
++    if (!(arena ? gemm.init_external(&q,nullptr,0,arena+arena_offset+(64u<<20),(large ? 128u : 32u)<<20,error) : gemm.init(&q,0,error)))
+         throw std::runtime_error(error);
+     int checks = 0, mismatched_cases = 0;
+     for (bool bf16 : {false, true}) {
+@@ -38,17 +39,20 @@
+         if (!bf16 && padding) continue;
+         if (bench_only && bf16 && !padding) continue;
+        for (int output_padding : {0,13}) {
+-        if (bench_only && output_padding) continue;
++        if ((bench_only || large) && output_padding) continue;
+        for (int output_offset : {0,7}) {
+         if (output_offset && (bf16 || !output_padding)) continue;
+         for (int t : {1, 4, 6, 22, 64, 256}) {
+             if (bench_only && t!=4) continue;
+-            for (auto dims : {std::pair{1280,2560}, std::pair{640,2560}, std::pair{2560,640}, std::pair{17,65}, std::pair{4096,2560},
+-                              std::pair{320,10240}, std::pair{10240,320}, std::pair{1,2560}}) {
++            const auto shapes = large
++                ? std::vector<std::pair<int,int>>{{4096,2560},{6144,2560},{10240,2560},{12288,2560},{16384,2560}}
++                : std::vector<std::pair<int,int>>{{1280,2560},{640,2560},{2560,640},{17,65},{4096,2560},
++                                                  {320,10240},{10240,320},{1,2560}};
++            for (auto dims : shapes) {
+                 const int n = dims.first, k = dims.second;
+-                if (bench_only && n!=1280) continue;
++                if (bench_only && (large ? n!=4096 && n!=12288 : n!=1280)) continue;
+                 const int ldx = k + (bf16 && n!=4096 ? padding : 0), ldy = n + (n==1 && output_padding ? 1 : output_padding);
+-                if (size_t(t)*ldx*2 > (16u<<20) || size_t(n)*k*2 > (48u<<20) ||
++                if (size_t(t)*ldx*2 > (16u<<20) || size_t(n)*k*2 > (96u<<20) ||
+                     (size_t(t)*ldy+output_offset+17)*4 > (32u<<20)) throw std::runtime_error("test arena slices overlap");
+                 std::vector<uint16_t> hx(t*ldx), hw(n*k);
+                 uint32_t state = 42;
+@@ -63,11 +67,11 @@
+                 for (auto& v : hx) v = encode(random());
+                 for (auto& v : hw) v = encode(random());
+                 hx[0]=1; hx[1]=0x8000; hx[2]=0x8001;
+-                auto* x = arena ? reinterpret_cast<uint16_t*>(arena+arena_offset+(112u<<20)) : sycl::malloc_device<uint16_t>(hx.size(),q);
+-                auto* w = arena ? reinterpret_cast<uint16_t*>(arena+arena_offset+(128u<<20)) : sycl::malloc_device<uint16_t>(hw.size(),q);
++                auto* x = arena ? reinterpret_cast<uint16_t*>(arena+arena_offset+(224u<<20)) : sycl::malloc_device<uint16_t>(hx.size(),q);
++                auto* w = arena ? reinterpret_cast<uint16_t*>(arena+arena_offset+(240u<<20)) : sycl::malloc_device<uint16_t>(hw.size(),q);
+                 const size_t output_size = size_t(t)*ldy+output_offset+17;
+-                auto* a_storage = arena ? reinterpret_cast<float*>(arena+arena_offset+(176u<<20)) : sycl::malloc_device<float>(output_size,q);
+-                auto* b_storage = arena ? reinterpret_cast<float*>(arena+arena_offset+(208u<<20)) : sycl::malloc_device<float>(output_size,q);
++                auto* a_storage = arena ? reinterpret_cast<float*>(arena+arena_offset+(352u<<20)) : sycl::malloc_device<float>(output_size,q);
++                auto* b_storage = arena ? reinterpret_cast<float*>(arena+arena_offset+(416u<<20)) : sycl::malloc_device<float>(output_size,q);
+                 if (!x || !w || !a_storage || !b_storage) throw std::runtime_error("allocation failed");
+                 auto* a = a_storage+output_offset;
+                 auto* b = b_storage+output_offset;
+@@ -143,12 +147,12 @@
+                             auto t0=Clock::now();
+                             for(int i=0;i<16;++i) { if(widen) widened(0); else original(0); }
+                             submit.push_back(us(t0)/16); q.wait_and_throw(); total.push_back(us(t0)/16);
+-                            std::printf("BATCH {\"bf16\":%s,\"batch\":%d,\"submit_us\":%.6f,\"total_us\":%.6f}\n",
+-                                        bf16?"true":"false",batch,submit.back(),total.back());
++                            std::printf("BATCH {\"bf16\":%s,\"batch\":%d,\"submit_us\":%.6f,\"total_us\":%.6f,\"n\":%d,\"k\":%d}\n",
++                                        bf16?"true":"false",batch,submit.back(),total.back(),n,k);
+                         }
+                         std::sort(submit.begin(),submit.end()); std::sort(total.begin(),total.end());
+-                        std::printf("BENCH {\"bf16\":%s,\"engine\":%s,\"submit_us\":%.6f,\"total_us\":%.6f}\n",
+-                                    bf16?"true":"false",widen?"true":"false",submit[2],total[2]); std::fflush(stdout);
++                        std::printf("BENCH {\"bf16\":%s,\"engine\":%s,\"submit_us\":%.6f,\"total_us\":%.6f,\"n\":%d,\"k\":%d}\n",
++                                    bf16?"true":"false",widen?"true":"false",submit[2],total[2],n,k); std::fflush(stdout);
+                     };
+                     bench(true);
+                 }

@@ -70,52 +70,21 @@ IMAGE_PAD = "<|image_pad|>"
 _DEBUG = bool(os.environ.get("STRATA_DEBUG"))       # ponytail: env is fixed for the server process
 _REQUEST_LINES = bool(os.environ.get("STRATA_REQUEST_LINES"))
 _PARALLEL_SOLO_OFF = os.environ.get("STRATA_PARALLEL_SOLO") == "0"
-_BATCH_MTP_ENV = os.environ.get("STRATA_BATCH_MTP", "0")
 
 
 def env_on_value(v) -> bool:
     return v is not None and str(v).strip().lower() not in ("", "0", "false", "no", "off")
 
 
-def _parse_int_at(line: str, i: int) -> tuple[int, int]:
-    n = len(line)
-    while i < n and line[i] == " ":
-        i += 1
-    sign = 1
-    if i < n and line[i] == "-":
-        sign, i = -1, i + 1
-    if i >= n or not ("0" <= line[i] <= "9"):
+def _token_batch(line: str) -> list[int]:
+    # ponytail: native split/int for one small engine window; validate it all before returning any tokens.
+    fields = line.split()
+    if len(fields) < 2 or fields[0] != "TB":
         raise ValueError("malformed token batch from the engine")
-    v = 0
-    while i < n:
-        d = ord(line[i]) - 48
-        if d < 0 or d > 9:
-            break
-        v = v * 10 + d
-        i += 1
-    if i < n and line[i] not in " \r\n":
+    want, *tokens = map(int, fields[1:])
+    if want < 0 or len(tokens) != want:
         raise ValueError("malformed token batch from the engine")
-    return sign * v, i
-
-
-def _count_ints_after(line: str, i: int) -> int:
-    n, c = len(line), 0
-    while True:
-        while i < n and line[i] == " ":
-            i += 1
-        if i >= n or line[i] in "\r\n":
-            return c
-        _, i = _parse_int_at(line, i)
-        c += 1
-
-
-def _token_batch(line: str):
-    want, pos = _parse_int_at(line, 3)
-    if want < 0 or _count_ints_after(line, pos) != want:
-        raise ValueError("malformed token batch from the engine")
-    for _ in range(want):
-        t, pos = _parse_int_at(line, pos)
-        yield t
+    return tokens
 
 def popen(what: str, args: list, **kw):
     """#735: subprocess.Popen, but Windows' refusal to start a program (WinError 4551, or 1260 when a policy blocks it:
@@ -1954,7 +1923,7 @@ def parallel_args(cfg: dict, args: list[str]) -> list[str]:
         return []
     if n <= 1:
         return []
-    if n > PARALLEL_MAX and "--batch-mtp" not in args and _BATCH_MTP_ENV in ("", "0"):
+    if n > PARALLEL_MAX and "--batch-mtp" not in args and os.environ.get("STRATA_BATCH_MTP", "0") in ("", "0"):
         print(f'[strata] "parallel": {n} - the engine runs at most {PARALLEL_MAX} requests together; it will use '
               f"{PARALLEL_MAX}", flush=True)
     return ["--batch", str(n)]
@@ -3514,19 +3483,25 @@ def openai_collect(chunks) -> dict:
         content.append(d.get("content") or "")
         reasoning.append(d.get("reasoning_content") or "")
         for tc in d.get("tool_calls") or []:       # streamed calls arrive in pieces: merge them by index
-            cur = by_index.setdefault(tc.get("index", len(by_index)), {"id": None, "type": "function",
-                                                                        "function": {"name": "", "arguments": ""}})
+            index = tc.get("index", len(by_index))
+            cur = by_index.get(index)
+            if cur is None:
+                cur = by_index[index] = {"id": None, "type": "function", "function": {"name": "", "arguments": []}}
             cur["id"] = tc.get("id") or cur["id"]
             fn = tc.get("function") or {}
             cur["function"]["name"] += fn.get("name") or ""
-            cur["function"]["arguments"] += fn.get("arguments") or ""
+            if fn.get("arguments"):
+                cur["function"]["arguments"].append(fn["arguments"])
         last = c
     calls = [by_index[i] for i in sorted(by_index)]
+    for call in calls:
+        call["function"]["arguments"] = "".join(call["function"]["arguments"])
     if last["choices"][0]["finish_reason"] != "tool_calls":
         calls = [c for c in calls if _is_json(c["function"]["arguments"])]   # a call the output ended inside (#211)
     msg = {"role": "assistant", "content": "".join(content) or None}
-    if "".join(reasoning):
-        msg["reasoning_content"] = "".join(reasoning)
+    reasoning = "".join(reasoning)
+    if reasoning:
+        msg["reasoning_content"] = reasoning
     if calls:
         msg["tool_calls"] = calls
     if mcp:
@@ -3571,6 +3546,7 @@ def anthropic_events(svc: Service, req: dict, ids, thinking, tools, max_new, can
         "id": mid, "type": "message", "role": "assistant", "model": svc.model_for(req), "content": [],
         "stop_reason": None, "stop_sequence": None, "usage": {"input_tokens": len(ids), "output_tokens": 0}}}
     index, open_kind, used_tool = -1, None, False
+    kinds = {"reasoning": "thinking", "content": "text", "tool_call": "tool_use", "tool_start": "tool_use"}
 
     def close():
         return ("content_block_stop", {"type": "content_block_stop", "index": index})
@@ -3589,7 +3565,7 @@ def anthropic_events(svc: Service, req: dict, ids, thinking, tools, max_new, can
             if ev.kind == "tool_call" and ev.call.id in streamed:
                 finished.add(ev.call.id)
                 continue
-            want = {"reasoning": "thinking", "content": "text", "tool_call": "tool_use", "tool_start": "tool_use"}[ev.kind]
+            want = kinds[ev.kind]
             if ev.kind not in ("tool_call", "tool_start") and not ev.text:
                 continue
             if ev.kind == "tool_start":
@@ -3600,10 +3576,13 @@ def anthropic_events(svc: Service, req: dict, ids, thinking, tools, max_new, can
                     yield close()
                 index += 1
                 open_kind = want
-                block = {"thinking": {"type": "thinking", "thinking": "", "signature": ""},
-                         "text": {"type": "text", "text": ""},
-                         "tool_use": {"type": "tool_use", "id": ev.call.id if ev.call else "", "name":
-                                      ev.call.name if ev.call else "", "input": {}}}[want]
+                if want == "thinking":
+                    block = {"type": "thinking", "thinking": "", "signature": ""}
+                elif want == "text":
+                    block = {"type": "text", "text": ""}
+                else:
+                    block = {"type": "tool_use", "id": ev.call.id if ev.call else "",
+                             "name": ev.call.name if ev.call else "", "input": {}}
                 yield "content_block_start", {"type": "content_block_start", "index": index, "content_block": block}
             if want == "thinking":
                 yield "content_block_delta", {"type": "content_block_delta", "index": index,
@@ -3642,25 +3621,35 @@ def anthropic_collect(events) -> dict:
         if name == "message_start":
             msg = e["message"]
         elif name == "content_block_start":
-            blocks.append(dict(e["content_block"]))
+            b = dict(e["content_block"])
+            if (key := b["type"]) in ("text", "thinking"):
+                b[key] = [b[key]] if b[key] else []
+            blocks.append(b)
         elif name == "content_block_delta":
             d, b = e["delta"], blocks[-1]
             if d["type"] == "text_delta":
-                b["text"] += d["text"]
+                b["text"].append(d["text"])
             elif d["type"] == "thinking_delta":
-                b["thinking"] += d["thinking"]
+                b["thinking"].append(d["thinking"])
             else:                                  # input_json_delta pieces: parsed when complete
-                b["_json"] = b.get("_json", "") + d["partial_json"]
+                if "_json" not in b:
+                    b["_json"] = []
+                b["_json"].append(d["partial_json"])
         elif name == "content_block_stop" and blocks and "_json" in blocks[-1]:
             b = blocks[-1]
             try:
-                b["input"] = json.loads(b.pop("_json") or "{}")
+                b["input"] = json.loads("".join(b.pop("_json")) or "{}")
             except ValueError:                     # a call the output ended inside (#211): it has no input to give
                 blocks.pop()
         elif name == "message_delta":
             msg["stop_reason"] = e["delta"]["stop_reason"]
             msg["stop_sequence"] = e["delta"].get("stop_sequence")
             msg["usage"].update(e["usage"])
+    for b in blocks:
+        if (key := b["type"]) in ("text", "thinking"):
+            b[key] = "".join(b[key])
+        if "_json" in b:                            # an iterator that ended before content_block_stop
+            b["_json"] = "".join(b["_json"])
     msg["content"] = blocks
     return msg
 

@@ -1,0 +1,693 @@
+{
+  "diagnostic_only": true,
+  "production_exe_sha256": "8f0d866ded297cf5a409e84cf5dd61f437c56c8a89aaeb2a85569265b6a3e122",
+  "request": {
+    "model": "qwen3.8-flash-next-iq2_xs",
+    "temperature": 0,
+    "thinking": {
+      "type": "disabled"
+    },
+    "max_tokens": 384,
+    "stream": false,
+    "messages": [
+      {
+        "role": "user",
+        "content": "record memory locality."
+      }
+    ],
+    "tools": [
+      {
+        "name": "record",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "value": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    ],
+    "tool_choice": {
+      "type": "tool",
+      "name": "record"
+    }
+  },
+  "private_config": {
+    "exe": "G:\\GitHub\\Strata\\build-sycl-a770-unified-operators\\bin\\strata-unified-all-operators.exe",
+    "args": [
+      "--pack",
+      "G:\\GitHub\\Strata-data\\packs\\iq2_xs",
+      "--native",
+      "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00001-of-00002.gguf",
+      "--ple-gguf",
+      "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00002-of-00002.gguf",
+      "--expert-profile",
+      "G:\\GitHub\\Strata\\data\\expert-profile.bin",
+      "--expert-cache",
+      "auto",
+      "--prefill",
+      "8192",
+      "--spec",
+      "4",
+      "--spec-min-p",
+      "0.5",
+      "--mtp",
+      "G:\\GitHub\\Strata-data\\mtp\\rt-full-vocab-current",
+      "--max-context",
+      "8192",
+      "--stream-experts",
+      "--vram-reserve-mib",
+      "1536",
+      "--pcie-frac",
+      "0.16",
+      "--prompt-cache",
+      "0",
+      "--short-read",
+      "256",
+      "--adapt-every",
+      "1",
+      "--adapt-swaps",
+      "32",
+      "--prefill-borrow",
+      "--mtp-window",
+      "1024",
+      "--mtp-hnorm",
+      "stream",
+      "--adapt-decay",
+      "0.5"
+    ],
+    "cwd": "G:\\GitHub\\Strata",
+    "tokenizer": "G:\\GitHub\\Strata-data\\packs\\iq2_xs\\tokenizer",
+    "model_name": "qwen3.8-flash-next-iq2_xs",
+    "log": "G:\\GitHub\\Strata\\build-sycl-a770-prefill-root-20261025\\engine.stderr.log",
+    "port": 8080,
+    "backend": "sycl",
+    "env": {
+      "STRATA_SYCL_BIN": "build-sycl-a770-unified-operators\\bin\\strata-unified-all-operators.exe",
+      "ZES_ENABLE_SYSMAN": "1",
+      "STRATA_MIRROR_MIB": "49152",
+      "ONEAPI_DEVICE_SELECTOR": "level_zero:0",
+      "UR_L0_ENABLE_RELAXED_ALLOCATION_LIMITS": "1",
+      "STRATA_VERIFY_DEVICE_PLAN": "1",
+      "STRATA_VERIFY_NO_HOST": "1",
+      "STRATA_VERIFY_EAGER": "1",
+      "STRATA_STAGER_THREADS": "12",
+      "STRATA_VERIFY_ADAPT": "1",
+      "STRATA_ADAPT_COST_WEIGHTED": "1",
+      "STRATA_PREFILL_FIRST": "0",
+      "STRATA_GDN_SG16": "1",
+      "STRATA_IQ4_XS_SG16": "2",
+      "STRATA_VERIFY_FUSED_ACT": "1",
+      "STRATA_VERIFY_DESC_CACHE": "1",
+      "STRATA_SERVE_QUIET": "1",
+      "STRATA_GU_LANES": "16",
+      "STRATA_DOWN_LANES": "4",
+      "SYCL_PROGRAM_COMPILE_OPTIONS": "-cl-fp32-correctly-rounded-divide-sqrt",
+      "STRATA_MTP_LAST_DRAFT_MIN_P": "0.6",
+      "STRATA_GU_IQ2S_SG16": "1",
+      "STRATA_GU_IQ2S_SINGLE_GROUP": "1",
+      "STRATA_GDN_Q8_TAIL": "1",
+      "STRATA_QSA_Q8_TAIL": "1",
+      "MKL_VERBOSE": "1"
+    },
+    "lib_dirs": [
+      "C:\\Program Files (x86)\\Intel\\oneAPI\\mkl\\2025.3\\bin",
+      "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin"
+    ]
+  },
+  "warmup": {
+    "case": "warmup255",
+    "started": 98074.1812631,
+    "reply": {
+      "id": "msg_f53220111543497f90df8644",
+      "type": "message",
+      "role": "assistant",
+      "model": "qwen3.8-flash-next-iq2_xs",
+      "content": [
+        {
+          "type": "tool_use",
+          "id": "call_0d83f78513044866a7672ae7",
+          "name": "record",
+          "input": {
+            "value": "note"
+          }
+        }
+      ],
+      "stop_reason": "tool_use",
+      "stop_sequence": null,
+      "usage": {
+        "input_tokens": 255,
+        "output_tokens": 17,
+        "cache_read_input_tokens": 0
+      }
+    },
+    "timings": {
+      "cache_n": 0,
+      "prompt_n": 255,
+      "prompt_ms": 12314.0,
+      "prompt_per_token_ms": 48.29,
+      "prompt_per_second": 20.7,
+      "predicted_n": 17,
+      "predicted_ms": 982.4,
+      "predicted_per_token_ms": 57.788,
+      "predicted_per_second": 17.3,
+      "draft_n": 14,
+      "draft_n_accepted": 11,
+      "at": 1792859659
+    },
+    "ended": 98087.5198715
+  },
+  "trace_seconds": 45.016809000007925,
+  "server_exit_code": 0,
+  "mixed_call_count": 1436,
+  "nested_float_pairs": 1436,
+  "dtype_counts": {
+    "float": 1437,
+    "bfloat16,bfloat16,float": 22,
+    "half,half,float": 1414
+  },
+  "expert_shape_calls": {
+    "down": 703,
+    "gate_up": 701
+  },
+  "mixed_shape_counts": {
+    "bfloat16,bfloat16,float/320/257/10240": 4,
+    "bfloat16,bfloat16,float/10240/257/320": 4,
+    "bfloat16,bfloat16,float/4/257/10240": 4,
+    "half,half,float/10240/257/2560": 2,
+    "half,half,float/6144/257/2560": 2,
+    "bfloat16,bfloat16,float/48/257/2560": 4,
+    "half,half,float/2560/257/6144": 2,
+    "bfloat16,bfloat16,float/512/257/2560": 2,
+    "half,half,float/640/257/2560": 4,
+    "half,half,float/2560/257/640": 2,
+    "bfloat16,bfloat16,float/1/257/2560": 2,
+    "half,half,float/1280/4/2560": 51,
+    "half,half,float/2560/4/640": 51,
+    "half,half,float/1280/11/2560": 26,
+    "half,half,float/2560/11/640": 26,
+    "half,half,float/1280/3/2560": 72,
+    "half,half,float/2560/3/640": 72,
+    "half,half,float/1280/7/2560": 51,
+    "half,half,float/2560/7/640": 51,
+    "half,half,float/1280/1/2560": 102,
+    "half,half,float/2560/1/640": 102,
+    "half,half,float/1280/5/2560": 55,
+    "half,half,float/2560/5/640": 55,
+    "half,half,float/1280/6/2560": 44,
+    "half,half,float/2560/6/640": 44,
+    "half,half,float/1280/8/2560": 32,
+    "half,half,float/2560/8/640": 32,
+    "half,half,float/1280/2/2560": 94,
+    "half,half,float/2560/2/640": 94,
+    "half,half,float/1280/19/2560": 3,
+    "half,half,float/2560/19/640": 3,
+    "half,half,float/1280/18/2560": 7,
+    "half,half,float/2560/18/640": 7,
+    "half,half,float/1280/9/2560": 35,
+    "half,half,float/2560/9/640": 35,
+    "half,half,float/1280/10/2560": 27,
+    "half,half,float/2560/10/640": 27,
+    "half,half,float/1280/24/2560": 2,
+    "half,half,float/2560/24/640": 2,
+    "half,half,float/1280/12/2560": 22,
+    "half,half,float/2560/12/640": 22,
+    "half,half,float/1280/32/2560": 1,
+    "half,half,float/2560/32/640": 1,
+    "half,half,float/1280/33/2560": 1,
+    "half,half,float/2560/33/640": 1,
+    "half,half,float/1280/13/2560": 16,
+    "half,half,float/2560/13/640": 16,
+    "half,half,float/1280/31/2560": 1,
+    "half,half,float/2560/31/640": 1,
+    "half,half,float/1280/20/2560": 7,
+    "half,half,float/2560/20/640": 7,
+    "half,half,float/1280/16/2560": 6,
+    "half,half,float/2560/16/640": 6,
+    "half,half,float/1280/25/2560": 3,
+    "half,half,float/2560/25/640": 3,
+    "half,half,float/1280/15/2560": 9,
+    "half,half,float/2560/15/640": 9,
+    "half,half,float/1280/17/2560": 5,
+    "half,half,float/2560/17/640": 5,
+    "half,half,float/1280/22/2560": 3,
+    "half,half,float/2560/22/640": 3,
+    "half,half,float/1280/14/2560": 11,
+    "half,half,float/2560/14/640": 11,
+    "half,half,float/1280/21/2560": 5,
+    "half,half,float/2560/21/640": 5,
+    "half,half,float/1280/26/2560": 1,
+    "half,half,float/2560/26/640": 1,
+    "bfloat16,bfloat16,float/10240/257/2560": 1,
+    "bfloat16,bfloat16,float/2560/257/2560": 1,
+    "half,half,float/1280/42/2560": 1,
+    "half,half,float/2560/42/640": 1,
+    "half,half,float/1280/51/2560": 2,
+    "half,half,float/2560/51/640": 2,
+    "half,half,float/1280/27/2560": 2,
+    "half,half,float/2560/27/640": 2,
+    "half,half,float/1280/23/2560": 2,
+    "half,half,float/2560/23/640": 2,
+    "half,half,float/1280/29/2560": 1,
+    "half,half,float/2560/29/640": 1,
+    "half,half,float/1280/35/2560": 1,
+    "half,half,float/2560/35/640": 1
+  },
+  "production_excerpt": [
+    {
+      "time": 98087.7129995,
+      "line": "MKL_VERBOSE oneapi::mkl::blas::column_major::gemm[float](000000B7A8CE0A10,Transpose,NonTranspose,320,257,10240,1,000002B820800000,10240,000002BA85C00000,10240,0,000002B606400000,320,unset,Vector<sycl::event>OfSize:0) mode:unset host:N/A device:N/A GPU0\n"
+    },
+    {
+      "time": 98087.7196104,
+      "line": "MKL_VERBOSE oneapi::mkl::blas::column_major::gemm[bfloat16,bfloat16,float](000000B7A8CE0A10,Transpose,NonTranspose,320,257,10240,1,FFFFB8020150B400,10240,FFFFB8052F430100,10240,0,FFFFB8052FE30200,320,unset,Vector<sycl::event>OfSize:0) mode:unset host:N/A device:N/A GPU0\n"
+    },
+    {
+      "time": 98087.7459985,
+      "line": "MKL_VERBOSE oneapi::mkl::blas::column_major::gemm[float](000000B7A8CE0A10,Transpose,NonTranspose,10240,257,320,1,000002B820800000,320,000002B606400000,320,0,000002BA86000000,10240,unset,Vector<sycl::event>OfSize:0) mode:unset host:N/A device:N/A GPU0\n"
+    },
+    {
+      "time": 98087.7578412,
+      "line": "MKL_VERBOSE oneapi::mkl::blas::column_major::gemm[bfloat16,bfloat16,float](000000B7A8CE0A10,Transpose,NonTranspose,10240,257,320,1,FFFFB80201B69400,320,FFFFB8052FED0300,320,0,FFFFB8052FF20400,10240,unset,Vector<sycl::event>OfSize:0) mode:unset host:N/A device:N/A GPU0\n"
+    },
+    {
+      "time": 98087.7986101,
+      "line": "MKL_VERBOSE oneapi::mkl::blas::column_major::gemm[float](000000B7A8CE0A10,Transpose,NonTranspose,4,257,10240,1,000002B606400000,10240,000002BA84C00000,10240,0,000002B820C00000,4,unset,Vector<sycl::event>OfSize:0) mode:unset host:N/A device:N/A GPU0\n"
+    },
+    {
+      "time": 98087.8024099,
+      "line": "MKL_VERBOSE oneapi::mkl::blas::column_major::gemm[bfloat16,bfloat16,float](000000B7A8CE0A10,Transpose,NonTranspose,4,257,10240,1,FFFFB80201B4B400,10240,FFFFB8052F430100,10240,0,FFFFB80531320500,4,unset,Vector<sycl::event>OfSize:0) mode:unset host:N/A device:N/A GPU0\n"
+    },
+    {
+      "time": 98087.9906957,
+      "line": "MKL_VERBOSE oneapi::mkl::blas::column_major::gemm[float](000000B7A8CE0930,Transpose,NonTranspose,10240,257,2560,1,000002BA89200000,2560,000002B820800000,2560,0,000002BA84C00000,10240,unset,Vector<sycl::event>OfSize:0) mode:unset host:N/A device:N/A GPU0\n"
+    },
+    {
+      "time": 98088.0167255,
+      "line": "MKL_VERBOSE oneapi::mkl::blas::column_major::gemm[half,half,float](000000B7A8CE0930,Transpose,NonTranspose,10240,257,2560,1,FFFFB80527B2DC00,2560,FFFFB80531AA2800,2560,0,FFFFB80532224B00,10240,unset,Vector<sycl::event>OfSize:0) mode:unset host:N/A device:N/A GPU0\n"
+    },
+    {
+      "time": 98088.1172016,
+      "line": "MKL_VERBOSE oneapi::mkl::blas::column_major::gemm[float](000000B7A8CE0930,Transpose,NonTranspose,6144,257,2560,1,000002BA89200000,2560,000002B820800000,2560,0,000002BA84C00000,6144,unset,Vector<sycl::event>OfSize:0) mode:unset host:N/A device:N/A GPU0\n"
+    },
+    {
+      "time": 98088.1479797,
+      "line": "MKL_VERBOSE oneapi::mkl::blas::column_major::gemm[half,half,float](000000B7A8CE0930,Transpose,NonTranspose,6144,257,2560,1,FFFFB80527B2DC00,2560,FFFFB80531AA2800,2560,0,FFFFB80533624C00,6144,unset,Vector<sycl::event>OfSize:0) mode:unset host:N/A device:N/A GPU0\n"
+    },
+    {
+      "time": 98088.1501388,
+      "line": "MKL_VERBOSE oneapi::mkl::blas::column_major::gemm[float](000000B7A8CE0A10,Transpose,NonTranspose,48,257,2560,1,000002B606400000,2560,000002B820C00000,2560,0,000002BA84C00000,96,unset,Vector<sycl::event>OfSize:0) mode:unset host:N/A device:N/A GPU0\n"
+    },
+    {
+      "time": 98088.1529053,
+      "line": "MKL_VERBOSE oneapi::mkl::blas::column_major::gemm[bfloat16,bfloat16,float](000000B7A8CE0A10,Transpose,NonTranspose,48,257,2560,1,FFFFB80202E474C0,2560,FFFFB80531822700,2560,0,FFFFB80534224D00,96,unset,Vector<sycl::event>OfSize:0) mode:unset host:N/A device:N/A GPU0\n"
+    },
+    {
+      "time": 98088.1673194,
+      "line": "MKL_VERBOSE oneapi::mkl::blas::column_major::gemm[float](000000B7A8CE0A10,Transpose,NonTranspose,48,257,2560,1,000002B606400000,2560,000002B820C00000,2560,0,000002BA84C00000,96,unset,Vector<sycl::event>OfSize:0) mode:unset host:N/A device:N/A GPU0\n"
+    },
+    {
+      "time": 98088.1699981,
+      "line": "MKL_VERBOSE oneapi::mkl::blas::column_major::gemm[bfloat16,bfloat16,float](000000B7A8CE0A10,Transpose,NonTranspose,48,257,2560,1,FFFFB80202E834C0,2560,FFFFB80531822700,2560,0,FFFFB80534224DC0,96,unset,Vector<sycl::event>OfSize:0) mode:unset host:N/A device:N/A GPU0\n"
+    },
+    {
+      "time": 98088.3176303,
+      "line": "MKL_VERBOSE oneapi::mkl::blas::column_major::gemm[float](000000B7A8CE0930,Transpose,NonTranspose,2560,257,6144,1,000002BA89200000,6144,000002B820800000,6144,0,000002B821200000,2560,unset,Vector<sycl::event>OfSize:0) mode:unset host:N/A device:N/A GPU0\n"
+    },
+    {
+      "time": 98088.3315824,
+      "line": "MKL_VERBOSE oneapi::mkl::blas::column_major::gemm[half,half,float](000000B7A8CE0930,Transpose,NonTranspose,2560,257,6144,1,FFFFB80527B2DC00,6144,FFFFB80536285200,6144,0,FFFFB80531D22900,2560,unset,Vector<sycl::event>OfSize:0) mode:unset host:N/A device:N/A GPU0\n"
+    }
+  ],
+  "input_token_counts": [
+    255,
+    258
+  ],
+  "input_evidence": "Unchanged server source hashes and the identical historical HTTP request, plus production GEMM T=257; stdin tap is empty because generate() bypasses _send().",
+  "ur_probe_shape": {
+    "T": 4,
+    "N": 1280,
+    "K": 2560
+  },
+  "ur_cycles": [
+    {
+      "first_line": 893,
+      "last_line": 1360,
+      "operations": {
+        "urUSMSharedAlloc": 3,
+        "urUSMGetMemAllocInfo": 9,
+        "urDeviceGetInfo": 9,
+        "urUSMHostAlloc": 3,
+        "urDeviceGetGlobalTimestamps": 13,
+        "urEnqueueUSMMemcpy": 3,
+        "urEventWait": 5,
+        "urEventRelease": 13,
+        "urUSMFree": 7,
+        "urContextGetNativeHandle": 4,
+        "urProgramCreateWithNativeHandle": 4,
+        "urProgramGetInfo": 8,
+        "urProgramGetBuildInfo": 4,
+        "urProgramGetNativeHandle": 4,
+        "urKernelCreateWithNativeHandle": 4,
+        "urKernelGetInfo": 26,
+        "urKernelSetExecInfo": 4,
+        "urUSMDeviceAlloc": 1,
+        "urKernelSetArgValue": 81,
+        "urKernelSetArgPointer": 19,
+        "urEnqueueKernelLaunch": 10
+      },
+      "allocation_bytes": 26054656
+    },
+    {
+      "first_line": 1361,
+      "last_line": 1722,
+      "operations": {
+        "urUSMSharedAlloc": 3,
+        "urUSMGetMemAllocInfo": 9,
+        "urUSMHostAlloc": 3,
+        "urDeviceGetGlobalTimestamps": 13,
+        "urEnqueueUSMMemcpy": 3,
+        "urEventWait": 5,
+        "urEventRelease": 13,
+        "urUSMFree": 7,
+        "urContextGetNativeHandle": 4,
+        "urUSMDeviceAlloc": 1,
+        "urKernelGetInfo": 10,
+        "urKernelSetArgValue": 81,
+        "urKernelSetArgPointer": 19,
+        "urEnqueueKernelLaunch": 10
+      },
+      "allocation_bytes": 26054656
+    },
+    {
+      "first_line": 1723,
+      "last_line": 2084,
+      "operations": {
+        "urUSMSharedAlloc": 3,
+        "urUSMGetMemAllocInfo": 9,
+        "urUSMHostAlloc": 3,
+        "urDeviceGetGlobalTimestamps": 13,
+        "urEnqueueUSMMemcpy": 3,
+        "urEventWait": 5,
+        "urEventRelease": 13,
+        "urUSMFree": 7,
+        "urContextGetNativeHandle": 4,
+        "urUSMDeviceAlloc": 1,
+        "urKernelGetInfo": 10,
+        "urKernelSetArgValue": 81,
+        "urKernelSetArgPointer": 19,
+        "urEnqueueKernelLaunch": 10
+      },
+      "allocation_bytes": 26054656
+    },
+    {
+      "first_line": 2085,
+      "last_line": 2448,
+      "operations": {
+        "urUSMSharedAlloc": 3,
+        "urUSMGetMemAllocInfo": 9,
+        "urUSMHostAlloc": 3,
+        "urDeviceGetGlobalTimestamps": 13,
+        "urEnqueueUSMMemcpy": 3,
+        "urEventWait": 5,
+        "urEventRelease": 13,
+        "urUSMFree": 7,
+        "urContextGetNativeHandle": 4,
+        "urUSMDeviceAlloc": 1,
+        "urKernelGetInfo": 10,
+        "urKernelSetArgValue": 81,
+        "urKernelSetArgPointer": 19,
+        "urEnqueueKernelLaunch": 10,
+        "urQueueFinish": 1
+      },
+      "allocation_bytes": 26054656
+    },
+    {
+      "first_line": 2449,
+      "last_line": 2810,
+      "operations": {
+        "urUSMSharedAlloc": 3,
+        "urUSMGetMemAllocInfo": 9,
+        "urUSMHostAlloc": 3,
+        "urDeviceGetGlobalTimestamps": 13,
+        "urEnqueueUSMMemcpy": 3,
+        "urEventWait": 5,
+        "urEventRelease": 13,
+        "urUSMFree": 7,
+        "urContextGetNativeHandle": 4,
+        "urUSMDeviceAlloc": 1,
+        "urKernelGetInfo": 10,
+        "urKernelSetArgValue": 81,
+        "urKernelSetArgPointer": 19,
+        "urEnqueueKernelLaunch": 10
+      },
+      "allocation_bytes": 26054656
+    }
+  ],
+  "ur_copies_per_call": [
+    {
+      "direction": "device_to_host",
+      "bytes": 6553600
+    },
+    {
+      "direction": "device_to_host",
+      "bytes": 20480
+    },
+    {
+      "direction": "host_to_device",
+      "bytes": 20480
+    }
+  ],
+  "ur_excerpt": [
+    {
+      "line_number": 893,
+      "line": "<--- urUSMSharedAlloc(.hContext = 000001DB0CF11890, .hDevice = 000001DB11AA5630, .pUSMDesc = 000000C72BEFE5C0 ((struct ur_usm_desc_t){.stype = UR_STRUCTURE_TYPE_CONTEXT_PROPERTIES, .pNext = 000000C72BEFE560 ((struct ur_usm_device_desc_t){.stype = UR_STRUCTURE_TYPE_USM_DEVICE_DESC, .pNext = nullptr, .flags = 0}), .hints = 0, .align = 4}), .pool = nullptr, .size = 13107200, .ppMem = 000000C72BEFE5E0 (000001DB14400000)) -> UR_RESULT_SUCCESS;"
+    },
+    {
+      "line_number": 895,
+      "line": "<--- urUSMSharedAlloc(.hContext = 000001DB0CF11890, .hDevice = 000001DB11AA5630, .pUSMDesc = 000000C72BEFE5C0 ((struct ur_usm_desc_t){.stype = UR_STRUCTURE_TYPE_CONTEXT_PROPERTIES, .pNext = 000000C72BEFE560 ((struct ur_usm_device_desc_t){.stype = UR_STRUCTURE_TYPE_USM_DEVICE_DESC, .pNext = nullptr, .flags = 0}), .hints = 0, .align = 4}), .pool = nullptr, .size = 40960, .ppMem = 000000C72BEFE5E0 (000001DB16400000)) -> UR_RESULT_SUCCESS;"
+    },
+    {
+      "line_number": 897,
+      "line": "<--- urUSMSharedAlloc(.hContext = 000001DB0CF11890, .hDevice = 000001DB11AA5630, .pUSMDesc = 000000C72BEFE5C0 ((struct ur_usm_desc_t){.stype = UR_STRUCTURE_TYPE_CONTEXT_PROPERTIES, .pNext = 000000C72BEFE560 ((struct ur_usm_device_desc_t){.stype = UR_STRUCTURE_TYPE_USM_DEVICE_DESC, .pNext = nullptr, .flags = 0}), .hints = 0, .align = 4}), .pool = nullptr, .size = 20480, .ppMem = 000000C72BEFE5E0 (000001DB16C00000)) -> UR_RESULT_SUCCESS;"
+    },
+    {
+      "line_number": 899,
+      "line": "<--- urUSMGetMemAllocInfo(.hContext = 000001DB0CF11890, .pMem = FFFFB80200310000, .propName = UR_USM_ALLOC_INFO_TYPE, .propSize = 4, .pPropValue = 000000C72BEFE644 (UR_USM_TYPE_DEVICE), .pPropSizeRet = nullptr) -> UR_RESULT_SUCCESS;"
+    },
+    {
+      "line_number": 901,
+      "line": "<--- urUSMGetMemAllocInfo(.hContext = 000001DB0CF11890, .pMem = FFFFB80200310000, .propName = UR_USM_ALLOC_INFO_TYPE, .propSize = 4, .pPropValue = 000000C72BEFE644 (UR_USM_TYPE_DEVICE), .pPropSizeRet = nullptr) -> UR_RESULT_SUCCESS;"
+    },
+    {
+      "line_number": 903,
+      "line": "<--- urUSMGetMemAllocInfo(.hContext = 000001DB0CF11890, .pMem = FFFFB80200310000, .propName = UR_USM_ALLOC_INFO_TYPE, .propSize = 4, .pPropValue = 000000C72BEFE644 (UR_USM_TYPE_DEVICE), .pPropSizeRet = nullptr) -> UR_RESULT_SUCCESS;"
+    },
+    {
+      "line_number": 907,
+      "line": "<--- urUSMHostAlloc(.hContext = 000001DB0CF11890, .pUSMDesc = 000000C72BEFE580 ((struct ur_usm_desc_t){.stype = UR_STRUCTURE_TYPE_CONTEXT_PROPERTIES, .pNext = nullptr, .hints = 0, .align = 2}), .pool = nullptr, .size = 6553600, .ppMem = 000000C72BEFE628 (000001DB173A0000)) -> UR_RESULT_SUCCESS;"
+    },
+    {
+      "line_number": 911,
+      "line": "<--- urEnqueueUSMMemcpy(.hQueue = 000001DB11AAE770, .blocking = 0, .pDst = 000001DB173A0000, .pSrc = FFFFB80200310000, .size = 6553600, .numEventsInWaitList = 0, .phEventWaitList = nullptr, .phEvent = 000000C72BEFE498 (000001DB11A3C530)) -> UR_RESULT_SUCCESS;"
+    },
+    {
+      "line_number": 913,
+      "line": "<--- urEventWait(.numEvents = 1, .phEventWaitList = 000000C72BEFE4D0 {000001DB11A3C530}) -> UR_RESULT_SUCCESS;"
+    },
+    {
+      "line_number": 917,
+      "line": "<--- urUSMFree(.hContext = 000001DB0CF11890, .pMem = 000001DB173A0000) -> UR_RESULT_SUCCESS;"
+    },
+    {
+      "line_number": 919,
+      "line": "<--- urUSMGetMemAllocInfo(.hContext = 000001DB0CF11890, .pMem = FFFFB80200300000, .propName = UR_USM_ALLOC_INFO_TYPE, .propSize = 4, .pPropValue = 000000C72BEFE644 (UR_USM_TYPE_DEVICE), .pPropSizeRet = nullptr) -> UR_RESULT_SUCCESS;"
+    },
+    {
+      "line_number": 921,
+      "line": "<--- urUSMGetMemAllocInfo(.hContext = 000001DB0CF11890, .pMem = FFFFB80200300000, .propName = UR_USM_ALLOC_INFO_TYPE, .propSize = 4, .pPropValue = 000000C72BEFE644 (UR_USM_TYPE_DEVICE), .pPropSizeRet = nullptr) -> UR_RESULT_SUCCESS;"
+    },
+    {
+      "line_number": 923,
+      "line": "<--- urUSMGetMemAllocInfo(.hContext = 000001DB0CF11890, .pMem = FFFFB80200300000, .propName = UR_USM_ALLOC_INFO_TYPE, .propSize = 4, .pPropValue = 000000C72BEFE644 (UR_USM_TYPE_DEVICE), .pPropSizeRet = nullptr) -> UR_RESULT_SUCCESS;"
+    },
+    {
+      "line_number": 925,
+      "line": "<--- urUSMHostAlloc(.hContext = 000001DB0CF11890, .pUSMDesc = 000000C72BEFE580 ((struct ur_usm_desc_t){.stype = UR_STRUCTURE_TYPE_CONTEXT_PROPERTIES, .pNext = nullptr, .hints = 0, .align = 2}), .pool = nullptr, .size = 20480, .ppMem = 000000C72BEFE628 (000001DB13600000)) -> UR_RESULT_SUCCESS;"
+    },
+    {
+      "line_number": 929,
+      "line": "<--- urEnqueueUSMMemcpy(.hQueue = 000001DB11AAE770, .blocking = 0, .pDst = 000001DB13600000, .pSrc = FFFFB80200300000, .size = 20480, .numEventsInWaitList = 0, .phEventWaitList = nullptr, .phEvent = 000000C72BEFE498 (000001DB11A3AE70)) -> UR_RESULT_SUCCESS;"
+    },
+    {
+      "line_number": 931,
+      "line": "<--- urEventWait(.numEvents = 1, .phEventWaitList = 000000C72BEFE4D0 {000001DB11A3AE70}) -> UR_RESULT_SUCCESS;"
+    },
+    {
+      "line_number": 935,
+      "line": "<--- urUSMFree(.hContext = 000001DB0CF11890, .pMem = 000001DB13600000) -> UR_RESULT_SUCCESS;"
+    },
+    {
+      "line_number": 1033,
+      "line": "<--- urUSMDeviceAlloc(.hContext = 000001DB0CF11890, .hDevice = 000001DB11AA5630, .pUSMDesc = 000000C72BEFD940 ((struct ur_usm_desc_t){.stype = UR_STRUCTURE_TYPE_CONTEXT_PROPERTIES, .pNext = nullptr, .hints = 0, .align = 0}), .pool = nullptr, .size = 6291456, .ppMem = 000000C72BEFD960 (FFFFB80200E00000)) -> UR_RESULT_SUCCESS;"
+    },
+    {
+      "line_number": 1329,
+      "line": "<--- urEventWait(.numEvents = 1, .phEventWaitList = 000000C72BEFD9D0 {000001DB11A3AE70}) -> UR_RESULT_SUCCESS;"
+    },
+    {
+      "line_number": 1331,
+      "line": "<--- urUSMFree(.hContext = 000001DB0CF11890, .pMem = FFFFB80200E00000) -> UR_RESULT_SUCCESS;"
+    },
+    {
+      "line_number": 1333,
+      "line": "<--- urEventWait(.numEvents = 1, .phEventWaitList = 000000C72BEFE650 {000001DB11A3AE70}) -> UR_RESULT_SUCCESS;"
+    },
+    {
+      "line_number": 1337,
+      "line": "<--- urUSMGetMemAllocInfo(.hContext = 000001DB0CF11890, .pMem = FFFFB80200306000, .propName = UR_USM_ALLOC_INFO_TYPE, .propSize = 4, .pPropValue = 000000C72BEFE7C4 (UR_USM_TYPE_DEVICE), .pPropSizeRet = nullptr) -> UR_RESULT_SUCCESS;"
+    },
+    {
+      "line_number": 1339,
+      "line": "<--- urUSMHostAlloc(.hContext = 000001DB0CF11890, .pUSMDesc = 000000C72BEFE680 ((struct ur_usm_desc_t){.stype = UR_STRUCTURE_TYPE_CONTEXT_PROPERTIES, .pNext = nullptr, .hints = 0, .align = 0}), .pool = nullptr, .size = 20480, .ppMem = 000000C72BEFE728 (000001DB13600000)) -> UR_RESULT_SUCCESS;"
+    },
+    {
+      "line_number": 1343,
+      "line": "<--- urEnqueueUSMMemcpy(.hQueue = 000001DB11AAE770, .blocking = 0, .pDst = FFFFB80200306000, .pSrc = 000001DB13600000, .size = 20480, .numEventsInWaitList = 0, .phEventWaitList = nullptr, .phEvent = 000000C72BEFE608 (000001DB11A39C10)) -> UR_RESULT_SUCCESS;"
+    },
+    {
+      "line_number": 1345,
+      "line": "<--- urEventWait(.numEvents = 1, .phEventWaitList = 000000C72BEFE650 {000001DB11A39C10}) -> UR_RESULT_SUCCESS;"
+    },
+    {
+      "line_number": 1349,
+      "line": "<--- urUSMFree(.hContext = 000001DB0CF11890, .pMem = 000001DB13600000) -> UR_RESULT_SUCCESS;"
+    },
+    {
+      "line_number": 1351,
+      "line": "<--- urUSMFree(.hContext = 000001DB0CF11890, .pMem = 000001DB14400000) -> UR_RESULT_SUCCESS;"
+    },
+    {
+      "line_number": 1353,
+      "line": "<--- urUSMFree(.hContext = 000001DB0CF11890, .pMem = 000001DB16400000) -> UR_RESULT_SUCCESS;"
+    },
+    {
+      "line_number": 1355,
+      "line": "<--- urUSMFree(.hContext = 000001DB0CF11890, .pMem = 000001DB16C00000) -> UR_RESULT_SUCCESS;"
+    },
+    {
+      "line_number": 1357,
+      "line": "<--- urUSMGetMemAllocInfo(.hContext = 000001DB0CF11890, .pMem = 000000C72BEFF6F8, .propName = UR_USM_ALLOC_INFO_TYPE, .propSize = 4, .pPropValue = 000000C72BEFF204 (UR_USM_TYPE_UNKNOWN), .pPropSizeRet = nullptr) -> UR_RESULT_SUCCESS;"
+    },
+    {
+      "line_number": 1359,
+      "line": "<--- urUSMGetMemAllocInfo(.hContext = 000001DB0CF11890, .pMem = 000000C72BEFF6FC, .propName = UR_USM_ALLOC_INFO_TYPE, .propSize = 4, .pPropValue = 000000C72BEFF204 (UR_USM_TYPE_UNKNOWN), .pPropSizeRet = nullptr) -> UR_RESULT_SUCCESS;"
+    }
+  ],
+  "scalar_probe_runs": [
+    {
+      "direct": false,
+      "allocations": 0,
+      "submit_us": 24784.0125,
+      "total_us": 24785.50625
+    },
+    {
+      "direct": true,
+      "allocations": 0,
+      "submit_us": 25427.95625,
+      "total_us": 25429.60625
+    },
+    {
+      "direct": false,
+      "allocations": 0,
+      "submit_us": 27007.83125,
+      "total_us": 27009.2625
+    },
+    {
+      "direct": false,
+      "allocations": 24576,
+      "submit_us": 30109.875,
+      "total_us": 30111.375
+    },
+    {
+      "direct": true,
+      "allocations": 24576,
+      "submit_us": 30100.9375,
+      "total_us": 30102.46875
+    },
+    {
+      "direct": false,
+      "allocations": 24576,
+      "submit_us": 30026.2125,
+      "total_us": 30029.11875
+    }
+  ],
+  "scalar_queries": [
+    {
+      "allocations": 0,
+      "us": 0.064062
+    },
+    {
+      "allocations": 24576,
+      "us": 0.095312
+    }
+  ],
+  "widen_probe_runs": [
+    {
+      "bf16": false,
+      "widen": false,
+      "submit_us": 25185.00625,
+      "total_us": 25186.54375
+    },
+    {
+      "bf16": false,
+      "widen": true,
+      "submit_us": 6880.91875,
+      "total_us": 6882.525
+    },
+    {
+      "bf16": false,
+      "widen": false,
+      "submit_us": 26641.88125,
+      "total_us": 26643.5375
+    },
+    {
+      "bf16": true,
+      "widen": false,
+      "submit_us": 22959.8625,
+      "total_us": 22961.4125
+    },
+    {
+      "bf16": true,
+      "widen": true,
+      "submit_us": 6826.50625,
+      "total_us": 6828.01875
+    },
+    {
+      "bf16": true,
+      "widen": false,
+      "submit_us": 23175.275,
+      "total_us": 23176.7625
+    }
+  ],
+  "limits": [
+    "Verbose logs change timing; counts are a partial trace, not a completed request or phase-time attribution.",
+    "UR allocation/copy counts come from the frozen same-toolchain operator probe, not the production request.",
+    "GPU widening and native XMX results use private builds; they are not production E2E gains."
+  ],
+  "evidence_sha256": {
+    "build-sycl-a770-prefill-root-20261025/results.json": "5a0371e44115075b5195d4fda121010e820d827ab52215ab715f0bd70d58b05b",
+    "build-sycl-a770-prefill-root-20261025/engine.stdout.jsonl": "760eeddd6aa51b5a2f42fbaad6a2a9fdcf199ab3639f591f06b54c123e72e855",
+    "build-sycl-a770-prefill-root-20261025/engine.stdin.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-sycl-a770-prefill-root-20261025/engine.stderr.log": "fe8fbde26588d41f0e568e0fa637fe16f0ca6d94c005dca41eae859c4fbc6a59",
+    "build-sycl-a770-prefill-root-20261025/config.json": "7b70d1f8cce70d548205ea347dca5f6f961aaf960ebe48122a6d4ba3ccdec50d",
+    "build-sycl-deepinfer-20261023/mkl-runtime-trace/stdout.log": "d76ea2669b74b9c4c262ffbc5af42b597b6be01a7cf4a65a2f0b9653eb15faf6",
+    "build-sycl-deepinfer-20261023/mkl-runtime-verbose/stdout.log": "e1565ec18e9f09a50951f5b298918c366c934e27873fdd637a8881f88c1f240f",
+    "build-sycl-deepinfer-20261023/mkl-scalar-probe-final/results.json": "7bc5c78a10eff48691480ac07353c939b445b5bf2be6f76e1feb8256c9b736a4",
+    "build-sycl-deepinfer-20261023/mkl-runtime-no-program-options/results.json": "8a94b3ac98b72b10cc23945e30bc2ae5023ba17c57712866a865273fb948621f",
+    "build-sycl-deepinfer-20261023/mkl-widen-probe-dynamic/probe.log": "975abb360a37abcf3595db82580f01508f019308b3f0d776f42853ff4f576b79",
+    "bench/results/a770/window-reader-long-2026-10-24.json": "09dcc1298a9fe8644f088166632a852aef6982fb14e41c4da7f8e327089fbf7e",
+    "build-sycl-a770-prefill-root-20261025/analyze-v2.py": "57c2e6d1128e363ddffed9cb4a920b828416a579163f97fc727d55ee429ce56e"
+  }
+}

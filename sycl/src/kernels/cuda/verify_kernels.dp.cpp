@@ -248,8 +248,8 @@ auto &sk = *sycl::ext::oneapi::group_local_memory_for_overwrite<float[S]>(
         sycl::nd_item::barrier(sycl::access::fence_space::local_space) for
         better performance if there is no access to global memory.
         */
-        item_ct1.barrier(); // the previous token is done with sk/sq/red/wsum
-        if (tid < S) { sk[tid] = ht[qk + qh * S + tid]; sq[tid] = ht[qh * S + tid]; }
+        if (t > 0) item_ct1.barrier(sycl::access::fence_space::local_space); // retire the previous token before reusing local memory
+        if (tid < S) { sk[tid] = ht[qk + qh * S + tid]; if (t >= t_out_begin) sq[tid] = ht[qh * S + tid]; }
         /*
         DPCT1118: SYCL group functions and algorithms must be encountered in
         converged control flow. You may need to adjust the code.
@@ -259,7 +259,7 @@ auto &sk = *sycl::ext::oneapi::group_local_memory_for_overwrite<float[S]>(
         sycl::nd_item::barrier(sycl::access::fence_space::local_space) for
         better performance if there is no access to global memory.
         */
-        item_ct1.barrier();
+        item_ct1.barrier(sycl::access::fence_space::local_space);
         const float g = sycl::native::exp(gate[(size_t)t * h_v + head]);
         float kv = 0.0f;
 #pragma unroll
@@ -275,9 +275,16 @@ auto &sk = *sycl::ext::oneapi::group_local_memory_for_overwrite<float[S]>(
         sycl::nd_item::barrier(sycl::access::fence_space::local_space) for
         better performance if there is no access to global memory.
         */
-        item_ct1.barrier();
+        item_ct1.barrier(sycl::access::fence_space::local_space);
         const float kv_col = red[0][col] + red[1][col] + red[2][col] + red[3][col];
         const float delta = (ht[2 * qk + head * S + col] - g * kv_col) * beta[(size_t) t * h_v + head];
+        if (t < t_out_begin) {
+            // ponytail: replay needs only the ordered state updates.
+#pragma unroll
+            for (int r = 0; r < RPG; ++r)
+                s[r] = sycl::fma((float)g, s[r], sk[rg * RPG + r] * delta);
+            continue;
+        }
         float o = 0.0f;
 #pragma unroll
         for (int r = 0; r < RPG; ++r) {
@@ -293,7 +300,7 @@ auto &sk = *sycl::ext::oneapi::group_local_memory_for_overwrite<float[S]>(
         sycl::nd_item::barrier(sycl::access::fence_space::local_space) for
         better performance if there is no access to global memory.
         */
-        item_ct1.barrier();
+        item_ct1.barrier(sycl::access::fence_space::local_space);
         red[rg][col] = o;
         /*
         DPCT1118: SYCL group functions and algorithms must be encountered in
@@ -304,14 +311,13 @@ auto &sk = *sycl::ext::oneapi::group_local_memory_for_overwrite<float[S]>(
         sycl::nd_item::barrier(sycl::access::fence_space::local_space) for
         better performance if there is no access to global memory.
         */
-        item_ct1.barrier();
+        item_ct1.barrier(sycl::access::fence_space::local_space);
         float oc = 0.0f, sq_part = 0.0f;
         if (rg == 0) {
             oc = (red[0][col] + red[1][col] + red[2][col] + red[3][col]) *
                  sycl::rsqrt((float)S);
             sq_part = oc * oc;
         }
-        if (t < t_out_begin) continue;   // a replayed token: its state update is needed, its output is not
         /*
 DPCT1108: '__shfl_xor_sync' was migrated with the experimental feature
 masked sub_group function which may not be supported by all compilers or
@@ -342,7 +348,7 @@ runtimes. You may need to adjust the code.
         sycl::nd_item::barrier(sycl::access::fence_space::local_space) for
         better performance if there is no access to global memory.
         */
-        item_ct1.barrier();
+        item_ct1.barrier(sycl::access::fence_space::local_space);
         float yv = 0.0f;
         if (rg == 0) {
             const float ss = wsum[0] + wsum[1] + wsum[2] + wsum[3];
@@ -1172,6 +1178,95 @@ static void gdn_state_replay_esimd(float* state, const float* h, int C, const fl
         });
 }
 
+template<int MAXT, bool FIXED = false, bool SINGLE = false>
+static void gdn_state_replay_layers_esimd(float* state, const float* qkv, const float* h,
+                                         int conv_channels, const float* gate, const float* beta,
+                                         int key_heads, int value_heads,
+                                         int n_layers, const int32_t* n_keep, void* stream, float* history = nullptr) {
+    const int C = FIXED ? 10240 : conv_channels;
+    const int h_k = FIXED ? 16 : key_heads, h_v = FIXED ? 48 : value_heads;
+    const auto props = sycl::ext::oneapi::experimental::properties{
+        sycl::ext::intel::experimental::grf_size<256>};
+    // Four work items share a 32-column tile; each keeps one 32-row chain in registers.
+    strata::q_of(stream)->parallel_for(sycl::nd_range<1>((size_t) n_layers * h_v * 16, 4), props,
+        [=](sycl::nd_item<1> item) SYCL_ESIMD_KERNEL {
+            namespace es = sycl::ext::intel::esimd;
+            using V = es::simd<float, 32>;
+            es::slm_init<2 * RG * 32 * sizeof(float)>();
+            const size_t index = item.get_global_linear_id();
+            const size_t layer = SINGLE ? 0 : index / (h_v * 16);
+            const int lane = SINGLE ? index : index % (h_v * 16), local = item.get_local_linear_id();
+            const int head = lane / 16, col = (lane / 4 % 4) * 32;
+            const size_t state_stride = (size_t) S * h_v * S + (size_t) C * 3;
+            float* state_l = state + layer * state_stride;
+            float* history_l = SINGLE ? history : state_l + (size_t) S * h_v * S;
+            const float* h_l = h + layer * MAXT * C;
+            const float* qkv_l = SINGLE ? qkv : qkv + layer * MAXT * C;
+            const float* gate_l = gate + layer * MAXT * h_v;
+            const float* beta_l = beta + layer * MAXT * h_v;
+            const int qh = head % h_k, qk = S * h_k;
+            const int n = *n_keep;
+            if (n <= 0) return;
+            // Single-layer callers may keep history separately, or commit state only.
+            if (!SINGLE || history_l) {
+                const es::simd<uint32_t, 16> offsets(0, 3 * sizeof(float));
+                for (int c = lane * 16; c < C; c += h_v * 16 * 16) {
+                    es::simd<float, 16> seq[3];
+#pragma unroll
+                    for (int j = 0; j < 3; ++j) {
+                        const int src = n + j;
+                        seq[j] = src < 3 ? es::gather<float, 16>(history_l + c * 3 + src, offsets)
+                                         : es::block_load<float, 16>(qkv_l + (size_t) (src - 3) * C + c);
+                    }
+                    if constexpr (FIXED) {
+                        // Write the 16 channel triplets as two contiguous blocks.
+                        es::simd<float, 48> packed;
+#pragma unroll
+                        for (int j = 0; j < 3; ++j) packed.template select<16, 3>(j) = seq[j];
+                        es::block_store<float, 32>(history_l + c * 3, packed.template select<32, 1>(0).read());
+                        es::block_store<float, 16>(history_l + c * 3 + 32, packed.template select<16, 1>(32).read());
+                    } else {
+#pragma unroll
+                        for (int j = 0; j < 3; ++j) es::scatter<float, 16>(history_l + c * 3 + j, offsets, seq[j]);
+                    }
+                }
+            }
+            const size_t stride = (size_t) h_v * S;
+            float* ptr = state_l + (size_t) head * S + col + local * RPG * stride;
+            V rows[RPG];
+#pragma unroll
+            for (int r = 0; r < RPG; ++r) rows[r] = es::block_load<float, 32>(ptr + r * stride);
+            auto fma = [](V a, V b, V c) SYCL_ESIMD_FUNCTION {
+                return V(__builtin_elementwise_fma(a.data(), b.data(), c.data()));
+            };
+#pragma unroll
+            for (int t = 0; t < MAXT; ++t) {
+                if (t >= n) break;
+                const float* ht = h_l + (size_t) t * C;
+                auto key = es::block_load<float, RPG>(ht + qk + qh * S + local * RPG);
+                const float g = es::exp(gate_l[(size_t) t * h_v + head]);
+                V acc = 0.0f;
+#pragma unroll
+                for (int r = 0; r < RPG; ++r) acc = fma(rows[r], V(key[r]), acc);
+                // ponytail: exchange only partial sums; two banks allow one barrier per token.
+                const uint32_t bank = (t & 1) * RG * 32 * sizeof(float);
+                es::slm_block_store<float, 32>(bank + local * 32 * sizeof(float), acc);
+                es::barrier();  // Also retires all reads of bank t-2 before reuse.
+                auto partials = es::slm_block_load<float, RG * 32>(bank);
+                V a = partials.template select<32, 1>(0);
+                V b = partials.template select<32, 1>(32);
+                V c = partials.template select<32, 1>(64);
+                V d = partials.template select<32, 1>(96);
+                V value = es::block_load<float, 32>(ht + 2 * qk + head * S + col);
+                V delta = (value - g * ((a + b) + c + d)) * beta_l[(size_t) t * h_v + head];
+#pragma unroll
+                for (int r = 0; r < RPG; ++r) rows[r] = fma(V(g), rows[r], V(key[r]) * delta);
+            }
+#pragma unroll
+            for (int r = 0; r < RPG; ++r) es::block_store<float, 32>(ptr + r * stride, rows[r]);
+        });
+}
+
 bool gdn_commit_esimd(float* state, float* history, const float* qkv, const float* h,
                       int C, const float* gate, const float* beta, int h_k, int h_v,
                       int n_tok, const int32_t* n_keep, void* stream) {
@@ -1181,7 +1276,10 @@ bool gdn_commit_esimd(float* state, float* history, const float* qkv, const floa
         strata::q_of(stream)->get_device().get_info<
             sycl::ext::oneapi::experimental::info::device::architecture>() !=
             sycl::ext::oneapi::experimental::architecture::intel_gpu_acm_g10) return false;
-    if (n_tok == 4) gdn_state_replay_esimd<4, true>(state, h, C, gate, beta, h_k, h_v, n_keep, stream, history, qkv);
+    if (h_k == 16 && h_v == 48) {
+        if (n_tok == 4) gdn_state_replay_layers_esimd<4, true, true>(state, qkv, h, C, gate, beta, h_k, h_v, 1, n_keep, stream, history);
+        else gdn_state_replay_layers_esimd<6, true, true>(state, qkv, h, C, gate, beta, h_k, h_v, 1, n_keep, stream, history);
+    } else if (n_tok == 4) gdn_state_replay_esimd<4, true>(state, h, C, gate, beta, h_k, h_v, n_keep, stream, history, qkv);
     else gdn_state_replay_esimd<6, true>(state, h, C, gate, beta, h_k, h_v, n_keep, stream, history, qkv);
     return true;
 }
@@ -1195,9 +1293,12 @@ bool gdn_commit_layers_esimd(float* state, const float* qkv, const float* h,
         strata::q_of(stream)->get_device().get_info<
             sycl::ext::oneapi::experimental::info::device::architecture>() !=
             sycl::ext::oneapi::experimental::architecture::intel_gpu_acm_g10) return false;
-    float* history = state + (size_t) S * h_v * S;
-    if (n_tok == 4) gdn_state_replay_esimd<4, true, true>(state, h, C, gate, beta, h_k, h_v, n_keep, stream, history, qkv, n_layers);
-    else gdn_state_replay_esimd<6, true, true>(state, h, C, gate, beta, h_k, h_v, n_keep, stream, history, qkv, n_layers);
+    // ponytail: specialize only the measured HK16/HV48 layout; other geometries keep the generic kernel.
+    if (h_k == 16 && h_v == 48) {
+        if (n_tok == 4) gdn_state_replay_layers_esimd<4, true>(state, qkv, h, C, gate, beta, h_k, h_v, n_layers, n_keep, stream);
+        else gdn_state_replay_layers_esimd<6, true>(state, qkv, h, C, gate, beta, h_k, h_v, n_layers, n_keep, stream);
+    } else if (n_tok == 4) gdn_state_replay_layers_esimd<4>(state, qkv, h, C, gate, beta, h_k, h_v, n_layers, n_keep, stream);
+    else gdn_state_replay_layers_esimd<6>(state, qkv, h, C, gate, beta, h_k, h_v, n_layers, n_keep, stream);
     return true;
 }
 
@@ -1216,7 +1317,10 @@ void gdn_step_norm_multi(float* state, const float* h, int conv_channels, const 
         strata::q_of(stream)->get_device().get_info<
             sycl::ext::oneapi::experimental::info::device::architecture>() ==
             sycl::ext::oneapi::experimental::architecture::intel_gpu_acm_g10) {
-        if (n_tok == 4) gdn_state_replay_esimd<4>(state, h, conv_channels, gate, beta, h_k, h_v, n_keep, stream);
+        if (h_k == 16 && h_v == 48 && conv_channels == 10240) {
+            if (n_tok == 4) gdn_state_replay_layers_esimd<4, true, true>(state, nullptr, h, conv_channels, gate, beta, h_k, h_v, 1, n_keep, stream);
+            else gdn_state_replay_layers_esimd<6, true, true>(state, nullptr, h, conv_channels, gate, beta, h_k, h_v, 1, n_keep, stream);
+        } else if (n_tok == 4) gdn_state_replay_esimd<4>(state, h, conv_channels, gate, beta, h_k, h_v, n_keep, stream);
         else gdn_state_replay_esimd<6>(state, h, conv_channels, gate, beta, h_k, h_v, n_keep, stream);
         return;
     }
@@ -1235,7 +1339,9 @@ void gdn_step_norm_multi(float* state, const float* h, int conv_channels, const 
                 sycl::nd_range<3>(sycl::range(1, 1, (unsigned) h_v) *
                                       sycl::range(1, RG, S),
                                   sycl::range(1, RG, S)),
-                exp_props,
+                sycl::ext::oneapi::experimental::properties{
+                    sycl::ext::oneapi::experimental::use_root_sync,
+                    sycl::ext::intel::experimental::grf_size<256>},
                 [=](sycl::nd_item<3> item)
                     [[sycl::reqd_sub_group_size(SG)]] {
                         gdn_step_norm_multi_kernel<SG, Q>(
@@ -1700,6 +1806,9 @@ namespace {
     buf[i] = t;
 } }
 void gpu_stamp(unsigned long long* buf, int i, void* stream) {
+#if defined(STRATA_ORCA_NATIVE)
+    strata::q_of(stream)->write_global_timestamp(reinterpret_cast<uint64_t*>(buf + i));
+#else
     auto exp_props = sycl::ext::oneapi::experimental::properties{
         sycl::ext::oneapi::experimental::use_root_sync};
 
@@ -1709,6 +1818,7 @@ void gpu_stamp(unsigned long long* buf, int i, void* stream) {
             exp_props, [=](sycl::nd_item<3> item_ct1) {
                 gpu_stamp_kernel(buf, i);
             });
+#endif
 }
 
 }  // namespace strata::kernels

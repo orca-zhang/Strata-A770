@@ -19,7 +19,6 @@
 #include <memory>
 #include <mutex>
 #include <string>
-#include <unordered_map>
 #include <vector>
 
 namespace strata::core {
@@ -73,8 +72,9 @@ private:
     std::vector<std::string> names_;
     std::vector<int> layer_fd_;         ///< per layer and role (3 * layer + role): index into fds_
     std::vector<std::vector<uint8_t>> ring_;
-    std::vector<int64_t> ring_key_;                 ///< (layer << 20 | expert) held by each slot, -1 = empty
-    std::unordered_map<int64_t, size_t> where_;     ///< key -> slot
+    std::vector<int64_t> ring_key_;                 ///< layer * n_expert + expert held by each slot, -1 = empty
+    // ponytail: bounded expert IDs need no hash nodes; 0 = absent, otherwise ring slot + 1.
+    std::vector<uint16_t> where_;
     size_t ring_next_ = 0;
     std::mutex mu_;
     int64_t n_layers_ = 0, n_expert_ = 0;

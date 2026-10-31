@@ -1,0 +1,657 @@
+{
+  "complete": true,
+  "phase": "operators",
+  "dtype": "bf16",
+  "exe_sha256": "47b6900bbf71ad3209231c20f9481e04a70fb3d1f7891a18837d105fb69fdaa1",
+  "build_sha256": "7b1cf3e5e9304e1a6c96ed12d2b0f30534635052d4a358f4db03cc91f82ffe59",
+  "runs": [
+    {
+      "widen": false,
+      "env": {
+        "STRATA_SYCL_BIN": "build-sycl-a770-unified-operators\\bin\\strata-unified-all-operators.exe",
+        "ZES_ENABLE_SYSMAN": "1",
+        "STRATA_MIRROR_MIB": "49152",
+        "ONEAPI_DEVICE_SELECTOR": "level_zero:0",
+        "UR_L0_ENABLE_RELAXED_ALLOCATION_LIMITS": "1",
+        "STRATA_VERIFY_DEVICE_PLAN": "1",
+        "STRATA_VERIFY_NO_HOST": "1",
+        "STRATA_VERIFY_EAGER": "1",
+        "STRATA_STAGER_THREADS": "12",
+        "STRATA_VERIFY_ADAPT": "1",
+        "STRATA_ADAPT_COST_WEIGHTED": "1",
+        "STRATA_PREFILL_FIRST": "0",
+        "STRATA_GDN_SG16": "1",
+        "STRATA_IQ4_XS_SG16": "2",
+        "STRATA_VERIFY_FUSED_ACT": "1",
+        "STRATA_VERIFY_DESC_CACHE": "1",
+        "STRATA_SERVE_QUIET": "1",
+        "STRATA_GU_LANES": "16",
+        "STRATA_DOWN_LANES": "4",
+        "SYCL_PROGRAM_COMPILE_OPTIONS": "-cl-fp32-correctly-rounded-divide-sqrt",
+        "STRATA_MTP_LAST_DRAFT_MIN_P": "0.6",
+        "STRATA_GU_IQ2S_SG16": "1",
+        "STRATA_GU_IQ2S_SINGLE_GROUP": "1",
+        "STRATA_GDN_Q8_TAIL": "1",
+        "STRATA_QSA_Q8_TAIL": "1",
+        "STRATA_NO_BATCH_KV_STEP": "1",
+        "STRATA_MTP_CUM_MIN_P": "0",
+        "STRATA_PREFILL_GPU_WIDEN": "1",
+        "STRATA_PREFILL_BF16_GPU_WIDEN": "0"
+      },
+      "argv": [
+        "G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-bf16-final\\parity\\strata.exe",
+        "--bench"
+      ],
+      "returncode": 0,
+      "batches": [
+        {
+          "bf16": false,
+          "batch": 0,
+          "submit_us": 7548.84375,
+          "total_us": 7550.075
+        },
+        {
+          "bf16": false,
+          "batch": 1,
+          "submit_us": 7331.70625,
+          "total_us": 7332.89375
+        },
+        {
+          "bf16": false,
+          "batch": 2,
+          "submit_us": 7315.29375,
+          "total_us": 7316.49375
+        },
+        {
+          "bf16": false,
+          "batch": 3,
+          "submit_us": 7318.15,
+          "total_us": 7319.48125
+        },
+        {
+          "bf16": false,
+          "batch": 4,
+          "submit_us": 7346.83125,
+          "total_us": 7348.00625
+        },
+        {
+          "bf16": true,
+          "batch": 0,
+          "submit_us": 22909.30625,
+          "total_us": 22912.2125
+        },
+        {
+          "bf16": true,
+          "batch": 1,
+          "submit_us": 22198.525,
+          "total_us": 22201.6
+        },
+        {
+          "bf16": true,
+          "batch": 2,
+          "submit_us": 23082.6875,
+          "total_us": 23084.85
+        },
+        {
+          "bf16": true,
+          "batch": 3,
+          "submit_us": 23468.95,
+          "total_us": 23470.63125
+        },
+        {
+          "bf16": true,
+          "batch": 4,
+          "submit_us": 23278.06875,
+          "total_us": 23279.575
+        }
+      ],
+      "benches": [
+        {
+          "bf16": false,
+          "engine": true,
+          "submit_us": 7331.70625,
+          "total_us": 7332.89375
+        },
+        {
+          "bf16": true,
+          "engine": true,
+          "submit_us": 23082.6875,
+          "total_us": 23084.85
+        }
+      ],
+      "summary": [
+        {
+          "checks": 6,
+          "mismatched_cases": 0
+        }
+      ]
+    },
+    {
+      "widen": true,
+      "env": {
+        "STRATA_SYCL_BIN": "build-sycl-a770-unified-operators\\bin\\strata-unified-all-operators.exe",
+        "ZES_ENABLE_SYSMAN": "1",
+        "STRATA_MIRROR_MIB": "49152",
+        "ONEAPI_DEVICE_SELECTOR": "level_zero:0",
+        "UR_L0_ENABLE_RELAXED_ALLOCATION_LIMITS": "1",
+        "STRATA_VERIFY_DEVICE_PLAN": "1",
+        "STRATA_VERIFY_NO_HOST": "1",
+        "STRATA_VERIFY_EAGER": "1",
+        "STRATA_STAGER_THREADS": "12",
+        "STRATA_VERIFY_ADAPT": "1",
+        "STRATA_ADAPT_COST_WEIGHTED": "1",
+        "STRATA_PREFILL_FIRST": "0",
+        "STRATA_GDN_SG16": "1",
+        "STRATA_IQ4_XS_SG16": "2",
+        "STRATA_VERIFY_FUSED_ACT": "1",
+        "STRATA_VERIFY_DESC_CACHE": "1",
+        "STRATA_SERVE_QUIET": "1",
+        "STRATA_GU_LANES": "16",
+        "STRATA_DOWN_LANES": "4",
+        "SYCL_PROGRAM_COMPILE_OPTIONS": "-cl-fp32-correctly-rounded-divide-sqrt",
+        "STRATA_MTP_LAST_DRAFT_MIN_P": "0.6",
+        "STRATA_GU_IQ2S_SG16": "1",
+        "STRATA_GU_IQ2S_SINGLE_GROUP": "1",
+        "STRATA_GDN_Q8_TAIL": "1",
+        "STRATA_QSA_Q8_TAIL": "1",
+        "STRATA_NO_BATCH_KV_STEP": "1",
+        "STRATA_MTP_CUM_MIN_P": "0",
+        "STRATA_PREFILL_GPU_WIDEN": "1",
+        "STRATA_PREFILL_BF16_GPU_WIDEN": "1"
+      },
+      "argv": [
+        "G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-bf16-final\\parity\\strata.exe",
+        "--bench"
+      ],
+      "returncode": 0,
+      "batches": [
+        {
+          "bf16": false,
+          "batch": 0,
+          "submit_us": 8770.56875,
+          "total_us": 8771.83125
+        },
+        {
+          "bf16": false,
+          "batch": 1,
+          "submit_us": 7360.16875,
+          "total_us": 7361.48125
+        },
+        {
+          "bf16": false,
+          "batch": 2,
+          "submit_us": 7301.5375,
+          "total_us": 7302.8375
+        },
+        {
+          "bf16": false,
+          "batch": 3,
+          "submit_us": 7284.65,
+          "total_us": 7285.9375
+        },
+        {
+          "bf16": false,
+          "batch": 4,
+          "submit_us": 7336.28125,
+          "total_us": 7337.45625
+        },
+        {
+          "bf16": true,
+          "batch": 0,
+          "submit_us": 7469.2875,
+          "total_us": 7470.4875
+        },
+        {
+          "bf16": true,
+          "batch": 1,
+          "submit_us": 7280.275,
+          "total_us": 7281.5125
+        },
+        {
+          "bf16": true,
+          "batch": 2,
+          "submit_us": 7319.08125,
+          "total_us": 7320.2625
+        },
+        {
+          "bf16": true,
+          "batch": 3,
+          "submit_us": 7292.66875,
+          "total_us": 7293.80625
+        },
+        {
+          "bf16": true,
+          "batch": 4,
+          "submit_us": 7230.01875,
+          "total_us": 7232.6375
+        }
+      ],
+      "benches": [
+        {
+          "bf16": false,
+          "engine": true,
+          "submit_us": 7336.28125,
+          "total_us": 7337.45625
+        },
+        {
+          "bf16": true,
+          "engine": true,
+          "submit_us": 7292.66875,
+          "total_us": 7293.80625
+        }
+      ],
+      "summary": [
+        {
+          "checks": 6,
+          "mismatched_cases": 0
+        }
+      ]
+    },
+    {
+      "widen": false,
+      "env": {
+        "STRATA_SYCL_BIN": "build-sycl-a770-unified-operators\\bin\\strata-unified-all-operators.exe",
+        "ZES_ENABLE_SYSMAN": "1",
+        "STRATA_MIRROR_MIB": "49152",
+        "ONEAPI_DEVICE_SELECTOR": "level_zero:0",
+        "UR_L0_ENABLE_RELAXED_ALLOCATION_LIMITS": "1",
+        "STRATA_VERIFY_DEVICE_PLAN": "1",
+        "STRATA_VERIFY_NO_HOST": "1",
+        "STRATA_VERIFY_EAGER": "1",
+        "STRATA_STAGER_THREADS": "12",
+        "STRATA_VERIFY_ADAPT": "1",
+        "STRATA_ADAPT_COST_WEIGHTED": "1",
+        "STRATA_PREFILL_FIRST": "0",
+        "STRATA_GDN_SG16": "1",
+        "STRATA_IQ4_XS_SG16": "2",
+        "STRATA_VERIFY_FUSED_ACT": "1",
+        "STRATA_VERIFY_DESC_CACHE": "1",
+        "STRATA_SERVE_QUIET": "1",
+        "STRATA_GU_LANES": "16",
+        "STRATA_DOWN_LANES": "4",
+        "SYCL_PROGRAM_COMPILE_OPTIONS": "-cl-fp32-correctly-rounded-divide-sqrt",
+        "STRATA_MTP_LAST_DRAFT_MIN_P": "0.6",
+        "STRATA_GU_IQ2S_SG16": "1",
+        "STRATA_GU_IQ2S_SINGLE_GROUP": "1",
+        "STRATA_GDN_Q8_TAIL": "1",
+        "STRATA_QSA_Q8_TAIL": "1",
+        "STRATA_NO_BATCH_KV_STEP": "1",
+        "STRATA_MTP_CUM_MIN_P": "0",
+        "STRATA_PREFILL_GPU_WIDEN": "1",
+        "STRATA_PREFILL_BF16_GPU_WIDEN": "0"
+      },
+      "argv": [
+        "G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-bf16-final\\parity\\strata.exe",
+        "--bench"
+      ],
+      "returncode": 0,
+      "batches": [
+        {
+          "bf16": false,
+          "batch": 0,
+          "submit_us": 8378.43125,
+          "total_us": 8380.99375
+        },
+        {
+          "bf16": false,
+          "batch": 1,
+          "submit_us": 7250.75,
+          "total_us": 7251.9
+        },
+        {
+          "bf16": false,
+          "batch": 2,
+          "submit_us": 7301.06875,
+          "total_us": 7302.38125
+        },
+        {
+          "bf16": false,
+          "batch": 3,
+          "submit_us": 7308.7125,
+          "total_us": 7310.6125
+        },
+        {
+          "bf16": false,
+          "batch": 4,
+          "submit_us": 7314.83125,
+          "total_us": 7315.8625
+        },
+        {
+          "bf16": true,
+          "batch": 0,
+          "submit_us": 22373.99375,
+          "total_us": 22376.36875
+        },
+        {
+          "bf16": true,
+          "batch": 1,
+          "submit_us": 22905.10625,
+          "total_us": 22906.69375
+        },
+        {
+          "bf16": true,
+          "batch": 2,
+          "submit_us": 22437.85,
+          "total_us": 22439.54375
+        },
+        {
+          "bf16": true,
+          "batch": 3,
+          "submit_us": 24397.29375,
+          "total_us": 24399.20625
+        },
+        {
+          "bf16": true,
+          "batch": 4,
+          "submit_us": 24495.28125,
+          "total_us": 24496.825
+        }
+      ],
+      "benches": [
+        {
+          "bf16": false,
+          "engine": true,
+          "submit_us": 7308.7125,
+          "total_us": 7310.6125
+        },
+        {
+          "bf16": true,
+          "engine": true,
+          "submit_us": 22905.10625,
+          "total_us": 22906.69375
+        }
+      ],
+      "summary": [
+        {
+          "checks": 6,
+          "mismatched_cases": 0
+        }
+      ]
+    },
+    {
+      "widen": true,
+      "env": {
+        "STRATA_SYCL_BIN": "build-sycl-a770-unified-operators\\bin\\strata-unified-all-operators.exe",
+        "ZES_ENABLE_SYSMAN": "1",
+        "STRATA_MIRROR_MIB": "49152",
+        "ONEAPI_DEVICE_SELECTOR": "level_zero:0",
+        "UR_L0_ENABLE_RELAXED_ALLOCATION_LIMITS": "1",
+        "STRATA_VERIFY_DEVICE_PLAN": "1",
+        "STRATA_VERIFY_NO_HOST": "1",
+        "STRATA_VERIFY_EAGER": "1",
+        "STRATA_STAGER_THREADS": "12",
+        "STRATA_VERIFY_ADAPT": "1",
+        "STRATA_ADAPT_COST_WEIGHTED": "1",
+        "STRATA_PREFILL_FIRST": "0",
+        "STRATA_GDN_SG16": "1",
+        "STRATA_IQ4_XS_SG16": "2",
+        "STRATA_VERIFY_FUSED_ACT": "1",
+        "STRATA_VERIFY_DESC_CACHE": "1",
+        "STRATA_SERVE_QUIET": "1",
+        "STRATA_GU_LANES": "16",
+        "STRATA_DOWN_LANES": "4",
+        "SYCL_PROGRAM_COMPILE_OPTIONS": "-cl-fp32-correctly-rounded-divide-sqrt",
+        "STRATA_MTP_LAST_DRAFT_MIN_P": "0.6",
+        "STRATA_GU_IQ2S_SG16": "1",
+        "STRATA_GU_IQ2S_SINGLE_GROUP": "1",
+        "STRATA_GDN_Q8_TAIL": "1",
+        "STRATA_QSA_Q8_TAIL": "1",
+        "STRATA_NO_BATCH_KV_STEP": "1",
+        "STRATA_MTP_CUM_MIN_P": "0",
+        "STRATA_PREFILL_GPU_WIDEN": "1",
+        "STRATA_PREFILL_BF16_GPU_WIDEN": "1"
+      },
+      "argv": [
+        "G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-bf16-final\\parity\\strata.exe",
+        "--bench"
+      ],
+      "returncode": 0,
+      "batches": [
+        {
+          "bf16": false,
+          "batch": 0,
+          "submit_us": 7910.71875,
+          "total_us": 7912.0625
+        },
+        {
+          "bf16": false,
+          "batch": 1,
+          "submit_us": 7270.225,
+          "total_us": 7271.39375
+        },
+        {
+          "bf16": false,
+          "batch": 2,
+          "submit_us": 7379.13125,
+          "total_us": 7380.40625
+        },
+        {
+          "bf16": false,
+          "batch": 3,
+          "submit_us": 7312.76875,
+          "total_us": 7314.08125
+        },
+        {
+          "bf16": false,
+          "batch": 4,
+          "submit_us": 7303.3625,
+          "total_us": 7304.38125
+        },
+        {
+          "bf16": true,
+          "batch": 0,
+          "submit_us": 7476.5125,
+          "total_us": 7477.79375
+        },
+        {
+          "bf16": true,
+          "batch": 1,
+          "submit_us": 7499.4875,
+          "total_us": 7501.15
+        },
+        {
+          "bf16": true,
+          "batch": 2,
+          "submit_us": 7256.94375,
+          "total_us": 7258.28125
+        },
+        {
+          "bf16": true,
+          "batch": 3,
+          "submit_us": 7241.425,
+          "total_us": 7242.575
+        },
+        {
+          "bf16": true,
+          "batch": 4,
+          "submit_us": 7248.6125,
+          "total_us": 7249.925
+        }
+      ],
+      "benches": [
+        {
+          "bf16": false,
+          "engine": true,
+          "submit_us": 7312.76875,
+          "total_us": 7314.08125
+        },
+        {
+          "bf16": true,
+          "engine": true,
+          "submit_us": 7256.94375,
+          "total_us": 7258.28125
+        }
+      ],
+      "summary": [
+        {
+          "checks": 6,
+          "mismatched_cases": 0
+        }
+      ]
+    },
+    {
+      "widen": false,
+      "env": {
+        "STRATA_SYCL_BIN": "build-sycl-a770-unified-operators\\bin\\strata-unified-all-operators.exe",
+        "ZES_ENABLE_SYSMAN": "1",
+        "STRATA_MIRROR_MIB": "49152",
+        "ONEAPI_DEVICE_SELECTOR": "level_zero:0",
+        "UR_L0_ENABLE_RELAXED_ALLOCATION_LIMITS": "1",
+        "STRATA_VERIFY_DEVICE_PLAN": "1",
+        "STRATA_VERIFY_NO_HOST": "1",
+        "STRATA_VERIFY_EAGER": "1",
+        "STRATA_STAGER_THREADS": "12",
+        "STRATA_VERIFY_ADAPT": "1",
+        "STRATA_ADAPT_COST_WEIGHTED": "1",
+        "STRATA_PREFILL_FIRST": "0",
+        "STRATA_GDN_SG16": "1",
+        "STRATA_IQ4_XS_SG16": "2",
+        "STRATA_VERIFY_FUSED_ACT": "1",
+        "STRATA_VERIFY_DESC_CACHE": "1",
+        "STRATA_SERVE_QUIET": "1",
+        "STRATA_GU_LANES": "16",
+        "STRATA_DOWN_LANES": "4",
+        "SYCL_PROGRAM_COMPILE_OPTIONS": "-cl-fp32-correctly-rounded-divide-sqrt",
+        "STRATA_MTP_LAST_DRAFT_MIN_P": "0.6",
+        "STRATA_GU_IQ2S_SG16": "1",
+        "STRATA_GU_IQ2S_SINGLE_GROUP": "1",
+        "STRATA_GDN_Q8_TAIL": "1",
+        "STRATA_QSA_Q8_TAIL": "1",
+        "STRATA_NO_BATCH_KV_STEP": "1",
+        "STRATA_MTP_CUM_MIN_P": "0",
+        "STRATA_PREFILL_GPU_WIDEN": "1",
+        "STRATA_PREFILL_BF16_GPU_WIDEN": "0"
+      },
+      "argv": [
+        "G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-bf16-final\\parity\\strata.exe",
+        "--bench"
+      ],
+      "returncode": 0,
+      "batches": [
+        {
+          "bf16": false,
+          "batch": 0,
+          "submit_us": 8038.28125,
+          "total_us": 8039.48125
+        },
+        {
+          "bf16": false,
+          "batch": 1,
+          "submit_us": 7333.5125,
+          "total_us": 7335.75625
+        },
+        {
+          "bf16": false,
+          "batch": 2,
+          "submit_us": 7306.675,
+          "total_us": 7308.05
+        },
+        {
+          "bf16": false,
+          "batch": 3,
+          "submit_us": 7294.1,
+          "total_us": 7295.41875
+        },
+        {
+          "bf16": false,
+          "batch": 4,
+          "submit_us": 7347.5875,
+          "total_us": 7348.86875
+        },
+        {
+          "bf16": true,
+          "batch": 0,
+          "submit_us": 22763.9125,
+          "total_us": 22765.475
+        },
+        {
+          "bf16": true,
+          "batch": 1,
+          "submit_us": 22347.4625,
+          "total_us": 22349.06875
+        },
+        {
+          "bf16": true,
+          "batch": 2,
+          "submit_us": 22640.1375,
+          "total_us": 22641.86875
+        },
+        {
+          "bf16": true,
+          "batch": 3,
+          "submit_us": 23668.55625,
+          "total_us": 23670.14375
+        },
+        {
+          "bf16": true,
+          "batch": 4,
+          "submit_us": 23502.7875,
+          "total_us": 23504.3375
+        }
+      ],
+      "benches": [
+        {
+          "bf16": false,
+          "engine": true,
+          "submit_us": 7333.5125,
+          "total_us": 7335.75625
+        },
+        {
+          "bf16": true,
+          "engine": true,
+          "submit_us": 22763.9125,
+          "total_us": 22765.475
+        }
+      ],
+      "summary": [
+        {
+          "checks": 6,
+          "mismatched_cases": 0
+        }
+      ]
+    }
+  ],
+  "note": "Both arms use the same binary, toolchain, BLAS DLL and all other flags; experimental switch defaults off.",
+  "comparisons": [
+    {
+      "candidate_run": 1,
+      "bf16": false,
+      "optimized": false,
+      "baseline": 7321.744649325178,
+      "candidate": 7337.45625,
+      "throughput_change_pct": -0.21412871354186125,
+      "baseline_drift_pct": -0.3038534412147964,
+      "meets_screen": false
+    },
+    {
+      "candidate_run": 1,
+      "bf16": true,
+      "optimized": true,
+      "baseline": 22995.599344541715,
+      "candidate": 7293.80625,
+      "throughput_change_pct": 215.27570868148186,
+      "baseline_drift_pct": -0.7717453221485093,
+      "meets_screen": true
+    },
+    {
+      "candidate_run": 3,
+      "bf16": false,
+      "optimized": false,
+      "baseline": 7323.173583782043,
+      "candidate": 7314.08125,
+      "throughput_change_pct": 0.12431272597694942,
+      "baseline_drift_pct": 0.34393493021276367,
+      "meets_screen": false
+    },
+    {
+      "candidate_run": 3,
+      "bf16": true,
+      "optimized": true,
+      "baseline": 22835.97521233287,
+      "candidate": 7258.28125,
+      "throughput_change_pct": 214.6195969236225,
+      "baseline_drift_pct": -0.6164955603861433,
+      "meets_screen": true
+    }
+  ]
+}

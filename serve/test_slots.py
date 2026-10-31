@@ -16,10 +16,11 @@ import unittest
 import urllib.error
 import urllib.request
 from pathlib import Path
+from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from serve.frontend import ChatTemplate  # noqa: E402
-from serve.server import (ByteTokenizer, Service, StrataEngine, serve, slot_filename_problem,  # noqa: E402
+from serve.server import (ByteTokenizer, EngineSilent, Service, StrataEngine, serve, slot_filename_problem,  # noqa: E402
                           slot_save_dir)
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -89,6 +90,49 @@ class FakeEngine(StrataEngine):
         self.fail = False
         self.script = None
         self.proc = FakeProc(self)
+
+
+class SessionTimeouts(unittest.TestCase):
+    def test_progress_and_allowances_reset_the_deadline(self):
+        for action, script in [
+            ("save", [(0.2, "SESSION 1 3", 0.3), (0.2, "SESSION 2 3", 0.3), (0.2, "SAVED 3 3 1.0", 0.3)]),
+            ("save", [(0.0, "SWAIT flush 1", 0.3), (0.7, "SWAIT publish 1", 1.0), (0.7, "SAVED 3 3 1.0", 1.0)]),
+            ("restore", [(0.0, "SWAIT validate 1", 0.3), (0.7, "SWAIT transfer 1", 1.0),
+                         (0.2, "SESSION 2 3", 1.0), (0.2, "RESTORED 3 3 1.0", 0.3)]),
+        ]:
+            with self.subTest(action=action, script=script):
+                engine = FakeEngine()
+                engine.silence_s, engine.script = 0.3, []
+                lines, now = iter(script), 0.0
+
+                def receive(timeout):
+                    nonlocal now
+                    delay, line, expected = next(lines)
+                    self.assertAlmostEqual(timeout, expected)
+                    now += delay
+                    return line + "\n"
+
+                # ponytail: advance the queue clock; host scheduling must not consume the heartbeat margin.
+                with mock.patch("serve.server.time.monotonic", side_effect=lambda: now), \
+                        mock.patch.object(engine.lines, "get", side_effect=receive):
+                    self.assertEqual(engine.session_file(action, "unused.bin"), {"tokens": 3, "bytes": 3, "ms": 1.0})
+                self.assertGreater(now, engine.silence_s)
+                self.assertFalse(engine.ended)
+
+    def test_queue_waits_use_the_announced_deadline(self):
+        for lines, expected in [([queue.Empty], [0.3]),
+                                (["SWAIT flush 1\n", queue.Empty], [0.3, 1.0]),
+                                (["SWAIT transfer 2\n", "SESSION 1 2\n", queue.Empty], [0.3, 2.0, 0.3])]:
+            with self.subTest(lines=lines):
+                engine = FakeEngine()
+                engine.silence_s, engine.script = 0.3, []
+                # ponytail: check the engine deadline directly; HTTP scheduling has no fixed upper bound under load.
+                with mock.patch("serve.server.time.monotonic", return_value=0.0), \
+                        mock.patch.object(engine.lines, "get", side_effect=lines) as read:
+                    with self.assertRaises(EngineSilent):
+                        engine.session_file("save", "unused.bin")
+                self.assertEqual([call.kwargs["timeout"] for call in read.call_args_list], expected)
+                self.assertTrue(engine.ended and engine.proc.killed)
 
 
 class Slots(unittest.TestCase):
@@ -226,38 +270,31 @@ class Slots(unittest.TestCase):
             self.assertEqual(s, 400, b)
             self.assertIn("symbolic link", b["error"]["message"])
 
-    def test_progress_lines_keep_a_long_save_alive(self):
-        self.engine.silence_s = 0.3
-        self.engine.script = [0.2, "SESSION 268435456 1198691396\n", 0.2, "SESSION 536870912 1198691396\n", 0.2,
+    def test_progress_lines_before_a_save(self):
+        self.engine.script = ["SESSION 268435456 1198691396\n", "SESSION 536870912 1198691396\n",
                               "SAVED 63000 1198691396 2000.0\n"]
-        t0 = time.monotonic()
         s, b = self.post("/slots/0?action=save", {"filename": "long.bin"})
         self.assertEqual(s, 200, b)
-        self.assertGreater(time.monotonic() - t0, 0.5)       # the lines arrived during the wait, past its 0.3 s
         self.assertEqual(b["n_written"], 1198691396)
         self.assertFalse(self.engine.ended)
 
     def test_a_small_save_reports_its_only_partial_block(self):
         """B: a file below one 16 MiB block still reports (the start, then its last partial block)."""
-        self.engine.silence_s = 0.3
-        self.engine.script = ["SESSION 0 56834\n", 0.2, "SESSION 56834 56834\n", 0.2, "SAVED 120 56834 410.0\n"]
+        self.engine.script = ["SESSION 0 56834\n", "SESSION 56834 56834\n", "SAVED 120 56834 410.0\n"]
         s, b = self.post("/slots/0?action=save", {"filename": "small.bin"})
         self.assertEqual(s, 200, b)
         self.assertEqual(b["n_written"], 56834)
         self.assertFalse(self.engine.ended)
 
-    def test_a_blocking_step_gets_its_announced_allowance(self):
-        """B: SWAIT gives one non-streaming step (a flush, the device transfer) its own bounded wait."""
-        self.engine.silence_s = 0.3
-        self.engine.script = ["SESSION 1198691396 1198691396\n", "SWAIT flush 1\n", 0.7, "SWAIT publish 1\n", 0.7,
+    def test_announced_steps_before_save_and_restore(self):
+        """SWAIT phases and SESSION progress reach a successful save or restore through HTTP."""
+        self.engine.script = ["SESSION 1198691396 1198691396\n", "SWAIT flush 1\n", "SWAIT publish 1\n",
                               "SAVED 63000 1198691396 2000.0\n"]
-        t0 = time.monotonic()
         s, b = self.post("/slots/0?action=save", {"filename": "flush.bin"})
         self.assertEqual(s, 200, b)
-        self.assertGreater(time.monotonic() - t0, 1.3)       # longer than the silence limit, twice
         self.assertFalse(self.engine.ended)
         Path(self.dir.name, "flush.bin").write_bytes(b"x")    # the scripted engine wrote nothing; restore needs a file
-        self.engine.script = ["SESSION 16777216 1198691396\n", 0.2, "SWAIT validate 1\n", 0.7, "SWAIT transfer 1\n", 0.7,
+        self.engine.script = ["SESSION 16777216 1198691396\n", "SWAIT validate 1\n", "SWAIT transfer 1\n",
                               "RESTORED 63000 1198691396 900.0\n"]
         s, b = self.post("/slots/0?action=restore", {"filename": "flush.bin"})
         self.assertEqual(s, 200, b)
@@ -271,15 +308,19 @@ class Slots(unittest.TestCase):
         took = time.monotonic() - t0
         self.assertEqual(s, 500, b)
         self.assertGreater(took, 0.9)
-        self.assertLess(took, 5)
         self.assertIn("blocking step allowed 1 s", b["error"]["message"])
         self.assertTrue(self.engine.ended and self.engine.proc.killed)
 
     def test_progress_ends_the_allowance(self):
         """B: after a SESSION line the ordinary silence limit applies again (the allowance was for one step)."""
         self.engine.silence_s = 0.3
-        self.engine.script = ["SWAIT transfer 2\n", "SESSION 1 2\n", 0.8, "SAVED 1 2 1.0\n"]
-        s, b = self.post("/slots/0?action=save", {"filename": "reset.bin"})
+        self.engine.script = []
+        # Inject expiry after SESSION: the producer and consumer need not be scheduled together.
+        with mock.patch("serve.server.time.monotonic", return_value=0.0), \
+                mock.patch.object(self.engine.lines, "get", side_effect=[
+                    "SWAIT transfer 2\n", "SESSION 1 2\n", queue.Empty]) as read:
+            s, b = self.post("/slots/0?action=save", {"filename": "reset.bin"})
+        self.assertEqual([call.kwargs["timeout"] for call in read.call_args_list], [0.3, 2.0, 0.3])
         self.assertEqual(s, 500, b)
         self.assertIn("said nothing", b["error"]["message"])
         self.assertNotIn("blocking step", b["error"]["message"])
@@ -298,10 +339,8 @@ class Slots(unittest.TestCase):
     def test_a_silent_engine_is_ended_not_waited_for(self):
         self.engine.silence_s = 0.3
         self.engine.script = []                      # the engine never answers
-        t0 = time.monotonic()
         s, b = self.post("/slots/0?action=save", {"filename": "silent.bin"})
         self.assertEqual(s, 500, b)
-        self.assertLess(time.monotonic() - t0, 5)
         self.assertIn("said nothing", b["error"]["message"])
         self.assertTrue(self.engine.ended and self.engine.proc.killed)
         self.assertTrue(self.svc.fifo.acquire(blocking=False))   # the FIFO was released
@@ -387,17 +426,16 @@ class Slots(unittest.TestCase):
 
     def test_slot_work_counts_as_activity_and_shows_in_status(self):
         seen = {}
+        session_file = self.engine.session_file
 
-        def during():
-            time.sleep(0.15)
+        def during(*args):
             with self.svc.status_lock:
                 seen.update(self.svc.status)
-        self.engine.script = [0.4, "SAVED 1 2 3.0\n"]
+            return session_file(*args)
+        self.engine.script = ["SAVED 1 2 3.0\n"]
         self.svc.last_request_at = 0
-        t = threading.Thread(target=during)
-        t.start()
-        s, _ = self.post("/slots/0?action=save", {"filename": "act.bin"})
-        t.join()
+        with mock.patch.object(self.engine, "session_file", side_effect=during):
+            s, _ = self.post("/slots/0?action=save", {"filename": "act.bin"})
         self.assertEqual(s, 200)
         self.assertTrue(seen.get("busy"))
         self.assertEqual(seen.get("phase"), "saving the session")

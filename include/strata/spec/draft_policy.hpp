@@ -19,6 +19,11 @@
 
 namespace strata::spec {
 
+/// Includes the fed-back token. A positive cumulative floor also limits the product of draft confidences;
+/// zero keeps the per-token rule. `last_min_p` overrides only draft four of a five-row window, as before.
+int mtp_confidence_window(int max_t, const float* probs, float min_p, float cumulative_min_p = 0.0f,
+                          float last_min_p = -1.0f);
+
 class DraftPolicy {
 public:
     static constexpr int kMaxT = 8;
@@ -46,12 +51,18 @@ public:
     double lookup_rate(int match) const;   // current q for a match length
     double cost_ms(int t) const;           // measured or scaled round time of a window of t tokens
 
+    /// Opt-in caller: shorten a threshold-limited MTP window after eight valid pure-MTP rounds.
+    /// Every sixteenth round retains the threshold window to refresh censored prefix observations.
+    int choose_mtp(int threshold_t) const;
+
 private:
     static int bucket(int match);
     double mtp_tokens(int t) const;
 
     int max_t_;
     double margin_;
+    int mtp_rounds_ = 0;
+    std::array<double, kMaxT + 1> prefix_tok_{}, prefix_n_{};
     std::array<double, kMaxT + 1> cost_{}, cost_n_{};      // round ms by window size
     std::array<double, kMaxT + 1> mtp_tok_{}, mtp_n_{};    // tokens committed by MTP windows of that size
     std::array<double, kBuckets> ok_{}, bad_{};            // lookup drafts accepted / windows cut short, decayed

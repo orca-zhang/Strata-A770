@@ -12,7 +12,7 @@ Useful sources:
 
 - ArcInt README: <https://github.com/marfrit/arcint>
 - Strata Intel Arc status: [INTEL_ARC.md](INTEL_ARC.md)
-- Strata B60 community report: [2026-10-04-community-2x-arc-pro-b60](https://github.com/Niko1221/Strata/blob/f40c418e483adc89e2e4f58e602c32a7e7d892c8/bench/results/2026-10-04-community-2x-arc-pro-b60/README.md)
+- Strata B60 community report: [2026-10-04-community-2x-arc-pro-b60](../bench/results/2026-10-04-community-2x-arc-pro-b60/README.md)
 
 ## What is comparable
 

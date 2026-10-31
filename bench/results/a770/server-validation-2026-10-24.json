@@ -1,0 +1,191 @@
+{
+  "scope": "Server correctness with a real pack tokenizer and mock engines; no model inference performance measurement",
+  "date": "2026-10-24",
+  "environment": {
+    "cpu": "Intel Xeon E5-2696 v4",
+    "os": "Windows 10 19045",
+    "python": "3.11.9 (tags/v3.11.9:de54cf5, Apr  2 2024, 10:12:12) [MSC v.1938 64 bit (AMD64)]",
+    "jsonschema": "4.26.0"
+  },
+  "full": {
+    "mode": "full",
+    "modules": [
+      "serve.test_control_cancel",
+      "serve.test_detok",
+      "serve.test_fatal_recovery",
+      "serve.test_frontend",
+      "serve.test_lifecycle",
+      "serve.test_mcp",
+      "serve.test_monitor",
+      "serve.test_parallel",
+      "serve.test_reasoning_loop_recovery",
+      "serve.test_reasoning_rescue",
+      "serve.test_reasoning_tools",
+      "serve.test_responses",
+      "serve.test_restart_waiters",
+      "serve.test_runconfig",
+      "serve.test_security",
+      "serve.test_server",
+      "serve.test_slots",
+      "serve.test_structured",
+      "serve.test_text_scan",
+      "serve.test_vram",
+      "serve.test_winjob"
+    ],
+    "python": "3.11.9 (tags/v3.11.9:de54cf5, Apr  2 2024, 10:12:12) [MSC v.1938 64 bit (AMD64)]",
+    "jsonschema": "4.26.0",
+    "tokenizer": "G:\\GitHub\\Strata-data\\packs\\iq2_xs\\tokenizer",
+    "native_scanner": true,
+    "tests_run": 499,
+    "failures": [],
+    "errors": [],
+    "skipped": [
+      [
+        "serve.test_slots.Slots.test_restore_of_a_link_reaches_the_engine_which_decides",
+        "symlinks need privileges on Windows"
+      ]
+    ],
+    "expected_failures": [],
+    "unexpected_successes": [],
+    "seconds": 741.5686486999912,
+    "successful": true
+  },
+  "fallback": {
+    "mode": "fallback",
+    "modules": [
+      "serve.test_frontend",
+      "serve.test_reasoning_rescue",
+      "serve.test_reasoning_tools",
+      "serve.test_responses",
+      "serve.test_structured",
+      "serve.test_text_scan",
+      "serve.test_server.TokenBatchParser",
+      "serve.test_server.LiteralThinkTags",
+      "serve.test_server.LiteralControlTokens",
+      "serve.test_server.ToolCallTerminators",
+      "serve.test_server.ToolCallTagInProse",
+      "serve.test_server.UnfinishedToolCall",
+      "serve.test_server.ClientShapes",
+      "serve.test_server.ToolArguments",
+      "serve.test_server.ThinkingBudget",
+      "serve.test_server.ForcedToolChoice",
+      "serve.test_server.StreamingGzip",
+      "serve.test_server.StopStrings",
+      "serve.test_server.UsageAndStatus"
+    ],
+    "python": "3.11.9 (tags/v3.11.9:de54cf5, Apr  2 2024, 10:12:12) [MSC v.1938 64 bit (AMD64)]",
+    "jsonschema": "4.26.0",
+    "tokenizer": "G:\\GitHub\\Strata-data\\packs\\iq2_xs\\tokenizer",
+    "native_scanner": false,
+    "tests_run": 177,
+    "failures": [],
+    "errors": [],
+    "skipped": [
+      [
+        "serve.test_text_scan.TextScan.test_native_marker_restore_at_boundaries",
+        "optional scanner not built"
+      ],
+      [
+        "serve.test_text_scan.TextScan.test_native_matches_python_at_boundaries",
+        "build optional scanner with tools/build_text_scan.py"
+      ],
+      [
+        "serve.test_text_scan.TextScan.test_native_rejects_invalid_arguments",
+        "optional scanner not built"
+      ]
+    ],
+    "expected_failures": [],
+    "unexpected_successes": [],
+    "seconds": 54.368958600010956,
+    "successful": true
+  },
+  "differential_rerun": {
+    "python": "3.11.9 (tags/v3.11.9:de54cf5, Apr  2 2024, 10:12:12) [MSC v.1938 64 bit (AMD64)]",
+    "platform": "Windows-10-10.0.19045-SP0",
+    "cpu_affinity": [
+      42
+    ],
+    "sha256": {
+      "build-sycl-a770-anthropic-events-20261024/before/serve/server.py": "63ec0b315f62c855d1ffc40a6a988f296b2513d7070043507aaa4a624abca31e",
+      "build-sycl-a770-anthropic-events-20261024/after/serve/server.py": "6d64d7d53f474270eabc9ab7137196060fe540ab18d39702458392ed3e3a4b67",
+      "build-sycl-a770-anthropic-events-20261024/measure.py": "13f58f32b4febcbfb4d606985c7f7671f0c806cdfca8301dd28ab81529565198"
+    },
+    "comparisons": 5000,
+    "protocol_and_sse_match": true,
+    "inputs_unchanged": true,
+    "unsupported_event_still_rejected": true
+  },
+  "baseline": {
+    "python": "3.11.9 (tags/v3.11.9:de54cf5, Apr  2 2024, 10:12:12) [MSC v.1938 64 bit (AMD64)]",
+    "source_sha256": {
+      "serve/frontend.py": "e0857ef350d5bd0468dba77c4c3e8aba556ff6c29e9951846f7f11eeab0c07b1",
+      "serve/mcp.py": "4cd9f18d427123e7080cb2a1b937b7c8ede401378c3485bc142db40b9655be0b",
+      "serve/mcp_fake_server.py": "484a5202e378fb61aa2baf4adea106f13f95696c1719a054d68c7a167e9e5325",
+      "serve/responses.py": "884756f4b33ebcd930249218568396b94f9e4c6cfec1c2c6d5c4b084ca17ab00",
+      "serve/runconfig.py": "b479b7f65067d1b85f8d3f36fca29772cf1307aecf2298d80e5e40f6955ffe4a",
+      "serve/server.py": "6d64d7d53f474270eabc9ab7137196060fe540ab18d39702458392ed3e3a4b67",
+      "serve/structured.py": "36af8fd3eef409b801cb5517fccca768634a95420d718281940c17a00a5527b8",
+      "serve/telemetry.py": "611ce7043ad316793569de52c0f9f4f57c3dd1ffa77f9e41ef85b65189a2873b",
+      "serve/test_control_cancel.py": "a1eda9d7ee61b2d8da26579cf968f15e4d2870a839a7c47c2077e1df58aa3e36",
+      "serve/test_detok.py": "a1e44a865df2d8974e108823cb81efa777fe2b350fc2df35fbde459d515a7278",
+      "serve/test_fatal_recovery.py": "f14477565a472608bed122258066b91676a16ec76d97a4fb9b54ea62ae8639b6",
+      "serve/test_frontend.py": "62099f4db00daac9f324efa0ff6313e1e1a9cbb167ce7d62d7ec8dc1cd91f7f1",
+      "serve/test_lifecycle.py": "bc7334530c0900db675a7c73b079d3565a1e456c3d6cfdc04760e8479e4ec320",
+      "serve/test_mcp.py": "6a02008f1910404743cfde66933c6fbcf29572b5cc71f7e224e24402ef3fb6d6",
+      "serve/test_monitor.py": "7face289d89c1bec38b5fae0334fc2f88e2e98b7aa151b8ea640437d5890292a",
+      "serve/test_parallel.py": "2326d767050db0e752671991d7bf99e23a367d99227d914cc31409a348ca8873",
+      "serve/test_reasoning_loop_recovery.py": "4a89bf1fa248196efd728ef374b1274fc764577d63f400ad317866973e8e5a96",
+      "serve/test_reasoning_rescue.py": "ecf14826ba71a54c5073b109a7745ec5d59d07b21565156b7a9f918c77d577e7",
+      "serve/test_reasoning_tools.py": "3c009fe9fb7585b182b84b0fc45e4c7370965ebe7e6ff673302f8bf6315126d8",
+      "serve/test_responses.py": "c3730d860a28399f38f7f3626eb251e76a6ae1763dbb18f3fea24d04d14734cc",
+      "serve/test_restart_waiters.py": "b35f1d486fc2d76854ff69fc1a62141881d47df98926b7f677bbaa21741421ab",
+      "serve/test_runconfig.py": "cd968de92873d64cb056d12b3639ccff67616b3fe308e7ed8cadf0a2ec717365",
+      "serve/test_security.py": "a6867eec898088f6eba83878ab5edc983896a6f7c55da91d77f931be314b3d05",
+      "serve/test_server.py": "55284af9f45fdda81c53729cd536cec19107f4f7443529a16855fc4399922c07",
+      "serve/test_slots.py": "12c1407453bff494a4987507c2a3326762a6b097572f6f82fbf090fa81d16ba9",
+      "serve/test_structured.py": "ab37dc77bde935e28e132488656e29bd8579e5c3c3392384a8437e99f8449b94",
+      "serve/test_text_scan.py": "3e0afe22209a7ec1e11ae38913c5e1cb0385c1ae5019a9d4a71731343767fe96",
+      "serve/test_vram.py": "a908f82e4bbc11621848cfe420cceb3eb4de92a2e6aeb9e16f130c5929a7d71b",
+      "serve/test_winjob.py": "e305a9aa79d53f6652e345c22ca55f6f3f8c4ccf20b05f67b6331328b6205f2e",
+      "serve/winjob.py": "736ee937e58438a4599b25d576a97cb3680cb963f50976abecc25038ef20740f",
+      "serve/__init__.py": "5b38172f894574bf933b1e932a2dace1c113184f105bcd7db8718e6330f809c2",
+      "serve/_text_scan.c": "18959b8a58f9d859d377e5830aadbb339982c75de00ed538d90d27d34da91a2f",
+      "serve/_text_scan.cp311-win_amd64.pyd": "4aa73e98f9428ae6cc3923c253f387aee5e234f4113b93d98eb1facf846b1444",
+      "tools/strata_tokenizer.py": "87eacd2cc297f704fd3b65a95b3eb8b83eb3c87aa40e15a1fbf727dd5d698912",
+      "strata-iq2_xs.json": "1a755372f0e6c90c0bfa2af865d67b51f8df49c10aa1613b041b08da8184ca88",
+      "build-sycl-a770-unified-operators/bin/strata-unified-all-operators.exe": "8f0d866ded297cf5a409e84cf5dd61f437c56c8a89aaeb2a85569265b6a3e122",
+      "README.md": "33b2409731c9afc5f8afbc6550050daed608e33fac36b4a7db81bf69f86c92b7",
+      "README.zh-CN.md": "f35295511e91b5c640764489f00c20dc9ab7e65c9ce27b5aa0ce8d16160c219a"
+    },
+    "tokenizer": "G:\\GitHub\\Strata-data\\packs\\iq2_xs\\tokenizer",
+    "tokenizer_sha256": {
+      "vocab.json": "4ba64f0332abcfb0b600b7df1537d1e836e68009d5fb7cdb77339738dc6365c4",
+      "merges.txt": "080cf95432173729d160346b7882bd2a644b07f7a3813a3eb73f4e66787bfde9",
+      "token_type.json": "5088c8c298fc06af8382ddb3b76c888703ac2634e82263b97eedcc2ad202738b"
+    }
+  },
+  "integrity": {
+    "source_and_protected_files": 38,
+    "tokenizer_files": 3,
+    "all_unchanged": true
+  },
+  "latest_evidence_verification": {
+    "command": "python -X utf8 build-sycl-a770-anthropic-events-20261024/publish.py --check --live",
+    "exit_code": 0,
+    "output": "OK: 76 artifact hashes; 5,000 protocol comparisons; 28 tests; A/B/A arithmetic; protected files"
+  },
+  "diff_check": {
+    "command": "git diff --check -- serve tools/strata_tokenizer.py",
+    "exit_code": 0
+  },
+  "sha256": {
+    "build-sycl-a770-server-validation-20261024/baseline.json": "95e454821987ddf127462b4aec1296c2571ae30de2b7b0d28db78778732ff032",
+    "build-sycl-a770-server-validation-20261024/run.py": "aa726daf5384f438cce889aedfe834c27a5b4534349ebcac199ea23d71e079ed",
+    "build-sycl-a770-server-validation-20261024/full.log": "2b2cdbffa899cd92e77584fb65b82491d0851114ec195c81bb0c42b5cdae450c",
+    "build-sycl-a770-server-validation-20261024/full.json": "a15aa93baa536bbe6d165472c12a77d82e73476fa030460fa75d9aa1475a9c22",
+    "build-sycl-a770-server-validation-20261024/fallback.log": "d814ad9110a3a4be0624e5ada1b772a828820a72a6c28273ea78ca57d7027371",
+    "build-sycl-a770-server-validation-20261024/fallback.json": "6a0e017ed5ea01b9b1449c725e43c00033960711e770c057875b39a97c57fd04",
+    "build-sycl-a770-anthropic-events-20261024/differential-validation.json": "8ee6906bf4e1795cc95aff2c920fc542748b520c4a1789449aecdde518c122ef",
+    "bench/results/a770/server-validation-2026-10-24.md": "e8a8f9dd517508fd032e611039d1b1eb06a59b6aaa540fd7a488d32a07ab07be"
+  }
+}

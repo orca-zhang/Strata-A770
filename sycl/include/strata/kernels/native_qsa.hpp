@@ -1,6 +1,21 @@
 #pragma once
 
+#include "strata/kernels/qsa.hpp"
+#include "strata/kernels/rope_scaling.hpp"
+
 namespace strata::kernels {
+
+// Batch of distinct device positions; same stores and host mirrors as kv_append_step.
+void kv_append_steps(uint16_t* k_pool, uint16_t* v_pool, const int32_t* table, const int32_t* steps,
+                     int step_stride, int n_tok, const float* kcur, const float* vcur,
+                     const QsaShapes& s, void* stream, const KvHostPools* host);
+
+// HD=256/n_rot=64, unrotated Q8 KV: same FP32 norm/RoPE and stored-scale quantization as the separate calls.
+// Positions are [token * position_stride + head]; steps are [token * step_stride]. Distinct output cells required.
+void native_qsa_norm_rope_store_q8_steps(const float* kcur, const float* vcur, const float* gamma,
+    const int32_t* positions, int position_stride, const int32_t* steps, int step_stride, int n_tok,
+    int8_t* k_q, int8_t* v_q, uint16_t* k_scale, uint16_t* v_scale, const int32_t* table,
+    const QsaShapes& s, float epsilon, const RopeScaling& scaling, void* stream, const KvHostPools* host);
 
 // Set before session construction/capture; existing CUDA graphs retain their
 // selected kernels. Disabled by default. Integration chooses the call sites.

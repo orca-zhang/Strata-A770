@@ -1,0 +1,366 @@
+strata generate: this CPU has no AVX-512: the expert kernels run on AVX-2 (multi-token for the i-quant gate/up rows)
+strata generate: native pack: G:\GitHub\Strata-data\packs\iq2_xs experts (largest blob 1.51 MB), token embedding IQ4_XS in mapped host memory (322 MiB)
+strata generate: 1466 MiB of weights loaded from G:\GitHub\Strata-data\packs\iq2_xs (302 canonical tensors skipped: served natively)
+strata generate: 300 native projection matrices, 1474.85 MiB of weights
+strata generate: the SSD is kept awake while rows are read: one page of the table after 100 ms without a read, until 60 s after the last request (STRATA_SSD_KEEPALIVE=0 turns it off)
+strata generate: profile G:\GitHub\Strata\data\expert-profile.bin: 24576 ranked pairs, built for 24576 slots
+strata generate: PLE on, table 320001536 rows of G:\GitHub\Strata-data\models\IQ2_XS\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00002-of-00002.gguf
+strata mtp: draft layer loaded, 799 MiB of VRAM (experts 675, dense 111), files read in 0.52 s (1500 MiB/s)
+strata generate: native head type 23, 337715200 bytes
+strata generate: GPU 0: Intel(R) Arc(TM) A770 Graphics, compute capability 12.55
+strata generate: WARNING: this engine was compiled with CUDA 12.8 headers but loaded a CUDA 0.1 runtime (libcudart): GPU properties can read wrong and some kernels go unused. Rebuild it against one toolkit (cmake -DCUDAToolkit_ROOT=<the toolkit>, with its libcudart.so present) (#542)
+strata generate: experts streamed from the GGUF on demand (--stream-experts): no host arena; every expert must fit the VRAM cache
+strata trace: 10183 MiB free after the weights, the session and the drafter
+strata generate: expert cache 4191 slots, 5.63 GiB of VRAM; policy is
+strata trace: 4421 MiB free after opening the expert cache
+strata generate: the GPU computes the experts in the cache; it rounds differently from the CPU,
+                 so a reply can differ slightly from a run without the cache (same quality:
+                 bench/results/2026-09-27-cache-parity).
+                 PROFILE, ranked by routing frequency, no eviction.
+strata generate: profile fill: 5.63 GiB in 2.7 s (2.21 GB/s, pipelined)
+strata trace: 4410 MiB free after the profile fill
+strata generate: pre-filled 4191 of 4191 slots from the profile; slot 0 verified
+strata generate: 24576 of 24576 experts missing from VRAM mirrored in pinned host memory (33.02 GiB, 19.0 s); the GPU reads them over PCIe
+strata trace: 4345 MiB free after the R4 hit path
+strata generate: R4 hit path ON - resident experts are computed on the GPU
+strata generate: 21 expert-pool workers + the host thread
+strata trace: 4345 MiB free after the expert cache and the graphs
+strata generate: session is up (engine 0.1.39-sycl)
+strata generate: token graph hit path: 4191 resident experts, decided on the device
+strata serve: the prompt path borrows 176 CUDA0 cache slots (0.24 GiB)
+strata trace: 4345 MiB free after the head and the prompt path
+strata verify: window up to 6 tokens, 56.4 MiB of device buffers
+strata trace: 4281 MiB free after the verifier and the drafter's binding
+strata serve: 4281 MiB of VRAM free with everything loaded
+strata trace: request 256 0
+strata serve: priming Windows before the first batched prompt
+strata trace: prompt start 255 -1
+strata trace: lent 176 slots for 256 tokens in 0.6 ms
+strata trace: prompt chunk 0 of 255
+strata trace: prefill submitting embed+steps
+strata trace: prefill layer 0, position 0, rows 255, after 3.2 ms
+strata trace: prefill submitting hc read
+strata trace: prefill submitting gdn
+strata trace: prefill submitting gdn conv+gates
+strata trace: prefill submitting gdn recurrence
+strata trace: prefill submitting gdn out proj
+strata trace: prefill submitting hc read
+strata trace: prefill submitting router+shared
+strata trace: prefill submitting host grouping
+strata trace: prefill submitting gather
+strata trace: prefill submitting combine
+strata trace: prefill layer 1, position 0, rows 255, after 18907.0 ms
+strata trace: prefill submitting ple
+strata trace: prefill submitting hc read
+strata trace: prefill submitting gdn
+strata trace: prefill submitting gdn conv+gates
+strata trace: prefill submitting gdn recurrence
+strata trace: prefill submitting gdn out proj
+strata trace: prefill submitting hc read
+strata trace: prefill submitting router+shared
+strata trace: prefill submitting host grouping
+strata trace: prefill submitting gather
+strata trace: prefill submitting combine
+strata trace: prefill layer 2, position 0, rows 255, after 35895.9 ms
+strata trace: prefill submitting hc read
+strata trace: prefill submitting gdn
+strata trace: prefill submitting gdn conv+gates
+strata trace: prefill submitting gdn recurrence
+strata trace: prefill submitting gdn out proj
+strata trace: prefill submitting hc read
+strata trace: prefill submitting router+shared
+strata trace: prefill submitting host grouping
+strata trace: prefill submitting gather
+strata trace: prefill submitting combine
+strata trace: prefill layer 3, position 0, rows 255, after 50675.8 ms
+strata trace: prefill submitting hc read
+strata trace: prefill submitting qsa proj
+strata trace: prefill submitting qsa indexer
+strata trace: prefill submitting qsa select
+strata trace: prefill submitting qsa attn
+strata trace: prefill submitting qsa proj
+strata trace: prefill submitting hc read
+strata trace: prefill submitting router+shared
+strata trace: prefill submitting host grouping
+strata trace: prefill submitting gather
+strata trace: prefill submitting combine
+strata trace: prefill layer 4, position 0, rows 255, after 62077.2 ms
+strata trace: prefill submitting hc read
+strata trace: prefill submitting gdn
+strata trace: prefill submitting gdn conv+gates
+strata trace: prefill submitting gdn recurrence
+strata trace: prefill submitting gdn out proj
+strata trace: prefill submitting hc read
+strata trace: prefill submitting router+shared
+strata trace: prefill submitting host grouping
+strata trace: prefill submitting gather
+strata trace: prefill submitting combine
+strata trace: prefill layer 5, position 0, rows 255, after 75660.6 ms
+strata trace: prefill submitting hc read
+strata trace: prefill submitting gdn
+strata trace: prefill submitting gdn conv+gates
+strata trace: prefill submitting gdn recurrence
+strata trace: prefill submitting gdn out proj
+strata trace: prefill submitting hc read
+strata trace: prefill submitting router+shared
+strata trace: prefill submitting host grouping
+strata trace: prefill submitting gather
+strata trace: prefill submitting combine
+strata trace: prefill layer 6, position 0, rows 255, after 91499.1 ms
+strata trace: prefill submitting hc read
+strata trace: prefill submitting gdn
+strata trace: prefill submitting gdn conv+gates
+strata trace: prefill submitting gdn recurrence
+strata trace: prefill submitting gdn out proj
+strata trace: prefill submitting hc read
+strata trace: prefill submitting router+shared
+strata trace: prefill submitting host grouping
+strata trace: prefill submitting gather
+strata trace: prefill submitting combine
+strata trace: prefill layer 7, position 0, rows 255, after 107149.1 ms
+strata trace: prefill submitting hc read
+strata trace: prefill submitting qsa proj
+strata trace: prefill submitting qsa indexer
+strata trace: prefill submitting qsa select
+strata trace: prefill submitting qsa attn
+strata trace: prefill submitting qsa proj
+strata trace: prefill submitting hc read
+strata trace: prefill submitting router+shared
+strata trace: prefill submitting host grouping
+strata trace: prefill submitting gather
+strata trace: prefill submitting combine
+strata trace: prefill layer 8, position 0, rows 255, after 123065.5 ms
+strata trace: prefill submitting hc read
+strata trace: prefill submitting gdn
+strata trace: prefill submitting gdn conv+gates
+strata trace: prefill submitting gdn recurrence
+strata trace: prefill submitting gdn out proj
+strata trace: prefill submitting hc read
+strata trace: prefill submitting router+shared
+strata trace: prefill submitting host grouping
+strata trace: prefill submitting gather
+strata trace: prefill submitting combine
+strata trace: prefill layer 9, position 0, rows 255, after 136662.9 ms
+strata trace: prefill submitting hc read
+strata trace: prefill submitting gdn
+strata trace: prefill submitting gdn conv+gates
+strata trace: prefill submitting gdn recurrence
+strata trace: prefill submitting gdn out proj
+strata trace: prefill submitting hc read
+strata trace: prefill submitting router+shared
+strata trace: prefill submitting host grouping
+strata trace: prefill submitting gather
+strata trace: prefill submitting combine
+strata trace: prefill layer 10, position 0, rows 255, after 150212.7 ms
+strata trace: prefill submitting hc read
+strata trace: prefill submitting gdn
+strata trace: prefill submitting gdn conv+gates
+strata trace: prefill submitting gdn recurrence
+strata trace: prefill submitting gdn out proj
+strata trace: prefill submitting hc read
+strata trace: prefill submitting router+shared
+strata trace: prefill submitting host grouping
+strata trace: prefill submitting gather
+strata trace: prefill submitting combine
+strata trace: prefill layer 11, position 0, rows 255, after 165158.2 ms
+strata trace: prefill submitting hc read
+strata trace: prefill submitting qsa proj
+strata trace: prefill submitting qsa indexer
+strata trace: prefill submitting qsa select
+strata trace: prefill submitting qsa attn
+strata trace: prefill submitting qsa proj
+strata trace: prefill submitting hc read
+strata trace: prefill submitting router+shared
+strata trace: prefill submitting host grouping
+strata trace: prefill submitting gather
+strata trace: prefill submitting combine
+strata trace: prefill layer 12, position 0, rows 255, after 178747.1 ms
+strata trace: prefill submitting hc read
+strata trace: prefill submitting gdn
+strata trace: prefill submitting gdn conv+gates
+strata trace: prefill submitting gdn recurrence
+strata trace: prefill submitting gdn out proj
+strata trace: prefill submitting hc read
+strata trace: prefill submitting router+shared
+strata trace: prefill submitting host grouping
+strata trace: prefill submitting gather
+strata trace: prefill submitting combine
+strata trace: prefill layer 13, position 0, rows 255, after 194342.5 ms
+strata trace: prefill submitting hc read
+strata trace: prefill submitting gdn
+strata trace: prefill submitting gdn conv+gates
+strata trace: prefill submitting gdn recurrence
+strata trace: prefill submitting gdn out proj
+strata trace: prefill submitting hc read
+strata trace: prefill submitting router+shared
+strata trace: prefill submitting host grouping
+strata trace: prefill submitting gather
+strata trace: prefill submitting combine
+strata trace: prefill layer 14, position 0, rows 255, after 207990.1 ms
+strata trace: prefill submitting hc read
+strata trace: prefill submitting gdn
+strata trace: prefill submitting gdn conv+gates
+strata trace: prefill submitting gdn recurrence
+strata trace: prefill submitting gdn out proj
+strata trace: prefill submitting hc read
+strata trace: prefill submitting router+shared
+strata trace: prefill submitting host grouping
+strata trace: prefill submitting gather
+strata trace: prefill submitting combine
+strata trace: prefill layer 15, position 0, rows 255, after 222720.0 ms
+strata trace: prefill submitting hc read
+strata trace: prefill submitting qsa proj
+strata trace: prefill submitting qsa indexer
+strata trace: prefill submitting qsa select
+strata trace: prefill submitting qsa attn
+strata trace: prefill submitting qsa proj
+strata trace: prefill submitting hc read
+strata trace: prefill submitting router+shared
+strata trace: prefill submitting host grouping
+strata trace: prefill submitting gather
+strata trace: prefill submitting combine
+strata trace: prefill layer 16, position 0, rows 255, after 234668.5 ms
+strata trace: prefill submitting hc read
+strata trace: prefill submitting gdn
+strata trace: prefill submitting gdn conv+gates
+strata trace: prefill submitting gdn recurrence
+strata trace: prefill submitting gdn out proj
+strata trace: prefill submitting hc read
+strata trace: prefill submitting router+shared
+strata trace: prefill submitting host grouping
+strata trace: prefill submitting gather
+strata trace: prefill submitting combine
+strata trace: prefill layer 17, position 0, rows 255, after 248393.2 ms
+strata trace: prefill submitting hc read
+strata trace: prefill submitting gdn
+strata trace: prefill submitting gdn conv+gates
+strata trace: prefill submitting gdn recurrence
+strata trace: prefill submitting gdn out proj
+strata trace: prefill submitting hc read
+strata trace: prefill submitting router+shared
+strata trace: prefill submitting host grouping
+strata trace: prefill submitting gather
+strata trace: prefill submitting combine
+strata trace: prefill layer 18, position 0, rows 255, after 265422.3 ms
+strata trace: prefill submitting hc read
+strata trace: prefill submitting gdn
+strata trace: prefill submitting gdn conv+gates
+strata trace: prefill submitting gdn recurrence
+strata trace: prefill submitting gdn out proj
+strata trace: prefill submitting hc read
+strata trace: prefill submitting router+shared
+strata trace: prefill submitting host grouping
+strata trace: prefill submitting gather
+strata trace: prefill submitting combine
+strata trace: prefill layer 19, position 0, rows 255, after 282681.5 ms
+strata trace: prefill submitting hc read
+strata trace: prefill submitting qsa proj
+strata trace: prefill submitting qsa indexer
+strata trace: prefill submitting qsa select
+strata trace: prefill submitting qsa attn
+strata trace: prefill submitting qsa proj
+strata trace: prefill submitting hc read
+strata trace: prefill submitting router+shared
+strata trace: prefill submitting host grouping
+strata trace: prefill submitting gather
+strata trace: prefill submitting combine
+strata trace: prefill layer 20, position 0, rows 255, after 298496.0 ms
+strata trace: prefill submitting hc read
+strata trace: prefill submitting gdn
+strata trace: prefill submitting gdn conv+gates
+strata trace: prefill submitting gdn recurrence
+strata trace: prefill submitting gdn out proj
+strata trace: prefill submitting hc read
+strata trace: prefill submitting router+shared
+strata trace: prefill submitting host grouping
+strata trace: prefill submitting gather
+strata trace: prefill submitting combine
+strata trace: prefill layer 21, position 0, rows 255, after 314198.7 ms
+strata trace: prefill submitting hc read
+strata trace: prefill submitting gdn
+strata trace: prefill submitting gdn conv+gates
+strata trace: prefill submitting gdn recurrence
+strata trace: prefill submitting gdn out proj
+strata trace: prefill submitting hc read
+strata trace: prefill submitting router+shared
+strata trace: prefill submitting host grouping
+strata trace: prefill submitting gather
+strata trace: prefill submitting combine
+strata trace: prefill layer 22, position 0, rows 255, after 331790.6 ms
+strata trace: prefill submitting hc read
+strata trace: prefill submitting gdn
+strata trace: prefill submitting gdn conv+gates
+strata trace: prefill submitting gdn recurrence
+strata trace: prefill submitting gdn out proj
+strata trace: prefill submitting hc read
+strata trace: prefill submitting router+shared
+strata trace: prefill submitting host grouping
+strata trace: prefill submitting gather
+strata trace: prefill submitting combine
+strata trace: prefill layer 23, position 0, rows 255, after 351910.7 ms
+strata trace: prefill submitting hc read
+strata trace: prefill submitting qsa proj
+strata trace: prefill submitting qsa indexer
+strata trace: prefill submitting qsa select
+strata trace: prefill submitting qsa attn
+strata trace: prefill submitting qsa proj
+strata trace: prefill submitting hc read
+strata trace: prefill submitting router+shared
+strata trace: prefill submitting host grouping
+strata trace: prefill submitting gather
+strata trace: prefill submitting combine
+strata trace: prefill layer 24, position 0, rows 255, after 368105.8 ms
+strata trace: prefill submitting hc read
+strata trace: prefill submitting gdn
+strata trace: prefill submitting gdn conv+gates
+strata trace: prefill submitting gdn recurrence
+strata trace: prefill submitting gdn out proj
+strata trace: prefill submitting hc read
+strata trace: prefill submitting router+shared
+strata trace: prefill submitting host grouping
+strata trace: prefill submitting gather
+strata trace: prefill submitting combine
+strata trace: prefill layer 25, position 0, rows 255, after 382832.9 ms
+strata trace: prefill submitting hc read
+strata trace: prefill submitting gdn
+strata trace: prefill submitting gdn conv+gates
+strata trace: prefill submitting gdn recurrence
+strata trace: prefill submitting gdn out proj
+strata trace: prefill submitting hc read
+strata trace: prefill submitting router+shared
+strata trace: prefill submitting host grouping
+strata trace: prefill submitting gather
+strata trace: prefill submitting combine
+strata trace: prefill layer 26, position 0, rows 255, after 396908.2 ms
+strata trace: prefill submitting hc read
+strata trace: prefill submitting gdn
+strata trace: prefill submitting gdn conv+gates
+strata trace: prefill submitting gdn recurrence
+strata trace: prefill submitting gdn out proj
+strata trace: prefill submitting hc read
+strata trace: prefill submitting router+shared
+strata trace: prefill submitting host grouping
+strata trace: prefill submitting gather
+strata trace: prefill submitting combine
+strata trace: prefill layer 27, position 0, rows 255, after 413172.2 ms
+strata trace: prefill submitting hc read
+strata trace: prefill submitting qsa proj
+strata trace: prefill submitting qsa indexer
+strata trace: prefill submitting qsa select
+strata trace: prefill submitting qsa attn
+strata trace: prefill submitting qsa proj
+strata trace: prefill submitting hc read
+strata trace: prefill submitting router+shared
+strata trace: prefill submitting host grouping
+strata trace: prefill submitting gather
+strata trace: prefill submitting combine
+strata trace: prefill layer 28, position 0, rows 255, after 427709.1 ms
+strata trace: prefill submitting hc read
+strata trace: prefill submitting gdn
+strata trace: prefill submitting gdn conv+gates
+strata trace: prefill submitting gdn recurrence
+strata trace: prefill submitting gdn out proj
+strata trace: prefill submitting hc read
+strata trace: prefill submitting router+shared
+strata trace: prefill submitting host grouping
+strata trace: prefill submitting gather

@@ -29,6 +29,7 @@
 #include "strata/kernels/sampler.hpp"
 #include "strata/kernels/shared_expert.hpp"
 #include "strata/kernels/verify_kernels.hpp"
+#include "strata/spec/draft_policy.hpp"
 
 #include <algorithm>
 #include <atomic>
@@ -65,6 +66,10 @@ const bool g_accepted_only = [] {
 }();
 const bool g_qsa_q8_tail = [] {
     const char* v = std::getenv("STRATA_QSA_Q8_TAIL");
+    return v && v[0] == '1';
+}();
+const bool g_chain_submit = [] {
+    const char* v = std::getenv("STRATA_MTP_CHAIN_SUBMIT");
     return v && v[0] == '1';
 }();
 
@@ -151,13 +156,13 @@ MtpDrafter::~MtpDrafter() {
     if (h_cparams_) sycl::free(h_cparams_, dpct::get_in_order_queue());
     if (h_chist_) sycl::free(h_chist_, dpct::get_in_order_queue());
     if (cs_) dpct::get_current_device().destroy_queue(cs_);
-    if (dense_) sycl::free(dense_, dpct::get_in_order_queue());
-    if (experts_) sycl::free(experts_, dpct::get_in_order_queue());
+    if (dense_ && !weights_owner_) sycl::free(dense_, dpct::get_in_order_queue());
+    if (experts_ && !weights_owner_) sycl::free(experts_, dpct::get_in_order_queue());
     if (state_arena_) sycl::free(state_arena_, dpct::get_in_order_queue());
     if (arena_) sycl::free(arena_, dpct::get_in_order_queue());
     if (head_logits_) sycl::free(head_logits_, dpct::get_in_order_queue());
-    if (dhead_) sycl::free(dhead_, dpct::get_in_order_queue());
-    if (dvocab_) sycl::free(dvocab_, dpct::get_in_order_queue());
+    if (dhead_ && owns_draft_head_) sycl::free(dhead_, dpct::get_in_order_queue());
+    if (dvocab_ && owns_draft_head_) sycl::free(dvocab_, dpct::get_in_order_queue());
     void* hosts[] = {h_tok_, h_step_, h_pos_, h_row_, h_out_, h_prob_};
     for (void *h : hosts) if (h) sycl::free(h, dpct::get_in_order_queue());
 }
@@ -177,7 +182,7 @@ const void* MtpDrafter::q8(const char* name) const {
 
 bool MtpDrafter::load(const std::string &rt_dir, const ModelGeometry &g,
                       SessionState &ss, int max_t, std::string &err,
-                      int64_t window) try {
+                      int64_t window, const MtpDrafter* shared) try {
     device_ =
         dpct::get_current_device_id(); // a layer split's last stage on another
                                        // GPU: the drafter lives there
@@ -186,11 +191,24 @@ bool MtpDrafter::load(const std::string &rt_dir, const ModelGeometry &g,
     max_t_ = max_t;
     rt_dir_ = rt_dir;
     if (max_t < 1 || max_t > strata::kernels::kVerifyMaxT) { err = "mtp: max_t out of range"; return false; }
+    if (shared) {
+        if (shared == this || shared->device_ != device_ || shared->g_ != &g ||
+            !shared->dense_ || !shared->experts_ || shared->rt_dir_ != rt_dir) {
+            err = "mtp: incompatible shared weights";
+            return false;
+        }
+        weights_owner_ = shared;
+        owns_draft_head_ = false;
+        dense_ = shared->dense_;
+        experts_ = shared->experts_;
+        tensors_ = shared->tensors_;
+        hnorm_stream_ = shared->hnorm_stream_;
+    }
     // Loader fix (0.1.15+loaderfix.2): the two reads below are the whole “drafter files” cost; reporting
     // them apart from the rest of the stage is what makes the next regression visible.
     const auto t_files = std::chrono::steady_clock::now();
     // ---- the index and the dense weights
-    {
+    if (!shared) {
         std::ifstream idx(rt_dir + "/dense.txt");
         if (!idx) { err = "mtp: cannot open " + rt_dir + "/dense.txt (run tools/mtp_rt.py)"; return false; }
         std::string line;
@@ -247,7 +265,7 @@ bool MtpDrafter::load(const std::string &rt_dir, const ModelGeometry &g,
         vram_ += blob.size();
     }
     // ---- the 512 routed experts, one blob each
-    {
+    if (!shared) {
         const uint64_t bytes = (uint64_t) g.n_expert * mtp_expert_bytes(g);
         // Loader fix (0.1.15+loaderfix.2): each 64 MiB read below reached the disk as ~16k 4095-byte reads under
         // MSVC's `basic_filebuf::xsgetn`, which is what made 675 MiB of drafter experts take minutes.
@@ -400,8 +418,11 @@ bool MtpDrafter::load(const std::string &rt_dir, const ModelGeometry &g,
         0) {
         err = "mtp: stream"; return false;
     }
+    l0_sync_.init(cs_, "mtp");
     const double files_s = std::chrono::duration<double>(std::chrono::steady_clock::now() - t_files).count();
-    std::fprintf(stderr, "strata mtp: draft layer loaded, %.0f MiB of VRAM (experts %.0f, dense %.0f), files read in %.2f s (%.0f MiB/s)\n",
+    if (shared) std::fprintf(stderr, "strata mtp: sharing draft weights; private state and buffers %.1f MiB\n",
+                              (double) vram_ / 1048576.0);
+    else std::fprintf(stderr, "strata mtp: draft layer loaded, %.0f MiB of VRAM (experts %.0f, dense %.0f), files read in %.2f s (%.0f MiB/s)\n",
                  (double) vram_ / 1048576.0, (double) g.n_expert * mtp_expert_bytes(g) / 1048576.0,
                  (double) tensors_.back().off / 1048576.0, files_s,
                  files_s > 0 ? ((double) g.n_expert * mtp_expert_bytes(g) + (double) tensors_.back().off) /
@@ -416,7 +437,7 @@ catch (sycl::exception const &exc) {
 
 uint64_t MtpDrafter::bind_bytes(uint64_t head_row_bytes, int64_t n_vocab) const {
     uint64_t bytes = head_logits_ ? 0 : (uint64_t) max_t_ * (uint64_t) n_vocab * sizeof(float);
-    if (dhead_ == nullptr) {
+    if (dhead_ == nullptr && owns_draft_head_) {
         if (FILE* f = std::fopen((rt_dir_ + "/draft_vocab.bin").c_str(), "rb")) {
             std::fseek(f, 0, SEEK_END);
             const long size = std::ftell(f);
@@ -555,7 +576,7 @@ void draft_head_hint(int64_t n_tokens, int64_t row_bytes) {
 }  // namespace
 
 bool MtpDrafter::bind(const WeightTable &wt, const NativeHead *head,
-                      const float *window_R, std::string &err) try {
+                      const float *window_R, std::string &err, const MtpDrafter* shared) try {
     const OnDevice on_device(device_);
     wt_ = &wt;
     head_ = head;
@@ -571,8 +592,19 @@ bool MtpDrafter::bind(const WeightTable &wt, const NativeHead *head,
         err = "mtp: the draft logits do not fit";
         return false;
     }
+    if (shared != weights_owner_) { err = "mtp: draft head owner differs from weight owner"; return false; }
+    if (shared) {
+        if (shared->head_ != head || shared->device_ != device_ || shared->n_vocab_ != n_vocab_) {
+            err = "mtp: incompatible shared draft head";
+            return false;
+        }
+        dhead_ = shared->dhead_;
+        dvocab_ = shared->dvocab_;
+        n_dvocab_ = shared->n_dvocab_;
+        dvocab_host_ = shared->dvocab_host_;
+    }
     // the draft head's token subset, when tools/draft_vocab.py wrote one
-    if (dhead_ == nullptr) {
+    if (dhead_ == nullptr && !shared) {
         std::vector<uint8_t> raw;
         if (read_file(rt_dir_ + "/draft_vocab.bin", raw) && raw.size() >= 4 && raw.size() % 4 == 0) {
             n_dvocab_ = (int64_t) (raw.size() / 4);
@@ -1120,7 +1152,7 @@ bool MtpDrafter::prefill(const float *R_rows, const int32_t *next_tokens,
                 return false;
             }
         }
-        if (DPCT_CHECK_ERROR(cs_->wait()) != 0) {
+        if (!l0_sync_.wait(cs_)) {
             /*
             DPCT1009: SYCL reports errors using exceptions and does not use
             error codes. Please replace the "get_error_string_dummy(...)" with a
@@ -1163,7 +1195,7 @@ bool MtpDrafter::prefill(const float *R_rows, const int32_t *next_tokens,
             (g_verify_eager
                  ? !record_forward(T, -1, cs_, err)   // SYCL port: no graph backend, replay the body
                  : DPCT_CHECK_ERROR((cs_)->ext_oneapi_graph(*prefill_exec_[T])) != 0) ||
-            DPCT_CHECK_ERROR(cs_->wait()) != 0) {
+            !l0_sync_.wait(cs_)) {
             /*
             DPCT1009: SYCL reports errors using exceptions and does not use
             error codes. Please replace the "get_error_string_dummy(...)" with a
@@ -1189,7 +1221,7 @@ catch (sycl::exception const &exc) {
 }
 
 bool MtpDrafter::draft(int T, const int32_t* tokens, int64_t p, int a, int32_t* drafts, std::string& err,
-                       float* probs, float min_p, int* n_drafts) {
+                       float* probs, float min_p, int* n_drafts, float cumulative_min_p) {
     const OnDevice on_device(device_);
     if (T < 1 || T > max_t_ || a < 0 || a >= T) { err = "mtp: draft arguments out of range"; return false; }
     // The target committed rows [0, a]. Rejected rows need no draft K/V; the next round overwrites their cells.
@@ -1212,13 +1244,22 @@ bool MtpDrafter::draft(int T, const int32_t* tokens, int64_t p, int a, int32_t* 
         put(t, p + t);
     }
     put(2 * max_t_ - 1, coupled_draft_cell(p, a, 0));   // p + a: draft 0's cell
+    const int max_steps = std::min(max_t_ - 1, max_drafts_);
+    const bool chain_submit = g_chain_submit && !top2_on && min_p <= 0.0f && cumulative_min_p <= 0.0f;
+    if (chain_submit) {
+        // All mapped metadata is ready before the first graph can read it.
+        for (int j = 1; j < max_steps; ++j) {
+            if (!capture_step(j, cp, err)) return false;
+            put(max_t_ + j - 1, coupled_draft_cell(p, a, j));
+        }
+    }
     h_row_[0] = a;
     h_row_[1] = 0;
     std::atomic_thread_fence(std::memory_order_seq_cst);
     if ((g_verify_eager
              ? !record_round(T, cp, err)   // SYCL port: no graph backend, replay the body
              : DPCT_CHECK_ERROR((cs_)->ext_oneapi_graph(*(cp ? round_exec_c_[T] : round_exec_[T]))) != 0) ||
-        DPCT_CHECK_ERROR(cs_->wait()) != 0) {
+        (!chain_submit && DPCT_CHECK_ERROR(cs_->wait_and_throw()) != 0)) {
         /*
         DPCT1009: SYCL reports errors using exceptions and does not use error
         codes. Please replace the "get_error_string_dummy(...)" with a real
@@ -1230,7 +1271,28 @@ bool MtpDrafter::draft(int T, const int32_t* tokens, int64_t p, int a, int32_t* 
         need to rewrite this code.
         */
         err = std::string("mtp draft: ") + dpct::get_error_string_dummy(0);
+        if (chain_submit) cs_->wait_and_throw();
         return false;
+    }
+    if (chain_submit) {
+        for (int j = 1; j < max_steps; ++j) {
+            if (g_verify_eager ? !record_step(j, cp, err)
+                               : DPCT_CHECK_ERROR(cs_->ext_oneapi_graph(*(cp ? step_exec_c_[j] : step_exec_[j]))) != 0) {
+                cs_->wait_and_throw(); // mapped inputs must remain live until queued work has drained
+                return false;
+            }
+        }
+        cs_->wait_and_throw();
+        const int n = std::max(1, max_steps);
+        for (int j = 0; j < n; ++j) {
+            drafts[j] = h_out_[j];
+            if (probs) probs[j] = h_prob_[j];
+        }
+        for (int j = n; j < max_t_ - 1; ++j) { drafts[j] = 0; if (probs) probs[j] = 0.0f; }
+        if (n_drafts) *n_drafts = n;
+        ms_draft += ms_since(t0);
+        ++rounds;
+        return true;
     }
     drafts[0] = ((volatile int32_t*) h_out_)[0];
     if (top2_on) record_top2(0);
@@ -1239,13 +1301,16 @@ bool MtpDrafter::draft(int T, const int32_t* tokens, int64_t p, int a, int32_t* 
     int n = 1;
     // the chain continues while the last draft is likely enough to be verified
     for (int j = 1; j < std::min(max_t_ - 1, max_drafts_) && pj >= min_p; ++j) {
+        // ponytail: at most eight probabilities; reuse the verify rule before computing an unusable suffix.
+        if (cumulative_min_p > 0.0f &&
+            strata::spec::mtp_confidence_window(j + 1, h_prob_, 0.0f, cumulative_min_p) != j + 1) break;
         if (!capture_step(j, cp, err)) return false;
         put(max_t_ + j - 1, coupled_draft_cell(p, a, j));   // p + a + j; coupled: drawn at counter cell + 1
         std::atomic_thread_fence(std::memory_order_seq_cst);
         if ((g_verify_eager
                  ? !record_step(j, cp, err)   // SYCL port: no graph backend, replay the body
                  : DPCT_CHECK_ERROR((cs_)->ext_oneapi_graph(*(cp ? step_exec_c_[j] : step_exec_[j]))) != 0) ||
-            DPCT_CHECK_ERROR(cs_->wait()) != 0) {
+            !l0_sync_.wait(cs_)) {
             /*
             DPCT1009: SYCL reports errors using exceptions and does not use
             error codes. Please replace the "get_error_string_dummy(...)" with a
@@ -1275,7 +1340,7 @@ bool MtpDrafter::draft(int T, const int32_t* tokens, int64_t p, int a, int32_t* 
 
 bool MtpDrafter::draft_first(int T, const float *R_row, int32_t token,
                              int64_t cell, int32_t *drafts, std::string &err,
-                             float *probs, float min_p, int *n_drafts) try {
+                             float *probs, float min_p, int *n_drafts, float cumulative_min_p) try {
     const OnDevice on_device(device_);
     // row 0 is the real pair; rows 1.. repeat it and only write cells the next round overwrites
     const int64_t HCN = g_->hc * g_->n_embd;
@@ -1287,7 +1352,7 @@ bool MtpDrafter::draft_first(int T, const float *R_row, int32_t token,
             return false;
         }
     std::vector<int32_t> toks((size_t) T, token);
-    return draft(T, toks.data(), cell, 0, drafts, err, probs, min_p, n_drafts);
+    return draft(T, toks.data(), cell, 0, drafts, err, probs, min_p, n_drafts, cumulative_min_p);
 }
 catch (sycl::exception const &exc) {
   std::cerr << exc.what() << "Exception caught at file:" << __FILE__

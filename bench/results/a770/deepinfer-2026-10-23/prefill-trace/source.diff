@@ -1,0 +1,20 @@
+--- 
++++ 
+@@ -1530,6 +1530,8 @@
+     bool sync = prefill_sync_env();
+     long long n_sync = 0;
+     void mark(int phase, dpct::queue_ptr s) {
++        if (trace_env() && (phase < kPfWaitCopy || phase > kPfGemmD))
++            std::fprintf(stderr, "strata trace: prefill submitting %s\n", kPfNames[phase]);
+         if (sync) {
+             const auto t0 = std::chrono::steady_clock::now();
+             s->wait();
+@@ -2183,6 +2185,8 @@
+         }
+         };
+         for (int64_t l = LB; l < LE; ++l) {
++            if (trace_env()) std::fprintf(stderr, "strata trace: prefill layer %lld, position %lld, rows %lld, after %.1f ms\n",
++                                         (long long) l, (long long) p0, (long long) T, ms_since(t_start));
+             core::progress_beat();   // the serve watchdog: a prompt chunk of 8192 tokens is still moving
+             if (l > LB) pf_step("reading the prompt (batched, step sync): the experts and the rest of layer", l - 1);
+             core::progress_at("reading the prompt (batched): layer", l, p0);   // #251: a stall names layer and chunk

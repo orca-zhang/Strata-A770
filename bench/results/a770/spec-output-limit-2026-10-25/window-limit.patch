@@ -1,0 +1,20 @@
+--- a/sycl/src/program/generate.cpp
++++ b/sycl/src/program/generate.cpp
+@@ -7282,6 +7282,8 @@
+                         if (pk.lookup) { T = pk.t; from_sfx = true; }
+                     }
+                 }
++                // ponytail: verify only rows that can still be returned to the caller.
++                T = (int) std::min<int64_t>(T, max_new - produced_n);
+                 const bool timed_round = !first_window;
+                 const Clock::time_point round0 = Clock::now();
+                 if (p + T > o.max_context) break;
+@@ -8424,6 +8426,8 @@
+                     if (pk.lookup) { T = pk.t; from_sfx = true; }
+                 }
+             }
++            // ponytail: verify only rows that can still be returned to the caller.
++            T = (int) std::min<int64_t>(T, o.max_new - (int64_t) produced.size());
+             const bool timed_round = !first_window;
+             ++window_hist[(size_t) T];
+             if (p + T > o.max_context) {

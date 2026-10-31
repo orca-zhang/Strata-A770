@@ -20,7 +20,7 @@ from serve.server import Detokenizer  # noqa: E402
 def find_tokenizer():
     cands = [os.environ.get("STRATA_TOKENIZER", "")]
     cands += [str(p) for p in ROOT.glob("packs/*/tokenizer")] + [str(p) for p in ROOT.glob("pack/*/tokenizer")]
-    cands += [r"C:\Strata\Public\Engine\pack\full\tokenizer"]
+    cands += [r"C:\Users\AI-Server\Desktop\Strata\Public\Engine\pack\full\tokenizer"]
     for c in cands:
         if c and (Path(c) / "vocab.json").exists():
             return Path(c)
@@ -193,6 +193,48 @@ def synthetic_tokenizer(seed=268, n_merges=1500):
 
 class HeapBpe(unittest.TestCase):
     """#268: words longer than HEAP_MIN symbols merge with a heap; the ids must be exactly the scan's."""
+
+    def test_decode_bytes_and_error_policies(self):
+        import strata_tokenizer as ST
+        tok = ST.Tokenizer([ST.BYTE_TO_UNICODE[b] for b in range(256)], [])
+        for raw in (b"", b"plain\x00text", "中e\u0301😀".encode(), bytes(range(256)), b"\xf0\x9f", b"\xed\xa0\x80"):
+            for errors in ("replace", "ignore", "surrogateescape", "backslashreplace", "surrogatepass", "strict"):
+                try:
+                    expected = raw.decode("utf-8", errors)
+                except UnicodeDecodeError as exc:
+                    with self.assertRaises(UnicodeDecodeError) as caught:
+                        tok.decode(iter(raw), errors)
+                    self.assertEqual(caught.exception.args, exc.args)
+                else:
+                    for ids in (list(raw), tuple(raw), iter(raw)):
+                        self.assertEqual(tok.decode(ids, errors), expected)
+        for ids in ([-1], [256], [1, -1]):
+            with self.assertRaises(IndexError):
+                tok.decode(iter(ids))
+
+    def test_token_bytes_cold_and_cached(self):
+        import strata_tokenizer as ST
+        a = ST.Tokenizer(["", "a", ST.BYTE_TO_UNICODE[0]], [])
+        b = ST.Tokenizer(["", "b", ST.BYTE_TO_UNICODE[255]], [])
+        for tok, expected in ((a, [b"", b"a", b"\x00"]), (b, [b"", b"b", b"\xff"])):
+            for _ in range(2):
+                self.assertEqual([tok.token_bytes(i) for i in range(3)], expected)
+                for invalid in (-1, 3):
+                    with self.assertRaises(IndexError):
+                        tok.token_bytes(invalid)
+        bad = ST.Tokenizer(["a中b"], [])
+        for _ in range(2):
+            with self.assertRaisesRegex(KeyError, "token 0.*'中'"):
+                bad.token_bytes(0)
+
+    def test_byte_mapping_is_utf8(self):
+        import strata_tokenizer as ST
+        tok = ST.Tokenizer([ST.BYTE_TO_UNICODE[b] for b in range(256)], [])
+        text = "".join(map(chr, range(256))) + "你好，世界。é 👩‍💻 한국어"
+        text += "".join(map(chr, (0x7FF, 0x800, 0xFFFF, 0x10000, 0x10FFFF)))
+        self.assertEqual(tok.encode(text), list(text.encode("utf-8")))
+        with self.assertRaises(UnicodeEncodeError):
+            tok.encode("before\ud800after")
 
     def parity(self, tok, texts):
         for k, text in enumerate(texts):

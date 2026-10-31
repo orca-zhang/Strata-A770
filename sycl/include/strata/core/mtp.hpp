@@ -24,6 +24,7 @@
 #include "strata/core/layer.hpp"
 #include "strata/core/session.hpp"
 #include "strata/kernels/sampler.hpp"
+#include "strata/l0_sync.hpp"
 
 #include <cstdint>
 #include <algorithm>
@@ -44,7 +45,7 @@ public:
     /// Loads `rt_dir` (from tools/mtp_rt.py) and allocates the layer's K/V and buffers for up to `max_t` rows.
     /// Call before the VRAM expert tier is sized: this takes ~0.9 GB.
     bool load(const std::string& rt_dir, const ModelGeometry& g, SessionState& ss, int max_t, std::string& err,
-              int64_t window = 32768);
+              int64_t window = 32768, const MtpDrafter* shared = nullptr);
     /// The prompt's length: prefill() skips the cells the attention window can never reach again.
     void set_prompt_len(int64_t n) { prompt_len_ = n; }
     /// At most this many drafts per round (below max_t - 1): a window longer than the MTP's comes from elsewhere.
@@ -72,7 +73,8 @@ public:
     /// the draft head over rt/draft_vocab.bin's subset.  The expert cache is sized before bind(), so it reserves this.
     uint64_t bind_bytes(uint64_t head_row_bytes, int64_t n_vocab) const;
     /// The main model's embedding and head, and the verify window's final residuals (T rows, hc*n_embd each).
-    bool bind(const WeightTable& wt, const NativeHead* head, const float* window_R, std::string& err);
+    bool bind(const WeightTable& wt, const NativeHead* head, const float* window_R, std::string& err,
+              const MtpDrafter* shared = nullptr);
 
     /// Prompt cells [cell0, cell0 + n): residual rows `R_rows` (device, hc*n_embd each) and `next_tokens` (host,
     /// the token at position cell+1).  Runs in batches of up to max_t rows.
@@ -81,12 +83,15 @@ public:
     /// One round: catch-up over T cells from `p` (rows = the window's final residuals, `tokens` = the window's
     /// argmaxes: row t pairs R_{p+t} with the token at p+t+1), then the draft chain from row `a` (the last
     /// accepted row) for T-1 drafts at cells p+a+1 ...  `drafts` gets T-1 tokens.
+    /// A positive cumulative floor stops after a rejected confidence prefix; uncomputed outputs are zeroed.
     bool draft(int T, const int32_t* tokens, int64_t p, int a, int32_t* drafts, std::string& err,
-               float* probs = nullptr, float min_p = 0.0f, int* n_drafts = nullptr);
+               float* probs = nullptr, float min_p = 0.0f, int* n_drafts = nullptr,
+               float cumulative_min_p = 0.0f);
 
     /// The first round: one cell (`cell`) from `R_row` (device) and `token` -> T-1 drafts.
     bool draft_first(int T, const float* R_row, int32_t token, int64_t cell, int32_t* drafts, std::string& err,
-                     float* probs = nullptr, float min_p = 0.0f, int* n_drafts = nullptr);
+                     float* probs = nullptr, float min_p = 0.0f, int* n_drafts = nullptr,
+                     float cumulative_min_p = 0.0f);
 
     /// COUPLED DRAFT SAMPLING (core/coupled_draft.hpp; STRATA_SPEC_COUPLED=1, set up by bind()): the request's
     /// sampling.  A sampled request (temperature > 0, not greedy) then drafts by SAMPLING with the target's chain and
@@ -159,7 +164,8 @@ private:
     int max_drafts_ = 1 << 30;
     int64_t n_vocab_ = 0;
     uint64_t vram_ = 0;
-    dpct::queue_ptr cs_ = &dpct::get_in_order_queue();
+    dpct::queue_ptr cs_ = nullptr;
+    L0QueueSync l0_sync_;
     dpct::experimental::command_graph_exec_ptr prefill_exec_[9] = {};
     dpct::experimental::command_graph_exec_ptr prefill_dev_exec_[9] = {};
     int32_t* pf_dev_ = nullptr;   ///< E-4: a prompt's rows' token / step / position records, uploaded at once
@@ -170,6 +176,9 @@ private:
     std::vector<Tensor> tensors_;
     uint8_t* dense_ = nullptr;
     uint8_t* experts_ = nullptr;
+    // The owner must outlive borrowers; state, scratch and command graphs stay per drafter.
+    const MtpDrafter* weights_owner_ = nullptr;
+    bool owns_draft_head_ = true;
     void* state_arena_ = nullptr;
     QsaState st_;
     void* arena_ = nullptr;

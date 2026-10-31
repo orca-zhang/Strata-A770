@@ -36,7 +36,7 @@ struct PrefillStats {
     int64_t experts_dma = 0;        ///< ...of which straight from the pinned arena (no CPU copy)
     int64_t experts_resident = 0;   ///< expert-layer groups served from the VRAM tier
     double ms_ple = 0;
-    std::vector<float> routing_tail;  ///< NO_HOST adaptation: the last 256 rows of each chunk, no GPU timing events.
+    std::vector<float> routing_tail;  ///< NO_HOST adaptation: last 256 rows/chunk, or normalized last 64 with STRATA_PREFILL_CACHE_TAIL64=1.
 };
 
 }  // namespace strata::prefill

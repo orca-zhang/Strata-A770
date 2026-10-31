@@ -1,0 +1,110 @@
+diff --git a/sycl/src/prefill/gemm.dp.cpp b/sycl/src/prefill/gemm.dp.cpp
+index beea3c2b..ddd88c91 100644
+--- a/sycl/src/prefill/gemm.dp.cpp
++++ b/sycl/src/prefill/gemm.dp.cpp
+@@ -308,6 +308,7 @@ Gemm::~Gemm() {
+ #if defined(__HIPCC__) && defined(STRATA_HIPBLASLT_AVAILABLE)
+     delete static_cast<HipLtState*>(hipblaslt_state_);
+ #endif
++    if (widen_output_) sycl::free(widen_output_, *strata::q_of(stream_));
+     if (handle_) delete ((dpct::blas::descriptor_ptr)handle_);
+     if (!external_) {
+         if (scratch_) sycl::free(scratch_, dpct::get_in_order_queue());
+@@ -735,7 +736,8 @@ bool native_half_output_gemm(const uint16_t* X, const uint16_t* W, float* Y,
+ }
+ 
+ bool gpu_widen_gemm(const uint16_t* X, const uint16_t* W, float* Y, int64_t T, int64_t N, int64_t K,
+-                    int64_t ldx, int64_t ldy, float beta, void* workspace, size_t bytes, void* stream, bool bf16 = false) {
++                    int64_t ldx, int64_t ldy, float beta, void* workspace, size_t bytes, void* stream,
++                    float*& output, size_t& output_elems, bool bf16 = false) {
+     static const bool enabled = [] {
+         const char* v = std::getenv("STRATA_PREFILL_GPU_WIDEN");
+         return v && std::strcmp(v, "1") == 0;
+@@ -755,11 +757,17 @@ bool gpu_widen_gemm(const uint16_t* X, const uint16_t* W, float* Y, int64_t T, i
+     const size_t nw = (size_t) N * K;
+     if ((uint64_t) T > (capacity - nw) / ldx) return false;
+     // oneMKL 2025.3/A770 corrupts a C slice above 4 GiB when A/B/C share one allocation.
+-    // ponytail: stage C in its own allocation; reuse this buffer only if allocation becomes a measured bottleneck.
+-    auto release = [q](float* p) { sycl::free(p, *q); };
+-    std::unique_ptr<float, decltype(release)> output(sycl::malloc_device<float>((size_t) T * ldy, *q), release);
+-    if (!output) return false;
+-    q->memcpy(output.get(), Y, (size_t) T * ldy * sizeof(float));
++    // ponytail: retain the largest output until destruction; bound the cache if VRAM becomes a bottleneck.
++    // Each call's final wait finishes all users before this buffer is reused or grown.
++    const size_t required = (size_t) T * ldy;
++    if (required > output_elems) {
++        auto* grown = sycl::malloc_device<float>(required, *q);
++        if (!grown) return false;
++        if (output) sycl::free(output, *q);
++        output = grown;
++        output_elems = required;
++    }
++    q->memcpy(output, Y, required * sizeof(float));
+     auto* wf = static_cast<float*>(workspace);
+     auto* xf = wf + nw;
+     // ponytail: use the existing bounded workspace; large products keep the original path.
+@@ -789,15 +797,15 @@ bool gpu_widen_gemm(const uint16_t* X, const uint16_t* W, float* Y, int64_t T, i
+     });
+     // ponytail: the in-order queue orders conversion, GEMM and copy; the final wait protects all input lifetimes.
+     oneapi::mkl::blas::column_major::gemm(*q, oneapi::mkl::transpose::trans,
+-        oneapi::mkl::transpose::nontrans, N, T, K, 1.f, wf, K, xf, ldx, beta, output.get(), ldy,
++        oneapi::mkl::transpose::nontrans, N, T, K, 1.f, wf, K, xf, ldx, beta, output, ldy,
+         oneapi::mkl::blas::compute_mode::unset);
+-    q->memcpy(Y, output.get(), (size_t) T * ldy * sizeof(float)).wait_and_throw();
++    q->memcpy(Y, output, required * sizeof(float)).wait_and_throw();
+     return true;
+ }
+ // oneMKL's 16-bit path writes row padding; these two projections share that padding.
+ bool gdn_ab_gemm(const uint16_t* X, const uint16_t* W, float* Y,
+                         int64_t T, int64_t N, int64_t K, int64_t ldx, int64_t ldy, float beta,
+-                        void* workspace, size_t bytes, void* stream) {
++                        void* workspace, size_t bytes, void* stream, float*& output, size_t& output_elems) {
+     static const int mode=[] {
+         const char* v=std::getenv("STRATA_PREFILL_GDN_AB");
+         return !v?0:std::strcmp(v,"widen")==0?1:std::strcmp(v,"xmx")==0?2:0;
+@@ -821,7 +829,7 @@ bool gdn_ab_gemm(const uint16_t* X, const uint16_t* W, float* Y,
+             if (beta!=0.f) q->parallel_for(sycl::range<1>(size_t(T)*48),[=](sycl::id<1> i) {
+                 packed_y[i]=Y[(i[0]/48)*96+i[0]%48];
+             });
+-            staged=gpu_widen_gemm(X,W,packed_y,T,N,K,ldx,N,beta,scratch,scratch_bytes,stream,true);
++            staged=gpu_widen_gemm(X,W,packed_y,T,N,K,ldx,N,beta,scratch,scratch_bytes,stream,output,output_elems,true);
+             if (staged) path="widen";
+         }
+         if (staged) q->parallel_for(sycl::range<1>(size_t(T)*48),[=](sycl::id<1> i) {
+@@ -859,12 +867,12 @@ void Gemm::bf16(const uint16_t* X, const uint16_t* W, float* Y, int64_t T, int64
+     // SYCL kernel there (slow prompts, same answers) instead of failing the prompt.
+     if (!onemkl_usable(stream_) ||
+         DPCT_CHECK_ERROR([&] {
+-           if (gdn_ab_gemm(X,W,Y,T,N,K,ldx?ldx:K,ldy,beta,workspace_,workspace_bytes_,stream_)) return;
++           if (gdn_ab_gemm(X,W,Y,T,N,K,ldx?ldx:K,ldy,beta,workspace_,workspace_bytes_,stream_,widen_output_,widen_output_elems_)) return;
+            if (native_hc_inject_gemm(X,W,Y,T,N,K,ldx?ldx:K,ldy,beta,workspace_,workspace_bytes_,stream_)) return;
+            if (native_xmx_gemm(X,W,Y,T,N,K,ldx?ldx:K,ldy,beta,workspace_,workspace_bytes_,stream_,true)) return;
+            if (!ldx && native_half_output_gemm(X,W,Y,T,N,K,ldy,beta,stream_,true)) return;
+            if (gpu_widen_gemm(X, W, Y, T, N, K, ldx ? ldx : K, ldy, beta,
+-                             workspace_, workspace_bytes_, stream_, true)) return;
++                             workspace_, workspace_bytes_, stream_, widen_output_, widen_output_elems_, true)) return;
+            dpct::blas::gemm(
+            (dpct::blas::descriptor_ptr)handle_, oneapi::mkl::transpose::trans,
+            oneapi::mkl::transpose::nontrans, (int)N, (int)T, (int)K, &alpha, W,
+@@ -897,7 +905,7 @@ void Gemm::f16(const uint16_t* X, const uint16_t* W, float* Y, int64_t T, int64_
+            if (native_xmx_gemm(X,W,Y,T,N,K,K,ldy,beta,workspace_,workspace_bytes_,stream_)) return;
+            if (native_half_output_gemm(X,W,Y,T,N,K,ldy,beta,stream_)) return;
+            if (gpu_widen_gemm(X, W, Y, T, N, K, K, ldy, beta,
+-                             workspace_, workspace_bytes_, stream_)) return;
++                             workspace_, workspace_bytes_, stream_, widen_output_, widen_output_elems_)) return;
+            dpct::blas::gemm(
+            (dpct::blas::descriptor_ptr)handle_, oneapi::mkl::transpose::trans,
+            oneapi::mkl::transpose::nontrans, (int)N, (int)T, (int)K, &alpha, W,
+diff --git a/include/strata/prefill/gemm.hpp b/include/strata/prefill/gemm.hpp
+index 76583037..c8dbf4ae 100644
+--- a/include/strata/prefill/gemm.hpp
++++ b/include/strata/prefill/gemm.hpp
+@@ -71,6 +71,8 @@ private:
+     int64_t scratch_elems_ = 0;
+     void* workspace_ = nullptr;
+     size_t workspace_bytes_ = 0;  // SYCL: reuse the otherwise unused cuBLAS workspace for GPU widening.
++    float* widen_output_ = nullptr;
++    size_t widen_output_elems_ = 0;
+     bool external_ = false;
+     void* hipblaslt_state_ = nullptr;
+     bool f16_io_ = false;

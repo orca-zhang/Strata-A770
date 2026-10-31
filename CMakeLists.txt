@@ -9,6 +9,15 @@
 # and is wrong about its own performance, which is the worst of both outcomes.
 cmake_minimum_required(VERSION 3.24)
 project(strata VERSION 0.1.40 LANGUAGES CXX)
+option(STRATA_ENABLE_ORCA "Build the Intel Arc engine with the native Orca Level Zero runtime" OFF)
+if(STRATA_ENABLE_ORCA)
+  if(STRATA_ENABLE_SYCL OR STRATA_ENABLE_CUDA OR STRATA_ENABLE_HIP OR STRATA_HIP_GFX906)
+    message(FATAL_ERROR "STRATA_ENABLE_ORCA is a separate backend; enable only one GPU backend")
+  endif()
+  enable_testing()
+  add_subdirectory(sycl/orca orca)
+  return()
+endif()
 # EXPERIMENTAL: the Intel Arc engine, the SYCL port in sycl/ (PR #423; icpx + oneMKL, docs/INTEL_ARC.md). It is its
 # own project that takes the unported sources from src/; with this on, nothing below is configured.
 option(STRATA_ENABLE_SYCL "EXPERIMENTAL: build the Intel Arc (SYCL) engine from sycl/ - docs/INTEL_ARC.md" OFF)

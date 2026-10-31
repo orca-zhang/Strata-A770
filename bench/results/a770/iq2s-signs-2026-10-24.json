@@ -1,0 +1,760 @@
+{
+  "date": "2026-10-24",
+  "hardware": "Arc A770 16GB, Xeon E5-2696 v4, 256GB RAM, PCIe 3.0 x16, Windows, driver 32.0.101.9034, DPC++ 2025.3.2 / oneMKL 2025.3",
+  "scope": "Only Multi<22> sign expansion changes; both arms retain IQ1_M pair reuse. Same frozen October 19 engine and main object. Production EXE/config unchanged.",
+  "checks": {
+    "exact_gpu_dots": 8388608,
+    "model_tokens_compared": 12620,
+    "expert_chain_calls_checked": 1260,
+    "expert_chain_calls_compared_to_baseline": 1008,
+    "harness_note": "Private packed Q8 activation in the new harness also fails on unmodified baseline; use host-encoded device-memory activations, as the engine does.",
+    "coverage_refinement": "Sign patterns are independent of selected chunk; each of 32 byte positions now covers all 1024 grid codes x 256 signs. Scale nibbles also vary over all values."
+  },
+  "stage_screen": [
+    {
+      "scenario": 0,
+      "profile": 0,
+      "T": 1,
+      "groups": 10,
+      "entries": 10,
+      "us": 78.196875,
+      "checks": 12,
+      "pairs": [
+        {
+          "baseline_us": 77.98695774158331,
+          "candidate_us": 78.264583,
+          "reduction_pct": -0.3559893429060601,
+          "drift_pct": -0.5361736002877482
+        },
+        {
+          "baseline_us": 77.91160306991593,
+          "candidate_us": 78.193229,
+          "reduction_pct": -0.36146853483600694,
+          "drift_pct": 0.3448666276734347
+        }
+      ],
+      "reduction_pct": -0.35872890147825576
+    },
+    {
+      "scenario": 1,
+      "profile": 0,
+      "T": 4,
+      "groups": 40,
+      "entries": 40,
+      "us": 248.420833,
+      "checks": 24,
+      "pairs": [
+        {
+          "baseline_us": 248.65197546707,
+          "candidate_us": 242.523958,
+          "reduction_pct": 2.4644957899727427,
+          "drift_pct": 0.18617601205772605
+        },
+        {
+          "baseline_us": 248.7874815425529,
+          "candidate_us": 243.269792,
+          "reduction_pct": 2.2178324682342043,
+          "drift_pct": -0.07701037979911396
+        }
+      ],
+      "reduction_pct": 2.341242005849098
+    },
+    {
+      "scenario": 2,
+      "profile": 1,
+      "T": 4,
+      "groups": 20,
+      "entries": 40,
+      "us": 152.897396,
+      "checks": 36,
+      "pairs": [
+        {
+          "baseline_us": 153.04628151055337,
+          "candidate_us": 150.290625,
+          "reduction_pct": 1.8005380355244682,
+          "drift_pct": 0.19484700707395053
+        },
+        {
+          "baseline_us": 153.43028829259887,
+          "candidate_us": 150.458333,
+          "reduction_pct": 1.9370069141310675,
+          "drift_pct": 0.3070022142714235
+        }
+      ],
+      "reduction_pct": 1.868796197853495
+    },
+    {
+      "scenario": 3,
+      "profile": 2,
+      "T": 4,
+      "groups": 30,
+      "entries": 40,
+      "us": 202.51875,
+      "checks": 48,
+      "pairs": [
+        {
+          "baseline_us": 202.85752914029652,
+          "candidate_us": 196.086979,
+          "reduction_pct": 3.33758878410374,
+          "drift_pct": 0.3348455389933003
+        },
+        {
+          "baseline_us": 203.31064514998502,
+          "candidate_us": 196.523958,
+          "reduction_pct": 3.338087459699124,
+          "drift_pct": 0.11201156513849231
+        }
+      ],
+      "reduction_pct": 3.3378381222230136
+    },
+    {
+      "scenario": 4,
+      "profile": 3,
+      "T": 4,
+      "groups": 10,
+      "entries": 40,
+      "us": 101.01875,
+      "checks": 60,
+      "pairs": [
+        {
+          "baseline_us": 101.19541851499503,
+          "candidate_us": 99.170833,
+          "reduction_pct": 2.000669145604672,
+          "drift_pct": 0.35007956443728894
+        },
+        {
+          "baseline_us": 101.51214317558697,
+          "candidate_us": 99.377083,
+          "reduction_pct": 2.1032559345081747,
+          "drift_pct": 0.2759005518622848
+        }
+      ],
+      "reduction_pct": 2.0519759707108953
+    },
+    {
+      "scenario": 5,
+      "profile": 0,
+      "T": 6,
+      "groups": 60,
+      "entries": 60,
+      "us": 363.904167,
+      "checks": 72,
+      "pairs": [
+        {
+          "baseline_us": 364.2974439896681,
+          "candidate_us": 354.395312,
+          "reduction_pct": 2.7181447888360633,
+          "drift_pct": 0.21625995835328204
+        },
+        {
+          "baseline_us": 365.08260240699354,
+          "candidate_us": 354.446875,
+          "reduction_pct": 2.913238630620052,
+          "drift_pct": 0.2147935338139506
+        }
+      ],
+      "reduction_pct": 2.815740665183619
+    },
+    {
+      "scenario": 6,
+      "profile": 1,
+      "T": 6,
+      "groups": 30,
+      "entries": 60,
+      "us": 215.451562,
+      "checks": 84,
+      "pairs": [
+        {
+          "baseline_us": 215.6907522277784,
+          "candidate_us": 208.638542,
+          "reduction_pct": 3.2695932277759243,
+          "drift_pct": 0.22215944760706208
+        },
+        {
+          "baseline_us": 216.28096511500206,
+          "candidate_us": 209.170312,
+          "reduction_pct": 3.28769252126333,
+          "drift_pct": 0.32514394651073086
+        }
+      ],
+      "reduction_pct": 3.278643297880657
+    },
+    {
+      "scenario": 7,
+      "profile": 2,
+      "T": 6,
+      "groups": 45,
+      "entries": 60,
+      "us": 293.78125,
+      "checks": 96,
+      "pairs": [
+        {
+          "baseline_us": 294.1302616873177,
+          "candidate_us": 285.245313,
+          "reduction_pct": 3.0207529943869105,
+          "drift_pct": 0.23774083608127938
+        },
+        {
+          "baseline_us": 294.691590759123,
+          "candidate_us": 286.099479,
+          "reduction_pct": 2.915628415792193,
+          "drift_pct": 0.14396850352542678
+        }
+      ],
+      "reduction_pct": 2.968204941629504
+    },
+    {
+      "scenario": 8,
+      "profile": 3,
+      "T": 6,
+      "groups": 10,
+      "entries": 60,
+      "us": 153.911458,
+      "checks": 108,
+      "pairs": [
+        {
+          "baseline_us": 154.5831692352369,
+          "candidate_us": 146.096875,
+          "reduction_pct": 5.489791855879778,
+          "drift_pct": 0.8747587850152172
+        },
+        {
+          "baseline_us": 155.30650236511315,
+          "candidate_us": 146.508333,
+          "reduction_pct": 5.6650360616771644,
+          "drift_pct": 0.0627317870484978
+        }
+      ],
+      "reduction_pct": 5.577454614488564
+    }
+  ],
+  "stage_confirmation": [
+    {
+      "scenario": 0,
+      "profile": 0,
+      "T": 1,
+      "groups": 10,
+      "entries": 10,
+      "us": 77.979687,
+      "checks": 12,
+      "pairs": [
+        {
+          "baseline_us": 77.95598589815027,
+          "candidate_us": 78.276562,
+          "reduction_pct": -0.4112270509522675,
+          "drift_pct": -0.060778648675507974
+        },
+        {
+          "baseline_us": 78.0121990340927,
+          "candidate_us": 78.315104,
+          "reduction_pct": -0.3882789738755221,
+          "drift_pct": 0.20517297245663535
+        }
+      ],
+      "reduction_pct": -0.399752356767058
+    },
+    {
+      "scenario": 1,
+      "profile": 0,
+      "T": 4,
+      "groups": 40,
+      "entries": 40,
+      "us": 248.878125,
+      "checks": 24,
+      "pairs": [
+        {
+          "baseline_us": 248.9307234418657,
+          "candidate_us": 243.172917,
+          "reduction_pct": 2.3130155901428306,
+          "drift_pct": 0.04227289963711911
+        },
+        {
+          "baseline_us": 249.15410793367425,
+          "candidate_us": 243.044271,
+          "reduction_pct": 2.452232068074389,
+          "drift_pct": 0.13722484789775447
+        }
+      ],
+      "reduction_pct": 2.3826486469624486
+    },
+    {
+      "scenario": 2,
+      "profile": 1,
+      "T": 4,
+      "groups": 20,
+      "entries": 40,
+      "us": 152.951042,
+      "checks": 36,
+      "pairs": [
+        {
+          "baseline_us": 153.3276613153241,
+          "candidate_us": 150.129688,
+          "reduction_pct": 2.085711924313094,
+          "drift_pct": 0.4930767323572782
+        },
+        {
+          "baseline_us": 153.51837595077458,
+          "candidate_us": 149.991667,
+          "reduction_pct": 2.2972552496942855,
+          "drift_pct": -0.24295663423453684
+        }
+      ],
+      "reduction_pct": 2.191540778587353
+    },
+    {
+      "scenario": 3,
+      "profile": 2,
+      "T": 4,
+      "groups": 30,
+      "entries": 40,
+      "us": 203.045833,
+      "checks": 48,
+      "pairs": [
+        {
+          "baseline_us": 203.29437887904024,
+          "candidate_us": 196.578646,
+          "reduction_pct": 3.3034523217368883,
+          "drift_pct": 0.2449673517801232
+        },
+        {
+          "baseline_us": 203.50572554493755,
+          "candidate_us": 196.666146,
+          "reduction_pct": 3.3608781898508577,
+          "drift_pct": -0.03684720949376219
+        }
+      ],
+      "reduction_pct": 3.3321695200489
+    },
+    {
+      "scenario": 4,
+      "profile": 3,
+      "T": 4,
+      "groups": 10,
+      "entries": 40,
+      "us": 101.483333,
+      "checks": 60,
+      "pairs": [
+        {
+          "baseline_us": 101.60851629098508,
+          "candidate_us": 99.389063,
+          "reduction_pct": 2.184318177256961,
+          "drift_pct": 0.24685925520400165
+        },
+        {
+          "baseline_us": 101.74609276382745,
+          "candidate_us": 99.270833,
+          "reduction_pct": 2.4327811482383055,
+          "drift_pct": 0.02406180345826403
+        }
+      ],
+      "reduction_pct": 2.3086286536325717
+    },
+    {
+      "scenario": 5,
+      "profile": 0,
+      "T": 6,
+      "groups": 60,
+      "entries": 60,
+      "us": 365.218229,
+      "checks": 72,
+      "pairs": [
+        {
+          "baseline_us": 365.2963456458026,
+          "candidate_us": 354.627604,
+          "reduction_pct": 2.920571687335516,
+          "drift_pct": 0.042782639965111
+        },
+        {
+          "baseline_us": 365.34739449613903,
+          "candidate_us": 355.904167,
+          "reduction_pct": 2.584725562135859,
+          "drift_pct": -0.014825063903822766
+        }
+      ],
+      "reduction_pct": 2.752793606452797
+    },
+    {
+      "scenario": 6,
+      "profile": 1,
+      "T": 6,
+      "groups": 30,
+      "entries": 60,
+      "us": 216.501563,
+      "checks": 84,
+      "pairs": [
+        {
+          "baseline_us": 216.5317688928652,
+          "candidate_us": 209.270833,
+          "reduction_pct": 3.3532889561613044,
+          "drift_pct": 0.02790557221057366
+        },
+        {
+          "baseline_us": 216.6093698146731,
+          "candidate_us": 209.152083,
+          "reduction_pct": 3.442735104697181,
+          "drift_pct": 0.04377130299495491
+        }
+      ],
+      "reduction_pct": 3.3980223829774725
+    },
+    {
+      "scenario": 7,
+      "profile": 2,
+      "T": 6,
+      "groups": 45,
+      "entries": 60,
+      "us": 295.458854,
+      "checks": 96,
+      "pairs": [
+        {
+          "baseline_us": 295.4046825339147,
+          "candidate_us": 285.85,
+          "reduction_pct": 3.2344384157883876,
+          "drift_pct": -0.03666601915404133
+        },
+        {
+          "baseline_us": 295.3734366110135,
+          "candidate_us": 285.703125,
+          "reduction_pct": 3.273927311124003,
+          "drift_pct": 0.015518171373041234
+        }
+      ],
+      "reduction_pct": 3.254184878236932
+    },
+    {
+      "scenario": 8,
+      "profile": 3,
+      "T": 6,
+      "groups": 10,
+      "entries": 60,
+      "us": 154.592708,
+      "checks": 108,
+      "pairs": [
+        {
+          "baseline_us": 154.76578861025004,
+          "candidate_us": 146.249479,
+          "reduction_pct": 5.5027081157430935,
+          "drift_pct": 0.22404355579308532
+        },
+        {
+          "baseline_us": 155.0093595530681,
+          "candidate_us": 146.103646,
+          "reduction_pct": 5.745274723246108,
+          "drift_pct": 0.09076148859890054
+        }
+      ],
+      "reduction_pct": 5.624069350560257
+    }
+  ],
+  "mapped": [
+    {
+      "scenario": 0,
+      "profile": 0,
+      "T": 1,
+      "groups": 10,
+      "entries": 10,
+      "us": 1589.654167,
+      "checks": 12,
+      "pairs": [
+        {
+          "baseline_us": 1589.2801645036798,
+          "candidate_us": 1584.278125,
+          "reduction_pct": 0.31473616895242307,
+          "drift_pct": -0.04704903843402164
+        },
+        {
+          "baseline_us": 1589.5608026779462,
+          "candidate_us": 1586.592188,
+          "reduction_pct": 0.18675691253489113,
+          "drift_pct": 0.08240731635362764
+        }
+      ],
+      "reduction_pct": 0.2507670655736538
+    },
+    {
+      "scenario": 2,
+      "profile": 1,
+      "T": 4,
+      "groups": 20,
+      "entries": 40,
+      "us": 3152.184375,
+      "checks": 24,
+      "pairs": [
+        {
+          "baseline_us": 3152.7213082702297,
+          "candidate_us": 3150.535938,
+          "reduction_pct": 0.0693169505498914,
+          "drift_pct": 0.03407027864608114
+        },
+        {
+          "baseline_us": 3153.123434614481,
+          "candidate_us": 3152.610417,
+          "reduction_pct": 0.016270140548557688,
+          "drift_pct": -0.008555943456223236
+        }
+      ],
+      "reduction_pct": 0.042797064510236016
+    },
+    {
+      "scenario": 6,
+      "profile": 1,
+      "T": 6,
+      "groups": 30,
+      "entries": 60,
+      "us": 4709.809375,
+      "checks": 36,
+      "pairs": [
+        {
+          "baseline_us": 4710.716318677269,
+          "candidate_us": 4712.096875,
+          "reduction_pct": -0.029306717478561062,
+          "drift_pct": 0.03851667563510297
+        },
+        {
+          "baseline_us": 4711.1708112590795,
+          "candidate_us": 4710.421875,
+          "reduction_pct": 0.015897030464051554,
+          "drift_pct": -0.019212231454912576
+        }
+      ],
+      "reduction_pct": -0.006702289454940669
+    }
+  ],
+  "model": [
+    {
+      "case": "short28",
+      "prompt_tokens": 28,
+      "output_tokens": 76,
+      "metrics": {
+        "decode_ms": {
+          "baseline_ms": 2168.624895823456,
+          "candidate_ms": 2168.4498334063437,
+          "latency_reduction_pct": 0.008072507949596908,
+          "throughput_increase_pct": 0.008073159656052376,
+          "max_abs_baseline_drift_pct": 0.07374631268436405,
+          "max_retained_span_pct": 0.5811808118081139,
+          "pairs": [
+            {
+              "baseline": 2168.7998524529644,
+              "candidate": 2169.3,
+              "baseline_drift_pct": -0.07374631268436405
+            },
+            {
+              "baseline": 2168.449953307662,
+              "candidate": 2167.6,
+              "baseline_drift_pct": 0.04151291512914934
+            }
+          ]
+        },
+        "prompt_ms": {
+          "baseline_ms": 1046.2999091874065,
+          "candidate_ms": 1048.6998283589064,
+          "latency_reduction_pct": -0.229372013743534,
+          "throughput_increase_pct": -0.2288471025360561,
+          "max_abs_baseline_drift_pct": 0.07651109410866663,
+          "max_retained_span_pct": 0.7645259938837919,
+          "pairs": [
+            {
+              "baseline": 1045.9999235181617,
+              "candidate": 1048.1,
+              "baseline_drift_pct": 0.07651109410866663
+            },
+            {
+              "baseline": 1046.5999808905024,
+              "candidate": 1049.3,
+              "baseline_drift_pct": 0.038226299694166244
+            }
+          ]
+        },
+        "request_ms": {
+          "baseline_ms": 3215.7743128076304,
+          "candidate_ms": 3215.549467820391,
+          "latency_reduction_pct": 0.0069919392770789734,
+          "throughput_increase_pct": 0.006992428183405508,
+          "max_abs_baseline_drift_pct": 0.15555002488800707,
+          "max_retained_span_pct": 0.6408661025385877,
+          "pairs": [
+            {
+              "baseline": 3214.649990278879,
+              "candidate": 3217.4,
+              "baseline_drift_pct": -0.015552583284073052
+            },
+            {
+              "baseline": 3216.8990285677296,
+              "candidate": 3213.7,
+              "baseline_drift_pct": 0.15555002488800707
+            }
+          ]
+        }
+      },
+      "baseline_decode_tps": 35.04524924820702,
+      "candidate_decode_tps": 35.04807850713069
+    },
+    {
+      "case": "code128",
+      "prompt_tokens": 128,
+      "output_tokens": 128,
+      "metrics": {
+        "decode_ms": {
+          "baseline_ms": 5174.873333534395,
+          "candidate_ms": 5181.745603558708,
+          "latency_reduction_pct": -0.13280073890464816,
+          "throughput_increase_pct": -0.1326246124393582,
+          "max_abs_baseline_drift_pct": 0.19338245247626507,
+          "max_retained_span_pct": 0.21393466319746293,
+          "pairs": [
+            {
+              "baseline": 5173.649371575156,
+              "candidate": 5175.0,
+              "baseline_drift_pct": -0.0985278775935905
+            },
+            {
+              "baseline": 5176.097585053822,
+              "candidate": 5188.5,
+              "baseline_drift_pct": 0.19338245247626507
+            }
+          ]
+        },
+        "prompt_ms": {
+          "baseline_ms": 5631.049999778017,
+          "candidate_ms": 5638.849329428834,
+          "latency_reduction_pct": -0.13850577869356506,
+          "throughput_increase_pct": -0.1383142055261577,
+          "max_abs_baseline_drift_pct": 0.001775883502053155,
+          "max_retained_span_pct": 0.44751469517500697,
+          "pairs": [
+            {
+              "baseline": 5631.049999778017,
+              "candidate": 5636.1,
+              "baseline_drift_pct": -0.001775851964991304
+            },
+            {
+              "baseline": 5631.049999778017,
+              "candidate": 5641.6,
+              "baseline_drift_pct": 0.001775883502053155
+            }
+          ]
+        },
+        "request_ms": {
+          "baseline_ms": 10806.349105086621,
+          "candidate_ms": 10816.7991846017,
+          "latency_reduction_pct": -0.09670314565497495,
+          "throughput_increase_pct": -0.09660972101575016,
+          "max_abs_baseline_drift_pct": 0.09350033789725654,
+          "max_retained_span_pct": 0.32925769038677183,
+          "pairs": [
+            {
+              "baseline": 10805.549449241349,
+              "candidate": 10812.599999999999,
+              "baseline_drift_pct": -0.06383569247848664
+            },
+            {
+              "baseline": 10807.14882010977,
+              "candidate": 10821.0,
+              "baseline_drift_pct": 0.09350033789725654
+            }
+          ]
+        }
+      },
+      "baseline_decode_tps": 24.73490494357223,
+      "candidate_decode_tps": 24.70210037175357
+    },
+    {
+      "case": "prose128",
+      "prompt_tokens": 128,
+      "output_tokens": 128,
+      "metrics": {
+        "decode_ms": {
+          "baseline_ms": 5322.972572604128,
+          "candidate_ms": 5333.796954328127,
+          "latency_reduction_pct": -0.20335219797504855,
+          "throughput_increase_pct": -0.2029395160086822,
+          "max_abs_baseline_drift_pct": 0.154271630952163,
+          "max_retained_span_pct": 0.2765601189020341,
+          "pairs": [
+            {
+              "baseline": 5319.398419934345,
+              "candidate": 5328.1,
+              "baseline_drift_pct": 0.154271630952163
+            },
+            {
+              "baseline": 5326.549126779927,
+              "candidate": 5339.5,
+              "baseline_drift_pct": 0.11458626843243724
+            }
+          ]
+        },
+        "prompt_ms": {
+          "baseline_ms": 5195.118830674436,
+          "candidate_ms": 5195.549670631588,
+          "latency_reduction_pct": -0.00829316847592576,
+          "throughput_increase_pct": -0.008292480766514121,
+          "max_abs_baseline_drift_pct": 0.3042791665061717,
+          "max_retained_span_pct": 0.5926039943048482,
+          "pairs": [
+            {
+              "baseline": 5189.749217447795,
+              "candidate": 5193.7,
+              "baseline_drift_pct": 0.10989222849873137
+            },
+            {
+              "baseline": 5200.49399961196,
+              "candidate": 5197.4,
+              "baseline_drift_pct": 0.3042791665061717
+            }
+          ]
+        },
+        "request_ms": {
+          "baseline_ms": 10517.445118756425,
+          "candidate_ms": 10528.346528301583,
+          "latency_reduction_pct": -0.1036507385782981,
+          "throughput_increase_pct": -0.10354341506383369,
+          "max_abs_baseline_drift_pct": 0.23215101233065027,
+          "max_retained_span_pct": 0.39195588835427014,
+          "pairs": [
+            {
+              "baseline": 10512.299828296376,
+              "candidate": 10519.8,
+              "baseline_drift_pct": -0.036141598980432565
+            },
+            {
+              "baseline": 10522.592927601067,
+              "candidate": 10536.9,
+              "baseline_drift_pct": 0.23215101233065027
+            }
+          ]
+        }
+      },
+      "baseline_decode_tps": 24.046714172224128,
+      "candidate_decode_tps": 23.997913886867025
+    }
+  ],
+  "model_method": "Fresh A/B/A/B/A processes; ten full short-prompt warmups and three per other prompt, then three full measured requests. Max 128 tokens. Neighboring A geometric mean; output tokens and MTP counts must match.",
+  "limitations": "Not retested here; existing 2K batch-prefill failure is under separate diagnosis. These are intentionally short-prompt comparisons.",
+  "all_short_cases_gain_at_least_1pct": false,
+  "sha256": {
+    "sycl/src/kernels/cuda/iq_kernels.dp.cpp": "5c71200ba9de5ddcbb3233c0ad871ee17738a82960b71750c26fb0d17240fae2",
+    "sycl/src/kernels/iq2s_signs_parity.cpp": "8a44a647b7be84d8e7f6e1eca5d3f74f61d3048b06e558217af94c9470436b09",
+    "build-sycl-a770-iq2s-signs-20261024/report.py": "5294b2718a6163cfeb8aeb157d511833ce6b4608883d83d2bbc400fc123123b6",
+    "build-sycl-a770-iq2s-signs-20261024/run.py": "5541b3c50127e9da8c68aaaa540f5f7cd7c73c592a7b65dda4584e16b9b84ce5",
+    "build-sycl-a770-iq2s-signs-20261024/verify.py": "76084c14d30ebf53ed54a16fb7824a1b30184dd137540d95a1bfcae5dbce5bea",
+    "build-sycl-a770-iq2s-signs-20261024/e2e.py": "dc98d3046af6c2465155b810b3c3e09b3dae8d3bf35d4ae530a5f483a06b6183",
+    "build-sycl-a770-iq2s-signs-20261024/final_check.py": "c27ed8860a50faf7c2d19124b968081a9eea3f92513be647d12857921a7da2ee",
+    "build-sycl-a770-iq2s-signs-20261024/inputs.json": "c030c6a223fbe5df7b6de76b8c241614a5919ee80210b789cdf2064a3e84deaf",
+    "build-sycl-a770-iq2s-signs-20261024/build.json": "3743a8033a17429ad69068fc2f3e7eac024ba94504f7b1a4c45a8929a05f4ac9",
+    "build-sycl-a770-iq2s-signs-20261024/checks.json": "cdf56c8244735a94daa8566a136278326e47dcbfaf52e6774df455918e5d24fe",
+    "build-sycl-a770-iq2s-signs-20261024/baseline.cpp": "9db1696c2f54266fde33211f002cc239955963e332abd49b1e7e1b61853625ff",
+    "build-sycl-a770-iq2s-signs-20261024/candidate.cpp": "5c71200ba9de5ddcbb3233c0ad871ee17738a82960b71750c26fb0d17240fae2",
+    "build-sycl-a770-iq2s-signs-20261024/baseline.obj": "d6cdec3c8435e5c144bac423c2e209ef0a68a86dd54455f7a152b9f8d3b0fdfc",
+    "build-sycl-a770-iq2s-signs-20261024/candidate.obj": "58ddfbe264e47103544cf86d03a3fb47588c3912a663f0b07672ad87b3528bf8",
+    "build-sycl-a770-iq2s-signs-20261024/check-global.cpp": "a3385d72d7d37b0318bb39eaaa4d4b88368a2558cd72aed226e0a62271eab5f3",
+    "build-sycl-a770-iq2s-signs-20261024/e2e/model.json": "df64522df86819ff033d4800d1fe0fa930a15535cfd89e78c5425c98c6a3c94a",
+    "build-sycl-a770-iq2s-signs-20261024/e2e/build.json": "15dbe715bb68d8f6859ec321597b98baee95ee0b19678d50ba7492383484b66a",
+    "build-sycl-a770-iq2s-signs-20261024/e2e/inputs.json": "7de99a9ea3173443d5e382e5df4ac660a4b8203763ad32d1369b40e42a593979",
+    "build-sycl-a770-iq2s-signs-20261024/vram.json": "a135b6865aa533a088a60cdc96f2eaaf1ed3d323746c8569552ab1adc8e2868f",
+    "build-sycl-a770-iq2s-signs-20261024/confirm.json": "c06271322b95c8a3144cc5f8943ee0ce5c2893baf584565091c80eadcd81a2e6",
+    "build-sycl-a770-iq2s-signs-20261024/mapped.json": "664c10b1c727b7d1f0178c8b08d20fb6b5a1e9b23a07db41702daa2fb1c66cab",
+    "build-sycl-a770-iq2s-signs-20261024/e2e/strata-iq2s-baseline.exe": "7f0965c503bc8301c978fcbec0f3f19108ebfb0bd089498c3dbfe0d77e93b142",
+    "build-sycl-a770-iq2s-signs-20261024/e2e/strata-iq2s-candidate.exe": "ba66567e620c5c81196795d8824616361ad3c10b2ffe7e5174e386e38db19efb"
+  }
+}

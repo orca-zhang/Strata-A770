@@ -14,8 +14,8 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from serve.frontend import ChatTemplate  # noqa: E402
-from serve.responses import (ENCRYPTED_PREFIX, ResponsesError, input_messages, request_tools,  # noqa: E402
+from serve.frontend import ChatTemplate, Event, ToolCall  # noqa: E402
+from serve.responses import (Assembler, ENCRYPTED_PREFIX, ResponsesError, input_messages, request_tools,  # noqa: E402
                              template_kwargs, text_format)
 from serve.server import ByteTokenizer, MockEngine, Service, serve  # noqa: E402
 
@@ -125,6 +125,30 @@ class Parsing(unittest.TestCase):
         self.assertEqual(text_format({"text": {"format": {"type": "json_schema", "name": "n", "schema": {}}}}),
                          {"type": "json_schema", "json_schema": {"name": "n", "schema": {}}})
         self.assertIsNone(text_format({"text": {"format": {"type": "text"}}}))
+
+
+class Assembling(unittest.TestCase):
+    def test_many_output_items_keep_their_event_indices_and_snapshots(self):
+        asm = Assembler({}, "m", 10, {}, True)
+        events = asm.start()
+        for i in range(100):
+            events += asm.feed(Event("reasoning", "thinking"))
+            events += asm.feed(Event("content", "answer"))
+            events += asm.feed(Event("tool_call", call=ToolCall("f", {"x": i}, str(i))))
+        events += asm.finish({"finish": "stop"})
+        output = events[-1]["response"]["output"]
+        self.assertEqual(len(output), 300)
+        self.assertEqual([e["sequence_number"] for e in events], list(range(len(events))))
+        self.assertEqual(events[0]["response"]["output"], [])
+        for i, item in enumerate(output):
+            related = [e for e in events if e.get("output_index") == i]
+            self.assertEqual(related[0]["type"], "response.output_item.added")
+            self.assertEqual(related[-1]["type"], "response.output_item.done")
+            self.assertEqual(related[0]["item"]["status"], "in_progress")
+            self.assertEqual(related[-1]["item"], item)
+            self.assertEqual(item["status"], "completed")
+            self.assertTrue(all(e.get("item_id", item["id"]) == item["id"] for e in related))
+        self.assertEqual(asm.close(), [])
 
 
 # ------------------------------------------------------------------------------------------------ over HTTP

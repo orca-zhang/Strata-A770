@@ -1,0 +1,216 @@
+--- a/sycl/src/kernels/cuda/verify_kernels.dp.cpp
++++ b/experimental-overlap.cpp
+@@ -1,3 +1,4 @@
++#include <sycl/ext/intel/experimental/esimd/memory.hpp>
+ // src/kernels/cuda/verify_kernels.cu - see include/strata/kernels/verify_kernels.hpp.
+ //
+ // The per-token arithmetic of every kernel here is transcribed from its single-token original (fused_gdn.cu,
+@@ -1279,6 +1280,208 @@
+     } else if (n_tok == 4) gdn_state_replay_layers_esimd<4>(state, qkv, h, C, gate, beta, h_k, h_v, n_layers, n_keep, stream);
+     else gdn_state_replay_layers_esimd<6>(state, qkv, h, C, gate, beta, h_k, h_v, n_layers, n_keep, stream);
+     return true;
++}
++template<int MAXT, bool FIXED = false>
++static void gdn_state_replay_early_value(float* state, const float* qkv, const float* h,
++                                         int conv_channels, const float* gate, const float* beta,
++                                         int key_heads, int value_heads,
++                                         int n_layers, const int32_t* n_keep, void* stream) {
++    const int C = FIXED ? 10240 : conv_channels;
++    const int h_k = FIXED ? 16 : key_heads, h_v = FIXED ? 48 : value_heads;
++    const auto props = sycl::ext::oneapi::experimental::properties{
++        sycl::ext::intel::experimental::grf_size<256>};
++    // Four work items share a 32-column tile; each keeps one 32-row chain in registers.
++    strata::q_of(stream)->parallel_for(sycl::nd_range<1>((size_t) n_layers * h_v * 16, 4), props,
++        [=](sycl::nd_item<1> item) SYCL_ESIMD_KERNEL {
++            namespace es = sycl::ext::intel::esimd;
++            using V = es::simd<float, 32>;
++            es::slm_init<2 * RG * 32 * sizeof(float)>();
++            const size_t index = item.get_global_linear_id();
++            const size_t layer = index / (h_v * 16);
++            const int lane = index % (h_v * 16), local = item.get_local_linear_id();
++            const int head = lane / 16, col = (lane / 4 % 4) * 32;
++            const size_t state_stride = (size_t) S * h_v * S + (size_t) C * 3;
++            float* state_l = state + layer * state_stride;
++            float* history_l = state_l + (size_t) S * h_v * S;
++            const float* h_l = h + layer * MAXT * C;
++            const float* qkv_l = qkv + layer * MAXT * C;
++            const float* gate_l = gate + layer * MAXT * h_v;
++            const float* beta_l = beta + layer * MAXT * h_v;
++            const int qh = head % h_k, qk = S * h_k;
++            const int n = *n_keep;
++            if (n <= 0) return;
++            const es::simd<uint32_t, 16> offsets(0, 3 * sizeof(float));
++            for (int c = lane * 16; c < C; c += h_v * 16 * 16) {
++                es::simd<float, 16> seq[3];
++#pragma unroll
++                for (int j = 0; j < 3; ++j) {
++                    const int src = n + j;
++                    seq[j] = src < 3 ? es::gather<float, 16>(history_l + c * 3 + src, offsets)
++                                     : es::block_load<float, 16>(qkv_l + (size_t) (src - 3) * C + c);
++                }
++#pragma unroll
++                for (int j = 0; j < 3; ++j) es::scatter<float, 16>(history_l + c * 3 + j, offsets, seq[j]);
++            }
++            const size_t stride = (size_t) h_v * S;
++            float* ptr = state_l + (size_t) head * S + col + local * RPG * stride;
++            V rows[RPG];
++#pragma unroll
++            for (int r = 0; r < RPG; ++r) rows[r] = es::block_load<float, 32>(ptr + r * stride);
++            auto fma = [](V a, V b, V c) SYCL_ESIMD_FUNCTION {
++                return V(__builtin_elementwise_fma(a.data(), b.data(), c.data()));
++            };
++#pragma unroll
++            for (int t = 0; t < MAXT; ++t) {
++                if (t >= n) break;
++                const float* ht = h_l + (size_t) t * C;
++                auto key = es::block_load<float, RPG>(ht + qk + qh * S + local * RPG);
++                const float g = es::exp(gate_l[(size_t) t * h_v + head]);
++                V acc = 0.0f;
++#pragma unroll
++                for (int r = 0; r < RPG; ++r) acc = fma(rows[r], V(key[r]), acc);
++                V value = es::block_load<float, 32>(ht + 2 * qk + head * S + col);
++                const float bt = beta_l[(size_t) t * h_v + head];
++                // ponytail: exchange only partial sums; two banks allow one barrier per token.
++                const uint32_t bank = (t & 1) * RG * 32 * sizeof(float);
++                es::slm_block_store<float, 32>(bank + local * 32 * sizeof(float), acc);
++                es::barrier();  // Also retires all reads of bank t-2 before reuse.
++                auto partials = es::slm_block_load<float, RG * 32>(bank);
++                V a = partials.template select<32, 1>(0);
++                V b = partials.template select<32, 1>(32);
++                V c = partials.template select<32, 1>(64);
++                V d = partials.template select<32, 1>(96);
++                V delta = (value - g * ((a + b) + c + d)) * bt;
++#pragma unroll
++                for (int r = 0; r < RPG; ++r) rows[r] = fma(V(g), rows[r], V(key[r]) * delta);
++            }
++#pragma unroll
++            for (int r = 0; r < RPG; ++r) es::block_store<float, 32>(ptr + r * stride, rows[r]);
++        });
++}
++
++bool gdn_commit_layers_early_value(float* state, const float* qkv, const float* h,
++                            int C, const float* gate, const float* beta, int h_k, int h_v,
++                            int n_tok, int n_layers, const int32_t* n_keep, void* stream) {
++    // ponytail: batch the existing fixed-layout commit; no pointer tables or extra device copies.
++    if (!state || !qkv || !h || !gate || !beta || !n_keep || n_layers <= 0 || h_k <= 0 || h_v <= 0 ||
++        h_v % h_k || C != (int64_t) S * (2ll * h_k + h_v) || (n_tok != 4 && n_tok != 6) ||
++        strata::q_of(stream)->get_device().get_info<
++            sycl::ext::oneapi::experimental::info::device::architecture>() !=
++            sycl::ext::oneapi::experimental::architecture::intel_gpu_acm_g10) return false;
++    // ponytail: specialize only the measured HK16/HV48 layout; other geometries keep the generic kernel.
++    if (h_k == 16 && h_v == 48) {
++        if (n_tok == 4) gdn_state_replay_early_value<4, true>(state, qkv, h, C, gate, beta, h_k, h_v, n_layers, n_keep, stream);
++        else gdn_state_replay_early_value<6, true>(state, qkv, h, C, gate, beta, h_k, h_v, n_layers, n_keep, stream);
++    } else if (n_tok == 4) gdn_state_replay_early_value<4>(state, qkv, h, C, gate, beta, h_k, h_v, n_layers, n_keep, stream);
++    else gdn_state_replay_early_value<6>(state, qkv, h, C, gate, beta, h_k, h_v, n_layers, n_keep, stream);
++    return true;
++}
++
++template<int MAXT, bool FIXED = false>
++static void gdn_state_replay_split_barrier(float* state, const float* qkv, const float* h,
++                                         int conv_channels, const float* gate, const float* beta,
++                                         int key_heads, int value_heads,
++                                         int n_layers, const int32_t* n_keep, void* stream) {
++    const int C = FIXED ? 10240 : conv_channels;
++    const int h_k = FIXED ? 16 : key_heads, h_v = FIXED ? 48 : value_heads;
++    const auto props = sycl::ext::oneapi::experimental::properties{
++        sycl::ext::intel::experimental::grf_size<256>};
++    // Four work items share a 32-column tile; each keeps one 32-row chain in registers.
++    strata::q_of(stream)->parallel_for(sycl::nd_range<1>((size_t) n_layers * h_v * 16, 4), props,
++        [=](sycl::nd_item<1> item) SYCL_ESIMD_KERNEL {
++            namespace es = sycl::ext::intel::esimd;
++            using V = es::simd<float, 32>;
++            es::slm_init<2 * RG * 32 * sizeof(float)>();
++            const size_t index = item.get_global_linear_id();
++            const size_t layer = index / (h_v * 16);
++            const int lane = index % (h_v * 16), local = item.get_local_linear_id();
++            const int head = lane / 16, col = (lane / 4 % 4) * 32;
++            const size_t state_stride = (size_t) S * h_v * S + (size_t) C * 3;
++            float* state_l = state + layer * state_stride;
++            float* history_l = state_l + (size_t) S * h_v * S;
++            const float* h_l = h + layer * MAXT * C;
++            const float* qkv_l = qkv + layer * MAXT * C;
++            const float* gate_l = gate + layer * MAXT * h_v;
++            const float* beta_l = beta + layer * MAXT * h_v;
++            const int qh = head % h_k, qk = S * h_k;
++            const int n = *n_keep;
++            if (n <= 0) return;
++            const es::simd<uint32_t, 16> offsets(0, 3 * sizeof(float));
++            for (int c = lane * 16; c < C; c += h_v * 16 * 16) {
++                es::simd<float, 16> seq[3];
++#pragma unroll
++                for (int j = 0; j < 3; ++j) {
++                    const int src = n + j;
++                    seq[j] = src < 3 ? es::gather<float, 16>(history_l + c * 3 + src, offsets)
++                                     : es::block_load<float, 16>(qkv_l + (size_t) (src - 3) * C + c);
++                }
++#pragma unroll
++                for (int j = 0; j < 3; ++j) es::scatter<float, 16>(history_l + c * 3 + j, offsets, seq[j]);
++            }
++            const size_t stride = (size_t) h_v * S;
++            float* ptr = state_l + (size_t) head * S + col + local * RPG * stride;
++            V rows[RPG];
++#pragma unroll
++            for (int r = 0; r < RPG; ++r) rows[r] = es::block_load<float, 32>(ptr + r * stride);
++            auto fma = [](V a, V b, V c) SYCL_ESIMD_FUNCTION {
++                return V(__builtin_elementwise_fma(a.data(), b.data(), c.data()));
++            };
++#pragma unroll
++            for (int t = 0; t < MAXT; ++t) {
++                if (t >= n) break;
++                const float* ht = h_l + (size_t) t * C;
++                auto key = es::block_load<float, RPG>(ht + qk + qh * S + local * RPG);
++                const float g = es::exp(gate_l[(size_t) t * h_v + head]);
++                V acc = 0.0f;
++#pragma unroll
++                for (int r = 0; r < RPG; ++r) acc = fma(rows[r], V(key[r]), acc);
++                // ponytail: exchange only partial sums; two banks allow one barrier per token.
++                const uint32_t bank = (t & 1) * RG * 32 * sizeof(float);
++                es::slm_block_store<float, 32>(bank + local * 32 * sizeof(float), acc);
++                namespace ee = sycl::ext::intel::experimental::esimd;
++                es::fence<es::fence_mask::global_coherent_fence | es::fence_mask::local_barrier>();
++                ee::split_barrier<ee::split_barrier_action::signal>();
++                V value = es::block_load<float, 32>(ht + 2 * qk + head * S + col);
++                const float bt = beta_l[(size_t) t * h_v + head];
++                ee::split_barrier<ee::split_barrier_action::wait>();
++                auto partials = es::slm_block_load<float, RG * 32>(bank);
++                V a = partials.template select<32, 1>(0);
++                V b = partials.template select<32, 1>(32);
++                V c = partials.template select<32, 1>(64);
++                V d = partials.template select<32, 1>(96);
++                V delta = (value - g * ((a + b) + c + d)) * bt;
++#pragma unroll
++                for (int r = 0; r < RPG; ++r) rows[r] = fma(V(g), rows[r], V(key[r]) * delta);
++            }
++#pragma unroll
++            for (int r = 0; r < RPG; ++r) es::block_store<float, 32>(ptr + r * stride, rows[r]);
++        });
++}
++
++bool gdn_commit_layers_split_barrier(float* state, const float* qkv, const float* h,
++                            int C, const float* gate, const float* beta, int h_k, int h_v,
++                            int n_tok, int n_layers, const int32_t* n_keep, void* stream) {
++    // ponytail: batch the existing fixed-layout commit; no pointer tables or extra device copies.
++    if (!state || !qkv || !h || !gate || !beta || !n_keep || n_layers <= 0 || h_k <= 0 || h_v <= 0 ||
++        h_v % h_k || C != (int64_t) S * (2ll * h_k + h_v) || (n_tok != 4 && n_tok != 6) ||
++        strata::q_of(stream)->get_device().get_info<
++            sycl::ext::oneapi::experimental::info::device::architecture>() !=
++            sycl::ext::oneapi::experimental::architecture::intel_gpu_acm_g10) return false;
++    // ponytail: specialize only the measured HK16/HV48 layout; other geometries keep the generic kernel.
++    if (h_k == 16 && h_v == 48) {
++        if (n_tok == 4) gdn_state_replay_split_barrier<4, true>(state, qkv, h, C, gate, beta, h_k, h_v, n_layers, n_keep, stream);
++        else gdn_state_replay_split_barrier<6, true>(state, qkv, h, C, gate, beta, h_k, h_v, n_layers, n_keep, stream);
++    } else if (n_tok == 4) gdn_state_replay_split_barrier<4>(state, qkv, h, C, gate, beta, h_k, h_v, n_layers, n_keep, stream);
++    else gdn_state_replay_split_barrier<6>(state, qkv, h, C, gate, beta, h_k, h_v, n_layers, n_keep, stream);
++    return true;
++}
++
++bool gdn_commit_layers_variant_esimd(int mode, float* state, const float* qkv, const float* h,
++                            int C, const float* gate, const float* beta, int h_k, int h_v,
++                            int n_tok, int n_layers, const int32_t* n_keep, void* stream) {
++    if (mode == 1) return gdn_commit_layers_early_value(state, qkv, h, C, gate, beta, h_k, h_v, n_tok, n_layers, n_keep, stream);
++    if (mode == 2) return gdn_commit_layers_split_barrier(state, qkv, h, C, gate, beta, h_k, h_v, n_tok, n_layers, n_keep, stream);
++    return false;
+ }
+ 
+ void gdn_step_norm_multi(float* state, const float* h, int conv_channels, const float* gate, const float* beta,

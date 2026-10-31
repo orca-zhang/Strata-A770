@@ -1,0 +1,55 @@
+draft_policy_test
+  confidence: disabled cumulative floor keeps the old window         ok
+  confidence: both floors off do not read probabilities              ok
+  confidence: disabled cumulative floor keeps the old window         ok
+  confidence: both floors off do not read probabilities              ok
+  confidence: disabled cumulative floor keeps the old window         ok
+  confidence: both floors off do not read probabilities              ok
+  confidence: disabled cumulative floor keeps the old window         ok
+  confidence: both floors off do not read probabilities              ok
+  confidence: disabled cumulative floor keeps the old window         ok
+  confidence: both floors off do not read probabilities              ok
+  confidence: disabled cumulative floor keeps the old window         ok
+  confidence: both floors off do not read probabilities              ok
+  confidence: disabled cumulative floor keeps the old window         ok
+  confidence: both floors off do not read probabilities              ok
+  confidence: disabled cumulative floor keeps the old window         ok
+  confidence: both floors off do not read probabilities              ok
+  confidence: cumulative floor cuts individually confident drafts    ok
+  confidence: cumulative rule works without a per-token floor        ok
+  confidence: equality at either threshold is accepted               ok
+  confidence: cumulative rule cannot bypass the per-token floor      ok
+  confidence: last-draft override still applies only to five rows    ok
+  confidence: no drafts or missing probabilities stay at one row     ok
+  confidence: cumulative floor one retains only certain drafts       ok
+  confidence: invalid draft confidence ends the prefix               ok
+  confidence: invalid draft confidence ends the prefix               ok
+  confidence: invalid draft confidence ends the prefix               ok
+  confidence: invalid draft confidence ends the prefix               ok
+  no proposal: the MTP window                                        ok
+  rejected short-match drafts: their rate falls below 0.15           ok
+  rejected short-match drafts: no longer taken                       ok
+  accepted long-match drafts: their rate rises above 0.9             ok
+  accepted long matches: the full lookup window is taken             ok
+  buckets are separate: short matches still not taken                ok
+  never beyond the window cap                                        ok
+  a mediocre lookup does not replace a strong MTP window             ok
+  an unmeasured size is probed for a confident lookup                ok
+  after the probes, the measured cost decides                        ok
+  chain: cheap rows, always accepted -> all 3 chained                ok
+  chain: dear rows, never accepted -> none                           ok
+  chain: nothing proposed / no room -> none                          ok
+  MTP: first eight windows retain the threshold policy               ok
+  MTP: rejected drafts favor the cheapest prefix                     ok
+  MTP: no drafts stays at one row                                    ok
+  MTP: round sixteen refreshes the full threshold window             ok
+  MTP: selection resumes after the refresh                           ok
+  MTP: a measured expensive prefix overrides its prior cost          ok
+  MTP: suffix results do not train MTP prefix acceptance             ok
+  MTP: invalid times do not count as observations                    ok
+  MTP: all accepted drafts keep the long window                      ok
+  MTP: selection never exceeds the probability threshold cap         ok
+  MTP: one-row verifier stays at one row                             ok
+  MTP: partial acceptance learns the committed prefix                ok
+  MTP: a two-percent predicted gain does not switch windows          ok
+PASS

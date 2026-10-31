@@ -1,0 +1,87 @@
+{
+  "complete": true,
+  "purpose": "Diagnose scalar pointer queries with many pinned allocations",
+  "source_sha256": "fb740c437ba8d2d5e17a8c5a5a11e9e889255557cab1156548e744f8c9f7fbe3",
+  "commands": [
+    [
+      "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin\\icx.exe",
+      "/nologo",
+      "/EHsc",
+      "/O2",
+      "/MD",
+      "-Qstd:c++20",
+      "-fsycl",
+      "-fsycl-device-code-split=per_kernel",
+      "/fp:precise",
+      "-Wno-deprecated-declarations",
+      "-IG:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\source\\sycl\\include",
+      "-IC:\\Program Files (x86)\\Intel\\oneAPI\\mkl\\2025.3\\include",
+      "-c",
+      "G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\mkl-scalar-probe-final\\probe.cpp",
+      "/FoG:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\mkl-scalar-probe-final\\probe.obj"
+    ],
+    [
+      "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin\\icx.exe",
+      "/nologo",
+      "G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\mkl-scalar-probe-final\\probe.obj",
+      "-fsycl",
+      "-fsycl-device-code-split=per_kernel",
+      "C:\\Program Files (x86)\\Intel\\oneAPI\\mkl\\2025.3\\lib\\mkl_sycl.lib",
+      "C:\\Program Files (x86)\\Intel\\oneAPI\\mkl\\2025.3\\lib\\mkl_intel_lp64.lib",
+      "C:\\Program Files (x86)\\Intel\\oneAPI\\mkl\\2025.3\\lib\\mkl_sequential.lib",
+      "C:\\Program Files (x86)\\Intel\\oneAPI\\mkl\\2025.3\\lib\\mkl_core.lib",
+      "/link",
+      "/out:G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\mkl-scalar-probe-final\\strata-mkl-scalar-probe.exe"
+    ]
+  ],
+  "runs": [
+    {
+      "direct": false,
+      "allocations": 0,
+      "submit_us": 24784.0125,
+      "total_us": 24785.50625
+    },
+    {
+      "direct": true,
+      "allocations": 0,
+      "submit_us": 25427.95625,
+      "total_us": 25429.60625
+    },
+    {
+      "direct": false,
+      "allocations": 0,
+      "submit_us": 27007.83125,
+      "total_us": 27009.2625
+    },
+    {
+      "direct": false,
+      "allocations": 24576,
+      "submit_us": 30109.875,
+      "total_us": 30111.375
+    },
+    {
+      "direct": true,
+      "allocations": 24576,
+      "submit_us": 30100.9375,
+      "total_us": 30102.46875
+    },
+    {
+      "direct": false,
+      "allocations": 24576,
+      "submit_us": 30026.2125,
+      "total_us": 30029.11875
+    }
+  ],
+  "exe_sha256": "b7bbe205e70a0865562d8d6c3c12d41488929b2ac96642ddfd6c86e60550ec49",
+  "returncode": 0,
+  "queries": [
+    {
+      "allocations": 0,
+      "us": 0.064062
+    },
+    {
+      "allocations": 24576,
+      "us": 0.095312
+    }
+  ]
+}

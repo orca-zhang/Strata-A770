@@ -10,6 +10,7 @@
 
 #include <cstdio>
 #include <cstdlib>
+#include <stdexcept>
 
 namespace strata::kernels {
 namespace {
@@ -140,17 +141,21 @@ __dpct_inline__ void kv_append_q4_kernel(
     uint8_t *__restrict__ k_q4, uint8_t *__restrict__ v_q4,
     const int32_t *__restrict__ table, const int32_t *__restrict__ step,
     const float *__restrict__ kcur, const float *__restrict__ vcur,
-    int kv_heads, int head_dim, int page_size, KvHostPools host) {
+    int kv_heads, int head_dim, int page_size, KvHostPools host, int step_stride = 0) {
     /*
     DPCT1098: The '*' expression is used instead of the __ldg call. These
     two expressions do not provide the exact same functionality. Check the
     generated code for potential precision and/or performance issues.
     */
     auto item_ct1 = sycl::ext::oneapi::this_work_item::get_nd_item<3>();
+    const size_t token = item_ct1.get_group(0) / 2;
+    step += token * step_stride;
+    kcur += token * kv_heads * head_dim;
+    vcur += token * kv_heads * head_dim;
     const long long pos = (long long)*(step + kStepPos);
     const int h = item_ct1.get_group(2), b = item_ct1.get_group(1),
               t = item_ct1.get_local_id(2);
-    const bool is_v = item_ct1.get_group(0) == 1;
+    const bool is_v = (item_ct1.get_group(0) & 1) != 0;
     const float x = (is_v ? vcur : kcur)[h * head_dim + b * QK4_0 + t];
     uint8_t byte;
     const uint16_t d = q4_group(x, t, byte);
@@ -295,6 +300,25 @@ void kv_append_q4_step(uint8_t* k_q4, uint8_t* v_q4, const int32_t* page_table, 
             });
     }
     check("kv_append_q4 launch");
+}
+
+void kv_append_q4_steps(uint8_t* k_q4, uint8_t* v_q4, const int32_t* table, const int32_t* steps,
+                        int step_stride, int n_tok, const float* kcur, const float* vcur,
+                        const QsaShapes& s, void* stream, const KvHostPools* host) {
+    if (n_tok == 0) return;
+    if (n_tok < 0 || n_tok > 65535 || s.n_head_kv <= 0 || s.page_size <= 0 ||
+        step_stride <= kStepPos || !k_q4 || !v_q4 || !table ||
+        !steps || !kcur || !vcur || !stream)
+        throw std::invalid_argument("kv_append_q4_steps: invalid arguments");
+    need_256(s, "kv_append_q4_steps");
+    const KvHostPools hp = host ? *host : KvHostPools{};
+    q_of(stream)->parallel_for<class kv_q4_steps>(
+        sycl::nd_range<3>(sycl::range<3>(2 * n_tok, s.head_dim / QK4_0, s.n_head_kv * QK4_0),
+                          sycl::range<3>(1, 1, QK4_0)),
+        [=](sycl::nd_item<3>) [[sycl::reqd_sub_group_size(32)]] {
+            kv_append_q4_kernel(k_q4, v_q4, table, steps, kcur, vcur,
+                                (int)s.n_head_kv, (int)s.head_dim, (int)s.page_size, hp, step_stride);
+        });
 }
 
 void kv_append_q4(uint8_t* k_q4, uint8_t* v_q4, const int32_t* page_table, int64_t pos0, int64_t T, const float* K,

@@ -1,0 +1,2124 @@
+{
+  "complete": true,
+  "date": "2026-10-24",
+  "integrated": false,
+  "default_enabled": false,
+  "hardware": "A77016GB,E5-2696v4,PCIe3.0x16,Windows,driver32.0.101.9034,DPC++2025.3.2,oneMKL2025.3",
+  "change": "Private candidate changes only bounded wait interval;values1/8=8,16,32,64;absent/invalid=no batching.",
+  "new_depth_values_only_in_isolated_exe": true,
+  "baseline": "Batch8,original XMX/FP32 accumulation+SwiGLU+dequant,HC XMX+corrected GDN XMX enabled.",
+  "rule_before_measurement": "Only change expert finish interval,original XMX/SwiGLU/dequant/FP32 accumulation,corrected GDN XMX+HC on. Screen8/16/8/32/8/64/8;each candidate needs>=8of15 shapes with absolute adjacent-baseline drift<=3%, stable median throughput gain>=3%,no stable regression<-3%. Select highest stable median passing candidate, tie smaller depth. No passing candidate means stop. One independent8/B/8/B/8 confirmation,each round same gate. 428checks/process,full byte comparison,guards,short/moved workspace,mixed1..65call chains,two reused dequant buffers. 128warmup calls,median7samples x128 complete expert calls,8weight banks,128MiB workspace,all128pool. Only confirmed operator candidate proceeds to same-EXE IQ2_XS Code2568/B/8/B/8;all32IDs must equal previous corrected-XMX reference;4191slots/5760MiB,both prefill gains>=3%,absolute baseline drift<=3%. No resampling,no profile timing as speed evidence,production unchanged.",
+  "scope": "Isolated private check/new prefill relink;reuse exact corrected GDN GEMM object.",
+  "selected": 64,
+  "operator_passed": true,
+  "cohorts": [
+    {
+      "cohort": "screen",
+      "runs": [
+        {
+          "depth": 8,
+          "index": 0,
+          "rows": [
+            {
+              "T": 1,
+              "us": 238.785156,
+              "hash": "8e79b20c5c6d0ab1",
+              "weight_banks": 8
+            },
+            {
+              "T": 2,
+              "us": 239.998437,
+              "hash": "6a831aa8b50f7351",
+              "weight_banks": 8
+            },
+            {
+              "T": 4,
+              "us": 243.014062,
+              "hash": "a24dd780779851ed",
+              "weight_banks": 8
+            },
+            {
+              "T": 6,
+              "us": 243.953125,
+              "hash": "1d409b844fc8315d",
+              "weight_banks": 8
+            },
+            {
+              "T": 7,
+              "us": 239.76875,
+              "hash": "dbdf1ecbc2819631",
+              "weight_banks": 8
+            },
+            {
+              "T": 8,
+              "us": 213.669531,
+              "hash": "614dedfa653ea7f9",
+              "weight_banks": 8
+            },
+            {
+              "T": 9,
+              "us": 244.659375,
+              "hash": "d0701a06d0fa4531",
+              "weight_banks": 8
+            },
+            {
+              "T": 16,
+              "us": 224.571094,
+              "hash": "2785613fb5688b0b",
+              "weight_banks": 8
+            },
+            {
+              "T": 22,
+              "us": 258.958594,
+              "hash": "8bb97e6c6825f1f3",
+              "weight_banks": 8
+            },
+            {
+              "T": 32,
+              "us": 264.995313,
+              "hash": "565ffe4110f84d52",
+              "weight_banks": 8
+            },
+            {
+              "T": 40,
+              "us": 276.428125,
+              "hash": "4b20e840f395570e",
+              "weight_banks": 8
+            },
+            {
+              "T": 64,
+              "us": 317.0875,
+              "hash": "825197dc5e69ca41",
+              "weight_banks": 8
+            },
+            {
+              "T": 65,
+              "us": 344.327344,
+              "hash": "c90852b5fb548b2d",
+              "weight_banks": 8
+            },
+            {
+              "T": 128,
+              "us": 441.55,
+              "hash": "8c9cae1f6312b489",
+              "weight_banks": 8
+            },
+            {
+              "T": 256,
+              "us": 674.264844,
+              "hash": "10bc973f4e8a6825",
+              "weight_banks": 8
+            }
+          ],
+          "summary": {
+            "checks": 428
+          },
+          "competition": false
+        },
+        {
+          "depth": 16,
+          "index": 1,
+          "rows": [
+            {
+              "T": 1,
+              "us": 225.180469,
+              "hash": "8e79b20c5c6d0ab1",
+              "weight_banks": 8
+            },
+            {
+              "T": 2,
+              "us": 223.819531,
+              "hash": "6a831aa8b50f7351",
+              "weight_banks": 8
+            },
+            {
+              "T": 4,
+              "us": 225.482031,
+              "hash": "a24dd780779851ed",
+              "weight_banks": 8
+            },
+            {
+              "T": 6,
+              "us": 227.792969,
+              "hash": "1d409b844fc8315d",
+              "weight_banks": 8
+            },
+            {
+              "T": 7,
+              "us": 225.666406,
+              "hash": "dbdf1ecbc2819631",
+              "weight_banks": 8
+            },
+            {
+              "T": 8,
+              "us": 202.875781,
+              "hash": "614dedfa653ea7f9",
+              "weight_banks": 8
+            },
+            {
+              "T": 9,
+              "us": 233.244531,
+              "hash": "d0701a06d0fa4531",
+              "weight_banks": 8
+            },
+            {
+              "T": 16,
+              "us": 210.041406,
+              "hash": "2785613fb5688b0b",
+              "weight_banks": 8
+            },
+            {
+              "T": 22,
+              "us": 247.678125,
+              "hash": "8bb97e6c6825f1f3",
+              "weight_banks": 8
+            },
+            {
+              "T": 32,
+              "us": 246.5875,
+              "hash": "565ffe4110f84d52",
+              "weight_banks": 8
+            },
+            {
+              "T": 40,
+              "us": 257.632031,
+              "hash": "4b20e840f395570e",
+              "weight_banks": 8
+            },
+            {
+              "T": 64,
+              "us": 294.279688,
+              "hash": "825197dc5e69ca41",
+              "weight_banks": 8
+            },
+            {
+              "T": 65,
+              "us": 327.060938,
+              "hash": "c90852b5fb548b2d",
+              "weight_banks": 8
+            },
+            {
+              "T": 128,
+              "us": 425.0,
+              "hash": "8c9cae1f6312b489",
+              "weight_banks": 8
+            },
+            {
+              "T": 256,
+              "us": 640.030469,
+              "hash": "10bc973f4e8a6825",
+              "weight_banks": 8
+            }
+          ],
+          "summary": {
+            "checks": 428
+          },
+          "competition": false
+        },
+        {
+          "depth": 8,
+          "index": 2,
+          "rows": [
+            {
+              "T": 1,
+              "us": 240.628125,
+              "hash": "8e79b20c5c6d0ab1",
+              "weight_banks": 8
+            },
+            {
+              "T": 2,
+              "us": 240.614062,
+              "hash": "6a831aa8b50f7351",
+              "weight_banks": 8
+            },
+            {
+              "T": 4,
+              "us": 239.141406,
+              "hash": "a24dd780779851ed",
+              "weight_banks": 8
+            },
+            {
+              "T": 6,
+              "us": 243.426562,
+              "hash": "1d409b844fc8315d",
+              "weight_banks": 8
+            },
+            {
+              "T": 7,
+              "us": 242.724219,
+              "hash": "dbdf1ecbc2819631",
+              "weight_banks": 8
+            },
+            {
+              "T": 8,
+              "us": 215.695312,
+              "hash": "614dedfa653ea7f9",
+              "weight_banks": 8
+            },
+            {
+              "T": 9,
+              "us": 247.5125,
+              "hash": "d0701a06d0fa4531",
+              "weight_banks": 8
+            },
+            {
+              "T": 16,
+              "us": 225.077344,
+              "hash": "2785613fb5688b0b",
+              "weight_banks": 8
+            },
+            {
+              "T": 22,
+              "us": 260.709375,
+              "hash": "8bb97e6c6825f1f3",
+              "weight_banks": 8
+            },
+            {
+              "T": 32,
+              "us": 265.625781,
+              "hash": "565ffe4110f84d52",
+              "weight_banks": 8
+            },
+            {
+              "T": 40,
+              "us": 276.392969,
+              "hash": "4b20e840f395570e",
+              "weight_banks": 8
+            },
+            {
+              "T": 64,
+              "us": 315.417969,
+              "hash": "825197dc5e69ca41",
+              "weight_banks": 8
+            },
+            {
+              "T": 65,
+              "us": 334.241406,
+              "hash": "c90852b5fb548b2d",
+              "weight_banks": 8
+            },
+            {
+              "T": 128,
+              "us": 430.751562,
+              "hash": "8c9cae1f6312b489",
+              "weight_banks": 8
+            },
+            {
+              "T": 256,
+              "us": 656.954687,
+              "hash": "10bc973f4e8a6825",
+              "weight_banks": 8
+            }
+          ],
+          "summary": {
+            "checks": 428
+          },
+          "competition": false
+        },
+        {
+          "depth": 32,
+          "index": 3,
+          "rows": [
+            {
+              "T": 1,
+              "us": 223.8875,
+              "hash": "8e79b20c5c6d0ab1",
+              "weight_banks": 8
+            },
+            {
+              "T": 2,
+              "us": 220.990625,
+              "hash": "6a831aa8b50f7351",
+              "weight_banks": 8
+            },
+            {
+              "T": 4,
+              "us": 220.858594,
+              "hash": "a24dd780779851ed",
+              "weight_banks": 8
+            },
+            {
+              "T": 6,
+              "us": 222.828125,
+              "hash": "1d409b844fc8315d",
+              "weight_banks": 8
+            },
+            {
+              "T": 7,
+              "us": 224.860938,
+              "hash": "dbdf1ecbc2819631",
+              "weight_banks": 8
+            },
+            {
+              "T": 8,
+              "us": 197.552344,
+              "hash": "614dedfa653ea7f9",
+              "weight_banks": 8
+            },
+            {
+              "T": 9,
+              "us": 230.805469,
+              "hash": "d0701a06d0fa4531",
+              "weight_banks": 8
+            },
+            {
+              "T": 16,
+              "us": 206.340625,
+              "hash": "2785613fb5688b0b",
+              "weight_banks": 8
+            },
+            {
+              "T": 22,
+              "us": 241.864844,
+              "hash": "8bb97e6c6825f1f3",
+              "weight_banks": 8
+            },
+            {
+              "T": 32,
+              "us": 236.423438,
+              "hash": "565ffe4110f84d52",
+              "weight_banks": 8
+            },
+            {
+              "T": 40,
+              "us": 249.413281,
+              "hash": "4b20e840f395570e",
+              "weight_banks": 8
+            },
+            {
+              "T": 64,
+              "us": 286.225,
+              "hash": "825197dc5e69ca41",
+              "weight_banks": 8
+            },
+            {
+              "T": 65,
+              "us": 314.270312,
+              "hash": "c90852b5fb548b2d",
+              "weight_banks": 8
+            },
+            {
+              "T": 128,
+              "us": 417.228125,
+              "hash": "8c9cae1f6312b489",
+              "weight_banks": 8
+            },
+            {
+              "T": 256,
+              "us": 642.760937,
+              "hash": "10bc973f4e8a6825",
+              "weight_banks": 8
+            }
+          ],
+          "summary": {
+            "checks": 428
+          },
+          "competition": false
+        },
+        {
+          "depth": 8,
+          "index": 4,
+          "rows": [
+            {
+              "T": 1,
+              "us": 237.43125,
+              "hash": "8e79b20c5c6d0ab1",
+              "weight_banks": 8
+            },
+            {
+              "T": 2,
+              "us": 236.602344,
+              "hash": "6a831aa8b50f7351",
+              "weight_banks": 8
+            },
+            {
+              "T": 4,
+              "us": 236.060156,
+              "hash": "a24dd780779851ed",
+              "weight_banks": 8
+            },
+            {
+              "T": 6,
+              "us": 237.95625,
+              "hash": "1d409b844fc8315d",
+              "weight_banks": 8
+            },
+            {
+              "T": 7,
+              "us": 239.757812,
+              "hash": "dbdf1ecbc2819631",
+              "weight_banks": 8
+            },
+            {
+              "T": 8,
+              "us": 219.400781,
+              "hash": "614dedfa653ea7f9",
+              "weight_banks": 8
+            },
+            {
+              "T": 9,
+              "us": 245.374219,
+              "hash": "d0701a06d0fa4531",
+              "weight_banks": 8
+            },
+            {
+              "T": 16,
+              "us": 222.209375,
+              "hash": "2785613fb5688b0b",
+              "weight_banks": 8
+            },
+            {
+              "T": 22,
+              "us": 258.276563,
+              "hash": "8bb97e6c6825f1f3",
+              "weight_banks": 8
+            },
+            {
+              "T": 32,
+              "us": 269.182813,
+              "hash": "565ffe4110f84d52",
+              "weight_banks": 8
+            },
+            {
+              "T": 40,
+              "us": 274.897656,
+              "hash": "4b20e840f395570e",
+              "weight_banks": 8
+            },
+            {
+              "T": 64,
+              "us": 323.217188,
+              "hash": "825197dc5e69ca41",
+              "weight_banks": 8
+            },
+            {
+              "T": 65,
+              "us": 343.254687,
+              "hash": "c90852b5fb548b2d",
+              "weight_banks": 8
+            },
+            {
+              "T": 128,
+              "us": 435.026563,
+              "hash": "8c9cae1f6312b489",
+              "weight_banks": 8
+            },
+            {
+              "T": 256,
+              "us": 655.789844,
+              "hash": "10bc973f4e8a6825",
+              "weight_banks": 8
+            }
+          ],
+          "summary": {
+            "checks": 428
+          },
+          "competition": false
+        },
+        {
+          "depth": 64,
+          "index": 5,
+          "rows": [
+            {
+              "T": 1,
+              "us": 210.966406,
+              "hash": "8e79b20c5c6d0ab1",
+              "weight_banks": 8
+            },
+            {
+              "T": 2,
+              "us": 209.164062,
+              "hash": "6a831aa8b50f7351",
+              "weight_banks": 8
+            },
+            {
+              "T": 4,
+              "us": 210.601562,
+              "hash": "a24dd780779851ed",
+              "weight_banks": 8
+            },
+            {
+              "T": 6,
+              "us": 209.14375,
+              "hash": "1d409b844fc8315d",
+              "weight_banks": 8
+            },
+            {
+              "T": 7,
+              "us": 210.664844,
+              "hash": "dbdf1ecbc2819631",
+              "weight_banks": 8
+            },
+            {
+              "T": 8,
+              "us": 185.251563,
+              "hash": "614dedfa653ea7f9",
+              "weight_banks": 8
+            },
+            {
+              "T": 9,
+              "us": 218.555469,
+              "hash": "d0701a06d0fa4531",
+              "weight_banks": 8
+            },
+            {
+              "T": 16,
+              "us": 194.7875,
+              "hash": "2785613fb5688b0b",
+              "weight_banks": 8
+            },
+            {
+              "T": 22,
+              "us": 230.595313,
+              "hash": "8bb97e6c6825f1f3",
+              "weight_banks": 8
+            },
+            {
+              "T": 32,
+              "us": 224.778906,
+              "hash": "565ffe4110f84d52",
+              "weight_banks": 8
+            },
+            {
+              "T": 40,
+              "us": 246.847656,
+              "hash": "4b20e840f395570e",
+              "weight_banks": 8
+            },
+            {
+              "T": 64,
+              "us": 271.885156,
+              "hash": "825197dc5e69ca41",
+              "weight_banks": 8
+            },
+            {
+              "T": 65,
+              "us": 306.639844,
+              "hash": "c90852b5fb548b2d",
+              "weight_banks": 8
+            },
+            {
+              "T": 128,
+              "us": 395.984375,
+              "hash": "8c9cae1f6312b489",
+              "weight_banks": 8
+            },
+            {
+              "T": 256,
+              "us": 617.176563,
+              "hash": "10bc973f4e8a6825",
+              "weight_banks": 8
+            }
+          ],
+          "summary": {
+            "checks": 428
+          },
+          "competition": false
+        },
+        {
+          "depth": 8,
+          "index": 6,
+          "rows": [
+            {
+              "T": 1,
+              "us": 235.466406,
+              "hash": "8e79b20c5c6d0ab1",
+              "weight_banks": 8
+            },
+            {
+              "T": 2,
+              "us": 232.288281,
+              "hash": "6a831aa8b50f7351",
+              "weight_banks": 8
+            },
+            {
+              "T": 4,
+              "us": 232.492969,
+              "hash": "a24dd780779851ed",
+              "weight_banks": 8
+            },
+            {
+              "T": 6,
+              "us": 235.772656,
+              "hash": "1d409b844fc8315d",
+              "weight_banks": 8
+            },
+            {
+              "T": 7,
+              "us": 234.475,
+              "hash": "dbdf1ecbc2819631",
+              "weight_banks": 8
+            },
+            {
+              "T": 8,
+              "us": 211.026563,
+              "hash": "614dedfa653ea7f9",
+              "weight_banks": 8
+            },
+            {
+              "T": 9,
+              "us": 240.826562,
+              "hash": "d0701a06d0fa4531",
+              "weight_banks": 8
+            },
+            {
+              "T": 16,
+              "us": 221.948438,
+              "hash": "2785613fb5688b0b",
+              "weight_banks": 8
+            },
+            {
+              "T": 22,
+              "us": 253.901563,
+              "hash": "8bb97e6c6825f1f3",
+              "weight_banks": 8
+            },
+            {
+              "T": 32,
+              "us": 257.845312,
+              "hash": "565ffe4110f84d52",
+              "weight_banks": 8
+            },
+            {
+              "T": 40,
+              "us": 271.010938,
+              "hash": "4b20e840f395570e",
+              "weight_banks": 8
+            },
+            {
+              "T": 64,
+              "us": 309.925781,
+              "hash": "825197dc5e69ca41",
+              "weight_banks": 8
+            },
+            {
+              "T": 65,
+              "us": 328.027344,
+              "hash": "c90852b5fb548b2d",
+              "weight_banks": 8
+            },
+            {
+              "T": 128,
+              "us": 422.592969,
+              "hash": "8c9cae1f6312b489",
+              "weight_banks": 8
+            },
+            {
+              "T": 256,
+              "us": 637.259375,
+              "hash": "10bc973f4e8a6825",
+              "weight_banks": 8
+            }
+          ],
+          "summary": {
+            "checks": 428
+          },
+          "competition": false
+        }
+      ],
+      "pairs": [
+        {
+          "round": 1,
+          "depth": 16,
+          "T": 1,
+          "baseline": 239.70486929996332,
+          "candidate": 225.180469,
+          "throughput_change_pct": 6.450115484910612,
+          "baseline_drift_pct": 0.7718105391777419
+        },
+        {
+          "round": 1,
+          "depth": 16,
+          "T": 2,
+          "baseline": 240.30605235869754,
+          "candidate": 223.819531,
+          "throughput_change_pct": 7.365988698590176,
+          "baseline_drift_pct": 0.25651208720163243
+        },
+        {
+          "round": 1,
+          "depth": 16,
+          "T": 4,
+          "baseline": 241.06995761490307,
+          "candidate": 225.482031,
+          "throughput_change_pct": 6.913156913556029,
+          "baseline_drift_pct": -1.5935933781478062
+        },
+        {
+          "round": 1,
+          "depth": 16,
+          "T": 6,
+          "baseline": 243.68970127583611,
+          "candidate": 227.792969,
+          "throughput_change_pct": 6.978587770123901,
+          "baseline_drift_pct": -0.2158459745084218
+        },
+        {
+          "round": 1,
+          "depth": 16,
+          "T": 7,
+          "baseline": 241.24195859003518,
+          "candidate": 225.666406,
+          "throughput_change_pct": 6.90202536838167,
+          "baseline_drift_pct": 1.232633110027881
+        },
+        {
+          "round": 1,
+          "depth": 16,
+          "T": 8,
+          "baseline": 214.6800320335794,
+          "candidate": 202.875781,
+          "throughput_change_pct": 5.818462398712554,
+          "baseline_drift_pct": 0.9480907223969215
+        },
+        {
+          "round": 1,
+          "depth": 16,
+          "T": 9,
+          "baseline": 246.0818025671291,
+          "candidate": 233.244531,
+          "throughput_change_pct": 5.503782451871975,
+          "baseline_drift_pct": 1.1661621386876986
+        },
+        {
+          "round": 1,
+          "depth": 16,
+          "T": 16,
+          "baseline": 224.82407650581897,
+          "candidate": 210.041406,
+          "throughput_change_pct": 7.037979219115953,
+          "baseline_drift_pct": 0.22542972516312876
+        },
+        {
+          "round": 1,
+          "depth": 16,
+          "T": 22,
+          "baseline": 259.8325098839996,
+          "candidate": 247.678125,
+          "throughput_change_pct": 4.907330788296149,
+          "baseline_drift_pct": 0.6760853049735172
+        },
+        {
+          "round": 1,
+          "depth": 16,
+          "T": 32,
+          "baseline": 265.3103597241624,
+          "candidate": 246.5875,
+          "throughput_change_pct": 7.592785410518554,
+          "baseline_drift_pct": 0.23791666081278695
+        },
+        {
+          "round": 1,
+          "depth": 16,
+          "T": 40,
+          "baseline": 276.410546441074,
+          "candidate": 257.632031,
+          "throughput_change_pct": 7.288890037541185,
+          "baseline_drift_pct": -0.012717953355878553
+        },
+        {
+          "round": 1,
+          "depth": 16,
+          "T": 64,
+          "baseline": 316.25163279465846,
+          "candidate": 294.279688,
+          "throughput_change_pct": 7.46634772654049,
+          "baseline_drift_pct": -0.5265205976268228
+        },
+        {
+          "round": 1,
+          "depth": 16,
+          "T": 65,
+          "baseline": 339.24689472831676,
+          "candidate": 327.060938,
+          "throughput_change_pct": 3.7258979329157116,
+          "baseline_drift_pct": -2.9291713759450944
+        },
+        {
+          "round": 1,
+          "depth": 16,
+          "T": 128,
+          "baseline": 436.11736058210295,
+          "candidate": 425.0,
+          "throughput_change_pct": 2.615849548730109,
+          "baseline_drift_pct": -2.44557535952894
+        },
+        {
+          "round": 1,
+          "depth": 16,
+          "T": 256,
+          "baseline": 665.5534911223319,
+          "candidate": 640.030469,
+          "throughput_change_pct": 3.9877823570196202,
+          "baseline_drift_pct": -2.567263762012184
+        },
+        {
+          "round": 3,
+          "depth": 32,
+          "T": 1,
+          "baseline": 239.02434291073,
+          "candidate": 223.8875,
+          "throughput_change_pct": 6.760914705255994,
+          "baseline_drift_pct": -1.3285541746211105
+        },
+        {
+          "round": 3,
+          "depth": 32,
+          "T": 2,
+          "baseline": 238.5997717278064,
+          "candidate": 220.990625,
+          "throughput_change_pct": 7.968277716670746,
+          "baseline_drift_pct": -1.6672832695871276
+        },
+        {
+          "round": 3,
+          "depth": 32,
+          "T": 4,
+          "baseline": 237.59578617142884,
+          "candidate": 220.858594,
+          "throughput_change_pct": 7.578239029914702,
+          "baseline_drift_pct": -1.2884636130306881
+        },
+        {
+          "round": 3,
+          "depth": 32,
+          "T": 6,
+          "baseline": 240.6758646892382,
+          "candidate": 222.828125,
+          "throughput_change_pct": 8.00964406501119,
+          "baseline_drift_pct": -2.247212446766589
+        },
+        {
+          "round": 3,
+          "depth": 32,
+          "T": 7,
+          "baseline": 241.23645592415926,
+          "candidate": 224.860938,
+          "throughput_change_pct": 7.282508945221622,
+          "baseline_drift_pct": -1.2221306189474257
+        },
+        {
+          "round": 3,
+          "depth": 32,
+          "T": 8,
+          "baseline": 217.54015700747914,
+          "candidate": 197.552344,
+          "throughput_change_pct": 10.117730117886703,
+          "baseline_drift_pct": 1.7179181900810025
+        },
+        {
+          "round": 3,
+          "depth": 32,
+          "T": 9,
+          "baseline": 246.44104037322498,
+          "candidate": 230.805469,
+          "throughput_change_pct": 6.774350469669765,
+          "baseline_drift_pct": -0.8639082874602244
+        },
+        {
+          "round": 3,
+          "depth": 32,
+          "T": 16,
+          "baseline": 223.63876215204735,
+          "candidate": 206.340625,
+          "throughput_change_pct": 8.383292021165168,
+          "baseline_drift_pct": -1.2742148761094363
+        },
+        {
+          "round": 3,
+          "depth": 32,
+          "T": 22,
+          "baseline": 259.4901179561144,
+          "candidate": 241.864844,
+          "throughput_change_pct": 7.287240950203722,
+          "baseline_drift_pct": -0.9331509463363252
+        },
+        {
+          "round": 3,
+          "depth": 32,
+          "T": 32,
+          "baseline": 267.39838244630795,
+          "candidate": 236.423438,
+          "throughput_change_pct": 13.101469426355239,
+          "baseline_drift_pct": 1.3391139921015371
+        },
+        {
+          "round": 3,
+          "depth": 32,
+          "T": 40,
+          "baseline": 275.64429853160516,
+          "candidate": 249.413281,
+          "throughput_change_pct": 10.51708931715034,
+          "baseline_drift_pct": -0.5410097823436377
+        },
+        {
+          "round": 3,
+          "depth": 32,
+          "T": 64,
+          "baseline": 319.29376596615725,
+          "candidate": 286.225,
+          "throughput_change_pct": 11.553416356417934,
+          "baseline_drift_pct": 2.472661600328796
+        },
+        {
+          "round": 3,
+          "depth": 32,
+          "T": 65,
+          "baseline": 338.7180674232922,
+          "candidate": 314.270312,
+          "throughput_change_pct": 7.779212509036548,
+          "baseline_drift_pct": 2.696638070030133
+        },
+        {
+          "round": 3,
+          "depth": 32,
+          "T": 128,
+          "baseline": 432.88378524003576,
+          "candidate": 417.228125,
+          "throughput_change_pct": 3.7523022303531883,
+          "baseline_drift_pct": 0.9924516536053973
+        },
+        {
+          "round": 3,
+          "depth": 32,
+          "T": 256,
+          "baseline": 656.3720070987175,
+          "candidate": 642.760937,
+          "throughput_change_pct": 2.117594476454232,
+          "baseline_drift_pct": -0.17730948923118106
+        },
+        {
+          "round": 5,
+          "depth": 64,
+          "T": 1,
+          "baseline": 236.44678705701946,
+          "candidate": 210.966406,
+          "throughput_change_pct": 12.077932946831105,
+          "baseline_drift_pct": -0.8275422885572148
+        },
+        {
+          "round": 5,
+          "depth": 64,
+          "T": 2,
+          "baseline": 234.43538932578133,
+          "candidate": 209.164062,
+          "throughput_change_pct": 12.08205993139555,
+          "baseline_drift_pct": -1.823339079007591
+        },
+        {
+          "round": 5,
+          "depth": 64,
+          "T": 4,
+          "baseline": 234.26977297774283,
+          "candidate": 210.601562,
+          "throughput_change_pct": 11.238383397053253,
+          "baseline_drift_pct": -1.5111347295729272
+        },
+        {
+          "round": 5,
+          "depth": 64,
+          "T": 6,
+          "baseline": 236.86193673593908,
+          "candidate": 209.14375,
+          "throughput_change_pct": 13.253174783343557,
+          "baseline_drift_pct": -0.9176451553594367
+        },
+        {
+          "round": 5,
+          "depth": 64,
+          "T": 7,
+          "baseline": 237.10169330626888,
+          "candidate": 210.664844,
+          "throughput_change_pct": 12.549245903729854,
+          "baseline_drift_pct": -2.2033951494352166
+        },
+        {
+          "round": 5,
+          "depth": 64,
+          "T": 8,
+          "baseline": 215.1729368065271,
+          "candidate": 185.251563,
+          "throughput_change_pct": 16.151752418157518,
+          "baseline_drift_pct": -3.8168587923121278
+        },
+        {
+          "round": 5,
+          "depth": 64,
+          "T": 9,
+          "baseline": 243.0897561914222,
+          "candidate": 218.555469,
+          "throughput_change_pct": 11.225656948178319,
+          "baseline_drift_pct": -1.8533556697739373
+        },
+        {
+          "round": 5,
+          "depth": 64,
+          "T": 16,
+          "baseline": 222.0788681757142,
+          "candidate": 194.7875,
+          "throughput_change_pct": 14.01084164831634,
+          "baseline_drift_pct": -0.11742843883161269
+        },
+        {
+          "round": 5,
+          "depth": 64,
+          "T": 22,
+          "baseline": 256.079720071637,
+          "candidate": 230.595313,
+          "throughput_change_pct": 11.051572011629297,
+          "baseline_drift_pct": -1.6939206365387482
+        },
+        {
+          "round": 5,
+          "depth": 64,
+          "T": 32,
+          "baseline": 263.4530819767016,
+          "candidate": 224.778906,
+          "throughput_change_pct": 17.205429399456882,
+          "baseline_drift_pct": -4.211822022975897
+        },
+        {
+          "round": 5,
+          "depth": 64,
+          "T": 40,
+          "baseline": 272.94737882339393,
+          "candidate": 246.847656,
+          "throughput_change_pct": 10.573210718838633,
+          "baseline_drift_pct": -1.4138781889067698
+        },
+        {
+          "round": 5,
+          "depth": 64,
+          "T": 64,
+          "baseline": 316.5017210435416,
+          "candidate": 271.885156,
+          "throughput_change_pct": 16.41007758567796,
+          "baseline_drift_pct": -4.112221593859067
+        },
+        {
+          "round": 5,
+          "depth": 64,
+          "T": 65,
+          "baseline": 335.5546502317638,
+          "candidate": 306.639844,
+          "throughput_change_pct": 9.429565921564919,
+          "baseline_drift_pct": -4.4361646254811316
+        },
+        {
+          "round": 5,
+          "depth": 64,
+          "T": 128,
+          "baseline": 428.76469870085566,
+          "candidate": 395.984375,
+          "throughput_change_pct": 8.278186153394484,
+          "baseline_drift_pct": -2.858122941793795
+        },
+        {
+          "round": 5,
+          "depth": 64,
+          "T": 256,
+          "baseline": 646.458216839099,
+          "candidate": 617.176563,
+          "throughput_change_pct": 4.744453304701879,
+          "baseline_drift_pct": -2.825671847397504
+        }
+      ],
+      "groups": [
+        {
+          "round": 1,
+          "depth": 16,
+          "stable_cases": 15,
+          "median_pct": 6.90202536838167,
+          "minimum_pct": 2.615849548730109,
+          "passed": true
+        },
+        {
+          "round": 3,
+          "depth": 32,
+          "stable_cases": 15,
+          "median_pct": 7.779212509036548,
+          "minimum_pct": 2.117594476454232,
+          "passed": true
+        },
+        {
+          "round": 5,
+          "depth": 64,
+          "stable_cases": 11,
+          "median_pct": 11.238383397053253,
+          "minimum_pct": 4.744453304701879,
+          "passed": true
+        }
+      ],
+      "passed": true
+    },
+    {
+      "cohort": "confirm",
+      "runs": [
+        {
+          "depth": 8,
+          "index": 0,
+          "rows": [
+            {
+              "T": 1,
+              "us": 230.382812,
+              "hash": "8e79b20c5c6d0ab1",
+              "weight_banks": 8
+            },
+            {
+              "T": 2,
+              "us": 228.754687,
+              "hash": "6a831aa8b50f7351",
+              "weight_banks": 8
+            },
+            {
+              "T": 4,
+              "us": 229.573438,
+              "hash": "a24dd780779851ed",
+              "weight_banks": 8
+            },
+            {
+              "T": 6,
+              "us": 228.925,
+              "hash": "1d409b844fc8315d",
+              "weight_banks": 8
+            },
+            {
+              "T": 7,
+              "us": 234.839844,
+              "hash": "dbdf1ecbc2819631",
+              "weight_banks": 8
+            },
+            {
+              "T": 8,
+              "us": 212.352344,
+              "hash": "614dedfa653ea7f9",
+              "weight_banks": 8
+            },
+            {
+              "T": 9,
+              "us": 237.716406,
+              "hash": "d0701a06d0fa4531",
+              "weight_banks": 8
+            },
+            {
+              "T": 16,
+              "us": 217.617188,
+              "hash": "2785613fb5688b0b",
+              "weight_banks": 8
+            },
+            {
+              "T": 22,
+              "us": 249.816406,
+              "hash": "8bb97e6c6825f1f3",
+              "weight_banks": 8
+            },
+            {
+              "T": 32,
+              "us": 257.207031,
+              "hash": "565ffe4110f84d52",
+              "weight_banks": 8
+            },
+            {
+              "T": 40,
+              "us": 268.326563,
+              "hash": "4b20e840f395570e",
+              "weight_banks": 8
+            },
+            {
+              "T": 64,
+              "us": 307.5625,
+              "hash": "825197dc5e69ca41",
+              "weight_banks": 8
+            },
+            {
+              "T": 65,
+              "us": 327.690625,
+              "hash": "c90852b5fb548b2d",
+              "weight_banks": 8
+            },
+            {
+              "T": 128,
+              "us": 419.210156,
+              "hash": "8c9cae1f6312b489",
+              "weight_banks": 8
+            },
+            {
+              "T": 256,
+              "us": 637.371875,
+              "hash": "10bc973f4e8a6825",
+              "weight_banks": 8
+            }
+          ],
+          "summary": {
+            "checks": 428
+          },
+          "competition": false
+        },
+        {
+          "depth": 64,
+          "index": 1,
+          "rows": [
+            {
+              "T": 1,
+              "us": 210.476562,
+              "hash": "8e79b20c5c6d0ab1",
+              "weight_banks": 8
+            },
+            {
+              "T": 2,
+              "us": 207.803125,
+              "hash": "6a831aa8b50f7351",
+              "weight_banks": 8
+            },
+            {
+              "T": 4,
+              "us": 211.053906,
+              "hash": "a24dd780779851ed",
+              "weight_banks": 8
+            },
+            {
+              "T": 6,
+              "us": 213.215625,
+              "hash": "1d409b844fc8315d",
+              "weight_banks": 8
+            },
+            {
+              "T": 7,
+              "us": 211.569531,
+              "hash": "dbdf1ecbc2819631",
+              "weight_banks": 8
+            },
+            {
+              "T": 8,
+              "us": 186.4,
+              "hash": "614dedfa653ea7f9",
+              "weight_banks": 8
+            },
+            {
+              "T": 9,
+              "us": 216.878906,
+              "hash": "d0701a06d0fa4531",
+              "weight_banks": 8
+            },
+            {
+              "T": 16,
+              "us": 194.4125,
+              "hash": "2785613fb5688b0b",
+              "weight_banks": 8
+            },
+            {
+              "T": 22,
+              "us": 229.642969,
+              "hash": "8bb97e6c6825f1f3",
+              "weight_banks": 8
+            },
+            {
+              "T": 32,
+              "us": 222.378906,
+              "hash": "565ffe4110f84d52",
+              "weight_banks": 8
+            },
+            {
+              "T": 40,
+              "us": 235.15625,
+              "hash": "4b20e840f395570e",
+              "weight_banks": 8
+            },
+            {
+              "T": 64,
+              "us": 271.21875,
+              "hash": "825197dc5e69ca41",
+              "weight_banks": 8
+            },
+            {
+              "T": 65,
+              "us": 307.216406,
+              "hash": "c90852b5fb548b2d",
+              "weight_banks": 8
+            },
+            {
+              "T": 128,
+              "us": 394.736719,
+              "hash": "8c9cae1f6312b489",
+              "weight_banks": 8
+            },
+            {
+              "T": 256,
+              "us": 618.911719,
+              "hash": "10bc973f4e8a6825",
+              "weight_banks": 8
+            }
+          ],
+          "summary": {
+            "checks": 428
+          },
+          "competition": false
+        },
+        {
+          "depth": 8,
+          "index": 2,
+          "rows": [
+            {
+              "T": 1,
+              "us": 228.850781,
+              "hash": "8e79b20c5c6d0ab1",
+              "weight_banks": 8
+            },
+            {
+              "T": 2,
+              "us": 229.405469,
+              "hash": "6a831aa8b50f7351",
+              "weight_banks": 8
+            },
+            {
+              "T": 4,
+              "us": 231.483594,
+              "hash": "a24dd780779851ed",
+              "weight_banks": 8
+            },
+            {
+              "T": 6,
+              "us": 230.054688,
+              "hash": "1d409b844fc8315d",
+              "weight_banks": 8
+            },
+            {
+              "T": 7,
+              "us": 230.644531,
+              "hash": "dbdf1ecbc2819631",
+              "weight_banks": 8
+            },
+            {
+              "T": 8,
+              "us": 209.197656,
+              "hash": "614dedfa653ea7f9",
+              "weight_banks": 8
+            },
+            {
+              "T": 9,
+              "us": 239.464063,
+              "hash": "d0701a06d0fa4531",
+              "weight_banks": 8
+            },
+            {
+              "T": 16,
+              "us": 218.535937,
+              "hash": "2785613fb5688b0b",
+              "weight_banks": 8
+            },
+            {
+              "T": 22,
+              "us": 251.614062,
+              "hash": "8bb97e6c6825f1f3",
+              "weight_banks": 8
+            },
+            {
+              "T": 32,
+              "us": 256.19375,
+              "hash": "565ffe4110f84d52",
+              "weight_banks": 8
+            },
+            {
+              "T": 40,
+              "us": 268.257031,
+              "hash": "4b20e840f395570e",
+              "weight_banks": 8
+            },
+            {
+              "T": 64,
+              "us": 307.089844,
+              "hash": "825197dc5e69ca41",
+              "weight_banks": 8
+            },
+            {
+              "T": 65,
+              "us": 327.014844,
+              "hash": "c90852b5fb548b2d",
+              "weight_banks": 8
+            },
+            {
+              "T": 128,
+              "us": 420.117969,
+              "hash": "8c9cae1f6312b489",
+              "weight_banks": 8
+            },
+            {
+              "T": 256,
+              "us": 648.789844,
+              "hash": "10bc973f4e8a6825",
+              "weight_banks": 8
+            }
+          ],
+          "summary": {
+            "checks": 428
+          },
+          "competition": false
+        },
+        {
+          "depth": 64,
+          "index": 3,
+          "rows": [
+            {
+              "T": 1,
+              "us": 210.885156,
+              "hash": "8e79b20c5c6d0ab1",
+              "weight_banks": 8
+            },
+            {
+              "T": 2,
+              "us": 209.203125,
+              "hash": "6a831aa8b50f7351",
+              "weight_banks": 8
+            },
+            {
+              "T": 4,
+              "us": 207.357031,
+              "hash": "a24dd780779851ed",
+              "weight_banks": 8
+            },
+            {
+              "T": 6,
+              "us": 209.15625,
+              "hash": "1d409b844fc8315d",
+              "weight_banks": 8
+            },
+            {
+              "T": 7,
+              "us": 214.350781,
+              "hash": "dbdf1ecbc2819631",
+              "weight_banks": 8
+            },
+            {
+              "T": 8,
+              "us": 189.457812,
+              "hash": "614dedfa653ea7f9",
+              "weight_banks": 8
+            },
+            {
+              "T": 9,
+              "us": 220.767188,
+              "hash": "d0701a06d0fa4531",
+              "weight_banks": 8
+            },
+            {
+              "T": 16,
+              "us": 201.566406,
+              "hash": "2785613fb5688b0b",
+              "weight_banks": 8
+            },
+            {
+              "T": 22,
+              "us": 235.165625,
+              "hash": "8bb97e6c6825f1f3",
+              "weight_banks": 8
+            },
+            {
+              "T": 32,
+              "us": 230.21875,
+              "hash": "565ffe4110f84d52",
+              "weight_banks": 8
+            },
+            {
+              "T": 40,
+              "us": 236.146875,
+              "hash": "4b20e840f395570e",
+              "weight_banks": 8
+            },
+            {
+              "T": 64,
+              "us": 271.813281,
+              "hash": "825197dc5e69ca41",
+              "weight_banks": 8
+            },
+            {
+              "T": 65,
+              "us": 307.463281,
+              "hash": "c90852b5fb548b2d",
+              "weight_banks": 8
+            },
+            {
+              "T": 128,
+              "us": 393.905469,
+              "hash": "8c9cae1f6312b489",
+              "weight_banks": 8
+            },
+            {
+              "T": 256,
+              "us": 616.78125,
+              "hash": "10bc973f4e8a6825",
+              "weight_banks": 8
+            }
+          ],
+          "summary": {
+            "checks": 428
+          },
+          "competition": false
+        },
+        {
+          "depth": 8,
+          "index": 4,
+          "rows": [
+            {
+              "T": 1,
+              "us": 230.738281,
+              "hash": "8e79b20c5c6d0ab1",
+              "weight_banks": 8
+            },
+            {
+              "T": 2,
+              "us": 230.567187,
+              "hash": "6a831aa8b50f7351",
+              "weight_banks": 8
+            },
+            {
+              "T": 4,
+              "us": 230.789844,
+              "hash": "a24dd780779851ed",
+              "weight_banks": 8
+            },
+            {
+              "T": 6,
+              "us": 235.139844,
+              "hash": "1d409b844fc8315d",
+              "weight_banks": 8
+            },
+            {
+              "T": 7,
+              "us": 231.967187,
+              "hash": "dbdf1ecbc2819631",
+              "weight_banks": 8
+            },
+            {
+              "T": 8,
+              "us": 209.501563,
+              "hash": "614dedfa653ea7f9",
+              "weight_banks": 8
+            },
+            {
+              "T": 9,
+              "us": 240.864062,
+              "hash": "d0701a06d0fa4531",
+              "weight_banks": 8
+            },
+            {
+              "T": 16,
+              "us": 220.117969,
+              "hash": "2785613fb5688b0b",
+              "weight_banks": 8
+            },
+            {
+              "T": 22,
+              "us": 253.835156,
+              "hash": "8bb97e6c6825f1f3",
+              "weight_banks": 8
+            },
+            {
+              "T": 32,
+              "us": 259.909375,
+              "hash": "565ffe4110f84d52",
+              "weight_banks": 8
+            },
+            {
+              "T": 40,
+              "us": 269.263281,
+              "hash": "4b20e840f395570e",
+              "weight_banks": 8
+            },
+            {
+              "T": 64,
+              "us": 307.895312,
+              "hash": "825197dc5e69ca41",
+              "weight_banks": 8
+            },
+            {
+              "T": 65,
+              "us": 327.321875,
+              "hash": "c90852b5fb548b2d",
+              "weight_banks": 8
+            },
+            {
+              "T": 128,
+              "us": 420.096094,
+              "hash": "8c9cae1f6312b489",
+              "weight_banks": 8
+            },
+            {
+              "T": 256,
+              "us": 636.920313,
+              "hash": "10bc973f4e8a6825",
+              "weight_banks": 8
+            }
+          ],
+          "summary": {
+            "checks": 428
+          },
+          "competition": false
+        }
+      ],
+      "pairs": [
+        {
+          "round": 1,
+          "depth": 64,
+          "T": 1,
+          "baseline": 229.61551875946054,
+          "candidate": 210.476562,
+          "throughput_change_pct": 9.09315345024524,
+          "baseline_drift_pct": -0.6649936194024653
+        },
+        {
+          "round": 1,
+          "depth": 64,
+          "T": 2,
+          "baseline": 229.0798469031774,
+          "candidate": 207.803125,
+          "throughput_change_pct": 10.2388844745128,
+          "baseline_drift_pct": 0.2844890343165041
+        },
+        {
+          "round": 1,
+          "depth": 64,
+          "T": 4,
+          "baseline": 230.5265375508342,
+          "candidate": 211.053906,
+          "throughput_change_pct": 9.226378189292639,
+          "baseline_drift_pct": 0.8320457351864929
+        },
+        {
+          "round": 1,
+          "depth": 64,
+          "T": 6,
+          "baseline": 229.48914887288245,
+          "candidate": 213.215625,
+          "throughput_change_pct": 7.632425565847933,
+          "baseline_drift_pct": 0.49347515561863897
+        },
+        {
+          "round": 1,
+          "depth": 64,
+          "T": 7,
+          "baseline": 232.73273443908394,
+          "candidate": 211.569531,
+          "throughput_change_pct": 10.002954271843588,
+          "baseline_drift_pct": -1.7864570715691697
+        },
+        {
+          "round": 1,
+          "depth": 64,
+          "T": 8,
+          "baseline": 210.76909785570004,
+          "candidate": 186.4,
+          "throughput_change_pct": 13.073550351770402,
+          "baseline_drift_pct": -1.4855913245770402
+        },
+        {
+          "round": 1,
+          "depth": 64,
+          "T": 9,
+          "baseline": 238.58863431127136,
+          "candidate": 216.878906,
+          "throughput_change_pct": 10.010069080333416,
+          "baseline_drift_pct": 0.7351856901286036
+        },
+        {
+          "round": 1,
+          "depth": 64,
+          "T": 16,
+          "baseline": 218.07607866725124,
+          "candidate": 194.4125,
+          "throughput_change_pct": 12.171840116891275,
+          "baseline_drift_pct": 0.4221858615322205
+        },
+        {
+          "round": 1,
+          "depth": 64,
+          "T": 22,
+          "baseline": 250.71362282074176,
+          "candidate": 229.642969,
+          "throughput_change_pct": 9.175396883473397,
+          "baseline_drift_pct": 0.7195908502502402
+        },
+        {
+          "round": 1,
+          "depth": 64,
+          "T": 32,
+          "baseline": 256.6998905302771,
+          "candidate": 222.378906,
+          "throughput_change_pct": 15.433561189601818,
+          "baseline_drift_pct": -0.3939554047416194
+        },
+        {
+          "round": 1,
+          "depth": 64,
+          "T": 40,
+          "baseline": 268.2917947474623,
+          "candidate": 235.15625,
+          "throughput_change_pct": 14.090862882641764,
+          "baseline_drift_pct": -0.025913200401272984
+        },
+        {
+          "round": 1,
+          "depth": 64,
+          "T": 64,
+          "baseline": 307.3260811341107,
+          "candidate": 271.21875,
+          "throughput_change_pct": 13.312992237487542,
+          "baseline_drift_pct": -0.15367803292012372
+        },
+        {
+          "round": 1,
+          "depth": 64,
+          "T": 65,
+          "baseline": 327.35256011621095,
+          "candidate": 307.216406,
+          "throughput_change_pct": 6.554387631307335,
+          "baseline_drift_pct": -0.2062253077884102
+        },
+        {
+          "round": 1,
+          "depth": 64,
+          "T": 128,
+          "baseline": 419.6638170284557,
+          "candidate": 394.736719,
+          "throughput_change_pct": 6.314866803271912,
+          "baseline_drift_pct": 0.2165531982006641
+        },
+        {
+          "round": 1,
+          "depth": 64,
+          "T": 256,
+          "baseline": 643.0555180940737,
+          "candidate": 618.911719,
+          "throughput_change_pct": 3.9010085530588823,
+          "baseline_drift_pct": 1.7914139998725265
+        },
+        {
+          "round": 3,
+          "depth": 64,
+          "T": 1,
+          "baseline": 229.7925930343436,
+          "candidate": 210.885156,
+          "throughput_change_pct": 8.965750550192176,
+          "baseline_drift_pct": 0.8247732394673246
+        },
+        {
+          "round": 3,
+          "depth": 64,
+          "T": 2,
+          "baseline": 229.98559448310172,
+          "candidate": 209.203125,
+          "throughput_change_pct": 9.934110440798483,
+          "baseline_drift_pct": 0.5064037945843314
+        },
+        {
+          "round": 3,
+          "depth": 64,
+          "T": 4,
+          "baseline": 231.13645871609987,
+          "candidate": 207.357031,
+          "throughput_change_pct": 11.467866607378197,
+          "baseline_drift_pct": -0.2996972649387919
+        },
+        {
+          "round": 3,
+          "depth": 64,
+          "T": 6,
+          "baseline": 232.58336881167725,
+          "candidate": 209.15625,
+          "throughput_change_pct": 11.200773972414035,
+          "baseline_drift_pct": 2.210411813038138
+        },
+        {
+          "round": 3,
+          "depth": 64,
+          "T": 7,
+          "baseline": 231.30491359459768,
+          "candidate": 214.350781,
+          "throughput_change_pct": 7.909526858499127,
+          "baseline_drift_pct": 0.5734608118672435
+        },
+        {
+          "round": 3,
+          "depth": 64,
+          "T": 8,
+          "baseline": 209.3495543533263,
+          "candidate": 189.457812,
+          "throughput_change_pct": 10.499299101652415,
+          "baseline_drift_pct": 0.14527266022521523
+        },
+        {
+          "round": 3,
+          "depth": 64,
+          "T": 9,
+          "baseline": 240.16304236331598,
+          "candidate": 220.767188,
+          "throughput_change_pct": 8.785659924841728,
+          "baseline_drift_pct": 0.5846384557502304
+        },
+        {
+          "round": 3,
+          "depth": 64,
+          "T": 16,
+          "baseline": 219.32552657169649,
+          "candidate": 201.566406,
+          "throughput_change_pct": 8.810555748906147,
+          "baseline_drift_pct": 0.7239230406301589
+        },
+        {
+          "round": 3,
+          "depth": 64,
+          "T": 22,
+          "baseline": 252.72216895152604,
+          "candidate": 235.165625,
+          "throughput_change_pct": 7.4656081013226405,
+          "baseline_drift_pct": 0.8827384218295542
+        },
+        {
+          "round": 3,
+          "depth": 64,
+          "T": 32,
+          "baseline": 258.0448748597931,
+          "candidate": 230.21875,
+          "throughput_change_pct": 12.08681954002142,
+          "baseline_drift_pct": 1.4503183625673932
+        },
+        {
+          "round": 3,
+          "depth": 64,
+          "T": 40,
+          "baseline": 268.7596850689826,
+          "candidate": 236.146875,
+          "throughput_change_pct": 13.81039239625026,
+          "baseline_drift_pct": 0.37510666402627013
+        },
+        {
+          "round": 3,
+          "depth": 64,
+          "T": 64,
+          "baseline": 307.49231426234275,
+          "candidate": 271.813281,
+          "throughput_change_pct": 13.126302412847423,
+          "baseline_drift_pct": 0.2622906669619285
+        },
+        {
+          "round": 3,
+          "depth": 64,
+          "T": 65,
+          "baseline": 327.16832348336,
+          "candidate": 307.463281,
+          "throughput_change_pct": 6.408909193732315,
+          "baseline_drift_pct": 0.0938890101270129
+        },
+        {
+          "round": 3,
+          "depth": 64,
+          "T": 128,
+          "baseline": 420.10703135762094,
+          "candidate": 393.905469,
+          "throughput_change_pct": 6.651738658043604,
+          "baseline_drift_pct": -0.005206870834895128
+        },
+        {
+          "round": 3,
+          "depth": 64,
+          "T": 256,
+          "baseline": 642.8276833737804,
+          "candidate": 616.78125,
+          "throughput_change_pct": 4.222961280645343,
+          "baseline_drift_pct": -1.8294877932768738
+        }
+      ],
+      "groups": [
+        {
+          "round": 1,
+          "depth": 64,
+          "stable_cases": 15,
+          "median_pct": 10.002954271843588,
+          "minimum_pct": 3.9010085530588823,
+          "passed": true
+        },
+        {
+          "round": 3,
+          "depth": 64,
+          "stable_cases": 15,
+          "median_pct": 8.965750550192176,
+          "minimum_pct": 4.222961280645343,
+          "passed": true
+        }
+      ],
+      "passed": true
+    }
+  ],
+  "model": {
+    "complete": true,
+    "pairs": [
+      {
+        "round": 1,
+        "baseline": 8373.297921368856,
+        "candidate": 8198.5,
+        "throughput_change_pct": 2.1320719810801414,
+        "baseline_drift_pct": -0.14082489975177914,
+        "passed": false
+      },
+      {
+        "round": 3,
+        "baseline": 8473.033223114377,
+        "candidate": 8184.3,
+        "throughput_change_pct": 3.527891488757451,
+        "baseline_drift_pct": 2.5408131558190217,
+        "passed": true
+      }
+    ],
+    "passed": false,
+    "runs": [
+      {
+        "depth": 8,
+        "prefill_ms": 8379.2,
+        "decode_ms": 1451.6,
+        "expert_slots": 4191,
+        "expert_cache_mib": 5760,
+        "competition": false
+      },
+      {
+        "depth": 64,
+        "prefill_ms": 8198.5,
+        "decode_ms": 1443.6,
+        "expert_slots": 4191,
+        "expert_cache_mib": 5760,
+        "competition": false
+      },
+      {
+        "depth": 8,
+        "prefill_ms": 8367.4,
+        "decode_ms": 1435.0,
+        "expert_slots": 4191,
+        "expert_cache_mib": 5760,
+        "competition": false
+      },
+      {
+        "depth": 64,
+        "prefill_ms": 8184.3,
+        "decode_ms": 1433.6,
+        "expert_slots": 4191,
+        "expert_cache_mib": 5760,
+        "competition": false
+      },
+      {
+        "depth": 8,
+        "prefill_ms": 8580.0,
+        "decode_ms": 1433.8,
+        "expert_slots": 4191,
+        "expert_cache_mib": 5760,
+        "competition": false
+      }
+    ],
+    "all_five_32_ID_outputs_equal_corrected_XMX_reference": true
+  },
+  "model_gate_passed": false,
+  "correctness": {
+    "private_checks": 5136,
+    "public_checks": 0,
+    "total_checks": 5136,
+    "checks_per_process": 428,
+    "full_intermediate_final_bytes_and_guards_equal": true,
+    "mixed_call_counts": [
+      1,
+      2,
+      3,
+      4,
+      7,
+      8,
+      9,
+      15,
+      16,
+      17,
+      31,
+      32,
+      33,
+      63,
+      64,
+      65
+    ],
+    "two_reused_dequant_buffers": true,
+    "GEMM_source_byte_identical": true,
+    "arithmetic_precision_unchanged": true,
+    "public_fresh_CMake_CTest_registration": false,
+    "full_cmake_target_build": false
+  },
+  "production_exe_updated": false,
+  "config_updated": false,
+  "pcie4_tested": false,
+  "standalone_q2_model_tested": false,
+  "new_perplexity_test": false,
+  "files_sha256": {
+    "build-sycl-a770-xmx-batch-depth-20261024/run.py": "d1f30985a860f44a46f4b77d78edf83a455faaa8ad12ffd75ef930a95a31396e",
+    "build-sycl-a770-xmx-batch-depth-20261024/prepare.py": "75a3850bdc09b05b0a3230e280c2617a37bdda41d0379d9236d0d4f99d101d6c",
+    "build-sycl-a770-xmx-batch-depth-20261024/check.cpp": "d8efedafe32e320220991f9cce275b6aae47796eb32344bd9f5aca6e63206cf7",
+    "build-sycl-a770-xmx-batch-depth-20261024/before-check.cpp": "137f7de5266555787cfb993552d9fc9d2e5817016a23c44b022b6a1c2b972291",
+    "build-sycl-a770-xmx-batch-depth-20261024/prefill.cpp": "5555d45b8d13ecb2a264c2090b6e25693cfd80bed48c0e00e97bca2643d49ba9",
+    "build-sycl-a770-xmx-batch-depth-20261024/before-prefill.cpp": "b728ec0baa7e7450db61f3f75514d2bebfbcb0ee95eca28808b253012a26b3b4",
+    "build-sycl-a770-xmx-batch-depth-20261024/before.dp.cpp": "c4f2ba0e8cae56b10d79d10e2e71740ec6238d2411ca3989c7c844c23ad2defb",
+    "build-sycl-a770-xmx-batch-depth-20261024/include/strata/prefill/gemm.hpp": "77fb3493631bf6ccab9e20e86a4cd41cf67b018707b6e71d08cc9a73d199fc1c",
+    "build-sycl-a770-gdn-ab-xmx-20261024/candidate.obj": "a07db11a21f8a39f0e2e3bc867f53db534a9650741a6cfa5da2a4139651292e4",
+    "build-sycl-a770-gdn-ab-xmx-20261024/candidate.dp.cpp": "c4f2ba0e8cae56b10d79d10e2e71740ec6238d2411ca3989c7c844c23ad2defb",
+    "build-sycl-a770-gdn-bounded-20261024/results.json": "68a035aa7b18481142f193d662c59dea1b6baaacf25b6479107d1af59b150328",
+    "build-sycl-a770-gdn-bounded-20261024/integration.json": "892150abc2762ad7963ffc622b327c03b6bda4e1a9a598efca4074741705aae2",
+    "sycl/src/prefill/prefill.cpp": "b728ec0baa7e7450db61f3f75514d2bebfbcb0ee95eca28808b253012a26b3b4",
+    "include/strata/prefill/gemm.hpp": "77fb3493631bf6ccab9e20e86a4cd41cf67b018707b6e71d08cc9a73d199fc1c",
+    "strata-iq2_xs.json": "1a755372f0e6c90c0bfa2af865d67b51f8df49c10aa1613b041b08da8184ca88",
+    "build-sycl-a770-native-xmx-20261024/model-code256/request.txt": "db96eae03010fd87fc1ac773db2c109fd1854d5be5501fdd38483a10a56f65e4",
+    "build-sycl-a770-xmx-expert-batch-20261024/build.json": "649ee77518e3b6578159d00026092cb04d61e07a4254f41fda6c1c2eb162ba86",
+    "build-sycl-a770-gdn-ab-xmx-20261024/run.py": "34b8df9ab58f1ac04552ec3689cdda3bd652c5b062e657227bf6241ab41cd6e3",
+    "build-sycl-deepinfer-20261023/sampler-fp32/sampler.obj": "8179a1285c8234eb812da978004299c0ff8fc09cb98dc6579a18fafee928dd4d",
+    "build-sycl-deepinfer-20261023/baseline/CMakeFiles/strata.dir/src/program/generate.cpp.obj": "3803026bb66e111096d95273261a2ff074fe50905146c83c375a4d1ddf9efd5e",
+    "build-sycl-deepinfer-20261023/baseline/strata_engine.lib": "53322fc27e5d3970695c9558d00cedff70325b2ab946052f82818d33b691b5f8",
+    "build-sycl-deepinfer-20261023/baseline/strata_prefill.lib": "db7030439dcbe4ac607bb3a2e426a7720a6ae060c9f29bc1f9bc4682fa944377",
+    "build-sycl-deepinfer-20261023/baseline/strata_spec.lib": "417e16e26147c87ea2a73bbd9b0d0d305a3477c90c721e90770ad5df136172c5",
+    "build-sycl-deepinfer-20261023/baseline/strata_kernels.lib": "66be7e63d2d994935e5da2150e1663c350334f4c50f656d05a4794a1c60bb173",
+    "build-sycl-deepinfer-20261023/baseline/strata_core.lib": "fe7a34a2cce8612bc1c802398ca0490b06052f9fab1a5bba8477718d8ab3e9ca",
+    "build-sycl-a770-xmx-batch-depth-20261024/check.obj": "fc2c6f321d4d05375c9539e8a6104eded37fbf549d3e317922ab81abdb9ec7ea",
+    "build-sycl-a770-xmx-batch-depth-20261024/prefill.obj": "ccb922cf3c1803130c04f145450380f616717a2f27f1a8571647a4b44678d7ec",
+    "build-sycl-a770-xmx-batch-depth-20261024/check/strata.exe": "e709c42f43ec3ec0b0ef782d2bb54e8af09c118b9197460bc852ed34a41e03cc",
+    "build-sycl-a770-xmx-batch-depth-20261024/model/strata.exe": "19ddae971f2d746b641690f457594b0359ab8ee5d1063d745765c64031077092",
+    "build-sycl-a770-xmx-batch-depth-20261024/compile-check.log": "8942b9f9ac048d219657ca7ddf555dba7b2e7b0fa6c0f4d4aa9f8b6a51131ef4",
+    "build-sycl-a770-xmx-batch-depth-20261024/compile-prefill.log": "79a19f9d46dc929b4f6a884657787ff20d671a33b9d1af41f9ad381715ac5925",
+    "build-sycl-a770-xmx-batch-depth-20261024/link-check.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-sycl-a770-xmx-batch-depth-20261024/link-model.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-sycl-a770-xmx-batch-depth-20261024/confirm/0.stdout": "1d3128b09b4d4633b88a210253ca3b85e36e28d30a3e877463f8fb9d74ec9ef9",
+    "build-sycl-a770-xmx-batch-depth-20261024/confirm/1.stdout": "2b61a0ac627b1c2a61be36dbeafba993138297f117e895269d53e7774f279a35",
+    "build-sycl-a770-xmx-batch-depth-20261024/confirm/2.stdout": "6807a6404477e544869b6340e9fe2662ea62050d81fac0a7956b2d17a73c8454",
+    "build-sycl-a770-xmx-batch-depth-20261024/confirm/3.stdout": "311278040be7bdf561336c7cb79831966ae537c6bd6680aabf5ab7df6166a8ae",
+    "build-sycl-a770-xmx-batch-depth-20261024/confirm/4.stdout": "10b63d8378a803409974aeae6083b7c22d2f4fce3e699268c6921a7b0e4c9b4b",
+    "build-sycl-a770-xmx-batch-depth-20261024/screen/0.stdout": "4408a7c58fbd2ebd942a79d279fae40e541c5a15ee15e6a076d6c26dc08bc99d",
+    "build-sycl-a770-xmx-batch-depth-20261024/screen/1.stdout": "c877924844e6a68b6cf4cadf50a537babd54b309ca5afa97eeffeea2c801b267",
+    "build-sycl-a770-xmx-batch-depth-20261024/screen/2.stdout": "6ace331ab8441bae31075db49af77361e77059a5216c5017ef7e23fdfa98db45",
+    "build-sycl-a770-xmx-batch-depth-20261024/screen/3.stdout": "46d93aa76c57818124cfeb1433a779be2ec298b50bf8067e63a87939dca52f23",
+    "build-sycl-a770-xmx-batch-depth-20261024/screen/4.stdout": "b2e107ddb64d6ca38db0acc9f7aaca10937bb1cbf517e296f9f8be375b95b853",
+    "build-sycl-a770-xmx-batch-depth-20261024/screen/5.stdout": "d09edb82f014da3a353521fd2601945067e47dec11e433413d9cbb2ad7c9054a",
+    "build-sycl-a770-xmx-batch-depth-20261024/screen/6.stdout": "4c9cdd0b49298167252edead57002aa6f9f14f8ae3e283a07932955babc832bb",
+    "build-sycl-a770-xmx-batch-depth-20261024/confirm/0.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-sycl-a770-xmx-batch-depth-20261024/confirm/1.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-sycl-a770-xmx-batch-depth-20261024/confirm/2.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-sycl-a770-xmx-batch-depth-20261024/confirm/3.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-sycl-a770-xmx-batch-depth-20261024/confirm/4.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-sycl-a770-xmx-batch-depth-20261024/model-direct/0.stderr": "70282ddd0f1a8a0c8389017a5525ed6e43d9cae285d35ff88fe0936e8d7500d9",
+    "build-sycl-a770-xmx-batch-depth-20261024/model-direct/1.stderr": "c72741c83a3c25ddd9470581c6349bb0cea57f7e0b55836611ca2f3b8673ef4a",
+    "build-sycl-a770-xmx-batch-depth-20261024/model-direct/2.stderr": "ba75968c280a638fb8dee533c73e1d2f5cea3cc4021a5588b690242498585cd4",
+    "build-sycl-a770-xmx-batch-depth-20261024/model-direct/3.stderr": "1075e96857a2f923aa98b3f0c084e17735f7963259231f4a6f41d1f389b87a22",
+    "build-sycl-a770-xmx-batch-depth-20261024/model-direct/4.stderr": "3c522809b2a9064d3694be1720518863ba79708ae7e12a0a31c622d048e870be",
+    "build-sycl-a770-xmx-batch-depth-20261024/screen/0.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-sycl-a770-xmx-batch-depth-20261024/screen/1.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-sycl-a770-xmx-batch-depth-20261024/screen/2.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-sycl-a770-xmx-batch-depth-20261024/screen/3.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-sycl-a770-xmx-batch-depth-20261024/screen/4.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-sycl-a770-xmx-batch-depth-20261024/screen/5.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-sycl-a770-xmx-batch-depth-20261024/screen/6.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-sycl-a770-xmx-batch-depth-20261024/model-direct/0.protocol": "9a4831014bcef34cdb230c6b3a979cc97b61ad0c4b90f45073249c8440210490",
+    "build-sycl-a770-xmx-batch-depth-20261024/model-direct/1.protocol": "9bda16fa78c9933313b0470516ebd0abb14438950287af3843fa226593c0f310",
+    "build-sycl-a770-xmx-batch-depth-20261024/model-direct/2.protocol": "b20bf1a4c801462b0a5d1de8ad69950edb9616da08362e8bfc936b73e313141a",
+    "build-sycl-a770-xmx-batch-depth-20261024/model-direct/3.protocol": "89694b9d1bd1a13af92116693279d3609ce36b7108ab90cd83e619c2d2049916",
+    "build-sycl-a770-xmx-batch-depth-20261024/model-direct/4.protocol": "6e41f8106a9871c7c9b874cebbdbf4f8443326b671de792541f95712f2db8cd3",
+    "build-sycl-a770-xmx-batch-depth-20261024/results.json": "9384203013e1618dfb96e8e88e4789304a8aada5629fae37054d8ceac859fca3",
+    "build-sycl-a770-xmx-batch-depth-20261024/audit.py": "cf2900646b02df20ff4f60cd23e6f553e1ef89c7b283fc7fd9d0aac65132b8ac",
+    "build-sycl-a770-xmx-batch-depth-20261024/publish.py": "2e965b08a619559f60a1c8dee6b51dc53eace7600c00a2929350d1831abaceea"
+  }
+}

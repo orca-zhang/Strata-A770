@@ -1,7 +1,7 @@
 """Tests for setup.py's Intel Arc detection on Windows (mocked Win32_VideoController rows and display-class
 registry values): the discrete Arc cards from their PCI device ids with the registry's 64-bit VRAM size, the
-integrated GPU listed but not supported, and the no-NVIDIA message naming the Intel card instead of only asking
-for the NVIDIA driver. No GPU, no downloads.
+integrated GPU listed but not supported, automatic native routing on Windows and Linux, and explicit backend
+choices preserved. No GPU, no downloads.
 
     python -m unittest tools.test_setup_intel_windows
 """
@@ -47,7 +47,7 @@ class WindowsDetection(unittest.TestCase):
         self.assertAlmostEqual(g[1]["vram_gb"], 34139537408 / 2 ** 30, places=1)  # the registry's 64-bit size
         self.assertEqual(g[1]["driver"], "32.0.101.8805")
         self.assertEqual(g[1]["pci_id"], 0xE223)
-        self.assertIsNone(setup.intel_problem(g[1]))  # the B70 can be used (experimental, Linux-only)
+        self.assertIsNone(setup.intel_problem(g[1]))  # a known discrete Arc
         self.assertIn("Arc", setup.intel_problem(g[0]) + "discrete Arc cards only")
 
     def test_table_fallback_when_the_registry_has_no_size(self):
@@ -67,26 +67,105 @@ class WindowsDetection(unittest.TestCase):
         for did, (name, gb) in mod.INTEL_ARC.items():
             self.assertEqual(setup._WIN_INTEL_DID[int(did, 16)], (name, gb), did)
 
-    def test_no_nvidia_message_names_the_intel_card(self):
+    def test_automatic_orca_handoff_preserves_other_backend_choices(self):
+        arc = dict(index=0, name="Arc A770", vram_gb=16, pci_id=0x56A0)
+        igpu = dict(index=0, name="UHD 630", vram_gb=1, pci_id=0x3E98)
+        cases = (
+            (None, [], [], [arc], True, 1),
+            (None, [dict(problem="unsupported")], [], [arc], True, 1),
+            (None, [], [], [igpu], False, 1),
+            (None, [dict(problem=None)], [], [arc], False, 0),
+            (None, [], [{}], [arc], False, 0),
+            ("cuda", [], [], [arc], False, 0),
+            ("hip", [], [], [arc], False, 0),
+            ("12", [], [], [arc], False, 0),
+            ("13", [], [], [arc], False, 0),
+            ("auto", [], [], [arc], True, 1),
+        )
+        for win in (False, True):
+            for backend, nv, amd, intel, delegated, queries in cases:
+                argv = ["setup.py", "--check", "--model", "IQ2_XS"]
+                if backend in ("12", "13", "auto"):
+                    argv += ["--cuda", backend]
+                elif backend:
+                    argv += ["--backend", backend]
+                with self.subTest(win=win, backend=backend, nv=nv, amd=amd, intel=intel), \
+                        mock.patch.object(sys, "argv", argv), \
+                        mock.patch.object(setup, "WIN", win), \
+                        mock.patch.object(setup, "OLD_GPUS", False), \
+                        mock.patch.object(setup, "data_folder", return_value=(ROOT, [])), \
+                        mock.patch.object(setup, "installed_configs", return_value=[]), \
+                        mock.patch.object(setup, "start_gpus", return_value=None), \
+                        mock.patch.object(setup, "gpus", return_value=nv), \
+                        mock.patch.object(setup, "gpu_problem", side_effect=lambda g: g["problem"]), \
+                        mock.patch.object(setup, "amd_gpus", return_value=amd), \
+                        mock.patch.object(setup, "amd_problem", return_value=None), \
+                        mock.patch.object(setup, "intel_gpus", return_value=intel) as discover, \
+                        mock.patch.object(setup, "sycl_setup", return_value=17) as handoff, \
+                        mock.patch.object(setup, "old_gpus_opt_in", side_effect=None if delegated else RuntimeError("kept backend"),
+                                          return_value=False), contextlib.redirect_stdout(io.StringIO()):
+                    if delegated:
+                        self.assertEqual(setup.main(), 17)
+                        handoff.assert_called_once_with(argv[1:], "orca")
+                    else:
+                        with self.assertRaisesRegex(RuntimeError, "kept backend"):
+                            setup.main()
+                        handoff.assert_not_called()
+                    self.assertEqual(discover.call_count, queries)
+
+    def test_explicit_cuda_failure_names_orca(self):
         out = io.StringIO()
-        with contextlib.redirect_stdout(out), mock.patch.object(setup, "gpus", lambda: []), \
-                mock.patch.object(setup, "amd_gpus", lambda *a, **k: []), \
-                mock.patch.object(setup, "intel_gpus",
-                                  lambda: [{"index": 1, "name": "Intel(R) Arc(TM) Pro B70 Graphics",
-                                            "vram_gb": 31.8, "arch": "xe", "driver": "xe",
-                                            "vendor": "intel", "pci_id": 0xE223}]):
+        with mock.patch.object(sys, "argv", ["setup.py", "--backend", "cuda", "--check"]), \
+                mock.patch.object(setup, "data_folder", return_value=(ROOT, [])), \
+                mock.patch.object(setup, "installed_configs", return_value=[]), \
+                mock.patch.object(setup, "start_gpus", return_value=None), \
+                mock.patch.object(setup, "OLD_GPUS", False), \
+                mock.patch.object(setup, "old_gpus_opt_in", return_value=False), \
+                mock.patch.object(setup, "gpus", return_value=[]), \
+                mock.patch.object(setup, "amd_gpus", return_value=[]), \
+                mock.patch.object(setup, "intel_gpus", return_value=[dict(index=0, name="Arc A770", vram_gb=16,
+                                                                         pci_id=0x56A0)]) as discover, \
+                contextlib.redirect_stdout(out):
             with self.assertRaises(SystemExit):
-                # the no-GPU branch of main(): it fails with the Intel hint
-                intel = setup.intel_gpus()
-                intel_usable = [g for g in intel if setup.intel_problem(g) is None]
-                self.assertEqual(len(intel_usable), 1)
-                setup.fail("no NVIDIA GPU found (nvidia-smi did not answer)",
-                           "install the NVIDIA driver"
-                           + ("; Intel (" + ", ".join(f"{g['name']} {g['vram_gb']:.0f} GB" for g in intel_usable) +
-                              "): experimental Linux-only, docs/INTEL_ARC.md (--backend sycl on Linux)"
-                              if intel_usable else ""))
-        self.assertIn("Intel(R) Arc(TM) Pro B70 Graphics", out.getvalue())
-        self.assertIn("docs/INTEL_ARC.md", out.getvalue())
+                setup.main()
+        discover.assert_called_once()
+        self.assertIn("Arc A770", out.getvalue())
+        self.assertIn("--backend orca", out.getvalue())
+
+    def test_saved_intel_profiles_use_orca_without_overriding_explicit_backends(self):
+        import json
+        import tempfile
+        cases = [(None, ["sycl"], True), ("auto", ["orca", "sycl"], True),
+                 ("12", ["sycl"], False), ("13", ["orca"], False),
+                 ("cuda", ["sycl"], False), ("hip", ["orca"], False),
+                 (None, ["cuda", "sycl"], False)]
+        with tempfile.TemporaryDirectory() as d:
+            for win in (True, False):
+                for backend, profiles, delegated in cases:
+                    have = []
+                    for i, value in enumerate(profiles):
+                        path = Path(d) / f"strata-{i}.json"
+                        path.write_text(json.dumps({"backend": value}), encoding="utf-8-sig")
+                        have.append(path)
+                    argv = ["setup.py"]
+                    if backend in ("12", "13", "auto"):
+                        argv += ["--cuda", backend]
+                    elif backend:
+                        argv += ["--backend", backend]
+                    with self.subTest(win=win, backend=backend, profiles=profiles), \
+                            mock.patch.object(sys, "argv", argv), mock.patch.object(setup, "WIN", win), \
+                            mock.patch.object(setup, "data_folder", return_value=(ROOT, [])), \
+                            mock.patch.object(setup, "installed_configs", return_value=have), \
+                            mock.patch.object(setup, "start_gpus", side_effect=RuntimeError("kept backend")), \
+                            mock.patch.object(setup, "sycl_setup", return_value=17) as handoff, \
+                            contextlib.redirect_stdout(io.StringIO()):
+                        if delegated:
+                            self.assertEqual(setup.main(), 17)
+                            handoff.assert_called_once_with(argv[1:], "orca")
+                        else:
+                            with self.assertRaisesRegex(RuntimeError, "kept backend"):
+                                setup.main()
+                            handoff.assert_not_called()
 
     def test_sycl_windows_hands_over_to_setup_intel(self):
         import contextlib
@@ -99,7 +178,7 @@ class WindowsDetection(unittest.TestCase):
         self.assertIn("EXPERIMENTAL", out.getvalue())
         cmd = call.call_args[0][0]
         self.assertTrue(cmd[1].endswith(str(Path("sycl") / "setup_intel.py")))
-        self.assertEqual(cmd[2:], [])
+        self.assertEqual(cmd[2:], ["--runtime", "sycl"])
 
     def test_sycl_engine_windows_finds_the_exe_without_docker(self):
         import tempfile

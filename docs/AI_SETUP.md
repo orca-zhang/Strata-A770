@@ -52,7 +52,14 @@ Requirements (details: [INSTALL.md](INSTALL.md#what-you-need)):
 - **RAM:** 32 GB or more (see step 3). **Disk:** ~80 GB free, ideally on an NVMe SSD. **CPU:** x86-64 with AVX2. Without AVX2 (Xeon E5 v1/v2 and older) setup still installs, as an experimental and slow build it compiles on the PC (10-20 minutes): tell the user that before starting ([INSTALL.md](INSTALL.md#older-cpus-experimental)).
 - **OS:** Windows 10/11 or Linux (Ubuntu 22.04/24.04 are fully automatic).
 
-If the PC does not meet them, say which part is missing and stop.
+Intel Arc uses the native Orca Level Zero backend when no NVIDIA or AMD card can
+be used. It currently requires a source build and matching kernel packs; see
+[the native build instructions](../sycl/orca/README.md) before running setup.
+Windows A770 regression evidence is available; Linux GPU validation is pending.
+Use `--backend orca` to select it explicitly, or `--backend sycl` for the SYCL
+comparison build. Integrated Intel graphics remain unsupported.
+
+If the PC does not meet these requirements, say which part is missing and stop.
 
 ## 2. Get Strata
 

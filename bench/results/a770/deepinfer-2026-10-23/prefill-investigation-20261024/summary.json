@@ -1,0 +1,3186 @@
+{
+  "complete": true,
+  "purpose": "Bounded prefill diagnostics, not performance acceptance",
+  "cache_slots": 5771,
+  "cache_mib": 7922,
+  "kv": "int8",
+  "chunk": 256,
+  "short_read": 0,
+  "first_prompt_tokens": 23,
+  "first_prefill_rows": 22,
+  "runtime_controls": [
+    {
+      "directory": "prefill-health-257-default",
+      "variant": "default",
+      "timeout_seconds": 100,
+      "completed_requests": 0
+    },
+    {
+      "directory": "prefill-health-257-v1",
+      "variant": "v1",
+      "timeout_seconds": 100,
+      "completed_requests": 0
+    },
+    {
+      "directory": "prefill-health-257-no-offload",
+      "variant": "no-offload",
+      "timeout_seconds": 100,
+      "completed_requests": 0
+    }
+  ],
+  "trace": {
+    "directory": "prefill-trace",
+    "timeout_seconds": 180,
+    "last_layer_started": 27,
+    "last_layer_start_ms": 144167.8,
+    "layer_start_ms": {
+      "0": 2.0,
+      "1": 10167.1,
+      "2": 16915.2,
+      "3": 22251.2,
+      "4": 27228.3,
+      "5": 32922.7,
+      "6": 38464.4,
+      "7": 44529.2,
+      "8": 49802.9,
+      "9": 53904.7,
+      "10": 58261.6,
+      "11": 62498.6,
+      "12": 66949.2,
+      "13": 72418.3,
+      "14": 76457.5,
+      "15": 81346.5,
+      "16": 85755.8,
+      "17": 89773.9,
+      "18": 94227.2,
+      "19": 100166.7,
+      "20": 105194.7,
+      "21": 111072.1,
+      "22": 117204.3,
+      "23": 125228.1,
+      "24": 130475.1,
+      "25": 134994.3,
+      "26": 139470.9,
+      "27": 144167.8
+    },
+    "adjacent_layer_ms": [
+      10165.1,
+      6748.1,
+      5336.0,
+      4977.0999999999985,
+      5694.399999999998,
+      5541.700000000004,
+      6064.799999999996,
+      5273.700000000004,
+      4101.799999999996,
+      4356.9000000000015,
+      4237.0,
+      4450.5999999999985,
+      5469.100000000006,
+      4039.199999999997,
+      4889.0,
+      4409.300000000003,
+      4018.0999999999913,
+      4453.300000000003,
+      5939.5,
+      5028.0,
+      5877.400000000009,
+      6132.199999999997,
+      8023.800000000003,
+      5247.0,
+      4519.1999999999825,
+      4476.600000000006,
+      4696.899999999994
+    ],
+    "median_adjacent_layer_ms": 5028.0,
+    "completed_requests": 0,
+    "observation": "The trace run progressed through many layers; earlier bounded timeouts do not prove deadlock."
+  },
+  "default_decision": "Keep all four original experiments and prefill GPU widening disabled; no new model speed claim.",
+  "scalar_probe": {
+    "directory": "mkl-scalar-probe-final",
+    "exe_sha256": "b7bbe205e70a0865562d8d6c3c12d41488929b2ac96642ddfd6c86e60550ec49",
+    "queries": [
+      {
+        "allocations": 0,
+        "us": 0.064062
+      },
+      {
+        "allocations": 24576,
+        "us": 0.095312
+      }
+    ],
+    "runs": [
+      {
+        "direct": false,
+        "allocations": 0,
+        "submit_us": 24784.0125,
+        "total_us": 24785.50625
+      },
+      {
+        "direct": true,
+        "allocations": 0,
+        "submit_us": 25427.95625,
+        "total_us": 25429.60625
+      },
+      {
+        "direct": false,
+        "allocations": 0,
+        "submit_us": 27007.83125,
+        "total_us": 27009.2625
+      },
+      {
+        "direct": false,
+        "allocations": 24576,
+        "submit_us": 30109.875,
+        "total_us": 30111.375
+      },
+      {
+        "direct": true,
+        "allocations": 24576,
+        "submit_us": 30100.9375,
+        "total_us": 30102.46875
+      },
+      {
+        "direct": false,
+        "allocations": 24576,
+        "submit_us": 30026.2125,
+        "total_us": 30029.11875
+      }
+    ],
+    "decision": "Do not replace DPCT with a typed call: scalar queries are negligible and typed GEMM has no stable advantage."
+  },
+  "runtime_probe": {
+    "no_program_options_directory": "mkl-runtime-no-program-options",
+    "no_program_options_runs": [
+      {
+        "direct": false,
+        "allocations": 0,
+        "submit_us": 25713.9625,
+        "total_us": 25715.45
+      },
+      {
+        "direct": true,
+        "allocations": 0,
+        "submit_us": 25727.125,
+        "total_us": 25728.56875
+      },
+      {
+        "direct": false,
+        "allocations": 0,
+        "submit_us": 26083.74375,
+        "total_us": 26085.2625
+      },
+      {
+        "direct": false,
+        "allocations": 24576,
+        "submit_us": 31527.9875,
+        "total_us": 31529.425
+      },
+      {
+        "direct": true,
+        "allocations": 24576,
+        "submit_us": 30458.725,
+        "total_us": 30461.88125
+      },
+      {
+        "direct": false,
+        "allocations": 24576,
+        "submit_us": 30152.125,
+        "total_us": 30154.49375
+      }
+    ],
+    "verbose_directory": "mkl-runtime-verbose",
+    "trace_directory": "mkl-runtime-trace",
+    "device_to_host_weight_copy_evidence": "<--- urEnqueueUSMMemcpy(.hQueue = 000001DB11AAE770, .blocking = 0, .pDst = 000001DB173A0000, .pSrc = FFFFB80200310000, .size = 6553600, .numEventsInWaitList = 0, .phEventWaitList = nullptr, .phEvent = 000000C72BEFE498 (000001DB11A3C530)) -> UR_RESULT_SUCCESS;",
+    "observation": "FP16 mixed-output GEMM invokes FP32 GEMM internally and stages device inputs through host allocations. Removing program compile options did not remove the large per-call cost.",
+    "next_check": "FP16 GPU widening plus separate output staging resolves the measured Short regression; four-scenario model performance acceptance remains outstanding."
+  },
+  "gpu_widen": {
+    "flag": "STRATA_PREFILL_GPU_WIDEN=1",
+    "default": "off",
+    "build_directory": "prefill-widen",
+    "checks_per_process": 96,
+    "check_processes": 5,
+    "all_active_elements_bit_equal": true,
+    "workspace": "Reuse existing 32 MiB workspace; no added device allocations; oversized products fall back.",
+    "library": "Both arms use the same installed oneMKL 2025.3 BLAS DLL import, not the older static engine binary.",
+    "measurements": [
+      {
+        "directory": "prefill-widen-operators",
+        "comparisons": [
+          {
+            "candidate_run": 1,
+            "bf16": false,
+            "baseline": 26069.89043820476,
+            "candidate": 6768.89375,
+            "throughput_change_pct": 285.14255653968206,
+            "baseline_drift_pct": -0.33949368173179506,
+            "meets_screen": true
+          },
+          {
+            "candidate_run": 1,
+            "bf16": true,
+            "baseline": 22974.513273154655,
+            "candidate": 6769.775,
+            "throughput_change_pct": 239.36893431694045,
+            "baseline_drift_pct": 6.51280853374423,
+            "meets_screen": false
+          },
+          {
+            "candidate_run": 3,
+            "bf16": false,
+            "baseline": 26266.160101164387,
+            "candidate": 6763.51875,
+            "throughput_change_pct": 288.3505180075739,
+            "baseline_drift_pct": 1.8571858093569427,
+            "meets_screen": true
+          },
+          {
+            "candidate_run": 3,
+            "bf16": true,
+            "baseline": 23353.843491524076,
+            "candidate": 6782.39375,
+            "throughput_change_pct": 244.33039944819,
+            "baseline_drift_pct": -2.9887153484809414,
+            "meets_screen": true
+          }
+        ]
+      },
+      {
+        "directory": "prefill-widen-operators-confirm",
+        "comparisons": [
+          {
+            "candidate_run": 1,
+            "bf16": false,
+            "baseline": 26162.28820284552,
+            "candidate": 6817.6875,
+            "throughput_change_pct": 283.74138155856394,
+            "baseline_drift_pct": 1.1154716774450346,
+            "meets_screen": true
+          },
+          {
+            "candidate_run": 1,
+            "bf16": true,
+            "baseline": 22709.502377303772,
+            "candidate": 6905.575,
+            "throughput_change_pct": 228.8575155190375,
+            "baseline_drift_pct": 2.6560939332542555,
+            "meets_screen": true
+          },
+          {
+            "candidate_run": 3,
+            "bf16": false,
+            "baseline": 25990.7710300695,
+            "candidate": 6677.65625,
+            "throughput_change_pct": 289.21996067212206,
+            "baseline_drift_pct": -2.3956298132112863,
+            "meets_screen": true
+          },
+          {
+            "candidate_run": 3,
+            "bf16": true,
+            "baseline": 22730.060898422944,
+            "candidate": 6756.26875,
+            "throughput_change_pct": 236.42919989562202,
+            "baseline_drift_pct": -2.4109191491742843,
+            "meets_screen": true
+          }
+        ]
+      }
+    ],
+    "limits": "Synthetic T=4 N=1280 K=2560, no extra pinned expert allocations; not a full-model speed claim.",
+    "original_padding_observation": "The original mixed-input beta=0 call overwrites unused row padding; GPU widening preserves it. Comparisons require exact active elements and untouched trailing guards.",
+    "failed_model": {
+      "directory": "prefill-widen-model-short",
+      "reference": {
+        "case": "Short",
+        "tokens": [
+          29108,
+          4009,
+          27891,
+          8964,
+          579,
+          16078,
+          321,
+          1100,
+          9872,
+          303,
+          660,
+          17425,
+          11,
+          694,
+          22602,
+          6105,
+          89661,
+          513,
+          35742,
+          777,
+          28750,
+          1056,
+          4860,
+          2438,
+          89661,
+          4016,
+          310,
+          12870,
+          60845,
+          69377,
+          13,
+          1061,
+          24057,
+          10814,
+          279,
+          6105,
+          3000,
+          310,
+          5372,
+          1004,
+          6213,
+          494,
+          660,
+          5306,
+          314,
+          279,
+          12515,
+          11
+        ],
+        "generated": 48,
+        "prompt_tokens": 23,
+        "prompt_ms": 254588.6,
+        "decode_ms": 4931.1,
+        "finish": "length",
+        "accepted": 31,
+        "offered": 39,
+        "reused": 0,
+        "resume": 0,
+        "ttft_ms": 254659.6619999982,
+        "done": "DONE 48 23 254588.6 4931.1 length 31 39 0 0 0 0 0 0.0 23 0"
+      },
+      "candidate_requests": [
+        {
+          "case": "Short",
+          "tokens": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "generated": 48,
+          "prompt_tokens": 23,
+          "prompt_ms": 41808.9,
+          "decode_ms": 8144.9,
+          "finish": "length",
+          "accepted": 3,
+          "offered": 3,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 43374.82380000438,
+          "done": "DONE 48 23 41808.9 8144.9 length 3 3 0 0 0 0 0 0.0 23 0"
+        },
+        {
+          "case": "Short",
+          "tokens": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "generated": 48,
+          "prompt_tokens": 23,
+          "prompt_ms": 30276.1,
+          "decode_ms": 1418.6,
+          "finish": "length",
+          "accepted": 22,
+          "offered": 22,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 30364.040899999964,
+          "done": "DONE 48 23 30276.1 1418.6 length 22 22 0 0 0 0 0 0.0 23 0"
+        }
+      ],
+      "functional_acceptance": false
+    },
+    "debug": {
+      "directory": "prefill-widen-model-debug",
+      "first_bad_moe_layer": 0,
+      "activation_nonfinite": 563200,
+      "final_nonfinite_logits": 248320
+    },
+    "extended_checks": [
+      {
+        "directory": "prefill-widen-hc-check",
+        "cases_per_process": 216
+      },
+      {
+        "directory": "prefill-widen-chain-check",
+        "cases_per_process": 219
+      }
+    ],
+    "synchronized_model_status": "FAILED; waits alone did not resolve the model regression.",
+    "failed_variants": [
+      {
+        "directory": "prefill-widen-sync-model",
+        "variant": "FP16/BF16, explicit waits",
+        "functional_acceptance": false,
+        "requests": [
+          {
+            "case": "Short",
+            "input_tokens": [
+              248045,
+              846,
+              198,
+              814,
+              20139,
+              3069,
+              279,
+              12515,
+              369,
+              6105,
+              303,
+              2250,
+              22157,
+              13,
+              248046,
+              198,
+              248045,
+              74455,
+              198,
+              248068,
+              271,
+              248069,
+              271
+            ],
+            "tokens": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "generated": 48,
+            "prompt_tokens": 23,
+            "prompt_ms": 29471.5,
+            "decode_ms": 1422.4,
+            "finish": "length",
+            "accepted": 22,
+            "offered": 22,
+            "reused": 0,
+            "resume": 0,
+            "ttft_ms": 29559.94539999665,
+            "done": "DONE 48 23 29471.5 1422.4 length 22 22 0 0 0 0 0 0.0 23 0"
+          }
+        ]
+      },
+      {
+        "directory": "prefill-widen-f16-model",
+        "variant": "FP16 only, explicit waits",
+        "functional_acceptance": false,
+        "requests": [
+          {
+            "case": "Short",
+            "input_tokens": [
+              248045,
+              846,
+              198,
+              814,
+              20139,
+              3069,
+              279,
+              12515,
+              369,
+              6105,
+              303,
+              2250,
+              22157,
+              13,
+              248046,
+              198,
+              248045,
+              74455,
+              198,
+              248068,
+              271,
+              248069,
+              271
+            ],
+            "tokens": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "generated": 48,
+            "prompt_tokens": 23,
+            "prompt_ms": 36352.0,
+            "decode_ms": 1430.1,
+            "finish": "length",
+            "accepted": 22,
+            "offered": 22,
+            "reused": 0,
+            "resume": 0,
+            "ttft_ms": 36440.057199994044,
+            "done": "DONE 48 23 36352.0 1430.1 length 22 22 0 0 0 0 0 0.0 23 0"
+          }
+        ]
+      }
+    ],
+    "additional_checks": [
+      {
+        "directory": "prefill-widen-f16",
+        "checks_per_process": 219,
+        "processes": 2
+      },
+      {
+        "directory": "prefill-widen-tight-check",
+        "checks_per_process": 219,
+        "processes": 2
+      },
+      {
+        "directory": "prefill-widen-arena-check",
+        "checks_per_process": 219,
+        "processes": 2
+      }
+    ],
+    "small_shared_arena": {
+      "directory": "prefill-widen-arena-results",
+      "checks_per_process": 219,
+      "processes": 2,
+      "passed": true
+    },
+    "actual_model_gemm": {
+      "directory": "prefill-widen-actual-compare-model",
+      "comparisons": [
+        "GEMM_COMPARE call=1 T=22 N=640 K=2560 ldy=640 beta=0 different=14080 bad_actual=2 bad_expected=0",
+        "GEMM_COMPARE inputs bad_x=0 bad_w=0 first_actual=-1.53356e-17 first_expected=-0.100045"
+      ],
+      "observation": "First optimized GEMM (T=22,N=640,K=2560) differs in all 14080 elements; raw FP16 inputs and reference output are finite."
+    },
+    "large_offset_reproducer": {
+      "directory": "mkl-large-offset-probe",
+      "cases": [
+        {
+          "offset_gib": 0,
+          "n": 640,
+          "t": 4,
+          "shared_output": false,
+          "different": 0,
+          "nonfinite": 0,
+          "conversion_errors": 0
+        },
+        {
+          "offset_gib": 0,
+          "n": 640,
+          "t": 4,
+          "shared_output": true,
+          "different": 0,
+          "nonfinite": 0,
+          "conversion_errors": 0
+        },
+        {
+          "offset_gib": 0,
+          "n": 640,
+          "t": 22,
+          "shared_output": false,
+          "different": 0,
+          "nonfinite": 0,
+          "conversion_errors": 0
+        },
+        {
+          "offset_gib": 0,
+          "n": 640,
+          "t": 22,
+          "shared_output": true,
+          "different": 0,
+          "nonfinite": 0,
+          "conversion_errors": 0
+        },
+        {
+          "offset_gib": 0,
+          "n": 1280,
+          "t": 4,
+          "shared_output": false,
+          "different": 0,
+          "nonfinite": 0,
+          "conversion_errors": 0
+        },
+        {
+          "offset_gib": 0,
+          "n": 1280,
+          "t": 4,
+          "shared_output": true,
+          "different": 0,
+          "nonfinite": 0,
+          "conversion_errors": 0
+        },
+        {
+          "offset_gib": 0,
+          "n": 1280,
+          "t": 22,
+          "shared_output": false,
+          "different": 0,
+          "nonfinite": 0,
+          "conversion_errors": 0
+        },
+        {
+          "offset_gib": 0,
+          "n": 1280,
+          "t": 22,
+          "shared_output": true,
+          "different": 0,
+          "nonfinite": 0,
+          "conversion_errors": 0
+        },
+        {
+          "offset_gib": 4,
+          "n": 640,
+          "t": 4,
+          "shared_output": false,
+          "different": 0,
+          "nonfinite": 0,
+          "conversion_errors": 0
+        },
+        {
+          "offset_gib": 4,
+          "n": 640,
+          "t": 4,
+          "shared_output": true,
+          "different": 2560,
+          "nonfinite": 0,
+          "conversion_errors": 0
+        },
+        {
+          "offset_gib": 4,
+          "n": 640,
+          "t": 22,
+          "shared_output": false,
+          "different": 0,
+          "nonfinite": 0,
+          "conversion_errors": 0
+        },
+        {
+          "offset_gib": 4,
+          "n": 640,
+          "t": 22,
+          "shared_output": true,
+          "different": 14080,
+          "nonfinite": 0,
+          "conversion_errors": 0
+        },
+        {
+          "offset_gib": 4,
+          "n": 1280,
+          "t": 4,
+          "shared_output": false,
+          "different": 0,
+          "nonfinite": 0,
+          "conversion_errors": 0
+        },
+        {
+          "offset_gib": 4,
+          "n": 1280,
+          "t": 4,
+          "shared_output": true,
+          "different": 5120,
+          "nonfinite": 0,
+          "conversion_errors": 0
+        },
+        {
+          "offset_gib": 4,
+          "n": 1280,
+          "t": 22,
+          "shared_output": false,
+          "different": 0,
+          "nonfinite": 0,
+          "conversion_errors": 0
+        },
+        {
+          "offset_gib": 4,
+          "n": 1280,
+          "t": 22,
+          "shared_output": true,
+          "different": 28160,
+          "nonfinite": 0,
+          "conversion_errors": 0
+        }
+      ],
+      "observation": "On A770/oneMKL 2025.3, FP32 GEMM corrupts C when A/B/C share an allocation and C is above 4 GiB. Converted inputs match; independent C passes."
+    },
+    "current_scope": "FP16 only, opt-in; BF16 restored to its original implementation. One separate device output allocation per optimized call, copied back after GEMM.",
+    "output_staging_results": [
+      {
+        "directory": "prefill-widen-output-stage",
+        "result": {
+          "complete": true,
+          "runs": [
+            {
+              "widen": false,
+              "argv": [
+                "G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-output-stage\\parity\\strata.exe"
+              ],
+              "returncode": 0,
+              "summary": [
+                {
+                  "checks": 255,
+                  "mismatched_cases": 0
+                }
+              ]
+            },
+            {
+              "widen": true,
+              "argv": [
+                "G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-output-stage\\parity\\strata.exe"
+              ],
+              "returncode": 0,
+              "summary": [
+                {
+                  "checks": 255,
+                  "mismatched_cases": 0
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "directory": "prefill-widen-output-stage-arena",
+        "result": {
+          "complete": true,
+          "diagnostic_only": true,
+          "exe_sha256": "1b303298764069b4c6a347470a6b3cb97b708baed7de883730f550d8aecebf5c",
+          "build_sha256": "54b50c570ac140274e818fe614f0c8493827bdb0a8db6b646908cce52b8051a2",
+          "runs": [
+            {
+              "widen": false,
+              "shared_arena": true,
+              "offset_gib": 4,
+              "returncode": 0,
+              "summary": [
+                {
+                  "checks": 255,
+                  "mismatched_cases": 0
+                }
+              ],
+              "env": {
+                "STRATA_SYCL_BIN": "build-sycl-a770-unified-operators\\bin\\strata-unified-all-operators.exe",
+                "ZES_ENABLE_SYSMAN": "1",
+                "STRATA_MIRROR_MIB": "49152",
+                "ONEAPI_DEVICE_SELECTOR": "level_zero:0",
+                "UR_L0_ENABLE_RELAXED_ALLOCATION_LIMITS": "1",
+                "STRATA_VERIFY_DEVICE_PLAN": "1",
+                "STRATA_VERIFY_NO_HOST": "1",
+                "STRATA_VERIFY_EAGER": "1",
+                "STRATA_STAGER_THREADS": "12",
+                "STRATA_VERIFY_ADAPT": "1",
+                "STRATA_ADAPT_COST_WEIGHTED": "1",
+                "STRATA_PREFILL_FIRST": "0",
+                "STRATA_GDN_SG16": "1",
+                "STRATA_IQ4_XS_SG16": "2",
+                "STRATA_VERIFY_FUSED_ACT": "1",
+                "STRATA_VERIFY_DESC_CACHE": "1",
+                "STRATA_SERVE_QUIET": "1",
+                "STRATA_GU_LANES": "16",
+                "STRATA_DOWN_LANES": "4",
+                "SYCL_PROGRAM_COMPILE_OPTIONS": "-cl-fp32-correctly-rounded-divide-sqrt",
+                "STRATA_MTP_LAST_DRAFT_MIN_P": "0.6",
+                "STRATA_GU_IQ2S_SG16": "1",
+                "STRATA_GU_IQ2S_SINGLE_GROUP": "1",
+                "STRATA_GDN_Q8_TAIL": "1",
+                "STRATA_QSA_Q8_TAIL": "1",
+                "STRATA_NO_BATCH_KV_STEP": "1",
+                "STRATA_MTP_CUM_MIN_P": "0",
+                "STRATA_PREFILL_GPU_WIDEN": "0",
+                "STRATA_GEMM_SHARED_ARENA": "4"
+              }
+            },
+            {
+              "widen": true,
+              "shared_arena": true,
+              "offset_gib": 4,
+              "returncode": 0,
+              "summary": [
+                {
+                  "checks": 255,
+                  "mismatched_cases": 0
+                }
+              ],
+              "env": {
+                "STRATA_SYCL_BIN": "build-sycl-a770-unified-operators\\bin\\strata-unified-all-operators.exe",
+                "ZES_ENABLE_SYSMAN": "1",
+                "STRATA_MIRROR_MIB": "49152",
+                "ONEAPI_DEVICE_SELECTOR": "level_zero:0",
+                "UR_L0_ENABLE_RELAXED_ALLOCATION_LIMITS": "1",
+                "STRATA_VERIFY_DEVICE_PLAN": "1",
+                "STRATA_VERIFY_NO_HOST": "1",
+                "STRATA_VERIFY_EAGER": "1",
+                "STRATA_STAGER_THREADS": "12",
+                "STRATA_VERIFY_ADAPT": "1",
+                "STRATA_ADAPT_COST_WEIGHTED": "1",
+                "STRATA_PREFILL_FIRST": "0",
+                "STRATA_GDN_SG16": "1",
+                "STRATA_IQ4_XS_SG16": "2",
+                "STRATA_VERIFY_FUSED_ACT": "1",
+                "STRATA_VERIFY_DESC_CACHE": "1",
+                "STRATA_SERVE_QUIET": "1",
+                "STRATA_GU_LANES": "16",
+                "STRATA_DOWN_LANES": "4",
+                "SYCL_PROGRAM_COMPILE_OPTIONS": "-cl-fp32-correctly-rounded-divide-sqrt",
+                "STRATA_MTP_LAST_DRAFT_MIN_P": "0.6",
+                "STRATA_GU_IQ2S_SG16": "1",
+                "STRATA_GU_IQ2S_SINGLE_GROUP": "1",
+                "STRATA_GDN_Q8_TAIL": "1",
+                "STRATA_QSA_Q8_TAIL": "1",
+                "STRATA_NO_BATCH_KV_STEP": "1",
+                "STRATA_MTP_CUM_MIN_P": "0",
+                "STRATA_PREFILL_GPU_WIDEN": "1",
+                "STRATA_GEMM_SHARED_ARENA": "4"
+              }
+            }
+          ],
+          "functional_acceptance": true
+        }
+      },
+      {
+        "directory": "prefill-widen-output-stage-model",
+        "result": {
+          "complete": true,
+          "phase": "model",
+          "exe_sha256": "227aae2b9c04aa74cfd1b1df9afdf1accd69c639c2fa6b8c2bd69a275d26af0d",
+          "build_sha256": "54b50c570ac140274e818fe614f0c8493827bdb0a8db6b646908cce52b8051a2",
+          "runs": [
+            {
+              "widen": true,
+              "env": {
+                "STRATA_SYCL_BIN": "build-sycl-a770-unified-operators\\bin\\strata-unified-all-operators.exe",
+                "ZES_ENABLE_SYSMAN": "1",
+                "STRATA_MIRROR_MIB": "49152",
+                "ONEAPI_DEVICE_SELECTOR": "level_zero:0",
+                "UR_L0_ENABLE_RELAXED_ALLOCATION_LIMITS": "1",
+                "STRATA_VERIFY_DEVICE_PLAN": "1",
+                "STRATA_VERIFY_NO_HOST": "1",
+                "STRATA_VERIFY_EAGER": "1",
+                "STRATA_STAGER_THREADS": "12",
+                "STRATA_VERIFY_ADAPT": "1",
+                "STRATA_ADAPT_COST_WEIGHTED": "1",
+                "STRATA_PREFILL_FIRST": "0",
+                "STRATA_GDN_SG16": "1",
+                "STRATA_IQ4_XS_SG16": "2",
+                "STRATA_VERIFY_FUSED_ACT": "1",
+                "STRATA_VERIFY_DESC_CACHE": "1",
+                "STRATA_SERVE_QUIET": "1",
+                "STRATA_GU_LANES": "16",
+                "STRATA_DOWN_LANES": "4",
+                "SYCL_PROGRAM_COMPILE_OPTIONS": "-cl-fp32-correctly-rounded-divide-sqrt",
+                "STRATA_MTP_LAST_DRAFT_MIN_P": "0.6",
+                "STRATA_GU_IQ2S_SG16": "1",
+                "STRATA_GU_IQ2S_SINGLE_GROUP": "1",
+                "STRATA_GDN_Q8_TAIL": "1",
+                "STRATA_QSA_Q8_TAIL": "1",
+                "STRATA_NO_BATCH_KV_STEP": "1",
+                "STRATA_MTP_CUM_MIN_P": "0",
+                "STRATA_PREFILL_GPU_WIDEN": "1",
+                "STRATA_TRACE": "1"
+              },
+              "argv": [
+                "--pack",
+                "G:\\GitHub\\Strata-data\\packs\\iq2_xs",
+                "--native",
+                "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00001-of-00002.gguf",
+                "--ple-gguf",
+                "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00002-of-00002.gguf",
+                "--expert-profile",
+                "G:\\GitHub\\Strata\\data\\expert-profile.bin",
+                "--expert-cache",
+                "5500",
+                "--prefill",
+                "256",
+                "--spec",
+                "4",
+                "--spec-min-p",
+                "0.5",
+                "--mtp",
+                "G:\\GitHub\\Strata-data\\mtp\\rt-full-vocab-current",
+                "--max-context",
+                "8192",
+                "--stream-experts",
+                "--vram-reserve-mib",
+                "1536",
+                "--pcie-frac",
+                "0.16",
+                "--prompt-cache",
+                "0",
+                "--short-read",
+                "0",
+                "--adapt-every",
+                "1",
+                "--adapt-swaps",
+                "32",
+                "--prefill-borrow",
+                "--mtp-window",
+                "1024",
+                "--mtp-hnorm",
+                "stream",
+                "--adapt-decay",
+                "0.5",
+                "--kv",
+                "int8"
+              ],
+              "info": "INFO context=8192 kv=int8 kv_resident=0 expert_slots=5771 expert_cache_mib=7922 expert_slots_primary=5771 expert_cache_primary_mib=7922 spec=6 mtp_max=4 lookup=3 vram_free_mib=2176 cvec=0 arena_mib=33812 pool_workers=21 pcie_frac=0.16 spec_min_p=0.50 conversation_cache_mib=0 conversation_cache_slots=4 conversation_cache_min_free_mib=2560 tail_role_token=-1 vram_elastic=0 engine=0.1.39-sycl",
+              "requests": [
+                {
+                  "case": "Short",
+                  "input_tokens": [
+                    248045,
+                    846,
+                    198,
+                    814,
+                    20139,
+                    3069,
+                    279,
+                    12515,
+                    369,
+                    6105,
+                    303,
+                    2250,
+                    22157,
+                    13,
+                    248046,
+                    198,
+                    248045,
+                    74455,
+                    198,
+                    248068,
+                    271,
+                    248069,
+                    271
+                  ],
+                  "tokens": [
+                    29108,
+                    4009,
+                    27891,
+                    8964,
+                    579,
+                    16078,
+                    321,
+                    1100,
+                    9872,
+                    303,
+                    660,
+                    17425,
+                    11,
+                    694,
+                    22602,
+                    6105,
+                    89661,
+                    513,
+                    35742,
+                    777,
+                    28750,
+                    1056,
+                    4860,
+                    2438,
+                    89661,
+                    4016,
+                    310,
+                    12870,
+                    60845,
+                    69377,
+                    13,
+                    1061,
+                    24057,
+                    10814,
+                    279,
+                    6105,
+                    3000,
+                    310,
+                    5372,
+                    1004,
+                    6213,
+                    494,
+                    660,
+                    5306,
+                    314,
+                    279,
+                    12515,
+                    11
+                  ],
+                  "generated": 48,
+                  "prompt_tokens": 23,
+                  "prompt_ms": 74681.2,
+                  "decode_ms": 2292.6,
+                  "finish": "length",
+                  "accepted": 31,
+                  "offered": 39,
+                  "reused": 0,
+                  "resume": 0,
+                  "ttft_ms": 74755.23359999352,
+                  "done": "DONE 48 23 74681.2 2292.6 length 31 39 0 0 0 0 0 0.0 23 0"
+                }
+              ]
+            }
+          ],
+          "note": "Both arms use the same binary, toolchain, BLAS DLL and all other flags; experimental switch defaults off.",
+          "outputs_equal": true,
+          "diagnostic_only": true,
+          "nondegenerate_outputs": true,
+          "reference_sha256": "375ba63a36715a9afbc5e319ea1774abe296358d14aefdc0c8bce25a4a289d6e",
+          "outputs_equal_reference": true,
+          "functional_acceptance": true
+        }
+      },
+      {
+        "directory": "prefill-widen-output-stage-operators",
+        "result": {
+          "complete": true,
+          "phase": "operators",
+          "exe_sha256": "1b303298764069b4c6a347470a6b3cb97b708baed7de883730f550d8aecebf5c",
+          "build_sha256": "54b50c570ac140274e818fe614f0c8493827bdb0a8db6b646908cce52b8051a2",
+          "runs": [
+            {
+              "widen": false,
+              "env": {
+                "STRATA_SYCL_BIN": "build-sycl-a770-unified-operators\\bin\\strata-unified-all-operators.exe",
+                "ZES_ENABLE_SYSMAN": "1",
+                "STRATA_MIRROR_MIB": "49152",
+                "ONEAPI_DEVICE_SELECTOR": "level_zero:0",
+                "UR_L0_ENABLE_RELAXED_ALLOCATION_LIMITS": "1",
+                "STRATA_VERIFY_DEVICE_PLAN": "1",
+                "STRATA_VERIFY_NO_HOST": "1",
+                "STRATA_VERIFY_EAGER": "1",
+                "STRATA_STAGER_THREADS": "12",
+                "STRATA_VERIFY_ADAPT": "1",
+                "STRATA_ADAPT_COST_WEIGHTED": "1",
+                "STRATA_PREFILL_FIRST": "0",
+                "STRATA_GDN_SG16": "1",
+                "STRATA_IQ4_XS_SG16": "2",
+                "STRATA_VERIFY_FUSED_ACT": "1",
+                "STRATA_VERIFY_DESC_CACHE": "1",
+                "STRATA_SERVE_QUIET": "1",
+                "STRATA_GU_LANES": "16",
+                "STRATA_DOWN_LANES": "4",
+                "SYCL_PROGRAM_COMPILE_OPTIONS": "-cl-fp32-correctly-rounded-divide-sqrt",
+                "STRATA_MTP_LAST_DRAFT_MIN_P": "0.6",
+                "STRATA_GU_IQ2S_SG16": "1",
+                "STRATA_GU_IQ2S_SINGLE_GROUP": "1",
+                "STRATA_GDN_Q8_TAIL": "1",
+                "STRATA_QSA_Q8_TAIL": "1",
+                "STRATA_NO_BATCH_KV_STEP": "1",
+                "STRATA_MTP_CUM_MIN_P": "0",
+                "STRATA_PREFILL_GPU_WIDEN": "0"
+              },
+              "argv": [
+                "G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-output-stage\\parity\\strata.exe",
+                "--bench"
+              ],
+              "returncode": 0,
+              "batches": [
+                {
+                  "bf16": false,
+                  "batch": 0,
+                  "submit_us": 24683.0875,
+                  "total_us": 24684.76875
+                },
+                {
+                  "bf16": false,
+                  "batch": 1,
+                  "submit_us": 25724.40625,
+                  "total_us": 25725.88125
+                },
+                {
+                  "bf16": false,
+                  "batch": 2,
+                  "submit_us": 26420.825,
+                  "total_us": 26422.28125
+                },
+                {
+                  "bf16": false,
+                  "batch": 3,
+                  "submit_us": 26581.86875,
+                  "total_us": 26583.30625
+                },
+                {
+                  "bf16": false,
+                  "batch": 4,
+                  "submit_us": 26095.70625,
+                  "total_us": 26097.225
+                },
+                {
+                  "bf16": true,
+                  "batch": 0,
+                  "submit_us": 23466.51875,
+                  "total_us": 23467.96875
+                },
+                {
+                  "bf16": true,
+                  "batch": 1,
+                  "submit_us": 23685.80625,
+                  "total_us": 23687.23125
+                },
+                {
+                  "bf16": true,
+                  "batch": 2,
+                  "submit_us": 23649.83125,
+                  "total_us": 23651.3
+                },
+                {
+                  "bf16": true,
+                  "batch": 3,
+                  "submit_us": 22751.98125,
+                  "total_us": 22753.64375
+                },
+                {
+                  "bf16": true,
+                  "batch": 4,
+                  "submit_us": 23261.8125,
+                  "total_us": 23263.325
+                }
+              ],
+              "benches": [
+                {
+                  "bf16": false,
+                  "engine": true,
+                  "submit_us": 26095.70625,
+                  "total_us": 26097.225
+                },
+                {
+                  "bf16": true,
+                  "engine": true,
+                  "submit_us": 23466.51875,
+                  "total_us": 23467.96875
+                }
+              ],
+              "summary": [
+                {
+                  "checks": 6,
+                  "mismatched_cases": 0
+                }
+              ]
+            },
+            {
+              "widen": true,
+              "env": {
+                "STRATA_SYCL_BIN": "build-sycl-a770-unified-operators\\bin\\strata-unified-all-operators.exe",
+                "ZES_ENABLE_SYSMAN": "1",
+                "STRATA_MIRROR_MIB": "49152",
+                "ONEAPI_DEVICE_SELECTOR": "level_zero:0",
+                "UR_L0_ENABLE_RELAXED_ALLOCATION_LIMITS": "1",
+                "STRATA_VERIFY_DEVICE_PLAN": "1",
+                "STRATA_VERIFY_NO_HOST": "1",
+                "STRATA_VERIFY_EAGER": "1",
+                "STRATA_STAGER_THREADS": "12",
+                "STRATA_VERIFY_ADAPT": "1",
+                "STRATA_ADAPT_COST_WEIGHTED": "1",
+                "STRATA_PREFILL_FIRST": "0",
+                "STRATA_GDN_SG16": "1",
+                "STRATA_IQ4_XS_SG16": "2",
+                "STRATA_VERIFY_FUSED_ACT": "1",
+                "STRATA_VERIFY_DESC_CACHE": "1",
+                "STRATA_SERVE_QUIET": "1",
+                "STRATA_GU_LANES": "16",
+                "STRATA_DOWN_LANES": "4",
+                "SYCL_PROGRAM_COMPILE_OPTIONS": "-cl-fp32-correctly-rounded-divide-sqrt",
+                "STRATA_MTP_LAST_DRAFT_MIN_P": "0.6",
+                "STRATA_GU_IQ2S_SG16": "1",
+                "STRATA_GU_IQ2S_SINGLE_GROUP": "1",
+                "STRATA_GDN_Q8_TAIL": "1",
+                "STRATA_QSA_Q8_TAIL": "1",
+                "STRATA_NO_BATCH_KV_STEP": "1",
+                "STRATA_MTP_CUM_MIN_P": "0",
+                "STRATA_PREFILL_GPU_WIDEN": "1"
+              },
+              "argv": [
+                "G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-output-stage\\parity\\strata.exe",
+                "--bench"
+              ],
+              "returncode": 0,
+              "batches": [
+                {
+                  "bf16": false,
+                  "batch": 0,
+                  "submit_us": 7262.18125,
+                  "total_us": 7263.325
+                },
+                {
+                  "bf16": false,
+                  "batch": 1,
+                  "submit_us": 7185.75,
+                  "total_us": 7186.89375
+                },
+                {
+                  "bf16": false,
+                  "batch": 2,
+                  "submit_us": 7122.85625,
+                  "total_us": 7124.15
+                },
+                {
+                  "bf16": false,
+                  "batch": 3,
+                  "submit_us": 7228.0125,
+                  "total_us": 7229.175
+                },
+                {
+                  "bf16": false,
+                  "batch": 4,
+                  "submit_us": 7080.9625,
+                  "total_us": 7082.0875
+                },
+                {
+                  "bf16": true,
+                  "batch": 0,
+                  "submit_us": 22231.0875,
+                  "total_us": 22232.46875
+                },
+                {
+                  "bf16": true,
+                  "batch": 1,
+                  "submit_us": 20644.40625,
+                  "total_us": 20645.8375
+                },
+                {
+                  "bf16": true,
+                  "batch": 2,
+                  "submit_us": 22314.36875,
+                  "total_us": 22315.7625
+                },
+                {
+                  "bf16": true,
+                  "batch": 3,
+                  "submit_us": 22699.04375,
+                  "total_us": 22700.50625
+                },
+                {
+                  "bf16": true,
+                  "batch": 4,
+                  "submit_us": 23330.8375,
+                  "total_us": 23332.29375
+                }
+              ],
+              "benches": [
+                {
+                  "bf16": false,
+                  "engine": true,
+                  "submit_us": 7185.75,
+                  "total_us": 7186.89375
+                },
+                {
+                  "bf16": true,
+                  "engine": true,
+                  "submit_us": 22314.36875,
+                  "total_us": 22315.7625
+                }
+              ],
+              "summary": [
+                {
+                  "checks": 6,
+                  "mismatched_cases": 0
+                }
+              ]
+            },
+            {
+              "widen": false,
+              "env": {
+                "STRATA_SYCL_BIN": "build-sycl-a770-unified-operators\\bin\\strata-unified-all-operators.exe",
+                "ZES_ENABLE_SYSMAN": "1",
+                "STRATA_MIRROR_MIB": "49152",
+                "ONEAPI_DEVICE_SELECTOR": "level_zero:0",
+                "UR_L0_ENABLE_RELAXED_ALLOCATION_LIMITS": "1",
+                "STRATA_VERIFY_DEVICE_PLAN": "1",
+                "STRATA_VERIFY_NO_HOST": "1",
+                "STRATA_VERIFY_EAGER": "1",
+                "STRATA_STAGER_THREADS": "12",
+                "STRATA_VERIFY_ADAPT": "1",
+                "STRATA_ADAPT_COST_WEIGHTED": "1",
+                "STRATA_PREFILL_FIRST": "0",
+                "STRATA_GDN_SG16": "1",
+                "STRATA_IQ4_XS_SG16": "2",
+                "STRATA_VERIFY_FUSED_ACT": "1",
+                "STRATA_VERIFY_DESC_CACHE": "1",
+                "STRATA_SERVE_QUIET": "1",
+                "STRATA_GU_LANES": "16",
+                "STRATA_DOWN_LANES": "4",
+                "SYCL_PROGRAM_COMPILE_OPTIONS": "-cl-fp32-correctly-rounded-divide-sqrt",
+                "STRATA_MTP_LAST_DRAFT_MIN_P": "0.6",
+                "STRATA_GU_IQ2S_SG16": "1",
+                "STRATA_GU_IQ2S_SINGLE_GROUP": "1",
+                "STRATA_GDN_Q8_TAIL": "1",
+                "STRATA_QSA_Q8_TAIL": "1",
+                "STRATA_NO_BATCH_KV_STEP": "1",
+                "STRATA_MTP_CUM_MIN_P": "0",
+                "STRATA_PREFILL_GPU_WIDEN": "0"
+              },
+              "argv": [
+                "G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-output-stage\\parity\\strata.exe",
+                "--bench"
+              ],
+              "returncode": 0,
+              "batches": [
+                {
+                  "bf16": false,
+                  "batch": 0,
+                  "submit_us": 25519.05,
+                  "total_us": 25520.4625
+                },
+                {
+                  "bf16": false,
+                  "batch": 1,
+                  "submit_us": 26245.14375,
+                  "total_us": 26246.7625
+                },
+                {
+                  "bf16": false,
+                  "batch": 2,
+                  "submit_us": 26790.34375,
+                  "total_us": 26791.775
+                },
+                {
+                  "bf16": false,
+                  "batch": 3,
+                  "submit_us": 27451.94375,
+                  "total_us": 27453.53125
+                },
+                {
+                  "bf16": false,
+                  "batch": 4,
+                  "submit_us": 26349.04375,
+                  "total_us": 26350.475
+                },
+                {
+                  "bf16": true,
+                  "batch": 0,
+                  "submit_us": 23073.00625,
+                  "total_us": 23074.4375
+                },
+                {
+                  "bf16": true,
+                  "batch": 1,
+                  "submit_us": 23342.54375,
+                  "total_us": 23344.0
+                },
+                {
+                  "bf16": true,
+                  "batch": 2,
+                  "submit_us": 23190.55625,
+                  "total_us": 23192.10625
+                },
+                {
+                  "bf16": true,
+                  "batch": 3,
+                  "submit_us": 22828.725,
+                  "total_us": 22830.11875
+                },
+                {
+                  "bf16": true,
+                  "batch": 4,
+                  "submit_us": 23932.825,
+                  "total_us": 23934.275
+                }
+              ],
+              "benches": [
+                {
+                  "bf16": false,
+                  "engine": true,
+                  "submit_us": 26349.04375,
+                  "total_us": 26350.475
+                },
+                {
+                  "bf16": true,
+                  "engine": true,
+                  "submit_us": 23190.55625,
+                  "total_us": 23192.10625
+                }
+              ],
+              "summary": [
+                {
+                  "checks": 6,
+                  "mismatched_cases": 0
+                }
+              ]
+            },
+            {
+              "widen": true,
+              "env": {
+                "STRATA_SYCL_BIN": "build-sycl-a770-unified-operators\\bin\\strata-unified-all-operators.exe",
+                "ZES_ENABLE_SYSMAN": "1",
+                "STRATA_MIRROR_MIB": "49152",
+                "ONEAPI_DEVICE_SELECTOR": "level_zero:0",
+                "UR_L0_ENABLE_RELAXED_ALLOCATION_LIMITS": "1",
+                "STRATA_VERIFY_DEVICE_PLAN": "1",
+                "STRATA_VERIFY_NO_HOST": "1",
+                "STRATA_VERIFY_EAGER": "1",
+                "STRATA_STAGER_THREADS": "12",
+                "STRATA_VERIFY_ADAPT": "1",
+                "STRATA_ADAPT_COST_WEIGHTED": "1",
+                "STRATA_PREFILL_FIRST": "0",
+                "STRATA_GDN_SG16": "1",
+                "STRATA_IQ4_XS_SG16": "2",
+                "STRATA_VERIFY_FUSED_ACT": "1",
+                "STRATA_VERIFY_DESC_CACHE": "1",
+                "STRATA_SERVE_QUIET": "1",
+                "STRATA_GU_LANES": "16",
+                "STRATA_DOWN_LANES": "4",
+                "SYCL_PROGRAM_COMPILE_OPTIONS": "-cl-fp32-correctly-rounded-divide-sqrt",
+                "STRATA_MTP_LAST_DRAFT_MIN_P": "0.6",
+                "STRATA_GU_IQ2S_SG16": "1",
+                "STRATA_GU_IQ2S_SINGLE_GROUP": "1",
+                "STRATA_GDN_Q8_TAIL": "1",
+                "STRATA_QSA_Q8_TAIL": "1",
+                "STRATA_NO_BATCH_KV_STEP": "1",
+                "STRATA_MTP_CUM_MIN_P": "0",
+                "STRATA_PREFILL_GPU_WIDEN": "1"
+              },
+              "argv": [
+                "G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-output-stage\\parity\\strata.exe",
+                "--bench"
+              ],
+              "returncode": 0,
+              "batches": [
+                {
+                  "bf16": false,
+                  "batch": 0,
+                  "submit_us": 7258.51875,
+                  "total_us": 7260.16875
+                },
+                {
+                  "bf16": false,
+                  "batch": 1,
+                  "submit_us": 7156.3875,
+                  "total_us": 7157.51875
+                },
+                {
+                  "bf16": false,
+                  "batch": 2,
+                  "submit_us": 7164.125,
+                  "total_us": 7165.275
+                },
+                {
+                  "bf16": false,
+                  "batch": 3,
+                  "submit_us": 7111.3375,
+                  "total_us": 7112.26875
+                },
+                {
+                  "bf16": false,
+                  "batch": 4,
+                  "submit_us": 7206.31875,
+                  "total_us": 7207.2375
+                },
+                {
+                  "bf16": true,
+                  "batch": 0,
+                  "submit_us": 22517.9875,
+                  "total_us": 22519.41875
+                },
+                {
+                  "bf16": true,
+                  "batch": 1,
+                  "submit_us": 22042.125,
+                  "total_us": 22044.86875
+                },
+                {
+                  "bf16": true,
+                  "batch": 2,
+                  "submit_us": 21409.5875,
+                  "total_us": 21411.0875
+                },
+                {
+                  "bf16": true,
+                  "batch": 3,
+                  "submit_us": 22408.4375,
+                  "total_us": 22409.90625
+                },
+                {
+                  "bf16": true,
+                  "batch": 4,
+                  "submit_us": 22976.36875,
+                  "total_us": 22978.0
+                }
+              ],
+              "benches": [
+                {
+                  "bf16": false,
+                  "engine": true,
+                  "submit_us": 7164.125,
+                  "total_us": 7165.275
+                },
+                {
+                  "bf16": true,
+                  "engine": true,
+                  "submit_us": 22408.4375,
+                  "total_us": 22409.90625
+                }
+              ],
+              "summary": [
+                {
+                  "checks": 6,
+                  "mismatched_cases": 0
+                }
+              ]
+            },
+            {
+              "widen": false,
+              "env": {
+                "STRATA_SYCL_BIN": "build-sycl-a770-unified-operators\\bin\\strata-unified-all-operators.exe",
+                "ZES_ENABLE_SYSMAN": "1",
+                "STRATA_MIRROR_MIB": "49152",
+                "ONEAPI_DEVICE_SELECTOR": "level_zero:0",
+                "UR_L0_ENABLE_RELAXED_ALLOCATION_LIMITS": "1",
+                "STRATA_VERIFY_DEVICE_PLAN": "1",
+                "STRATA_VERIFY_NO_HOST": "1",
+                "STRATA_VERIFY_EAGER": "1",
+                "STRATA_STAGER_THREADS": "12",
+                "STRATA_VERIFY_ADAPT": "1",
+                "STRATA_ADAPT_COST_WEIGHTED": "1",
+                "STRATA_PREFILL_FIRST": "0",
+                "STRATA_GDN_SG16": "1",
+                "STRATA_IQ4_XS_SG16": "2",
+                "STRATA_VERIFY_FUSED_ACT": "1",
+                "STRATA_VERIFY_DESC_CACHE": "1",
+                "STRATA_SERVE_QUIET": "1",
+                "STRATA_GU_LANES": "16",
+                "STRATA_DOWN_LANES": "4",
+                "SYCL_PROGRAM_COMPILE_OPTIONS": "-cl-fp32-correctly-rounded-divide-sqrt",
+                "STRATA_MTP_LAST_DRAFT_MIN_P": "0.6",
+                "STRATA_GU_IQ2S_SG16": "1",
+                "STRATA_GU_IQ2S_SINGLE_GROUP": "1",
+                "STRATA_GDN_Q8_TAIL": "1",
+                "STRATA_QSA_Q8_TAIL": "1",
+                "STRATA_NO_BATCH_KV_STEP": "1",
+                "STRATA_MTP_CUM_MIN_P": "0",
+                "STRATA_PREFILL_GPU_WIDEN": "0"
+              },
+              "argv": [
+                "G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-output-stage\\parity\\strata.exe",
+                "--bench"
+              ],
+              "returncode": 0,
+              "batches": [
+                {
+                  "bf16": false,
+                  "batch": 0,
+                  "submit_us": 24123.9,
+                  "total_us": 24125.4375
+                },
+                {
+                  "bf16": false,
+                  "batch": 1,
+                  "submit_us": 25488.24375,
+                  "total_us": 25489.93125
+                },
+                {
+                  "bf16": false,
+                  "batch": 2,
+                  "submit_us": 24484.15,
+                  "total_us": 24486.4
+                },
+                {
+                  "bf16": false,
+                  "batch": 3,
+                  "submit_us": 25808.4125,
+                  "total_us": 25810.00625
+                },
+                {
+                  "bf16": false,
+                  "batch": 4,
+                  "submit_us": 25745.40625,
+                  "total_us": 25746.93125
+                },
+                {
+                  "bf16": true,
+                  "batch": 0,
+                  "submit_us": 22605.4875,
+                  "total_us": 22606.96875
+                },
+                {
+                  "bf16": true,
+                  "batch": 1,
+                  "submit_us": 23701.325,
+                  "total_us": 23702.825
+                },
+                {
+                  "bf16": true,
+                  "batch": 2,
+                  "submit_us": 23241.56875,
+                  "total_us": 23243.08125
+                },
+                {
+                  "bf16": true,
+                  "batch": 3,
+                  "submit_us": 22870.7875,
+                  "total_us": 22872.51875
+                },
+                {
+                  "bf16": true,
+                  "batch": 4,
+                  "submit_us": 25241.73125,
+                  "total_us": 25243.225
+                }
+              ],
+              "benches": [
+                {
+                  "bf16": false,
+                  "engine": true,
+                  "submit_us": 25488.24375,
+                  "total_us": 25489.93125
+                },
+                {
+                  "bf16": true,
+                  "engine": true,
+                  "submit_us": 23241.56875,
+                  "total_us": 23243.08125
+                }
+              ],
+              "summary": [
+                {
+                  "checks": 6,
+                  "mismatched_cases": 0
+                }
+              ]
+            }
+          ],
+          "note": "Both arms use the same binary, toolchain, BLAS DLL and all other flags; experimental switch defaults off.",
+          "comparisons": [
+            {
+              "candidate_run": 1,
+              "bf16": false,
+              "baseline": 26223.544286230168,
+              "candidate": 7186.89375,
+              "throughput_change_pct": 264.8800886506798,
+              "baseline_drift_pct": 0.9704096891527847,
+              "meets_screen": true
+            },
+            {
+              "candidate_run": 1,
+              "bf16": true,
+              "baseline": 23329.6297596357,
+              "candidate": 22315.7625,
+              "throughput_change_pct": 4.543278589004962,
+              "baseline_drift_pct": -1.1754852025699924,
+              "meets_screen": true
+            },
+            {
+              "candidate_run": 3,
+              "bf16": false,
+              "baseline": 25916.63165140956,
+              "candidate": 7165.275,
+              "throughput_change_pct": 261.697655029424,
+              "baseline_drift_pct": -3.265761812642831,
+              "meets_screen": false
+            },
+            {
+              "candidate_run": 3,
+              "bf16": true,
+              "baseline": 23217.5797603321,
+              "candidate": 22409.90625,
+              "throughput_change_pct": 3.6040914286827874,
+              "baseline_drift_pct": 0.21979461222931818,
+              "meets_screen": true
+            }
+          ]
+        }
+      },
+      {
+        "directory": "prefill-widen-output-stage-operators-confirm",
+        "result": {
+          "complete": true,
+          "phase": "operators",
+          "exe_sha256": "1b303298764069b4c6a347470a6b3cb97b708baed7de883730f550d8aecebf5c",
+          "build_sha256": "54b50c570ac140274e818fe614f0c8493827bdb0a8db6b646908cce52b8051a2",
+          "runs": [
+            {
+              "widen": false,
+              "env": {
+                "STRATA_SYCL_BIN": "build-sycl-a770-unified-operators\\bin\\strata-unified-all-operators.exe",
+                "ZES_ENABLE_SYSMAN": "1",
+                "STRATA_MIRROR_MIB": "49152",
+                "ONEAPI_DEVICE_SELECTOR": "level_zero:0",
+                "UR_L0_ENABLE_RELAXED_ALLOCATION_LIMITS": "1",
+                "STRATA_VERIFY_DEVICE_PLAN": "1",
+                "STRATA_VERIFY_NO_HOST": "1",
+                "STRATA_VERIFY_EAGER": "1",
+                "STRATA_STAGER_THREADS": "12",
+                "STRATA_VERIFY_ADAPT": "1",
+                "STRATA_ADAPT_COST_WEIGHTED": "1",
+                "STRATA_PREFILL_FIRST": "0",
+                "STRATA_GDN_SG16": "1",
+                "STRATA_IQ4_XS_SG16": "2",
+                "STRATA_VERIFY_FUSED_ACT": "1",
+                "STRATA_VERIFY_DESC_CACHE": "1",
+                "STRATA_SERVE_QUIET": "1",
+                "STRATA_GU_LANES": "16",
+                "STRATA_DOWN_LANES": "4",
+                "SYCL_PROGRAM_COMPILE_OPTIONS": "-cl-fp32-correctly-rounded-divide-sqrt",
+                "STRATA_MTP_LAST_DRAFT_MIN_P": "0.6",
+                "STRATA_GU_IQ2S_SG16": "1",
+                "STRATA_GU_IQ2S_SINGLE_GROUP": "1",
+                "STRATA_GDN_Q8_TAIL": "1",
+                "STRATA_QSA_Q8_TAIL": "1",
+                "STRATA_NO_BATCH_KV_STEP": "1",
+                "STRATA_MTP_CUM_MIN_P": "0",
+                "STRATA_PREFILL_GPU_WIDEN": "0"
+              },
+              "argv": [
+                "G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-output-stage\\parity\\strata.exe",
+                "--bench"
+              ],
+              "returncode": 0,
+              "batches": [
+                {
+                  "bf16": false,
+                  "batch": 0,
+                  "submit_us": 25603.6875,
+                  "total_us": 25605.0875
+                },
+                {
+                  "bf16": false,
+                  "batch": 1,
+                  "submit_us": 25424.56875,
+                  "total_us": 25426.0625
+                },
+                {
+                  "bf16": false,
+                  "batch": 2,
+                  "submit_us": 25602.325,
+                  "total_us": 25604.0375
+                },
+                {
+                  "bf16": false,
+                  "batch": 3,
+                  "submit_us": 26226.63125,
+                  "total_us": 26228.0875
+                },
+                {
+                  "bf16": false,
+                  "batch": 4,
+                  "submit_us": 26829.56875,
+                  "total_us": 26831.06875
+                },
+                {
+                  "bf16": true,
+                  "batch": 0,
+                  "submit_us": 23274.25625,
+                  "total_us": 23275.75625
+                },
+                {
+                  "bf16": true,
+                  "batch": 1,
+                  "submit_us": 23258.96875,
+                  "total_us": 23260.4125
+                },
+                {
+                  "bf16": true,
+                  "batch": 2,
+                  "submit_us": 22584.26875,
+                  "total_us": 22586.425
+                },
+                {
+                  "bf16": true,
+                  "batch": 3,
+                  "submit_us": 23468.25625,
+                  "total_us": 23469.83125
+                },
+                {
+                  "bf16": true,
+                  "batch": 4,
+                  "submit_us": 22482.9375,
+                  "total_us": 22484.425
+                }
+              ],
+              "benches": [
+                {
+                  "bf16": false,
+                  "engine": true,
+                  "submit_us": 25603.6875,
+                  "total_us": 25605.0875
+                },
+                {
+                  "bf16": true,
+                  "engine": true,
+                  "submit_us": 23258.96875,
+                  "total_us": 23260.4125
+                }
+              ],
+              "summary": [
+                {
+                  "checks": 6,
+                  "mismatched_cases": 0
+                }
+              ]
+            },
+            {
+              "widen": true,
+              "env": {
+                "STRATA_SYCL_BIN": "build-sycl-a770-unified-operators\\bin\\strata-unified-all-operators.exe",
+                "ZES_ENABLE_SYSMAN": "1",
+                "STRATA_MIRROR_MIB": "49152",
+                "ONEAPI_DEVICE_SELECTOR": "level_zero:0",
+                "UR_L0_ENABLE_RELAXED_ALLOCATION_LIMITS": "1",
+                "STRATA_VERIFY_DEVICE_PLAN": "1",
+                "STRATA_VERIFY_NO_HOST": "1",
+                "STRATA_VERIFY_EAGER": "1",
+                "STRATA_STAGER_THREADS": "12",
+                "STRATA_VERIFY_ADAPT": "1",
+                "STRATA_ADAPT_COST_WEIGHTED": "1",
+                "STRATA_PREFILL_FIRST": "0",
+                "STRATA_GDN_SG16": "1",
+                "STRATA_IQ4_XS_SG16": "2",
+                "STRATA_VERIFY_FUSED_ACT": "1",
+                "STRATA_VERIFY_DESC_CACHE": "1",
+                "STRATA_SERVE_QUIET": "1",
+                "STRATA_GU_LANES": "16",
+                "STRATA_DOWN_LANES": "4",
+                "SYCL_PROGRAM_COMPILE_OPTIONS": "-cl-fp32-correctly-rounded-divide-sqrt",
+                "STRATA_MTP_LAST_DRAFT_MIN_P": "0.6",
+                "STRATA_GU_IQ2S_SG16": "1",
+                "STRATA_GU_IQ2S_SINGLE_GROUP": "1",
+                "STRATA_GDN_Q8_TAIL": "1",
+                "STRATA_QSA_Q8_TAIL": "1",
+                "STRATA_NO_BATCH_KV_STEP": "1",
+                "STRATA_MTP_CUM_MIN_P": "0",
+                "STRATA_PREFILL_GPU_WIDEN": "1"
+              },
+              "argv": [
+                "G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-output-stage\\parity\\strata.exe",
+                "--bench"
+              ],
+              "returncode": 0,
+              "batches": [
+                {
+                  "bf16": false,
+                  "batch": 0,
+                  "submit_us": 7252.5375,
+                  "total_us": 7253.89375
+                },
+                {
+                  "bf16": false,
+                  "batch": 1,
+                  "submit_us": 7158.34375,
+                  "total_us": 7159.50625
+                },
+                {
+                  "bf16": false,
+                  "batch": 2,
+                  "submit_us": 7120.9,
+                  "total_us": 7121.9375
+                },
+                {
+                  "bf16": false,
+                  "batch": 3,
+                  "submit_us": 7243.98125,
+                  "total_us": 7245.13125
+                },
+                {
+                  "bf16": false,
+                  "batch": 4,
+                  "submit_us": 7104.64375,
+                  "total_us": 7105.775
+                },
+                {
+                  "bf16": true,
+                  "batch": 0,
+                  "submit_us": 22457.19375,
+                  "total_us": 22459.4375
+                },
+                {
+                  "bf16": true,
+                  "batch": 1,
+                  "submit_us": 22430.1875,
+                  "total_us": 22432.36875
+                },
+                {
+                  "bf16": true,
+                  "batch": 2,
+                  "submit_us": 21118.75,
+                  "total_us": 21120.15625
+                },
+                {
+                  "bf16": true,
+                  "batch": 3,
+                  "submit_us": 22553.6875,
+                  "total_us": 22555.15
+                },
+                {
+                  "bf16": true,
+                  "batch": 4,
+                  "submit_us": 22487.3375,
+                  "total_us": 22488.96875
+                }
+              ],
+              "benches": [
+                {
+                  "bf16": false,
+                  "engine": true,
+                  "submit_us": 7158.34375,
+                  "total_us": 7159.50625
+                },
+                {
+                  "bf16": true,
+                  "engine": true,
+                  "submit_us": 22457.19375,
+                  "total_us": 22459.4375
+                }
+              ],
+              "summary": [
+                {
+                  "checks": 6,
+                  "mismatched_cases": 0
+                }
+              ]
+            },
+            {
+              "widen": false,
+              "env": {
+                "STRATA_SYCL_BIN": "build-sycl-a770-unified-operators\\bin\\strata-unified-all-operators.exe",
+                "ZES_ENABLE_SYSMAN": "1",
+                "STRATA_MIRROR_MIB": "49152",
+                "ONEAPI_DEVICE_SELECTOR": "level_zero:0",
+                "UR_L0_ENABLE_RELAXED_ALLOCATION_LIMITS": "1",
+                "STRATA_VERIFY_DEVICE_PLAN": "1",
+                "STRATA_VERIFY_NO_HOST": "1",
+                "STRATA_VERIFY_EAGER": "1",
+                "STRATA_STAGER_THREADS": "12",
+                "STRATA_VERIFY_ADAPT": "1",
+                "STRATA_ADAPT_COST_WEIGHTED": "1",
+                "STRATA_PREFILL_FIRST": "0",
+                "STRATA_GDN_SG16": "1",
+                "STRATA_IQ4_XS_SG16": "2",
+                "STRATA_VERIFY_FUSED_ACT": "1",
+                "STRATA_VERIFY_DESC_CACHE": "1",
+                "STRATA_SERVE_QUIET": "1",
+                "STRATA_GU_LANES": "16",
+                "STRATA_DOWN_LANES": "4",
+                "SYCL_PROGRAM_COMPILE_OPTIONS": "-cl-fp32-correctly-rounded-divide-sqrt",
+                "STRATA_MTP_LAST_DRAFT_MIN_P": "0.6",
+                "STRATA_GU_IQ2S_SG16": "1",
+                "STRATA_GU_IQ2S_SINGLE_GROUP": "1",
+                "STRATA_GDN_Q8_TAIL": "1",
+                "STRATA_QSA_Q8_TAIL": "1",
+                "STRATA_NO_BATCH_KV_STEP": "1",
+                "STRATA_MTP_CUM_MIN_P": "0",
+                "STRATA_PREFILL_GPU_WIDEN": "0"
+              },
+              "argv": [
+                "G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-output-stage\\parity\\strata.exe",
+                "--bench"
+              ],
+              "returncode": 0,
+              "batches": [
+                {
+                  "bf16": false,
+                  "batch": 0,
+                  "submit_us": 24821.2625,
+                  "total_us": 24822.8125
+                },
+                {
+                  "bf16": false,
+                  "batch": 1,
+                  "submit_us": 25408.975,
+                  "total_us": 25410.45
+                },
+                {
+                  "bf16": false,
+                  "batch": 2,
+                  "submit_us": 26150.08125,
+                  "total_us": 26151.45625
+                },
+                {
+                  "bf16": false,
+                  "batch": 3,
+                  "submit_us": 25599.93125,
+                  "total_us": 25602.1625
+                },
+                {
+                  "bf16": false,
+                  "batch": 4,
+                  "submit_us": 26971.59375,
+                  "total_us": 26973.00625
+                },
+                {
+                  "bf16": true,
+                  "batch": 0,
+                  "submit_us": 23087.6375,
+                  "total_us": 23089.0625
+                },
+                {
+                  "bf16": true,
+                  "batch": 1,
+                  "submit_us": 23092.075,
+                  "total_us": 23093.5
+                },
+                {
+                  "bf16": true,
+                  "batch": 2,
+                  "submit_us": 23432.075,
+                  "total_us": 23433.64375
+                },
+                {
+                  "bf16": true,
+                  "batch": 3,
+                  "submit_us": 23840.51875,
+                  "total_us": 23842.01875
+                },
+                {
+                  "bf16": true,
+                  "batch": 4,
+                  "submit_us": 22724.025,
+                  "total_us": 22725.4375
+                }
+              ],
+              "benches": [
+                {
+                  "bf16": false,
+                  "engine": true,
+                  "submit_us": 25599.93125,
+                  "total_us": 25602.1625
+                },
+                {
+                  "bf16": true,
+                  "engine": true,
+                  "submit_us": 23092.075,
+                  "total_us": 23093.5
+                }
+              ],
+              "summary": [
+                {
+                  "checks": 6,
+                  "mismatched_cases": 0
+                }
+              ]
+            },
+            {
+              "widen": true,
+              "env": {
+                "STRATA_SYCL_BIN": "build-sycl-a770-unified-operators\\bin\\strata-unified-all-operators.exe",
+                "ZES_ENABLE_SYSMAN": "1",
+                "STRATA_MIRROR_MIB": "49152",
+                "ONEAPI_DEVICE_SELECTOR": "level_zero:0",
+                "UR_L0_ENABLE_RELAXED_ALLOCATION_LIMITS": "1",
+                "STRATA_VERIFY_DEVICE_PLAN": "1",
+                "STRATA_VERIFY_NO_HOST": "1",
+                "STRATA_VERIFY_EAGER": "1",
+                "STRATA_STAGER_THREADS": "12",
+                "STRATA_VERIFY_ADAPT": "1",
+                "STRATA_ADAPT_COST_WEIGHTED": "1",
+                "STRATA_PREFILL_FIRST": "0",
+                "STRATA_GDN_SG16": "1",
+                "STRATA_IQ4_XS_SG16": "2",
+                "STRATA_VERIFY_FUSED_ACT": "1",
+                "STRATA_VERIFY_DESC_CACHE": "1",
+                "STRATA_SERVE_QUIET": "1",
+                "STRATA_GU_LANES": "16",
+                "STRATA_DOWN_LANES": "4",
+                "SYCL_PROGRAM_COMPILE_OPTIONS": "-cl-fp32-correctly-rounded-divide-sqrt",
+                "STRATA_MTP_LAST_DRAFT_MIN_P": "0.6",
+                "STRATA_GU_IQ2S_SG16": "1",
+                "STRATA_GU_IQ2S_SINGLE_GROUP": "1",
+                "STRATA_GDN_Q8_TAIL": "1",
+                "STRATA_QSA_Q8_TAIL": "1",
+                "STRATA_NO_BATCH_KV_STEP": "1",
+                "STRATA_MTP_CUM_MIN_P": "0",
+                "STRATA_PREFILL_GPU_WIDEN": "1"
+              },
+              "argv": [
+                "G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-output-stage\\parity\\strata.exe",
+                "--bench"
+              ],
+              "returncode": 0,
+              "batches": [
+                {
+                  "bf16": false,
+                  "batch": 0,
+                  "submit_us": 7262.19375,
+                  "total_us": 7263.38125
+                },
+                {
+                  "bf16": false,
+                  "batch": 1,
+                  "submit_us": 7085.0875,
+                  "total_us": 7086.21875
+                },
+                {
+                  "bf16": false,
+                  "batch": 2,
+                  "submit_us": 7113.1,
+                  "total_us": 7114.2125
+                },
+                {
+                  "bf16": false,
+                  "batch": 3,
+                  "submit_us": 7160.51875,
+                  "total_us": 7161.40625
+                },
+                {
+                  "bf16": false,
+                  "batch": 4,
+                  "submit_us": 7220.54375,
+                  "total_us": 7221.68125
+                },
+                {
+                  "bf16": true,
+                  "batch": 0,
+                  "submit_us": 23408.15625,
+                  "total_us": 23409.60625
+                },
+                {
+                  "bf16": true,
+                  "batch": 1,
+                  "submit_us": 22856.325,
+                  "total_us": 22858.55
+                },
+                {
+                  "bf16": true,
+                  "batch": 2,
+                  "submit_us": 22454.21875,
+                  "total_us": 22455.83125
+                },
+                {
+                  "bf16": true,
+                  "batch": 3,
+                  "submit_us": 22098.8,
+                  "total_us": 22100.225
+                },
+                {
+                  "bf16": true,
+                  "batch": 4,
+                  "submit_us": 22984.25625,
+                  "total_us": 22985.71875
+                }
+              ],
+              "benches": [
+                {
+                  "bf16": false,
+                  "engine": true,
+                  "submit_us": 7160.51875,
+                  "total_us": 7161.40625
+                },
+                {
+                  "bf16": true,
+                  "engine": true,
+                  "submit_us": 22856.325,
+                  "total_us": 22858.55
+                }
+              ],
+              "summary": [
+                {
+                  "checks": 6,
+                  "mismatched_cases": 0
+                }
+              ]
+            },
+            {
+              "widen": false,
+              "env": {
+                "STRATA_SYCL_BIN": "build-sycl-a770-unified-operators\\bin\\strata-unified-all-operators.exe",
+                "ZES_ENABLE_SYSMAN": "1",
+                "STRATA_MIRROR_MIB": "49152",
+                "ONEAPI_DEVICE_SELECTOR": "level_zero:0",
+                "UR_L0_ENABLE_RELAXED_ALLOCATION_LIMITS": "1",
+                "STRATA_VERIFY_DEVICE_PLAN": "1",
+                "STRATA_VERIFY_NO_HOST": "1",
+                "STRATA_VERIFY_EAGER": "1",
+                "STRATA_STAGER_THREADS": "12",
+                "STRATA_VERIFY_ADAPT": "1",
+                "STRATA_ADAPT_COST_WEIGHTED": "1",
+                "STRATA_PREFILL_FIRST": "0",
+                "STRATA_GDN_SG16": "1",
+                "STRATA_IQ4_XS_SG16": "2",
+                "STRATA_VERIFY_FUSED_ACT": "1",
+                "STRATA_VERIFY_DESC_CACHE": "1",
+                "STRATA_SERVE_QUIET": "1",
+                "STRATA_GU_LANES": "16",
+                "STRATA_DOWN_LANES": "4",
+                "SYCL_PROGRAM_COMPILE_OPTIONS": "-cl-fp32-correctly-rounded-divide-sqrt",
+                "STRATA_MTP_LAST_DRAFT_MIN_P": "0.6",
+                "STRATA_GU_IQ2S_SG16": "1",
+                "STRATA_GU_IQ2S_SINGLE_GROUP": "1",
+                "STRATA_GDN_Q8_TAIL": "1",
+                "STRATA_QSA_Q8_TAIL": "1",
+                "STRATA_NO_BATCH_KV_STEP": "1",
+                "STRATA_MTP_CUM_MIN_P": "0",
+                "STRATA_PREFILL_GPU_WIDEN": "0"
+              },
+              "argv": [
+                "G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-output-stage\\parity\\strata.exe",
+                "--bench"
+              ],
+              "returncode": 0,
+              "batches": [
+                {
+                  "bf16": false,
+                  "batch": 0,
+                  "submit_us": 24514.59375,
+                  "total_us": 24516.175
+                },
+                {
+                  "bf16": false,
+                  "batch": 1,
+                  "submit_us": 26275.14375,
+                  "total_us": 26276.81875
+                },
+                {
+                  "bf16": false,
+                  "batch": 2,
+                  "submit_us": 26875.0,
+                  "total_us": 26876.71875
+                },
+                {
+                  "bf16": false,
+                  "batch": 3,
+                  "submit_us": 26054.59375,
+                  "total_us": 26056.16875
+                },
+                {
+                  "bf16": false,
+                  "batch": 4,
+                  "submit_us": 26193.86875,
+                  "total_us": 26195.35
+                },
+                {
+                  "bf16": true,
+                  "batch": 0,
+                  "submit_us": 22069.21875,
+                  "total_us": 22070.65625
+                },
+                {
+                  "bf16": true,
+                  "batch": 1,
+                  "submit_us": 23443.99375,
+                  "total_us": 23445.5375
+                },
+                {
+                  "bf16": true,
+                  "batch": 2,
+                  "submit_us": 23485.03125,
+                  "total_us": 23486.525
+                },
+                {
+                  "bf16": true,
+                  "batch": 3,
+                  "submit_us": 22827.71875,
+                  "total_us": 22829.19375
+                },
+                {
+                  "bf16": true,
+                  "batch": 4,
+                  "submit_us": 22736.75625,
+                  "total_us": 22738.21875
+                }
+              ],
+              "benches": [
+                {
+                  "bf16": false,
+                  "engine": true,
+                  "submit_us": 26193.86875,
+                  "total_us": 26195.35
+                },
+                {
+                  "bf16": true,
+                  "engine": true,
+                  "submit_us": 22827.71875,
+                  "total_us": 22829.19375
+                }
+              ],
+              "summary": [
+                {
+                  "checks": 6,
+                  "mismatched_cases": 0
+                }
+              ]
+            }
+          ],
+          "note": "Both arms use the same binary, toolchain, BLAS DLL and all other flags; experimental switch defaults off.",
+          "comparisons": [
+            {
+              "candidate_run": 1,
+              "bf16": false,
+              "baseline": 25603.6249582304,
+              "candidate": 7159.50625,
+              "throughput_change_pct": 257.61718845109465,
+              "baseline_drift_pct": -0.011423511050301371,
+              "meets_screen": true
+            },
+            {
+              "candidate_run": 1,
+              "bf16": true,
+              "baseline": 23176.805993681486,
+              "candidate": 22459.4375,
+              "throughput_change_pct": 3.1940626014408613,
+              "baseline_drift_pct": -0.7175818571575121,
+              "meets_screen": true
+            },
+            {
+              "candidate_run": 3,
+              "bf16": false,
+              "baseline": 25897.057891667442,
+              "candidate": 7161.40625,
+              "throughput_change_pct": 261.6197292489508,
+              "baseline_drift_pct": 2.316942953549339,
+              "meets_screen": true
+            },
+            {
+              "candidate_run": 3,
+              "bf16": true,
+              "baseline": 22960.966570805005,
+              "candidate": 22858.55,
+              "throughput_change_pct": 0.448044914506851,
+              "baseline_drift_pct": -1.1445049472795454,
+              "meets_screen": false
+            }
+          ]
+        }
+      },
+      {
+        "directory": "mkl-output-stage-probe",
+        "result": {
+          "complete": true,
+          "purpose": "Independent oneMKL probe",
+          "source_sha256": "5fb441a5e9ac1d678626771924dda276c78ec221397e956557c1c51b32a9386f",
+          "commands": [
+            [
+              "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin\\icx.exe",
+              "/nologo",
+              "/EHsc",
+              "/O2",
+              "/MD",
+              "-Qstd:c++20",
+              "-fsycl",
+              "-fsycl-device-code-split=per_kernel",
+              "/fp:precise",
+              "-Wno-deprecated-declarations",
+              "-IG:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\source\\sycl\\include",
+              "-IC:\\Program Files (x86)\\Intel\\oneAPI\\mkl\\2025.3\\include",
+              "-c",
+              "G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\mkl-output-stage-probe\\probe.cpp",
+              "/FoG:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\mkl-output-stage-probe\\probe.obj"
+            ],
+            [
+              "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin\\icx.exe",
+              "/nologo",
+              "G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\mkl-output-stage-probe\\probe.obj",
+              "-fsycl",
+              "-fsycl-device-code-split=per_kernel",
+              "C:\\Program Files (x86)\\Intel\\oneAPI\\mkl\\2025.3\\lib\\mkl_sycl_blas_dll.lib",
+              "C:\\Program Files (x86)\\Intel\\oneAPI\\mkl\\2025.3\\lib\\mkl_intel_lp64.lib",
+              "C:\\Program Files (x86)\\Intel\\oneAPI\\mkl\\2025.3\\lib\\mkl_sequential.lib",
+              "C:\\Program Files (x86)\\Intel\\oneAPI\\mkl\\2025.3\\lib\\mkl_core.lib",
+              "/link",
+              "/out:G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\mkl-output-stage-probe\\strata-mkl-scalar-probe.exe"
+            ]
+          ],
+          "runs": [],
+          "exe_sha256": "775a076263efb2e2842a8c45ca5f6038cc38ef12d9569f90afec8563ec7a25f5",
+          "returncode": 0,
+          "queries": [],
+          "parity": [
+            {
+              "offset_gib": 0,
+              "n": 640,
+              "t": 4,
+              "shared_output": false,
+              "different": 0,
+              "nonfinite": 0,
+              "conversion_errors": 0
+            },
+            {
+              "offset_gib": 0,
+              "n": 640,
+              "t": 4,
+              "shared_output": true,
+              "different": 0,
+              "nonfinite": 0,
+              "conversion_errors": 0
+            },
+            {
+              "offset_gib": 0,
+              "n": 640,
+              "t": 22,
+              "shared_output": false,
+              "different": 0,
+              "nonfinite": 0,
+              "conversion_errors": 0
+            },
+            {
+              "offset_gib": 0,
+              "n": 640,
+              "t": 22,
+              "shared_output": true,
+              "different": 0,
+              "nonfinite": 0,
+              "conversion_errors": 0
+            },
+            {
+              "offset_gib": 0,
+              "n": 1280,
+              "t": 4,
+              "shared_output": false,
+              "different": 0,
+              "nonfinite": 0,
+              "conversion_errors": 0
+            },
+            {
+              "offset_gib": 0,
+              "n": 1280,
+              "t": 4,
+              "shared_output": true,
+              "different": 0,
+              "nonfinite": 0,
+              "conversion_errors": 0
+            },
+            {
+              "offset_gib": 0,
+              "n": 1280,
+              "t": 22,
+              "shared_output": false,
+              "different": 0,
+              "nonfinite": 0,
+              "conversion_errors": 0
+            },
+            {
+              "offset_gib": 0,
+              "n": 1280,
+              "t": 22,
+              "shared_output": true,
+              "different": 0,
+              "nonfinite": 0,
+              "conversion_errors": 0
+            },
+            {
+              "offset_gib": 4,
+              "n": 640,
+              "t": 4,
+              "shared_output": false,
+              "different": 0,
+              "nonfinite": 0,
+              "conversion_errors": 0
+            },
+            {
+              "offset_gib": 4,
+              "n": 640,
+              "t": 4,
+              "shared_output": true,
+              "different": 0,
+              "nonfinite": 0,
+              "conversion_errors": 0
+            },
+            {
+              "offset_gib": 4,
+              "n": 640,
+              "t": 22,
+              "shared_output": false,
+              "different": 0,
+              "nonfinite": 0,
+              "conversion_errors": 0
+            },
+            {
+              "offset_gib": 4,
+              "n": 640,
+              "t": 22,
+              "shared_output": true,
+              "different": 0,
+              "nonfinite": 0,
+              "conversion_errors": 0
+            },
+            {
+              "offset_gib": 4,
+              "n": 1280,
+              "t": 4,
+              "shared_output": false,
+              "different": 0,
+              "nonfinite": 0,
+              "conversion_errors": 0
+            },
+            {
+              "offset_gib": 4,
+              "n": 1280,
+              "t": 4,
+              "shared_output": true,
+              "different": 0,
+              "nonfinite": 0,
+              "conversion_errors": 0
+            },
+            {
+              "offset_gib": 4,
+              "n": 1280,
+              "t": 22,
+              "shared_output": false,
+              "different": 0,
+              "nonfinite": 0,
+              "conversion_errors": 0
+            },
+            {
+              "offset_gib": 4,
+              "n": 1280,
+              "t": 22,
+              "shared_output": true,
+              "different": 0,
+              "nonfinite": 0,
+              "conversion_errors": 0
+            }
+          ],
+          "benches": [],
+          "summary": [
+            {
+              "checks": 16,
+              "mismatched_cases": 0
+            }
+          ]
+        }
+      },
+      {
+        "directory": "prefill-widen-output-stage-sampling",
+        "result": {
+          "complete": true,
+          "functional_only": true,
+          "exe_sha256": "227aae2b9c04aa74cfd1b1df9afdf1accd69c639c2fa6b8c2bd69a275d26af0d",
+          "build_sha256": "54b50c570ac140274e818fe614f0c8493827bdb0a8db6b646908cce52b8051a2",
+          "argv": [
+            "--pack",
+            "G:\\GitHub\\Strata-data\\packs\\iq2_xs",
+            "--native",
+            "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00001-of-00002.gguf",
+            "--ple-gguf",
+            "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00002-of-00002.gguf",
+            "--expert-profile",
+            "G:\\GitHub\\Strata\\data\\expert-profile.bin",
+            "--expert-cache",
+            "5500",
+            "--prefill",
+            "256",
+            "--spec",
+            "4",
+            "--spec-min-p",
+            "0.5",
+            "--mtp",
+            "G:\\GitHub\\Strata-data\\mtp\\rt-full-vocab-current",
+            "--max-context",
+            "8192",
+            "--stream-experts",
+            "--vram-reserve-mib",
+            "1536",
+            "--pcie-frac",
+            "0.16",
+            "--prompt-cache",
+            "128",
+            "--short-read",
+            "0",
+            "--adapt-every",
+            "1",
+            "--adapt-swaps",
+            "32",
+            "--prefill-borrow",
+            "--mtp-window",
+            "1024",
+            "--mtp-hnorm",
+            "stream",
+            "--adapt-decay",
+            "0.5",
+            "--kv",
+            "int8"
+          ],
+          "sampling": "temperature=0.7 top_p=0.9 top_k=20 seed=1234 penalty_repeat=1.1 penalty_freq=0.1 penalty_present=0.2 penalty_last_n=128",
+          "input_tokens": [
+            248045,
+            846,
+            198,
+            814,
+            20139,
+            3069,
+            279,
+            12515,
+            369,
+            6105,
+            303,
+            2250,
+            22157,
+            13,
+            248046,
+            198,
+            248045,
+            74455,
+            198,
+            248068,
+            271,
+            248069,
+            271
+          ],
+          "runs": [
+            {
+              "widen": false,
+              "info": "INFO context=8192 kv=int8 kv_resident=0 expert_slots=5771 expert_cache_mib=7922 expert_slots_primary=5771 expert_cache_primary_mib=7922 spec=6 mtp_max=4 lookup=3 vram_free_mib=2163 cvec=0 arena_mib=33812 pool_workers=21 pcie_frac=0.16 spec_min_p=0.50 conversation_cache_mib=0 conversation_cache_slots=4 conversation_cache_min_free_mib=2560 tail_role_token=-1 vram_elastic=0 engine=0.1.39-sycl",
+              "requests": [
+                {
+                  "tokens": [
+                    29108,
+                    4009,
+                    5435,
+                    660,
+                    7736,
+                    314,
+                    279,
+                    9155,
+                    19142,
+                    11,
+                    694,
+                    948,
+                    424,
+                    27891,
+                    8964,
+                    579,
+                    16078,
+                    11,
+                    22602,
+                    89661,
+                    1040,
+                    6105,
+                    513,
+                    35742,
+                    777,
+                    28750,
+                    1056,
+                    4860,
+                    89661,
+                    539,
+                    3594,
+                    33470,
+                    13,
+                    1061,
+                    24057,
+                    11,
+                    3750,
+                    430,
+                    12870,
+                    60845,
+                    69377,
+                    11,
+                    10814,
+                    37728,
+                    310,
+                    52592,
+                    303,
+                    660
+                  ],
+                  "generated": 48,
+                  "prompt_tokens": 23,
+                  "prompt_ms": 345465.5,
+                  "decode_ms": 5747.1,
+                  "finish": "length",
+                  "accepted": 28,
+                  "offered": 42,
+                  "reused": 0,
+                  "resume": 0,
+                  "ttft_ms": 345827.5061000022,
+                  "done": "DONE 48 23 345465.5 5747.1 length 28 42 0 0 0 0 0 0.0 23 0"
+                },
+                {
+                  "tokens": [
+                    29108,
+                    4009,
+                    5435,
+                    660,
+                    7736,
+                    314,
+                    279,
+                    9155,
+                    19142,
+                    11,
+                    694,
+                    948,
+                    424,
+                    27891,
+                    8964,
+                    579,
+                    16078,
+                    11,
+                    22602,
+                    89661,
+                    1040,
+                    6105,
+                    513,
+                    35742,
+                    777,
+                    28750,
+                    1056,
+                    4860,
+                    89661,
+                    539,
+                    3594,
+                    33470,
+                    13,
+                    1061,
+                    24057,
+                    11,
+                    3750,
+                    430,
+                    12870,
+                    60845,
+                    69377,
+                    11,
+                    10814,
+                    37728,
+                    310,
+                    52592,
+                    303,
+                    660
+                  ],
+                  "generated": 48,
+                  "prompt_tokens": 23,
+                  "prompt_ms": 115484.8,
+                  "decode_ms": 2150.9,
+                  "finish": "length",
+                  "accepted": 28,
+                  "offered": 42,
+                  "reused": 16,
+                  "resume": 16,
+                  "ttft_ms": 115543.96950000228,
+                  "done": "DONE 48 23 115484.8 2150.9 length 28 42 16 0 0 0 0 0.0 7 0"
+                }
+              ],
+              "env": {
+                "STRATA_SYCL_BIN": "build-sycl-a770-unified-operators\\bin\\strata-unified-all-operators.exe",
+                "ZES_ENABLE_SYSMAN": "1",
+                "STRATA_MIRROR_MIB": "49152",
+                "ONEAPI_DEVICE_SELECTOR": "level_zero:0",
+                "UR_L0_ENABLE_RELAXED_ALLOCATION_LIMITS": "1",
+                "STRATA_VERIFY_DEVICE_PLAN": "1",
+                "STRATA_VERIFY_NO_HOST": "1",
+                "STRATA_VERIFY_EAGER": "1",
+                "STRATA_STAGER_THREADS": "12",
+                "STRATA_VERIFY_ADAPT": "1",
+                "STRATA_ADAPT_COST_WEIGHTED": "1",
+                "STRATA_PREFILL_FIRST": "0",
+                "STRATA_GDN_SG16": "1",
+                "STRATA_IQ4_XS_SG16": "2",
+                "STRATA_VERIFY_FUSED_ACT": "1",
+                "STRATA_VERIFY_DESC_CACHE": "1",
+                "STRATA_SERVE_QUIET": "1",
+                "STRATA_GU_LANES": "16",
+                "STRATA_DOWN_LANES": "4",
+                "SYCL_PROGRAM_COMPILE_OPTIONS": "-cl-fp32-correctly-rounded-divide-sqrt",
+                "STRATA_MTP_LAST_DRAFT_MIN_P": "0.6",
+                "STRATA_GU_IQ2S_SG16": "1",
+                "STRATA_GU_IQ2S_SINGLE_GROUP": "1",
+                "STRATA_GDN_Q8_TAIL": "1",
+                "STRATA_QSA_Q8_TAIL": "1",
+                "STRATA_NO_BATCH_KV_STEP": "1",
+                "STRATA_MTP_CUM_MIN_P": "0",
+                "STRATA_IQ_MT_MIN": "1",
+                "STRATA_PREFILL_GPU_WIDEN": "0"
+              }
+            },
+            {
+              "widen": true,
+              "info": "INFO context=8192 kv=int8 kv_resident=0 expert_slots=5771 expert_cache_mib=7922 expert_slots_primary=5771 expert_cache_primary_mib=7922 spec=6 mtp_max=4 lookup=3 vram_free_mib=2164 cvec=0 arena_mib=33812 pool_workers=21 pcie_frac=0.16 spec_min_p=0.50 conversation_cache_mib=0 conversation_cache_slots=4 conversation_cache_min_free_mib=2560 tail_role_token=-1 vram_elastic=0 engine=0.1.39-sycl",
+              "requests": [
+                {
+                  "tokens": [
+                    29108,
+                    4009,
+                    5435,
+                    660,
+                    7736,
+                    314,
+                    279,
+                    9155,
+                    19142,
+                    11,
+                    694,
+                    948,
+                    424,
+                    27891,
+                    8964,
+                    579,
+                    16078,
+                    11,
+                    22602,
+                    89661,
+                    1040,
+                    6105,
+                    513,
+                    35742,
+                    777,
+                    28750,
+                    1056,
+                    4860,
+                    89661,
+                    539,
+                    3594,
+                    33470,
+                    13,
+                    1061,
+                    24057,
+                    11,
+                    3750,
+                    430,
+                    12870,
+                    60845,
+                    69377,
+                    11,
+                    10814,
+                    37728,
+                    310,
+                    52592,
+                    303,
+                    660
+                  ],
+                  "generated": 48,
+                  "prompt_tokens": 23,
+                  "prompt_ms": 116099.3,
+                  "decode_ms": 2751.2,
+                  "finish": "length",
+                  "accepted": 28,
+                  "offered": 42,
+                  "reused": 0,
+                  "resume": 0,
+                  "ttft_ms": 116179.41150000115,
+                  "done": "DONE 48 23 116099.3 2751.2 length 28 42 0 0 0 0 0 0.0 23 0"
+                },
+                {
+                  "tokens": [
+                    29108,
+                    4009,
+                    5435,
+                    660,
+                    7736,
+                    314,
+                    279,
+                    9155,
+                    19142,
+                    11,
+                    694,
+                    948,
+                    424,
+                    27891,
+                    8964,
+                    579,
+                    16078,
+                    11,
+                    22602,
+                    89661,
+                    1040,
+                    6105,
+                    513,
+                    35742,
+                    777,
+                    28750,
+                    1056,
+                    4860,
+                    89661,
+                    539,
+                    3594,
+                    33470,
+                    13,
+                    1061,
+                    24057,
+                    11,
+                    3750,
+                    430,
+                    12870,
+                    60845,
+                    69377,
+                    11,
+                    10814,
+                    37728,
+                    310,
+                    52592,
+                    303,
+                    660
+                  ],
+                  "generated": 48,
+                  "prompt_tokens": 23,
+                  "prompt_ms": 46231.5,
+                  "decode_ms": 2165.0,
+                  "finish": "length",
+                  "accepted": 28,
+                  "offered": 42,
+                  "reused": 16,
+                  "resume": 16,
+                  "ttft_ms": 46290.71939999994,
+                  "done": "DONE 48 23 46231.5 2165.0 length 28 42 16 0 0 0 0 0.0 7 0"
+                }
+              ],
+              "env": {
+                "STRATA_SYCL_BIN": "build-sycl-a770-unified-operators\\bin\\strata-unified-all-operators.exe",
+                "ZES_ENABLE_SYSMAN": "1",
+                "STRATA_MIRROR_MIB": "49152",
+                "ONEAPI_DEVICE_SELECTOR": "level_zero:0",
+                "UR_L0_ENABLE_RELAXED_ALLOCATION_LIMITS": "1",
+                "STRATA_VERIFY_DEVICE_PLAN": "1",
+                "STRATA_VERIFY_NO_HOST": "1",
+                "STRATA_VERIFY_EAGER": "1",
+                "STRATA_STAGER_THREADS": "12",
+                "STRATA_VERIFY_ADAPT": "1",
+                "STRATA_ADAPT_COST_WEIGHTED": "1",
+                "STRATA_PREFILL_FIRST": "0",
+                "STRATA_GDN_SG16": "1",
+                "STRATA_IQ4_XS_SG16": "2",
+                "STRATA_VERIFY_FUSED_ACT": "1",
+                "STRATA_VERIFY_DESC_CACHE": "1",
+                "STRATA_SERVE_QUIET": "1",
+                "STRATA_GU_LANES": "16",
+                "STRATA_DOWN_LANES": "4",
+                "SYCL_PROGRAM_COMPILE_OPTIONS": "-cl-fp32-correctly-rounded-divide-sqrt",
+                "STRATA_MTP_LAST_DRAFT_MIN_P": "0.6",
+                "STRATA_GU_IQ2S_SG16": "1",
+                "STRATA_GU_IQ2S_SINGLE_GROUP": "1",
+                "STRATA_GDN_Q8_TAIL": "1",
+                "STRATA_QSA_Q8_TAIL": "1",
+                "STRATA_NO_BATCH_KV_STEP": "1",
+                "STRATA_MTP_CUM_MIN_P": "0",
+                "STRATA_IQ_MT_MIN": "1",
+                "STRATA_PREFILL_GPU_WIDEN": "1"
+              }
+            }
+          ],
+          "outputs_equal": true,
+          "nondegenerate_outputs": true,
+          "functional_acceptance": true
+        }
+      },
+      {
+        "directory": "prefill-widen-final-check",
+        "result": {
+          "complete": true,
+          "date": "2026-10-24T08:06:03",
+          "source_sha256": {
+            "include/strata/prefill/gemm.hpp": "0086abbd6d169177e449d47388a7639aea59e72dae3ebf14dca7ab9040f85da6",
+            "sycl/src/prefill/gemm.dp.cpp": "685474fb450ef4088aade20ef4b5dbc711bf5388edbb1362df42de7905a0a782",
+            "sycl/src/prefill/gemm_parity.cpp": "3e0deeda915014d157b6bdf2c76546697aa4ffdae3fe6afa764d5be045273440",
+            "sycl/src/prefill/prefill.cpp": "0697919ce830d355110bc6c40e734f64c2b0a9d48d9c0af4bf30c6d32a95c531"
+          },
+          "build_sha256": "54b50c570ac140274e818fe614f0c8493827bdb0a8db6b646908cce52b8051a2",
+          "extra_source_sha256": {
+            "sycl/CMakeLists.txt": "7a4783c78e8c7bcd4507020ef76ea17b540e544ea0e4e331c1ac97ce971d553c",
+            "docs/DEEPINFER_OPTIMIZATIONS.md": "c41d9487119363237cbcad067ed37dbb60b0e5d21086201cfc8ec94deda510b6",
+            "sycl/src/kernels/cuda/sampler.dp.cpp": "7a49a2c2b137f3bfbb7ac5383be0e347f50eb958dbcb0fb9249d4204740a2ec5"
+          },
+          "unchanged_dependency_objects_libraries": 96,
+          "bf16_function_unchanged": true,
+          "production_sha256": {
+            "exe": "8f0d866ded297cf5a409e84cf5dd61f437c56c8a89aaeb2a85569265b6a3e122",
+            "config": "1a755372f0e6c90c0bfa2af865d67b51f8df49c10aa1613b041b08da8184ca88"
+          },
+          "production_unchanged": true,
+          "operator_confirmation": [
+            {
+              "directory": "prefill-widen-output-stage-operators",
+              "valid_fp16_pairs": [
+                {
+                  "candidate_run": 1,
+                  "bf16": false,
+                  "baseline": 26223.544286230168,
+                  "candidate": 7186.89375,
+                  "throughput_change_pct": 264.8800886506798,
+                  "baseline_drift_pct": 0.9704096891527847,
+                  "meets_screen": true
+                }
+              ]
+            },
+            {
+              "directory": "prefill-widen-output-stage-operators-confirm",
+              "valid_fp16_pairs": [
+                {
+                  "candidate_run": 1,
+                  "bf16": false,
+                  "baseline": 25603.6249582304,
+                  "candidate": 7159.50625,
+                  "throughput_change_pct": 257.61718845109465,
+                  "baseline_drift_pct": -0.011423511050301371,
+                  "meets_screen": true
+                },
+                {
+                  "candidate_run": 3,
+                  "bf16": false,
+                  "baseline": 25897.057891667442,
+                  "candidate": 7161.40625,
+                  "throughput_change_pct": 261.6197292489508,
+                  "baseline_drift_pct": 2.316942953549339,
+                  "meets_screen": true
+                }
+              ]
+            }
+          ],
+          "default_switch": "off",
+          "model_speed_claim": false
+        }
+      }
+    ],
+    "prototype_model_status": "FAILED: original produces normal tokens; both enabled prototype requests produce 48 zero tokens.",
+    "current_build_directory": "prefill-widen-output-stage",
+    "model_status": "Fixed FP16 path: Short batch-prefill greedy and repeated fixed-seed sampling/penalties match the disabled reference. Full performance matrix remains incomplete.",
+    "operator_decision": "Retain fixed FP16 source after two independent A/B/A/B/A rounds with valid >=3% gains; BF16 is unchanged and is only a control."
+  }
+}

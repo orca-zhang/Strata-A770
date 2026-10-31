@@ -1,0 +1,107 @@
+{
+  "complete": true,
+  "date": "2026-10-24T10:00:35",
+  "source_sha256": {
+    "include/strata/prefill/gemm.hpp": "0086abbd6d169177e449d47388a7639aea59e72dae3ebf14dca7ab9040f85da6",
+    "sycl/src/prefill/gemm.dp.cpp": "e5f88cb71a0f2ea9c851e090393d47df06dff2b3007c049495d946d3662b6184",
+    "sycl/src/prefill/gemm_parity.cpp": "7c82d84965a74222fe8b94dd67d42a90432e0a42f4627fe0d0eac4ffb332fab6",
+    "sycl/src/prefill/prefill.cpp": "0697919ce830d355110bc6c40e734f64c2b0a9d48d9c0af4bf30c6d32a95c531"
+  },
+  "build_sha256": "7b1cf3e5e9304e1a6c96ed12d2b0f30534635052d4a358f4db03cc91f82ffe59",
+  "extra_source_sha256": {
+    "sycl/CMakeLists.txt": "6fc69d157302bcd5017baaf97909ed5c3dbc9ba092b431b36263fbf38b6a62e2",
+    "docs/DEEPINFER_OPTIMIZATIONS.md": "052848e9e6562434dfd7b929a1ade7278c64b2ac61bb38870d45b71db00b69bd",
+    "tools/bench_deepinfer.py": "10cf806bfdffc9cb4ba110d87503d6b28b8c163a789c1567c4a0dde0c1a83730"
+  },
+  "unchanged_dependency_objects_libraries": 96,
+  "f16_native_functions_unchanged": true,
+  "scalar_dot_prototype_mismatches": [
+    {
+      "bf16": false,
+      "t": 1,
+      "n": 1,
+      "k": 2560,
+      "ldx": 2560,
+      "ldy": 1,
+      "beta": 0.0,
+      "different": 1,
+      "max_abs": 3.81469727e-06,
+      "original_padding_changed": 0
+    },
+    {
+      "bf16": true,
+      "t": 1,
+      "n": 1,
+      "k": 2560,
+      "ldx": 2560,
+      "ldy": 1,
+      "beta": 0.0,
+      "different": 1,
+      "max_abs": 5.7220459e-06,
+      "original_padding_changed": 0
+    },
+    {
+      "bf16": true,
+      "t": 1,
+      "n": 1,
+      "k": 2560,
+      "ldx": 2573,
+      "ldy": 1,
+      "beta": 0.0,
+      "different": 1,
+      "max_abs": 1.90734863e-06,
+      "original_padding_changed": 0
+    }
+  ],
+  "production_sha256": {
+    "exe": "8f0d866ded297cf5a409e84cf5dd61f437c56c8a89aaeb2a85569265b6a3e122",
+    "config": "1a755372f0e6c90c0bfa2af865d67b51f8df49c10aa1613b041b08da8184ca88"
+  },
+  "production_unchanged": true,
+  "operator_confirmation": [
+    {
+      "directory": "prefill-widen-bf16-operators",
+      "valid_pairs": [
+        {
+          "candidate_run": 1,
+          "bf16": true,
+          "optimized": true,
+          "baseline": 22995.599344541715,
+          "candidate": 7293.80625,
+          "throughput_change_pct": 215.27570868148186,
+          "baseline_drift_pct": -0.7717453221485093,
+          "meets_screen": true
+        },
+        {
+          "candidate_run": 3,
+          "bf16": true,
+          "optimized": true,
+          "baseline": 22835.97521233287,
+          "candidate": 7258.28125,
+          "throughput_change_pct": 214.6195969236225,
+          "baseline_drift_pct": -0.6164955603861433,
+          "meets_screen": true
+        }
+      ]
+    },
+    {
+      "directory": "prefill-widen-bf16-operators-confirm",
+      "valid_pairs": [
+        {
+          "candidate_run": 3,
+          "bf16": true,
+          "optimized": true,
+          "baseline": 22837.732675688516,
+          "candidate": 7353.075,
+          "throughput_change_pct": 210.58751169665095,
+          "baseline_drift_pct": -1.0890833371664743,
+          "meets_screen": true
+        }
+      ]
+    }
+  ],
+  "default_switch": "off",
+  "switch": "STRATA_PREFILL_BF16_GPU_WIDEN=1",
+  "restriction": "BF16 ldy == N, inputs fit existing workspace; preserve original interleaved-output path",
+  "model_speed_claim": false
+}

@@ -1,0 +1,133 @@
+{
+  "complete": true,
+  "date": "2026-10-24T11:37:31",
+  "purpose": "Expanded batch and bounded prompt correctness only; no new performance measurements",
+  "source_sha256": {
+    "include/strata/prefill/gemm.hpp": "0086abbd6d169177e449d47388a7639aea59e72dae3ebf14dca7ab9040f85da6",
+    "sycl/src/prefill/gemm.dp.cpp": "e5f88cb71a0f2ea9c851e090393d47df06dff2b3007c049495d946d3662b6184",
+    "sycl/src/prefill/gemm_parity.cpp": "40f04d4eedeec5f6f0b24237ecbb96731fa2c1690510d3e84aa95b63bd341772",
+    "sycl/src/prefill/prefill.cpp": "0697919ce830d355110bc6c40e734f64c2b0a9d48d9c0af4bf30c6d32a95c531"
+  },
+  "unchanged_runtime_sources": {
+    "include/strata/prefill/gemm.hpp": "0086abbd6d169177e449d47388a7639aea59e72dae3ebf14dca7ab9040f85da6",
+    "sycl/src/prefill/gemm.dp.cpp": "e5f88cb71a0f2ea9c851e090393d47df06dff2b3007c049495d946d3662b6184",
+    "sycl/src/prefill/prefill.cpp": "0697919ce830d355110bc6c40e734f64c2b0a9d48d9c0af4bf30c6d32a95c531",
+    "sycl/src/kernels/cuda/sampler.dp.cpp": "7a49a2c2b137f3bfbb7ac5383be0e347f50eb958dbcb0fb9249d4204740a2ec5"
+  },
+  "build_sha256": "fbca98eda9463c65cb7e26eb43b504f3d0a309a7a3cc3f2fa8590aa081ffd597",
+  "model_binary_unchanged": true,
+  "unchanged_dependency_objects_libraries": 96,
+  "production_sha256": {
+    "exe": "8f0d866ded297cf5a409e84cf5dd61f437c56c8a89aaeb2a85569265b6a3e122",
+    "config": "1a755372f0e6c90c0bfa2af865d67b51f8df49c10aa1613b041b08da8184ca88"
+  },
+  "production_unchanged": true,
+  "parity": [
+    {
+      "directory": "prefill-widen-bf16-batches",
+      "checks_per_arm": 725,
+      "sha256": "d0b917516312df087ca661602e0cc47f75c2f26e1d2e8e5062a2329e4e3a65d9"
+    },
+    {
+      "directory": "prefill-widen-bf16-batches-arena0",
+      "checks_per_arm": 725,
+      "sha256": "1e7725a9a059186f0f1d24eb8c6e6fd13f2860771c3a85161eee5709cdea173c"
+    },
+    {
+      "directory": "prefill-widen-bf16-batches-arena4",
+      "checks_per_arm": 725,
+      "sha256": "e719653c5f8699de6f206bfa1842e2c5f4f33e8893799493f49753a54ff5a1e7"
+    }
+  ],
+  "total_comparisons": 4350,
+  "model_outputs": [
+    {
+      "case": "Code2K",
+      "input_tokens": 256,
+      "output_limit": 8,
+      "output_tokens": 8,
+      "finish": "length",
+      "tokens": [
+        760,
+        3766,
+        1970,
+        41643,
+        10551,
+        264,
+        4281,
+        314
+      ],
+      "accepted": 5,
+      "offered": 5,
+      "trace_batches": [
+        [
+          [
+            0,
+            255
+          ]
+        ],
+        [
+          [
+            0,
+            255
+          ]
+        ]
+      ],
+      "results_sha256": "40efb5775253d42ed07994356a91a68cb53e478c4dd64c5b16909e9e31e4d48f"
+    },
+    {
+      "case": "Prose2K",
+      "input_tokens": 512,
+      "output_limit": 8,
+      "output_tokens": 8,
+      "finish": "length",
+      "tokens": [
+        760,
+        3766,
+        1414,
+        17855,
+        264,
+        25450,
+        321,
+        13987
+      ],
+      "accepted": 3,
+      "offered": 3,
+      "trace_batches": [
+        [
+          [
+            0,
+            256
+          ],
+          [
+            256,
+            255
+          ]
+        ],
+        [
+          [
+            0,
+            256
+          ],
+          [
+            256,
+            255
+          ]
+        ]
+      ],
+      "results_sha256": "2cbd4d1e9d86fee81a258ed36771dafbb4e0cd0cef4af5d780f5cfbc37d78f62"
+    }
+  ],
+  "input_construction": "First (length-64) tokens plus original final 64 tokens; preserve instruction and assistant template",
+  "prefix_only_prototype_is_not_generation_acceptance": true,
+  "prefix_only_prototype_sha256": "fa986afa4e6b69c29efff225e68f11c7cf4e68f3a9d5fb9752c0e0a50fb8c9ef",
+  "window_reader_output_matches_batch": true,
+  "window_reference_sha256": "2db1b684cc8c104e2f75cb43b8505febf08aeaf577e5c7bc510a5fb8fa7bac40",
+  "rejected_cache_comparison_sha256": "7fc12a5e11fc0000e1aff8c77d63ede442663e1a6653ac4806b9f3c96e5b1dc8",
+  "expert_slots": 4191,
+  "expert_cache_mib": 5760,
+  "default_switch": "off",
+  "full_2k_8k_batch_validation": false,
+  "model_speed_claim": false,
+  "docs_sha256": "67685db51f088d310e721f52339ed9797a8e3e8a8275b563782a801961b32023"
+}

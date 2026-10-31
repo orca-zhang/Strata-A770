@@ -1,0 +1,76 @@
+{
+  "client_date": "2026-10-23",
+  "checked_utc": "2026-10-23T14:57:15.246335+00:00",
+  "historical_audit_passed": true,
+  "historical_tokens_reparsed": 11808,
+  "historical_verifier_output": "PASS historical calculations, 11808 tokens, failed-baseline evidence, report integrity",
+  "fresh_performance_comparison_completed": false,
+  "fresh_candidate_runs": 0,
+  "supplemental_diagnostics_started": false,
+  "resource_wait_limit_seconds": 600,
+  "resource_state": {
+    "observed_utc": "2026-10-23T14:57:12.9225262Z",
+    "processes": [
+      {
+        "Name": "strata-cumulative.exe",
+        "ProcessId": 29656,
+        "ParentProcessId": 29308
+      }
+    ],
+    "reason": "Supplemental diagnostics were not started after waiting up to 600 seconds for existing build/GPU work"
+  },
+  "pcie": {
+    "timestamp_utc": "2026-10-23T14:43:04.696746+00:00",
+    "devices": [
+      {
+        "api": "Level Zero Sysman",
+        "properties_result": 0,
+        "state_result": 0,
+        "max_generation": 4,
+        "max_lanes": 16,
+        "max_bandwidth_bytes_s": 31507692304,
+        "current_generation": 3,
+        "current_lanes": 16,
+        "current_bandwidth_bytes_s": 15753846144,
+        "link_status": 0,
+        "quality_issues": 0,
+        "stability_issues": 0
+      }
+    ]
+  },
+  "same_day_prior_failed_baselines": [
+    {
+      "candidate": "baseline",
+      "status": "timeout",
+      "timeout_seconds": 600,
+      "completed_requests": 0,
+      "output_tokens": 0,
+      "note": "No candidate was run; CPU sampling collected during the stalled warmup.",
+      "sha256": {
+        "attempt1-native-0-baseline.protocol": "8c723de8cb848f7e6935627bb875dd8fde4f580ec864e4ea88bc19825bf9d795",
+        "attempt1-native-0-baseline.stderr": "d67b39ab0ab8dec6996e55a494ffc393292d77698af8ab707a46c11564e963d6"
+      }
+    },
+    {
+      "candidate": "baseline",
+      "status": "stopped_after_repeated_stall",
+      "completed_requests": 0,
+      "output_tokens": 0,
+      "pid": 7172,
+      "elapsed_seconds": 414.3,
+      "reason": "Same first-prefill stall as the 600-second failed attempt; no candidate run."
+    }
+  ],
+  "config_matches_archived": true,
+  "production_exe_matches_archived": true,
+  "conclusion": "Historical calculations are correct; original percentages remain single-screen observations, without fresh A/B confirmation.",
+  "evidence_sha256": {
+    "bench\\results\\a770\\queue-cache-followup-2026-10-21.json": "7f9065f2faf695c18c4b110d8e39192ce42f4ab920692bc08f1e0fab34ffb9a2",
+    "bench\\results\\a770\\recheck-2026-10-23.json": "cc0f0b6f0a19b229468e69b95ce95702f99f6606e5c1dba6fa329a6ee49c04f1",
+    "build-sycl-a770-unified-operators\\bin\\strata-unified-all-operators.exe": "8f0d866ded297cf5a409e84cf5dd61f437c56c8a89aaeb2a85569265b6a3e122",
+    "build-sycl-a770-recheck-followup-20261023\\health.py": "f096b3ac92b7fd39429b6b9c51f355f79cf21bd61c0717c1ca63683d6ca00293",
+    "build-sycl-a770-recheck-followup-20261023\\pcie.json": "504d587c6ff3710b4b6feb359d7b7a5a5dde3e771c9ab2a4d41b375358e1407e",
+    "build-sycl-a770-recheck-followup-20261023\\busy-at-end.json": "3023a14eef111bb21c8e6a20fa6c977cc07f7ee4e9824d4f54e1d5eea41291f0",
+    "build-sycl-a770-recheck-20261023\\verify.py": "764109ed5486d1e70fd3c9d188d1df59193ef4c2d6b3879a0155d99bb03fd898"
+  }
+}

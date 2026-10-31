@@ -421,6 +421,7 @@ bool FileExpertSource::open(const std::string& pack_dir, int64_t n_layers, int64
         layer_offsets_ = std::move(layer_offsets);
         layer_blob_bytes_ = std::move(layer_blob_bytes);
         if (!open_gguf(err)) { close(); return false; }
+        record_inputs(path, gguf_, layout, true);
         return true;
     }
 
@@ -507,10 +508,12 @@ bool FileExpertSource::open(const std::string& pack_dir, int64_t n_layers, int64
     mapped_bytes_ = want;
     layer_offsets_ = std::move(layer_offsets);
     layer_blob_bytes_ = std::move(layer_blob_bytes);
+    record_inputs(path, gguf_, layout, false);
     return true;
 }
 
 void FileExpertSource::close() {
+    inputs_.clear();
     if (complement_arena_ != nullptr) {
         if (complement_pinned_ && !complement_partial_)(void) DPCT_CHECK_ERROR(
             sycl::free(complement_arena_, dpct::get_in_order_queue()));
@@ -740,20 +743,22 @@ bool FileExpertSource::copy_from_files(int64_t layer, int64_t expert, uint8_t* d
 // being filled by another thread - the caller then waits), false when the caller must fill buffer `v`.
 bool FileExpertSource::claim_stage(int64_t key, size_t& v, bool& fill) {
     constexpr uint64_t kStageSeq = 256;
-    const uint64_t seq = ++stage_seq_;
-    auto it = stage_of_.find(key);
     fill = false;
-    if (it != stage_of_.end()) {
-        v = it->second;
+    if (key < 0 || key >= blobs_) return false;
+    if (stage_of_.empty()) stage_of_.assign((size_t) blobs_, 0);
+    const uint64_t seq = ++stage_seq_;
+    if (stage_of_[(size_t) key] != 0) {
+        v = stage_of_[(size_t) key] - 1;
         stage_epoch_[v] = epoch_;
         stage_used_[v] = seq;
         return true;
     }
     v = stage_buf_.size();
     uint64_t oldest = std::numeric_limits<uint64_t>::max();
+    // Skip newer slots before loading their busy/epoch metadata.
     for (size_t i = 0; i < stage_buf_.size(); ++i)
-        if (!stage_busy_[i] && (stage_epoch_[i] + kStageAge <= epoch_ || stage_used_[i] + kStageSeq <= seq) &&
-            stage_used_[i] < oldest) {
+        if (stage_used_[i] < oldest && !stage_busy_[i] &&
+            (stage_epoch_[i] + kStageAge <= epoch_ || stage_used_[i] + kStageSeq <= seq)) {
             oldest = stage_used_[i];
             v = i;
         }
@@ -770,13 +775,13 @@ bool FileExpertSource::claim_stage(int64_t key, size_t& v, bool& fill) {
                          stage_buf_.size(), (double) stage_buf_.size() * (double) stage_blob_ / 1073741824.0);
         }
     } else {
-        stage_of_.erase(stage_key_[v]);
+        if (stage_key_[v] >= 0) stage_of_[(size_t) stage_key_[v]] = 0;
     }
     stage_key_[v] = key;
     stage_epoch_[v] = epoch_;
     stage_used_[v] = seq;
     stage_busy_[v] = 1;
-    stage_of_[key] = v;
+    stage_of_[(size_t) key] = v + 1;
     fill = true;
     return false;
 }
@@ -799,7 +804,7 @@ void FileExpertSource::publish_stage(size_t v, int64_t layer, bool ok, double us
         std::lock_guard<std::mutex> lk(stage_mu_);
         stage_busy_[v] = 0;
         if (!ok) {
-            stage_of_.erase(stage_key_[v]);
+            stage_of_[(size_t) stage_key_[v]] = 0;
             stage_key_[v] = -1;
         }
     }
@@ -2661,6 +2666,17 @@ std::string expert_gguf_file(const std::string& gguf, const strata::kernels::cpu
 }
 }  // namespace
 
+void ExpertSource::record_inputs(const std::string& pack_experts, const std::string& gguf,
+                                 const strata::kernels::cpu::ExpertLayout& lay, bool from_gguf) {
+    static const char* roles[3] = {"gate", "up", "down"};
+    inputs_.clear();
+    if (!from_gguf) { inputs_.push_back({"pack experts.bin", pack_experts}); return; }
+    // the same resolution open_gguf / load_experts_gguf use: every (layer, role) tensor and the file it is read from
+    for (int64_t l = 0; l < lay.n_layers; ++l)
+        for (int r = 0; r < 3; ++r)
+            inputs_.push_back({"expert blk." + std::to_string(l) + ".ffn_" + roles[r], expert_gguf_file(gguf, lay, l, r)});
+}
+
 bool check_experts_gguf(const std::string& gguf, const strata::kernels::cpu::ExpertLayout& lay, std::string& err) {
     static const char* roles[3] = {"gate", "up", "down"};
     if (lay.gguf_off.size() != (size_t) (3 * lay.n_layers)) {
@@ -2955,6 +2971,7 @@ bool ArenaExpertSource::open(const std::string& pack_dir, int64_t n_layers, int6
             note_ = "mapped read-only from " + path + " (STRATA_ARENA_MMAP: not locked, not pinned)";
             gib_per_s_ = 0.0;
             load_seconds_ = load_read_s_ = load_copy_s_ = 0.0;
+            record_inputs(path, gguf_, lay, from_gguf);
             return true;
         }
     }
@@ -3104,10 +3121,12 @@ bool ArenaExpertSource::open(const std::string& pack_dir, int64_t n_layers, int6
     load_seconds_ = st.seconds;
     load_read_s_ = st.read_seconds;
     load_copy_s_ = st.copy_seconds;
+    record_inputs(path, gguf_, lay, from_gguf);
     return true;
 }
 
 void ArenaExpertSource::close() {
+    inputs_.clear();
 #if !defined(_WIN32)
     if (map_ != nullptr) munmap(map_, (size_t) map_bytes_);
 #endif

@@ -3,11 +3,16 @@
 #include <dpct/dpct.hpp>
 #include "strata/core/conversation_snapshot.hpp"
 #include "strata/kernels/kv_q4.hpp"
+#ifdef STRATA_ORCA_NATIVE
+#include "strata/orca_engine.hpp"
+#endif
 
 #include <algorithm>
 #include <array>
+#include <chrono>
 #include <cstdio>
 #include <cstdlib>
+#include <filesystem>
 #include <limits>
 #include <vector>
 
@@ -21,11 +26,7 @@ void check(bool ok, const char* label) {
     if (!ok) { std::fprintf(stderr, "FAIL: %s\n", label); std::exit(1); }
 }
 void cuda_check(dpct::err0 e) {
-    /*
-    DPCT1009: SYCL reports errors using exceptions and does not use error
-    codes. Please replace the "get_error_string_dummy(...)" with a real
-    error-handling function.
-    */
+    check(e == 0, "snapshot fixture device operation");
 }
 struct Fixture {
     ModelGeometry g;
@@ -55,10 +56,10 @@ struct Fixture {
                 device.push_back(raw); p = static_cast<T *>(raw);
         }
     }
-    Fixture(int fmt, int mode) {
+    Fixture(int fmt, int mode, int64_t cells = 96) {
         auto& st = state;
         st.kv_mode = mode; st.kv_int8 = fmt==kKvInt8; st.kv_q4 = fmt==kKvQ4; st.kv_hybrid = fmt==3;
-        st.n_pages = 24; st.n_slots = mode ? 4 : st.n_pages;
+        st.n_pages = (cells + 3) / 4; st.n_slots = mode ? 4 : st.n_pages;
         st.max_cells = st.n_pages * 4; st.idx_pooled_rows = mode==2 ? 2 : st.max_cells/4+2;
         const size_t per = fmt==kKvQ4 ? kv_q4_bytes_per_head((int)g.head_dim) : g.head_dim*((st.kv_int8 || st.kv_hybrid) ? 1:2);
         const size_t rows = st.max_cells*g.n_head_kv, slot_rows = st.n_slots*4*g.n_head_kv;
@@ -131,6 +132,33 @@ bool equal(const ConversationKv& a,const ConversationKv& b) {
     return a.k==b.k && a.v==b.v && a.k_scale==b.k_scale && a.v_scale==b.v_scale && a.pooled==b.pooled;
 }
 
+void copy_bench() {
+    using Clock = std::chrono::steady_clock;
+    for (int fmt : std::array<int,4>{kKvF16,kKvInt8,kKvQ4,3}) for (int64_t cells : {8192,32768,65536}) {
+        Fixture f(fmt,0,cells);
+        std::string error;
+        ConversationKv expected, captured;
+        f.fill(13);
+        check(conversation_kv_save(expected,f.state,f.g,cells,true,error),"copy benchmark reference");
+        for (int repeat=0;repeat<12;++repeat) {
+            auto start=Clock::now();
+            check(conversation_kv_save(captured,f.state,f.g,cells,true,error),"timed snapshot save");
+            const double save_us=std::chrono::duration<double,std::micro>(Clock::now()-start).count();
+            // Inspect host bytes before another GPU synchronization could hide an unfinished save.
+            check(equal(expected,captured),"snapshot save complete on return");
+            f.fill(177);
+            start=Clock::now();
+            check(conversation_kv_restore(expected,f.state,f.g,cells,true,error),"timed snapshot restore");
+            const double restore_us=std::chrono::duration<double,std::micro>(Clock::now()-start).count();
+            check(dpct::get_in_order_queue().ext_oneapi_empty(),"resident restore complete on return");
+            if (repeat>=3) std::printf("COPY_BENCH %d %lld %zu %d %.3f %.3f\n",fmt,
+                (long long)cells,expected.bytes(),repeat-3,save_us,restore_us);
+        }
+        check(conversation_kv_save(captured,f.state,f.g,cells,true,error) && equal(expected,captured),
+              "final restore preserves all K/V and indexer bytes");
+    }
+}
+
 void full_session(int fmt, int mode, int experts) {
     Fixture main(fmt,mode), draft(fmt==3?kKvInt8:fmt,2);
     auto& g=main.g;
@@ -185,6 +213,31 @@ void full_session(int fmt, int mode, int experts) {
     SavedConversation a,b,restored;
     check(conversation_snapshot_save(a,view,ss,g,draft.state,err),"capture complete A");
     check(a.checkpoints[0].used == 17,"upstream checkpoint LRU stamp survives capture");
+    {
+        SavedConversation meta, disk;
+        std::vector<SessionKvSource> sources;
+        check(conversation_snapshot_sources(meta,sources,view,ss,g,draft.state,err),"stream session sources");
+        const auto path = std::filesystem::temp_directory_path() / ("strata-snapshot-" +
+            std::to_string(std::chrono::steady_clock::now().time_since_epoch().count()) + ".bin");
+        SessionWriteOptions options;
+        options.min_free_bytes = 0;
+        size_t written = 0, read = 0;
+        const SessionFileIdentity identity{123,456};
+        check(session_file_write(path.string(),meta,sources,identity,written,err,options),"stream GPU session to disk");
+        SessionReadLimits limits;
+        check(conversation_session_read_limits(limits,ss,g,draft.state,ss.max_cells,1,err),"runtime session read bounds");
+        check(!session_file_read(path.string(),{123,457},disk,read,err,limits),"refuse foreign configuration");
+        check(session_file_read(path.string(),identity,disk,read,err,limits),"read streamed GPU session");
+        check(written==read && disk.live.gdn==a.live.gdn && disk.live.ple==a.live.ple &&
+              disk.live.tails==a.live.tails && disk.live.dead==a.live.dead && disk.live.block_pos==a.live.block_pos &&
+              disk.live.ids==a.live.ids && disk.checkpoints.size()==a.checkpoints.size() &&
+              equal(disk.kv[0],a.kv[0]) && equal(disk.kv[1],a.kv[1]),"disk payload matches full host capture");
+        uint8_t byte = 0;
+        check(!sources[0].read(5,0,&byte,1),"stream rejects invalid K/V part");
+        check(!sources[0].read(0,SIZE_MAX,&byte,1),"stream rejects invalid K/V offset");
+        check(!sources[0].read(0,0,&byte,SIZE_MAX),"stream rejects invalid K/V length");
+        std::filesystem::remove(path);
+    }
     fill(177);
     check(conversation_snapshot_save(b,view,ss,g,draft.state,err),"capture complete B");
     check(a.live.dead!=b.live.dead,"different opening-state spare keys in regression fixture");
@@ -243,10 +296,21 @@ void full_session(int fmt, int mode, int experts) {
 }
 }
 
-int main() {
+int main(int argc, char** argv) {
+#ifdef STRATA_ORCA_NATIVE
+    if (argc != 2 && !(argc==3 && std::string(argv[2])=="--copy-bench")) {
+        std::fprintf(stderr,"usage: snapshot-check images [--copy-bench]\n"); return 2;
+    }
+    strata::l0::install_engine(argv[1]);
+#endif
     int devices=0;
     if (DPCT_CHECK_ERROR(devices = dpct::device_count()) != 0 ||
         !devices) return 77;
+    if (argc>1 && std::string(argv[argc-1])=="--copy-bench") {
+        copy_bench();
+        std::printf("conversation_snapshot_copy_bench: %d checks passed\n",checks);
+        return 0;
+    }
     for (int fmt : std::array<int,4>{kKvF16,kKvInt8,kKvQ4,3}) for (int mode : {0,1,2}) {
         if (fmt==3 && mode!=0) continue;
         Fixture f(fmt,mode);
@@ -281,6 +345,14 @@ int main() {
             f.fill(177);
             check(conversation_kv_save(b,f.state,f.g,upto,index,err),"save B");
             check(upto==0 || !equal(a,b),"fixture changes state");
+            if (index && upto>0) {
+                auto* pooled=f.state.idx_pooled;
+                f.state.idx_pooled=nullptr;
+                ConversationKv rejected=a;
+                check(!conversation_kv_save(rejected,f.state,f.g,upto,index,err),"reject missing final source buffer");
+                check(equal(rejected,a),"invalid save does not overwrite earlier buffers");
+                f.state.idx_pooled=pooled;
+            }
             check(conversation_kv_restore(a,f.state,f.g,upto,index,err),"restore A over B");
             cuda_check(DPCT_CHECK_ERROR(
                 dpct::get_current_device().queues_wait_and_throw()));

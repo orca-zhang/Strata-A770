@@ -1,0 +1,66 @@
+{
+  "complete": true,
+  "performance_measurement": false,
+  "full_model_stability_established": false,
+  "linux_gpu_validated": false,
+  "date": "2026-10-30",
+  "device": "Intel Arc A770 16 GB",
+  "windows_driver": "32.0.101.9034",
+  "compiler": "IntelLLVM 2025.3.2",
+  "spirv_sha256": "31ad3a2509305ee8a506ac031e0e034d6f267e7b60ce357fc85246f2c66eef75",
+  "matches_managed_fp16_spirv": true,
+  "native_query_local_run": "xmx-grf-native-1793356049652876500",
+  "native_query_results_sha256": "2f45ae8ec996a8b58002f1eeb4f0bb8dd90c38d9e018824d92b26396182febd7",
+  "disassembler": "Intel ocloc 2025.3; disasm -device dg2-g10",
+  "disassembler_sha256": "c3ba4f03be4f9d36bb5fe6f44c0b1de5f51dc3054c54e44a7692d764c9d81d44",
+  "rows": [
+    {
+      "name": "default",
+      "module_flags": "-cl-fp32-correctly-rounded-divide-sqrt",
+      "native_binary_sha256": "c8c3ad4da5eb739a0572438495d30aad9ccecdc6d3929574addf30f8248b198c",
+      "assembly_sha256": "3de73fd7c08f9f7f1ac596c43df0a946b83071767c900b0a9363a5fe967b4a97",
+      "ze_info_sha256": "7496d4f67354966bbfdb6524d371eae6f9f7076448a2cb8c8f11d952bf4bcbfd",
+      "grf_count": [
+        128
+      ],
+      "simd_size": [
+        8
+      ],
+      "requires_disable_eufusion": true,
+      "static_dpas_instruction_count": 2,
+      "static_dpasw_instruction_count": 0,
+      "dpas_instructions": [
+        "dpas.8x8 (8|M0)          r37:f         null:f            r37:hf            r37.0:hf         {Atomic}",
+        "dpas.8x8 (8|M0)          r37:f         r37:f             r23:hf            r56.0:hf         {$3}"
+      ],
+      "assembly_local_path": "build-isa-1793369402414814800\\default\\.text._ZTSZZN6strata7prefill17native_xmx_launchIN4sycl3_V16detail9half_impl4halfELi8EEEvPKtS8_PfxxxxPNS_2l05QueueES8_ENKUlRSB_E_clESD_EUlNS3_7nd_itemILi3EEEE_.asm"
+    },
+    {
+      "name": "large",
+      "module_flags": "-cl-fp32-correctly-rounded-divide-sqrt -ze-opt-large-register-file",
+      "native_binary_sha256": "9f1cfe483666a79a4dc132cc246ddeb1171669dca78c145cb568b08d637917c3",
+      "assembly_sha256": "089045e1139f2b17a44ba431e446b4b172d5026aead0c6789eb3409dc504489f",
+      "ze_info_sha256": "4b890df3cc06d2bd49cc40f67ebdc97b0d27fcc8bf2434aaf925defffc9daa90",
+      "grf_count": [
+        256
+      ],
+      "simd_size": [
+        8
+      ],
+      "requires_disable_eufusion": true,
+      "static_dpas_instruction_count": 2,
+      "static_dpasw_instruction_count": 0,
+      "dpas_instructions": [
+        "dpas.8x8 (8|M0)          r63:f         null:f            r63:hf            r63.0:hf         {Atomic}",
+        "dpas.8x8 (8|M0)          r63:f         r63:f             r49:hf            r82.0:hf         {$3}"
+      ],
+      "assembly_local_path": "build-isa-1793369402414814800\\large\\.text._ZTSZZN6strata7prefill17native_xmx_launchIN4sycl3_V16detail9half_impl4halfELi8EEEvPKtS8_PfxxxxPNS_2l05QueueES8_ENKUlRSB_E_clESD_EUlNS3_7nd_itemILi3EEEE_.asm"
+    }
+  ],
+  "limitations": [
+    "The counts are static instruction sites, not executed instruction counts or timing.",
+    "The disassembly contains DPAS and no DPASW; it does not identify the cause of intermittent full-model corruption.",
+    "Both binaries request disabled EU fusion; this is compiler metadata, not a driver scheduling trace.",
+    "The initial long-path dump silently omitted text sections; the retained short-path dump contains complete assembly."
+  ]
+}

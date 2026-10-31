@@ -1,0 +1,36 @@
+{
+  "complete": true,
+  "steps": [
+    [
+      "G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\build_prefill_widen.py",
+      "--reuse",
+      "G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-bf16-final",
+      "--checks",
+      "725",
+      "--out",
+      "G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-bf16-batches"
+    ],
+    [
+      "G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\test_gemm_arena.py",
+      "--build-root",
+      "G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-bf16-batches",
+      "--offset-gib",
+      "0",
+      "--checks",
+      "725",
+      "--out",
+      "G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-bf16-batches-arena0"
+    ],
+    [
+      "G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\test_gemm_arena.py",
+      "--build-root",
+      "G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-bf16-batches",
+      "--offset-gib",
+      "4",
+      "--checks",
+      "725",
+      "--out",
+      "G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-bf16-batches-arena4"
+    ]
+  ]
+}

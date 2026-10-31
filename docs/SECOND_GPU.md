@@ -122,7 +122,7 @@ PCIe 4.0 x8 each, IQ3_S): there the expert plan's PCIe share had been taking
 experts the helper already held, which made the primary card wait 43 ms per
 verify window instead of 19 (decode 40 instead of 66 tok/s). #854 keeps a
 helper's experts out of that share; before it, `--pcie-frac 0` avoided the
-cost ([bench/results/2026-10-04-rdna2-helper-pcie-share](https://github.com/Niko1221/Strata/blob/f40c418e483adc89e2e4f58e602c32a7e7d892c8/bench/results/2026-10-04-rdna2-helper-pcie-share/README.md)).
+cost ([bench/results/2026-10-04-rdna2-helper-pcie-share](../bench/results/2026-10-04-rdna2-helper-pcie-share/README.md)).
 Three/four cards have not been validated. Without the switch, the
 existing decode path remains in use. This does not optimize the separate
 `--peer-device` path below or change its existing incompatibility with helper

@@ -1,0 +1,26 @@
+name: Orca L0 Linux
+on:
+  push:
+    paths: ["orca-l0/**", ".github/workflows/orca-l0.yml"]
+  pull_request:
+    paths: ["orca-l0/**", ".github/workflows/orca-l0.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  host-and-ring:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Level Zero development files
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libze-dev ninja-build
+      - name: Build host runtime without SYCL or ocloc
+        run: |
+          cmake -S orca-l0 -B build-orca-l0 -G Ninja -DCMAKE_BUILD_TYPE=Release -DORCA_L0_BUILD_GPU_CHECKS=OFF
+          cmake --build build-orca-l0
+      - name: Check the request and completion rings
+        run: ctest --test-dir build-orca-l0 --output-on-failure

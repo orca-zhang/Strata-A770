@@ -1,0 +1,2639 @@
+{
+  "complete": true,
+  "check_passed": true,
+  "date": "2026-10-31",
+  "scope": "Slot-verifier port: existing component and solo-model regression; independent slot correctness is pending",
+  "independent_slot_correctness_validated": false,
+  "linux_gpu_validated": false,
+  "full_model_speedup_established": false,
+  "commands": [
+    {
+      "label": "configure",
+      "command": [
+        "C:\\Program Files\\CMake\\bin\\cmake.exe",
+        "-S",
+        "G:\\GitHub\\Strata\\build-orca-native-20261029\\clean-root-orca-1793380617150969000\\source",
+        "-B",
+        "G:\\GitHub\\Strata\\build-orca-native-20261029\\clean-root-orca-1793380617150969000\\build",
+        "-G",
+        "Ninja",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DSTRATA_ENABLE_ORCA=ON",
+        "-DCMAKE_CXX_COMPILER=C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin\\icx.exe",
+        "-DCMAKE_C_COMPILER=C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin\\icx.exe",
+        "-DORCA_L0_SDK=C:\\Program Files\\LevelZeroSDK\\1.33.1",
+        "-DORCA_L0_BUILD_CHECKS=OFF",
+        "-DSTRATA_GGML_DIR=G:\\GitHub\\Strata\\build-sycl\\_deps\\strata_llamacpp-src",
+        "-DSTRATA_ORCA_IQ_FIXTURES=G:\\GitHub\\Strata\\build-orca-native-20261029\\iq-fixtures"
+      ],
+      "exit_code": 0,
+      "log_sha256": "4c861abdc9019b35e4f13870cb5a606f6e3e848978ba9852f92ee3fef8092e6e"
+    },
+    {
+      "label": "build",
+      "command": [
+        "C:\\Program Files\\CMake\\bin\\cmake.exe",
+        "--build",
+        "G:\\GitHub\\Strata\\build-orca-native-20261029\\clean-root-orca-1793380617150969000\\build",
+        "--parallel",
+        "2"
+      ],
+      "exit_code": 0,
+      "log_sha256": "7776d81c358dfa75a4b960b4e9bad1bcb2603167b71c39487df61b29eb32396d"
+    },
+    {
+      "label": "list-tests",
+      "command": [
+        "C:\\Program Files\\CMake\\bin\\ctest.exe",
+        "--test-dir",
+        "G:\\GitHub\\Strata\\build-orca-native-20261029\\clean-root-orca-1793380617150969000\\build",
+        "-N"
+      ],
+      "exit_code": 0,
+      "log_sha256": "2313c645cf90f636654d76d62280d7ad4b591016b4c67dd7ff667452631ae0de"
+    },
+    {
+      "label": "checks",
+      "command": [
+        "C:\\Program Files\\CMake\\bin\\ctest.exe",
+        "--test-dir",
+        "G:\\GitHub\\Strata\\build-orca-native-20261029\\clean-root-orca-1793380617150969000\\build",
+        "--output-on-failure"
+      ],
+      "exit_code": 0,
+      "log_sha256": "875095a8e26bb669b954b08c0947eb197299e98928b10d0a8ffedba9e162c8ce"
+    },
+    {
+      "label": "engine-in-order",
+      "command": [
+        "G:\\GitHub\\Strata\\build-orca-native-20261029\\clean-root-orca-1793380617150969000\\build\\orca\\strata-orca-engine-check.exe",
+        "G:\\GitHub\\Strata\\build-orca-native-20261029\\clean-root-orca-1793380617150969000\\build\\orca\\images"
+      ],
+      "exit_code": 0,
+      "log_sha256": "b93e6a473bf1467277dfa20cc3e92f5deda3f5c67b2f1dddfccc445300e9cd67"
+    },
+    {
+      "label": "help",
+      "command": [
+        "G:\\GitHub\\Strata\\build-orca-native-20261029\\clean-root-orca-1793380617150969000\\build\\orca\\strata.exe",
+        "--help"
+      ],
+      "exit_code": 0,
+      "log_sha256": "8daf6fd33154fd2a0ebd083c5eab717ab4e726c182a4b3830758ae9333d8fcfd"
+    }
+  ],
+  "runs": [
+    {
+      "label": "capacity1",
+      "args": [
+        "--pack",
+        "G:\\GitHub\\Strata-data\\packs\\iq2_xs",
+        "--native",
+        "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00001-of-00002.gguf",
+        "--ple-gguf",
+        "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00002-of-00002.gguf",
+        "--expert-profile",
+        "G:\\GitHub\\Strata\\data\\expert-profile.bin",
+        "--expert-cache",
+        "6000",
+        "--prefill",
+        "8192",
+        "--spec",
+        "2",
+        "--spec-min-p",
+        "0.5",
+        "--max-context",
+        "8192",
+        "--stream-experts",
+        "--vram-reserve-mib",
+        "1024",
+        "--pcie-frac",
+        "0.16",
+        "--prompt-cache",
+        "0",
+        "--short-read",
+        "1024",
+        "--adapt-every",
+        "1",
+        "--adapt-swaps",
+        "32",
+        "--prefill-borrow",
+        "--mtp-window",
+        "1024",
+        "--mtp-hnorm",
+        "stream",
+        "--adapt-decay",
+        "0.5",
+        "--suffix-draft",
+        "0"
+      ],
+      "rows": [
+        {
+          "tokens": [
+            29108,
+            4009,
+            27891,
+            8964,
+            579,
+            16078,
+            321,
+            1100,
+            9872,
+            303,
+            660,
+            17425,
+            11,
+            694,
+            22602,
+            6105,
+            89661,
+            513,
+            35742,
+            777,
+            28750,
+            1056,
+            4860,
+            2438,
+            89661,
+            4016,
+            310,
+            12870,
+            60845,
+            69377,
+            13,
+            1061,
+            10386,
+            2209,
+            69377,
+            10814,
+            6105,
+            3000,
+            310,
+            5372,
+            1004,
+            6213,
+            494,
+            660,
+            5306,
+            314,
+            279,
+            12515,
+            11,
+            3154,
+            424,
+            4833,
+            6105,
+            13,
+            50275,
+            11,
+            567,
+            42918,
+            279,
+            12515,
+            430,
+            6105,
+            4598,
+            1056
+          ],
+          "generated": 64,
+          "prompt_tokens": 23,
+          "prompt_ms": 1483.4,
+          "decode_ms": 3655.1,
+          "finish": "length",
+          "accepted": 0,
+          "offered": 0,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 1564.4209000020055,
+          "done": "DONE 64 23 1483.4 3655.1 length 0 0 0 0 0 0 0 0.0 23 0",
+          "case": "Short",
+          "mismatched_fields": []
+        },
+        {
+          "tokens": [
+            760,
+            3766,
+            1970,
+            41643,
+            10551,
+            264,
+            4281,
+            314,
+            12654,
+            5568,
+            11,
+            28853,
+            1510,
+            7945,
+            62,
+            15,
+            63,
+            1472,
+            1510,
+            7945,
+            62,
+            22,
+            17,
+            7561,
+            864,
+            4072,
+            264,
+            3050,
+            34780,
+            17454,
+            383,
+            449,
+            1879,
+            3759,
+            1510,
+            87,
+            27653,
+            1946,
+            3418,
+            279,
+            3558,
+            303,
+            7472,
+            11,
+            567,
+            1902,
+            22903,
+            279,
+            5759,
+            11,
+            279,
+            34780,
+            5215,
+            11,
+            279,
+            42441,
+            33633,
+            6197,
+            11,
+            321,
+            279,
+            4499,
+            52652,
+            23398
+          ],
+          "generated": 64,
+          "prompt_tokens": 2048,
+          "prompt_ms": 34497.7,
+          "decode_ms": 3648.8,
+          "finish": "length",
+          "accepted": 0,
+          "offered": 0,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 34554.9663999991,
+          "done": "DONE 64 2048 34497.7 3648.8 length 0 0 0 0 0 0 0 0.0 2048 0",
+          "case": "Code2K",
+          "mismatched_fields": []
+        }
+      ],
+      "modules_startup": [
+        {
+          "path": "G:\\GitHub\\Strata\\build-orca-native-20261029\\clean-root-orca-1793380617150969000\\build\\orca\\strata.exe",
+          "sha256": "1407a8e4cb936262f3bfc0a359edc7676edba56d7a8837abcbbd6920c0e31940"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ntdll.dll",
+          "sha256": "36b1a62e4bf6bf7d68458fff6e8a33b39f6527ec6a46e55ecdd12cde83894c8d"
+        },
+        {
+          "path": "C:\\windows\\System32\\KERNEL32.DLL",
+          "sha256": "4636f65d449b1353100578c6cb139933cf2b134f5e246119d18968873a058bed"
+        },
+        {
+          "path": "C:\\windows\\System32\\KERNELBASE.dll",
+          "sha256": "b4ad8c8e3632104f4d2132ecb8979b8df279f0046dc42e79bed5acb744751871"
+        },
+        {
+          "path": "C:\\windows\\System32\\ADVAPI32.dll",
+          "sha256": "bde5f0e6f36a706a8a2e0fab1b362eea267aa6ee9f18aab1f899f38888c21280"
+        },
+        {
+          "path": "C:\\windows\\System32\\msvcrt.dll",
+          "sha256": "a7f4196d9476d36894ce17c3b0dd97504ca2cc31b3e0a774fee326e867565885"
+        },
+        {
+          "path": "C:\\windows\\System32\\sechost.dll",
+          "sha256": "54756c8bc96e3baf57ee58e4f73ca10183c8267d208efe7819a256eca53361a0"
+        },
+        {
+          "path": "C:\\windows\\System32\\RPCRT4.dll",
+          "sha256": "b9decb81fcf8ef9a6b674072da5676322b925c73b3c8c9253805db7510d9c493"
+        },
+        {
+          "path": "C:\\windows\\System32\\bcrypt.dll",
+          "sha256": "811af66dd7e323a74db80648610bbebb956093ae7bd91c5b950ed6aca13d8026"
+        },
+        {
+          "path": "C:\\windows\\System32\\ucrtbase.dll",
+          "sha256": "3c60056371f82e4744185b6f2fa0c69042b1e78804685944132974dd13f3b6d9"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ze_loader.dll",
+          "sha256": "a56a109788c97ed42275803202e42a44c591a24064a038e6aa3cbc5908f98b4b"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\MSVCP140.dll",
+          "sha256": "def46aa6a8f72f27bafac0c43334419486a4d1dcdb6c479a8ef7034b3e1fa4cb"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\MSVCP140_ATOMIC_WAIT.dll",
+          "sha256": "e7963645e0d1db08e300614d4c5fa7194bd8173e9ab7a5558859e6b232ed3241"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VCRUNTIME140.dll",
+          "sha256": "184146852727a9db4eea06178716bec3cdbb1015c911f6b0f915b184ad7775b2"
+        },
+        {
+          "path": "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin\\svml_dispmd.dll",
+          "sha256": "03b6af2ab4dac88fa5d80ddded702aeb7cfd3f0460e63425ded73d7a755a1dce"
+        },
+        {
+          "path": "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin\\libmmd.dll",
+          "sha256": "0e8e285e2d1cb7dbe6018371fd5fd9763e9b3a574f516ff000f606433fe3cc10"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VCRUNTIME140_1.dll",
+          "sha256": "e6bfb3662ab4b1969a73441dbe35c96d51441b6bff8cf1fe7430bd5b246ca605"
+        },
+        {
+          "path": "C:\\windows\\System32\\CFGMGR32.dll",
+          "sha256": "7fefd329b398827d6babf33973eaa2c0dc580fe1f3b291efa4793e795e4df8fa"
+        },
+        {
+          "path": "C:\\windows\\System32\\ole32.dll",
+          "sha256": "4a7b8ed9f2aeca875f948d9a1bce8b8d177744475f253704362792d7182d55f2"
+        },
+        {
+          "path": "C:\\windows\\System32\\combase.dll",
+          "sha256": "e1ed05c78ccd1056f106468b551f846a4f7e1d46d925223755c44f3191730993"
+        },
+        {
+          "path": "C:\\windows\\System32\\GDI32.dll",
+          "sha256": "b5f5a3f16d03366cdb02020fc4dadceb0892e243f8aa94d205e124045da9457f"
+        },
+        {
+          "path": "C:\\windows\\System32\\win32u.dll",
+          "sha256": "20ac4556b0b3fc82bd5632ffc623a45497184483e14a2841ac30213e162daf1f"
+        },
+        {
+          "path": "C:\\windows\\System32\\gdi32full.dll",
+          "sha256": "724754c47bcd7a2739816c7cefbc75382515538a15ccb73a8342043a16453772"
+        },
+        {
+          "path": "C:\\windows\\System32\\msvcp_win.dll",
+          "sha256": "2a7825c2925347e0cb767a0dcb611f3eb80d0f71cbec981069b227bdc7cb871a"
+        },
+        {
+          "path": "C:\\windows\\System32\\USER32.dll",
+          "sha256": "82870be1e008d5232cb175ebc815f645a2add4c0b164fd4ba20744192c1c81f7"
+        },
+        {
+          "path": "C:\\windows\\System32\\IMM32.DLL",
+          "sha256": "2a882bc0df58f4f6dd906889b1fb6d7b7bc70da7109e016e0f1e67b264d073b6"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\ze_intel_gpu64.dll",
+          "sha256": "e291d6c88c85d85751d3e2ba26d5510e1abb3a1f6d255f8f25b9aa2843ecf96d"
+        },
+        {
+          "path": "C:\\windows\\System32\\dxgi.dll",
+          "sha256": "d33765793e32eff65f9103efe2419184ab0b6289e69e69ce85aa7568f678c3b5"
+        },
+        {
+          "path": "C:\\windows\\System32\\WS2_32.dll",
+          "sha256": "5e9857a80a301ad21d0e0a0928a4ff2b5360c305a97bfc88886e3b686bf8d503"
+        },
+        {
+          "path": "C:\\windows\\System32\\SETUPAPI.dll",
+          "sha256": "3777075e8391c40c21fd5662845f5e2928d3cfd2b6abdf4003e087d2089cb853"
+        },
+        {
+          "path": "C:\\windows\\System32\\SHELL32.dll",
+          "sha256": "936c33a8283196a070aa6f844a65a29a8f99f760eae0016754c1cbf17d62bdb7"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\WINMM.dll",
+          "sha256": "ead9055dc522bcab041c8eb7b875adb681a2f1fa851d4075789d78d0242711a0"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VERSION.dll",
+          "sha256": "af45a728552ccfdcd9435c40ace60a9354d7c1b52abf507a2f1cb371dada4fde"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ze_tracing_layer.dll",
+          "sha256": "d3f8f8c4bd055c464495703761f5754c140137e4c457f60a168e35085ee2c51f"
+        },
+        {
+          "path": "C:\\windows\\System32\\bcryptPrimitives.dll",
+          "sha256": "f0a1662d0f55533a21d609f8dc737288ede77d314d90e885ca9e6ef79d429c3b"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmm2_64.dll",
+          "sha256": "db2ea2a6f271cc85d097dc13176e153e5ebf67775155df162b768a75ed863a2e"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmm64.dll",
+          "sha256": "db3b3d6fbc6aba6ba156080224916c1fefcb1080f0ea3927727f52626623c681"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmmstaging_64.dll",
+          "sha256": "994d22569552487dcadbc8b1aa6ac9bef0c24df23e67637b4e2a2f63952c1e70"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\windows.storage.dll",
+          "sha256": "718c890022323ed8e38a3beb7a143df9e5d680b006c3f1fd28754eeb7cd82010"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\Wldp.dll",
+          "sha256": "c2a7ed84bdd3cf931fdcc5782cea58c376b1a2841fcc6f954e65812deff50389"
+        },
+        {
+          "path": "C:\\windows\\System32\\OLEAUT32.dll",
+          "sha256": "4dd40579e7254dd553b49b229aa85b9c079586b034e37e564909da25eb298345"
+        },
+        {
+          "path": "C:\\windows\\System32\\SHCORE.dll",
+          "sha256": "63257882eb0d0d08ccc275287e11e7213ec26946185e3f3116316c249708a920"
+        },
+        {
+          "path": "C:\\windows\\System32\\shlwapi.dll",
+          "sha256": "eb70b465352f04f188cd12affd72b44f14770e6bfd98f6a6570b62ef21873297"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdfcl64.dll",
+          "sha256": "4aafd9f797a227cdab388853ba835a5670f384ca98395e859a4cf7810b8d68ae"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igc-default64.dll",
+          "sha256": "55559222a70929c46c7b4000e019bfe5126fa8c051037cfdf62ac6f29ba53a89"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\dxcore.dll",
+          "sha256": "c4976547ea4ecf3faa1c82e03acfc6344f944203a660f137d938bb53f3495f53"
+        },
+        {
+          "path": "C:\\windows\\System32\\kernel.appcore.dll",
+          "sha256": "abff38d9efaca07602acc2a31775f8790ac720261842dbb6d7d9e1a46bba91f8"
+        }
+      ],
+      "modules_workload": [
+        {
+          "path": "G:\\GitHub\\Strata\\build-orca-native-20261029\\clean-root-orca-1793380617150969000\\build\\orca\\strata.exe",
+          "sha256": "1407a8e4cb936262f3bfc0a359edc7676edba56d7a8837abcbbd6920c0e31940"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ntdll.dll",
+          "sha256": "36b1a62e4bf6bf7d68458fff6e8a33b39f6527ec6a46e55ecdd12cde83894c8d"
+        },
+        {
+          "path": "C:\\windows\\System32\\KERNEL32.DLL",
+          "sha256": "4636f65d449b1353100578c6cb139933cf2b134f5e246119d18968873a058bed"
+        },
+        {
+          "path": "C:\\windows\\System32\\KERNELBASE.dll",
+          "sha256": "b4ad8c8e3632104f4d2132ecb8979b8df279f0046dc42e79bed5acb744751871"
+        },
+        {
+          "path": "C:\\windows\\System32\\ADVAPI32.dll",
+          "sha256": "bde5f0e6f36a706a8a2e0fab1b362eea267aa6ee9f18aab1f899f38888c21280"
+        },
+        {
+          "path": "C:\\windows\\System32\\msvcrt.dll",
+          "sha256": "a7f4196d9476d36894ce17c3b0dd97504ca2cc31b3e0a774fee326e867565885"
+        },
+        {
+          "path": "C:\\windows\\System32\\sechost.dll",
+          "sha256": "54756c8bc96e3baf57ee58e4f73ca10183c8267d208efe7819a256eca53361a0"
+        },
+        {
+          "path": "C:\\windows\\System32\\RPCRT4.dll",
+          "sha256": "b9decb81fcf8ef9a6b674072da5676322b925c73b3c8c9253805db7510d9c493"
+        },
+        {
+          "path": "C:\\windows\\System32\\bcrypt.dll",
+          "sha256": "811af66dd7e323a74db80648610bbebb956093ae7bd91c5b950ed6aca13d8026"
+        },
+        {
+          "path": "C:\\windows\\System32\\ucrtbase.dll",
+          "sha256": "3c60056371f82e4744185b6f2fa0c69042b1e78804685944132974dd13f3b6d9"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ze_loader.dll",
+          "sha256": "a56a109788c97ed42275803202e42a44c591a24064a038e6aa3cbc5908f98b4b"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\MSVCP140.dll",
+          "sha256": "def46aa6a8f72f27bafac0c43334419486a4d1dcdb6c479a8ef7034b3e1fa4cb"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\MSVCP140_ATOMIC_WAIT.dll",
+          "sha256": "e7963645e0d1db08e300614d4c5fa7194bd8173e9ab7a5558859e6b232ed3241"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VCRUNTIME140.dll",
+          "sha256": "184146852727a9db4eea06178716bec3cdbb1015c911f6b0f915b184ad7775b2"
+        },
+        {
+          "path": "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin\\svml_dispmd.dll",
+          "sha256": "03b6af2ab4dac88fa5d80ddded702aeb7cfd3f0460e63425ded73d7a755a1dce"
+        },
+        {
+          "path": "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin\\libmmd.dll",
+          "sha256": "0e8e285e2d1cb7dbe6018371fd5fd9763e9b3a574f516ff000f606433fe3cc10"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VCRUNTIME140_1.dll",
+          "sha256": "e6bfb3662ab4b1969a73441dbe35c96d51441b6bff8cf1fe7430bd5b246ca605"
+        },
+        {
+          "path": "C:\\windows\\System32\\CFGMGR32.dll",
+          "sha256": "7fefd329b398827d6babf33973eaa2c0dc580fe1f3b291efa4793e795e4df8fa"
+        },
+        {
+          "path": "C:\\windows\\System32\\ole32.dll",
+          "sha256": "4a7b8ed9f2aeca875f948d9a1bce8b8d177744475f253704362792d7182d55f2"
+        },
+        {
+          "path": "C:\\windows\\System32\\combase.dll",
+          "sha256": "e1ed05c78ccd1056f106468b551f846a4f7e1d46d925223755c44f3191730993"
+        },
+        {
+          "path": "C:\\windows\\System32\\GDI32.dll",
+          "sha256": "b5f5a3f16d03366cdb02020fc4dadceb0892e243f8aa94d205e124045da9457f"
+        },
+        {
+          "path": "C:\\windows\\System32\\win32u.dll",
+          "sha256": "20ac4556b0b3fc82bd5632ffc623a45497184483e14a2841ac30213e162daf1f"
+        },
+        {
+          "path": "C:\\windows\\System32\\gdi32full.dll",
+          "sha256": "724754c47bcd7a2739816c7cefbc75382515538a15ccb73a8342043a16453772"
+        },
+        {
+          "path": "C:\\windows\\System32\\msvcp_win.dll",
+          "sha256": "2a7825c2925347e0cb767a0dcb611f3eb80d0f71cbec981069b227bdc7cb871a"
+        },
+        {
+          "path": "C:\\windows\\System32\\USER32.dll",
+          "sha256": "82870be1e008d5232cb175ebc815f645a2add4c0b164fd4ba20744192c1c81f7"
+        },
+        {
+          "path": "C:\\windows\\System32\\IMM32.DLL",
+          "sha256": "2a882bc0df58f4f6dd906889b1fb6d7b7bc70da7109e016e0f1e67b264d073b6"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\ze_intel_gpu64.dll",
+          "sha256": "e291d6c88c85d85751d3e2ba26d5510e1abb3a1f6d255f8f25b9aa2843ecf96d"
+        },
+        {
+          "path": "C:\\windows\\System32\\dxgi.dll",
+          "sha256": "d33765793e32eff65f9103efe2419184ab0b6289e69e69ce85aa7568f678c3b5"
+        },
+        {
+          "path": "C:\\windows\\System32\\WS2_32.dll",
+          "sha256": "5e9857a80a301ad21d0e0a0928a4ff2b5360c305a97bfc88886e3b686bf8d503"
+        },
+        {
+          "path": "C:\\windows\\System32\\SETUPAPI.dll",
+          "sha256": "3777075e8391c40c21fd5662845f5e2928d3cfd2b6abdf4003e087d2089cb853"
+        },
+        {
+          "path": "C:\\windows\\System32\\SHELL32.dll",
+          "sha256": "936c33a8283196a070aa6f844a65a29a8f99f760eae0016754c1cbf17d62bdb7"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\WINMM.dll",
+          "sha256": "ead9055dc522bcab041c8eb7b875adb681a2f1fa851d4075789d78d0242711a0"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VERSION.dll",
+          "sha256": "af45a728552ccfdcd9435c40ace60a9354d7c1b52abf507a2f1cb371dada4fde"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ze_tracing_layer.dll",
+          "sha256": "d3f8f8c4bd055c464495703761f5754c140137e4c457f60a168e35085ee2c51f"
+        },
+        {
+          "path": "C:\\windows\\System32\\bcryptPrimitives.dll",
+          "sha256": "f0a1662d0f55533a21d609f8dc737288ede77d314d90e885ca9e6ef79d429c3b"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmm2_64.dll",
+          "sha256": "db2ea2a6f271cc85d097dc13176e153e5ebf67775155df162b768a75ed863a2e"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmm64.dll",
+          "sha256": "db3b3d6fbc6aba6ba156080224916c1fefcb1080f0ea3927727f52626623c681"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmmstaging_64.dll",
+          "sha256": "994d22569552487dcadbc8b1aa6ac9bef0c24df23e67637b4e2a2f63952c1e70"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\windows.storage.dll",
+          "sha256": "718c890022323ed8e38a3beb7a143df9e5d680b006c3f1fd28754eeb7cd82010"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\Wldp.dll",
+          "sha256": "c2a7ed84bdd3cf931fdcc5782cea58c376b1a2841fcc6f954e65812deff50389"
+        },
+        {
+          "path": "C:\\windows\\System32\\OLEAUT32.dll",
+          "sha256": "4dd40579e7254dd553b49b229aa85b9c079586b034e37e564909da25eb298345"
+        },
+        {
+          "path": "C:\\windows\\System32\\SHCORE.dll",
+          "sha256": "63257882eb0d0d08ccc275287e11e7213ec26946185e3f3116316c249708a920"
+        },
+        {
+          "path": "C:\\windows\\System32\\shlwapi.dll",
+          "sha256": "eb70b465352f04f188cd12affd72b44f14770e6bfd98f6a6570b62ef21873297"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdfcl64.dll",
+          "sha256": "4aafd9f797a227cdab388853ba835a5670f384ca98395e859a4cf7810b8d68ae"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igc-default64.dll",
+          "sha256": "55559222a70929c46c7b4000e019bfe5126fa8c051037cfdf62ac6f29ba53a89"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\dxcore.dll",
+          "sha256": "c4976547ea4ecf3faa1c82e03acfc6344f944203a660f137d938bb53f3495f53"
+        },
+        {
+          "path": "C:\\windows\\System32\\kernel.appcore.dll",
+          "sha256": "abff38d9efaca07602acc2a31775f8790ac720261842dbb6d7d9e1a46bba91f8"
+        }
+      ],
+      "exit_code": 0,
+      "log_sha256": "5b464d494a73373e4fc22fa367a172848bd4e408ba19a91acc48a3b20566e045",
+      "post_zero_diagnostic_triggered": false
+    },
+    {
+      "label": "capacity4",
+      "args": [
+        "--pack",
+        "G:\\GitHub\\Strata-data\\packs\\iq2_xs",
+        "--native",
+        "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00001-of-00002.gguf",
+        "--ple-gguf",
+        "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00002-of-00002.gguf",
+        "--expert-profile",
+        "G:\\GitHub\\Strata\\data\\expert-profile.bin",
+        "--expert-cache",
+        "6000",
+        "--prefill",
+        "8192",
+        "--spec",
+        "4",
+        "--spec-min-p",
+        "0.5",
+        "--mtp",
+        "G:\\GitHub\\Strata-data\\mtp\\rt-full-vocab-current",
+        "--max-context",
+        "8192",
+        "--stream-experts",
+        "--vram-reserve-mib",
+        "1024",
+        "--pcie-frac",
+        "0.16",
+        "--prompt-cache",
+        "0",
+        "--short-read",
+        "1024",
+        "--adapt-every",
+        "1",
+        "--adapt-swaps",
+        "32",
+        "--prefill-borrow",
+        "--mtp-window",
+        "1024",
+        "--mtp-hnorm",
+        "stream",
+        "--adapt-decay",
+        "0.5",
+        "--suffix-draft",
+        "0"
+      ],
+      "rows": [
+        {
+          "tokens": [
+            29108,
+            4009,
+            27891,
+            8964,
+            579,
+            16078,
+            321,
+            1100,
+            9872,
+            303,
+            660,
+            17425,
+            11,
+            694,
+            22602,
+            6105,
+            89661,
+            513,
+            35742,
+            777,
+            28750,
+            1056,
+            4860,
+            2438,
+            89661,
+            4016,
+            310,
+            12870,
+            60845,
+            69377,
+            13,
+            1061,
+            10386,
+            2209,
+            69377,
+            10814,
+            6105,
+            3000,
+            310,
+            5372,
+            1004,
+            6213,
+            494,
+            660,
+            5306,
+            314,
+            279,
+            12515,
+            11,
+            3154,
+            424,
+            4833,
+            6105,
+            13,
+            50275,
+            11,
+            567,
+            42918,
+            279,
+            12515,
+            430,
+            6105,
+            4598,
+            1056
+          ],
+          "generated": 64,
+          "prompt_tokens": 23,
+          "prompt_ms": 1263.4,
+          "decode_ms": 2914.4,
+          "finish": "length",
+          "accepted": 37,
+          "offered": 50,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 1342.0084999961546,
+          "done": "DONE 64 23 1263.4 2914.4 length 37 50 0 0 0 0 0 0.0 23 0",
+          "case": "Short",
+          "mismatched_fields": []
+        },
+        {
+          "tokens": [
+            760,
+            3766,
+            1970,
+            41643,
+            10551,
+            264,
+            4281,
+            314,
+            12654,
+            5568,
+            11,
+            28853,
+            1510,
+            7945,
+            62,
+            15,
+            63,
+            1472,
+            1510,
+            7945,
+            62,
+            22,
+            17,
+            7561,
+            864,
+            4072,
+            264,
+            3050,
+            34780,
+            17454,
+            383,
+            449,
+            1879,
+            3759,
+            1510,
+            87,
+            27653,
+            1946,
+            3418,
+            279,
+            3558,
+            303,
+            7472,
+            11,
+            567,
+            1902,
+            22903,
+            279,
+            5759,
+            11,
+            279,
+            34780,
+            5215,
+            11,
+            279,
+            42441,
+            33633,
+            6197,
+            11,
+            321,
+            279,
+            4499,
+            52652,
+            23398
+          ],
+          "generated": 64,
+          "prompt_tokens": 2048,
+          "prompt_ms": 34477.4,
+          "decode_ms": 2458.4,
+          "finish": "length",
+          "accepted": 38,
+          "offered": 44,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 34529.95039999951,
+          "done": "DONE 64 2048 34477.4 2458.4 length 38 44 0 0 0 0 0 0.0 2048 0",
+          "case": "Code2K",
+          "mismatched_fields": []
+        }
+      ],
+      "modules_startup": [
+        {
+          "path": "G:\\GitHub\\Strata\\build-orca-native-20261029\\clean-root-orca-1793380617150969000\\build\\orca\\strata.exe",
+          "sha256": "1407a8e4cb936262f3bfc0a359edc7676edba56d7a8837abcbbd6920c0e31940"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ntdll.dll",
+          "sha256": "36b1a62e4bf6bf7d68458fff6e8a33b39f6527ec6a46e55ecdd12cde83894c8d"
+        },
+        {
+          "path": "C:\\windows\\System32\\KERNEL32.DLL",
+          "sha256": "4636f65d449b1353100578c6cb139933cf2b134f5e246119d18968873a058bed"
+        },
+        {
+          "path": "C:\\windows\\System32\\KERNELBASE.dll",
+          "sha256": "b4ad8c8e3632104f4d2132ecb8979b8df279f0046dc42e79bed5acb744751871"
+        },
+        {
+          "path": "C:\\windows\\System32\\ADVAPI32.dll",
+          "sha256": "bde5f0e6f36a706a8a2e0fab1b362eea267aa6ee9f18aab1f899f38888c21280"
+        },
+        {
+          "path": "C:\\windows\\System32\\msvcrt.dll",
+          "sha256": "a7f4196d9476d36894ce17c3b0dd97504ca2cc31b3e0a774fee326e867565885"
+        },
+        {
+          "path": "C:\\windows\\System32\\sechost.dll",
+          "sha256": "54756c8bc96e3baf57ee58e4f73ca10183c8267d208efe7819a256eca53361a0"
+        },
+        {
+          "path": "C:\\windows\\System32\\RPCRT4.dll",
+          "sha256": "b9decb81fcf8ef9a6b674072da5676322b925c73b3c8c9253805db7510d9c493"
+        },
+        {
+          "path": "C:\\windows\\System32\\bcrypt.dll",
+          "sha256": "811af66dd7e323a74db80648610bbebb956093ae7bd91c5b950ed6aca13d8026"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ze_loader.dll",
+          "sha256": "a56a109788c97ed42275803202e42a44c591a24064a038e6aa3cbc5908f98b4b"
+        },
+        {
+          "path": "C:\\windows\\System32\\ucrtbase.dll",
+          "sha256": "3c60056371f82e4744185b6f2fa0c69042b1e78804685944132974dd13f3b6d9"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\MSVCP140.dll",
+          "sha256": "def46aa6a8f72f27bafac0c43334419486a4d1dcdb6c479a8ef7034b3e1fa4cb"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\MSVCP140_ATOMIC_WAIT.dll",
+          "sha256": "e7963645e0d1db08e300614d4c5fa7194bd8173e9ab7a5558859e6b232ed3241"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VCRUNTIME140.dll",
+          "sha256": "184146852727a9db4eea06178716bec3cdbb1015c911f6b0f915b184ad7775b2"
+        },
+        {
+          "path": "C:\\windows\\System32\\CFGMGR32.dll",
+          "sha256": "7fefd329b398827d6babf33973eaa2c0dc580fe1f3b291efa4793e795e4df8fa"
+        },
+        {
+          "path": "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin\\libmmd.dll",
+          "sha256": "0e8e285e2d1cb7dbe6018371fd5fd9763e9b3a574f516ff000f606433fe3cc10"
+        },
+        {
+          "path": "C:\\windows\\System32\\ole32.dll",
+          "sha256": "4a7b8ed9f2aeca875f948d9a1bce8b8d177744475f253704362792d7182d55f2"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VCRUNTIME140_1.dll",
+          "sha256": "e6bfb3662ab4b1969a73441dbe35c96d51441b6bff8cf1fe7430bd5b246ca605"
+        },
+        {
+          "path": "C:\\windows\\System32\\combase.dll",
+          "sha256": "e1ed05c78ccd1056f106468b551f846a4f7e1d46d925223755c44f3191730993"
+        },
+        {
+          "path": "C:\\windows\\System32\\GDI32.dll",
+          "sha256": "b5f5a3f16d03366cdb02020fc4dadceb0892e243f8aa94d205e124045da9457f"
+        },
+        {
+          "path": "C:\\windows\\System32\\win32u.dll",
+          "sha256": "20ac4556b0b3fc82bd5632ffc623a45497184483e14a2841ac30213e162daf1f"
+        },
+        {
+          "path": "C:\\windows\\System32\\gdi32full.dll",
+          "sha256": "724754c47bcd7a2739816c7cefbc75382515538a15ccb73a8342043a16453772"
+        },
+        {
+          "path": "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin\\svml_dispmd.dll",
+          "sha256": "03b6af2ab4dac88fa5d80ddded702aeb7cfd3f0460e63425ded73d7a755a1dce"
+        },
+        {
+          "path": "C:\\windows\\System32\\msvcp_win.dll",
+          "sha256": "2a7825c2925347e0cb767a0dcb611f3eb80d0f71cbec981069b227bdc7cb871a"
+        },
+        {
+          "path": "C:\\windows\\System32\\USER32.dll",
+          "sha256": "82870be1e008d5232cb175ebc815f645a2add4c0b164fd4ba20744192c1c81f7"
+        },
+        {
+          "path": "C:\\windows\\System32\\IMM32.DLL",
+          "sha256": "2a882bc0df58f4f6dd906889b1fb6d7b7bc70da7109e016e0f1e67b264d073b6"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\ze_intel_gpu64.dll",
+          "sha256": "e291d6c88c85d85751d3e2ba26d5510e1abb3a1f6d255f8f25b9aa2843ecf96d"
+        },
+        {
+          "path": "C:\\windows\\System32\\dxgi.dll",
+          "sha256": "d33765793e32eff65f9103efe2419184ab0b6289e69e69ce85aa7568f678c3b5"
+        },
+        {
+          "path": "C:\\windows\\System32\\WS2_32.dll",
+          "sha256": "5e9857a80a301ad21d0e0a0928a4ff2b5360c305a97bfc88886e3b686bf8d503"
+        },
+        {
+          "path": "C:\\windows\\System32\\SETUPAPI.dll",
+          "sha256": "3777075e8391c40c21fd5662845f5e2928d3cfd2b6abdf4003e087d2089cb853"
+        },
+        {
+          "path": "C:\\windows\\System32\\SHELL32.dll",
+          "sha256": "936c33a8283196a070aa6f844a65a29a8f99f760eae0016754c1cbf17d62bdb7"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\WINMM.dll",
+          "sha256": "ead9055dc522bcab041c8eb7b875adb681a2f1fa851d4075789d78d0242711a0"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VERSION.dll",
+          "sha256": "af45a728552ccfdcd9435c40ace60a9354d7c1b52abf507a2f1cb371dada4fde"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ze_tracing_layer.dll",
+          "sha256": "d3f8f8c4bd055c464495703761f5754c140137e4c457f60a168e35085ee2c51f"
+        },
+        {
+          "path": "C:\\windows\\System32\\bcryptPrimitives.dll",
+          "sha256": "f0a1662d0f55533a21d609f8dc737288ede77d314d90e885ca9e6ef79d429c3b"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmm2_64.dll",
+          "sha256": "db2ea2a6f271cc85d097dc13176e153e5ebf67775155df162b768a75ed863a2e"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmm64.dll",
+          "sha256": "db3b3d6fbc6aba6ba156080224916c1fefcb1080f0ea3927727f52626623c681"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmmstaging_64.dll",
+          "sha256": "994d22569552487dcadbc8b1aa6ac9bef0c24df23e67637b4e2a2f63952c1e70"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\windows.storage.dll",
+          "sha256": "718c890022323ed8e38a3beb7a143df9e5d680b006c3f1fd28754eeb7cd82010"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\Wldp.dll",
+          "sha256": "c2a7ed84bdd3cf931fdcc5782cea58c376b1a2841fcc6f954e65812deff50389"
+        },
+        {
+          "path": "C:\\windows\\System32\\OLEAUT32.dll",
+          "sha256": "4dd40579e7254dd553b49b229aa85b9c079586b034e37e564909da25eb298345"
+        },
+        {
+          "path": "C:\\windows\\System32\\SHCORE.dll",
+          "sha256": "63257882eb0d0d08ccc275287e11e7213ec26946185e3f3116316c249708a920"
+        },
+        {
+          "path": "C:\\windows\\System32\\shlwapi.dll",
+          "sha256": "eb70b465352f04f188cd12affd72b44f14770e6bfd98f6a6570b62ef21873297"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdfcl64.dll",
+          "sha256": "4aafd9f797a227cdab388853ba835a5670f384ca98395e859a4cf7810b8d68ae"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igc-default64.dll",
+          "sha256": "55559222a70929c46c7b4000e019bfe5126fa8c051037cfdf62ac6f29ba53a89"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\dxcore.dll",
+          "sha256": "c4976547ea4ecf3faa1c82e03acfc6344f944203a660f137d938bb53f3495f53"
+        },
+        {
+          "path": "C:\\windows\\System32\\kernel.appcore.dll",
+          "sha256": "abff38d9efaca07602acc2a31775f8790ac720261842dbb6d7d9e1a46bba91f8"
+        }
+      ],
+      "modules_workload": [
+        {
+          "path": "G:\\GitHub\\Strata\\build-orca-native-20261029\\clean-root-orca-1793380617150969000\\build\\orca\\strata.exe",
+          "sha256": "1407a8e4cb936262f3bfc0a359edc7676edba56d7a8837abcbbd6920c0e31940"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ntdll.dll",
+          "sha256": "36b1a62e4bf6bf7d68458fff6e8a33b39f6527ec6a46e55ecdd12cde83894c8d"
+        },
+        {
+          "path": "C:\\windows\\System32\\KERNEL32.DLL",
+          "sha256": "4636f65d449b1353100578c6cb139933cf2b134f5e246119d18968873a058bed"
+        },
+        {
+          "path": "C:\\windows\\System32\\KERNELBASE.dll",
+          "sha256": "b4ad8c8e3632104f4d2132ecb8979b8df279f0046dc42e79bed5acb744751871"
+        },
+        {
+          "path": "C:\\windows\\System32\\ADVAPI32.dll",
+          "sha256": "bde5f0e6f36a706a8a2e0fab1b362eea267aa6ee9f18aab1f899f38888c21280"
+        },
+        {
+          "path": "C:\\windows\\System32\\msvcrt.dll",
+          "sha256": "a7f4196d9476d36894ce17c3b0dd97504ca2cc31b3e0a774fee326e867565885"
+        },
+        {
+          "path": "C:\\windows\\System32\\sechost.dll",
+          "sha256": "54756c8bc96e3baf57ee58e4f73ca10183c8267d208efe7819a256eca53361a0"
+        },
+        {
+          "path": "C:\\windows\\System32\\RPCRT4.dll",
+          "sha256": "b9decb81fcf8ef9a6b674072da5676322b925c73b3c8c9253805db7510d9c493"
+        },
+        {
+          "path": "C:\\windows\\System32\\bcrypt.dll",
+          "sha256": "811af66dd7e323a74db80648610bbebb956093ae7bd91c5b950ed6aca13d8026"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ze_loader.dll",
+          "sha256": "a56a109788c97ed42275803202e42a44c591a24064a038e6aa3cbc5908f98b4b"
+        },
+        {
+          "path": "C:\\windows\\System32\\ucrtbase.dll",
+          "sha256": "3c60056371f82e4744185b6f2fa0c69042b1e78804685944132974dd13f3b6d9"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\MSVCP140.dll",
+          "sha256": "def46aa6a8f72f27bafac0c43334419486a4d1dcdb6c479a8ef7034b3e1fa4cb"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\MSVCP140_ATOMIC_WAIT.dll",
+          "sha256": "e7963645e0d1db08e300614d4c5fa7194bd8173e9ab7a5558859e6b232ed3241"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VCRUNTIME140.dll",
+          "sha256": "184146852727a9db4eea06178716bec3cdbb1015c911f6b0f915b184ad7775b2"
+        },
+        {
+          "path": "C:\\windows\\System32\\CFGMGR32.dll",
+          "sha256": "7fefd329b398827d6babf33973eaa2c0dc580fe1f3b291efa4793e795e4df8fa"
+        },
+        {
+          "path": "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin\\libmmd.dll",
+          "sha256": "0e8e285e2d1cb7dbe6018371fd5fd9763e9b3a574f516ff000f606433fe3cc10"
+        },
+        {
+          "path": "C:\\windows\\System32\\ole32.dll",
+          "sha256": "4a7b8ed9f2aeca875f948d9a1bce8b8d177744475f253704362792d7182d55f2"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VCRUNTIME140_1.dll",
+          "sha256": "e6bfb3662ab4b1969a73441dbe35c96d51441b6bff8cf1fe7430bd5b246ca605"
+        },
+        {
+          "path": "C:\\windows\\System32\\combase.dll",
+          "sha256": "e1ed05c78ccd1056f106468b551f846a4f7e1d46d925223755c44f3191730993"
+        },
+        {
+          "path": "C:\\windows\\System32\\GDI32.dll",
+          "sha256": "b5f5a3f16d03366cdb02020fc4dadceb0892e243f8aa94d205e124045da9457f"
+        },
+        {
+          "path": "C:\\windows\\System32\\win32u.dll",
+          "sha256": "20ac4556b0b3fc82bd5632ffc623a45497184483e14a2841ac30213e162daf1f"
+        },
+        {
+          "path": "C:\\windows\\System32\\gdi32full.dll",
+          "sha256": "724754c47bcd7a2739816c7cefbc75382515538a15ccb73a8342043a16453772"
+        },
+        {
+          "path": "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin\\svml_dispmd.dll",
+          "sha256": "03b6af2ab4dac88fa5d80ddded702aeb7cfd3f0460e63425ded73d7a755a1dce"
+        },
+        {
+          "path": "C:\\windows\\System32\\msvcp_win.dll",
+          "sha256": "2a7825c2925347e0cb767a0dcb611f3eb80d0f71cbec981069b227bdc7cb871a"
+        },
+        {
+          "path": "C:\\windows\\System32\\USER32.dll",
+          "sha256": "82870be1e008d5232cb175ebc815f645a2add4c0b164fd4ba20744192c1c81f7"
+        },
+        {
+          "path": "C:\\windows\\System32\\IMM32.DLL",
+          "sha256": "2a882bc0df58f4f6dd906889b1fb6d7b7bc70da7109e016e0f1e67b264d073b6"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\ze_intel_gpu64.dll",
+          "sha256": "e291d6c88c85d85751d3e2ba26d5510e1abb3a1f6d255f8f25b9aa2843ecf96d"
+        },
+        {
+          "path": "C:\\windows\\System32\\dxgi.dll",
+          "sha256": "d33765793e32eff65f9103efe2419184ab0b6289e69e69ce85aa7568f678c3b5"
+        },
+        {
+          "path": "C:\\windows\\System32\\WS2_32.dll",
+          "sha256": "5e9857a80a301ad21d0e0a0928a4ff2b5360c305a97bfc88886e3b686bf8d503"
+        },
+        {
+          "path": "C:\\windows\\System32\\SETUPAPI.dll",
+          "sha256": "3777075e8391c40c21fd5662845f5e2928d3cfd2b6abdf4003e087d2089cb853"
+        },
+        {
+          "path": "C:\\windows\\System32\\SHELL32.dll",
+          "sha256": "936c33a8283196a070aa6f844a65a29a8f99f760eae0016754c1cbf17d62bdb7"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\WINMM.dll",
+          "sha256": "ead9055dc522bcab041c8eb7b875adb681a2f1fa851d4075789d78d0242711a0"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VERSION.dll",
+          "sha256": "af45a728552ccfdcd9435c40ace60a9354d7c1b52abf507a2f1cb371dada4fde"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ze_tracing_layer.dll",
+          "sha256": "d3f8f8c4bd055c464495703761f5754c140137e4c457f60a168e35085ee2c51f"
+        },
+        {
+          "path": "C:\\windows\\System32\\bcryptPrimitives.dll",
+          "sha256": "f0a1662d0f55533a21d609f8dc737288ede77d314d90e885ca9e6ef79d429c3b"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmm2_64.dll",
+          "sha256": "db2ea2a6f271cc85d097dc13176e153e5ebf67775155df162b768a75ed863a2e"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmm64.dll",
+          "sha256": "db3b3d6fbc6aba6ba156080224916c1fefcb1080f0ea3927727f52626623c681"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmmstaging_64.dll",
+          "sha256": "994d22569552487dcadbc8b1aa6ac9bef0c24df23e67637b4e2a2f63952c1e70"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\windows.storage.dll",
+          "sha256": "718c890022323ed8e38a3beb7a143df9e5d680b006c3f1fd28754eeb7cd82010"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\Wldp.dll",
+          "sha256": "c2a7ed84bdd3cf931fdcc5782cea58c376b1a2841fcc6f954e65812deff50389"
+        },
+        {
+          "path": "C:\\windows\\System32\\OLEAUT32.dll",
+          "sha256": "4dd40579e7254dd553b49b229aa85b9c079586b034e37e564909da25eb298345"
+        },
+        {
+          "path": "C:\\windows\\System32\\SHCORE.dll",
+          "sha256": "63257882eb0d0d08ccc275287e11e7213ec26946185e3f3116316c249708a920"
+        },
+        {
+          "path": "C:\\windows\\System32\\shlwapi.dll",
+          "sha256": "eb70b465352f04f188cd12affd72b44f14770e6bfd98f6a6570b62ef21873297"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdfcl64.dll",
+          "sha256": "4aafd9f797a227cdab388853ba835a5670f384ca98395e859a4cf7810b8d68ae"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igc-default64.dll",
+          "sha256": "55559222a70929c46c7b4000e019bfe5126fa8c051037cfdf62ac6f29ba53a89"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\dxcore.dll",
+          "sha256": "c4976547ea4ecf3faa1c82e03acfc6344f944203a660f137d938bb53f3495f53"
+        },
+        {
+          "path": "C:\\windows\\System32\\kernel.appcore.dll",
+          "sha256": "abff38d9efaca07602acc2a31775f8790ac720261842dbb6d7d9e1a46bba91f8"
+        }
+      ],
+      "exit_code": 0,
+      "log_sha256": "b3f880b1f60ccb9d71cbdb2df881830c7bb533a6203378ec438697c9d5b5801d",
+      "post_zero_diagnostic_triggered": false
+    },
+    {
+      "label": "capacity8",
+      "args": [
+        "--pack",
+        "G:\\GitHub\\Strata-data\\packs\\iq2_xs",
+        "--native",
+        "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00001-of-00002.gguf",
+        "--ple-gguf",
+        "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00002-of-00002.gguf",
+        "--expert-profile",
+        "G:\\GitHub\\Strata\\data\\expert-profile.bin",
+        "--expert-cache",
+        "6000",
+        "--prefill",
+        "8192",
+        "--spec",
+        "8",
+        "--spec-min-p",
+        "0.5",
+        "--mtp",
+        "G:\\GitHub\\Strata-data\\mtp\\rt-full-vocab-current",
+        "--max-context",
+        "8192",
+        "--stream-experts",
+        "--vram-reserve-mib",
+        "1024",
+        "--pcie-frac",
+        "0.16",
+        "--prompt-cache",
+        "0",
+        "--short-read",
+        "1024",
+        "--adapt-every",
+        "1",
+        "--adapt-swaps",
+        "32",
+        "--prefill-borrow",
+        "--mtp-window",
+        "1024",
+        "--mtp-hnorm",
+        "stream",
+        "--adapt-decay",
+        "0.5",
+        "--suffix-draft",
+        "0"
+      ],
+      "rows": [
+        {
+          "tokens": [
+            29108,
+            4009,
+            27891,
+            8964,
+            579,
+            16078,
+            321,
+            1100,
+            9872,
+            303,
+            660,
+            17425,
+            11,
+            694,
+            22602,
+            6105,
+            89661,
+            513,
+            35742,
+            777,
+            28750,
+            1056,
+            4860,
+            2438,
+            89661,
+            4016,
+            310,
+            12870,
+            60845,
+            69377,
+            13,
+            1061,
+            10386,
+            2209,
+            69377,
+            10814,
+            6105,
+            3000,
+            310,
+            5372,
+            1004,
+            6213,
+            494,
+            660,
+            5306,
+            314,
+            279,
+            12515,
+            11,
+            3154,
+            424,
+            4833,
+            6105,
+            13,
+            50275,
+            11,
+            567,
+            42918,
+            279,
+            12515,
+            430,
+            6105,
+            4598,
+            1056
+          ],
+          "generated": 64,
+          "prompt_tokens": 23,
+          "prompt_ms": 1099.9,
+          "decode_ms": 3053.0,
+          "finish": "length",
+          "accepted": 43,
+          "offered": 68,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 1183.7333000003127,
+          "done": "DONE 64 23 1099.9 3053.0 length 43 68 0 0 0 0 0 0.0 23 0",
+          "case": "Short",
+          "mismatched_fields": []
+        },
+        {
+          "tokens": [
+            760,
+            3766,
+            1970,
+            41643,
+            10551,
+            264,
+            4281,
+            314,
+            12654,
+            5568,
+            11,
+            28853,
+            1510,
+            7945,
+            62,
+            15,
+            63,
+            1472,
+            1510,
+            7945,
+            62,
+            22,
+            17,
+            7561,
+            864,
+            4072,
+            264,
+            3050,
+            34780,
+            17454,
+            383,
+            449,
+            1879,
+            3759,
+            1510,
+            87,
+            27653,
+            1946,
+            3418,
+            279,
+            3558,
+            303,
+            7472,
+            11,
+            567,
+            1902,
+            22903,
+            279,
+            5759,
+            11,
+            279,
+            34780,
+            5215,
+            11,
+            279,
+            42441,
+            33633,
+            6197,
+            11,
+            321,
+            279,
+            4499,
+            52652,
+            23398
+          ],
+          "generated": 64,
+          "prompt_tokens": 2048,
+          "prompt_ms": 34584.5,
+          "decode_ms": 2363.6,
+          "finish": "length",
+          "accepted": 41,
+          "offered": 49,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 34637.74210000702,
+          "done": "DONE 64 2048 34584.5 2363.6 length 41 49 0 0 0 0 0 0.0 2048 0",
+          "case": "Code2K",
+          "mismatched_fields": []
+        }
+      ],
+      "modules_startup": [
+        {
+          "path": "G:\\GitHub\\Strata\\build-orca-native-20261029\\clean-root-orca-1793380617150969000\\build\\orca\\strata.exe",
+          "sha256": "1407a8e4cb936262f3bfc0a359edc7676edba56d7a8837abcbbd6920c0e31940"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ntdll.dll",
+          "sha256": "36b1a62e4bf6bf7d68458fff6e8a33b39f6527ec6a46e55ecdd12cde83894c8d"
+        },
+        {
+          "path": "C:\\windows\\System32\\KERNEL32.DLL",
+          "sha256": "4636f65d449b1353100578c6cb139933cf2b134f5e246119d18968873a058bed"
+        },
+        {
+          "path": "C:\\windows\\System32\\KERNELBASE.dll",
+          "sha256": "b4ad8c8e3632104f4d2132ecb8979b8df279f0046dc42e79bed5acb744751871"
+        },
+        {
+          "path": "C:\\windows\\System32\\ADVAPI32.dll",
+          "sha256": "bde5f0e6f36a706a8a2e0fab1b362eea267aa6ee9f18aab1f899f38888c21280"
+        },
+        {
+          "path": "C:\\windows\\System32\\msvcrt.dll",
+          "sha256": "a7f4196d9476d36894ce17c3b0dd97504ca2cc31b3e0a774fee326e867565885"
+        },
+        {
+          "path": "C:\\windows\\System32\\sechost.dll",
+          "sha256": "54756c8bc96e3baf57ee58e4f73ca10183c8267d208efe7819a256eca53361a0"
+        },
+        {
+          "path": "C:\\windows\\System32\\RPCRT4.dll",
+          "sha256": "b9decb81fcf8ef9a6b674072da5676322b925c73b3c8c9253805db7510d9c493"
+        },
+        {
+          "path": "C:\\windows\\System32\\bcrypt.dll",
+          "sha256": "811af66dd7e323a74db80648610bbebb956093ae7bd91c5b950ed6aca13d8026"
+        },
+        {
+          "path": "C:\\windows\\System32\\ucrtbase.dll",
+          "sha256": "3c60056371f82e4744185b6f2fa0c69042b1e78804685944132974dd13f3b6d9"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ze_loader.dll",
+          "sha256": "a56a109788c97ed42275803202e42a44c591a24064a038e6aa3cbc5908f98b4b"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\MSVCP140.dll",
+          "sha256": "def46aa6a8f72f27bafac0c43334419486a4d1dcdb6c479a8ef7034b3e1fa4cb"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\MSVCP140_ATOMIC_WAIT.dll",
+          "sha256": "e7963645e0d1db08e300614d4c5fa7194bd8173e9ab7a5558859e6b232ed3241"
+        },
+        {
+          "path": "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin\\libmmd.dll",
+          "sha256": "0e8e285e2d1cb7dbe6018371fd5fd9763e9b3a574f516ff000f606433fe3cc10"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VCRUNTIME140_1.dll",
+          "sha256": "e6bfb3662ab4b1969a73441dbe35c96d51441b6bff8cf1fe7430bd5b246ca605"
+        },
+        {
+          "path": "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin\\svml_dispmd.dll",
+          "sha256": "03b6af2ab4dac88fa5d80ddded702aeb7cfd3f0460e63425ded73d7a755a1dce"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VCRUNTIME140.dll",
+          "sha256": "184146852727a9db4eea06178716bec3cdbb1015c911f6b0f915b184ad7775b2"
+        },
+        {
+          "path": "C:\\windows\\System32\\CFGMGR32.dll",
+          "sha256": "7fefd329b398827d6babf33973eaa2c0dc580fe1f3b291efa4793e795e4df8fa"
+        },
+        {
+          "path": "C:\\windows\\System32\\ole32.dll",
+          "sha256": "4a7b8ed9f2aeca875f948d9a1bce8b8d177744475f253704362792d7182d55f2"
+        },
+        {
+          "path": "C:\\windows\\System32\\combase.dll",
+          "sha256": "e1ed05c78ccd1056f106468b551f846a4f7e1d46d925223755c44f3191730993"
+        },
+        {
+          "path": "C:\\windows\\System32\\GDI32.dll",
+          "sha256": "b5f5a3f16d03366cdb02020fc4dadceb0892e243f8aa94d205e124045da9457f"
+        },
+        {
+          "path": "C:\\windows\\System32\\win32u.dll",
+          "sha256": "20ac4556b0b3fc82bd5632ffc623a45497184483e14a2841ac30213e162daf1f"
+        },
+        {
+          "path": "C:\\windows\\System32\\gdi32full.dll",
+          "sha256": "724754c47bcd7a2739816c7cefbc75382515538a15ccb73a8342043a16453772"
+        },
+        {
+          "path": "C:\\windows\\System32\\msvcp_win.dll",
+          "sha256": "2a7825c2925347e0cb767a0dcb611f3eb80d0f71cbec981069b227bdc7cb871a"
+        },
+        {
+          "path": "C:\\windows\\System32\\USER32.dll",
+          "sha256": "82870be1e008d5232cb175ebc815f645a2add4c0b164fd4ba20744192c1c81f7"
+        },
+        {
+          "path": "C:\\windows\\System32\\IMM32.DLL",
+          "sha256": "2a882bc0df58f4f6dd906889b1fb6d7b7bc70da7109e016e0f1e67b264d073b6"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\ze_intel_gpu64.dll",
+          "sha256": "e291d6c88c85d85751d3e2ba26d5510e1abb3a1f6d255f8f25b9aa2843ecf96d"
+        },
+        {
+          "path": "C:\\windows\\System32\\dxgi.dll",
+          "sha256": "d33765793e32eff65f9103efe2419184ab0b6289e69e69ce85aa7568f678c3b5"
+        },
+        {
+          "path": "C:\\windows\\System32\\WS2_32.dll",
+          "sha256": "5e9857a80a301ad21d0e0a0928a4ff2b5360c305a97bfc88886e3b686bf8d503"
+        },
+        {
+          "path": "C:\\windows\\System32\\SETUPAPI.dll",
+          "sha256": "3777075e8391c40c21fd5662845f5e2928d3cfd2b6abdf4003e087d2089cb853"
+        },
+        {
+          "path": "C:\\windows\\System32\\SHELL32.dll",
+          "sha256": "936c33a8283196a070aa6f844a65a29a8f99f760eae0016754c1cbf17d62bdb7"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\WINMM.dll",
+          "sha256": "ead9055dc522bcab041c8eb7b875adb681a2f1fa851d4075789d78d0242711a0"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VERSION.dll",
+          "sha256": "af45a728552ccfdcd9435c40ace60a9354d7c1b52abf507a2f1cb371dada4fde"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ze_tracing_layer.dll",
+          "sha256": "d3f8f8c4bd055c464495703761f5754c140137e4c457f60a168e35085ee2c51f"
+        },
+        {
+          "path": "C:\\windows\\System32\\bcryptPrimitives.dll",
+          "sha256": "f0a1662d0f55533a21d609f8dc737288ede77d314d90e885ca9e6ef79d429c3b"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmm2_64.dll",
+          "sha256": "db2ea2a6f271cc85d097dc13176e153e5ebf67775155df162b768a75ed863a2e"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmm64.dll",
+          "sha256": "db3b3d6fbc6aba6ba156080224916c1fefcb1080f0ea3927727f52626623c681"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmmstaging_64.dll",
+          "sha256": "994d22569552487dcadbc8b1aa6ac9bef0c24df23e67637b4e2a2f63952c1e70"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\windows.storage.dll",
+          "sha256": "718c890022323ed8e38a3beb7a143df9e5d680b006c3f1fd28754eeb7cd82010"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\Wldp.dll",
+          "sha256": "c2a7ed84bdd3cf931fdcc5782cea58c376b1a2841fcc6f954e65812deff50389"
+        },
+        {
+          "path": "C:\\windows\\System32\\OLEAUT32.dll",
+          "sha256": "4dd40579e7254dd553b49b229aa85b9c079586b034e37e564909da25eb298345"
+        },
+        {
+          "path": "C:\\windows\\System32\\SHCORE.dll",
+          "sha256": "63257882eb0d0d08ccc275287e11e7213ec26946185e3f3116316c249708a920"
+        },
+        {
+          "path": "C:\\windows\\System32\\shlwapi.dll",
+          "sha256": "eb70b465352f04f188cd12affd72b44f14770e6bfd98f6a6570b62ef21873297"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdfcl64.dll",
+          "sha256": "4aafd9f797a227cdab388853ba835a5670f384ca98395e859a4cf7810b8d68ae"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igc-default64.dll",
+          "sha256": "55559222a70929c46c7b4000e019bfe5126fa8c051037cfdf62ac6f29ba53a89"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\dxcore.dll",
+          "sha256": "c4976547ea4ecf3faa1c82e03acfc6344f944203a660f137d938bb53f3495f53"
+        },
+        {
+          "path": "C:\\windows\\System32\\kernel.appcore.dll",
+          "sha256": "abff38d9efaca07602acc2a31775f8790ac720261842dbb6d7d9e1a46bba91f8"
+        }
+      ],
+      "modules_workload": [
+        {
+          "path": "G:\\GitHub\\Strata\\build-orca-native-20261029\\clean-root-orca-1793380617150969000\\build\\orca\\strata.exe",
+          "sha256": "1407a8e4cb936262f3bfc0a359edc7676edba56d7a8837abcbbd6920c0e31940"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ntdll.dll",
+          "sha256": "36b1a62e4bf6bf7d68458fff6e8a33b39f6527ec6a46e55ecdd12cde83894c8d"
+        },
+        {
+          "path": "C:\\windows\\System32\\KERNEL32.DLL",
+          "sha256": "4636f65d449b1353100578c6cb139933cf2b134f5e246119d18968873a058bed"
+        },
+        {
+          "path": "C:\\windows\\System32\\KERNELBASE.dll",
+          "sha256": "b4ad8c8e3632104f4d2132ecb8979b8df279f0046dc42e79bed5acb744751871"
+        },
+        {
+          "path": "C:\\windows\\System32\\ADVAPI32.dll",
+          "sha256": "bde5f0e6f36a706a8a2e0fab1b362eea267aa6ee9f18aab1f899f38888c21280"
+        },
+        {
+          "path": "C:\\windows\\System32\\msvcrt.dll",
+          "sha256": "a7f4196d9476d36894ce17c3b0dd97504ca2cc31b3e0a774fee326e867565885"
+        },
+        {
+          "path": "C:\\windows\\System32\\sechost.dll",
+          "sha256": "54756c8bc96e3baf57ee58e4f73ca10183c8267d208efe7819a256eca53361a0"
+        },
+        {
+          "path": "C:\\windows\\System32\\RPCRT4.dll",
+          "sha256": "b9decb81fcf8ef9a6b674072da5676322b925c73b3c8c9253805db7510d9c493"
+        },
+        {
+          "path": "C:\\windows\\System32\\bcrypt.dll",
+          "sha256": "811af66dd7e323a74db80648610bbebb956093ae7bd91c5b950ed6aca13d8026"
+        },
+        {
+          "path": "C:\\windows\\System32\\ucrtbase.dll",
+          "sha256": "3c60056371f82e4744185b6f2fa0c69042b1e78804685944132974dd13f3b6d9"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ze_loader.dll",
+          "sha256": "a56a109788c97ed42275803202e42a44c591a24064a038e6aa3cbc5908f98b4b"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\MSVCP140.dll",
+          "sha256": "def46aa6a8f72f27bafac0c43334419486a4d1dcdb6c479a8ef7034b3e1fa4cb"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\MSVCP140_ATOMIC_WAIT.dll",
+          "sha256": "e7963645e0d1db08e300614d4c5fa7194bd8173e9ab7a5558859e6b232ed3241"
+        },
+        {
+          "path": "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin\\libmmd.dll",
+          "sha256": "0e8e285e2d1cb7dbe6018371fd5fd9763e9b3a574f516ff000f606433fe3cc10"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VCRUNTIME140_1.dll",
+          "sha256": "e6bfb3662ab4b1969a73441dbe35c96d51441b6bff8cf1fe7430bd5b246ca605"
+        },
+        {
+          "path": "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin\\svml_dispmd.dll",
+          "sha256": "03b6af2ab4dac88fa5d80ddded702aeb7cfd3f0460e63425ded73d7a755a1dce"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VCRUNTIME140.dll",
+          "sha256": "184146852727a9db4eea06178716bec3cdbb1015c911f6b0f915b184ad7775b2"
+        },
+        {
+          "path": "C:\\windows\\System32\\CFGMGR32.dll",
+          "sha256": "7fefd329b398827d6babf33973eaa2c0dc580fe1f3b291efa4793e795e4df8fa"
+        },
+        {
+          "path": "C:\\windows\\System32\\ole32.dll",
+          "sha256": "4a7b8ed9f2aeca875f948d9a1bce8b8d177744475f253704362792d7182d55f2"
+        },
+        {
+          "path": "C:\\windows\\System32\\combase.dll",
+          "sha256": "e1ed05c78ccd1056f106468b551f846a4f7e1d46d925223755c44f3191730993"
+        },
+        {
+          "path": "C:\\windows\\System32\\GDI32.dll",
+          "sha256": "b5f5a3f16d03366cdb02020fc4dadceb0892e243f8aa94d205e124045da9457f"
+        },
+        {
+          "path": "C:\\windows\\System32\\win32u.dll",
+          "sha256": "20ac4556b0b3fc82bd5632ffc623a45497184483e14a2841ac30213e162daf1f"
+        },
+        {
+          "path": "C:\\windows\\System32\\gdi32full.dll",
+          "sha256": "724754c47bcd7a2739816c7cefbc75382515538a15ccb73a8342043a16453772"
+        },
+        {
+          "path": "C:\\windows\\System32\\msvcp_win.dll",
+          "sha256": "2a7825c2925347e0cb767a0dcb611f3eb80d0f71cbec981069b227bdc7cb871a"
+        },
+        {
+          "path": "C:\\windows\\System32\\USER32.dll",
+          "sha256": "82870be1e008d5232cb175ebc815f645a2add4c0b164fd4ba20744192c1c81f7"
+        },
+        {
+          "path": "C:\\windows\\System32\\IMM32.DLL",
+          "sha256": "2a882bc0df58f4f6dd906889b1fb6d7b7bc70da7109e016e0f1e67b264d073b6"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\ze_intel_gpu64.dll",
+          "sha256": "e291d6c88c85d85751d3e2ba26d5510e1abb3a1f6d255f8f25b9aa2843ecf96d"
+        },
+        {
+          "path": "C:\\windows\\System32\\dxgi.dll",
+          "sha256": "d33765793e32eff65f9103efe2419184ab0b6289e69e69ce85aa7568f678c3b5"
+        },
+        {
+          "path": "C:\\windows\\System32\\WS2_32.dll",
+          "sha256": "5e9857a80a301ad21d0e0a0928a4ff2b5360c305a97bfc88886e3b686bf8d503"
+        },
+        {
+          "path": "C:\\windows\\System32\\SETUPAPI.dll",
+          "sha256": "3777075e8391c40c21fd5662845f5e2928d3cfd2b6abdf4003e087d2089cb853"
+        },
+        {
+          "path": "C:\\windows\\System32\\SHELL32.dll",
+          "sha256": "936c33a8283196a070aa6f844a65a29a8f99f760eae0016754c1cbf17d62bdb7"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\WINMM.dll",
+          "sha256": "ead9055dc522bcab041c8eb7b875adb681a2f1fa851d4075789d78d0242711a0"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VERSION.dll",
+          "sha256": "af45a728552ccfdcd9435c40ace60a9354d7c1b52abf507a2f1cb371dada4fde"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ze_tracing_layer.dll",
+          "sha256": "d3f8f8c4bd055c464495703761f5754c140137e4c457f60a168e35085ee2c51f"
+        },
+        {
+          "path": "C:\\windows\\System32\\bcryptPrimitives.dll",
+          "sha256": "f0a1662d0f55533a21d609f8dc737288ede77d314d90e885ca9e6ef79d429c3b"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmm2_64.dll",
+          "sha256": "db2ea2a6f271cc85d097dc13176e153e5ebf67775155df162b768a75ed863a2e"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmm64.dll",
+          "sha256": "db3b3d6fbc6aba6ba156080224916c1fefcb1080f0ea3927727f52626623c681"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmmstaging_64.dll",
+          "sha256": "994d22569552487dcadbc8b1aa6ac9bef0c24df23e67637b4e2a2f63952c1e70"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\windows.storage.dll",
+          "sha256": "718c890022323ed8e38a3beb7a143df9e5d680b006c3f1fd28754eeb7cd82010"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\Wldp.dll",
+          "sha256": "c2a7ed84bdd3cf931fdcc5782cea58c376b1a2841fcc6f954e65812deff50389"
+        },
+        {
+          "path": "C:\\windows\\System32\\OLEAUT32.dll",
+          "sha256": "4dd40579e7254dd553b49b229aa85b9c079586b034e37e564909da25eb298345"
+        },
+        {
+          "path": "C:\\windows\\System32\\SHCORE.dll",
+          "sha256": "63257882eb0d0d08ccc275287e11e7213ec26946185e3f3116316c249708a920"
+        },
+        {
+          "path": "C:\\windows\\System32\\shlwapi.dll",
+          "sha256": "eb70b465352f04f188cd12affd72b44f14770e6bfd98f6a6570b62ef21873297"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdfcl64.dll",
+          "sha256": "4aafd9f797a227cdab388853ba835a5670f384ca98395e859a4cf7810b8d68ae"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igc-default64.dll",
+          "sha256": "55559222a70929c46c7b4000e019bfe5126fa8c051037cfdf62ac6f29ba53a89"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\dxcore.dll",
+          "sha256": "c4976547ea4ecf3faa1c82e03acfc6344f944203a660f137d938bb53f3495f53"
+        },
+        {
+          "path": "C:\\windows\\System32\\kernel.appcore.dll",
+          "sha256": "abff38d9efaca07602acc2a31775f8790ac720261842dbb6d7d9e1a46bba91f8"
+        }
+      ],
+      "exit_code": 0,
+      "log_sha256": "46e65eee06b74f955058ef9f9bc05da38c33f8c9155d57dccf83e75bbe77c52d",
+      "post_zero_diagnostic_triggered": false
+    },
+    {
+      "label": "multichunk0",
+      "args": [
+        "--pack",
+        "G:\\GitHub\\Strata-data\\packs\\iq2_xs",
+        "--native",
+        "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00001-of-00002.gguf",
+        "--ple-gguf",
+        "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00002-of-00002.gguf",
+        "--expert-profile",
+        "G:\\GitHub\\Strata\\data\\expert-profile.bin",
+        "--expert-cache",
+        "6000",
+        "--prefill",
+        "1024",
+        "--spec",
+        "8",
+        "--spec-min-p",
+        "0.5",
+        "--mtp",
+        "G:\\GitHub\\Strata-data\\mtp\\rt-full-vocab-current",
+        "--max-context",
+        "8192",
+        "--stream-experts",
+        "--vram-reserve-mib",
+        "1024",
+        "--pcie-frac",
+        "0.16",
+        "--prompt-cache",
+        "0",
+        "--short-read",
+        "1024",
+        "--adapt-every",
+        "1",
+        "--adapt-swaps",
+        "32",
+        "--prefill-borrow",
+        "--mtp-window",
+        "1024",
+        "--mtp-hnorm",
+        "stream",
+        "--adapt-decay",
+        "0.5",
+        "--suffix-draft",
+        "0"
+      ],
+      "rows": [
+        {
+          "tokens": [
+            760,
+            3766,
+            1970,
+            41643,
+            10551,
+            264,
+            4281,
+            314,
+            12654,
+            5568,
+            11,
+            28853,
+            1510,
+            7945,
+            62,
+            15,
+            63,
+            1472,
+            1510,
+            7945,
+            62,
+            22,
+            17,
+            7561,
+            864,
+            4072,
+            264,
+            3050,
+            34780,
+            17454,
+            383,
+            449,
+            1879,
+            3759,
+            1510,
+            87,
+            27653,
+            1946,
+            3418,
+            279,
+            3558,
+            303,
+            7472,
+            11,
+            567,
+            1902,
+            22903,
+            279,
+            5759,
+            11,
+            279,
+            34780,
+            5215,
+            11,
+            279,
+            42441,
+            33633,
+            6197,
+            11,
+            321,
+            279,
+            4499,
+            52652,
+            23398
+          ],
+          "generated": 64,
+          "prompt_tokens": 2048,
+          "prompt_ms": 47497.5,
+          "decode_ms": 2819.8,
+          "finish": "length",
+          "accepted": 41,
+          "offered": 49,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 47799.54930000531,
+          "done": "DONE 64 2048 47497.5 2819.8 length 41 49 0 0 0 0 0 0.0 2048 0",
+          "case": "Code2K",
+          "mismatched_fields": []
+        },
+        {
+          "tokens": [
+            760,
+            3766,
+            1414,
+            17855,
+            264,
+            25450,
+            321,
+            13987,
+            62342,
+            3010,
+            314,
+            795,
+            51623,
+            11,
+            31838,
+            430,
+            264,
+            328,
+            79097,
+            220,
+            15,
+            11,
+            1105,
+            1248,
+            1149,
+            2332,
+            1141,
+            6007,
+            11,
+            279,
+            3558,
+            16661,
+            314,
+            264,
+            3074,
+            11,
+            1064,
+            11316,
+            11173,
+            3408,
+            2586,
+            3808,
+            220,
+            18,
+            17,
+            17,
+            12103,
+            13753,
+            11,
+            28853,
+            91291,
+            494,
+            10790,
+            220,
+            15,
+            310,
+            10790,
+            220,
+            18,
+            17,
+            16,
+            13,
+            561,
+            11316
+          ],
+          "generated": 64,
+          "prompt_tokens": 8000,
+          "prompt_ms": 174180.9,
+          "decode_ms": 2631.3,
+          "finish": "length",
+          "accepted": 35,
+          "offered": 57,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 174232.56070000934,
+          "done": "DONE 64 8000 174180.9 2631.3 length 35 57 0 0 0 0 0 0.0 8000 0",
+          "case": "Long8K",
+          "mismatched_fields": []
+        },
+        {
+          "tokens": [
+            29108,
+            4009,
+            27891,
+            8964,
+            579,
+            16078,
+            321,
+            1100,
+            9872,
+            303,
+            660,
+            17425,
+            11,
+            694,
+            22602,
+            6105,
+            89661,
+            513,
+            35742,
+            777,
+            28750,
+            1056,
+            4860,
+            2438,
+            89661,
+            4016,
+            310,
+            12870,
+            60845,
+            69377,
+            13,
+            1061,
+            10386,
+            2209,
+            69377,
+            10814,
+            6105,
+            3000,
+            310,
+            5372,
+            1004,
+            6213,
+            494,
+            660,
+            5306,
+            314,
+            279,
+            12515,
+            11,
+            3154,
+            424,
+            4833,
+            6105,
+            13,
+            50275,
+            11,
+            567,
+            42918,
+            279,
+            12515,
+            430,
+            6105,
+            4598,
+            1056
+          ],
+          "generated": 64,
+          "prompt_tokens": 23,
+          "prompt_ms": 729.2,
+          "decode_ms": 2837.4,
+          "finish": "length",
+          "accepted": 43,
+          "offered": 68,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 781.8026000022655,
+          "done": "DONE 64 23 729.2 2837.4 length 43 68 0 0 0 0 0 0.0 23 0",
+          "case": "Short",
+          "mismatched_fields": []
+        },
+        {
+          "tokens": [
+            760,
+            3766,
+            1970,
+            41643,
+            10551,
+            264,
+            4281,
+            314,
+            12654,
+            5568,
+            11,
+            28853,
+            1510,
+            7945,
+            62,
+            15,
+            63,
+            1472,
+            1510,
+            7945,
+            62,
+            22,
+            17,
+            7561,
+            864,
+            4072,
+            264,
+            3050,
+            34780,
+            17454,
+            383,
+            449,
+            1879,
+            3759,
+            1510,
+            87,
+            27653,
+            1946,
+            3418,
+            279,
+            3558,
+            303,
+            7472,
+            11,
+            567,
+            1902,
+            22903,
+            279,
+            5759,
+            11,
+            279,
+            34780,
+            5215,
+            11,
+            279,
+            42441,
+            33633,
+            6197,
+            11,
+            321,
+            279,
+            4499,
+            52652,
+            23398
+          ],
+          "generated": 64,
+          "prompt_tokens": 2048,
+          "prompt_ms": 47957.7,
+          "decode_ms": 2106.2,
+          "finish": "length",
+          "accepted": 41,
+          "offered": 49,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 48004.46219999867,
+          "done": "DONE 64 2048 47957.7 2106.2 length 41 49 0 0 0 0 0 0.0 2048 0",
+          "case": "Code2K",
+          "mismatched_fields": []
+        }
+      ],
+      "modules_startup": [
+        {
+          "path": "G:\\GitHub\\Strata\\build-orca-native-20261029\\clean-root-orca-1793380617150969000\\build\\orca\\strata.exe",
+          "sha256": "1407a8e4cb936262f3bfc0a359edc7676edba56d7a8837abcbbd6920c0e31940"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ntdll.dll",
+          "sha256": "36b1a62e4bf6bf7d68458fff6e8a33b39f6527ec6a46e55ecdd12cde83894c8d"
+        },
+        {
+          "path": "C:\\windows\\System32\\KERNEL32.DLL",
+          "sha256": "4636f65d449b1353100578c6cb139933cf2b134f5e246119d18968873a058bed"
+        },
+        {
+          "path": "C:\\windows\\System32\\KERNELBASE.dll",
+          "sha256": "b4ad8c8e3632104f4d2132ecb8979b8df279f0046dc42e79bed5acb744751871"
+        },
+        {
+          "path": "C:\\windows\\System32\\ADVAPI32.dll",
+          "sha256": "bde5f0e6f36a706a8a2e0fab1b362eea267aa6ee9f18aab1f899f38888c21280"
+        },
+        {
+          "path": "C:\\windows\\System32\\msvcrt.dll",
+          "sha256": "a7f4196d9476d36894ce17c3b0dd97504ca2cc31b3e0a774fee326e867565885"
+        },
+        {
+          "path": "C:\\windows\\System32\\sechost.dll",
+          "sha256": "54756c8bc96e3baf57ee58e4f73ca10183c8267d208efe7819a256eca53361a0"
+        },
+        {
+          "path": "C:\\windows\\System32\\RPCRT4.dll",
+          "sha256": "b9decb81fcf8ef9a6b674072da5676322b925c73b3c8c9253805db7510d9c493"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ze_loader.dll",
+          "sha256": "a56a109788c97ed42275803202e42a44c591a24064a038e6aa3cbc5908f98b4b"
+        },
+        {
+          "path": "C:\\windows\\System32\\bcrypt.dll",
+          "sha256": "811af66dd7e323a74db80648610bbebb956093ae7bd91c5b950ed6aca13d8026"
+        },
+        {
+          "path": "C:\\windows\\System32\\ucrtbase.dll",
+          "sha256": "3c60056371f82e4744185b6f2fa0c69042b1e78804685944132974dd13f3b6d9"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\MSVCP140_ATOMIC_WAIT.dll",
+          "sha256": "e7963645e0d1db08e300614d4c5fa7194bd8173e9ab7a5558859e6b232ed3241"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\MSVCP140.dll",
+          "sha256": "def46aa6a8f72f27bafac0c43334419486a4d1dcdb6c479a8ef7034b3e1fa4cb"
+        },
+        {
+          "path": "C:\\windows\\System32\\CFGMGR32.dll",
+          "sha256": "7fefd329b398827d6babf33973eaa2c0dc580fe1f3b291efa4793e795e4df8fa"
+        },
+        {
+          "path": "C:\\windows\\System32\\ole32.dll",
+          "sha256": "4a7b8ed9f2aeca875f948d9a1bce8b8d177744475f253704362792d7182d55f2"
+        },
+        {
+          "path": "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin\\libmmd.dll",
+          "sha256": "0e8e285e2d1cb7dbe6018371fd5fd9763e9b3a574f516ff000f606433fe3cc10"
+        },
+        {
+          "path": "C:\\windows\\System32\\combase.dll",
+          "sha256": "e1ed05c78ccd1056f106468b551f846a4f7e1d46d925223755c44f3191730993"
+        },
+        {
+          "path": "C:\\windows\\System32\\GDI32.dll",
+          "sha256": "b5f5a3f16d03366cdb02020fc4dadceb0892e243f8aa94d205e124045da9457f"
+        },
+        {
+          "path": "C:\\windows\\System32\\win32u.dll",
+          "sha256": "20ac4556b0b3fc82bd5632ffc623a45497184483e14a2841ac30213e162daf1f"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VCRUNTIME140_1.dll",
+          "sha256": "e6bfb3662ab4b1969a73441dbe35c96d51441b6bff8cf1fe7430bd5b246ca605"
+        },
+        {
+          "path": "C:\\windows\\System32\\gdi32full.dll",
+          "sha256": "724754c47bcd7a2739816c7cefbc75382515538a15ccb73a8342043a16453772"
+        },
+        {
+          "path": "C:\\windows\\System32\\msvcp_win.dll",
+          "sha256": "2a7825c2925347e0cb767a0dcb611f3eb80d0f71cbec981069b227bdc7cb871a"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VCRUNTIME140.dll",
+          "sha256": "184146852727a9db4eea06178716bec3cdbb1015c911f6b0f915b184ad7775b2"
+        },
+        {
+          "path": "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin\\svml_dispmd.dll",
+          "sha256": "03b6af2ab4dac88fa5d80ddded702aeb7cfd3f0460e63425ded73d7a755a1dce"
+        },
+        {
+          "path": "C:\\windows\\System32\\USER32.dll",
+          "sha256": "82870be1e008d5232cb175ebc815f645a2add4c0b164fd4ba20744192c1c81f7"
+        },
+        {
+          "path": "C:\\windows\\System32\\IMM32.DLL",
+          "sha256": "2a882bc0df58f4f6dd906889b1fb6d7b7bc70da7109e016e0f1e67b264d073b6"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\ze_intel_gpu64.dll",
+          "sha256": "e291d6c88c85d85751d3e2ba26d5510e1abb3a1f6d255f8f25b9aa2843ecf96d"
+        },
+        {
+          "path": "C:\\windows\\System32\\dxgi.dll",
+          "sha256": "d33765793e32eff65f9103efe2419184ab0b6289e69e69ce85aa7568f678c3b5"
+        },
+        {
+          "path": "C:\\windows\\System32\\WS2_32.dll",
+          "sha256": "5e9857a80a301ad21d0e0a0928a4ff2b5360c305a97bfc88886e3b686bf8d503"
+        },
+        {
+          "path": "C:\\windows\\System32\\SETUPAPI.dll",
+          "sha256": "3777075e8391c40c21fd5662845f5e2928d3cfd2b6abdf4003e087d2089cb853"
+        },
+        {
+          "path": "C:\\windows\\System32\\SHELL32.dll",
+          "sha256": "936c33a8283196a070aa6f844a65a29a8f99f760eae0016754c1cbf17d62bdb7"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VERSION.dll",
+          "sha256": "af45a728552ccfdcd9435c40ace60a9354d7c1b52abf507a2f1cb371dada4fde"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\WINMM.dll",
+          "sha256": "ead9055dc522bcab041c8eb7b875adb681a2f1fa851d4075789d78d0242711a0"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ze_tracing_layer.dll",
+          "sha256": "d3f8f8c4bd055c464495703761f5754c140137e4c457f60a168e35085ee2c51f"
+        },
+        {
+          "path": "C:\\windows\\System32\\bcryptPrimitives.dll",
+          "sha256": "f0a1662d0f55533a21d609f8dc737288ede77d314d90e885ca9e6ef79d429c3b"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmm2_64.dll",
+          "sha256": "db2ea2a6f271cc85d097dc13176e153e5ebf67775155df162b768a75ed863a2e"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmm64.dll",
+          "sha256": "db3b3d6fbc6aba6ba156080224916c1fefcb1080f0ea3927727f52626623c681"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmmstaging_64.dll",
+          "sha256": "994d22569552487dcadbc8b1aa6ac9bef0c24df23e67637b4e2a2f63952c1e70"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\windows.storage.dll",
+          "sha256": "718c890022323ed8e38a3beb7a143df9e5d680b006c3f1fd28754eeb7cd82010"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\Wldp.dll",
+          "sha256": "c2a7ed84bdd3cf931fdcc5782cea58c376b1a2841fcc6f954e65812deff50389"
+        },
+        {
+          "path": "C:\\windows\\System32\\OLEAUT32.dll",
+          "sha256": "4dd40579e7254dd553b49b229aa85b9c079586b034e37e564909da25eb298345"
+        },
+        {
+          "path": "C:\\windows\\System32\\SHCORE.dll",
+          "sha256": "63257882eb0d0d08ccc275287e11e7213ec26946185e3f3116316c249708a920"
+        },
+        {
+          "path": "C:\\windows\\System32\\shlwapi.dll",
+          "sha256": "eb70b465352f04f188cd12affd72b44f14770e6bfd98f6a6570b62ef21873297"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdfcl64.dll",
+          "sha256": "4aafd9f797a227cdab388853ba835a5670f384ca98395e859a4cf7810b8d68ae"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igc-default64.dll",
+          "sha256": "55559222a70929c46c7b4000e019bfe5126fa8c051037cfdf62ac6f29ba53a89"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\dxcore.dll",
+          "sha256": "c4976547ea4ecf3faa1c82e03acfc6344f944203a660f137d938bb53f3495f53"
+        },
+        {
+          "path": "C:\\windows\\System32\\kernel.appcore.dll",
+          "sha256": "abff38d9efaca07602acc2a31775f8790ac720261842dbb6d7d9e1a46bba91f8"
+        }
+      ],
+      "modules_workload": [
+        {
+          "path": "G:\\GitHub\\Strata\\build-orca-native-20261029\\clean-root-orca-1793380617150969000\\build\\orca\\strata.exe",
+          "sha256": "1407a8e4cb936262f3bfc0a359edc7676edba56d7a8837abcbbd6920c0e31940"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ntdll.dll",
+          "sha256": "36b1a62e4bf6bf7d68458fff6e8a33b39f6527ec6a46e55ecdd12cde83894c8d"
+        },
+        {
+          "path": "C:\\windows\\System32\\KERNEL32.DLL",
+          "sha256": "4636f65d449b1353100578c6cb139933cf2b134f5e246119d18968873a058bed"
+        },
+        {
+          "path": "C:\\windows\\System32\\KERNELBASE.dll",
+          "sha256": "b4ad8c8e3632104f4d2132ecb8979b8df279f0046dc42e79bed5acb744751871"
+        },
+        {
+          "path": "C:\\windows\\System32\\ADVAPI32.dll",
+          "sha256": "bde5f0e6f36a706a8a2e0fab1b362eea267aa6ee9f18aab1f899f38888c21280"
+        },
+        {
+          "path": "C:\\windows\\System32\\msvcrt.dll",
+          "sha256": "a7f4196d9476d36894ce17c3b0dd97504ca2cc31b3e0a774fee326e867565885"
+        },
+        {
+          "path": "C:\\windows\\System32\\sechost.dll",
+          "sha256": "54756c8bc96e3baf57ee58e4f73ca10183c8267d208efe7819a256eca53361a0"
+        },
+        {
+          "path": "C:\\windows\\System32\\RPCRT4.dll",
+          "sha256": "b9decb81fcf8ef9a6b674072da5676322b925c73b3c8c9253805db7510d9c493"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ze_loader.dll",
+          "sha256": "a56a109788c97ed42275803202e42a44c591a24064a038e6aa3cbc5908f98b4b"
+        },
+        {
+          "path": "C:\\windows\\System32\\bcrypt.dll",
+          "sha256": "811af66dd7e323a74db80648610bbebb956093ae7bd91c5b950ed6aca13d8026"
+        },
+        {
+          "path": "C:\\windows\\System32\\ucrtbase.dll",
+          "sha256": "3c60056371f82e4744185b6f2fa0c69042b1e78804685944132974dd13f3b6d9"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\MSVCP140_ATOMIC_WAIT.dll",
+          "sha256": "e7963645e0d1db08e300614d4c5fa7194bd8173e9ab7a5558859e6b232ed3241"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\MSVCP140.dll",
+          "sha256": "def46aa6a8f72f27bafac0c43334419486a4d1dcdb6c479a8ef7034b3e1fa4cb"
+        },
+        {
+          "path": "C:\\windows\\System32\\CFGMGR32.dll",
+          "sha256": "7fefd329b398827d6babf33973eaa2c0dc580fe1f3b291efa4793e795e4df8fa"
+        },
+        {
+          "path": "C:\\windows\\System32\\ole32.dll",
+          "sha256": "4a7b8ed9f2aeca875f948d9a1bce8b8d177744475f253704362792d7182d55f2"
+        },
+        {
+          "path": "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin\\libmmd.dll",
+          "sha256": "0e8e285e2d1cb7dbe6018371fd5fd9763e9b3a574f516ff000f606433fe3cc10"
+        },
+        {
+          "path": "C:\\windows\\System32\\combase.dll",
+          "sha256": "e1ed05c78ccd1056f106468b551f846a4f7e1d46d925223755c44f3191730993"
+        },
+        {
+          "path": "C:\\windows\\System32\\GDI32.dll",
+          "sha256": "b5f5a3f16d03366cdb02020fc4dadceb0892e243f8aa94d205e124045da9457f"
+        },
+        {
+          "path": "C:\\windows\\System32\\win32u.dll",
+          "sha256": "20ac4556b0b3fc82bd5632ffc623a45497184483e14a2841ac30213e162daf1f"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VCRUNTIME140_1.dll",
+          "sha256": "e6bfb3662ab4b1969a73441dbe35c96d51441b6bff8cf1fe7430bd5b246ca605"
+        },
+        {
+          "path": "C:\\windows\\System32\\gdi32full.dll",
+          "sha256": "724754c47bcd7a2739816c7cefbc75382515538a15ccb73a8342043a16453772"
+        },
+        {
+          "path": "C:\\windows\\System32\\msvcp_win.dll",
+          "sha256": "2a7825c2925347e0cb767a0dcb611f3eb80d0f71cbec981069b227bdc7cb871a"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VCRUNTIME140.dll",
+          "sha256": "184146852727a9db4eea06178716bec3cdbb1015c911f6b0f915b184ad7775b2"
+        },
+        {
+          "path": "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin\\svml_dispmd.dll",
+          "sha256": "03b6af2ab4dac88fa5d80ddded702aeb7cfd3f0460e63425ded73d7a755a1dce"
+        },
+        {
+          "path": "C:\\windows\\System32\\USER32.dll",
+          "sha256": "82870be1e008d5232cb175ebc815f645a2add4c0b164fd4ba20744192c1c81f7"
+        },
+        {
+          "path": "C:\\windows\\System32\\IMM32.DLL",
+          "sha256": "2a882bc0df58f4f6dd906889b1fb6d7b7bc70da7109e016e0f1e67b264d073b6"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\ze_intel_gpu64.dll",
+          "sha256": "e291d6c88c85d85751d3e2ba26d5510e1abb3a1f6d255f8f25b9aa2843ecf96d"
+        },
+        {
+          "path": "C:\\windows\\System32\\dxgi.dll",
+          "sha256": "d33765793e32eff65f9103efe2419184ab0b6289e69e69ce85aa7568f678c3b5"
+        },
+        {
+          "path": "C:\\windows\\System32\\WS2_32.dll",
+          "sha256": "5e9857a80a301ad21d0e0a0928a4ff2b5360c305a97bfc88886e3b686bf8d503"
+        },
+        {
+          "path": "C:\\windows\\System32\\SETUPAPI.dll",
+          "sha256": "3777075e8391c40c21fd5662845f5e2928d3cfd2b6abdf4003e087d2089cb853"
+        },
+        {
+          "path": "C:\\windows\\System32\\SHELL32.dll",
+          "sha256": "936c33a8283196a070aa6f844a65a29a8f99f760eae0016754c1cbf17d62bdb7"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\VERSION.dll",
+          "sha256": "af45a728552ccfdcd9435c40ace60a9354d7c1b52abf507a2f1cb371dada4fde"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\WINMM.dll",
+          "sha256": "ead9055dc522bcab041c8eb7b875adb681a2f1fa851d4075789d78d0242711a0"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\ze_tracing_layer.dll",
+          "sha256": "d3f8f8c4bd055c464495703761f5754c140137e4c457f60a168e35085ee2c51f"
+        },
+        {
+          "path": "C:\\windows\\System32\\bcryptPrimitives.dll",
+          "sha256": "f0a1662d0f55533a21d609f8dc737288ede77d314d90e885ca9e6ef79d429c3b"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmm2_64.dll",
+          "sha256": "db2ea2a6f271cc85d097dc13176e153e5ebf67775155df162b768a75ed863a2e"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmm64.dll",
+          "sha256": "db3b3d6fbc6aba6ba156080224916c1fefcb1080f0ea3927727f52626623c681"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdgmmstaging_64.dll",
+          "sha256": "994d22569552487dcadbc8b1aa6ac9bef0c24df23e67637b4e2a2f63952c1e70"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\windows.storage.dll",
+          "sha256": "718c890022323ed8e38a3beb7a143df9e5d680b006c3f1fd28754eeb7cd82010"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\Wldp.dll",
+          "sha256": "c2a7ed84bdd3cf931fdcc5782cea58c376b1a2841fcc6f954e65812deff50389"
+        },
+        {
+          "path": "C:\\windows\\System32\\OLEAUT32.dll",
+          "sha256": "4dd40579e7254dd553b49b229aa85b9c079586b034e37e564909da25eb298345"
+        },
+        {
+          "path": "C:\\windows\\System32\\SHCORE.dll",
+          "sha256": "63257882eb0d0d08ccc275287e11e7213ec26946185e3f3116316c249708a920"
+        },
+        {
+          "path": "C:\\windows\\System32\\shlwapi.dll",
+          "sha256": "eb70b465352f04f188cd12affd72b44f14770e6bfd98f6a6570b62ef21873297"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igdfcl64.dll",
+          "sha256": "4aafd9f797a227cdab388853ba835a5670f384ca98395e859a4cf7810b8d68ae"
+        },
+        {
+          "path": "C:\\windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\igc-default64.dll",
+          "sha256": "55559222a70929c46c7b4000e019bfe5126fa8c051037cfdf62ac6f29ba53a89"
+        },
+        {
+          "path": "C:\\windows\\SYSTEM32\\dxcore.dll",
+          "sha256": "c4976547ea4ecf3faa1c82e03acfc6344f944203a660f137d938bb53f3495f53"
+        },
+        {
+          "path": "C:\\windows\\System32\\kernel.appcore.dll",
+          "sha256": "abff38d9efaca07602acc2a31775f8790ac720261842dbb6d7d9e1a46bba91f8"
+        }
+      ],
+      "exit_code": 0,
+      "log_sha256": "0fddf2c7976aaa66e9bae82585a4ffd47fc245d8c10417912dd35ad55cc3fc07",
+      "post_zero_diagnostic_triggered": false
+    }
+  ],
+  "script_sha256": "6aaffb95935cd17fc63b2308fd7473ed0f28c938e579f254300472ce7c629f5e",
+  "exe_sha256": "1407a8e4cb936262f3bfc0a359edc7676edba56d7a8837abcbbd6920c0e31940",
+  "images_unchanged": true,
+  "exe_unchanged": true,
+  "snapshot_unchanged": true,
+  "workspace_matches_snapshot": true,
+  "ggml_unchanged": true,
+  "source_sha256_count": 557,
+  "source_sha256_manifest_sha256": "79616d8856a8a5876235cdd197d960f3e55ae6d4f587e65e5654e4c23477c8a3",
+  "ggml_sha256_count": 1099,
+  "ggml_sha256_manifest_sha256": "f313861c60206dd8b0a5ebe56d090fccbbe81917bdb8f79190a4dc4137c7d3a8",
+  "image_sha256_count": 5362,
+  "image_sha256_manifest_sha256": "64c25d30c9fe73f97c45667a3f6f5285762200515827d33e3c6afd485e9504d3",
+  "full_result_path": "build-orca-native-20261029/batch-verifier-regression-1793385923602147600/results.json",
+  "full_result_sha256": "e51a916d2b4a302cdda2db3b951ecc3e325db82b6748cf0f313cb8a53238447b",
+  "matched_tokens": 640
+}

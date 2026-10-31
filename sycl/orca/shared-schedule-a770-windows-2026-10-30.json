@@ -1,0 +1,5407 @@
+{
+  "complete": true,
+  "check_passed": true,
+  "full_model_speedup_established": false,
+  "physical_concurrency_proven": false,
+  "linux_gpu_validated": false,
+  "scope": "Complete shared expert, gate/up/scalar plus joined SwiGLU/down/scale",
+  "commands": [
+    {
+      "label": "compile-shared",
+      "command": "C:\\PROGRA~2\\Intel\\oneAPI\\compiler\\2025.3\\bin\\icx.exe  /nologo /TP  -IG:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\frozen\\sycl\\orca\\include -IG:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\frozen\\build-orca-native-20261029\\strata-kernels\\generated\\include -IG:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\frozen\\sycl -IG:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\frozen\\sycl\\include -IG:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\frozen\\include -IG:\\GitHub\\Strata\\third_party\\ggml -IG:\\GitHub\\Strata\\orca-l0\\tests -IG:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\frozen\\orca-l0\\include -I\"C:\\Program Files\\LevelZeroSDK\\1.33.1\\include\" /DWIN32 /D_WINDOWS /EHsc /O2 /Ob2 /DNDEBUG -Qstd:c++20 -MD -DSTRATA_ORCA_NATIVE=1 -Wno-ignored-attributes -Wno-deprecated-declarations -fsycl-default-sub-group-size=32 /EHsc /MD /O2 /fp:precise -Qstd:c++20 -D_USE_STD_VECTOR_ALGORITHMS=0 -IG:/GitHub/Strata/build-orca-native-20261029/ready-operators-1793365616605763800/frozen/sycl/orca/include -IG:/GitHub/Strata/build-orca-native-20261029/ready-operators-1793365616605763800/frozen/build-orca-native-20261029/strata-kernels/generated/include -IG:/GitHub/Strata/build-orca-native-20261029/ready-operators-1793365616605763800/frozen/sycl -IG:/GitHub/Strata/build-orca-native-20261029/ready-operators-1793365616605763800/frozen/sycl/include -IG:/GitHub/Strata/build-orca-native-20261029/ready-operators-1793365616605763800/frozen/include -IG:/GitHub/Strata/third_party/ggml -IG:/GitHub/Strata/orca-l0/tests -IG:/GitHub/Strata/build-orca-native-20261029/ready-operators-1793365616605763800/frozen/orca-l0/include \"-IC:/Program Files/LevelZeroSDK/1.33.1/include\" -fsycl -fsycl-host-only -QMD -QMT G:\\GitHub\\Strata\\build-orca-native-20261029\\real-shared-schedule-1793375236798237000\\shared.obj -QMF G:\\GitHub\\Strata\\build-orca-native-20261029\\real-shared-schedule-1793375236798237000\\shared.obj.d /FoG:\\GitHub\\Strata\\build-orca-native-20261029\\real-shared-schedule-1793375236798237000\\shared.obj /FdG:/GitHub/Strata/build-orca-native-20261029/ready-operators-1793365616605763800/private.pdb -c G:\\GitHub\\Strata\\build-orca-native-20261029\\real-shared-schedule-1793375236798237000\\shared_expert.cpp",
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "archive",
+      "command": "C:\\PROGRA~2\\Intel\\oneAPI\\compiler\\2025.3\\bin\\icx.exe /nologo G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\CMakeFiles\\strata_orca_kernels.dir\\generated\\elementwise.cpp.obj G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\CMakeFiles\\strata_orca_kernels.dir\\generated\\dequant_bf16.cpp.obj G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\CMakeFiles\\strata_orca_kernels.dir\\generated\\iq_kernels.cpp.obj G:\\GitHub\\Strata\\build-orca-native-20261029\\xmx-m4-1793369844886653300\\xmx.obj G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\CMakeFiles\\strata_orca_kernels.dir\\generated\\native_gemm.cpp.obj G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\CMakeFiles\\strata_orca_kernels.dir\\generated\\prefill_helpers.cpp.obj G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\CMakeFiles\\strata_orca_kernels.dir\\generated\\dequant_s2.cpp.obj G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\CMakeFiles\\strata_orca_kernels.dir\\generated\\s2_gemv.cpp.obj G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\CMakeFiles\\strata_orca_kernels.dir\\generated\\s_gemv.cpp.obj G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\CMakeFiles\\strata_orca_kernels.dir\\generated\\s2_gemv_quads.cpp.obj G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\CMakeFiles\\strata_orca_kernels.dir\\generated\\s2_gemv_fast.cpp.obj G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\CMakeFiles\\strata_orca_kernels.dir\\generated\\router_top10.cpp.obj G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\CMakeFiles\\strata_orca_kernels.dir\\generated\\quantize_act.cpp.obj G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\CMakeFiles\\strata_orca_kernels.dir\\generated\\rope.cpp.obj G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\CMakeFiles\\strata_orca_kernels.dir\\generated\\sampler.cpp.obj G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\CMakeFiles\\strata_orca_kernels.dir\\generated\\s2_gemv_q8.cpp.obj G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\CMakeFiles\\strata_orca_kernels.dir\\generated\\s2_expert_grouped.cpp.obj G:\\GitHub\\Strata\\build-orca-native-20261029\\real-shared-schedule-1793375236798237000\\shared.obj G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\CMakeFiles\\strata_orca_kernels.dir\\generated\\gr.cpp.obj G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\CMakeFiles\\strata_orca_kernels.dir\\generated\\gdn.cpp.obj G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\CMakeFiles\\strata_orca_kernels.dir\\generated\\qsa.cpp.obj G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\CMakeFiles\\strata_orca_kernels.dir\\generated\\bf16_gemv.cpp.obj G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\CMakeFiles\\strata_orca_kernels.dir\\generated\\native_mmvq.cpp.obj G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\CMakeFiles\\strata_orca_kernels.dir\\generated\\native_bf16.cpp.obj G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\CMakeFiles\\strata_orca_kernels.dir\\generated\\native_gr_norm.cpp.obj G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\CMakeFiles\\strata_orca_kernels.dir\\generated\\native_moe.cpp.obj G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\CMakeFiles\\strata_orca_kernels.dir\\generated\\native_gdn.cpp.obj G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\CMakeFiles\\strata_orca_kernels.dir\\generated\\native_gr_postops.cpp.obj G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\CMakeFiles\\strata_orca_kernels.dir\\generated\\native_router.cpp.obj G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\CMakeFiles\\strata_orca_kernels.dir\\generated\\native_gdn_preprocess.cpp.obj G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\CMakeFiles\\strata_orca_kernels.dir\\generated\\native_qsa.cpp.obj G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\CMakeFiles\\strata_orca_kernels.dir\\generated\\native_rope.cpp.obj G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\CMakeFiles\\strata_orca_kernels.dir\\generated\\native_ple_postops.cpp.obj G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\CMakeFiles\\strata_orca_kernels.dir\\generated\\native_flash_attn.cpp.obj G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\CMakeFiles\\strata_orca_kernels.dir\\generated\\native_qsa_indexer.cpp.obj G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\CMakeFiles\\strata_orca_kernels.dir\\generated\\native_qsa_score.cpp.obj G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\CMakeFiles\\strata_orca_kernels.dir\\generated\\ple.cpp.obj G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\CMakeFiles\\strata_orca_kernels.dir\\generated\\kv_q8.cpp.obj G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\CMakeFiles\\strata_orca_kernels.dir\\generated\\kv_stream.cpp.obj G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\CMakeFiles\\strata_orca_kernels.dir\\generated\\kv_q4.cpp.obj G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\CMakeFiles\\strata_orca_kernels.dir\\generated\\fused_gr.cpp.obj G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\CMakeFiles\\strata_orca_kernels.dir\\generated\\cvec.cpp.obj G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\CMakeFiles\\strata_orca_kernels.dir\\generated\\qsa_decode_attn.cpp.obj G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\CMakeFiles\\strata_orca_kernels.dir\\generated\\qsa_prompt_attn.cpp.obj G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\CMakeFiles\\strata_orca_kernels.dir\\generated\\fused_gdn.cpp.obj G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\CMakeFiles\\strata_orca_kernels.dir\\generated\\qsa_select.cpp.obj G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\CMakeFiles\\strata_orca_kernels.dir\\generated\\verify_kernels.cpp.obj G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\CMakeFiles\\strata_orca_kernels.dir\\generated\\qsa_prompt_attn_xmx.cpp.obj  -fuse-ld=llvm-lib -o G:\\GitHub\\Strata\\build-orca-native-20261029\\real-shared-schedule-1793375236798237000\\strata_orca_kernels.lib /Qoption,link,/machine:x64  ",
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "link-model",
+      "command": "C:\\PROGRA~2\\Intel\\oneAPI\\compiler\\2025.3\\bin\\icx.exe /nologo G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\CMakeFiles\\strata.dir\\generated\\engine\\program\\generate.cpp.obj  /Qoption,link,/MAP /Qoption,link,/INCREMENTAL:NO /Qoption,link,/subsystem:console  G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-qsa-integration-1793373331920047900\\strata_orca_engine.lib  G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\strata_orca_host.lib  G:\\GitHub\\Strata\\build-orca-native-20261029\\real-shared-schedule-1793375236798237000\\strata_orca_kernels.lib  G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\runtime\\orca_l0.lib  \"C:\\Program Files\\LevelZeroSDK\\1.33.1\\lib\\ze_loader.lib\"  advapi32.lib  psapi.lib  strata_orca_cpu.lib  ggml\\src\\ggml-cpu.lib  ggml\\src\\ggml-base.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /link /out:G:\\GitHub\\Strata\\build-orca-native-20261029\\real-shared-schedule-1793375236798237000\\strata.exe /implib:G:\\GitHub\\Strata\\build-orca-native-20261029\\real-shared-schedule-1793375236798237000\\strata-import.lib /pdb:G:\\GitHub\\Strata\\build-orca-native-20261029\\real-shared-schedule-1793375236798237000\\strata.pdb /version:0.0",
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "compile-check",
+      "command": "C:\\PROGRA~2\\Intel\\oneAPI\\compiler\\2025.3\\bin\\icx.exe  /nologo /TP  -IG:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\frozen\\sycl\\orca\\include -IG:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\frozen\\build-orca-native-20261029\\strata-kernels\\generated\\include -IG:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\frozen\\sycl -IG:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\frozen\\sycl\\include -IG:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\frozen\\include -IG:\\GitHub\\Strata\\third_party\\ggml -IG:\\GitHub\\Strata\\orca-l0\\tests -IG:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\frozen\\orca-l0\\include -I\"C:\\Program Files\\LevelZeroSDK\\1.33.1\\include\" /DWIN32 /D_WINDOWS /EHsc /O2 /Ob2 /DNDEBUG -Qstd:c++20 -MD -DSTRATA_ORCA_NATIVE=1 -Wno-ignored-attributes -Wno-deprecated-declarations -fsycl-default-sub-group-size=32 /EHsc /MD /O2 /fp:precise -Qstd:c++20 -D_USE_STD_VECTOR_ALGORITHMS=0 -IG:/GitHub/Strata/build-orca-native-20261029/ready-operators-1793365616605763800/frozen/sycl/orca/include -IG:/GitHub/Strata/build-orca-native-20261029/ready-operators-1793365616605763800/frozen/build-orca-native-20261029/strata-kernels/generated/include -IG:/GitHub/Strata/build-orca-native-20261029/ready-operators-1793365616605763800/frozen/sycl -IG:/GitHub/Strata/build-orca-native-20261029/ready-operators-1793365616605763800/frozen/sycl/include -IG:/GitHub/Strata/build-orca-native-20261029/ready-operators-1793365616605763800/frozen/include -IG:/GitHub/Strata/third_party/ggml -IG:/GitHub/Strata/orca-l0/tests -IG:/GitHub/Strata/build-orca-native-20261029/ready-operators-1793365616605763800/frozen/orca-l0/include \"-IC:/Program Files/LevelZeroSDK/1.33.1/include\" -fsycl -fsycl-host-only -QMD -QMT G:\\GitHub\\Strata\\build-orca-native-20261029\\real-shared-schedule-1793375236798237000\\check.obj -QMF G:\\GitHub\\Strata\\build-orca-native-20261029\\real-shared-schedule-1793375236798237000\\check.obj.d /FoG:\\GitHub\\Strata\\build-orca-native-20261029\\real-shared-schedule-1793375236798237000\\check.obj /FdG:/GitHub/Strata/build-orca-native-20261029/ready-operators-1793365616605763800/private.pdb -c G:\\GitHub\\Strata\\build-orca-native-20261029\\real-shared-schedule-1793375236798237000\\shared_schedule_check.cpp",
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "link-check",
+      "command": "C:\\PROGRA~2\\Intel\\oneAPI\\compiler\\2025.3\\bin\\icx.exe /nologo G:\\GitHub\\Strata\\build-orca-native-20261029\\real-shared-schedule-1793375236798237000\\check.obj  /Qoption,link,/MAP /Qoption,link,/INCREMENTAL:NO /Qoption,link,/subsystem:console  G:\\GitHub\\Strata\\build-orca-native-20261029\\real-shared-schedule-1793375236798237000\\strata_orca_kernels.lib  G:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\runtime\\orca_l0.lib  \"C:\\Program Files\\LevelZeroSDK\\1.33.1\\lib\\ze_loader.lib\"  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /link /out:G:\\GitHub\\Strata\\build-orca-native-20261029\\real-shared-schedule-1793375236798237000\\check.exe /implib:G:\\GitHub\\Strata\\build-orca-native-20261029\\real-shared-schedule-1793375236798237000\\check-import.lib /pdb:G:\\GitHub\\Strata\\build-orca-native-20261029\\real-shared-schedule-1793375236798237000\\check.pdb /version:0.0",
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "batch1-process0",
+      "command": [
+        "G:\\GitHub\\Strata\\build-orca-native-20261029\\real-shared-schedule-1793375236798237000\\check.exe",
+        "G:\\GitHub\\Strata\\build-orca-native-20261029\\xmx-m4-1793369844886653300\\images",
+        "G:\\GitHub\\Strata\\build-orca-native-20261029\\real-shared-schedule-1793375236798237000\\fixtures",
+        "G:\\GitHub\\Strata\\build-orca-native-20261029\\real-shared-schedule-1793375236798237000\\outputs-batch1-0.bin",
+        "--bench"
+      ],
+      "exit_code": 0,
+      "log_sha256": "2c9ff51ce8292aed7ad3e46f4d4e4aaa21afd96aab57daaf4561b7fb79a8dc82"
+    },
+    {
+      "label": "batch1-process1",
+      "command": [
+        "G:\\GitHub\\Strata\\build-orca-native-20261029\\real-shared-schedule-1793375236798237000\\check.exe",
+        "G:\\GitHub\\Strata\\build-orca-native-20261029\\xmx-m4-1793369844886653300\\images",
+        "G:\\GitHub\\Strata\\build-orca-native-20261029\\real-shared-schedule-1793375236798237000\\fixtures",
+        "G:\\GitHub\\Strata\\build-orca-native-20261029\\real-shared-schedule-1793375236798237000\\outputs-batch1-1.bin",
+        "--bench"
+      ],
+      "exit_code": 0,
+      "log_sha256": "0e45c518cb8d3d2e4ed3e2b15bd1878e476f916cfbd89c187bf012d2eac594e0"
+    },
+    {
+      "label": "batch0-process0",
+      "command": [
+        "G:\\GitHub\\Strata\\build-orca-native-20261029\\real-shared-schedule-1793375236798237000\\check.exe",
+        "G:\\GitHub\\Strata\\build-orca-native-20261029\\xmx-m4-1793369844886653300\\images",
+        "G:\\GitHub\\Strata\\build-orca-native-20261029\\real-shared-schedule-1793375236798237000\\fixtures",
+        "G:\\GitHub\\Strata\\build-orca-native-20261029\\real-shared-schedule-1793375236798237000\\outputs-batch0-0.bin",
+        "--bench"
+      ],
+      "exit_code": 0,
+      "log_sha256": "a7eeb14fdd3c48b3436dca1e45d321c04770639ed37982a3b591fe19573fbce7"
+    },
+    {
+      "label": "batch0-process1",
+      "command": [
+        "G:\\GitHub\\Strata\\build-orca-native-20261029\\real-shared-schedule-1793375236798237000\\check.exe",
+        "G:\\GitHub\\Strata\\build-orca-native-20261029\\xmx-m4-1793369844886653300\\images",
+        "G:\\GitHub\\Strata\\build-orca-native-20261029\\real-shared-schedule-1793375236798237000\\fixtures",
+        "G:\\GitHub\\Strata\\build-orca-native-20261029\\real-shared-schedule-1793375236798237000\\outputs-batch0-1.bin",
+        "--bench"
+      ],
+      "exit_code": 0,
+      "log_sha256": "e7d52ec04011c0d136a5a74abd10bcde1140876bfbdaaa741393aec60ce9807d"
+    }
+  ],
+  "runs": [
+    {
+      "batch": 1,
+      "process": 0,
+      "output_sha256": "61daa804343894cc6fb18a7d886c6114e63050b3e19b8a0eb897cee6f5d68b76",
+      "samples": [
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 0,
+          "mode": 0,
+          "window_us": 460.9875
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 0,
+          "mode": 1,
+          "window_us": 363.3625
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 0,
+          "mode": 1,
+          "window_us": 352.375
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 0,
+          "mode": 0,
+          "window_us": 408.5375
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 1,
+          "mode": 0,
+          "window_us": 424.2125
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 1,
+          "mode": 1,
+          "window_us": 435.8125
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 1,
+          "mode": 1,
+          "window_us": 402.8
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 1,
+          "mode": 0,
+          "window_us": 413.1
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 2,
+          "mode": 0,
+          "window_us": 469.8875
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 2,
+          "mode": 1,
+          "window_us": 386.25
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 2,
+          "mode": 1,
+          "window_us": 256.5375
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 2,
+          "mode": 0,
+          "window_us": 357.9875
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 3,
+          "mode": 0,
+          "window_us": 417.975
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 3,
+          "mode": 1,
+          "window_us": 294.625
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 3,
+          "mode": 1,
+          "window_us": 355.95
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 3,
+          "mode": 0,
+          "window_us": 389.8375
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 4,
+          "mode": 0,
+          "window_us": 352.6
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 4,
+          "mode": 1,
+          "window_us": 297.825
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 4,
+          "mode": 1,
+          "window_us": 276.9625
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 4,
+          "mode": 0,
+          "window_us": 482.325
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 5,
+          "mode": 0,
+          "window_us": 360.9625
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 5,
+          "mode": 1,
+          "window_us": 270.1
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 5,
+          "mode": 1,
+          "window_us": 254.3125
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 5,
+          "mode": 0,
+          "window_us": 392.9
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 6,
+          "mode": 0,
+          "window_us": 480.5125
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 6,
+          "mode": 1,
+          "window_us": 248.3
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 6,
+          "mode": 1,
+          "window_us": 255.1625
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 6,
+          "mode": 0,
+          "window_us": 362.9625
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 0,
+          "mode": 0,
+          "window_us": 152.0625
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 0,
+          "mode": 1,
+          "window_us": 145.575
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 0,
+          "mode": 1,
+          "window_us": 132.775
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 0,
+          "mode": 0,
+          "window_us": 182.025
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 1,
+          "mode": 0,
+          "window_us": 196.375
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 1,
+          "mode": 1,
+          "window_us": 207.85
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 1,
+          "mode": 1,
+          "window_us": 135.125
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 1,
+          "mode": 0,
+          "window_us": 159.425
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 2,
+          "mode": 0,
+          "window_us": 160.7
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 2,
+          "mode": 1,
+          "window_us": 137.6125
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 2,
+          "mode": 1,
+          "window_us": 136.9
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 2,
+          "mode": 0,
+          "window_us": 158.4125
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 3,
+          "mode": 0,
+          "window_us": 172.2875
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 3,
+          "mode": 1,
+          "window_us": 165.9875
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 3,
+          "mode": 1,
+          "window_us": 139.075
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 3,
+          "mode": 0,
+          "window_us": 158.7375
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 4,
+          "mode": 0,
+          "window_us": 160.425
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 4,
+          "mode": 1,
+          "window_us": 134.1875
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 4,
+          "mode": 1,
+          "window_us": 143.5875
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 4,
+          "mode": 0,
+          "window_us": 157.85
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 5,
+          "mode": 0,
+          "window_us": 159.5375
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 5,
+          "mode": 1,
+          "window_us": 138.0125
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 5,
+          "mode": 1,
+          "window_us": 169.575
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 5,
+          "mode": 0,
+          "window_us": 164.4375
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 6,
+          "mode": 0,
+          "window_us": 161.6375
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 6,
+          "mode": 1,
+          "window_us": 131.0375
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 6,
+          "mode": 1,
+          "window_us": 139.6875
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 6,
+          "mode": 0,
+          "window_us": 168.025
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 0,
+          "mode": 0,
+          "window_us": 191.775
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 0,
+          "mode": 1,
+          "window_us": 152.0125
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 0,
+          "mode": 1,
+          "window_us": 150.5125
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 0,
+          "mode": 0,
+          "window_us": 191.0125
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 1,
+          "mode": 0,
+          "window_us": 197.8125
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 1,
+          "mode": 1,
+          "window_us": 167.6375
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 1,
+          "mode": 1,
+          "window_us": 152.2125
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 1,
+          "mode": 0,
+          "window_us": 190.5875
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 2,
+          "mode": 0,
+          "window_us": 190.3375
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 2,
+          "mode": 1,
+          "window_us": 155.975
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 2,
+          "mode": 1,
+          "window_us": 151.05
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 2,
+          "mode": 0,
+          "window_us": 214.425
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 3,
+          "mode": 0,
+          "window_us": 236.9375
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 3,
+          "mode": 1,
+          "window_us": 167.4875
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 3,
+          "mode": 1,
+          "window_us": 161.9375
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 3,
+          "mode": 0,
+          "window_us": 188.125
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 4,
+          "mode": 0,
+          "window_us": 196.375
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 4,
+          "mode": 1,
+          "window_us": 143.175
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 4,
+          "mode": 1,
+          "window_us": 146.8375
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 4,
+          "mode": 0,
+          "window_us": 193.075
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 5,
+          "mode": 0,
+          "window_us": 188.2625
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 5,
+          "mode": 1,
+          "window_us": 152.1125
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 5,
+          "mode": 1,
+          "window_us": 183.5125
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 5,
+          "mode": 0,
+          "window_us": 189.4
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 6,
+          "mode": 0,
+          "window_us": 243.1125
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 6,
+          "mode": 1,
+          "window_us": 192.5875
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 6,
+          "mode": 1,
+          "window_us": 150.3875
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 6,
+          "mode": 0,
+          "window_us": 197.225
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 0,
+          "mode": 0,
+          "window_us": 201.925
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 0,
+          "mode": 1,
+          "window_us": 154.15
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 0,
+          "mode": 1,
+          "window_us": 168.425
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 0,
+          "mode": 0,
+          "window_us": 186.0125
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 1,
+          "mode": 0,
+          "window_us": 185.4125
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 1,
+          "mode": 1,
+          "window_us": 147.2
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 1,
+          "mode": 1,
+          "window_us": 150.2375
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 1,
+          "mode": 0,
+          "window_us": 224.35
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 2,
+          "mode": 0,
+          "window_us": 246.4875
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 2,
+          "mode": 1,
+          "window_us": 156.2875
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 2,
+          "mode": 1,
+          "window_us": 146.325
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 2,
+          "mode": 0,
+          "window_us": 187.325
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 3,
+          "mode": 0,
+          "window_us": 190.1875
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 3,
+          "mode": 1,
+          "window_us": 145.925
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 3,
+          "mode": 1,
+          "window_us": 149.575
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 3,
+          "mode": 0,
+          "window_us": 190.6375
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 4,
+          "mode": 0,
+          "window_us": 192.8125
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 4,
+          "mode": 1,
+          "window_us": 173.7625
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 4,
+          "mode": 1,
+          "window_us": 158.1
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 4,
+          "mode": 0,
+          "window_us": 204.875
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 5,
+          "mode": 0,
+          "window_us": 200.875
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 5,
+          "mode": 1,
+          "window_us": 157.8125
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 5,
+          "mode": 1,
+          "window_us": 160.5125
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 5,
+          "mode": 0,
+          "window_us": 233.9625
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 6,
+          "mode": 0,
+          "window_us": 201.05
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 6,
+          "mode": 1,
+          "window_us": 184.25
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 6,
+          "mode": 1,
+          "window_us": 216.5875
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 6,
+          "mode": 0,
+          "window_us": 197.275
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 0,
+          "mode": 0,
+          "window_us": 246.1
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 0,
+          "mode": 1,
+          "window_us": 193.4
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 0,
+          "mode": 1,
+          "window_us": 222.3625
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 0,
+          "mode": 0,
+          "window_us": 308.025
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 1,
+          "mode": 0,
+          "window_us": 250.525
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 1,
+          "mode": 1,
+          "window_us": 186.575
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 1,
+          "mode": 1,
+          "window_us": 195.175
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 1,
+          "mode": 0,
+          "window_us": 282.6375
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 2,
+          "mode": 0,
+          "window_us": 260.85
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 2,
+          "mode": 1,
+          "window_us": 242.625
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 2,
+          "mode": 1,
+          "window_us": 226.475
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 2,
+          "mode": 0,
+          "window_us": 251.1
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 3,
+          "mode": 0,
+          "window_us": 254.55
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 3,
+          "mode": 1,
+          "window_us": 191.1375
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 3,
+          "mode": 1,
+          "window_us": 183.3375
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 3,
+          "mode": 0,
+          "window_us": 256.275
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 4,
+          "mode": 0,
+          "window_us": 338.2125
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 4,
+          "mode": 1,
+          "window_us": 189.1875
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 4,
+          "mode": 1,
+          "window_us": 191.775
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 4,
+          "mode": 0,
+          "window_us": 266.5375
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 5,
+          "mode": 0,
+          "window_us": 267.0375
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 5,
+          "mode": 1,
+          "window_us": 196.8875
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 5,
+          "mode": 1,
+          "window_us": 197.25
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 5,
+          "mode": 0,
+          "window_us": 284.275
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 6,
+          "mode": 0,
+          "window_us": 247.125
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 6,
+          "mode": 1,
+          "window_us": 184.4625
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 6,
+          "mode": 1,
+          "window_us": 191.1625
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 6,
+          "mode": 0,
+          "window_us": 250.5
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 0,
+          "mode": 0,
+          "window_us": 295.6625
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 0,
+          "mode": 1,
+          "window_us": 198.475
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 0,
+          "mode": 1,
+          "window_us": 202.95
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 0,
+          "mode": 0,
+          "window_us": 308.5375
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 1,
+          "mode": 0,
+          "window_us": 331.025
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 1,
+          "mode": 1,
+          "window_us": 190.475
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 1,
+          "mode": 1,
+          "window_us": 190.575
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 1,
+          "mode": 0,
+          "window_us": 306.6375
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 2,
+          "mode": 0,
+          "window_us": 260.3625
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 2,
+          "mode": 1,
+          "window_us": 188.8
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 2,
+          "mode": 1,
+          "window_us": 186.975
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 2,
+          "mode": 0,
+          "window_us": 255.775
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 3,
+          "mode": 0,
+          "window_us": 255.3625
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 3,
+          "mode": 1,
+          "window_us": 220.075
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 3,
+          "mode": 1,
+          "window_us": 238.075
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 3,
+          "mode": 0,
+          "window_us": 263.6125
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 4,
+          "mode": 0,
+          "window_us": 302.4875
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 4,
+          "mode": 1,
+          "window_us": 192.7375
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 4,
+          "mode": 1,
+          "window_us": 233.7375
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 4,
+          "mode": 0,
+          "window_us": 254.225
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 5,
+          "mode": 0,
+          "window_us": 291.9625
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 5,
+          "mode": 1,
+          "window_us": 193.025
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 5,
+          "mode": 1,
+          "window_us": 183.7375
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 5,
+          "mode": 0,
+          "window_us": 261.725
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 6,
+          "mode": 0,
+          "window_us": 259.1
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 6,
+          "mode": 1,
+          "window_us": 204.0375
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 6,
+          "mode": 1,
+          "window_us": 190.175
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 6,
+          "mode": 0,
+          "window_us": 288.4875
+        }
+      ],
+      "rows": [
+        {
+          "T": 1,
+          "ready": 0,
+          "paired_change_pct": [
+            21.486578529139557,
+            -0.15501796121569766,
+            28.794508293954067,
+            24.16900434231255,
+            45.25803014157408,
+            43.753724405882764,
+            67.53482136206767
+          ],
+          "median_change_pct": 28.794508293954067,
+          "median_window_us": {
+            "0": 410.81875,
+            "1": 296.225
+          }
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "paired_change_pct": [
+            20.024250044907465,
+            3.739339602011804,
+            16.24698328855696,
+            8.510551116574462,
+            14.580145801458011,
+            5.327752265615482,
+            21.770246560162533
+          ],
+          "median_change_pct": 14.580145801458011,
+          "median_window_us": {
+            "0": 160.5625,
+            "1": 138.54375
+          }
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "paired_change_pct": [
+            26.53086521775061,
+            21.431921213068605,
+            31.833726895204006,
+            29.03164604993549,
+            34.28731520193094,
+            12.525139664804485,
+            28.38763758291418
+          ],
+          "median_change_pct": 28.38763758291418,
+          "median_window_us": {
+            "0": 192.425,
+            "1": 152.16250000000002
+          }
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "paired_change_pct": [
+            20.262729597767937,
+            37.764236184072274,
+            43.35577677723164,
+            28.87478849407783,
+            19.835022034728244,
+            36.60174350113876,
+            -0.6268126110955063
+          ],
+          "median_change_pct": 28.87478849407783,
+          "median_window_us": {
+            "0": 199.075,
+            "1": 157.05
+          }
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "paired_change_pct": [
+            33.279215898499736,
+            39.66273739358219,
+            9.134512897036885,
+            36.4109753655117,
+            58.74265839813631,
+            39.87821508991152,
+            32.479201331114815
+          ],
+          "median_change_pct": 36.4109753655117,
+          "median_window_us": {
+            "0": 258.5625,
+            "1": 192.5875
+          }
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "paired_change_pct": [
+            50.51379460671362,
+            67.34352447185408,
+            37.35280420464375,
+            13.276219578740589,
+            30.538132364147952,
+            46.95929133074548,
+            38.90668104131658
+          ],
+          "median_change_pct": 38.90668104131658,
+          "median_window_us": {
+            "0": 276.05,
+            "1": 192.88125000000002
+          }
+        }
+      ]
+    },
+    {
+      "batch": 1,
+      "process": 1,
+      "output_sha256": "61daa804343894cc6fb18a7d886c6114e63050b3e19b8a0eb897cee6f5d68b76",
+      "samples": [
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 0,
+          "mode": 0,
+          "window_us": 170.8875
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 0,
+          "mode": 1,
+          "window_us": 154.275
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 0,
+          "mode": 1,
+          "window_us": 157.7625
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 0,
+          "mode": 0,
+          "window_us": 174.6125
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 1,
+          "mode": 0,
+          "window_us": 171.1125
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 1,
+          "mode": 1,
+          "window_us": 152.8875
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 1,
+          "mode": 1,
+          "window_us": 143.625
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 1,
+          "mode": 0,
+          "window_us": 171.425
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 2,
+          "mode": 0,
+          "window_us": 177.25
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 2,
+          "mode": 1,
+          "window_us": 148.75
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 2,
+          "mode": 1,
+          "window_us": 152.9
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 2,
+          "mode": 0,
+          "window_us": 177.4125
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 3,
+          "mode": 0,
+          "window_us": 209.4625
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 3,
+          "mode": 1,
+          "window_us": 194.2875
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 3,
+          "mode": 1,
+          "window_us": 135.95
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 3,
+          "mode": 0,
+          "window_us": 175.8125
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 4,
+          "mode": 0,
+          "window_us": 164.95
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 4,
+          "mode": 1,
+          "window_us": 137.075
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 4,
+          "mode": 1,
+          "window_us": 145.1875
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 4,
+          "mode": 0,
+          "window_us": 151.125
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 5,
+          "mode": 0,
+          "window_us": 180.5875
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 5,
+          "mode": 1,
+          "window_us": 139.6125
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 5,
+          "mode": 1,
+          "window_us": 189.6875
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 5,
+          "mode": 0,
+          "window_us": 175.1375
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 6,
+          "mode": 0,
+          "window_us": 173.7375
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 6,
+          "mode": 1,
+          "window_us": 150.3875
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 6,
+          "mode": 1,
+          "window_us": 146.7125
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 6,
+          "mode": 0,
+          "window_us": 153.9
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 0,
+          "mode": 0,
+          "window_us": 190.9875
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 0,
+          "mode": 1,
+          "window_us": 154.4625
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 0,
+          "mode": 1,
+          "window_us": 131.325
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 0,
+          "mode": 0,
+          "window_us": 163.7625
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 1,
+          "mode": 0,
+          "window_us": 162.3
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 1,
+          "mode": 1,
+          "window_us": 140.2
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 1,
+          "mode": 1,
+          "window_us": 148.05
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 1,
+          "mode": 0,
+          "window_us": 181.625
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 2,
+          "mode": 0,
+          "window_us": 166.4875
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 2,
+          "mode": 1,
+          "window_us": 139.4
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 2,
+          "mode": 1,
+          "window_us": 139.275
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 2,
+          "mode": 0,
+          "window_us": 160.9125
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 3,
+          "mode": 0,
+          "window_us": 182.5875
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 3,
+          "mode": 1,
+          "window_us": 161.075
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 3,
+          "mode": 1,
+          "window_us": 147.225
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 3,
+          "mode": 0,
+          "window_us": 184.1625
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 4,
+          "mode": 0,
+          "window_us": 157.4125
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 4,
+          "mode": 1,
+          "window_us": 144.6625
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 4,
+          "mode": 1,
+          "window_us": 150.6375
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 4,
+          "mode": 0,
+          "window_us": 166.8125
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 5,
+          "mode": 0,
+          "window_us": 170.6875
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 5,
+          "mode": 1,
+          "window_us": 147.7625
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 5,
+          "mode": 1,
+          "window_us": 175.0
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 5,
+          "mode": 0,
+          "window_us": 178.0125
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 6,
+          "mode": 0,
+          "window_us": 201.425
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 6,
+          "mode": 1,
+          "window_us": 148.5375
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 6,
+          "mode": 1,
+          "window_us": 151.9375
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 6,
+          "mode": 0,
+          "window_us": 173.8375
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 0,
+          "mode": 0,
+          "window_us": 202.7125
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 0,
+          "mode": 1,
+          "window_us": 153.1625
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 0,
+          "mode": 1,
+          "window_us": 160.3375
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 0,
+          "mode": 0,
+          "window_us": 260.0375
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 1,
+          "mode": 0,
+          "window_us": 196.625
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 1,
+          "mode": 1,
+          "window_us": 162.4375
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 1,
+          "mode": 1,
+          "window_us": 155.4
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 1,
+          "mode": 0,
+          "window_us": 211.175
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 2,
+          "mode": 0,
+          "window_us": 200.5375
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 2,
+          "mode": 1,
+          "window_us": 162.95
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 2,
+          "mode": 1,
+          "window_us": 144.7
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 2,
+          "mode": 0,
+          "window_us": 231.1625
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 3,
+          "mode": 0,
+          "window_us": 194.825
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 3,
+          "mode": 1,
+          "window_us": 163.025
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 3,
+          "mode": 1,
+          "window_us": 171.5
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 3,
+          "mode": 0,
+          "window_us": 198.4125
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 4,
+          "mode": 0,
+          "window_us": 194.2125
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 4,
+          "mode": 1,
+          "window_us": 154.375
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 4,
+          "mode": 1,
+          "window_us": 160.7125
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 4,
+          "mode": 0,
+          "window_us": 266.7625
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 5,
+          "mode": 0,
+          "window_us": 192.8375
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 5,
+          "mode": 1,
+          "window_us": 178.5875
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 5,
+          "mode": 1,
+          "window_us": 175.175
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 5,
+          "mode": 0,
+          "window_us": 202.15
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 6,
+          "mode": 0,
+          "window_us": 221.275
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 6,
+          "mode": 1,
+          "window_us": 164.5625
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 6,
+          "mode": 1,
+          "window_us": 151.0625
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 6,
+          "mode": 0,
+          "window_us": 241.25
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 0,
+          "mode": 0,
+          "window_us": 194.4125
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 0,
+          "mode": 1,
+          "window_us": 148.1
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 0,
+          "mode": 1,
+          "window_us": 180.6375
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 0,
+          "mode": 0,
+          "window_us": 259.6125
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 1,
+          "mode": 0,
+          "window_us": 266.95
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 1,
+          "mode": 1,
+          "window_us": 153.2375
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 1,
+          "mode": 1,
+          "window_us": 154.075
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 1,
+          "mode": 0,
+          "window_us": 188.8625
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 2,
+          "mode": 0,
+          "window_us": 202.2375
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 2,
+          "mode": 1,
+          "window_us": 154.3625
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 2,
+          "mode": 1,
+          "window_us": 188.4625
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 2,
+          "mode": 0,
+          "window_us": 231.4125
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 3,
+          "mode": 0,
+          "window_us": 227.8125
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 3,
+          "mode": 1,
+          "window_us": 150.1625
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 3,
+          "mode": 1,
+          "window_us": 161.6
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 3,
+          "mode": 0,
+          "window_us": 198.1625
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 4,
+          "mode": 0,
+          "window_us": 196.0875
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 4,
+          "mode": 1,
+          "window_us": 147.675
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 4,
+          "mode": 1,
+          "window_us": 152.3375
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 4,
+          "mode": 0,
+          "window_us": 204.5375
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 5,
+          "mode": 0,
+          "window_us": 211.2875
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 5,
+          "mode": 1,
+          "window_us": 149.775
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 5,
+          "mode": 1,
+          "window_us": 147.6375
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 5,
+          "mode": 0,
+          "window_us": 192.825
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 6,
+          "mode": 0,
+          "window_us": 206.075
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 6,
+          "mode": 1,
+          "window_us": 162.175
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 6,
+          "mode": 1,
+          "window_us": 154.15
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 6,
+          "mode": 0,
+          "window_us": 200.4
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 0,
+          "mode": 0,
+          "window_us": 255.7125
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 0,
+          "mode": 1,
+          "window_us": 204.5
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 0,
+          "mode": 1,
+          "window_us": 206.1125
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 0,
+          "mode": 0,
+          "window_us": 255.8875
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 1,
+          "mode": 0,
+          "window_us": 257.325
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 1,
+          "mode": 1,
+          "window_us": 192.1375
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 1,
+          "mode": 1,
+          "window_us": 186.8375
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 1,
+          "mode": 0,
+          "window_us": 252.925
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 2,
+          "mode": 0,
+          "window_us": 317.5125
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 2,
+          "mode": 1,
+          "window_us": 192.8625
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 2,
+          "mode": 1,
+          "window_us": 208.3875
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 2,
+          "mode": 0,
+          "window_us": 300.1625
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 3,
+          "mode": 0,
+          "window_us": 267.425
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 3,
+          "mode": 1,
+          "window_us": 193.4625
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 3,
+          "mode": 1,
+          "window_us": 192.95
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 3,
+          "mode": 0,
+          "window_us": 284.0875
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 4,
+          "mode": 0,
+          "window_us": 260.325
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 4,
+          "mode": 1,
+          "window_us": 210.4875
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 4,
+          "mode": 1,
+          "window_us": 228.45
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 4,
+          "mode": 0,
+          "window_us": 261.375
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 5,
+          "mode": 0,
+          "window_us": 256.7625
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 5,
+          "mode": 1,
+          "window_us": 239.2
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 5,
+          "mode": 1,
+          "window_us": 260.1875
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 5,
+          "mode": 0,
+          "window_us": 255.3125
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 6,
+          "mode": 0,
+          "window_us": 257.6
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 6,
+          "mode": 1,
+          "window_us": 194.2625
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 6,
+          "mode": 1,
+          "window_us": 194.925
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 6,
+          "mode": 0,
+          "window_us": 252.6625
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 0,
+          "mode": 0,
+          "window_us": 252.925
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 0,
+          "mode": 1,
+          "window_us": 199.325
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 0,
+          "mode": 1,
+          "window_us": 193.1625
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 0,
+          "mode": 0,
+          "window_us": 315.425
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 1,
+          "mode": 0,
+          "window_us": 327.7875
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 1,
+          "mode": 1,
+          "window_us": 186.975
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 1,
+          "mode": 1,
+          "window_us": 193.2125
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 1,
+          "mode": 0,
+          "window_us": 254.825
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 2,
+          "mode": 0,
+          "window_us": 254.575
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 2,
+          "mode": 1,
+          "window_us": 192.0125
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 2,
+          "mode": 1,
+          "window_us": 194.1
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 2,
+          "mode": 0,
+          "window_us": 259.475
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 3,
+          "mode": 0,
+          "window_us": 255.8125
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 3,
+          "mode": 1,
+          "window_us": 191.025
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 3,
+          "mode": 1,
+          "window_us": 188.35
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 3,
+          "mode": 0,
+          "window_us": 255.275
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 4,
+          "mode": 0,
+          "window_us": 258.425
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 4,
+          "mode": 1,
+          "window_us": 237.3875
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 4,
+          "mode": 1,
+          "window_us": 194.35
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 4,
+          "mode": 0,
+          "window_us": 261.0125
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 5,
+          "mode": 0,
+          "window_us": 254.6375
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 5,
+          "mode": 1,
+          "window_us": 246.3125
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 5,
+          "mode": 1,
+          "window_us": 248.025
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 5,
+          "mode": 0,
+          "window_us": 257.0375
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 6,
+          "mode": 0,
+          "window_us": 298.625
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 6,
+          "mode": 1,
+          "window_us": 192.1125
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 6,
+          "mode": 1,
+          "window_us": 192.1875
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 6,
+          "mode": 0,
+          "window_us": 277.875
+        }
+      ],
+      "rows": [
+        {
+          "T": 1,
+          "ready": 0,
+          "paired_change_pct": [
+            10.723871329567757,
+            15.52211120947684,
+            17.574175368804923,
+            16.66603580756274,
+            11.979097471325462,
+            8.024597631339203,
+            10.278525748906109
+          ],
+          "median_change_pct": 11.979097471325462,
+          "median_window_us": {
+            "0": 174.175,
+            "1": 149.56875
+          }
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "paired_change_pct": [
+            24.130691510300473,
+            19.31483087597572,
+            17.484524984300688,
+            18.958806357444068,
+            9.795123603115496,
+            8.036094651640147,
+            24.889757883351372
+          ],
+          "median_change_pct": 18.958806357444068,
+          "median_window_us": {
+            "0": 172.2625,
+            "1": 147.90625
+          }
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "paired_change_pct": [
+            47.60765550239234,
+            28.304558146851775,
+            40.32179424670892,
+            17.551005156565267,
+            46.30063077716508,
+            11.653298470018726,
+            46.54257425742574
+          ],
+          "median_change_pct": 40.32179424670892,
+          "median_window_us": {
+            "0": 202.43125,
+            "1": 161.575
+          }
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "paired_change_pct": [
+            38.111715274345045,
+            48.32214765100671,
+            26.493108728943305,
+            36.63445731927351,
+            33.53610266238904,
+            35.87609801202032,
+            28.499170157274946
+          ],
+          "median_change_pct": 35.87609801202032,
+          "median_window_us": {
+            "0": 203.3875,
+            "1": 153.65625
+          }
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "paired_change_pct": [
+            24.59435599257207,
+            34.63948809288211,
+            53.93769470404983,
+            42.72636107786369,
+            18.855190089705264,
+            2.54061225000628,
+            31.10968363577968
+          ],
+          "median_change_pct": 31.10968363577968,
+          "median_window_us": {
+            "0": 257.4625,
+            "1": 199.7125
+          }
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "paired_change_pct": [
+            44.807159463677216,
+            53.24346539536411,
+            33.13477289650037,
+            34.718286655683684,
+            20.31326905816615,
+            3.50721925809796,
+            50.01301066874837
+          ],
+          "median_change_pct": 34.718286655683684,
+          "median_window_us": {
+            "0": 257.73125000000005,
+            "1": 193.1875
+          }
+        }
+      ]
+    },
+    {
+      "batch": 0,
+      "process": 0,
+      "output_sha256": "61daa804343894cc6fb18a7d886c6114e63050b3e19b8a0eb897cee6f5d68b76",
+      "samples": [
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 0,
+          "mode": 0,
+          "window_us": 152.4125
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 0,
+          "mode": 1,
+          "window_us": 149.7125
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 0,
+          "mode": 1,
+          "window_us": 189.625
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 0,
+          "mode": 0,
+          "window_us": 165.5
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 1,
+          "mode": 0,
+          "window_us": 172.9625
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 1,
+          "mode": 1,
+          "window_us": 134.45
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 1,
+          "mode": 1,
+          "window_us": 140.3375
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 1,
+          "mode": 0,
+          "window_us": 165.1625
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 2,
+          "mode": 0,
+          "window_us": 161.925
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 2,
+          "mode": 1,
+          "window_us": 134.1625
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 2,
+          "mode": 1,
+          "window_us": 149.025
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 2,
+          "mode": 0,
+          "window_us": 168.6125
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 3,
+          "mode": 0,
+          "window_us": 203.3625
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 3,
+          "mode": 1,
+          "window_us": 159.075
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 3,
+          "mode": 1,
+          "window_us": 168.9375
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 3,
+          "mode": 0,
+          "window_us": 161.625
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 4,
+          "mode": 0,
+          "window_us": 176.4125
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 4,
+          "mode": 1,
+          "window_us": 134.7
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 4,
+          "mode": 1,
+          "window_us": 127.9875
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 4,
+          "mode": 0,
+          "window_us": 173.3375
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 5,
+          "mode": 0,
+          "window_us": 182.3125
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 5,
+          "mode": 1,
+          "window_us": 146.475
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 5,
+          "mode": 1,
+          "window_us": 127.925
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 5,
+          "mode": 0,
+          "window_us": 157.6875
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 6,
+          "mode": 0,
+          "window_us": 157.8125
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 6,
+          "mode": 1,
+          "window_us": 129.6125
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 6,
+          "mode": 1,
+          "window_us": 135.6375
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 6,
+          "mode": 0,
+          "window_us": 158.8
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 0,
+          "mode": 0,
+          "window_us": 189.9375
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 0,
+          "mode": 1,
+          "window_us": 130.7625
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 0,
+          "mode": 1,
+          "window_us": 173.9
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 0,
+          "mode": 0,
+          "window_us": 235.475
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 1,
+          "mode": 0,
+          "window_us": 154.975
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 1,
+          "mode": 1,
+          "window_us": 139.875
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 1,
+          "mode": 1,
+          "window_us": 131.4
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 1,
+          "mode": 0,
+          "window_us": 160.0
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 2,
+          "mode": 0,
+          "window_us": 159.575
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 2,
+          "mode": 1,
+          "window_us": 159.15
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 2,
+          "mode": 1,
+          "window_us": 125.975
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 2,
+          "mode": 0,
+          "window_us": 159.45
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 3,
+          "mode": 0,
+          "window_us": 164.4
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 3,
+          "mode": 1,
+          "window_us": 130.2875
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 3,
+          "mode": 1,
+          "window_us": 142.4125
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 3,
+          "mode": 0,
+          "window_us": 153.8375
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 4,
+          "mode": 0,
+          "window_us": 155.7375
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 4,
+          "mode": 1,
+          "window_us": 131.575
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 4,
+          "mode": 1,
+          "window_us": 140.3625
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 4,
+          "mode": 0,
+          "window_us": 162.7125
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 5,
+          "mode": 0,
+          "window_us": 158.775
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 5,
+          "mode": 1,
+          "window_us": 141.0625
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 5,
+          "mode": 1,
+          "window_us": 135.675
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 5,
+          "mode": 0,
+          "window_us": 183.35
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 6,
+          "mode": 0,
+          "window_us": 221.95
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 6,
+          "mode": 1,
+          "window_us": 138.975
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 6,
+          "mode": 1,
+          "window_us": 137.425
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 6,
+          "mode": 0,
+          "window_us": 174.9875
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 0,
+          "mode": 0,
+          "window_us": 195.45
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 0,
+          "mode": 1,
+          "window_us": 177.3125
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 0,
+          "mode": 1,
+          "window_us": 164.7
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 0,
+          "mode": 0,
+          "window_us": 211.3
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 1,
+          "mode": 0,
+          "window_us": 202.65
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 1,
+          "mode": 1,
+          "window_us": 157.5875
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 1,
+          "mode": 1,
+          "window_us": 270.375
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 1,
+          "mode": 0,
+          "window_us": 217.8875
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 2,
+          "mode": 0,
+          "window_us": 199.475
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 2,
+          "mode": 1,
+          "window_us": 187.7125
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 2,
+          "mode": 1,
+          "window_us": 172.2
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 2,
+          "mode": 0,
+          "window_us": 208.6125
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 3,
+          "mode": 0,
+          "window_us": 208.05
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 3,
+          "mode": 1,
+          "window_us": 155.3625
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 3,
+          "mode": 1,
+          "window_us": 155.4875
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 3,
+          "mode": 0,
+          "window_us": 206.975
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 4,
+          "mode": 0,
+          "window_us": 222.3
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 4,
+          "mode": 1,
+          "window_us": 152.5
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 4,
+          "mode": 1,
+          "window_us": 207.8625
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 4,
+          "mode": 0,
+          "window_us": 256.5375
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 5,
+          "mode": 0,
+          "window_us": 203.825
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 5,
+          "mode": 1,
+          "window_us": 157.1625
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 5,
+          "mode": 1,
+          "window_us": 166.2125
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 5,
+          "mode": 0,
+          "window_us": 206.425
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 6,
+          "mode": 0,
+          "window_us": 251.5125
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 6,
+          "mode": 1,
+          "window_us": 146.525
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 6,
+          "mode": 1,
+          "window_us": 166.25
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 6,
+          "mode": 0,
+          "window_us": 207.3875
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 0,
+          "mode": 0,
+          "window_us": 194.7375
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 0,
+          "mode": 1,
+          "window_us": 165.425
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 0,
+          "mode": 1,
+          "window_us": 156.3
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 0,
+          "mode": 0,
+          "window_us": 202.4375
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 1,
+          "mode": 0,
+          "window_us": 206.6875
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 1,
+          "mode": 1,
+          "window_us": 161.3875
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 1,
+          "mode": 1,
+          "window_us": 181.45
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 1,
+          "mode": 0,
+          "window_us": 218.0375
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 2,
+          "mode": 0,
+          "window_us": 205.925
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 2,
+          "mode": 1,
+          "window_us": 157.1375
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 2,
+          "mode": 1,
+          "window_us": 151.35
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 2,
+          "mode": 0,
+          "window_us": 211.8625
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 3,
+          "mode": 0,
+          "window_us": 192.5375
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 3,
+          "mode": 1,
+          "window_us": 168.0125
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 3,
+          "mode": 1,
+          "window_us": 195.0375
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 3,
+          "mode": 0,
+          "window_us": 200.8
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 4,
+          "mode": 0,
+          "window_us": 241.925
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 4,
+          "mode": 1,
+          "window_us": 201.25
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 4,
+          "mode": 1,
+          "window_us": 160.7
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 4,
+          "mode": 0,
+          "window_us": 202.85
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 5,
+          "mode": 0,
+          "window_us": 207.0875
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 5,
+          "mode": 1,
+          "window_us": 179.1625
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 5,
+          "mode": 1,
+          "window_us": 193.8
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 5,
+          "mode": 0,
+          "window_us": 200.05
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 6,
+          "mode": 0,
+          "window_us": 203.45
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 6,
+          "mode": 1,
+          "window_us": 162.525
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 6,
+          "mode": 1,
+          "window_us": 158.4
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 6,
+          "mode": 0,
+          "window_us": 200.9375
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 0,
+          "mode": 0,
+          "window_us": 292.6625
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 0,
+          "mode": 1,
+          "window_us": 218.9375
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 0,
+          "mode": 1,
+          "window_us": 203.175
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 0,
+          "mode": 0,
+          "window_us": 279.225
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 1,
+          "mode": 0,
+          "window_us": 272.1125
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 1,
+          "mode": 1,
+          "window_us": 194.1125
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 1,
+          "mode": 1,
+          "window_us": 199.0625
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 1,
+          "mode": 0,
+          "window_us": 348.2125
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 2,
+          "mode": 0,
+          "window_us": 280.4625
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 2,
+          "mode": 1,
+          "window_us": 256.175
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 2,
+          "mode": 1,
+          "window_us": 205.3
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 2,
+          "mode": 0,
+          "window_us": 289.125
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 3,
+          "mode": 0,
+          "window_us": 271.775
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 3,
+          "mode": 1,
+          "window_us": 219.9375
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 3,
+          "mode": 1,
+          "window_us": 235.3875
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 3,
+          "mode": 0,
+          "window_us": 267.6375
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 4,
+          "mode": 0,
+          "window_us": 274.5
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 4,
+          "mode": 1,
+          "window_us": 191.2
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 4,
+          "mode": 1,
+          "window_us": 190.7125
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 4,
+          "mode": 0,
+          "window_us": 268.9625
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 5,
+          "mode": 0,
+          "window_us": 287.6875
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 5,
+          "mode": 1,
+          "window_us": 197.1
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 5,
+          "mode": 1,
+          "window_us": 203.35
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 5,
+          "mode": 0,
+          "window_us": 308.5875
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 6,
+          "mode": 0,
+          "window_us": 280.65
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 6,
+          "mode": 1,
+          "window_us": 199.4
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 6,
+          "mode": 1,
+          "window_us": 214.85
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 6,
+          "mode": 0,
+          "window_us": 296.225
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 0,
+          "mode": 0,
+          "window_us": 256.1
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 0,
+          "mode": 1,
+          "window_us": 210.225
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 0,
+          "mode": 1,
+          "window_us": 215.4125
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 0,
+          "mode": 0,
+          "window_us": 332.2625
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 1,
+          "mode": 0,
+          "window_us": 275.95
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 1,
+          "mode": 1,
+          "window_us": 212.975
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 1,
+          "mode": 1,
+          "window_us": 210.025
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 1,
+          "mode": 0,
+          "window_us": 265.1375
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 2,
+          "mode": 0,
+          "window_us": 302.4375
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 2,
+          "mode": 1,
+          "window_us": 193.0625
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 2,
+          "mode": 1,
+          "window_us": 198.65
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 2,
+          "mode": 0,
+          "window_us": 274.15
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 3,
+          "mode": 0,
+          "window_us": 323.4125
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 3,
+          "mode": 1,
+          "window_us": 205.775
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 3,
+          "mode": 1,
+          "window_us": 197.2875
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 3,
+          "mode": 0,
+          "window_us": 316.0625
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 4,
+          "mode": 0,
+          "window_us": 304.1
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 4,
+          "mode": 1,
+          "window_us": 201.4875
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 4,
+          "mode": 1,
+          "window_us": 237.5625
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 4,
+          "mode": 0,
+          "window_us": 278.125
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 5,
+          "mode": 0,
+          "window_us": 273.3
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 5,
+          "mode": 1,
+          "window_us": 197.2125
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 5,
+          "mode": 1,
+          "window_us": 208.3625
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 5,
+          "mode": 0,
+          "window_us": 286.9375
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 6,
+          "mode": 0,
+          "window_us": 387.3125
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 6,
+          "mode": 1,
+          "window_us": 199.3625
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 6,
+          "mode": 1,
+          "window_us": 195.3
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 6,
+          "mode": 0,
+          "window_us": 294.1375
+        }
+      ],
+      "rows": [
+        {
+          "T": 1,
+          "ready": 0,
+          "paired_change_pct": [
+            -6.3137731609385845,
+            23.049629258972825,
+            16.720370779077463,
+            11.272436263861895,
+            33.14299310016655,
+            23.906705539358608,
+            19.36380772855797
+          ],
+          "median_change_pct": 19.36380772855797,
+          "median_window_us": {
+            "0": 165.33125,
+            "1": 137.9875
+          }
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "paired_change_pct": [
+            39.634021253025885,
+            16.109114367339437,
+            11.889522139412524,
+            16.698753208654217,
+            17.104113996782356,
+            23.627986810605716,
+            43.60980463096962
+          ],
+          "median_change_pct": 17.104113996782356,
+          "median_window_us": {
+            "0": 161.35625,
+            "1": 138.2
+          }
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "paired_change_pct": [
+            18.928401739702494,
+            -1.7349650962409036,
+            13.385197791129766,
+            33.51294836737975,
+            32.87661729508482,
+            26.865094704290684,
+            46.71888737910639
+          ],
+          "median_change_pct": 26.865094704290684,
+          "median_window_us": {
+            "0": 207.71875,
+            "1": 165.45625
+          }
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "paired_change_pct": [
+            23.4517056492346,
+            23.885222590877618,
+            35.43093318205766,
+            8.342514805123269,
+            22.882994888796794,
+            9.163119616583447,
+            26.006855184233068
+          ],
+          "median_change_pct": 23.4517056492346,
+          "median_window_us": {
+            "0": 203.14999999999998,
+            "1": 163.97500000000002
+          }
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "paired_change_pct": [
+            35.48224703130089,
+            57.77325618363325,
+            23.42759629449047,
+            18.467578103552395,
+            42.30026511308218,
+            48.90123610937695,
+            39.25769462884732
+          ],
+          "median_change_pct": 39.25769462884732,
+          "median_window_us": {
+            "0": 280.55625,
+            "1": 203.2625
+          }
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "paired_change_pct": [
+            38.23088896067664,
+            27.916666666666657,
+            47.19660465264703,
+            58.654054892231365,
+            32.61018107277076,
+            38.1341305553843,
+            72.66651886105218
+          ],
+          "median_change_pct": 38.23088896067664,
+          "median_window_us": {
+            "0": 290.5375,
+            "1": 203.63125000000002
+          }
+        }
+      ]
+    },
+    {
+      "batch": 0,
+      "process": 1,
+      "output_sha256": "61daa804343894cc6fb18a7d886c6114e63050b3e19b8a0eb897cee6f5d68b76",
+      "samples": [
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 0,
+          "mode": 0,
+          "window_us": 148.55
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 0,
+          "mode": 1,
+          "window_us": 137.025
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 0,
+          "mode": 1,
+          "window_us": 141.1
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 0,
+          "mode": 0,
+          "window_us": 166.275
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 1,
+          "mode": 0,
+          "window_us": 175.0125
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 1,
+          "mode": 1,
+          "window_us": 179.875
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 1,
+          "mode": 1,
+          "window_us": 141.6625
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 1,
+          "mode": 0,
+          "window_us": 161.0625
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 2,
+          "mode": 0,
+          "window_us": 224.6
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 2,
+          "mode": 1,
+          "window_us": 191.375
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 2,
+          "mode": 1,
+          "window_us": 173.8625
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 2,
+          "mode": 0,
+          "window_us": 167.475
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 3,
+          "mode": 0,
+          "window_us": 163.9375
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 3,
+          "mode": 1,
+          "window_us": 149.2125
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 3,
+          "mode": 1,
+          "window_us": 159.875
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 3,
+          "mode": 0,
+          "window_us": 152.4375
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 4,
+          "mode": 0,
+          "window_us": 156.8125
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 4,
+          "mode": 1,
+          "window_us": 137.4375
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 4,
+          "mode": 1,
+          "window_us": 163.675
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 4,
+          "mode": 0,
+          "window_us": 200.3375
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 5,
+          "mode": 0,
+          "window_us": 239.5
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 5,
+          "mode": 1,
+          "window_us": 131.7
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 5,
+          "mode": 1,
+          "window_us": 143.1
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 5,
+          "mode": 0,
+          "window_us": 155.85
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 6,
+          "mode": 0,
+          "window_us": 163.7375
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 6,
+          "mode": 1,
+          "window_us": 177.4375
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 6,
+          "mode": 1,
+          "window_us": 179.0875
+        },
+        {
+          "T": 1,
+          "ready": 0,
+          "repetition": 6,
+          "mode": 0,
+          "window_us": 224.425
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 0,
+          "mode": 0,
+          "window_us": 145.925
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 0,
+          "mode": 1,
+          "window_us": 129.975
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 0,
+          "mode": 1,
+          "window_us": 134.5375
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 0,
+          "mode": 0,
+          "window_us": 170.3875
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 1,
+          "mode": 0,
+          "window_us": 180.5375
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 1,
+          "mode": 1,
+          "window_us": 187.6125
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 1,
+          "mode": 1,
+          "window_us": 153.7125
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 1,
+          "mode": 0,
+          "window_us": 154.6625
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 2,
+          "mode": 0,
+          "window_us": 163.35
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 2,
+          "mode": 1,
+          "window_us": 135.2625
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 2,
+          "mode": 1,
+          "window_us": 128.775
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 2,
+          "mode": 0,
+          "window_us": 170.8875
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 3,
+          "mode": 0,
+          "window_us": 166.7
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 3,
+          "mode": 1,
+          "window_us": 149.275
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 3,
+          "mode": 1,
+          "window_us": 141.7
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 3,
+          "mode": 0,
+          "window_us": 241.6125
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 4,
+          "mode": 0,
+          "window_us": 146.9125
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 4,
+          "mode": 1,
+          "window_us": 128.9875
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 4,
+          "mode": 1,
+          "window_us": 126.025
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 4,
+          "mode": 0,
+          "window_us": 151.825
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 5,
+          "mode": 0,
+          "window_us": 163.6
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 5,
+          "mode": 1,
+          "window_us": 133.4125
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 5,
+          "mode": 1,
+          "window_us": 152.9125
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 5,
+          "mode": 0,
+          "window_us": 185.1875
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 6,
+          "mode": 0,
+          "window_us": 177.4
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 6,
+          "mode": 1,
+          "window_us": 187.575
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 6,
+          "mode": 1,
+          "window_us": 130.875
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "repetition": 6,
+          "mode": 0,
+          "window_us": 156.6125
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 0,
+          "mode": 0,
+          "window_us": 187.8
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 0,
+          "mode": 1,
+          "window_us": 142.275
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 0,
+          "mode": 1,
+          "window_us": 257.0
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 0,
+          "mode": 0,
+          "window_us": 192.5
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 1,
+          "mode": 0,
+          "window_us": 187.2125
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 1,
+          "mode": 1,
+          "window_us": 142.7625
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 1,
+          "mode": 1,
+          "window_us": 141.3125
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 1,
+          "mode": 0,
+          "window_us": 189.075
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 2,
+          "mode": 0,
+          "window_us": 192.7125
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 2,
+          "mode": 1,
+          "window_us": 184.8
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 2,
+          "mode": 1,
+          "window_us": 223.225
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 2,
+          "mode": 0,
+          "window_us": 188.1125
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 3,
+          "mode": 0,
+          "window_us": 190.4125
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 3,
+          "mode": 1,
+          "window_us": 149.9375
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 3,
+          "mode": 1,
+          "window_us": 149.8
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 3,
+          "mode": 0,
+          "window_us": 191.675
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 4,
+          "mode": 0,
+          "window_us": 190.75
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 4,
+          "mode": 1,
+          "window_us": 183.5375
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 4,
+          "mode": 1,
+          "window_us": 225.3375
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 4,
+          "mode": 0,
+          "window_us": 215.55
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 5,
+          "mode": 0,
+          "window_us": 191.5375
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 5,
+          "mode": 1,
+          "window_us": 147.7875
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 5,
+          "mode": 1,
+          "window_us": 147.7
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 5,
+          "mode": 0,
+          "window_us": 197.375
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 6,
+          "mode": 0,
+          "window_us": 205.5125
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 6,
+          "mode": 1,
+          "window_us": 149.1125
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 6,
+          "mode": 1,
+          "window_us": 186.9875
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "repetition": 6,
+          "mode": 0,
+          "window_us": 259.9125
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 0,
+          "mode": 0,
+          "window_us": 194.1625
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 0,
+          "mode": 1,
+          "window_us": 161.0
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 0,
+          "mode": 1,
+          "window_us": 144.5125
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 0,
+          "mode": 0,
+          "window_us": 215.625
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 1,
+          "mode": 0,
+          "window_us": 274.8625
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 1,
+          "mode": 1,
+          "window_us": 153.35
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 1,
+          "mode": 1,
+          "window_us": 141.9125
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 1,
+          "mode": 0,
+          "window_us": 203.4875
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 2,
+          "mode": 0,
+          "window_us": 192.4375
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 2,
+          "mode": 1,
+          "window_us": 154.0375
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 2,
+          "mode": 1,
+          "window_us": 145.425
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 2,
+          "mode": 0,
+          "window_us": 210.7
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 3,
+          "mode": 0,
+          "window_us": 301.7625
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 3,
+          "mode": 1,
+          "window_us": 159.575
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 3,
+          "mode": 1,
+          "window_us": 166.7625
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 3,
+          "mode": 0,
+          "window_us": 204.3
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 4,
+          "mode": 0,
+          "window_us": 196.275
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 4,
+          "mode": 1,
+          "window_us": 152.925
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 4,
+          "mode": 1,
+          "window_us": 143.475
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 4,
+          "mode": 0,
+          "window_us": 191.8
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 5,
+          "mode": 0,
+          "window_us": 242.875
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 5,
+          "mode": 1,
+          "window_us": 192.975
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 5,
+          "mode": 1,
+          "window_us": 142.425
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 5,
+          "mode": 0,
+          "window_us": 219.8
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 6,
+          "mode": 0,
+          "window_us": 186.875
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 6,
+          "mode": 1,
+          "window_us": 158.4
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 6,
+          "mode": 1,
+          "window_us": 153.825
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "repetition": 6,
+          "mode": 0,
+          "window_us": 185.95
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 0,
+          "mode": 0,
+          "window_us": 275.2
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 0,
+          "mode": 1,
+          "window_us": 206.675
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 0,
+          "mode": 1,
+          "window_us": 229.6875
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 0,
+          "mode": 0,
+          "window_us": 292.8375
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 1,
+          "mode": 0,
+          "window_us": 254.3625
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 1,
+          "mode": 1,
+          "window_us": 184.0875
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 1,
+          "mode": 1,
+          "window_us": 188.3125
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 1,
+          "mode": 0,
+          "window_us": 257.925
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 2,
+          "mode": 0,
+          "window_us": 323.8375
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 2,
+          "mode": 1,
+          "window_us": 207.075
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 2,
+          "mode": 1,
+          "window_us": 212.2125
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 2,
+          "mode": 0,
+          "window_us": 260.5375
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 3,
+          "mode": 0,
+          "window_us": 263.3375
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 3,
+          "mode": 1,
+          "window_us": 184.4
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 3,
+          "mode": 1,
+          "window_us": 185.25
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 3,
+          "mode": 0,
+          "window_us": 290.25
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 4,
+          "mode": 0,
+          "window_us": 252.4375
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 4,
+          "mode": 1,
+          "window_us": 183.4
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 4,
+          "mode": 1,
+          "window_us": 190.225
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 4,
+          "mode": 0,
+          "window_us": 314.475
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 5,
+          "mode": 0,
+          "window_us": 313.05
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 5,
+          "mode": 1,
+          "window_us": 193.4
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 5,
+          "mode": 1,
+          "window_us": 181.5
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 5,
+          "mode": 0,
+          "window_us": 258.075
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 6,
+          "mode": 0,
+          "window_us": 253.2125
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 6,
+          "mode": 1,
+          "window_us": 187.375
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 6,
+          "mode": 1,
+          "window_us": 200.2625
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "repetition": 6,
+          "mode": 0,
+          "window_us": 323.3625
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 0,
+          "mode": 0,
+          "window_us": 253.8875
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 0,
+          "mode": 1,
+          "window_us": 189.025
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 0,
+          "mode": 1,
+          "window_us": 201.3125
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 0,
+          "mode": 0,
+          "window_us": 325.05
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 1,
+          "mode": 0,
+          "window_us": 270.35
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 1,
+          "mode": 1,
+          "window_us": 194.475
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 1,
+          "mode": 1,
+          "window_us": 190.95
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 1,
+          "mode": 0,
+          "window_us": 343.175
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 2,
+          "mode": 0,
+          "window_us": 296.75
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 2,
+          "mode": 1,
+          "window_us": 187.9125
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 2,
+          "mode": 1,
+          "window_us": 218.9125
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 2,
+          "mode": 0,
+          "window_us": 256.7875
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 3,
+          "mode": 0,
+          "window_us": 262.3125
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 3,
+          "mode": 1,
+          "window_us": 188.95
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 3,
+          "mode": 1,
+          "window_us": 211.025
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 3,
+          "mode": 0,
+          "window_us": 261.3
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 4,
+          "mode": 0,
+          "window_us": 276.9125
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 4,
+          "mode": 1,
+          "window_us": 214.675
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 4,
+          "mode": 1,
+          "window_us": 186.0375
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 4,
+          "mode": 0,
+          "window_us": 262.2125
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 5,
+          "mode": 0,
+          "window_us": 286.4125
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 5,
+          "mode": 1,
+          "window_us": 261.6
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 5,
+          "mode": 1,
+          "window_us": 188.0625
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 5,
+          "mode": 0,
+          "window_us": 270.75
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 6,
+          "mode": 0,
+          "window_us": 266.125
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 6,
+          "mode": 1,
+          "window_us": 184.8375
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 6,
+          "mode": 1,
+          "window_us": 194.5375
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "repetition": 6,
+          "mode": 0,
+          "window_us": 299.85
+        }
+      ],
+      "rows": [
+        {
+          "T": 1,
+          "ready": 0,
+          "paired_change_pct": [
+            13.195505617977554,
+            4.521245577887489,
+            7.347958520141007,
+            2.3577465927933083,
+            18.610154012204738,
+            43.868267831149964,
+            8.873851763550956
+          ],
+          "median_change_pct": 8.873851763550956,
+          "median_window_us": {
+            "0": 165.10625,
+            "1": 154.54375
+          }
+        },
+        {
+          "T": 1,
+          "ready": 1,
+          "paired_change_pct": [
+            19.58319550115779,
+            -1.7944774042335188,
+            26.587132509586688,
+            40.32562934960047,
+            17.146218322631213,
+            21.815244913996356,
+            4.886952425812541
+          ],
+          "median_change_pct": 19.58319550115779,
+          "median_window_us": {
+            "0": 165.14999999999998,
+            "1": 134.89999999999998
+          }
+        },
+        {
+          "T": 4,
+          "ready": 0,
+          "paired_change_pct": [
+            -4.752363659132164,
+            32.4606177945965,
+            -6.666258194963525,
+            27.474039784811687,
+            -0.6297768266585124,
+            31.617242692161284,
+            38.478131508479606
+          ],
+          "median_change_pct": 27.474039784811687,
+          "median_window_us": {
+            "0": 191.60625,
+            "1": 149.86875
+          }
+        },
+        {
+          "T": 4,
+          "ready": 1,
+          "paired_change_pct": [
+            34.13117302892681,
+            62.008382371618495,
+            34.62036148098677,
+            55.07335197456622,
+            30.929487179487204,
+            37.947227191413255,
+            19.409079990391543
+          ],
+          "median_change_pct": 34.62036148098677,
+          "median_window_us": {
+            "0": 203.89375,
+            "1": 153.58749999999998
+          }
+        },
+        {
+          "T": 8,
+          "ready": 0,
+          "paired_change_pct": [
+            30.175599415623445,
+            37.56377551020409,
+            39.37334168082758,
+            49.75990802110104,
+            51.73302107728337,
+            52.34062416644441,
+            48.7407694044049
+          ],
+          "median_change_pct": 48.7407694044049,
+          "median_window_us": {
+            "0": 269.26874999999995,
+            "1": 189.26875
+          }
+        },
+        {
+          "T": 8,
+          "ready": 1,
+          "paired_change_pct": [
+            48.31716143081308,
+            59.18142310436536,
+            36.062803416702515,
+            30.911306956684783,
+            34.541597778956245,
+            23.906819003141244,
+            49.186161449752895
+          ],
+          "median_change_pct": 36.062803416702515,
+          "median_window_us": {
+            "0": 270.55,
+            "1": 192.71249999999998
+          }
+        }
+      ]
+    }
+  ],
+  "scheduling_delta": "--- \n+++ \n@@ -294,15 +294,40 @@\n         native_quantize_q8_1(x, nw.q8_1, (int) n_embd, n_tok, stream);\n         x_q8_1 = nw.q8_1;\n     }\n-    native_mmvq(nw.gate_type, nw.gate_data, x_q8_1, gate, (int) n_embd, (int) n_ff, n_tok, stream);\n-    native_mmvq(nw.up_type, nw.up_data, x_q8_1, up, (int) n_embd, (int) n_ff, n_tok, stream);\n+    static const bool batch = [] { const char* v = std::getenv(\"STRATA_DEC_BATCH\"); return v == nullptr || std::atoi(v) != 0; }();\n+    bool early_scalar = false;\n+#ifdef STRATA_ORCA_NATIVE\n+    // ponytail: only audited single-launch projections; extend after checking\n+    // other formats' hidden dependencies. The scalar dot needs only x.\n+    auto primitive = [](int type) { return type == 8 || type == 14 || type == 21 || type == 23; };\n+    early_scalar = cs->allows_independent() && native_bf16 && primitive(nw.gate_type) && primitive(nw.up_type);\n+    if (early_scalar) {\n+        static const bool logged = [&] {\n+            std::fprintf(stderr, \"strata: Orca shared independent projections enabled (gate=%d up=%d)\\n\",\n+                         nw.gate_type, nw.up_type);\n+            return true;\n+        }();\n+        (void)logged;\n+        cs->independent([&] {\n+            native_mmvq(nw.gate_type, nw.gate_data, x_q8_1, gate, (int) n_embd, (int) n_ff, n_tok, stream);\n+            native_mmvq(nw.up_type, nw.up_data, x_q8_1, up, (int) n_embd, (int) n_ff, n_tok, stream);\n+            if (batch && n_tok > 1)\n+                bf16_gemv_fp32_mmvf_multi(x, n_embd, gate_inp_bf16, g, 1, n_embd, 1, n_tok, stream);\n+            else for (int t = 0; t < n_tok; ++t)\n+                bf16_gemv_fp32_mmvf(x + (size_t) t * n_embd, gate_inp_bf16, g + t, n_embd, 1, stream);\n+        }); // Join before SwiGLU overwrites gate and reuses Q8 scratch.\n+    } else\n+#endif\n+    {\n+        native_mmvq(nw.gate_type, nw.gate_data, x_q8_1, gate, (int) n_embd, (int) n_ff, n_tok, stream);\n+        native_mmvq(nw.up_type, nw.up_data, x_q8_1, up, (int) n_embd, (int) n_ff, n_tok, stream);\n+    }\n     // Large caller-quantized windows retain the separate path; fusion loses on this A770 case.\n     native_swiglu_q8_1(gate, up, nw.q8_1, (int) n_ff, n_tok, stream,\n                        x_q8_1_ready == nullptr || n_tok <= 4);\n     native_mmvq(nw.down_type, nw.down_data, nw.q8_1, out, (int) n_ff, (int) n_embd, n_tok, stream);\n-    static const bool batch = [] { const char* v = std::getenv(\"STRATA_DEC_BATCH\"); return v == nullptr || std::atoi(v) != 0; }();\n     if (native_bf16 && batch && n_tok > 1) {   // one gemv for all rows (outputs identical), one sigmoid launch\n-        bf16_gemv_fp32_mmvf_multi(x, n_embd, gate_inp_bf16, g, 1, n_embd, 1, n_tok, stream);\n+        if (!early_scalar) bf16_gemv_fp32_mmvf_multi(x, n_embd, gate_inp_bf16, g, 1, n_embd, 1, n_tok, stream);\n         /*\n         DPCT1049: The work-group size passed to the SYCL kernel may exceed\n         the limit. To get the device limit, query\n@@ -323,7 +348,7 @@\n     } else\n     for (int t = 0; t < n_tok; ++t) {\n         if (native_bf16) {\n-            bf16_gemv_fp32_mmvf(x + (size_t) t * n_embd, gate_inp_bf16, g + t, n_embd, 1, stream);\n+            if (!early_scalar) bf16_gemv_fp32_mmvf(x + (size_t) t * n_embd, gate_inp_bf16, g + t, n_embd, 1, stream);\n                 {\n                     auto exp_props =\n                         sycl::ext::oneapi::experimental::properties{\n",
+  "source_sha256": "5ffd192728eab2de5ac7ced1b74c17f1fef973c9eb31fac3f1a07e672ba1ae7d",
+  "generated_sha256": "6b073931561f0c848ef987a0229b841ff21cfeca13c5646db94b366f319b50f2",
+  "base_results_sha256": "47d272ba3fde9f82c27c002195ad5c7e88443bfb675492599447b40716f62395",
+  "m4_results_sha256": "d6c628b0462f9a15af3c37bd34369ff2ba0cc763ed2c0050c6d3f9a50130009b",
+  "qsa_results_sha256": "4978a36d400d210916c4ed85745ca1934e4ad5952e28b9da0cfad4d69c1be196",
+  "model_exe_sha256": "936bc1688d9806c87b9d02ee1e3c5ec3df66858bacc0fd06bc2cbeb62e620e0b",
+  "fixtures": [
+    {
+      "tensor": "blk.0.ffn_gate_shexp.weight",
+      "type": 21,
+      "shape": [
+        2560,
+        640
+      ],
+      "bytes": 704000,
+      "file": "gate.iq3_s",
+      "sha256": "fcdae75b278e250b025f40ff6f49b4ee7a601d566bf2a6746271f4e96fe4b6a1"
+    },
+    {
+      "tensor": "blk.0.ffn_up_shexp.weight",
+      "type": 23,
+      "shape": [
+        2560,
+        640
+      ],
+      "bytes": 870400,
+      "file": "up.iq4_xs",
+      "sha256": "b9133ea1a06cbd944bdb592f080812363dd64c2488c2e4e54cdf7fa40ed1dfab"
+    },
+    {
+      "tensor": "blk.0.ffn_down_shexp.weight",
+      "type": 20,
+      "shape": [
+        640,
+        2560
+      ],
+      "bytes": 921600,
+      "file": "down.iq4_nl",
+      "sha256": "634c46c6a27728331d5752b5633d0a631901dfea3380db04e45475bae1538fc8"
+    },
+    {
+      "tensor": "blk.0.ffn_gate_inp_shexp.weight",
+      "type": 30,
+      "shape": [
+        2560
+      ],
+      "bytes": 5120,
+      "file": "scalar.bf16",
+      "sha256": "a43a13457ded04d02a6ff9904c177b383e2d52ea34e3637c84e63dbb59d7dd45"
+    }
+  ],
+  "check_source_sha256": "e6c9de6a230f14e263b0436224f7ddc703daba407f755badaf54e60f348ce286",
+  "exe_sha256": "f1868d1b16fe40d27c550447bb2db440510a5a84fbc3586319b913d9cf08095b",
+  "images_unchanged": true,
+  "sources_unchanged": true,
+  "executables_unchanged": true,
+  "date": "2026-10-30",
+  "platform": "Arc A770 16GB; Windows driver 32.0.101.9034; IntelLLVM 2025.3.2; Level Zero SDK 1.33.1",
+  "local_run": "real-shared-schedule-1793375236798237000",
+  "raw_results_sha256": "0bd335464745378050e2971dde67462cf404ab2d28ee96725a983f417a01c571",
+  "complete_bitwise_comparisons": 192,
+  "gpu_tail_checks": 6048,
+  "numerical_image_manifest": "Frozen M4 images; full image hashes are in the raw results named above.",
+  "timing": "Seven ABBA repetitions,8windows/sample,host submit+GPU+completion;allocation,JIT,upload,readback excluded.",
+  "limitations": [
+    "Real blk.0 shared-expert weights,three changing synthetic activations,T1/4/8,caller-quantized and self-quantized input,batch enabled/disabled.",
+    "Existing numerical kernels;every output and scratch bit matches ordered/eager execution. No separate CPU64 oracle.",
+    "Complete local shared-expert chain,not full-model or HTTP throughput. Native dependency checks passed.",
+    "No hardware timeline proving simultaneous execution and no Linux GPU validation. Experimental scheduling remains opt-in."
+  ],
+  "excluded_attempt": {
+    "local_run": "real-shared-schedule-1793375169521682300",
+    "raw_results_sha256": "99a0c3cad8f0c88b48986c58154d39c40230b1eecbf12b9932cdabdd0a110524",
+    "reason": "Initial checker omitted iq_kernels from its loaded packs. Kernel lookup failed before any correctness or timing result. Retained checker adds that required pack."
+  },
+  "source_reproduction": {
+    "complete": true,
+    "check_passed": true,
+    "performance_measurement": false,
+    "command": [
+      "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Python311\\python.exe",
+      "G:\\GitHub\\Strata\\orca-l0\\compiler\\build.py",
+      "--compiler",
+      "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin\\icx.exe",
+      "--source",
+      "G:\\GitHub\\Strata\\build-orca-native-20261029\\canonical-shared-1793376277316641800\\shared_expert.cpp",
+      "--out",
+      "G:\\GitHub\\Strata\\build-orca-native-20261029\\canonical-shared-1793376277316641800\\shared_expert",
+      "--module-flags=-cl-fp32-correctly-rounded-divide-sqrt",
+      "--",
+      "-DSTRATA_ORCA_NATIVE=1",
+      "-Wno-ignored-attributes",
+      "-Wno-deprecated-declarations",
+      "-fsycl-default-sub-group-size=32",
+      "/EHsc",
+      "/MD",
+      "/O2",
+      "/fp:precise",
+      "-Qstd:c++20",
+      "-D_USE_STD_VECTOR_ALGORITHMS=0",
+      "-IG:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\frozen\\sycl\\orca\\include",
+      "-IG:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\frozen\\build-orca-native-20261029\\strata-kernels\\generated\\include",
+      "-IG:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\frozen\\sycl",
+      "-IG:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\frozen\\sycl\\include",
+      "-IG:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\frozen\\include",
+      "-IG:/GitHub/Strata/third_party/ggml",
+      "-IG:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\frozen\\orca-l0\\tests",
+      "-IG:\\GitHub\\Strata\\build-orca-native-20261029\\ready-operators-1793365616605763800\\frozen\\orca-l0\\include",
+      "-IC:/Program Files/LevelZeroSDK/1.33.1/include"
+    ],
+    "shared_source_sha256": "5ffd192728eab2de5ac7ced1b74c17f1fef973c9eb31fac3f1a07e672ba1ae7d",
+    "generated_sha256": "6b073931561f0c848ef987a0229b841ff21cfeca13c5646db94b366f319b50f2",
+    "component_results_sha256": "0bd335464745378050e2971dde67462cf404ab2d28ee96725a983f417a01c571",
+    "exit_code": 0,
+    "log_sha256": "29df3454b5a90b5ba9084fafd1342627f193a0b0b9dc28d2a5b72627f3abe739",
+    "image_sha256": {
+      "abi.hpp": "33228e51711dd38b6c44e64ca92660bccf80de851d606e1acaea12f7e9bb25be",
+      "images_0.spv": "a37a48661fa2ec48b76f47dfba2ff79395d9812fc58d009a1c62717d22ddaef1",
+      "images_1.spv": "75b3591ffabcd61a481869072aecb0efa1116f015f9068f7134ab14da9db79b6",
+      "images_10.spv": "a736865d0f090020e7b57f3e1c42e51c7761456b787ad0bd08bf11d5bfb08c9b",
+      "images_11.spv": "5bf328a9aa886ea1bc66071a20f09541ad3d07e31f6ecdff6db1b7cdb976f456",
+      "images_2.spv": "72a3eaf91aa4640427b58067b79600360640a7839e14b3091ce2c0b7e9a2557c",
+      "images_3.spv": "94900284bb1743a5971d6d4c6785b06179073b375f684a4af35767cd8a0be15e",
+      "images_4.spv": "393bf4a2f61140c6f3ce566149d8d16e1a4e2e37b29b95a48a1758e5f91d52c4",
+      "images_5.spv": "786634cedf4cfec5a089e3e11de9aa535924da633a9c4aac86e531eff3920e55",
+      "images_6.spv": "0e8cbd2e5acb9e23e09ca9f0c754607885e50b9341dcb6f25861043f905f34c0",
+      "images_7.spv": "ccfe3c4d6e62970c6c221997f69ead295fc7ff184f13f595e15ecf1a68607319",
+      "images_8.spv": "bbf05d2c08ad7f8bd55875d48a2b7a20f6b1282329f85ed83905b0d8dc2693ff",
+      "images_9.spv": "2192c2d355cfba8f26985eb602444f8554265adccf8e3dfe14c9c941488d2a2e",
+      "index.txt": "337aebbd06dffcacc1c8a7196654deb1ca9a5296eb44682f417dec7c928b9ce8"
+    },
+    "mismatches": [
+      "abi.hpp"
+    ],
+    "all_spirv_exports_identical": true,
+    "index_identical": true,
+    "argument_abi_identical": true,
+    "abi_header_byte_identical": false,
+    "abi_difference": "Only getLineNumber() debug source locations changed; exported names,capture sizes,parameter kinds,offsets and all other header bytes are identical.",
+    "abi_delta": "--- \n+++ \n@@ -264,7 +264,7 @@\n   __SYCL_DLL_LOCAL\n   static constexpr unsigned getLineNumber() {\n #ifndef NDEBUG\n-    return 319;\n+    return 344;\n #else\n     return 0;\n #endif\n@@ -311,7 +311,7 @@\n   __SYCL_DLL_LOCAL\n   static constexpr unsigned getLineNumber() {\n #ifndef NDEBUG\n-    return 339;\n+    return 364;\n #else\n     return 0;\n #endif\n@@ -358,7 +358,7 @@\n   __SYCL_DLL_LOCAL\n   static constexpr unsigned getLineNumber() {\n #ifndef NDEBUG\n-    return 360;\n+    return 385;\n #else\n     return 0;\n #endif\n@@ -405,7 +405,7 @@\n   __SYCL_DLL_LOCAL\n   static constexpr unsigned getLineNumber() {\n #ifndef NDEBUG\n-    return 379;\n+    return 404;\n #else\n     return 0;\n #endif\n@@ -452,7 +452,7 @@\n   __SYCL_DLL_LOCAL\n   static constexpr unsigned getLineNumber() {\n #ifndef NDEBUG\n-    return 494;\n+    return 519;\n #else\n     return 0;\n #endif\n@@ -499,7 +499,7 @@\n   __SYCL_DLL_LOCAL\n   static constexpr unsigned getLineNumber() {\n #ifndef NDEBUG\n-    return 509;\n+    return 534;\n #else\n     return 0;\n #endif\n@@ -546,7 +546,7 @@\n   __SYCL_DLL_LOCAL\n   static constexpr unsigned getLineNumber() {\n #ifndef NDEBUG\n-    return 552;\n+    return 577;\n #else\n     return 0;\n #endif\n@@ -593,7 +593,7 @@\n   __SYCL_DLL_LOCAL\n   static constexpr unsigned getLineNumber() {\n #ifndef NDEBUG\n-    return 568;\n+    return 593;\n #else\n     return 0;\n #endif\n@@ -640,7 +640,7 @@\n   __SYCL_DLL_LOCAL\n   static constexpr unsigned getLineNumber() {\n #ifndef NDEBUG\n-    return 583;\n+    return 608;\n #else\n     return 0;\n #endif\n@@ -687,7 +687,7 @@\n   __SYCL_DLL_LOCAL\n   static constexpr unsigned getLineNumber() {\n #ifndef NDEBUG\n-    return 625;\n+    return 650;\n #else\n     return 0;\n #endif\n",
+    "new_abi_sha256": "35b1cffe21be2a8f4f011b2639404e79aa2db80ede2fa93c9fa2fdaa2f04be38",
+    "local_run": "canonical-shared-1793376277316641800",
+    "raw_results_sha256": "59aa38a6fe075e056b38269f03815ba8525bcdd28f6bc24812446a61e68e85d2"
+  }
+}

@@ -1,0 +1,296 @@
+{
+  "complete": false,
+  "adopted": false,
+  "production_changed": false,
+  "target_achieved": false,
+  "minimum_gain_pct": 1,
+  "maximum_baseline_drift_pct": 3,
+  "hardware": "A77016GB / PCIe3.0 / E5-2696v4 / Windows / DPC++2025.3.2 / driver32.0.101.9034",
+  "startup": {
+    "complete": true,
+    "rows": [
+      {
+        "label": "A1",
+        "slots": 6100,
+        "free_mib": 1417,
+        "exit_code": 0
+      },
+      {
+        "label": "B",
+        "slots": 6113,
+        "free_mib": 1394,
+        "exit_code": 0
+      },
+      {
+        "label": "A2",
+        "slots": 6113,
+        "free_mib": 1393,
+        "exit_code": 0
+      }
+    ]
+  },
+  "export_build": {
+    "complete": true,
+    "checks_passed": true,
+    "checks": [
+      {
+        "label": "outlier-0",
+        "exit_code": 0
+      },
+      {
+        "label": "outlier-1",
+        "exit_code": 0
+      },
+      {
+        "label": "random-0",
+        "exit_code": 0
+      },
+      {
+        "label": "random-1",
+        "exit_code": 0
+      },
+      {
+        "label": "graph-0",
+        "exit_code": 0
+      },
+      {
+        "label": "graph-1",
+        "exit_code": 0
+      }
+    ]
+  },
+  "finite_diagnostic": {
+    "complete": true,
+    "all_outputs_match_reference": true,
+    "nonfinite_diagnostics": [
+      "strata dbg: prompt end: last residual row 0 non-finite (max |x| 4.71); PLE history 0 non-finite (max |x| 14.1); GDN state 0 0 non-finite (max |x| 2.9)",
+      "strata dbg: prompt end: last residual row 0 non-finite (max |x| 7.04); PLE history 0 non-finite (max |x| 13.4); GDN state 0 0 non-finite (max |x| 2.63)",
+      "strata dbg: prompt end: last residual row 0 non-finite (max |x| 4.71); PLE history 0 non-finite (max |x| 14.1); GDN state 0 0 non-finite (max |x| 2.9)"
+    ],
+    "rows": [
+      {
+        "case": "Short",
+        "generated": 16,
+        "prompt_tokens": 23,
+        "all_zero": false,
+        "matches_reference": true
+      },
+      {
+        "case": "Code2K",
+        "generated": 128,
+        "prompt_tokens": 2048,
+        "all_zero": false,
+        "matches_reference": true
+      },
+      {
+        "case": "Prose2K",
+        "generated": 128,
+        "prompt_tokens": 2048,
+        "all_zero": false,
+        "matches_reference": true
+      },
+      {
+        "case": "Code2K",
+        "generated": 128,
+        "prompt_tokens": 2048,
+        "all_zero": false,
+        "matches_reference": true
+      }
+    ]
+  },
+  "environment_fix": {
+    "literal_unset_removed": true,
+    "regression_check_passed": true
+  },
+  "whole_iq_envfix": [
+    {
+      "label": "C",
+      "expert_slots": 5771,
+      "free_mib": 1847,
+      "exit_code": 0,
+      "enabled": false,
+      "dispatch": [],
+      "initializer": {
+        "generated": 16,
+        "prompt_tokens": 23,
+        "decode_ms": 1233.9,
+        "finish": "length",
+        "reused": 0,
+        "accepted": 8,
+        "offered": 14,
+        "case": "Short",
+        "warmup": false,
+        "all_zero": false,
+        "matches_reference": true
+      },
+      "rows": [
+        {
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "decode_ms": 5298.3,
+          "finish": "length",
+          "reused": 0,
+          "accepted": 73,
+          "offered": 92,
+          "case": "Code2K",
+          "warmup": false,
+          "all_zero": false,
+          "matches_reference": true
+        },
+        {
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "decode_ms": 5180.1,
+          "finish": "length",
+          "reused": 0,
+          "accepted": 72,
+          "offered": 96,
+          "case": "Prose2K",
+          "warmup": false,
+          "all_zero": false,
+          "matches_reference": true
+        }
+      ]
+    },
+    {
+      "label": "A",
+      "expert_slots": 5771,
+      "free_mib": 1847,
+      "exit_code": 1,
+      "enabled": false,
+      "dispatch": [],
+      "initializer": {
+        "generated": 16,
+        "prompt_tokens": 23,
+        "decode_ms": 1236.5,
+        "finish": "length",
+        "reused": 0,
+        "accepted": 8,
+        "offered": 14,
+        "case": "Short",
+        "warmup": false,
+        "all_zero": false,
+        "matches_reference": true
+      },
+      "rows": [
+        {
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "decode_ms": 6156.5,
+          "finish": "length",
+          "reused": 0,
+          "accepted": 2,
+          "offered": 2,
+          "case": "Code2K",
+          "warmup": false,
+          "all_zero": true,
+          "matches_reference": false
+        }
+      ]
+    }
+  ],
+  "model_runs": [
+    {
+      "label": "C",
+      "expert_slots": 5771,
+      "free_mib": 1848,
+      "exit_code": 1,
+      "enabled": false,
+      "dispatch": [],
+      "initializer": {
+        "generated": 16,
+        "prompt_tokens": 23,
+        "decode_ms": 1277.8,
+        "finish": "length",
+        "reused": 0,
+        "accepted": 8,
+        "offered": 14,
+        "case": "Short",
+        "warmup": false,
+        "all_zero": false,
+        "matches_reference": true
+      },
+      "rows": [
+        {
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "decode_ms": 5283.0,
+          "finish": "length",
+          "reused": 0,
+          "accepted": 73,
+          "offered": 96,
+          "case": "Code2K",
+          "warmup": false,
+          "all_zero": false,
+          "matches_reference": true
+        },
+        {
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "decode_ms": 3694.8,
+          "finish": "length",
+          "reused": 0,
+          "accepted": 61,
+          "offered": 61,
+          "case": "Prose2K",
+          "warmup": false,
+          "all_zero": true,
+          "matches_reference": false
+        }
+      ]
+    }
+  ],
+  "comparison": {},
+  "confirmation": {},
+  "passes_screen": false,
+  "passes_confirmation": false,
+  "latest_quality_passed": false,
+  "rule": "Original IQ object retained. Only a unique fusion export and a single matched-ABI verifier call added; no prefill/head/dequant replacements. Builds and original-object numerical Q8/full-output/graph checks must pass. Restore UNSET delete semantics. Original corrected-GDN C, new exportOFF A and ON B must match full corrected-GDN outputs before timings. SameEXE A1/B1/A2, fixedcache5500/exact5771slots/READYfree>=1500MiB,original2048/full128,Short16primer,onewarmup/case and3interleavedretained cycles. Fusion only GU22/down42/N2560/F640/cap<=20 with GU16/down4/SG16; other calls directly original. Both cases>=1% and abs adjacent baseline time drift<=3%. Only a passing screen triggers independent A3/B2/A4 at unchanged settings.1Hz readonly Sysman throughout timings. Every output equals corrected-GDN reference. No production change or general-quality/40claim",
+  "raw_file": "build-sycl-a770-gu-q8-export-model-20261027/partial.json",
+  "files_sha256": {
+    "build-sycl-a770-gu-q8-export-model-20261027/partial.json": "2b3035293f03651c4357af3de65bceda8449704c22d50b32af24a6cbfb5050be",
+    "build-sycl-a770-gu-q8-model-v3-20261027/ready-diagnostic-v2/results.json": "4f978a96725814d87da0d09d76d075e02687e198a5c125037e7647073bcfa80c",
+    "build-sycl-a770-gu-q8-export-20261027/build.json": "dd9ef2b0cd68f895fe06781fe9a8dab1533e9a4772400543bd440f06f91afc1d",
+    "build-sycl-a770-gu-q8-model-envfix-20261027/partial.json": "c350dd9d563e4fb5ab6e93ef86aefd1fd194a5df71387bf2c5fec1a01ce0bf96",
+    "build-sycl-a770-gu-q8-finite-control-20261027/results.json": "e1608c6e54ad663a1fc8620c9dfa31440ad1056c2301c7b373bd86d1e0aa6d2d",
+    "build-sycl-a770-gu-q8-export-model-20261027/run.py": "b318742138d64719f420c679a827e31bab164c77fdeaf6633209b6e40c2ec19c",
+    "build-sycl-a770-40tps-recovery-20261026/gdn-build-v2/bin/strata-unified-all-operators.exe": "4b70d03220d7598c772be3955954c2b8771b30138557b7ad14d9338e851fd7d0",
+    "build-sycl-a770-gu-q8-model-cache5500-20261027/run.py": "b0339ea3d9139ce4e1314a9d6dff88604508c44afe9873576dea2c3c11db99cc",
+    "build-sycl-a770-gu-q8-model-cache5500-20261027/partial.json": "3cc5e0c81cd823b4789e88a9c537cefb383384191aceb5a18b349c499d17f912",
+    "build-sycl-a770-gu-q8-cache5500-control-20261027/run.py": "25b4e85343efc5d6b1e139154eb2e793c00d4c3002656e01e0a14a0e3c125dc8",
+    "build-sycl-a770-gu-q8-cache5500-control-20261027/results.json": "79c0217c7ceffbe968d66e7752ad606415d84de7075977805e9d0c105495dd08",
+    "build-sycl-a770-gu-q8-model-v3-20261027/run.py": "0226ad53d98b796271696a86d65deb2a2eaf755c91512c4b56446cf19669e446",
+    "build-sycl-a770-gu-q8-model-v3-20261027/candidate.cpp": "0a629c085f23ae6758dc3c09d405f667a5747cb415ba613154d535b8ba274fa3",
+    "build-sycl-a770-gu-q8-model-v3-20261027/candidate.obj": "8c6a47a68a6c48d4f9f86fbe46307f05f19785764ede989ba31c58bd55d2decd",
+    "build-sycl-a770-gu-q8-model-v3-20261027/protocol.json": "007363b2a4786009b15813e5a13514d30305822ec4bf18524d4beda40a5acd03",
+    "build-sycl-a770-gu-q8-model-v3-20261027/partial.json": "a39ff29e7bd9c7556ae6a6b8a65b2d003c4139d6f22ea2fd4f4cc6ee08d5ec72",
+    "build-sycl-a770-gu-q8-model-v3-20261027/ready-diagnostic-v2/protocol.json": "b619ab6df2bee77042d56c66b9531abf5091aff1ca6eb4c5221a2d46f2f508cd",
+    "build-sycl-a770-40tps-recovery-20261026/gdn-xmx-model/results.json": "31e291319bcd4fe509e603c1f16c1759d0f0f12d225a74a1d67411744f0bf441",
+    "strata-iq2_xs.json": "f3412f382cd9b546aec53db27c8f2917e8869f9502805402fc37421f25d6a6d8",
+    "tools/bench_deepinfer.py": "10cf806bfdffc9cb4ba110d87503d6b28b8c163a789c1567c4a0dde0c1a83730",
+    "build-sycl-a770-decode2k-cache-confirm2-20261025/run.py": "f2945f3993b4741876dd6fbea0292dcba8970a4d583831d8f1dc0f1ef3a2ee4c",
+    "build-sycl-a770-sysman-uuid-20261025/monitor.exe": "7e6a49477a36902b0264bad5de560e927fbd2e696094fbbdab3db4448d732a43",
+    "build-sycl-a770-gu-q8-export-20261027/bin/strata-unified-all-operators.exe": "e04ff41dfc68e3f1bcd53370730b8492e8f14c947cfb0bb09ac5722b143088e7",
+    "build-sycl-a770-gu-q8-export-20261027/build.py": "95f38f0f40a51d4cf4b877e82302a4ae7ea0fd1e3fbf1d250d40f7df43f8e039",
+    "build-sycl-a770-gu-q8-export-20261027/fusion.cpp": "a1846001b071a24c0529ce03f733c2d7bcf1b70c0b7ac8ed926766319cb30d86",
+    "build-sycl-a770-gu-q8-export-20261027/fusion.obj": "7cae114af96e884d6dd3dfa4943e5407bccc726552dec59c7d71e7f2448b17cb",
+    "build-sycl-a770-gu-q8-export-20261027/verify.cpp": "0fcfe0073c63def78c0377f40ec1770b9e3494320ef63e4638859bf3ace314b4",
+    "build-sycl-a770-gu-q8-export-20261027/verify.obj": "410d07dc86fd9c802178dba7ab68b44a844549474449a1cc4eea462a6461aeb2",
+    "build-sycl-a770-gu-q8-export-20261027/verify.patch": "92841c4712f08e0972fb881bdad03b3fb9b185b3b2b0c5347bcb96a909a96d8a",
+    "build-sycl-a770-gu-q8-export-20261027/link.cmd": "117a0c4bffe1e6bdc78d8aa9ce18bba7f3bf5585bacff1c7a66bb7e7d24a1b65",
+    "build-sycl-a770-vram-down-sg16/iq.obj": "17cceb618ebf7707f4582747f206c1db5bdb25b8c92ae65ef25536130ca783bb",
+    "build-sycl-a770-gu-q8-export-model-20261027/protocol.json": "893f9f3277a95a0f3f9fae080c0ac25e5a7d731ccf7efccf22e2aa3e1c89d7a6",
+    "build-sycl-a770-gu-q8-finite-control-20261027/run.py": "86eb65029559de050d29b69315a9465cb2603d2ae8687baa2234969f9951f7a2",
+    "build-sycl-a770-gu-q8-finite-control-20261027/protocol.json": "889e528d90a024c2f49caa5750fd6d4b0e048097f9a14468e2ed86fe9f319cd9",
+    "build-sycl-a770-gu-q8-finite-control-20261027/D1.protocol": "87555f9b8d1c4ee054cad6aee0801b2ac7351ca9b6b4fdfc3366f49b9e543432",
+    "build-sycl-a770-gu-q8-finite-control-20261027/D1.stderr": "6c826957017182f24905aca6043d4dd31819c13d152907fe193f29d5f31c143f",
+    "build-sycl-a770-gu-q8-export-model-20261027/smoke-C.protocol": "eafc3b7e217c7f6783bf2be1d4d20a121d786df2cbecfadcb9d17e59135148c7",
+    "build-sycl-a770-gu-q8-export-model-20261027/smoke-C.stderr": "8fbeb3f462fcdd90443c4582e4087cec76f4e05e6ca23b4fc6dea58e2475cee9",
+    "build-sycl-a770-gu-q8-model-envfix-20261027/smoke-A.protocol": "8e5916f8bd2c223b3bf3cbde7fb9be0be6d80e38a5150d648c77e0ed756abfd4",
+    "build-sycl-a770-gu-q8-model-envfix-20261027/smoke-A.stderr": "ee0f4a4a53351428760d77b6d49384f5e7c79fbe05be91bb2fc2387400ca83c2",
+    "build-sycl-a770-gu-q8-model-envfix-20261027/smoke-C.protocol": "0ccf6f48827d9dfa2cf89ac48d2338039eccf1a97fc561b16e31b52424296d4a",
+    "build-sycl-a770-gu-q8-model-envfix-20261027/smoke-C.stderr": "a674a544e003059e132e921ac8e1dac5c9a5af918ae85f40db4513d2d1426ba0"
+  },
+  "checker_sha256": "fee4daff1699ef5e4b5d64bcc520276423baa6f58fabadb8e2442071157276a0",
+  "report_sha256": "394b4223bc1bf343c9226f5f91501c116b346236d1e50b290987b856671f18c5"
+}

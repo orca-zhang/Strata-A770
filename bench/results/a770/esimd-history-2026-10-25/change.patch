@@ -1,0 +1,22 @@
+--- a/sycl/src/kernels/cuda/verify_kernels.dp.cpp
++++ b/sycl/src/kernels/cuda/verify_kernels.dp.cpp
+@@ -1210,8 +1210,17 @@
+                     seq[j] = src < 3 ? es::gather<float, 16>(history_l + c * 3 + src, offsets)
+                                      : es::block_load<float, 16>(qkv_l + (size_t) (src - 3) * C + c);
+                 }
+-#pragma unroll
+-                for (int j = 0; j < 3; ++j) es::scatter<float, 16>(history_l + c * 3 + j, offsets, seq[j]);
++                if constexpr (FIXED) {
++                    // Write the 16 channel triplets as two contiguous blocks.
++                    es::simd<float, 48> packed;
++#pragma unroll
++                    for (int j = 0; j < 3; ++j) packed.template select<16, 3>(j) = seq[j];
++                    es::block_store<float, 32>(history_l + c * 3, packed.template select<32, 1>(0).read());
++                    es::block_store<float, 16>(history_l + c * 3 + 32, packed.template select<16, 1>(32).read());
++                } else {
++#pragma unroll
++                    for (int j = 0; j < 3; ++j) es::scatter<float, 16>(history_l + c * 3 + j, offsets, seq[j]);
++                }
+             }
+             const size_t stride = (size_t) h_v * S;
+             float* ptr = state_l + (size_t) head * S + col + local * RPG * stride;

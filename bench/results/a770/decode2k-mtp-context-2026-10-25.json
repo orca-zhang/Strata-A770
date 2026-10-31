@@ -1,0 +1,526 @@
+{
+  "complete": true,
+  "scope": "screen",
+  "passes_screen": false,
+  "target_achieved": false,
+  "hardware": "Intel Arc A770 16GB / PCIe3.0, E5-2696v4, Windows, driver32.0.101.9034, DPC++2025.3.2",
+  "rule": "Initial screen, not adoption or independent confirmation. Same frozen graph engine, full248320 draft and verifier vocabulary, FP16 KV, request5500/actual5771 expert slots, reserve1536MiB, context/prefill8192, spec4/min_p0.5, prompt-cache0. Only CLI --mtp-window changes: A1=1024,B1=4096,A2=1024. The4096 window covers the entire original2048 prompt and all128 generated tokens; the verifier is unchanged. Fresh processes, Short16 initializer, one warmup per case then three interleaved retained cycles. Require all24 complete128 outputs to match frozen references; retain every warmup and low sample. No profiler. Pass screen only if both cases gain at least3% paired median throughput with at most3% adjacent baseline time drift. A positive screen still requires independent confirmation. No production/default changes; no general-quality claim.",
+  "cases": [
+    "Code2K",
+    "Prose2K"
+  ],
+  "requests": 24,
+  "output_tokens_checked": 3072,
+  "raw_results_sha256": "fac77fe5c8cc0eb37a178b5a325d8550e18c5a48299ac3b6ec7d38ebc87cc634",
+  "protocol_sha256": "b479fad74d593001db08fe48430edf32e66a9a1fc3ed331372032bd29bb655e8",
+  "input_sha256": {
+    "Code2K": "52e6ff558ef30e7d22e35b6d01b6fdc37757565c4de3a816d2ac008f312a8b81",
+    "Prose2K": "a69ee0a6af1ac999201747e4866fe1bb85d3a03987b002c24057d0bcc87ec46e"
+  },
+  "reference_output_sha256": {
+    "Code2K": "76252b2f9e9cc17646ecace8afbd0527b70a8487646e63301ec8af1779c32894",
+    "Prose2K": "00c1afb1bf8359fc114b4c24b5d2636601cd4c8851032d099546275062c0c016"
+  },
+  "comparison": {
+    "Code2K": {
+      "baseline": 34.57405686819519,
+      "candidate": 34.2203125,
+      "throughput_change_pct": 1.0337262939816627,
+      "baseline_drift_pct": -1.9776728785878772
+    },
+    "Prose2K": {
+      "baseline": 34.07342832863178,
+      "candidate": 34.2609375,
+      "throughput_change_pct": -0.5472972576077928,
+      "baseline_drift_pct": 0.14684961681430408
+    }
+  },
+  "runs": [
+    {
+      "label": "A1",
+      "mtp_window": 1024,
+      "expert_slots": 5771,
+      "exit_code": 0,
+      "summary": {
+        "Code2K": {
+          "decode_tps": 28.635987382268063,
+          "decode_tps_range": [
+            28.472284011033008,
+            29.35308551379366
+          ],
+          "prompt_ms": 51920.8,
+          "ttft_ms": 51968.87380001135,
+          "accepted": [
+            75,
+            75,
+            75
+          ],
+          "offered": [
+            98,
+            98,
+            98
+          ],
+          "outputs_equal": true
+        },
+        "Prose2K": {
+          "decode_tps": 29.369923362856227,
+          "decode_tps_range": [
+            27.821248478525472,
+            29.38475665748393
+          ],
+          "prompt_ms": 49479.2,
+          "ttft_ms": 49526.13380001276,
+          "accepted": [
+            73,
+            73,
+            73
+          ],
+          "offered": [
+            98,
+            98,
+            98
+          ],
+          "outputs_equal": true
+        }
+      },
+      "rows": [
+        {
+          "case": "Code2K",
+          "warmup": true,
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 50182.6,
+          "decode_ms": 5062.3,
+          "finish": "length",
+          "accepted": 75,
+          "offered": 98,
+          "reused": 0,
+          "ttft_ms": 50238.83799999021,
+          "output_sha256": "76252b2f9e9cc17646ecace8afbd0527b70a8487646e63301ec8af1779c32894"
+        },
+        {
+          "case": "Prose2K",
+          "warmup": true,
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 51184.6,
+          "decode_ms": 4921.4,
+          "finish": "length",
+          "accepted": 72,
+          "offered": 100,
+          "reused": 0,
+          "ttft_ms": 51234.16999998153,
+          "output_sha256": "00c1afb1bf8359fc114b4c24b5d2636601cd4c8851032d099546275062c0c016"
+        },
+        {
+          "case": "Code2K",
+          "warmup": false,
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 52154.4,
+          "decode_ms": 4495.6,
+          "finish": "length",
+          "accepted": 75,
+          "offered": 98,
+          "reused": 0,
+          "ttft_ms": 52201.23739997507,
+          "output_sha256": "76252b2f9e9cc17646ecace8afbd0527b70a8487646e63301ec8af1779c32894"
+        },
+        {
+          "case": "Prose2K",
+          "warmup": false,
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 50741.2,
+          "decode_ms": 4600.8,
+          "finish": "length",
+          "accepted": 73,
+          "offered": 98,
+          "reused": 0,
+          "ttft_ms": 50789.752299984684,
+          "output_sha256": "00c1afb1bf8359fc114b4c24b5d2636601cd4c8851032d099546275062c0c016"
+        },
+        {
+          "case": "Code2K",
+          "warmup": false,
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 51920.8,
+          "decode_ms": 4469.9,
+          "finish": "length",
+          "accepted": 75,
+          "offered": 98,
+          "reused": 0,
+          "ttft_ms": 51968.87380001135,
+          "output_sha256": "76252b2f9e9cc17646ecace8afbd0527b70a8487646e63301ec8af1779c32894"
+        },
+        {
+          "case": "Prose2K",
+          "warmup": false,
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 49479.2,
+          "decode_ms": 4358.2,
+          "finish": "length",
+          "accepted": 73,
+          "offered": 98,
+          "reused": 0,
+          "ttft_ms": 49526.13380001276,
+          "output_sha256": "00c1afb1bf8359fc114b4c24b5d2636601cd4c8851032d099546275062c0c016"
+        },
+        {
+          "case": "Code2K",
+          "warmup": false,
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 49497.7,
+          "decode_ms": 4360.7,
+          "finish": "length",
+          "accepted": 75,
+          "offered": 98,
+          "reused": 0,
+          "ttft_ms": 49546.417900011875,
+          "output_sha256": "76252b2f9e9cc17646ecace8afbd0527b70a8487646e63301ec8af1779c32894"
+        },
+        {
+          "case": "Prose2K",
+          "warmup": false,
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 48836.9,
+          "decode_ms": 4356.0,
+          "finish": "length",
+          "accepted": 73,
+          "offered": 98,
+          "reused": 0,
+          "ttft_ms": 48884.57860000199,
+          "output_sha256": "00c1afb1bf8359fc114b4c24b5d2636601cd4c8851032d099546275062c0c016"
+        }
+      ]
+    },
+    {
+      "label": "B1",
+      "mtp_window": 4096,
+      "expert_slots": 5771,
+      "exit_code": 0,
+      "summary": {
+        "Code2K": {
+          "decode_tps": 29.22240993561938,
+          "decode_tps_range": [
+            29.216406838465222,
+            29.325513196480937
+          ],
+          "prompt_ms": 49844.4,
+          "ttft_ms": 49891.506799991475,
+          "accepted": [
+            75,
+            75,
+            75
+          ],
+          "offered": [
+            97,
+            97,
+            97
+          ],
+          "outputs_equal": true
+        },
+        "Prose2K": {
+          "decode_tps": 29.187759383408586,
+          "decode_tps_range": [
+            28.531306421772953,
+            29.317453046266607
+          ],
+          "prompt_ms": 48731.5,
+          "ttft_ms": 48779.399400023976,
+          "accepted": [
+            73,
+            73,
+            73
+          ],
+          "offered": [
+            99,
+            101,
+            99
+          ],
+          "outputs_equal": true
+        }
+      },
+      "rows": [
+        {
+          "case": "Code2K",
+          "warmup": true,
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 50079.5,
+          "decode_ms": 5100.3,
+          "finish": "length",
+          "accepted": 75,
+          "offered": 97,
+          "reused": 0,
+          "ttft_ms": 50135.97080000909,
+          "output_sha256": "76252b2f9e9cc17646ecace8afbd0527b70a8487646e63301ec8af1779c32894"
+        },
+        {
+          "case": "Prose2K",
+          "warmup": true,
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 48714.3,
+          "decode_ms": 4736.8,
+          "finish": "length",
+          "accepted": 72,
+          "offered": 100,
+          "reused": 0,
+          "ttft_ms": 48762.20540000941,
+          "output_sha256": "00c1afb1bf8359fc114b4c24b5d2636601cd4c8851032d099546275062c0c016"
+        },
+        {
+          "case": "Code2K",
+          "warmup": false,
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 49844.4,
+          "decode_ms": 4380.2,
+          "finish": "length",
+          "accepted": 75,
+          "offered": 97,
+          "reused": 0,
+          "ttft_ms": 49891.506799991475,
+          "output_sha256": "76252b2f9e9cc17646ecace8afbd0527b70a8487646e63301ec8af1779c32894"
+        },
+        {
+          "case": "Prose2K",
+          "warmup": false,
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 48731.5,
+          "decode_ms": 4385.4,
+          "finish": "length",
+          "accepted": 73,
+          "offered": 99,
+          "reused": 0,
+          "ttft_ms": 48779.399400023976,
+          "output_sha256": "00c1afb1bf8359fc114b4c24b5d2636601cd4c8851032d099546275062c0c016"
+        },
+        {
+          "case": "Code2K",
+          "warmup": false,
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 49838.6,
+          "decode_ms": 4381.1,
+          "finish": "length",
+          "accepted": 75,
+          "offered": 97,
+          "reused": 0,
+          "ttft_ms": 49887.59719999507,
+          "output_sha256": "76252b2f9e9cc17646ecace8afbd0527b70a8487646e63301ec8af1779c32894"
+        },
+        {
+          "case": "Prose2K",
+          "warmup": false,
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 48716.8,
+          "decode_ms": 4486.3,
+          "finish": "length",
+          "accepted": 73,
+          "offered": 101,
+          "reused": 0,
+          "ttft_ms": 48763.854400021955,
+          "output_sha256": "00c1afb1bf8359fc114b4c24b5d2636601cd4c8851032d099546275062c0c016"
+        },
+        {
+          "case": "Code2K",
+          "warmup": false,
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 49919.3,
+          "decode_ms": 4364.8,
+          "finish": "length",
+          "accepted": 75,
+          "offered": 97,
+          "reused": 0,
+          "ttft_ms": 49967.093099985505,
+          "output_sha256": "76252b2f9e9cc17646ecace8afbd0527b70a8487646e63301ec8af1779c32894"
+        },
+        {
+          "case": "Prose2K",
+          "warmup": false,
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 49116.1,
+          "decode_ms": 4366.0,
+          "finish": "length",
+          "accepted": 73,
+          "offered": 99,
+          "reused": 0,
+          "ttft_ms": 49163.42070000246,
+          "output_sha256": "00c1afb1bf8359fc114b4c24b5d2636601cd4c8851032d099546275062c0c016"
+        }
+      ]
+    },
+    {
+      "label": "A2",
+      "mtp_window": 1024,
+      "expert_slots": 5771,
+      "exit_code": 0,
+      "summary": {
+        "Code2K": {
+          "decode_tps": 29.213739586899464,
+          "decode_tps_range": [
+            28.21060983404227,
+            29.286596805930532
+          ],
+          "prompt_ms": 49858.1,
+          "ttft_ms": 49903.92949999659,
+          "accepted": [
+            75,
+            75,
+            75
+          ],
+          "offered": [
+            98,
+            98,
+            98
+          ],
+          "outputs_equal": true
+        },
+        "Prose2K": {
+          "decode_tps": 29.32685698574898,
+          "decode_tps_range": [
+            28.615501553732308,
+            29.430023222127698
+          ],
+          "prompt_ms": 48707.4,
+          "ttft_ms": 48755.13200002024,
+          "accepted": [
+            73,
+            73,
+            73
+          ],
+          "offered": [
+            98,
+            98,
+            98
+          ],
+          "outputs_equal": true
+        }
+      },
+      "rows": [
+        {
+          "case": "Code2K",
+          "warmup": true,
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 50094.8,
+          "decode_ms": 5065.6,
+          "finish": "length",
+          "accepted": 75,
+          "offered": 98,
+          "reused": 0,
+          "ttft_ms": 50150.84669998032,
+          "output_sha256": "76252b2f9e9cc17646ecace8afbd0527b70a8487646e63301ec8af1779c32894"
+        },
+        {
+          "case": "Prose2K",
+          "warmup": true,
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 48624.3,
+          "decode_ms": 4793.8,
+          "finish": "length",
+          "accepted": 72,
+          "offered": 100,
+          "reused": 0,
+          "ttft_ms": 48672.29069999303,
+          "output_sha256": "00c1afb1bf8359fc114b4c24b5d2636601cd4c8851032d099546275062c0c016"
+        },
+        {
+          "case": "Code2K",
+          "warmup": false,
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 49858.1,
+          "decode_ms": 4381.5,
+          "finish": "length",
+          "accepted": 75,
+          "offered": 98,
+          "reused": 0,
+          "ttft_ms": 49903.92949999659,
+          "output_sha256": "76252b2f9e9cc17646ecace8afbd0527b70a8487646e63301ec8af1779c32894"
+        },
+        {
+          "case": "Prose2K",
+          "warmup": false,
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 48707.4,
+          "decode_ms": 4349.3,
+          "finish": "length",
+          "accepted": 73,
+          "offered": 98,
+          "reused": 0,
+          "ttft_ms": 48755.13200002024,
+          "output_sha256": "00c1afb1bf8359fc114b4c24b5d2636601cd4c8851032d099546275062c0c016"
+        },
+        {
+          "case": "Code2K",
+          "warmup": false,
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 49200.1,
+          "decode_ms": 4370.6,
+          "finish": "length",
+          "accepted": 75,
+          "offered": 98,
+          "reused": 0,
+          "ttft_ms": 49248.41679999372,
+          "output_sha256": "76252b2f9e9cc17646ecace8afbd0527b70a8487646e63301ec8af1779c32894"
+        },
+        {
+          "case": "Prose2K",
+          "warmup": false,
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 48649.3,
+          "decode_ms": 4364.6,
+          "finish": "length",
+          "accepted": 73,
+          "offered": 98,
+          "reused": 0,
+          "ttft_ms": 48696.77660000161,
+          "output_sha256": "00c1afb1bf8359fc114b4c24b5d2636601cd4c8851032d099546275062c0c016"
+        },
+        {
+          "case": "Code2K",
+          "warmup": false,
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 51485.2,
+          "decode_ms": 4537.3,
+          "finish": "length",
+          "accepted": 75,
+          "offered": 98,
+          "reused": 0,
+          "ttft_ms": 51534.00459999102,
+          "output_sha256": "76252b2f9e9cc17646ecace8afbd0527b70a8487646e63301ec8af1779c32894"
+        },
+        {
+          "case": "Prose2K",
+          "warmup": false,
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 50462.5,
+          "decode_ms": 4473.1,
+          "finish": "length",
+          "accepted": 73,
+          "offered": 98,
+          "reused": 0,
+          "ttft_ms": 50511.831600015284,
+          "output_sha256": "00c1afb1bf8359fc114b4c24b5d2636601cd4c8851032d099546275062c0c016"
+        }
+      ]
+    }
+  ]
+}

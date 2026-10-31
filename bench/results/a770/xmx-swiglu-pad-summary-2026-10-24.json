@@ -1,0 +1,835 @@
+{
+  "complete": true,
+  "date": "2026-10-24",
+  "integrated": false,
+  "default_enabled": false,
+  "hardware": "A77016GB,E5-2696v4,PCIe3.0x16,Windows,driver32.0.101.9034,DPC++2025.3.2,oneMKL2025.3",
+  "feature": "Fuse SwiGLU with down-input tail padding for T<=64,T%8!=0. Reuse validated GU-input padding after GU finishes on the in-order queue. Original XMX kernel and FP32 accumulator unchanged; no new allocation.",
+  "baseline": "Already adopted expert-chain batching enabled; not the default production executable.",
+  "scope": "Private isolated relink,FP32 accumulation and original R1 XMX kernel unchanged. SwiGLU writes original H plus zero-tailed H into the existing GU padding workspace, then down consumes the pre-padded input; one final wait. 8 banks,78.6MB,128MiB/all128, 16 warmups,median7 batches x16 whole-chain calls,profiling off.",
+  "rule_before_measurement": "One screen and, only if passed, one independent confirmation, A/B/A/B/A each. A=adopted expert chain; B=same chain with SwiGLU+down-input padding fused for T<=64,T%8!=0. Both rounds require >=5 of7 affected shapes with baseline drift<=3%,median gain>=3%, no eligible affected regression below -3%. Unaffected shapes stay on the old chain. 384 full-output/guard/workspace/saturation/signed-zero checks per process. No resampling. Only both passing cohorts proceed to one same-EXE Code256 model A/B/A/B/A:both rounds prefill gain>=3%,drift<=3%,same4191 slots/5760MiB,exact32 output IDs. Production/default unchanged.",
+  "operator_passed": false,
+  "cohorts": [
+    {
+      "cohort": "screen",
+      "runs": [
+        {
+          "fused": false,
+          "index": 0,
+          "rows": [
+            {
+              "T": 1,
+              "us": 431.7,
+              "hash": "8e79b20c5c6d0ab1",
+              "weight_banks": 8
+            },
+            {
+              "T": 2,
+              "us": 436.26875,
+              "hash": "6a831aa8b50f7351",
+              "weight_banks": 8
+            },
+            {
+              "T": 4,
+              "us": 430.90625,
+              "hash": "a24dd780779851ed",
+              "weight_banks": 8
+            },
+            {
+              "T": 6,
+              "us": 436.49375,
+              "hash": "1d409b844fc8315d",
+              "weight_banks": 8
+            },
+            {
+              "T": 7,
+              "us": 439.14375,
+              "hash": "dbdf1ecbc2819631",
+              "weight_banks": 8
+            },
+            {
+              "T": 8,
+              "us": 391.08125,
+              "hash": "614dedfa653ea7f9",
+              "weight_banks": 8
+            },
+            {
+              "T": 9,
+              "us": 444.7375,
+              "hash": "d0701a06d0fa4531",
+              "weight_banks": 8
+            },
+            {
+              "T": 16,
+              "us": 401.16875,
+              "hash": "2785613fb5688b0b",
+              "weight_banks": 8
+            },
+            {
+              "T": 22,
+              "us": 461.0125,
+              "hash": "8bb97e6c6825f1f3",
+              "weight_banks": 8
+            },
+            {
+              "T": 32,
+              "us": 513.225,
+              "hash": "565ffe4110f84d52",
+              "weight_banks": 8
+            },
+            {
+              "T": 40,
+              "us": 526.89375,
+              "hash": "4b20e840f395570e",
+              "weight_banks": 8
+            },
+            {
+              "T": 64,
+              "us": 592.46875,
+              "hash": "825197dc5e69ca41",
+              "weight_banks": 8
+            },
+            {
+              "T": 65,
+              "us": 621.26875,
+              "hash": "c90852b5fb548b2d",
+              "weight_banks": 8
+            },
+            {
+              "T": 128,
+              "us": 628.01875,
+              "hash": "8c9cae1f6312b489",
+              "weight_banks": 8
+            },
+            {
+              "T": 256,
+              "us": 798.74375,
+              "hash": "10bc973f4e8a6825",
+              "weight_banks": 8
+            }
+          ],
+          "summary": {
+            "checks": 384
+          }
+        },
+        {
+          "fused": true,
+          "index": 1,
+          "rows": [
+            {
+              "T": 1,
+              "us": 441.7125,
+              "hash": "8e79b20c5c6d0ab1",
+              "weight_banks": 8
+            },
+            {
+              "T": 2,
+              "us": 434.35625,
+              "hash": "6a831aa8b50f7351",
+              "weight_banks": 8
+            },
+            {
+              "T": 4,
+              "us": 435.14375,
+              "hash": "a24dd780779851ed",
+              "weight_banks": 8
+            },
+            {
+              "T": 6,
+              "us": 448.625,
+              "hash": "1d409b844fc8315d",
+              "weight_banks": 8
+            },
+            {
+              "T": 7,
+              "us": 445.2375,
+              "hash": "dbdf1ecbc2819631",
+              "weight_banks": 8
+            },
+            {
+              "T": 8,
+              "us": 391.60625,
+              "hash": "614dedfa653ea7f9",
+              "weight_banks": 8
+            },
+            {
+              "T": 9,
+              "us": 467.05,
+              "hash": "d0701a06d0fa4531",
+              "weight_banks": 8
+            },
+            {
+              "T": 16,
+              "us": 401.26875,
+              "hash": "2785613fb5688b0b",
+              "weight_banks": 8
+            },
+            {
+              "T": 22,
+              "us": 499.73125,
+              "hash": "8bb97e6c6825f1f3",
+              "weight_banks": 8
+            },
+            {
+              "T": 32,
+              "us": 514.2125,
+              "hash": "565ffe4110f84d52",
+              "weight_banks": 8
+            },
+            {
+              "T": 40,
+              "us": 519.375,
+              "hash": "4b20e840f395570e",
+              "weight_banks": 8
+            },
+            {
+              "T": 64,
+              "us": 575.8875,
+              "hash": "825197dc5e69ca41",
+              "weight_banks": 8
+            },
+            {
+              "T": 65,
+              "us": 634.80625,
+              "hash": "c90852b5fb548b2d",
+              "weight_banks": 8
+            },
+            {
+              "T": 128,
+              "us": 644.5875,
+              "hash": "8c9cae1f6312b489",
+              "weight_banks": 8
+            },
+            {
+              "T": 256,
+              "us": 807.50625,
+              "hash": "10bc973f4e8a6825",
+              "weight_banks": 8
+            }
+          ],
+          "summary": {
+            "checks": 384
+          }
+        },
+        {
+          "fused": false,
+          "index": 2,
+          "rows": [
+            {
+              "T": 1,
+              "us": 424.925,
+              "hash": "8e79b20c5c6d0ab1",
+              "weight_banks": 8
+            },
+            {
+              "T": 2,
+              "us": 429.30625,
+              "hash": "6a831aa8b50f7351",
+              "weight_banks": 8
+            },
+            {
+              "T": 4,
+              "us": 410.475,
+              "hash": "a24dd780779851ed",
+              "weight_banks": 8
+            },
+            {
+              "T": 6,
+              "us": 421.4,
+              "hash": "1d409b844fc8315d",
+              "weight_banks": 8
+            },
+            {
+              "T": 7,
+              "us": 406.38125,
+              "hash": "dbdf1ecbc2819631",
+              "weight_banks": 8
+            },
+            {
+              "T": 8,
+              "us": 386.4,
+              "hash": "614dedfa653ea7f9",
+              "weight_banks": 8
+            },
+            {
+              "T": 9,
+              "us": 439.71875,
+              "hash": "d0701a06d0fa4531",
+              "weight_banks": 8
+            },
+            {
+              "T": 16,
+              "us": 404.99375,
+              "hash": "2785613fb5688b0b",
+              "weight_banks": 8
+            },
+            {
+              "T": 22,
+              "us": 460.475,
+              "hash": "8bb97e6c6825f1f3",
+              "weight_banks": 8
+            },
+            {
+              "T": 32,
+              "us": 510.15625,
+              "hash": "565ffe4110f84d52",
+              "weight_banks": 8
+            },
+            {
+              "T": 40,
+              "us": 511.66875,
+              "hash": "4b20e840f395570e",
+              "weight_banks": 8
+            },
+            {
+              "T": 64,
+              "us": 574.69375,
+              "hash": "825197dc5e69ca41",
+              "weight_banks": 8
+            },
+            {
+              "T": 65,
+              "us": 590.625,
+              "hash": "c90852b5fb548b2d",
+              "weight_banks": 8
+            },
+            {
+              "T": 128,
+              "us": 656.94375,
+              "hash": "8c9cae1f6312b489",
+              "weight_banks": 8
+            },
+            {
+              "T": 256,
+              "us": 819.875,
+              "hash": "10bc973f4e8a6825",
+              "weight_banks": 8
+            }
+          ],
+          "summary": {
+            "checks": 384
+          }
+        },
+        {
+          "fused": true,
+          "index": 3,
+          "rows": [
+            {
+              "T": 1,
+              "us": 437.1875,
+              "hash": "8e79b20c5c6d0ab1",
+              "weight_banks": 8
+            },
+            {
+              "T": 2,
+              "us": 425.625,
+              "hash": "6a831aa8b50f7351",
+              "weight_banks": 8
+            },
+            {
+              "T": 4,
+              "us": 427.16875,
+              "hash": "a24dd780779851ed",
+              "weight_banks": 8
+            },
+            {
+              "T": 6,
+              "us": 432.5375,
+              "hash": "1d409b844fc8315d",
+              "weight_banks": 8
+            },
+            {
+              "T": 7,
+              "us": 443.6875,
+              "hash": "dbdf1ecbc2819631",
+              "weight_banks": 8
+            },
+            {
+              "T": 8,
+              "us": 380.86875,
+              "hash": "614dedfa653ea7f9",
+              "weight_banks": 8
+            },
+            {
+              "T": 9,
+              "us": 462.34375,
+              "hash": "d0701a06d0fa4531",
+              "weight_banks": 8
+            },
+            {
+              "T": 16,
+              "us": 408.08125,
+              "hash": "2785613fb5688b0b",
+              "weight_banks": 8
+            },
+            {
+              "T": 22,
+              "us": 481.9125,
+              "hash": "8bb97e6c6825f1f3",
+              "weight_banks": 8
+            },
+            {
+              "T": 32,
+              "us": 512.16875,
+              "hash": "565ffe4110f84d52",
+              "weight_banks": 8
+            },
+            {
+              "T": 40,
+              "us": 524.15,
+              "hash": "4b20e840f395570e",
+              "weight_banks": 8
+            },
+            {
+              "T": 64,
+              "us": 578.8625,
+              "hash": "825197dc5e69ca41",
+              "weight_banks": 8
+            },
+            {
+              "T": 65,
+              "us": 619.7875,
+              "hash": "c90852b5fb548b2d",
+              "weight_banks": 8
+            },
+            {
+              "T": 128,
+              "us": 626.50625,
+              "hash": "8c9cae1f6312b489",
+              "weight_banks": 8
+            },
+            {
+              "T": 256,
+              "us": 821.7875,
+              "hash": "10bc973f4e8a6825",
+              "weight_banks": 8
+            }
+          ],
+          "summary": {
+            "checks": 384
+          }
+        },
+        {
+          "fused": false,
+          "index": 4,
+          "rows": [
+            {
+              "T": 1,
+              "us": 424.31875,
+              "hash": "8e79b20c5c6d0ab1",
+              "weight_banks": 8
+            },
+            {
+              "T": 2,
+              "us": 420.98125,
+              "hash": "6a831aa8b50f7351",
+              "weight_banks": 8
+            },
+            {
+              "T": 4,
+              "us": 419.8375,
+              "hash": "a24dd780779851ed",
+              "weight_banks": 8
+            },
+            {
+              "T": 6,
+              "us": 406.6125,
+              "hash": "1d409b844fc8315d",
+              "weight_banks": 8
+            },
+            {
+              "T": 7,
+              "us": 414.94375,
+              "hash": "dbdf1ecbc2819631",
+              "weight_banks": 8
+            },
+            {
+              "T": 8,
+              "us": 394.175,
+              "hash": "614dedfa653ea7f9",
+              "weight_banks": 8
+            },
+            {
+              "T": 9,
+              "us": 425.1375,
+              "hash": "d0701a06d0fa4531",
+              "weight_banks": 8
+            },
+            {
+              "T": 16,
+              "us": 398.1875,
+              "hash": "2785613fb5688b0b",
+              "weight_banks": 8
+            },
+            {
+              "T": 22,
+              "us": 457.0125,
+              "hash": "8bb97e6c6825f1f3",
+              "weight_banks": 8
+            },
+            {
+              "T": 32,
+              "us": 520.89375,
+              "hash": "565ffe4110f84d52",
+              "weight_banks": 8
+            },
+            {
+              "T": 40,
+              "us": 517.925,
+              "hash": "4b20e840f395570e",
+              "weight_banks": 8
+            },
+            {
+              "T": 64,
+              "us": 581.075,
+              "hash": "825197dc5e69ca41",
+              "weight_banks": 8
+            },
+            {
+              "T": 65,
+              "us": 617.425,
+              "hash": "c90852b5fb548b2d",
+              "weight_banks": 8
+            },
+            {
+              "T": 128,
+              "us": 640.2,
+              "hash": "8c9cae1f6312b489",
+              "weight_banks": 8
+            },
+            {
+              "T": 256,
+              "us": 826.01875,
+              "hash": "10bc973f4e8a6825",
+              "weight_banks": 8
+            }
+          ],
+          "summary": {
+            "checks": 384
+          }
+        }
+      ],
+      "pairs": [
+        {
+          "round": 1,
+          "T": 1,
+          "baseline": 428.29910401493953,
+          "candidate": 441.7125,
+          "throughput_change_pct": -3.036680190182628,
+          "baseline_drift_pct": -1.5693768820940424
+        },
+        {
+          "round": 1,
+          "T": 2,
+          "baseline": 432.7734985586427,
+          "candidate": 434.35625,
+          "throughput_change_pct": -0.36439016161441407,
+          "baseline_drift_pct": -1.5959199461341278
+        },
+        {
+          "round": 1,
+          "T": 4,
+          "baseline": 420.566573765379,
+          "candidate": 435.14375,
+          "throughput_change_pct": -3.3499679668203886,
+          "baseline_drift_pct": -4.741460584523893
+        },
+        {
+          "round": 1,
+          "T": 6,
+          "baseline": 428.8804801456928,
+          "candidate": 448.625,
+          "throughput_change_pct": -4.401118942169346,
+          "baseline_drift_pct": -3.457953292572913
+        },
+        {
+          "round": 1,
+          "T": 7,
+          "baseline": 422.4450095038259,
+          "candidate": 445.2375,
+          "throughput_change_pct": -5.1191758322634895,
+          "baseline_drift_pct": -7.46054110983021
+        },
+        {
+          "round": 1,
+          "T": 8,
+          "baseline": 388.73357843129526,
+          "candidate": 391.60625,
+          "throughput_change_pct": -0.7335612158142824,
+          "baseline_drift_pct": -1.197001901778727
+        },
+        {
+          "round": 1,
+          "T": 9,
+          "baseline": 442.22100535606063,
+          "candidate": 467.05,
+          "throughput_change_pct": -5.316132029534182,
+          "baseline_drift_pct": -1.1284746620197295
+        },
+        {
+          "round": 1,
+          "T": 16,
+          "baseline": 403.07671285415694,
+          "candidate": 401.26875,
+          "throughput_change_pct": 0.4505615885006975,
+          "baseline_drift_pct": 0.9534640970913166
+        },
+        {
+          "round": 1,
+          "T": 22,
+          "baseline": 460.7436716195894,
+          "candidate": 499.73125,
+          "throughput_change_pct": -7.8017090947205325,
+          "baseline_drift_pct": -0.11659119872020618
+        },
+        {
+          "round": 1,
+          "T": 32,
+          "baseline": 511.6883244771665,
+          "candidate": 514.2125,
+          "throughput_change_pct": -0.4908817896946305,
+          "baseline_drift_pct": -0.5979346290613363
+        },
+        {
+          "round": 1,
+          "T": 40,
+          "baseline": 519.2254485724986,
+          "candidate": 519.375,
+          "throughput_change_pct": -0.02879449867655426,
+          "baseline_drift_pct": -2.8895768833849256
+        },
+        {
+          "round": 1,
+          "T": 64,
+          "baseline": 583.5135711320796,
+          "candidate": 575.8875,
+          "throughput_change_pct": 1.3242293211920053,
+          "baseline_drift_pct": -3.000158236193884
+        },
+        {
+          "round": 1,
+          "T": 65,
+          "baseline": 605.753130795665,
+          "candidate": 634.80625,
+          "throughput_change_pct": -4.576690794133642,
+          "baseline_drift_pct": -4.932446706839821
+        },
+        {
+          "round": 1,
+          "T": 128,
+          "baseline": 642.3184511558986,
+          "candidate": 644.5875,
+          "throughput_change_pct": -0.3520156447497591,
+          "baseline_drift_pct": 4.6057542071793245
+        },
+        {
+          "round": 1,
+          "T": 256,
+          "baseline": 809.2404043491958,
+          "candidate": 807.50625,
+          "throughput_change_pct": 0.2147542943718106,
+          "baseline_drift_pct": 2.645560606890518
+        },
+        {
+          "round": 3,
+          "T": 1,
+          "baseline": 424.6217668039994,
+          "candidate": 437.1875,
+          "throughput_change_pct": -2.8742206023732675,
+          "baseline_drift_pct": -0.1426722362769861
+        },
+        {
+          "round": 3,
+          "T": 2,
+          "baseline": 425.1233723965462,
+          "candidate": 425.625,
+          "throughput_change_pct": -0.11785670565728212,
+          "baseline_drift_pct": -1.9391751226542797
+        },
+        {
+          "round": 3,
+          "T": 4,
+          "baseline": 415.1298565659907,
+          "candidate": 427.16875,
+          "throughput_change_pct": -2.8182991930026047,
+          "baseline_drift_pct": 2.2808940861197335
+        },
+        {
+          "round": 3,
+          "T": 6,
+          "baseline": 413.94022213358295,
+          "candidate": 432.5375,
+          "throughput_change_pct": -4.299575844040593,
+          "baseline_drift_pct": -3.509136212624575
+        },
+        {
+          "round": 3,
+          "T": 7,
+          "baseline": 410.64018289091916,
+          "candidate": 443.6875,
+          "throughput_change_pct": -7.448331789622387,
+          "baseline_drift_pct": 2.1070115808738743
+        },
+        {
+          "round": 3,
+          "T": 8,
+          "baseline": 390.26813859191736,
+          "candidate": 380.86875,
+          "throughput_change_pct": 2.467881282441109,
+          "baseline_drift_pct": 2.0121635610766075
+        },
+        {
+          "round": 3,
+          "T": 9,
+          "baseline": 432.3666616173419,
+          "candidate": 462.34375,
+          "throughput_change_pct": -6.483723070260627,
+          "baseline_drift_pct": -3.3160400824390646
+        },
+        {
+          "round": 3,
+          "T": 16,
+          "baseline": 401.57620550541213,
+          "candidate": 408.08125,
+          "throughput_change_pct": -1.5940562068430975,
+          "baseline_drift_pct": -1.6805814904550909
+        },
+        {
+          "round": 3,
+          "T": 22,
+          "baseline": 458.7404832119136,
+          "candidate": 481.9125,
+          "throughput_change_pct": -4.808345246924784,
+          "baseline_drift_pct": -0.751940930560846
+        },
+        {
+          "round": 3,
+          "T": 32,
+          "baseline": 515.4970437824426,
+          "candidate": 512.16875,
+          "throughput_change_pct": 0.649843197665323,
+          "baseline_drift_pct": 2.104747320061251
+        },
+        {
+          "round": 3,
+          "T": 40,
+          "baseline": 514.787371002582,
+          "candidate": 524.15,
+          "throughput_change_pct": -1.7862499279629906,
+          "baseline_drift_pct": 1.2227148912260066
+        },
+        {
+          "round": 3,
+          "T": 64,
+          "baseline": 577.8755668664752,
+          "candidate": 578.8625,
+          "throughput_change_pct": -0.1704952615733002,
+          "baseline_drift_pct": 1.1103740035453669
+        },
+        {
+          "round": 3,
+          "T": 65,
+          "baseline": 603.876345475628,
+          "candidate": 619.7875,
+          "throughput_change_pct": -2.5671951312945196,
+          "baseline_drift_pct": 4.537566137566129
+        },
+        {
+          "round": 3,
+          "T": 128,
+          "baseline": 648.5178399627878,
+          "candidate": 626.50625,
+          "throughput_change_pct": 3.513387131060175,
+          "baseline_drift_pct": -2.5487341952792675
+        },
+        {
+          "round": 3,
+          "T": 256,
+          "baseline": 822.9411416718998,
+          "candidate": 821.7875,
+          "throughput_change_pct": 0.1403819931429684,
+          "baseline_drift_pct": 0.7493520353712313
+        }
+      ],
+      "groups": [
+        {
+          "round": 1,
+          "stable_cases": 4,
+          "median_pct": -4.176406109858405,
+          "minimum_pct": -7.8017090947205325,
+          "passed": false
+        },
+        {
+          "round": 3,
+          "stable_cases": 5,
+          "median_pct": -2.8742206023732675,
+          "minimum_pct": -7.448331789622387,
+          "passed": false
+        }
+      ],
+      "passed": false
+    }
+  ],
+  "model_tested": false,
+  "confirmed_model_speedup": false,
+  "correctness": {
+    "operator_checks": 1920,
+    "full_GU_H_Y_bitwise_equal": true,
+    "saturation_and_signed_zero_reference": true,
+    "native_R1_kernel_source_unchanged": true,
+    "public_ctest_reused_evidence": "build-sycl-a770-xmx-swiglu-v2-20261024\\results.json",
+    "public_ctest": {
+      "passed": true,
+      "checks": 380,
+      "full_cmake_target_build": false
+    }
+  },
+  "production_exe_updated": false,
+  "config_updated": false,
+  "pcie4_tested": false,
+  "standalone_q2_model_tested": false,
+  "files_sha256": {
+    "build-sycl-a770-xmx-swiglu-pad-20261024/run.py": "2592ff8e7d2b62595f323e3786018ccaa219d6724ba204a4936102e713cfdff8",
+    "build-sycl-a770-xmx-swiglu-pad-20261024/prepare.py": "b8a3887ccebb7e34b3f7673de24d4505af9fff72918c2a01e36060e83efa4a4d",
+    "build-sycl-a770-xmx-swiglu-pad-20261024/before.dp.cpp": "3bfeff6cb6676cd7d06348e3c27e0ba3356196f2ad3385013f9396a1c3faa18e",
+    "build-sycl-a770-xmx-swiglu-pad-20261024/candidate.dp.cpp": "933f36e70dbd5cf25c5d0fc09398c84fb7b139e403bc3d17f6668e1de29e4e01",
+    "build-sycl-a770-xmx-swiglu-pad-20261024/check.cpp": "70539546e1bd40fb87efa521e60563705778737491e18eedd5e523dbe0c554ec",
+    "build-sycl-a770-xmx-swiglu-pad-20261024/include/strata/prefill/gemm.hpp": "da605d5c62ab4bccc8e4aed4f47015dc4a02988af578ca50438a7e15f21ea74e",
+    "build-sycl-a770-xmx-expert-chain-v2-20261024/candidate.obj": "0c48e72a4b0db3f9587e702881f8dad090458a9c630a7ee87ca9e1e5b74c3494",
+    "build-sycl-a770-xmx-expert-chain-v2-20261024/prefill.obj": "963396c61b3111cbbdabf13b44f6e460c2cfca2f16e2226ade64385090ef26e0",
+    "build-sycl-a770-xmx-expert-chain-v2-20261024/build.json": "598b9588535d19dc1e62e922296f06ff8803194d86e995846071a6b8fa7fd3ef",
+    "build-sycl-a770-xmx-expert-chain-v2-20261024/run.py": "eec924d863242f9e01044edc40105c368af5fff5b17f314e5e655108a7037b96",
+    "build-sycl-a770-xmx-swiglu-v2-20261024/results.json": "5625ab58a3fece562fc4a4b488ddb5754984ed6bf7428006da4c87f6a1ca5746",
+    "build-sycl-a770-xmx-swiglu-v2-20261024/public-ctest/ctest.log": "5d3ed40d6780c9ef101377f2497810e26f873e82925fa3f3398ae12716d4fbae",
+    "sycl/src/prefill/gemm.dp.cpp": "3bfeff6cb6676cd7d06348e3c27e0ba3356196f2ad3385013f9396a1c3faa18e",
+    "sycl/src/prefill/prefill.cpp": "c1cb38302f52ebdeac553e2991d20568d1eaf7a5b3d0330e6a21795dfc4b9796",
+    "include/strata/prefill/gemm.hpp": "da605d5c62ab4bccc8e4aed4f47015dc4a02988af578ca50438a7e15f21ea74e",
+    "strata-iq2_xs.json": "1a755372f0e6c90c0bfa2af865d67b51f8df49c10aa1613b041b08da8184ca88",
+    "build-sycl-deepinfer-20261023/sampler-fp32/sampler.obj": "8179a1285c8234eb812da978004299c0ff8fc09cb98dc6579a18fafee928dd4d",
+    "build-sycl-deepinfer-20261023/baseline/CMakeFiles/strata.dir/src/program/generate.cpp.obj": "3803026bb66e111096d95273261a2ff074fe50905146c83c375a4d1ddf9efd5e",
+    "build-sycl-deepinfer-20261023/baseline/strata_engine.lib": "53322fc27e5d3970695c9558d00cedff70325b2ab946052f82818d33b691b5f8",
+    "build-sycl-deepinfer-20261023/baseline/strata_prefill.lib": "db7030439dcbe4ac607bb3a2e426a7720a6ae060c9f29bc1f9bc4682fa944377",
+    "build-sycl-deepinfer-20261023/baseline/strata_spec.lib": "417e16e26147c87ea2a73bbd9b0d0d305a3477c90c721e90770ad5df136172c5",
+    "build-sycl-deepinfer-20261023/baseline/strata_kernels.lib": "66be7e63d2d994935e5da2150e1663c350334f4c50f656d05a4794a1c60bb173",
+    "build-sycl-deepinfer-20261023/baseline/strata_core.lib": "fe7a34a2cce8612bc1c802398ca0490b06052f9fab1a5bba8477718d8ab3e9ca",
+    "build-sycl-a770-xmx-swiglu-pad-20261024/compile-check.log": "28b4ebbc3a7ab0a011450c0b71f6accb895034eb301e6ba68a0f35ad51f2d975",
+    "build-sycl-a770-xmx-swiglu-pad-20261024/compile-gemm.log": "710fcedd1bf021b3ec1b951fcde37e59c2f4b156415b5f51c9ccfd9f3aa4f495",
+    "build-sycl-a770-xmx-swiglu-pad-20261024/link-check.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-sycl-a770-xmx-swiglu-pad-20261024/candidate.obj": "61f5a5d61dd1aa614011edcc36f5f841b68437e7e7572eec64e8a9e38f9deb02",
+    "build-sycl-a770-xmx-swiglu-pad-20261024/check.obj": "25b237b8dbf43b724dc6aaecc131cf6d89fb2a8b64cf9b5b9850813f51870603",
+    "build-sycl-a770-xmx-swiglu-pad-20261024/check/strata.exe": "f2c4c08390c1a4b11e4dd18ebe80a8a1cddd50a53cab4557a08dfbc3b1f0d1ce",
+    "build-sycl-a770-xmx-swiglu-pad-20261024/screen/0.stdout": "b145c8fd672690b126847528cf91732c598d7e69b9814fc10593d49d575ca591",
+    "build-sycl-a770-xmx-swiglu-pad-20261024/screen/1.stdout": "6be39c75982a4ea293c12a8acc63a913691c50034c08693a119fdc5669a11422",
+    "build-sycl-a770-xmx-swiglu-pad-20261024/screen/2.stdout": "1f1afaef2e3000d542c3bbb7bf9d6600b6fd6814ae8f8b63f5be6548b97daac4",
+    "build-sycl-a770-xmx-swiglu-pad-20261024/screen/3.stdout": "e49e97e20714b5b23a9fe1fce1bb04e8e3ef1d7f16bfdf2f6d39fcb682be9113",
+    "build-sycl-a770-xmx-swiglu-pad-20261024/screen/4.stdout": "12c520c419ff7b6e2e0459a067acb21b267d3e2709cc91c4a4bbb3fb8fb58853",
+    "build-sycl-a770-xmx-swiglu-pad-20261024/screen/0.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-sycl-a770-xmx-swiglu-pad-20261024/screen/1.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-sycl-a770-xmx-swiglu-pad-20261024/screen/2.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-sycl-a770-xmx-swiglu-pad-20261024/screen/3.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-sycl-a770-xmx-swiglu-pad-20261024/screen/4.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-sycl-a770-xmx-swiglu-pad-20261024/results.json": "9e2f12f498173ab0920e550ceac7ae83cb32129c5e05be6417f326bd74d8c18e",
+    "build-sycl-a770-xmx-swiglu-pad-20261024/audit.py": "0277fc341fea0f1da2c503dab81c40cc9d7b638de48bfb79f2dd1f3fa859e616",
+    "build-sycl-a770-xmx-swiglu-pad-20261024/publish.py": "484c12c6000ee5ed58b39928eea11d49710c20a43d68274d7f7b2042538be758"
+  }
+}

@@ -1,0 +1,171 @@
+{
+  "complete": true,
+  "target_achieved": false,
+  "target_tps": 40,
+  "gpu_stage_profile_available": false,
+  "original_check_passed": false,
+  "original_check_failure": "Frozen script required newer GPU-stage log format; the old binary explicitly disables stage waits on Windows EAGER. Unprofiled timing and outputs audited independently without resampling.",
+  "hardware": "A77016GB,E5-2696v4,PCIe3.0x16,Windows",
+  "driver": "32.0.101.9034",
+  "toolchain": "oneAPI2025.3.2",
+  "settings": {
+    "actual_expert_slots": 5771,
+    "requested_expert_cache": 5500,
+    "kv": "FP16",
+    "q8_tails": true,
+    "spec": 4,
+    "draft_vocabulary_rows": 248320,
+    "context": 8192,
+    "prefill": 8192,
+    "prompt_cache": 0,
+    "warmups_per_case": 1,
+    "retained_per_case": 3
+  },
+  "requests": [
+    {
+      "case": "Code2K",
+      "warmup": true,
+      "input_tokens": 2048,
+      "output_tokens": 128,
+      "reused": 0,
+      "prompt_ms": 52094.1,
+      "decode_ms": 5984.6,
+      "decode_tps": 21.388229789793805,
+      "accepted": 75,
+      "offered": 98,
+      "output_sha256": "76252b2f9e9cc17646ecace8afbd0527b70a8487646e63301ec8af1779c32894"
+    },
+    {
+      "case": "Prose2K",
+      "warmup": true,
+      "input_tokens": 2048,
+      "output_tokens": 128,
+      "reused": 0,
+      "prompt_ms": 50793.2,
+      "decode_ms": 5594.0,
+      "decode_tps": 22.881658920271718,
+      "accepted": 73,
+      "offered": 100,
+      "output_sha256": "00c1afb1bf8359fc114b4c24b5d2636601cd4c8851032d099546275062c0c016"
+    },
+    {
+      "case": "Code2K",
+      "warmup": false,
+      "input_tokens": 2048,
+      "output_tokens": 128,
+      "reused": 0,
+      "prompt_ms": 51093.7,
+      "decode_ms": 5173.2,
+      "decode_tps": 24.74290574499343,
+      "accepted": 75,
+      "offered": 98,
+      "output_sha256": "76252b2f9e9cc17646ecace8afbd0527b70a8487646e63301ec8af1779c32894"
+    },
+    {
+      "case": "Prose2K",
+      "warmup": false,
+      "input_tokens": 2048,
+      "output_tokens": 128,
+      "reused": 0,
+      "prompt_ms": 49139.6,
+      "decode_ms": 5157.4,
+      "decode_tps": 24.818707100476985,
+      "accepted": 73,
+      "offered": 98,
+      "output_sha256": "00c1afb1bf8359fc114b4c24b5d2636601cd4c8851032d099546275062c0c016"
+    },
+    {
+      "case": "Code2K",
+      "warmup": false,
+      "input_tokens": 2048,
+      "output_tokens": 128,
+      "reused": 0,
+      "prompt_ms": 50337.6,
+      "decode_ms": 5149.7,
+      "decode_tps": 24.855816843699635,
+      "accepted": 75,
+      "offered": 98,
+      "output_sha256": "76252b2f9e9cc17646ecace8afbd0527b70a8487646e63301ec8af1779c32894"
+    },
+    {
+      "case": "Prose2K",
+      "warmup": false,
+      "input_tokens": 2048,
+      "output_tokens": 128,
+      "reused": 0,
+      "prompt_ms": 49170.2,
+      "decode_ms": 5241.7,
+      "decode_tps": 24.419558540168268,
+      "accepted": 72,
+      "offered": 98,
+      "output_sha256": "00c1afb1bf8359fc114b4c24b5d2636601cd4c8851032d099546275062c0c016"
+    },
+    {
+      "case": "Code2K",
+      "warmup": false,
+      "input_tokens": 2048,
+      "output_tokens": 128,
+      "reused": 0,
+      "prompt_ms": 49470.1,
+      "decode_ms": 5150.0,
+      "decode_tps": 24.854368932038835,
+      "accepted": 75,
+      "offered": 98,
+      "output_sha256": "76252b2f9e9cc17646ecace8afbd0527b70a8487646e63301ec8af1779c32894"
+    },
+    {
+      "case": "Prose2K",
+      "warmup": false,
+      "input_tokens": 2048,
+      "output_tokens": 128,
+      "reused": 0,
+      "prompt_ms": 49121.5,
+      "decode_ms": 5214.7,
+      "decode_tps": 24.545994975741653,
+      "accepted": 72,
+      "offered": 97,
+      "output_sha256": "00c1afb1bf8359fc114b4c24b5d2636601cd4c8851032d099546275062c0c016"
+    }
+  ],
+  "summary": {
+    "Code2K": {
+      "median_tps": 24.854368932038835,
+      "range_tps": [
+        24.74290574499343,
+        24.855816843699635
+      ],
+      "required_gain_pct": 60.9375
+    },
+    "Prose2K": {
+      "median_tps": 24.545994975741653,
+      "range_tps": [
+        24.419558540168268,
+        24.818707100476985
+      ],
+      "required_gain_pct": 62.959374999999994
+    }
+  },
+  "host_diagnostics": [
+    "strata decode timing: 7 windows, avg T 3.14, 2.29 tokens/window, 144.75 ms/window = verify 129.20 (GPU-reach wait 0.00 + per-layer host 0.00 [plan 0.00 actq 0.00 jobs 0.00 CPU 0.00] + stage 0.87) + commit/emit 2.28 + draft 11.26; per layer-window: CPU experts 0.00 (0.00 entries), VRAM hits 0.00, PCIe 0.00",
+    "strata serve: mtp depth: T 1:1 2:0 3:0 4:5 5:0; accepted 0:2 1:1 2:1 3:2 4:0; depth4 p50 bins 50-60:0/0 60-70:0/0 70-80:0/0 80-90:0/0 90-100:0/0; pre4 p50 bins 50-60:0/1/0/0/0 60-70:0/0/0/0/0 70-80:0/0/0/0/0 80-90:0/1/0/0/0 90-100:0/3/0/0/0",
+    "strata decode timing: 55 windows, avg T 2.78, 2.33 tokens/window, 104.45 ms/window = verify 89.25 (GPU-reach wait 0.00 + per-layer host 0.00 [plan 0.00 actq 0.00 jobs 0.00 CPU 0.00] + stage 0.74) + commit/emit 2.00 + draft 11.89; per layer-window: CPU experts 0.00 (0.00 entries), VRAM hits 0.00, PCIe 0.00",
+    "strata serve: mtp depth: T 1:12 2:9 3:10 4:23 5:0; accepted 0:17 1:12 2:12 3:13 4:0; depth4 p50 bins 50-60:0/0 60-70:0/0 70-80:0/0 80-90:0/0 90-100:0/0; pre4 p50 bins 50-60:0/1/0/0/0 60-70:0/4/0/0/0 70-80:0/0/0/0/0 80-90:0/6/0/0/0 90-100:0/12/0/0/0",
+    "strata decode timing: 56 windows, avg T 2.79, 2.29 tokens/window, 97.01 ms/window = verify 81.89 (GPU-reach wait 0.00 + per-layer host 0.00 [plan 0.00 actq 0.00 jobs 0.00 CPU 0.00] + stage 0.69) + commit/emit 1.93 + draft 11.92; per layer-window: CPU experts 0.00 (0.00 entries), VRAM hits 0.00, PCIe 0.00",
+    "strata serve: mtp depth: T 1:12 2:9 3:12 4:20 5:0; accepted 0:18 1:13 2:13 3:9 4:0; depth4 p50 bins 50-60:0/0 60-70:0/0 70-80:0/0 80-90:0/0 90-100:0/0; pre4 p50 bins 50-60:0/3/0/0/0 60-70:0/4/0/0/0 70-80:0/4/0/0/0 80-90:0/2/0/0/0 90-100:0/7/0/0/0"
+  ],
+  "local_files_sha256": {
+    "build-sycl-a770-decode2k-baseline-20261025/run.py": "5b6ab63e7a1b8ee2fc5227f9bacf6a7465ee013e9177137760848baf5a32ce87",
+    "build-sycl-a770-decode2k-baseline-20261025/config.json": "b001f19b5f97dfd74a7f9aca0e122f67e66d970a87bcf5024ebae7ab987c2291",
+    "build-sycl-a770-decode2k-baseline-20261025/frozen-environment.json": "8cad0dcfc65e54908d6e8f798da2c92057f7f792adf881c78ff61634441fc59d",
+    "build-sycl-a770-production-xmx-v2-20261025/bin/strata-unified-all-operators.exe": "73996f4fab16c89531574d29bea70097cd5309d4db03c00af5829d78920e7890",
+    "tools/bench_deepinfer.py": "10cf806bfdffc9cb4ba110d87503d6b28b8c163a789c1567c4a0dde0c1a83730",
+    "bench/results/2026-10-13-a770-iq2s-single-group-adopt/screen.in": "526fcd265606426dc3ebc84bfeccc5202ecc67bb90af4ab81f7c5862c7225bd1",
+    "build-sycl-a770-decode2k-baseline-20261025/protocol.json": "936e0a9e27325591f35076349d3731b15dddafbbca6cfa3fa44c5d627cee2612",
+    "build-sycl-a770-decode2k-baseline-20261025/baseline.protocol": "6625920eb317bc1cfa9551c90e7c0f8d8aff4b55d7e0bcfd904f7641fcb5844b",
+    "build-sycl-a770-decode2k-baseline-20261025/baseline.stderr": "3fef4d0d081f947497a13268ff62c2fdd537a7e9fbbdf9e0d5d7573c0834fdc6",
+    "build-sycl-a770-decode2k-baseline-20261025/profile.protocol": "85a1d6e8b56ac3bdf77868f6224fb62a27cb981a6ff963b97abef74f629483c5",
+    "build-sycl-a770-decode2k-baseline-20261025/profile.stderr": "c8178b9e8e0c3237e5951393e3b7176d9216d064fc144ab6360141578a389ab9",
+    "build-sycl-a770-decode2k-baseline-20261025/results.json": "c45d123a5189bd788e100c48a5b2b5fc10ef9a53aaccd7730292c65f904f5e0b",
+    "bench/results/a770/check_decode2k_baseline_20261025.py": "453e8914508c72823c543d2fb546b84876b14d56671dcb0d9d528beeb69eb431"
+  }
+}

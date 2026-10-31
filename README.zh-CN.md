@@ -47,6 +47,44 @@ NVIDIA：Q2_0 用的是引擎 0.1.36，其他各行用的是 0.1.26（4K 回答�
 100-140 个 token。长对话和其他显卡的数据：[各模型的速度](docs/MODELS.md#how-fast-is-each-size)、
 [社区测试结果](docs/COMMUNITY_BENCHMARKS.md)。
 
+**同参数原生产 SYCL → Orca L0（2026-10-31）：41.42 → 50.54 tok/s，吞吐 +22.01%。** 固定 28-token 短代码／76-token 自然输出、5771 槽、MTP4／min-p=0.5／decay=0.95；SYCL／Orca／SYCL 三个独立进程，每臂十次预热／五次保留，前后基线漂移 0.17%，45 次完整输出与草稿计数相同。decode 排除准备与预填充；整版本后端对照不等于纯 API 收益，也不代表所有输入速度。日常保留平衡参数，锚定另存；最低空闲 847 MiB 未过 1024 MiB 余量线，无新质量等价或 Linux 结论。[仓库主图](docs/media/orca-l0-hero.png) · [同等条件复现与完整证据](bench/results/a770/orca-anchor50-2026-10-31.md)。
+
+**本分支混合请求 Intel A770 数据（2026-10-31）：** 1536 MiB 预留、5896 槽的实测：Short **24.34 tok/s**，Code2K TTFT **28.728 秒**，Long8K **77.195 秒**。16 请求／1024 输出 tokens、12 个保留样本，最低采样空闲显存 947 MiB。**未通过此前 1024 MiB 显存余量校验线。** 原始验证失败状态与全部样本保留；以下只报告已完成的性能观测，不作为显存余量验收通过的证据。这组混合请求为当前 Orca 性能观测，无同期混合请求 SYCL 或质量等价结论。[混合请求主表](README.md#速度有多快) · [完整记录](bench/results/a770/orca-reserve1536-2026-10-31.md)。
+
+**连续重复同一 Short 的补测为 38.54 tok/s。** 同一当前 EXE／images、23-token 输入、完整 64-token 输出与 37／50 草稿接受计数；当前完整配置连续重复十次预热后取五次中位数，实际自动缓存 5949 槽。上面的四场景交错结果是另一种请求分布；排除准备和首轮图预热不等于专家缓存已达到连续重复的热状态。两种结果分别保留，具体缓存适配、PCIe 访存与预热的贡献尚未单独量化。 [完整核对](bench/results/a770/orca-short-workloads-2026-10-31.md)。
+
+
+历史 Short 协议另行复测为旧 SYCL 42.99／43.13、Orca **48.94 tok/s**，输出及草稿计数一致；28-token Fibonacci 提示、自然输出 76、5771 专家槽、MTP4 / `spec-min-p=0.5`，十次预热后取五次中位数。[历史 41 的复现记录](bench/results/a770/orca-regression-2026-10-31.md)。本机默认门槛已改回 **0.5**，此前 0.8 旧表保留在历史报告。独立 KV 质量筛查中，K8/V8 原始 PPL +0.129%、K8/V4 −0.039%，分别有 4／9 个 top1 变化；小样本 PPL 下降不代表量化无损，[条件与原始评分](bench/results/a770/orca-kv-2026-10-31.md)。
+
+长输入提交策略筛查未发现尾部等凑满：固定 5771 槽、`min-p=0.5`，关闭八专家批量等待使 2K／8K TTFT 增加约 4.91%／2.21%，绕过专家链也未改善。每臂每场景一个样本，前后基线漂移小于 0.4%，输出及草稿计数一致；未改默认。[TTFT 排查与证据](bench/results/a770/orca-prefill-2026-10-31.md)。
+
+同一候选 EXE 的 FP16 双专家 OFF／ON／OFF 补测保持 `min-p=0.5`、5771 槽和 8192-token prefill：Code2K TTFT **33.001 → 28.230 秒（−14.46%）**，Long8K **84.178 → 76.296 秒（−9.36%）**。12 条完整输出及草稿计数一致，TTFT 漂移小于 0.08%；每臂每场景两个样本。decode 排除准备和首轮预热后未确认收益。已在 A770 原生 XMX 专家链上默认启用，`STRATA_PREFILL_FP16_PAIR=0` 可回退；此前 3072 MiB 预留配置的 11 请求／704 tokens 验收输出一致，最低采样空闲显存 1675 MiB。本机主配置保留门槛 0.5，预留现已恢复为 1536 MiB，下次启动生效。[默认采用证据](sycl/orca/prefill-pair-default-a770-windows-2026-10-31.json)。原整版本回退尚未证明全部消除。[详细结果与复现](bench/results/a770/orca-prefill-2026-10-31.md#优化验证)。
+
+本机 IQ2_XS 主配置现采用双专家 Orca，保留自动缓存、8192-token prefill、MTP4 / `spec-min-p=0.5`，显存预留已按用户要求恢复为 1536 MiB，下次正常启动生效；恢复后的实测为 5896 槽／8093 MiB，详见上表。原 SYCL 配置保留备份。多请求批量 MTP 的独立四请求实验整组吞吐中位数提升 10.13%；槽位占用专家缓存，服务批量保持可选。Linux 是后续主要部署方向，尚无 Linux 编译或 GPU 实测。[Orca 构建与功能范围](sycl/orca/README.md)。
+
+<details>
+<summary>历史 A770 HTTP 测试（2026-10-24～26）</summary>
+
+本分支的 Windows / Intel Arc A770 数据见 [A770 主 README](README.md#速度有多快)。10-24 使用 IQ2_XS 生产引擎、本地 Anthropic API 测得：28 / 76-token 短代码请求完整响应中位数 **2.716 秒**，等效 prefill **31.04 tok/s**、decode **42.28 tok/s**；36 / 256-token 流式请求完整响应 **9.725 秒**、首正文 **1.246 秒**。硬件为 A770 16 GB、Xeon E5-2696 v4、Windows，关闭提示缓存。最近事件转换优化的 HTTP 差异在噪音范围内，未确认提速；这些短输入结果不代表长上下文性能。[测量条件与原始记录](bench/results/a770/anthropic-e2e-2026-10-24.md)。
+
+10-25 本机配置已将 `--short-read 256` 调至 `1024`，规避短工具输入进入异常慢的批量预填充路径。原始 258-token 请求在旧阈值下再次于 180 秒超时；10-24 晚间的新阈值复测 **6/6 次完成**，完整响应中位数 **22.016 秒**，输出 276 tokens，等效 prefill **22.13 tok/s**、decode **27.49 tok/s**。10-25 的[异常定位](bench/results/a770/prefill-root-2026-10-25.md)确认生产批量路径反复使用 oneMKL mixed-input → FP32 GEMM，独立跟踪显示额外主机搬运、临时分配和等待。这项阈值调整只规避短输入。[完整记录与回归命令](bench/results/a770/short-read-fix-2026-10-24.md)。
+
+10-25 的生产对象 XMX 私有构建复测保留 32 MiB 工作区、FP16 KV、MTP4、`--short-read 1024`，固定 5771 个专家缓存槽位。1,038 / 23-token 检索请求 **3/3 返回正确 JSON**，HTTP 完整响应中位数 **28.595 秒**，等效 prefill **38.05 tok/s**、decode **17.91 tok/s**；旧生产 EXE 的同一请求在 **180 秒超时**。短工具 A/B/A 的 18 次完整结果一致，吞吐差异 −0.79%～+0.55%，按噪音处理，没有确认 decode 提升，也不计算超时加速倍率。实际自动缓存 6399 slots 的原工具和长检索检查也已通过，本机启动配置已切至新 EXE 并启用 XMX，下次启动服务生效。[完整数据、启用状态与限制](bench/results/a770/production-xmx-2026-10-25.md)。
+
+10-25 后续 XMX 尾块补齐优化将所测 2K 形状的补齐空间从 40.47 MiB 降至 160 KiB。独立固定容量 A/B/A 确认中，2,069 / 25-token 请求的 HTTP 配对基线 **55.608 秒**，候选中位数 **41.443 秒**，耗时下降 **25.47%**；等效 prefill 从 **38.34 提升至 51.90 tok/s（+35.34%）**，decode 15.90 tok/s，未确认 decode 提升。1K HTTP 吞吐变化 −0.22%，按噪音处理；长输入 HTTP / prefill 基线漂移绝对值最大 0.56%，全部采用门槛通过。此前 1728 项检查的冻结证据已复核，本轮 27 次正式响应一致、49 次 HTTP 请求全部通过，包含实际自动缓存 6319 slots 的兼容检查。**本机生产启动配置已切换至尾块优化 EXE，下次启动服务生效**，其余设置保留原值。[完整数据、切换状态与限制](bench/results/a770/xmx-tail-production-2026-10-25.md)。
+
+**10-25 历史生产版：HC inject XMX。** 相对[专家链批量提交版](bench/results/a770/xmx-batch-production-2026-10-25.md)，固定 5771 slots 的 HTTP A/B/A 中，1K 从 **23.348 降至 17.466 秒（−25.19%）**，2K 从 **36.135 降至 24.753 秒（−31.50%）**；等效 prefill 为 **64.75 / 89.57 tok/s（+37.04% / +49.74%）**。工具 decode 为 **26.36 → 26.26 tok/s（−0.39%，按噪音处理）**，未确认 decode 提升；短检索 decode 仅作描述。2647 项检查、27 次正式响应一致性及全部 49 次 HTTP 请求通过，受控指标最大基线漂移 0.520%；自动缓存 6392 slots 的兼容检查也通过。仅重编译 GEMM，保留 BF16 输入、FP32 累加和 32 MiB 工作区；修正 HC 尾块预算后显式启用该路径。[完整数据与切换记录](bench/results/a770/hc-production-2026-10-25.md)。
+
+后续将专家等待间隔从 8 扩至 32 的候选未采用：464 项独立检查通过，但 2K HTTP 预热返回错误输出，候选正式计时未开始。另行 12 次正确性重放通过，异常未复现，根因仍未确定；未确认新的 prefill / decode 收益。生产保持上述 HC inject 8 专家版。[失败证据与独立定位](bench/results/a770/batch32-production-2026-10-25.md)。
+
+随后重新运行[完整 HTTP A/B/A](bench/results/a770/batch32-rerun-2026-10-25.md)，45/45 次请求正确，27 次正式响应一致；候选 1K / 2K 等效 prefill 为 **74.52 / 98.53 tok/s**。但前后生产基线的 prefill 时间漂移达 **8.65% / 6.28%**，超过 3% 门槛，收益未获确认；工具 decode 配对变化 **+0.14%**，按噪音处理。保留首次异常记录，生产未切换。
+
+保持 8 专家等待的[锁页专家 DMA 事件精简候选](bench/results/a770/copy-event-2026-10-25.md)也已完成检查：48 项双队列检查、45 次 HTTP 请求通过，27 次正式响应一致。候选 1K / 2K 等效 prefill 为 **70.51 / 94.43 tok/s**，但前后生产基线的 prefill 耗时漂移为 **−9.90% / −9.03%**，未确认收益；工具 decode 配对变化 **+0.18%**，按噪音处理。频率与温度记录已保留，漂移原因仍未确定，生产未切换。
+
+10-26 使用相同 EXE 和流程[再次复测](bench/results/a770/copy-event-rerun-2026-10-26.md)：45 次请求通过，27 次正式响应一致；候选 1K / 2K HTTP 为 **17.43 / 24.70 秒**，等效 prefill 为 **65.04 / 89.75 tok/s**。生产 prefill 耗时仍漂移 **−7.34% / −5.28%**，未确认端到端收益；工具 decode **26.11 → 26.32 tok/s（+0.79%，按噪音处理）**，生产保持不变。
+
+</details>
+
 <p align="center"><a href="https://buymeacoffee.com/strataengine"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="请我喝杯咖啡" height="50"></a><br>
 <sub>Strata 是免费的。如果它在你的电脑上跑得不错，请我喝杯咖啡，让这个项目继续下去。</sub></p>
 
@@ -64,7 +102,7 @@ NVIDIA：Q2_0 用的是引擎 0.1.36，其他各行用的是 0.1.26（4K 回答�
 实验性支持，由社区成员在自己的机器上编写和测试：
 
 - **较老的显卡**（Tesla P40 / V100、GTX 10、Radeon VII / MI50、RX 6700 XT、RX 5500 XT）：[较老的 GPU](docs/OLDER_GPUS.md)。
-- **Intel Arc**，在 Linux 上从源码构建：[Intel Arc](docs/INTEL_ARC.md)。
+- **Intel Arc**，在 Linux / Windows 上从源码构建：[Intel Arc](docs/INTEL_ARC.md)；本分支的 [A770 Windows 启动步骤](README.md#在-windows-上开始运行)。
 - **AMD Ryzen AI Max（Strix Halo）**，在 Linux 上从源码构建：[Strix Halo](docs/STRIX_HALO.md)。
 - **不支持 AVX2 的老处理器**：能用，但很慢。[较老的 CPU](docs/INSTALL.md#older-cpus-experimental)。
 

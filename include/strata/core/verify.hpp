@@ -31,6 +31,7 @@
 #include <cuda_runtime.h>
 
 #include <atomic>
+#include <array>
 #include <chrono>
 #include <map>
 #include <cstdint>
@@ -265,21 +266,16 @@ private:
     int row_base_ = 0;                     ///< ... its hand-off rows start here (a pipeline group's own rows)
     int brow_[8] = {};                     ///< ... and row t is slot brow_[t]
     bool last_batch_ = false;              ///< the last run was a batch window (set_plan_slot: one group)
-    std::map<std::vector<int>, cudaGraphExec_t> exec_bm_, commit_bm_;   ///< full row layout avoids slot-ID collisions
-    std::map<std::vector<int>, uint64_t> bm_used_;   ///< last use of each captured layout (LRU, only with a graph limit)
+    using BatchKey = std::array<int, 11>;   // row count, base, doorbell flag, then up to eight ordered slot IDs
+    std::map<BatchKey, cudaGraphExec_t> exec_bm_, commit_bm_;   ///< full row layout avoids slot-ID collisions
+    std::map<BatchKey, uint64_t> bm_used_;   ///< last use of each captured layout (LRU, only with a graph limit)
     uint64_t bm_tick_ = 0;
     size_t batch_graph_limit_ = 0;         ///< 0: keep every captured batch graph (0.1.39); N: LRU-evict beyond N layouts
     int last_rows_[8] = {};                ///< the slots of the last batch window's rows
-    std::vector<int> bkey(const int* rows, int S, int hbase) const {   // #871: the doorbell variant has its own graphs
-        std::vector<int> k = batch_key(rows, S, hbase);
-        k.push_back(ar_off_ ? 1 : 0);
-        return k;
-    }
-    static std::vector<int> batch_key(const int* rows, int S, int hbase) {
-        std::vector<int> k;
-        k.reserve((size_t) S + 1);
-        k.push_back(hbase);
-        for (int t = 0; t < S; ++t) k.push_back(rows[t]);
+    BatchKey bkey(const int* rows, int S, int hbase) const {   // #871: the doorbell variant has its own graphs
+        // ponytail: stage_batch validates S <= 8; fixed storage avoids an allocation on every lookup.
+        BatchKey k{S, hbase, ar_off_ ? 1 : 0};
+        for (int t = 0; t < S; ++t) k[3 + t] = rows[t];
         return k;
     }
     // batch_launch / batch_poll

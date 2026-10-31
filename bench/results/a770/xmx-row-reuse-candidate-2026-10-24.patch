@@ -1,0 +1,179 @@
+--- a/sycl/src/prefill/gemm.dp.cpp
++++ b/sycl/src/prefill/gemm.dp.cpp
+@@ -565,6 +565,58 @@
+     });
+ }
+ 
++template <class Input, int ROW_TILES>
++void native_xmx_rows_launch(const uint16_t* X, const uint16_t* W, float* Y,
++                       int64_t T, int64_t N, int64_t K, int64_t ldx, sycl::queue* q) {
++    namespace jm = sycl::ext::oneapi::experimental::matrix;
++    constexpr int SG = 8, NSG = 8, TILE = 8;
++    const auto* x = reinterpret_cast<const Input*>(X);
++    const auto* w = reinterpret_cast<const Input*>(W);
++    q->submit([&](sycl::handler& h) {
++        sycl::local_accessor<float, 1> tail(sycl::range<1>(NSG * TILE * TILE), h);
++        h.parallel_for(sycl::nd_range<3>(sycl::range<3>((T + TILE * ROW_TILES - 1) / (TILE * ROW_TILES),
++            (N + TILE * NSG - 1) / (TILE * NSG), SG * NSG), sycl::range<3>(1, 1, SG * NSG)),
++            [=](sycl::nd_item<3> it) [[sycl::reqd_sub_group_size(SG)]] {
++                const auto sg = it.get_sub_group();
++                const int subgroup = int(sg.get_group_id()[0]);
++                const int lane = int(sg.get_local_id()[0]);
++                const int64_t row = int64_t(it.get_group(0)) * TILE * ROW_TILES;
++                const int64_t col = (int64_t(it.get_group(1)) * NSG + subgroup) * TILE;
++                if (col >= N) return;
++                auto gptr = [](auto* p) { return sycl::address_space_cast<sycl::access::address_space::global_space,
++                    sycl::access::decorated::no>(p); };
++                jm::joint_matrix<sycl::sub_group, float, jm::use::accumulator, TILE, TILE> c[ROW_TILES];
++                #pragma unroll
++                for (int r = 0; r < ROW_TILES; ++r) jm::joint_matrix_fill(sg, c[r], 0.f);
++                for (int64_t k = 0; k < K; k += 16) {
++                    jm::joint_matrix<sycl::sub_group, Input, jm::use::a, TILE, 16, jm::layout::row_major> a;
++                    jm::joint_matrix<sycl::sub_group, Input, jm::use::b, 16, TILE, jm::layout::col_major> b;
++                    jm::joint_matrix_load(sg, b, gptr(w + col * K + k), size_t(K));
++                    #pragma unroll
++                    for (int r = 0; r < ROW_TILES; ++r) {
++                        jm::joint_matrix_load(sg, a, gptr(x + (row + r * TILE) * ldx + k), size_t(ldx));
++                        jm::joint_matrix_mad(sg, c[r], a, b, c[r]);
++                    }
++                }
++                #pragma unroll
++                for (int r = 0; r < ROW_TILES; ++r) {
++                    const int64_t out_row = row + r * TILE;
++                    if (out_row + TILE <= T) {
++                        jm::joint_matrix_store(sg, c[r], gptr(Y + out_row * N + col), size_t(N), jm::layout::row_major);
++                    } else {
++                        auto* tmp = tail.get_multi_ptr<sycl::access::decorated::no>().get() + subgroup * TILE * TILE;
++                        jm::joint_matrix_store(sg, c[r], sycl::address_space_cast<sycl::access::address_space::local_space,
++                            sycl::access::decorated::no>(tmp), TILE, jm::layout::row_major);
++                        sycl::group_barrier(sg);
++                        for (int i = lane; i < TILE * TILE; i += SG)
++                            if (out_row + i / TILE < T) Y[(out_row + i / TILE) * N + col + i % TILE] = tmp[i];
++                        sycl::group_barrier(sg);
++                    }
++                }
++            });
++    });
++}
++
+ bool native_xmx_gemm(const uint16_t* X, const uint16_t* W, float* Y,
+                       int64_t T, int64_t N, int64_t K, int64_t ldx, int64_t ldy, float beta,
+                       void* workspace, size_t bytes, void* stream, bool bf16 = false) {
+@@ -596,9 +648,13 @@
+         return result;
+     }();
+     if (!supported[bf16]) return false;
+-    const bool pad = T % 8 != 0 || ldx % 8 != 0;
++    // ponytail: preserve R1 code generation; a shared row template regressed unchanged shapes.
++    // A770 calibration covers K=2560 and N>=6144; measure other shapes before extending this rule.
++    const int row_tiles = K == 2560 && N >= 6144 ? (T >= 128 ? 4 : T >= 64 ? 2 : 1) : 1;
++    const int tile_rows = 8 * row_tiles;
++    const bool pad = T % tile_rows != 0 || ldx % 8 != 0;
+     if (pad) {
+-        const size_t rows = size_t((T + 7) / 8) * 8;
++        const size_t rows = size_t((T + tile_rows - 1) / tile_rows) * tile_rows;
+         if (!workspace || rows > (bytes / sizeof(uint16_t)) / size_t(K)) return false;
+         auto* padded = static_cast<uint16_t*>(workspace);
+         q->parallel_for(sycl::range<1>(rows * size_t(K)), [=](sycl::id<1> p) {
+@@ -608,15 +664,23 @@
+         X = padded;
+         ldx = K;
+     }
+-    if (bf16) native_xmx_launch<sycl::ext::oneapi::bfloat16>(X, W, Y, T, N, K, ldx, q);
+-    else native_xmx_launch<sycl::half>(X, W, Y, T, N, K, ldx, q);
++    if (row_tiles == 4) {
++        if (bf16) native_xmx_rows_launch<sycl::ext::oneapi::bfloat16,4>(X, W, Y, T, N, K, ldx, q);
++        else native_xmx_rows_launch<sycl::half,4>(X, W, Y, T, N, K, ldx, q);
++    } else if (row_tiles == 2) {
++        if (bf16) native_xmx_rows_launch<sycl::ext::oneapi::bfloat16,2>(X, W, Y, T, N, K, ldx, q);
++        else native_xmx_rows_launch<sycl::half,2>(X, W, Y, T, N, K, ldx, q);
++    } else {
++        if (bf16) native_xmx_launch<sycl::ext::oneapi::bfloat16>(X, W, Y, T, N, K, ldx, q);
++        else native_xmx_launch<sycl::half>(X, W, Y, T, N, K, ldx, q);
++    }
+     q->wait_and_throw();
+     static const bool profile = [] {
+         const char* v = std::getenv("STRATA_PREFILL_XMX_PROFILE");
+         return v && std::strcmp(v, "1") == 0;
+     }();
+-    if (profile) std::fprintf(stderr, "NATIVE_XMX_CALL {\"bf16\":%s,\"T\":%lld,\"N\":%lld,\"K\":%lld,\"padded\":%s}\n",
+-        bf16 ? "true" : "false", (long long)T, (long long)N, (long long)K, pad ? "true" : "false");
++    if (profile) std::fprintf(stderr, "NATIVE_XMX_CALL {\"bf16\":%s,\"T\":%lld,\"N\":%lld,\"K\":%lld,\"padded\":%s,\"row_tiles\":%d}\n",
++        bf16 ? "true" : "false", (long long)T, (long long)N, (long long)K, pad ? "true" : "false", row_tiles);
+     return true;
+ }
+ 
+--- a/sycl/src/prefill/gemm_parity.cpp
++++ b/sycl/src/prefill/gemm_parity.cpp
+@@ -48,8 +48,9 @@
+         if ((bench_only || large) && output_padding) continue;
+        for (int output_offset : {0,7}) {
+         if (!boundary && output_offset && (bf16 || !output_padding)) continue;
+-        for (int t : boundary ? std::vector<int>{1,7,8,9,15,16,17} : std::vector<int>{1,4,6,22,64,256}) {
++        for (int t : boundary ? std::vector<int>{1,7,8,9,15,16,17,31,32,33,63,64,65,127,128,129,255,256,257} : std::vector<int>{1,4,6,22,64,256}) {
+             if (bench_only && t!=4) continue;
++            if (boundary && t>=31 && output_padding) continue;
+             const auto shapes = boundary ? std::vector<std::pair<int,int>>{{8,16},{16,32},{24,48},{64,64},{72,80}} : large
+                 ? std::vector<std::pair<int,int>>{{4096,2560},{6144,2560},{10240,2560},{12288,2560},{16384,2560}}
+                 : std::vector<std::pair<int,int>>{{1280,2560},{640,2560},{2560,640},{17,65},{4096,2560},
+@@ -133,6 +134,13 @@
+                     }
+                     mismatched_cases += (eligible ? max_abs>.005f : different!=0) || padding_different!=0;
+                     ++checks;
++                    uint64_t hash=14695981039346656037ull;
++                    for (int row=0;row<t;++row) for (int col=0;col<n;++col) {
++                        const float v=hb[output_offset+row*ldy+col];
++                        const uint32_t bits=sycl::bit_cast<uint32_t>(v);
++                        for (int byte=0;byte<4;++byte) hash=(hash^((bits>>(byte*8))&255))*1099511628211ull;
++                    }
++                    std::printf("HASH %016llx\n",(unsigned long long)hash);
+                     std::printf("PARITY {\"bf16\":%s,\"t\":%d,\"n\":%d,\"k\":%d,\"ldx\":%d,\"ldy\":%d,\"output_offset\":%d,\"beta\":%.2f,\"different\":%d,\"padding_different\":%d,\"max_abs\":%.9g,\"original_padding_changed\":%d}\n",
+                                 bf16?"true":"false",t,n,k,ldx,ldy,output_offset,beta,different,padding_different,max_abs,original_padding);
+                     std::fflush(stdout);
+@@ -191,10 +199,13 @@
+       }
+     }
+     if (xmx && boundary) {
+-        // A partial tile needs exactly eight padded rows; rebinding must use the new capacity and input.
+-        constexpr int t=7,n=8,k=16,guard=16;
+-        constexpr size_t required=8*k*sizeof(uint16_t);
+-        auto* storage=sycl::malloc_device<uint16_t>(8*k+2*guard,q);
++        // Cover R1/R2/R4 exact and short capacities with changed inputs and guarded output.
++      for (int t : {7,65,129}) {
++        constexpr int n=6144,k=2560,guard=16;
++        const int tile=t>=128?32:t>=64?16:8;
++        const int rows=(t+tile-1)/tile*tile;
++        const size_t required=size_t(rows)*k*sizeof(uint16_t);
++        auto* storage=sycl::malloc_device<uint16_t>(rows*k+2*guard,q);
+         auto* x=sycl::malloc_device<uint16_t>(t*k,q);
+         auto* w=sycl::malloc_device<uint16_t>(n*k,q);
+         auto* y=sycl::malloc_device<float>(t*n+guard,q);
+@@ -206,17 +217,17 @@
+             for (size_t capacity : {size_t(0),required-1,required,required+1,size_t(1),required}) {
+                 auto encode=[&](float v) { return bf16 ? uint16_t(sycl::bit_cast<uint32_t>(v)>>16)
+                     : sycl::bit_cast<uint16_t>(sycl::half(v)); };
+-                q.fill(storage,uint16_t(0x55aa),8*k+2*guard);
++                q.fill(storage,uint16_t(0x55aa),rows*k+2*guard);
+                 q.fill(x,encode(.25f),t*k); q.fill(w,encode(float(++index)/8),n*k);
+                 q.fill(y,-12345.f,t*n+guard);
+                 rebound.rebind(nullptr,0,capacity?storage+guard:nullptr,capacity);
+                 if (bf16) rebound.bf16(x,w,y,t,n,k); else rebound.f16(x,w,y,t,n,k);
+                 std::vector<float> result(t*n+guard);
+-                std::vector<uint16_t> contents(8*k+2*guard);
++                std::vector<uint16_t> contents(rows*k+2*guard);
+                 q.memcpy(result.data(),y,result.size()*4);
+                 q.memcpy(contents.data(),storage,contents.size()*2).wait_and_throw();
+                 for (int i=0;i<t*n+guard;++i)
+-                    if (result[i]!=(i<t*n?float(index)/2:-12345.f)) throw std::runtime_error("XMX rebind result/guard failed");
++                    if (result[i]!=(i<t*n?float(index)*k/32:-12345.f)) throw std::runtime_error("XMX rebind result/guard failed");
+                 for (size_t i=0;i<contents.size();++i)
+                     if ((i<guard || i>=guard+capacity/2) && contents[i]!=0x55aa)
+                         throw std::runtime_error("XMX workspace capacity/guard failed");
+@@ -225,6 +236,7 @@
+         }
+         rebound.rebind(nullptr,0,nullptr,0);
+         sycl::free(y,q); sycl::free(w,q); sycl::free(x,q); sycl::free(storage,q);
++      }
+     }
+     std::printf("SUMMARY {\"checks\":%d,\"mismatched_cases\":%d}\n",checks,mismatched_cases);
+     if (arena) sycl::free(arena,q);

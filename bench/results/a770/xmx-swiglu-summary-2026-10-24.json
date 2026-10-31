@@ -1,0 +1,848 @@
+{
+  "complete": true,
+  "date": "2026-10-24",
+  "integrated": false,
+  "default_enabled": false,
+  "hardware": "A77016GB,E5-2696v4,PCIe3.0x16,Windows,driver32.0.101.9034,DPC++2025.3.2,oneMKL2025.3",
+  "feature": "Fused gate/up XMX + saturated SwiGLU for T<=64; subgroup-local tile, FP16 input,FP32 accumulation; GU still written for complete output checks. Larger groups keep the adopted expert chain. Baseline already has chain batching enabled.",
+  "scope": "Private isolated relink; FP32 accumulation unchanged. Rotating8 banks,78.6MB; 128MiB workspace,all128 pool. Sixteen warmups,median7 batches x16 calls,profiling off. Public check recompiled/linked with measured frozen engine objects, then run using fresh CMake/CTest registration; not a full dirty-worktree or CMake-target build.",
+  "rule_before_measurement": "One screen and, only if passed, one independent confirmation, A/B/A/B/A each. A=adopted expert chain; B=same chain with fused gate/up+SwiGLU only for T<=64. Both rounds require >=6 of12 target shapes with baseline drift<=3%, median gain>=3%, no eligible target regression below -3%. Full GU/H/Y bitwise equality, guards, rebound workspace, saturation and signed-zero references:384 checks/process. No resampling. Only both passing cohorts proceed to one same-EXE Code256 model A/B/A/B/A, both rounds prefill gain>=3%,drift<=3%,same4191 slots/5760MiB,exact32 output IDs. Production/default stay unchanged until a separate adoption review.",
+  "profile": {
+    "expert_groups": 11967,
+    "T_le64_groups": 11753,
+    "T_le64_group_fraction": 0.9821174897635163,
+    "expected_chain_kernels": 58381,
+    "expected_fused_kernels": 46628,
+    "logical_GU_read_bytes_removed": 521681920,
+    "note": "Counts derived from an earlier frozen route profile, not measured GPU time or DRAM savings."
+  },
+  "correctness": {
+    "operator_checks": 1920,
+    "full_GU_H_Y_bitwise_equal": true,
+    "saturation_and_signed_zero_reference": true,
+    "public_ctest": {
+      "passed": true,
+      "checks": 380,
+      "full_cmake_target_build": false
+    }
+  },
+  "operator_passed": false,
+  "cohorts": [
+    {
+      "cohort": "screen",
+      "runs": [
+        {
+          "fused": false,
+          "index": 0,
+          "rows": [
+            {
+              "T": 1,
+              "us": 405.2875,
+              "hash": "8e79b20c5c6d0ab1",
+              "weight_banks": 8
+            },
+            {
+              "T": 2,
+              "us": 409.59375,
+              "hash": "6a831aa8b50f7351",
+              "weight_banks": 8
+            },
+            {
+              "T": 4,
+              "us": 412.475,
+              "hash": "a24dd780779851ed",
+              "weight_banks": 8
+            },
+            {
+              "T": 6,
+              "us": 412.3625,
+              "hash": "1d409b844fc8315d",
+              "weight_banks": 8
+            },
+            {
+              "T": 7,
+              "us": 413.0875,
+              "hash": "dbdf1ecbc2819631",
+              "weight_banks": 8
+            },
+            {
+              "T": 8,
+              "us": 383.36875,
+              "hash": "614dedfa653ea7f9",
+              "weight_banks": 8
+            },
+            {
+              "T": 9,
+              "us": 421.275,
+              "hash": "d0701a06d0fa4531",
+              "weight_banks": 8
+            },
+            {
+              "T": 16,
+              "us": 390.025,
+              "hash": "2785613fb5688b0b",
+              "weight_banks": 8
+            },
+            {
+              "T": 22,
+              "us": 450.9125,
+              "hash": "8bb97e6c6825f1f3",
+              "weight_banks": 8
+            },
+            {
+              "T": 32,
+              "us": 499.29375,
+              "hash": "565ffe4110f84d52",
+              "weight_banks": 8
+            },
+            {
+              "T": 40,
+              "us": 506.26875,
+              "hash": "4b20e840f395570e",
+              "weight_banks": 8
+            },
+            {
+              "T": 64,
+              "us": 561.84375,
+              "hash": "825197dc5e69ca41",
+              "weight_banks": 8
+            },
+            {
+              "T": 65,
+              "us": 588.4125,
+              "hash": "c90852b5fb548b2d",
+              "weight_banks": 8
+            },
+            {
+              "T": 128,
+              "us": 611.83125,
+              "hash": "8c9cae1f6312b489",
+              "weight_banks": 8
+            },
+            {
+              "T": 256,
+              "us": 798.475,
+              "hash": "10bc973f4e8a6825",
+              "weight_banks": 8
+            }
+          ],
+          "summary": {
+            "checks": 384
+          }
+        },
+        {
+          "fused": true,
+          "index": 1,
+          "rows": [
+            {
+              "T": 1,
+              "us": 421.125,
+              "hash": "8e79b20c5c6d0ab1",
+              "weight_banks": 8
+            },
+            {
+              "T": 2,
+              "us": 425.3,
+              "hash": "6a831aa8b50f7351",
+              "weight_banks": 8
+            },
+            {
+              "T": 4,
+              "us": 432.79375,
+              "hash": "a24dd780779851ed",
+              "weight_banks": 8
+            },
+            {
+              "T": 6,
+              "us": 429.25625,
+              "hash": "1d409b844fc8315d",
+              "weight_banks": 8
+            },
+            {
+              "T": 7,
+              "us": 425.825,
+              "hash": "dbdf1ecbc2819631",
+              "weight_banks": 8
+            },
+            {
+              "T": 8,
+              "us": 391.275,
+              "hash": "614dedfa653ea7f9",
+              "weight_banks": 8
+            },
+            {
+              "T": 9,
+              "us": 452.89375,
+              "hash": "d0701a06d0fa4531",
+              "weight_banks": 8
+            },
+            {
+              "T": 16,
+              "us": 418.28125,
+              "hash": "2785613fb5688b0b",
+              "weight_banks": 8
+            },
+            {
+              "T": 22,
+              "us": 481.0625,
+              "hash": "8bb97e6c6825f1f3",
+              "weight_banks": 8
+            },
+            {
+              "T": 32,
+              "us": 529.73125,
+              "hash": "565ffe4110f84d52",
+              "weight_banks": 8
+            },
+            {
+              "T": 40,
+              "us": 542.8,
+              "hash": "4b20e840f395570e",
+              "weight_banks": 8
+            },
+            {
+              "T": 64,
+              "us": 577.20625,
+              "hash": "825197dc5e69ca41",
+              "weight_banks": 8
+            },
+            {
+              "T": 65,
+              "us": 592.6875,
+              "hash": "c90852b5fb548b2d",
+              "weight_banks": 8
+            },
+            {
+              "T": 128,
+              "us": 615.86875,
+              "hash": "8c9cae1f6312b489",
+              "weight_banks": 8
+            },
+            {
+              "T": 256,
+              "us": 785.6375,
+              "hash": "10bc973f4e8a6825",
+              "weight_banks": 8
+            }
+          ],
+          "summary": {
+            "checks": 384
+          }
+        },
+        {
+          "fused": false,
+          "index": 2,
+          "rows": [
+            {
+              "T": 1,
+              "us": 472.925,
+              "hash": "8e79b20c5c6d0ab1",
+              "weight_banks": 8
+            },
+            {
+              "T": 2,
+              "us": 406.09375,
+              "hash": "6a831aa8b50f7351",
+              "weight_banks": 8
+            },
+            {
+              "T": 4,
+              "us": 422.10625,
+              "hash": "a24dd780779851ed",
+              "weight_banks": 8
+            },
+            {
+              "T": 6,
+              "us": 403.95,
+              "hash": "1d409b844fc8315d",
+              "weight_banks": 8
+            },
+            {
+              "T": 7,
+              "us": 410.56875,
+              "hash": "dbdf1ecbc2819631",
+              "weight_banks": 8
+            },
+            {
+              "T": 8,
+              "us": 379.25,
+              "hash": "614dedfa653ea7f9",
+              "weight_banks": 8
+            },
+            {
+              "T": 9,
+              "us": 423.86875,
+              "hash": "d0701a06d0fa4531",
+              "weight_banks": 8
+            },
+            {
+              "T": 16,
+              "us": 387.7625,
+              "hash": "2785613fb5688b0b",
+              "weight_banks": 8
+            },
+            {
+              "T": 22,
+              "us": 507.74375,
+              "hash": "8bb97e6c6825f1f3",
+              "weight_banks": 8
+            },
+            {
+              "T": 32,
+              "us": 493.85,
+              "hash": "565ffe4110f84d52",
+              "weight_banks": 8
+            },
+            {
+              "T": 40,
+              "us": 518.675,
+              "hash": "4b20e840f395570e",
+              "weight_banks": 8
+            },
+            {
+              "T": 64,
+              "us": 574.8125,
+              "hash": "825197dc5e69ca41",
+              "weight_banks": 8
+            },
+            {
+              "T": 65,
+              "us": 600.96875,
+              "hash": "c90852b5fb548b2d",
+              "weight_banks": 8
+            },
+            {
+              "T": 128,
+              "us": 619.0375,
+              "hash": "8c9cae1f6312b489",
+              "weight_banks": 8
+            },
+            {
+              "T": 256,
+              "us": 782.38125,
+              "hash": "10bc973f4e8a6825",
+              "weight_banks": 8
+            }
+          ],
+          "summary": {
+            "checks": 384
+          }
+        },
+        {
+          "fused": true,
+          "index": 3,
+          "rows": [
+            {
+              "T": 1,
+              "us": 418.03125,
+              "hash": "8e79b20c5c6d0ab1",
+              "weight_banks": 8
+            },
+            {
+              "T": 2,
+              "us": 415.65,
+              "hash": "6a831aa8b50f7351",
+              "weight_banks": 8
+            },
+            {
+              "T": 4,
+              "us": 428.94375,
+              "hash": "a24dd780779851ed",
+              "weight_banks": 8
+            },
+            {
+              "T": 6,
+              "us": 425.875,
+              "hash": "1d409b844fc8315d",
+              "weight_banks": 8
+            },
+            {
+              "T": 7,
+              "us": 419.1375,
+              "hash": "dbdf1ecbc2819631",
+              "weight_banks": 8
+            },
+            {
+              "T": 8,
+              "us": 393.35625,
+              "hash": "614dedfa653ea7f9",
+              "weight_banks": 8
+            },
+            {
+              "T": 9,
+              "us": 457.66875,
+              "hash": "d0701a06d0fa4531",
+              "weight_banks": 8
+            },
+            {
+              "T": 16,
+              "us": 419.9125,
+              "hash": "2785613fb5688b0b",
+              "weight_banks": 8
+            },
+            {
+              "T": 22,
+              "us": 493.31875,
+              "hash": "8bb97e6c6825f1f3",
+              "weight_banks": 8
+            },
+            {
+              "T": 32,
+              "us": 532.0,
+              "hash": "565ffe4110f84d52",
+              "weight_banks": 8
+            },
+            {
+              "T": 40,
+              "us": 545.78125,
+              "hash": "4b20e840f395570e",
+              "weight_banks": 8
+            },
+            {
+              "T": 64,
+              "us": 579.34375,
+              "hash": "825197dc5e69ca41",
+              "weight_banks": 8
+            },
+            {
+              "T": 65,
+              "us": 599.9125,
+              "hash": "c90852b5fb548b2d",
+              "weight_banks": 8
+            },
+            {
+              "T": 128,
+              "us": 614.99375,
+              "hash": "8c9cae1f6312b489",
+              "weight_banks": 8
+            },
+            {
+              "T": 256,
+              "us": 799.75625,
+              "hash": "10bc973f4e8a6825",
+              "weight_banks": 8
+            }
+          ],
+          "summary": {
+            "checks": 384
+          }
+        },
+        {
+          "fused": false,
+          "index": 4,
+          "rows": [
+            {
+              "T": 1,
+              "us": 404.19375,
+              "hash": "8e79b20c5c6d0ab1",
+              "weight_banks": 8
+            },
+            {
+              "T": 2,
+              "us": 408.2875,
+              "hash": "6a831aa8b50f7351",
+              "weight_banks": 8
+            },
+            {
+              "T": 4,
+              "us": 405.35625,
+              "hash": "a24dd780779851ed",
+              "weight_banks": 8
+            },
+            {
+              "T": 6,
+              "us": 405.2375,
+              "hash": "1d409b844fc8315d",
+              "weight_banks": 8
+            },
+            {
+              "T": 7,
+              "us": 404.18125,
+              "hash": "dbdf1ecbc2819631",
+              "weight_banks": 8
+            },
+            {
+              "T": 8,
+              "us": 398.88125,
+              "hash": "614dedfa653ea7f9",
+              "weight_banks": 8
+            },
+            {
+              "T": 9,
+              "us": 415.64375,
+              "hash": "d0701a06d0fa4531",
+              "weight_banks": 8
+            },
+            {
+              "T": 16,
+              "us": 390.425,
+              "hash": "2785613fb5688b0b",
+              "weight_banks": 8
+            },
+            {
+              "T": 22,
+              "us": 441.975,
+              "hash": "8bb97e6c6825f1f3",
+              "weight_banks": 8
+            },
+            {
+              "T": 32,
+              "us": 493.725,
+              "hash": "565ffe4110f84d52",
+              "weight_banks": 8
+            },
+            {
+              "T": 40,
+              "us": 504.8875,
+              "hash": "4b20e840f395570e",
+              "weight_banks": 8
+            },
+            {
+              "T": 64,
+              "us": 559.44375,
+              "hash": "825197dc5e69ca41",
+              "weight_banks": 8
+            },
+            {
+              "T": 65,
+              "us": 581.60625,
+              "hash": "c90852b5fb548b2d",
+              "weight_banks": 8
+            },
+            {
+              "T": 128,
+              "us": 610.91875,
+              "hash": "8c9cae1f6312b489",
+              "weight_banks": 8
+            },
+            {
+              "T": 256,
+              "us": 781.4625,
+              "hash": "10bc973f4e8a6825",
+              "weight_banks": 8
+            }
+          ],
+          "summary": {
+            "checks": 384
+          }
+        }
+      ],
+      "pairs": [
+        {
+          "round": 1,
+          "T": 1,
+          "baseline": 437.8019996956387,
+          "candidate": 421.125,
+          "throughput_change_pct": 3.9601067843606286,
+          "baseline_drift_pct": 16.688770317367307
+        },
+        {
+          "round": 1,
+          "T": 2,
+          "baseline": 407.8399954811476,
+          "candidate": 425.3,
+          "throughput_change_pct": -4.105338471397236,
+          "baseline_drift_pct": -0.8545052262149966
+        },
+        {
+          "round": 1,
+          "T": 4,
+          "baseline": 417.26283739239227,
+          "candidate": 432.79375,
+          "throughput_change_pct": -3.588525159526379,
+          "baseline_drift_pct": 2.3349899993938994
+        },
+        {
+          "round": 1,
+          "T": 6,
+          "baseline": 408.1345756916461,
+          "candidate": 429.25625,
+          "throughput_change_pct": -4.920528078124409,
+          "baseline_drift_pct": -2.0400739640486276
+        },
+        {
+          "round": 1,
+          "T": 7,
+          "baseline": 411.8261994040993,
+          "candidate": 425.825,
+          "throughput_change_pct": -3.287453906158788,
+          "baseline_drift_pct": -0.6097376463824133
+        },
+        {
+          "round": 1,
+          "T": 8,
+          "baseline": 381.30381382501275,
+          "candidate": 391.275,
+          "throughput_change_pct": -2.54838315123308,
+          "baseline_drift_pct": -1.0743572604704932
+        },
+        {
+          "round": 1,
+          "T": 9,
+          "baseline": 422.56988493768694,
+          "candidate": 452.89375,
+          "throughput_change_pct": -6.695580378910748,
+          "baseline_drift_pct": 0.6156904634739835
+        },
+        {
+          "round": 1,
+          "T": 16,
+          "baseline": 388.892104654363,
+          "candidate": 418.28125,
+          "throughput_change_pct": -7.026168480092521,
+          "baseline_drift_pct": -0.5800910198064169
+        },
+        {
+          "round": 1,
+          "T": 22,
+          "baseline": 478.48511332315763,
+          "candidate": 481.0625,
+          "throughput_change_pct": -0.5357696093215236,
+          "baseline_drift_pct": 12.603609347711565
+        },
+        {
+          "round": 1,
+          "T": 32,
+          "baseline": 496.56441519454455,
+          "candidate": 529.73125,
+          "throughput_change_pct": -6.261068193627517,
+          "baseline_drift_pct": -1.0902900346739686
+        },
+        {
+          "round": 1,
+          "T": 40,
+          "baseline": 512.4343313110959,
+          "candidate": 542.8,
+          "throughput_change_pct": -5.594264681080341,
+          "baseline_drift_pct": 2.4505265237089846
+        },
+        {
+          "round": 1,
+          "T": 64,
+          "baseline": 568.2911318566171,
+          "candidate": 577.20625,
+          "throughput_change_pct": -1.5445290385166288,
+          "baseline_drift_pct": 2.308248512153077
+        },
+        {
+          "round": 1,
+          "T": 65,
+          "baseline": 594.657485120111,
+          "candidate": 592.6875,
+          "throughput_change_pct": 0.3323817560031195,
+          "baseline_drift_pct": 2.13391965670342
+        },
+        {
+          "round": 1,
+          "T": 128,
+          "baseline": 615.423827473291,
+          "candidate": 615.86875,
+          "throughput_change_pct": -0.07224307560806942,
+          "baseline_drift_pct": 1.1778165956707998
+        },
+        {
+          "round": 1,
+          "T": 256,
+          "baseline": 790.3871637329075,
+          "candidate": 785.6375,
+          "throughput_change_pct": 0.6045617390854519,
+          "baseline_drift_pct": -2.0155609129903884
+        },
+        {
+          "round": 3,
+          "T": 1,
+          "baseline": 437.2108521282952,
+          "candidate": 418.03125,
+          "throughput_change_pct": 4.58807855352803,
+          "baseline_drift_pct": -14.533224084157103
+        },
+        {
+          "round": 3,
+          "T": 2,
+          "baseline": 407.1891476367279,
+          "candidate": 415.65,
+          "throughput_change_pct": -2.035571361306887,
+          "baseline_drift_pct": 0.5402077722200804
+        },
+        {
+          "round": 3,
+          "T": 4,
+          "baseline": 413.6464753887823,
+          "candidate": 428.94375,
+          "throughput_change_pct": -3.5662658824654137,
+          "baseline_drift_pct": -3.968195211513692
+        },
+        {
+          "round": 3,
+          "T": 6,
+          "baseline": 404.5932378636598,
+          "candidate": 425.875,
+          "throughput_change_pct": -4.997185121535708,
+          "baseline_drift_pct": 0.3187275652927424
+        },
+        {
+          "round": 3,
+          "T": 7,
+          "baseline": 407.3624805820211,
+          "candidate": 419.1375,
+          "throughput_change_pct": -2.8093452430238086,
+          "baseline_drift_pct": -1.5557686745520827
+        },
+        {
+          "round": 3,
+          "T": 8,
+          "baseline": 388.9417874984636,
+          "candidate": 393.35625,
+          "throughput_change_pct": -1.1222555893128372,
+          "baseline_drift_pct": 5.176334871456834
+        },
+        {
+          "round": 3,
+          "T": 9,
+          "baseline": 419.73610371019134,
+          "candidate": 457.66875,
+          "throughput_change_pct": -8.288231671882485,
+          "baseline_drift_pct": -1.9404591633612966
+        },
+        {
+          "round": 3,
+          "T": 16,
+          "baseline": 389.0914726160161,
+          "candidate": 419.9125,
+          "throughput_change_pct": -7.33986899270298,
+          "baseline_drift_pct": 0.6866316366332503
+        },
+        {
+          "round": 3,
+          "T": 22,
+          "baseline": 473.719372525813,
+          "candidate": 493.31875,
+          "throughput_change_pct": -3.972964229352116,
+          "baseline_drift_pct": -12.953138271027454
+        },
+        {
+          "round": 3,
+          "T": 32,
+          "baseline": 493.7874960446042,
+          "candidate": 532.0,
+          "throughput_change_pct": -7.182801495375147,
+          "baseline_drift_pct": -0.025311329351018763
+        },
+        {
+          "round": 3,
+          "T": 40,
+          "baseline": 511.73481810650713,
+          "candidate": 545.78125,
+          "throughput_change_pct": -6.238109479483378,
+          "baseline_drift_pct": -2.658215645635509
+        },
+        {
+          "round": 3,
+          "T": 64,
+          "baseline": 567.0760623998116,
+          "candidate": 579.34375,
+          "throughput_change_pct": -2.1175144463349116,
+          "baseline_drift_pct": -2.6736979449820564
+        },
+        {
+          "round": 3,
+          "T": 65,
+          "baseline": 591.2082383176739,
+          "candidate": 599.9125,
+          "throughput_change_pct": -1.4509218731608486,
+          "baseline_drift_pct": -3.2218813374239486
+        },
+        {
+          "round": 3,
+          "T": 128,
+          "baseline": 614.9647272024023,
+          "candidate": 614.99375,
+          "throughput_change_pct": -0.00471920204029308,
+          "baseline_drift_pct": -1.3115118227894018
+        },
+        {
+          "round": 3,
+          "T": 256,
+          "baseline": 781.9217400597869,
+          "candidate": 799.75625,
+          "throughput_change_pct": -2.229993193577806,
+          "baseline_drift_pct": -0.11742996141587136
+        }
+      ],
+      "groups": [
+        {
+          "round": 1,
+          "stable_cases": 10,
+          "median_pct": -4.512933274760822,
+          "minimum_pct": -7.026168480092521,
+          "passed": false
+        },
+        {
+          "round": 3,
+          "stable_cases": 8,
+          "median_pct": -5.617647300509542,
+          "minimum_pct": -8.288231671882485,
+          "passed": false
+        }
+      ],
+      "passed": false
+    }
+  ],
+  "model": null,
+  "production_exe_updated": false,
+  "config_updated": false,
+  "pcie4_tested": false,
+  "standalone_q2_model_tested": false,
+  "files_sha256": {
+    "build-sycl-a770-xmx-swiglu-v2-20261024/run.py": "1ef32721cfb45b277b75fcc5623b7cc0bb595b58e479686033ea37ee12c74ee1",
+    "build-sycl-a770-xmx-swiglu-v2-20261024/prepare.py": "443eb2996c766778203a4e754209761c298b6172acfe195646a38440b7994166",
+    "build-sycl-a770-xmx-swiglu-v2-20261024/before.dp.cpp": "3bfeff6cb6676cd7d06348e3c27e0ba3356196f2ad3385013f9396a1c3faa18e",
+    "build-sycl-a770-xmx-swiglu-v2-20261024/candidate.dp.cpp": "4390a3566b5944ef94fa2a4717d81abbdbbc165d244cfe8f82ebdb7b51d85284",
+    "build-sycl-a770-xmx-swiglu-v2-20261024/check.cpp": "70539546e1bd40fb87efa521e60563705778737491e18eedd5e523dbe0c554ec",
+    "build-sycl-a770-xmx-swiglu-v2-20261024/include/strata/prefill/gemm.hpp": "da605d5c62ab4bccc8e4aed4f47015dc4a02988af578ca50438a7e15f21ea74e",
+    "build-sycl-a770-xmx-expert-chain-v2-20261024/candidate.obj": "0c48e72a4b0db3f9587e702881f8dad090458a9c630a7ee87ca9e1e5b74c3494",
+    "build-sycl-a770-xmx-expert-chain-v2-20261024/prefill.obj": "963396c61b3111cbbdabf13b44f6e460c2cfca2f16e2226ade64385090ef26e0",
+    "build-sycl-a770-xmx-expert-chain-v2-20261024/build.json": "598b9588535d19dc1e62e922296f06ff8803194d86e995846071a6b8fa7fd3ef",
+    "build-sycl-a770-xmx-expert-chain-v2-20261024/run.py": "eec924d863242f9e01044edc40105c368af5fff5b17f314e5e655108a7037b96",
+    "sycl/CMakeLists.txt": "adb0bafe85a0fa08744bfd421daae4b38d9d3fd56bf37536af25ba954dad07a9",
+    "sycl/src/prefill/expert_chain_check.cpp": "d31659a29cbc93a6832b9aa1a51e4607ed3f229e7d0f922ef77e9baf18a58b96",
+    "sycl/src/prefill/gemm.dp.cpp": "3bfeff6cb6676cd7d06348e3c27e0ba3356196f2ad3385013f9396a1c3faa18e",
+    "sycl/src/prefill/prefill.cpp": "c1cb38302f52ebdeac553e2991d20568d1eaf7a5b3d0330e6a21795dfc4b9796",
+    "include/strata/prefill/gemm.hpp": "da605d5c62ab4bccc8e4aed4f47015dc4a02988af578ca50438a7e15f21ea74e",
+    "strata-iq2_xs.json": "1a755372f0e6c90c0bfa2af865d67b51f8df49c10aa1613b041b08da8184ca88",
+    "build-sycl-deepinfer-20261023/sampler-fp32/sampler.obj": "8179a1285c8234eb812da978004299c0ff8fc09cb98dc6579a18fafee928dd4d",
+    "build-sycl-deepinfer-20261023/baseline/CMakeFiles/strata.dir/src/program/generate.cpp.obj": "3803026bb66e111096d95273261a2ff074fe50905146c83c375a4d1ddf9efd5e",
+    "build-sycl-deepinfer-20261023/baseline/strata_engine.lib": "53322fc27e5d3970695c9558d00cedff70325b2ab946052f82818d33b691b5f8",
+    "build-sycl-deepinfer-20261023/baseline/strata_prefill.lib": "db7030439dcbe4ac607bb3a2e426a7720a6ae060c9f29bc1f9bc4682fa944377",
+    "build-sycl-deepinfer-20261023/baseline/strata_spec.lib": "417e16e26147c87ea2a73bbd9b0d0d305a3477c90c721e90770ad5df136172c5",
+    "build-sycl-deepinfer-20261023/baseline/strata_kernels.lib": "66be7e63d2d994935e5da2150e1663c350334f4c50f656d05a4794a1c60bb173",
+    "build-sycl-deepinfer-20261023/baseline/strata_core.lib": "fe7a34a2cce8612bc1c802398ca0490b06052f9fab1a5bba8477718d8ab3e9ca",
+    "build-sycl-a770-xmx-swiglu-v2-20261024/compile-check.log": "3b30e39df4f37534f5a62e467d3dcf26f19cccbe74c836a4edfeca3c46507917",
+    "build-sycl-a770-xmx-swiglu-v2-20261024/compile-gemm.log": "ca3f4e55d90f8e295d6fa1ce37672e9cd8303475685198b18866953f251a70b4",
+    "build-sycl-a770-xmx-swiglu-v2-20261024/compile-public.log": "d3217db6546d4e0c906ba6741ac74291506b15ba1db038f1c69ac5c2349cb54c",
+    "build-sycl-a770-xmx-swiglu-v2-20261024/configure-public.log": "9dc8b6724ce19ac37fe4d549aeac9ab447dfcaba5a065baa285bd5a5ad93850d",
+    "build-sycl-a770-xmx-swiglu-v2-20261024/link-check.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-sycl-a770-xmx-swiglu-v2-20261024/link-public.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-sycl-a770-xmx-swiglu-v2-20261024/candidate.obj": "58c61d019c1a0692c7f956dde6975c3d828655b0246c421f68696ed4518b1c07",
+    "build-sycl-a770-xmx-swiglu-v2-20261024/check.obj": "48338d8d2222ea7b820f77618b420791ab59e97253da05372de8250248d9d99f",
+    "build-sycl-a770-xmx-swiglu-v2-20261024/public-ctest/check.obj": "b8b6ff0103f2bb6fb5521865ce66a8b5d82f7f41b8f4c3c29f2a9359e330d632",
+    "build-sycl-a770-xmx-swiglu-v2-20261024/public-ctest/ctest.log": "5d3ed40d6780c9ef101377f2497810e26f873e82925fa3f3398ae12716d4fbae",
+    "build-sycl-a770-xmx-swiglu-v2-20261024/public-ctest/cmake/CTestTestfile.cmake": "dc0e36ac36d5272bce4a64199c03623f651926d68680749fa2dad65519ea9d1b",
+    "build-sycl-a770-xmx-swiglu-v2-20261024/public-ctest/cmake/prefill_xmx_expert_chain_check.exe": "f5a2cb7797e60bb5f5ffcff01292a081d8bdc0e8026f0a49de323ef93a4f4fff",
+    "build-sycl-a770-xmx-swiglu-v2-20261024/check/strata.exe": "f5a0fbe821202e2b70d31b3a2bd34c01c6d757d650b1613c225bbe8fba2e6916",
+    "build-sycl-a770-xmx-swiglu-v2-20261024/screen/0.stdout": "3b467c7231c4b4a921fb4a2d113724d6cca956dc127a4b61eabe67231d4bb1e5",
+    "build-sycl-a770-xmx-swiglu-v2-20261024/screen/1.stdout": "bf0f73651add8e800ab63ad45a54f4c2b081a24b96957568b04595be9baf93ca",
+    "build-sycl-a770-xmx-swiglu-v2-20261024/screen/2.stdout": "08ac0b66a528437a92760cb0183a5942160c497fd9477d9778c8934b615aa0eb",
+    "build-sycl-a770-xmx-swiglu-v2-20261024/screen/3.stdout": "6b26c5470f5df138bded42561e209219869c3e4cf048ce194c28aee446d28862",
+    "build-sycl-a770-xmx-swiglu-v2-20261024/screen/4.stdout": "447ff856b86fe6bb77dd87ef32e387e016fa9216c38d56cbd5ffc2c9f024c9f2",
+    "build-sycl-a770-xmx-swiglu-v2-20261024/screen/0.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-sycl-a770-xmx-swiglu-v2-20261024/screen/1.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-sycl-a770-xmx-swiglu-v2-20261024/screen/2.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-sycl-a770-xmx-swiglu-v2-20261024/screen/3.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-sycl-a770-xmx-swiglu-v2-20261024/screen/4.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-sycl-a770-xmx-swiglu-v2-20261024/results.json": "5625ab58a3fece562fc4a4b488ddb5754984ed6bf7428006da4c87f6a1ca5746",
+    "build-sycl-a770-xmx-swiglu-v2-20261024/audit.py": "0277fc341fea0f1da2c503dab81c40cc9d7b638de48bfb79f2dd1f3fa859e616",
+    "build-sycl-a770-xmx-swiglu-v2-20261024/publish.py": "4315b4c1d4e9e54be61551b4305b7c2d06e381a17b5eec4cfeefe40bdf19267c",
+    "build-sycl-a770-xmx-splitk-20261024/profile-results.json": "ced4dc8aafa1b3f5dbf7f5e0fa4f5595127501615f4f5bb04156b2cac9cb56ca"
+  }
+}

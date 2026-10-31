@@ -442,8 +442,7 @@ PleReader::Ticket PleReader::issue(const uint32_t* rows, size_t n, uint8_t* out_
     const bool rearm = m.keep_us > 0 && (m.last_issue_us <= 0 || now - m.last_issue_us > m.keep_window_us);
     m.last_issue_us = now;
     TicketState& ts = m.tickets[id];
-    std::unordered_map<uint64_t, size_t> by_page;     // aligned offset -> index in `jobs`
-    std::vector<Job> jobs;
+    std::vector<Use> misses;
     for (size_t i = 0; i < n; ++i) {
         const uint32_t rb = m.row_bytes;
         uint8_t* dst = out_raw + i * rb;
@@ -457,27 +456,38 @@ PleReader::Ticket PleReader::issue(const uint32_t* rows, size_t n, uint8_t* out_
             ++m.stats.cache_hits;
             continue;
         }
-        const uint64_t at = m.table_offset + (uint64_t) rows[i] * rb;
-        const uint64_t first = at / PAGE * PAGE;
-        const uint32_t length = (uint32_t) ((at + rb - 1) / PAGE * PAGE - first + PAGE);
-        auto f = by_page.find(first);
-        if (f != by_page.end()) {
-            Job& j = jobs[f->second];
-            j.length = std::max(j.length, length);
-            j.uses.push_back(Use{rows[i], (uint32_t) (at - first), dst});
-            ++m.stats.dedup_rows;
-            continue;
-        }
-        by_page.emplace(first, jobs.size());
+        if (misses.empty()) misses.reserve(std::min(n, size_t{16}));
+        misses.push_back(Use{rows[i], 0, dst});
+    }
+    // ponytail: sort compact records by page; destination order preserves row-cache replacement within a page.
+    const auto page_order = [&](const Use& a, const Use& b) {
+        const uint64_t pa = (m.table_offset + (uint64_t) a.row * m.row_bytes) / PAGE;
+        const uint64_t pb = (m.table_offset + (uint64_t) b.row * m.row_bytes) / PAGE;
+        return pa < pb || (pa == pb && a.dst < b.dst);
+    };
+    if (!std::is_sorted(misses.begin(), misses.end(), page_order))
+        std::sort(misses.begin(), misses.end(), page_order);
+    const size_t count = misses.size();
+    std::vector<Job> jobs;
+    if (count > 0) jobs.reserve(std::min(count, size_t{16}));
+    for (size_t i = 0; i < count;) {
+        const uint32_t rb = m.row_bytes;
         Job j;
-        j.offset = first;
-        j.length = length;
+        j.offset = (m.table_offset + (uint64_t) misses[i].row * rb) / PAGE * PAGE;
         j.ticket = id;
-        j.uses.push_back(Use{rows[i], (uint32_t) (at - first), dst});
+        const size_t first = i;
+        do {
+            Use& use = misses[i];
+            const uint64_t at = m.table_offset + (uint64_t) use.row * rb;
+            use.in_page = (uint32_t) (at - j.offset);
+            j.length = std::max(j.length, (uint32_t) ((at + rb - 1) / PAGE * PAGE - j.offset + PAGE));
+            ++i;
+        } while (i < count && (m.table_offset + (uint64_t) misses[i].row * rb) / PAGE * PAGE == j.offset);
+        m.stats.dedup_rows += i - first - 1;
+        if (first == 0 && i == count) j.uses = std::move(misses); // single page: transfer the existing allocation
+        else j.uses.assign(misses.begin() + (ptrdiff_t) first, misses.begin() + (ptrdiff_t) i);
         jobs.push_back(std::move(j));
     }
-    // Sorted by offset: prefill chunks then read the SSD in near-sequential order.
-    std::sort(jobs.begin(), jobs.end(), [](const Job& a, const Job& b) { return a.offset < b.offset; });
     ts.pending = (uint32_t) jobs.size();
     ts.jobs = ts.pending;
     ts.t_issue = now_us();

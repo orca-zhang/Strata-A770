@@ -810,20 +810,22 @@ bool FileExpertSource::copy_from_files(int64_t layer, int64_t expert, uint8_t* d
 // being filled by another thread - the caller then waits), false when the caller must fill buffer `v`.
 bool FileExpertSource::claim_stage(int64_t key, size_t& v, bool& fill) {
     constexpr uint64_t kStageSeq = 256;
-    const uint64_t seq = ++stage_seq_;
-    auto it = stage_of_.find(key);
     fill = false;
-    if (it != stage_of_.end()) {
-        v = it->second;
+    if (key < 0 || key >= blobs_) return false;
+    if (stage_of_.empty()) stage_of_.assign((size_t) blobs_, 0);
+    const uint64_t seq = ++stage_seq_;
+    if (stage_of_[(size_t) key] != 0) {
+        v = stage_of_[(size_t) key] - 1;
         stage_epoch_[v] = epoch_;
         stage_used_[v] = seq;
         return true;
     }
     v = stage_buf_.size();
     uint64_t oldest = std::numeric_limits<uint64_t>::max();
+    // Skip newer slots before loading their busy/epoch metadata.
     for (size_t i = 0; i < stage_buf_.size(); ++i)
-        if (!stage_busy_[i] && (stage_epoch_[i] + kStageAge <= epoch_ || stage_used_[i] + kStageSeq <= seq) &&
-            stage_used_[i] < oldest) {
+        if (stage_used_[i] < oldest && !stage_busy_[i] &&
+            (stage_epoch_[i] + kStageAge <= epoch_ || stage_used_[i] + kStageSeq <= seq)) {
             oldest = stage_used_[i];
             v = i;
         }
@@ -840,13 +842,13 @@ bool FileExpertSource::claim_stage(int64_t key, size_t& v, bool& fill) {
                          stage_buf_.size(), (double) stage_buf_.size() * (double) stage_blob_ / 1073741824.0);
         }
     } else {
-        stage_of_.erase(stage_key_[v]);
+        if (stage_key_[v] >= 0) stage_of_[(size_t) stage_key_[v]] = 0;
     }
     stage_key_[v] = key;
     stage_epoch_[v] = epoch_;
     stage_used_[v] = seq;
     stage_busy_[v] = 1;
-    stage_of_[key] = v;
+    stage_of_[(size_t) key] = v + 1;
     fill = true;
     return false;
 }
@@ -869,7 +871,7 @@ void FileExpertSource::publish_stage(size_t v, int64_t layer, bool ok, double us
         std::lock_guard<std::mutex> lk(stage_mu_);
         stage_busy_[v] = 0;
         if (!ok) {
-            stage_of_.erase(stage_key_[v]);
+            stage_of_[(size_t) stage_key_[v]] = 0;
             stage_key_[v] = -1;
         }
     }

@@ -1,223 +1,242 @@
-# Strata-A770
+<div align="center">
+  <h1>Strata-A770</h1>
+  <p><strong>一张 Intel Arc A770 16 GB，配合系统内存，在本地运行 125B MoE 模型。</strong></p>
+  <p>Qwen3.8-Flash-Next · 原生 Level Zero 后端 · 网页聊天与 OpenAI / Anthropic 兼容 API</p>
+  <p><a href="#在-windows-上开始运行">开始运行</a> · <a href="#速度有多快">性能实测</a> · <a href="#继续了解">文档</a> · <a href="README.upstream.md">Upstream / English</a> · <a href="LICENSE">MIT</a></p>
+</div>
 
-**一张 A770 16 GB，把 125B MoE 模型跑在本地。**
+[![Orca L0：同参数固定短代码锚点，原生产 SYCL 41.42 → Orca 50.54 tok/s，解码吞吐 +22.01%；链路与优化亮点](docs/media/orca-l0-hero.png)](bench/results/a770/orca-anchor50-2026-10-31.md)
 
-Strata-A770 让 Intel Arc A770 配合系统内存运行 **Qwen3.8-Flash-Next**。热点专家留在显存，其余权重借助系统内存承载，让大模型在这张 16 GB 显卡上运行起来。
+**原生产 SYCL → Orca L0，同参数实测 41.42 → 50.54 tok/s（+22.01%）。** 固定短代码锚点，三个独立进程 SYCL／Orca／SYCL、每进程十次预热后保留五次，45 次完整输出逐 token 一致；decode 排除准备与预填充。这是整版本后端对照，日常仍用平衡参数。[同等条件复现、锚定参数与边界](bench/results/a770/orca-anchor50-2026-10-31.md) · [完整样本与哈希](sycl/orca/anchor50-a770-windows-2026-10-31.json)
 
-最新测试中，**2K 代码输入下生成约 29.0 tok/s，8K 输入下生成约 24.4 tok/s、预填约 597 tok/s**。数据来自 A770 16 GB + Xeon E5-2696 v4 + **256 GiB DDR3** 的 Windows 测试机；实际内存需求取决于所选模型包。
+Strata-A770 基于 [Strata](https://github.com/Niko1221/Strata)，针对 Intel Arc A770 优化专家缓存、计算内核和任务提交。常用专家保留在显存，其余专家由系统内存承载；你可以通过网页聊天，也可以让已有应用调用本机 API。
 
-[看速度](#速度有多快) · [看优化](#这个分支好在哪里) · [开始运行](#在-windows-上开始运行) · [查看完整测量](docs/A770_PERFORMANCE.md)
+**当前 Intel 默认后端为 Orca L0。** 本分支的原生引擎已在 Windows / A770 16 GB 上完成真实模型与服务验证；Linux 提供构建入口，编译与 GPU 运行尚未验证。NVIDIA / AMD 用户可从[上游使用说明](README.upstream.md)开始。
 
-![Strata-A770 最新实测与历史倍率：2K 代码生成 29.02 tok/s（3.82×），2K 文本生成 27.87 tok/s（3.98×），8K 生成 24.39 tok/s（3.59×）、预填 596.92 tok/s（2.50×）。历史配置不同，基线见下表。](docs/media/a770-performance-hero-v2.png)
+| 你想做什么 | 从这里开始 |
+| --- | --- |
+| 在 A770 上运行模型、使用网页聊天 | [Windows 安装与启动](#在-windows-上开始运行) |
+| 接入聊天客户端、代码工具或自己的应用 | [API 接入](#接入你的应用) |
+| 判断短输入和长输入的实际表现 | [性能实测与适用条件](#速度有多快) |
+| 复用原生 Level Zero 运行时 | [独立 orca-l0 库](orca-l0/README.md) |
 
-*2026-10-21 · IQ2_XS · 预热后五次保留样本的中位数。生成与预填分别计时；图中倍率对比历史阶段，基线与完整范围见下表。*
+<a id="how-does-it-work"></a>
 
 ## 这个分支好在哪里
 
-[Strata-A770](https://github.com/orca-zhang/Strata-A770) 基于 [Strata](https://github.com/Niko1221/Strata)，专注 Windows、A770 和 Intel oneAPI。它保留上游的本地服务与 API，把优化集中在这张卡实际执行的计算和数据搬运上。
-
-| 你关心的事 | 这个分支做了什么 |
+| 能力 | 实际用途与边界 |
 | --- | --- |
-| **把有限显存用在热点上** | 查询实际显存余量，为运行预留空间；结合系统内存与专家缓存，把更常用、搬运成本更高的专家优先留在显存。 |
-| **减少生成时的等待** | 减少无效专家换入，融合重复的激活与量化调用；用 MTP 推测解码在一次验证中接受多个 token，减少逐个生成的开销。 |
-| **为 A770 优化计算路径** | 围绕实际量化格式优化 SYCL 算子，调整 subgroup、数据复用与归约；对常用形状做特化，并为其他输入保留通用路径。 |
-| **接入已有工作流** | 沿用 Strata 的网页界面和 OpenAI / Anthropic 兼容 API，可供聊天客户端、代码工具和本地应用调用。 |
+| **显存与系统内存协作** | 查询实际显存余量，预留运行空间，让热点专家优先驻留显存。16 GB 是显卡容量，完整模型仍需要系统内存与磁盘。 |
+| **原生 Level Zero 推理** | Orca 管理设备、内存、队列、事件与命令回放。原生推理运行时无需 SYCL、Unified Runtime 或 oneMKL；构建内核仍需要 Intel 编译器。 |
+| **A770 计算与调度优化** | 调整专家换入、量化与激活融合、subgroup 和 XMX 矩阵计算路径；MTP 推测解码可在一次验证中接受多个 token。逐项收益见[性能记录](docs/A770_PERFORMANCE.md)。 |
+| **本地服务与应用接入** | 沿用 Strata 网页界面，以及 OpenAI Chat Completions、Responses 和 Anthropic Messages 兼容接口。 |
+| **会话与可选批量执行** | 原生路径已验证会话保存、恢复及继续生成，以及 2 / 4 / 8 槽位批量。批量槽位占用专家缓存，默认关闭；磁盘会话当前要求关闭多请求批量。 |
+| **可单独使用的运行时** | `orca-l0/` 可独立构建，提供模块加载、内存池、命令回放等接口；Strata 集成位于 `sycl/orca/`。 |
 
-这些优化既有端到端测量，也有独立算子校验。例如，固定缓存下把每次专家换入上限从 64 降到 32，测得 **4.30% 的整模型吞吐收益**；IQ2_S GU16/SG16 调整测得 **16.67% 的算子吞吐收益**。两者的测量范围不同，分别记录在[性能证据](docs/A770_PERFORMANCE.md#主要调整的证据范围)中。
+完整功能、检查入口和限制见 [Orca 原生引擎](sycl/orca/README.md)。不同 Arc 型号与其他模型包的速度需要分别验证。
 
-## 速度有多快
-
-**生成（decode）**是模型输出回复的速度；**预填（prefill）**是模型处理输入提示的速度。以下为当前保留优化的隔离测试构建的实测，单位均为 tok/s。
-
-| 场景 | decode 中位数 | decode 范围 | fresh prefill 中位数 | prefill 范围 |
-| --- | ---: | ---: | ---: | ---: |
-| Short 28 | 41.85 | 41.56–42.04 | 30.56 | 30.31–30.93 |
-| Code 2K | 29.02 | 28.73–29.04 | 259.10 | 258.36–259.41 |
-| Prose 2K | 27.87 | 27.73–27.88 | 276.95 | 276.09–277.60 |
-| Long 8K | 24.39 | 24.30–24.41 | 596.92 | 595.12–597.76 |
-
-从记录中的起始阶段到本次测量，**2K 代码生成达到起始的 3.82 倍，8K 预填达到 2.50 倍**。倍率为最新吞吐除以历史基线；生成基线为最初开启 MTP 的配置，预填基线为显存预算修正阶段。各阶段配置不同，Short 输入也由 36 变为 28 tokens；这些是历史阶段倍率。
-
-| 指标 | 历史基线 tok/s | 最新 tok/s | 吞吐倍率 |
-| --- | ---: | ---: | ---: |
-| Short 生成（36 → 28 tokens） | 5.8 | 41.85 | **7.22×** |
-| Code 2K 生成 | 7.6 | 29.02 | **3.82×** |
-| Prose 2K 生成 | 7.0 | 27.87 | **3.98×** |
-| Long 8K 生成 | 6.8 | 24.39 | **3.59×** |
-| Long 8K 预填 | 239.2 | 596.92 | **2.50×** |
-
-每次请求都重新预填，提示缓存关闭。Short 输入为 28 tokens，其余输入分别为 2048 / 2048 / 8000 tokens；Short 自然结束于 76 个输出，其余最多生成 128 个输出。计时不包含模型加载，也不是 HTTP 客户端首字延迟。
-
-正式测速的 **39 次输出全部匹配历史参考**。同一构建通过 GDN 跨层、窗口、融合提交与 CPU 参考检查；数据和校验摘要见[最新测量](bench/results/a770/refresh-2026-10-21.json)。
-
-<details>
-<summary>展开测试平台、参数与测量边界</summary>
-
-| 项目 | 本机配置 |
-| --- | --- |
-| GPU | 单张 Intel Arc A770，16 GB 显存 |
-| CPU | Intel Xeon E5-2696 v4 |
-| 内存 | 256 GiB DDR3 |
-| 系统 | Windows 10 22H2 |
-| 显卡驱动 | 32.0.101.9034 |
-| 编译与数学库 | Intel oneAPI DPC++ 2025.3.2、oneMKL 2025.3 |
-| GPU 后端 | Level Zero |
-| 主要测试模型 | Qwen3.8-Flash-Next，IQ2_XS pack |
-| 常用测试设置 | 8192 上下文、temperature 0、关闭 thinking、最多生成 128 tokens；fresh prefill 关闭提示缓存 |
-
-IQ2_XS 是模型包名称。实际专家 gate/up 为 34 层 IQ2_S、11 层 IQ2_XXS、3 层 IQ1_M，down 全部为 Q2_0；算子按实际张量格式选择。
-
-专家缓存请求 5500，实际 **5771 slots**。Short 先预热十次，其余场景各三次，再各保留五次；表格为五个保留值的中位数和完整范围。输入为 28 / 2048 / 2048 / 8000 tokens，输出为 76 / 128 / 128 / 128 tokens。使用 spec4、完整 248320 行草稿词表、GDN/QSA Q8 tail、quiet 和 prompt cache 0。每次重新预填，专家缓存仍随请求调整；原生 DONE 计时不含模型加载，范围不是置信区间。
-
-正式组 39 次请求的输出哈希全部与历史参考一致。同一构建通过 71 项完整状态回归、42 项跨层检查、156 项窗口检查、44 项融合提交检查和 CPU 参考自检。构建合入保留的 GDN 跨层、QSA 索引批量提交、GDN Xe 预填充与 Q6_K 寄存器优化。
-
-本表报告 10-21 测试构建的绝对速度。本轮未完成等条件的新旧构建 A/B/A，历史表格的差异不能直接作为独立软件优化收益。
-
-相对 **10-20 正式复测**，按两日各自的中位数计算：
-
-| 场景 | decode 倍率 | fresh prefill 倍率 |
-| --- | ---: | ---: |
-| Short 28 | 1.010× | 1.016× |
-| Code 2K | 1.019× | 1.018× |
-| Prose 2K | 1.025× | 1.018× |
-| Long 8K | 1.019× | 1.079× |
-
-以上是跨日期的吞吐比值，本轮未完成等条件的新旧构建 A/B/A，不能将倍率作为单项优化的独立收益。
-
-逐次计时与测试设置见[10-21 数值摘要](bench/results/a770/refresh-2026-10-21.json)。
-
-</details>
+<a id="install"></a>
 
 ## 在 Windows 上开始运行
 
-如果你有 A770 16 GB、能容纳所选模型包的系统内存，并愿意从源码构建，可以从这里开始。当前 A770 路径以源码构建为主。
+当前 A770 路径需要从源码构建引擎，再由安装程序准备模型和服务。
 
-### 1. 构建引擎
+### 1. 准备环境
 
-准备 VS Build Tools 的 x64 开发环境、Windows SDK、Intel oneAPI 2025.3 / oneMKL 2025.3、CMake 3.24+、Ninja 和 Python。在已经初始化好 **2025.3** 工具链的终端中执行：
+| 项目 | 要求或参考 |
+| --- | --- |
+| 显卡与驱动 | 本分支已验证 Intel Arc A770 16 GB，Windows 驱动 32.0.101.9034。 |
+| 操作系统与 CPU | 已测系统为 Windows 10 22H2；使用支持 AVX2 的 x86-64 CPU。 |
+| 系统内存 | 需容纳模型和专家镜像。IQ2_XS 可参考[上游 48–64 GB 的选型建议](docs/MODELS.md#pick-by-ram)；本分支测机为 256 GiB DDR3，较小内存配置尚未在此验证。 |
+| 磁盘 | 为模型下载、pack 和编译产物预留空间；上游安装建议约 80 GB 空闲，优先使用 SSD。 |
+| 构建工具 | VS Build Tools 的 x64 C++ 开发环境、Windows SDK、Intel oneAPI 2025.3 编译器、Level Zero SDK、CMake 3.24+、Ninja、Python 3.10+。 |
 
-```text
+在已初始化 VS x64 与 oneAPI 2025.3 工具链的终端中操作。下面使用 PowerShell 语法，Level Zero SDK 路径按实际安装位置修改。
+
+### 2. 构建引擎
+
+```powershell
 git clone https://github.com/orca-zhang/Strata-A770.git
 cd Strata-A770
-cmake -S sycl -B build-a770 -G Ninja -DCMAKE_C_COMPILER=icx -DCMAKE_CXX_COMPILER=icx -DCMAKE_BUILD_TYPE=Release
-cmake --build build-a770 --target strata -j 1
+cmake -S . -B build-strata-orca -G Ninja -DSTRATA_ENABLE_ORCA=ON -DCMAKE_C_COMPILER=icx -DCMAKE_CXX_COMPILER=icx -DCMAKE_BUILD_TYPE=Release "-DORCA_L0_SDK=C:/Program Files/LevelZeroSDK/1.33.1"
+cmake --build build-strata-orca -j 1
+ctest --test-dir build-strata-orca --output-on-failure
 ```
 
-这里使用 SPIR-V / JIT 构建；不要套用 B 系列的 `bmg-*` AOT 目标。编译、头文件、库和运行时应来自同一代工具链，避免混用 2025.3 与 2026.1 的 SYCL ABI。
+引擎输出为 `build-strata-orca/orca/strata.exe`，内核包位于同目录的 `images/`。两者必须来自同一次构建。GPU 检查需要可用的 A770 驱动与运行环境。
 
-### 2. 准备模型并启动服务
+A770 不使用 B 系列的 `bmg-*` AOT 目标。其他构建位置、Linux 命令与 SYCL 对照方式见[原生引擎文档](sycl/orca/README.md)。
 
-准备模型、pack 和 MTP 文件后，按自己的路径生成配置，再启动本地服务。模型与 API 说明见 [AI_SETUP](docs/AI_SETUP.md)、[DETAILS](docs/DETAILS.md) 和 [Intel Arc](docs/INTEL_ARC.md)。服务入口为：
+### 3. 准备模型并启动
 
-```text
-python sycl/serve/server_intel.py --engine strata --config strata-iq2_xs.json --host 127.0.0.1 --port 8080
+在仓库根目录运行：
+
+```powershell
+python setup.py --backend orca --model IQ2_XS --context 8192
 ```
 
-`strata-iq2_xs.json` 是本机生成的配置，需要填写自己的模型、pack、MTP 和可执行文件路径。默认监听 `127.0.0.1`；需要对外提供服务时必须设置 `--api-key`。
+安装程序会发现上一步的引擎，按提示下载和准备模型、pack 与 MTP 文件，生成本机配置和启动脚本，并启动服务。切换已有 Intel 配置的后端时，会备份旧配置并保留模型参数。
 
-### 3. 接入你的应用
+安装完成后，浏览器打开 [http://127.0.0.1:8080](http://127.0.0.1:8080)。以后可使用安装程序生成的脚本启动；默认 Qwen IQ2_XS 对应：
 
-浏览器打开 `http://127.0.0.1:8080` 使用网页界面；支持 OpenAI 兼容接口的客户端可将 API 地址设为 `http://127.0.0.1:8080/v1`。模型名使用服务配置中的名称。完整 API 与设置见 [DETAILS](docs/DETAILS.md)。
+```powershell
+.\run-iq2_xs.bat
+```
+
+在另一个 PowerShell 窗口检查服务：
+
+```powershell
+Invoke-RestMethod http://127.0.0.1:8080/health
+Invoke-RestMethod http://127.0.0.1:8080/v1/models
+```
+
+健康检查返回 `status: ok`、`loaded: true` 后即可使用。默认监听 `127.0.0.1`；需要对外提供服务时，必须设置 `--api-key`。
+
+<details>
+<summary>手动启动与自定义引擎路径</summary>
+
+安装程序生成的配置包含本机模型、pack、MTP 和可执行文件路径，不能直接照搬其他机器的配置。需要手动启动时，使用安装生成的 Python 环境：
+
+```powershell
+.\.venv\Scripts\python.exe sycl/serve/server_intel.py --engine strata --config strata-iq2_xs.json --host 127.0.0.1 --port 8080
+```
+
+自定义构建位置可通过 `sycl/setup_intel.py` 的 `--orca-engine` 和 `--orca-images` 指定；编译器数学库 DLL 不在 `PATH` 时，可加 `--orca-lib-dir`。原生配置使用 `backend: orca`，并通过 `STRATA_ORCA_IMAGES` 指向匹配的内核包。见[完整安装说明](sycl/orca/README.md)。
+
+</details>
+
+## 接入你的应用
+
+| 使用方式 | 地址或设置 |
+| --- | --- |
+| 浏览器聊天 | `http://127.0.0.1:8080` |
+| OpenAI 兼容客户端 | Base URL：`http://127.0.0.1:8080/v1`；模型列表：`GET /v1/models` |
+| Chat Completions | `POST http://127.0.0.1:8080/v1/chat/completions` |
+| Responses API | `POST http://127.0.0.1:8080/v1/responses` |
+| Anthropic Messages | `POST http://127.0.0.1:8080/v1/messages` |
+
+模型名可填 `strata`；服务接受兼容客户端传入的模型名，不会据此自动切换模型。未启用认证时，要求填写 API Key 的客户端可填任意非空值；启用认证后使用配置的密钥。
+
+用 PowerShell 发送一次聊天请求：
+
+```powershell
+$body = '{"model":"strata","messages":[{"role":"user","content":"Say hello in one sentence."}],"max_tokens":128,"reasoning_effort":"none"}'
+Invoke-RestMethod http://127.0.0.1:8080/v1/chat/completions -Method Post -ContentType "application/json" -Body $body
+```
+
+启用认证后，为请求加上配置的密钥，例如 `-Headers @{ Authorization = "Bearer <你的密钥>" }`。流式输出、工具调用及 API 参数见[技术说明](docs/DETAILS.md#using-it)。
+
+## 速度有多快
+
+以下结果均来自 **A770 16 GB + Xeon E5-2696 v4 + 256 GiB DDR3 + Windows 10 22H2**，使用 Qwen3.8-Flash-Next IQ2_XS，测量日期为 **2026-10-31**。生成速度用 tok/s 表示；首 token 延迟（TTFT）与完整请求耗时越低越好。
+
+### 同参数整版本对照：原生产 SYCL → Orca L0
+
+固定 28-token Fibonacci 输入、76-token 自然输出，5771 专家槽、MTP4／`spec-min-p=0.5`、`adapt-decay=0.95`。三臂独立进程、每臂十次预热／五次保留，得到 **41.46 → 50.54 → 41.39 tok/s**，前后基线漂移 **0.17%**；以两次 SYCL 中位数的几何平均 41.42 为基线，吞吐提升 **22.01%**。Orca 五次保留样本为 **50.31～50.59 tok/s**，45 次请求完整输出与 57／57 草稿计数一致。
+
+这是固定短代码热态锚点，包含命令重放、调度与内核实现差异，不能作为纯 API 独立收益或通用请求速度。decode 排除准备、预填充与 HTTP；日常平衡配置保持 `auto` 缓存、`short-read=1024`、`adapt-decay=0.5`，锚定配置单独使用。最低采样空闲显存 **847 MiB**，未过此前 1024 MiB 余量线；没有新 PPL 或整版本质量等价结论，Linux 尚未验证。[参数、构建身份、全部样本与同等条件复现](bench/results/a770/orca-anchor50-2026-10-31.md)。以下混合请求及历史实验继续保留各自协议。
+
+**历史短提示解码实测 48.94 tok/s。** 这是 28-token Fibonacci 编程提示、自然输出 76 tokens 的结果：MTP4、`spec-min-p=0.5`、5771 专家槽，预热十次后取五次中位数。旧 SYCL → Orca → 旧 SYCL 为 **42.99 → 48.94 → 43.13 tok/s**，45 次请求输出与草稿计数一致；首次冷请求仅 20.27 tok/s。[完整条件与原始记录](bench/results/a770/orca-regression-2026-10-31.md)
+
+### 混合请求：Orca 1536 MiB 预留实测
+
+恢复 **1536 MiB 显存预留**后，实际为 **5896 专家槽／8093 MiB 缓存**。FP16 双专家、MTP4／`spec-min-p=0.5`、自动缓存、8192 context／prefill、adapt32／PCIe fraction 0.16 保留。单进程交错执行四场景，每场景一次预热、三个保留样本，共 16 请求、1024 个输出 tokens、12 个保留样本。 自动定容最初估算 6590 槽，写入后的引擎空闲查询为 201 MiB，随后自动收缩到实际 5896 槽；不是固定槽数上限。
+
+| 场景（输入 token） | Orca decode（tok/s） | TTFT（秒） | 完整请求（秒） |
+| --- | ---: | ---: | ---: |
+| Short（23） | **24.34** | 0.748 | 3.329 |
+| Code2K（2048） | **28.15** | 28.728 | 30.957 |
+| Prose2K（2048） | **24.58** | 27.846 | 30.399 |
+| Long8K（8000） | **28.83** | 77.195 | 79.381 |
+
+![恢复 1536 MiB 预留后的 Orca 四场景实测；蓝色为此前 3072 MiB 分时记录，非同期 A/B。](docs/media/a770-orca-reserve1536-2026-10-31.png)
+
+decode 使用请求准备完成后的引擎计时，排除首轮图预热；TTFT 与完整请求保留每请求准备。模型加载、上传、模板、分词、HTTP 和服务排队不计入。表内为保留样本耗时中位数，非跨进程置信区间。
+
+1 Hz 独立显存采样共 616 次，最低空闲 **947.051 MiB**；采样不能排除间隔内更短暂的低点。启动报告空闲 1649 MiB。全部请求生成 64 tokens、输出非全零且无 prompt 复用，进程正常退出；原生模块审计、EXE／images／配置／输入完整性检查通过，12 个长输入均记录双专家执行。 **未通过此前 1024 MiB 显存余量校验线。** 原始验证失败状态与全部样本保留；以下只报告已完成的性能观测，不作为显存余量验收通过的证据。
+
+本轮仅重测当前 Orca，没有新的同期 SYCL 对照，也没有新质量评分。历史 SYCL 和 3072 MiB 预留结果分别保留原始参数；分时记录受自动缓存容量、显存状态及生成轨迹影响，不能据此计算纯运行时或显存预留的独立收益。原始 PPL 回退与整版本质量等价尚未闭环；Linux 尚未验证。 [完整样本与复现](bench/results/a770/orca-reserve1536-2026-10-31.md) · [原始数据与哈希](sycl/orca/restored-reserve1536-a770-windows-2026-10-31.json)
+
+**连续重复同一 Short 的补测为 38.54 tok/s。** 同一当前 EXE／images、23-token 输入、完整 64-token 输出与 37／50 草稿接受计数；当前完整配置连续重复十次预热后取五次中位数，实际自动缓存 5949 槽。上面的四场景交错结果是另一种请求分布；排除准备和首轮图预热不等于专家缓存已达到连续重复的热状态。两种结果分别保留，具体缓存适配、PCIe 访存与预热的贡献尚未单独量化。
+
+| Short23／64 协议 | 实际专家槽 | decode（tok/s） |
+| --- | ---: | ---: |
+| 四场景交错，每场景一次预热／三次保留 | 5896 | 24.34 |
+| 连续同提示，旧参数，十次预热／五次保留 | 5771 | **38.42** |
+| 连续同提示，当前完整配置，十次预热／五次保留 | 5949 | **38.54** |
+
+[协议差异、全部样本与机制核对](bench/results/a770/orca-short-workloads-2026-10-31.md)。
+
+<details>
+<summary>原生产 SYCL 历史参考：0.8／1536 MiB，非同期对照</summary>
+
+| 场景 | 历史 SYCL decode（tok/s） | TTFT（秒） | 完整请求（秒） |
+| --- | ---: | ---: | ---: |
+| Short | 23.39 | 0.804 | 3.488 |
+| Code2K | 24.54 | 21.635 | 24.193 |
+| Prose2K | 22.43 | 20.935 | 23.747 |
+| Long8K | 23.16 | 57.580 | 60.293 |
+
+历史表来自先前成功的 A/B/A；当前默认参数、缓存容量与测量时段均不同，不能与新表拼成一次同期 A/B。旧 Orca 表的长输入 TTFT +45.96%～+51.44%、用户输入目标原始 PPL +6.94%和完整样本保留在[历史报告](bench/results/a770/orca-l0-2026-10-31.md)，未据此宣称这些问题已经修复。
+
+</details>
+
+### 已默认启用：FP16 双专家预填充
+
+同一候选 EXE 做 OFF／ON／OFF，固定 5771 专家槽、8192 context／prefill、MTP4／`spec-min-p=0.5`，关闭缓存适应和 PCIe 分担。每臂每场景两个样本，12 条完整 64-token 输出及草稿计数一致；TTFT 基线漂移小于 0.08%。
+
+| 场景 | TTFT 关闭 → 开启 | TTFT 耗时变化 | prefill 吞吐变化 |
+| --- | ---: | ---: | ---: |
+| Code2K | 33.001 → 28.230 秒 | **−14.46%** | +16.93% |
+| Long8K | 84.178 → 76.296 秒 | **−9.36%** | +10.34% |
+
+decode 单独排除准备和首轮预热，未确认生成提速。尾部单个专家立即走原路径；另行拆批筛查也未改善 TTFT。已在 A770 原生 XMX 专家链上默认启用，显式 `STRATA_PREFILL_FP16_PAIR=0` 可回退；默认门槛保留 0.5。此前 3072 MiB 预留配置通过 11 请求／704 tokens 的 OFF／ON／AUTO 验收，1 Hz 采样最低空闲显存 1675 MiB；本机预留现已恢复为 1536 MiB。[默认采用证据](sycl/orca/prefill-pair-default-a770-windows-2026-10-31.json)。原整版本的长输入回退尚未证明全部消除。[结果、计时口径与复现](bench/results/a770/orca-prefill-2026-10-31.md)
+
+<details>
+<summary>同源码对照、批量执行与历史记录</summary>
+
+- **同源码后端对照：** 72 次请求、4608 个输出 token 和草稿工作量一致。Orca 的生成吞吐提升 2.89%～5.56%，完整请求吞吐提升 2.54%～3.87%；MTP4 的 decode 基线漂移最高 2.44%。这是另一组配置下的补充实验，收益不与整版本结果相加。[测量报告](bench/results/a770/orca-l0-2026-10-31.md)
+- **四请求批量 MTP：** 相同四槽预分配下，整组吞吐中位数提升 10.13%，输出逐 token 一致。另一组自动缓存实验中，两个槽位占用 701 MiB 专家缓存，单请求 decode 回退 3.49%～5.06%，因此服务批量保持可选。[批量样本](sycl/orca/batch-groups-mtp-a770-windows-2026-10-31.json) · [槽位成本](sycl/orca/batch-memory-a770-windows-2026-10-31.json)
+- **增量输入 demo：** 相同分块、人工延后第二块 30 秒的实验中，TTFT 降低 23.48%；输入一次到齐时，分块反而增加 16.31%，且有一个输出 token 不同。当前为引擎 demo，尚未接入 HTTP 或设为默认。[方法与边界](sycl/orca/README.md#incremental-input-demo)
+- **历史速度、HTTP 实验与优化时间线：** 参数、采样、采用与未采用的结果保存在[性能记录](docs/A770_PERFORMANCE.md)及对应原始报告中。
+
+当前默认实测为 `spec-min-p=0.5`；历史测量保持各自原始配置。不同提示、预热、缓存和输出长度会影响结果，需按各自协议复现。
+
+</details>
+
+<a id="something-went-wrong"></a>
+
+## 常见问题
+
+**16 GB 显存能装下完整模型吗？** 完整模型由显存、系统内存与磁盘共同承载。16 GB 指 A770 显存容量，系统内存仍需按模型选择，见[模型与内存说明](docs/MODELS.md)。
+
+**可以直接用上游安装包吗？** A770 / Orca 路径需要本地构建的引擎与配套内核包；完成构建后使用 `--backend orca` 安装。需要对照旧 SYCL 路径时使用 `--backend sycl`。
+
+**Linux 或其他 Arc 显卡能用吗？** Orca 有 Linux 构建入口，Linux 是后续部署方向；本分支尚无 Linux 编译或 GPU 验证，其他 Arc 型号也没有本轮 Orca 性能数据。上游 SYCL 的社区验证情况见 [Intel Arc 文档](docs/INTEL_ARC.md)。
+
+**启动失败或长输入很慢，先看哪里？** 核对引擎与 `images/` 是否来自同一构建、配置中的模型路径是否有效，以及内存和显存余量。保留 `strata-<model>.log`；已知性能边界见上表，其他排查见[故障处理](docs/TROUBLESHOOTING.md)。
 
 ## 继续了解
 
-| 想看什么 | 从这里进入 |
+| 想了解什么 | 文档 |
 | --- | --- |
-| 每项优化的测量、验证与适用范围 | [A770 性能记录](docs/A770_PERFORMANCE.md) |
-| 最新逐次计时、预热样本与输出哈希 | [10-21 数值摘要](bench/results/a770/refresh-2026-10-21.json) |
-| Intel Arc 的平台支持与构建背景 | [Intel Arc 文档](docs/INTEL_ARC.md) |
-| 引擎结构、API 和参数 | [技术说明](docs/DETAILS.md) |
+| 每项优化、测量条件与历史结果 | [A770 性能记录](docs/A770_PERFORMANCE.md) |
+| 原生引擎构建、功能与检查 | [Orca 集成说明](sycl/orca/README.md) |
+| 可独立复用的 Level Zero 运行时 | [orca-l0](orca-l0/README.md) |
+| Intel 平台支持与 SYCL 背景 | [Intel Arc](docs/INTEL_ARC.md) |
+| 模型选择与系统内存 | [模型指南](docs/MODELS.md) |
+| API、参数与引擎结构 | [技术说明](docs/DETAILS.md) |
+| 安装自动化与 MCP 管理 | [AI 安装指南](docs/AI_SETUP.md) · [MCP Server](docs/MCP_SERVER.md) |
+| NVIDIA / AMD 安装与其他语言 | [上游 English](README.upstream.md) · [简体中文](README.zh-CN.md) |
 
-<details>
-<summary>展开历史性能阶段与优化时间线</summary>
+开发者可先运行无需 GPU 的安装检查；GPU 检查使用前面的 CTest 命令，性能测试需串行运行并固定模型、缓存与预热条件：
 
-### 整模型速度的历史阶段
-
-下面汇总优化过程中的**历史阶段与 10-15 部署 EXE 复测**，单位 tok/s。每行采用该阶段的实测中位数；源码中的 WG128 尚未进入 10-15 冻结 EXE。
-
-| 阶段 | Short 解码 | Code 2K 解码 | Prose 2K 解码 | Long 8K 解码 | Long 8K fresh prefill |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| 最初配置，MTP 开启 | 5.8 | 7.6 | 7.0 | 6.8 | — |
-| 实际显存预算、EAGER、2048 MiB 预留 | 14.8 | 14.1 | 13.3 | 13.8 | 239.2 |
-| 2025.3 EAGER、SG16、异步 commit、缓存调优 | 30.8 | 19.7 | 18.8 | 18.0 | 509.8 |
-| 10-15 当日部署 EXE，完整词表、GDN/QSA Q8 tail | **40.46** | **28.25** | **26.95** | **22.89** | **497.85** |
-
-前三阶段的 Short 输入为 36 tokens，最新一行为 28 tokens，提示不同。最新一行取充分预热后五次复测的中位数，同时测得 Code/Prose fresh prefill **242.86 / 262.73 tok/s**。8K 的预填成绩不代表所有提示长度都能达到 500 tok/s。以上是热机阶段结果，首次 JIT、模型加载和冷启动请求另计。
-
-不同阶段调整过 prefill 分块、浮点舍入、显存缓存容量和运行时，不能把整张表当作一次相同输出、单变量的累计 A/B。原始最初配置到显存预算修正阶段完成了完整输出对照；后续每项的证据范围见[性能记录](docs/A770_PERFORMANCE.md)。
-
-### 性能优化大事记
-
-按实验记录中的日期及阶段顺序整理；同日多条属于不同实验，不代表每条都在上一条基础上测量。“模型”指整模型测量，“算子”指对应计算链的测量。
-
-| 日期 / 阶段 | 调整与发现 | 实测结果与采用情况 |
-| --- | --- | --- |
-| 10-08 · 起点 | 保留原始配置和输出基线，先定位显存压力 | MTP 开启时四场景解码 5.8 / 7.6 / 7.0 / 6.8 tok/s |
-| 10-08 · 显存预算 | 去掉固定伪报的可用显存，查询实际余量，保留 2048 MiB | 模型解码升至 14.8 / 14.1 / 13.3 / 13.8；12/12 输出一致 |
-| 10-08～09 · 稳定运行 | 修正跨队列计时等待；增加首次 prefill 初始化与状态重置，保留 EAGER | 冷启动七场景输出对齐；失败 graph 路径未作为默认 |
-| 10-08～09 · 大块预填 | prefill chunk 提高到 8192 | 一组 fresh 8K prefill 中位数 555.9；分块改变数值路径，单独保留对照 |
-| 10-09 · SG16 与运行时 | GDN SG16、IQ4_XS 两列 SG16；比较 2025.3 / 2026.1，重叠 commit/draft | GDN 微基准 4.853 → 2.247 ms/window；解码优先配置选 2025.3 |
-| 10-09 · 热点缓存 | NO_HOST 路由反馈驱动换入，补齐镜像与 residency 状态；调整换入频率 | 2025.3 阶段四场景 30.8 / 19.7 / 18.8 / 18.0 tok/s |
-| 10-09 · 验证窗口修复 | resident_plan 容量 64 → 128，覆盖 8 行 × Top10 的 80 项 | 修复宽窗口错误输出，32 项计划检查通过；更宽窗口未稳定提速 |
-| 10-09 · 访问成本拆解 | 比较 VRAM、mapped RAM、CPU 与串行 DMA | IQ2_S 专家每层 0.418 / 1.619 / 0.686 / 1.682 ms；优先保住显存驻留 |
-| 10-10 · 激活融合 | Verify 的 Q8_1 与 BF16 激活准备融合 | 模型三场景 +1.52% / +1.09% / +1.10%；23/23 输出与用量一致 |
-| 10-10 · 成本加权 | 按专家访问成本调整缓存换入优先级 | 模型 +1.580%；换入次数减少约 6.1%，采用 |
-| 10-10 · 少搬运 | adaptive swaps 128 → 96 → 64 → 32 | 64 → 32 的受控模型对照 +4.302%；128 → 32 扫描中换入次数减少约 70.7% |
-| 10-10 · MTP 归一化 | pooled RMS 改为四个 HC 流各自 RMS | 固定缓存 ABBA 模型 +2.543%，每 128 tokens 少两个 Verify 窗口，输出一致 |
-| 10-10～11 · 显存余量复调 | 预留改为 1536 MiB，PCIe fraction 固定 0.16 | 正式五次 A/B/A 模型几何均值 +2.84%，三个场景均改善 |
-| 10-11 · 去掉常驻计时 | 正常服务关闭 DECODE_TIMING | 模型几何均值 +1.798%，输出哈希一致 |
-| 10-11 · 少算无效草稿 | spec4 最后一步草稿阈值设为 0.6 | 正式五次 A/B/A 模型 +1.238%，45 个保留输出一致 |
-| 10-12 · 共享专家与 QSA | 融合 SwiGLU/Q8_1；radix 提前退出、原生 subgroup scan、保留不适合形状的回退 | 保留通过算子检查的路径；一组共享专家/QSA 组合模型对照 -0.794%，未据此宣称模型提速 |
-| 10-13 · IQ2_S SG16 | GU16 切换物理 SG16，保持逻辑求和顺序 | VRAM 专家算子 +16.672%；独立记录，不换算成等比例解码收益 |
-| 10-13 · Router | 原生 subgroup max/min，保留较小 ID 的 tie 规则 | Router 算子 +45.653%；固定缓存模型仅约 +0.0056% |
-| 10-13 · HC 组合 | owned-stream static3 norm、prefetch8、WG512/SG16 down | 完整 HC 算子 +10.418%；与 Router 的组合模型仅 +0.0747%，不足以确认模型提速 |
-| 10-13 · 单条专家组 | singleton group 直达已有 aligned Multi<1> | VRAM 专家算子 T1 +4.718%、T4 +0.585%，几何均值 +2.631%；已验证部署 |
-| 10-13 · HC 后续 | 跳过尾部无效 subgroup；reduce 改 SG16；prefetch16/WG64；up 固定四流寻址 | 各自 HC 对照 +1.563%、+7.039%、+3.489%、+1.492%；生产头文件下 reduce 复验 +6.414% |
-| 10-13 · 算子集成 | 将确认正收益的 Router、HC、IQ2_S、共享专家与 QSA 路径汇入统一构建 | 按算子收益采用；单项百分比不累加成统一模型提速 |
-| 10-14 · 配对 gate/up | 同一个 SG16 计算一对 gate/up，共用激活读取 | 48 层专家链 VRAM 吞吐独立确认 +1.153%；源码采用 |
-| 10-14 · 提交与等待实验 | HC eventless 提交、运行时 batch64、graph event wait | 分别测到排队吞吐或等待收益；保留独立开关，默认关闭或不写入默认配置 |
-| 10-15 · 精度换吞吐探索 | Top9/Top8 与按层 SER 专家省略 | 按层实验固定 token 工作 +6.889%，参考 PPL +0.614%；生成提速未通过漂移检查，默认关闭 |
-| 10-15 · MTP 权重探索 | Q2_0 有符号尺度细化、BF16 输入投影 | 重建误差降低或提高权重精度未转化为接受率收益；均未采用 |
-| 10-15 · 固定输入宽度 | 对配对 IQ2_S 路径特化宽度 2560，其他宽度回退 | 48 层专家链 VRAM 吞吐独立确认 +0.832%；源码采用 |
-| 10-15 · GU 访存探索 | 固定更多布局字段、SLM 码表、显式向量读取 | 专家链 VRAM 筛选分别 -0.092% / -14.615% / -0.486%；均未采用，未进行通过筛选后的独立确认 |
-| 10-15 · 草稿词表 | Python 标准库扩展 106299 → 112038 行，随后改用 248320 行完整词表，共享目标输出头 | 完整词表十五例 MTP 接受率 73.47% → 76.24%，节省约 145.74 MiB 子集输出头及映射；当前配置已选，尚未证明稳定吞吐收益 |
-| 10-15 · 草稿注意力窗口 | 完整词表下比较 1024 / 512 / 768 | 两个短窗口均未通过筛选，保留 1024 |
-| 10-15 · GDN Q8 尾部融合 | 在递推与归一化尾部直接生成 Q8_1，省去一次独立量化调用，保留未融合路径 | 源码已合入，本轮测速配置开启；推送前 window 检查 156 例、0 失败；未单独量化整模型收益 |
-| 10-15 · QSA gate + Q8_1 融合 | gate 输出直接量化，可跳过 FP32 中间输出；接入 Verify 与 MTP，保留原路径 | 源码已合入，本轮测速配置开启；推送前 Q8 检查 T=1/2/4/8、0 失败；未单独量化整模型收益 |
-| 10-15 · 配对 GU 工作组 | 宽度 2560 使用 WG128 / 八对行，保持 SG16 和每行运算顺序，其他宽度保留 WG256 | 干净独立确认 VRAM 专家链 +1.006%，最大基线漂移 1.241%；源码已采用，未进入测出 40.46 tok/s 的 EXE，未据此宣称整模型提速 |
-| 10-15 · 最新版本复测 | 冻结部署 EXE，完整词表、Q8 tail，充分预热后独占测量；复验 batch64 与 MTP 阈值 0.55 | 四场景解码 40.46 / 28.25 / 26.95 / 22.89 tok/s；两个候选均无整体正收益，保留原设置 |
-| 10-15 · ezpp 复核 | 修正 Windows 计时换算；五组时钟校验及同一分析 EXE 的 OFF/ON/OFF 对照 | 时钟最大差 0.362 ms；输出一致，最大基线漂移 0.474%，聚合耗时开销约 +1.067%；生产关闭分析 |
-| 10-20 · 最新整模型复测 | 最新源码构建完成 39 次预定请求，输出一致 | 四场景 decode / fresh prefill 的中位数和范围见最新表；不作为等条件的软件增益对照 |
-| 10-21 · 组合构建与访存筛选 | 保留已验证优化，五项访存候选均未通过收益门槛 | 39 次整模型输出一致；decode / prefill 主表更新至 10-21 |
-| 10-21 · GDN 跨层提交 | 同一阶段 36 层的融合提交合并为一次启动 | 相对当前逐层融合实现，提交阶段耗时降低 **27.89%–42.29%**；[对照与验证](docs/A770_PERFORMANCE.md#2026-10-21-gdn-跨层批量提交) |
-| 10-21 · QSA 批量提交 | 按设备接受位置合并逐 token 追加，六槽窗口每层六次降为一次 | 四/六槽提交阶段保守比较至少降低 **56.79% / 66.98%**；[方法、漂移与验证](docs/A770_PERFORMANCE.md#2026-10-21-qsa-索引批量提交) |
-| 10-21 · GDN 融合提交 | 历史更新与 ESIMD 状态回放合并，每层少一次内核启动 | 相对上一轮 ESIMD，提交阶段耗时降低 **37.90%–41.73%**；[测量与验证](docs/A770_PERFORMANCE.md#2026-10-21-gdn-历史与状态融合提交) |
-| 10-21 · GDN ESIMD 与候选复测 | 256 GRF 四/六 token 状态提交已落源码；四场景输出匹配 | 独立确认阶段耗时降低：T4 **16.44%–27.08%**、T6 **20.66%–28.15%**；[方法与未采用项复测](docs/A770_PERFORMANCE.md#2026-10-21-gdn-esimd-落地与未采用方案复测) |
-
-</details>
-
-<details>
-<summary>展开开发者检查入口</summary>
-
-可复用的检查入口：
-
-```text
-python tools/bench_a770.py --self-test
+```powershell
 python tools/test_setup_sycl.py
-python tools/test_mtp_rt.py
-cmake --build build-a770 --target native_grouped_parity gr_parity quantize_act_parity -j 1
-ctest --test-dir build-a770 -R "native_iq2s_sg16_parity|gr_parity|quantize_act_parity" --output-on-failure
+python tools/bench_a770.py --self-test
 ```
 
-GPU 检查需要 A770 与可用运行时。重新比较性能时固定模型和实际缓存容量，完成预热、输出对照与漂移检查，并串行运行 GPU 测试。
-
-源码包含 `sycl/` 和仓库内修改过的 DPCT helper；oneAPI、oneMKL、驱动与模型作为外部依赖准备。性能分析、可选实验及其默认状态见[完整记录](docs/A770_PERFORMANCE.md#可选实验与默认状态)。
-
-</details>
-
 ## 致谢与许可证
-
-上游介绍与安装说明见 [Strata 上游文档](README.upstream.md)。
 
 感谢 [Strata](https://github.com/Niko1221/Strata) 作者与贡献者、最初的 Intel SYCL 移植作者 maxfridbe、Qwen 团队，以及 [llama.cpp / ggml](https://github.com/ggml-org/llama.cpp) 和 Intel oneAPI。
 

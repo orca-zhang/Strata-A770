@@ -1,0 +1,1899 @@
+{
+  "complete": true,
+  "purpose": "Vectorize only contiguous weight conversion, retaining scalar activation conversion, in-order queue, output staging and FP32 GEMM",
+  "source_sha256": {
+    "include/strata/prefill/gemm.hpp": "0086abbd6d169177e449d47388a7639aea59e72dae3ebf14dca7ab9040f85da6",
+    "sycl/src/prefill/gemm.dp.cpp": "2d36f6b083bbf7a08e1736225e13395b21a80d79a5d7934d0d40066864cc01e7",
+    "sycl/src/prefill/prefill.cpp": "602a42203460ff1775d2ec59c715da9dc205f42657988086e3d1a0fa6346cf46",
+    "sycl/src/prefill/gemm_parity.cpp": "67a1eaef54402f858876b1a51f0792336890d70ce7ab9293194ec553a143185a"
+  },
+  "baseline_build_sha256": "dada8f604f29d17d3033efe3841e5e3abce2940330d4e5fa22d12f71322f9aa3",
+  "production_sha256": {
+    "G:\\GitHub\\Strata\\build-sycl-a770-unified-operators\\bin\\strata-unified-all-operators.exe": "8f0d866ded297cf5a409e84cf5dd61f437c56c8a89aaeb2a85569265b6a3e122",
+    "G:\\GitHub\\Strata\\strata-iq2_xs.json": "1a755372f0e6c90c0bfa2af865d67b51f8df49c10aa1613b041b08da8184ca88"
+  },
+  "dependencies": {
+    "CMakeFiles\\kv_q4_parity.dir\\src\\kernels\\kv_q4_parity.cpp.obj": "6c66ab70f900caa220b53ee2b325a1ff8ec95183fde58f218777590c812f4b50",
+    "CMakeFiles\\kv_q8_parity.dir\\src\\kernels\\kv_q8_parity.cpp.obj": "8c39c9d154c651ced742e17774f79a1ec012035d9af10aa620f758ef1fad367a",
+    "CMakeFiles\\qsa_parity.dir\\src\\kernels\\qsa_parity.cpp.obj": "245c2c9b172d0c30f554af5015e7ff57a554ce667db19f99d0749532315044ad",
+    "CMakeFiles\\ShowIncludes\\main.obj": "57323f8fb500d0f8bc04e94966e04455c38ce91223a5f772096248fa22feed05",
+    "CMakeFiles\\strata_core.dir\\src\\core\\device.dp.cpp.obj": "d96d2f12d73a523a88d39a9644da54235674558009dcf55a2d0b16051324ac89",
+    "CMakeFiles\\strata_core.dir\\src\\core\\graph.cpp.obj": "495a6a24c0c16c138c379a7a0c8d4ad7284285827c7a2d65e910b3681cb6ce26",
+    "CMakeFiles\\strata_core.dir\\src\\core\\pinned.dp.cpp.obj": "0afb4111f0a58c7df178fc2421731e8ffff7568e74dfd1811f2895bd2c3caafb",
+    "CMakeFiles\\strata_core.dir\\src\\core\\weights.cpp.obj": "b5ddb481cacd33978805170b98c4ead7a76a0d6cffb6ae3d2706b80c19025a1b",
+    "CMakeFiles\\strata_engine.dir\\src\\core\\conversation_snapshot.cpp.obj": "a2278eb1cc2d3690aa848ca240eadc0d7d06a80f61de0264d51ce2f173fbf415",
+    "CMakeFiles\\strata_engine.dir\\src\\core\\conversation_state.cpp.obj": "f839fc34203f60ceed9b766ad7dc05806b23e970a435277b827b16f3a7644577",
+    "CMakeFiles\\strata_engine.dir\\src\\core\\expert_cache.cpp.obj": "47fbf48d8eb21caa1954f63537b246495938a75b33db57f5887d96693618af99",
+    "CMakeFiles\\strata_engine.dir\\src\\core\\expert_source.cpp.obj": "c42cf61bcf016f5b302b5233f5a4fccc8a97db2f1ef458bec2fff1a6eb0e5936",
+    "CMakeFiles\\strata_engine.dir\\src\\core\\gguf_expert_source.cpp.obj": "dc623289cfc284082a812eb31358dca8d94633d606d7fd6f6b753d8934102c9e",
+    "CMakeFiles\\strata_engine.dir\\src\\core\\layer.cpp.obj": "444260700ceab46c2f6fdbfdf817c55e9b7b3cb89351a8fa39a4d6c4815c311d",
+    "CMakeFiles\\strata_engine.dir\\src\\core\\native_dense.cpp.obj": "9486f95385458cae743b5c6f90925945c0cf673333d570a0253b2ce4698fb0ee",
+    "CMakeFiles\\strata_engine.dir\\src\\core\\native_head.cpp.obj": "dbdd8ce4fc79fe9eb341d95c2f824da504cca923f8e080a18006d0af3b9cc30a",
+    "CMakeFiles\\strata_engine.dir\\src\\core\\peer_experts.cpp.obj": "61527d1fe042afb12332d3696a646edf55175b4289a4a16be0c520921379e335",
+    "CMakeFiles\\strata_engine.dir\\src\\core\\remote_experts.cpp.obj": "399197e9be861d8f57e4c0c3e6f65b990f406d4ff82bfc22558ffa0e8af7e16f",
+    "CMakeFiles\\strata_engine.dir\\src\\core\\session.cpp.obj": "b8b1472857a486b1f312dc6398bb5853179819e2beb71829c76eebc9fa8d0bd8",
+    "CMakeFiles\\strata_engine.dir\\src\\core\\vmm_port.cpp.obj": "d4aefe6d5f13994bac7e5a6c47559913e010ddf0afe7f94f028c71fab128fac9",
+    "CMakeFiles\\strata_kernels.dir\\src\\kernels\\cuda\\bf16_gemv.dp.cpp.obj": "93c79c6a7cfb06fdedacb5db49e88e19e97d2f0318237b94de93794873267552",
+    "CMakeFiles\\strata_kernels.dir\\src\\kernels\\cuda\\cvec.dp.cpp.obj": "99235311915d4d68cc079452ecf79677c52147b12a4e80fbf106a2a11d61ffb2",
+    "CMakeFiles\\strata_kernels.dir\\src\\kernels\\cuda\\dequant_bf16.dp.cpp.obj": "de1f58717c0d80567446c772546aa6471297799b6e118b664f62cc08ca8a61b6",
+    "CMakeFiles\\strata_kernels.dir\\src\\kernels\\cuda\\dequant_s2.dp.cpp.obj": "bf4755f848f8c0a286dfc975c14bdd583dbb628ab5af5d8bc65ebe8674c2eae4",
+    "CMakeFiles\\strata_kernels.dir\\src\\kernels\\cuda\\elementwise.dp.cpp.obj": "c5c29eff3d038937c41a29536b8058b224c0e70a24dab7fad8116833dff2fea1",
+    "CMakeFiles\\strata_kernels.dir\\src\\kernels\\cuda\\fused_gdn.dp.cpp.obj": "fdbb12eda8d65b7bfccf31d8a9b07a9aef0b073e3679ec87b24317d493eefbfa",
+    "CMakeFiles\\strata_kernels.dir\\src\\kernels\\cuda\\fused_gr.dp.cpp.obj": "53a2f5e899eaf65c1d5e4c47642ee72ba92a3447e5de076ed066d3ae458fc392",
+    "CMakeFiles\\strata_kernels.dir\\src\\kernels\\cuda\\gdn.dp.cpp.obj": "f8bbdb56bc219a0ca50e4df64851370fa786b18c133817eeef6234627d356ea9",
+    "CMakeFiles\\strata_kernels.dir\\src\\kernels\\cuda\\gr.dp.cpp.obj": "8a56c7e2b9b6758c64a5c971216e842a8aec22e8f9195146b0b77824286ba93c",
+    "CMakeFiles\\strata_kernels.dir\\src\\kernels\\cuda\\iq_kernels.dp.cpp.obj": "8d3302e8ace255c246025ec83cf0f6748e625e06199de750fa9c8d2945c863d8",
+    "CMakeFiles\\strata_kernels.dir\\src\\kernels\\cuda\\kv_stream.dp.cpp.obj": "05b4dd43c5942a5dc2c26120169f6fe60b199e80608cb373b388889b004d79bf",
+    "CMakeFiles\\strata_kernels.dir\\src\\kernels\\cuda\\native_bf16.dp.cpp.obj": "8756c60a34f141378c0fdf5de36c556ea7e1af8c6cff38360caefbcd25d68b70",
+    "CMakeFiles\\strata_kernels.dir\\src\\kernels\\cuda\\native_flash_attn.dp.cpp.obj": "654c3e4d9db4252d7a8cea8916e24ebf20ecfcd574315294dbaec4065c0a3b6e",
+    "CMakeFiles\\strata_kernels.dir\\src\\kernels\\cuda\\native_gdn.dp.cpp.obj": "affccdde0d8f096f17c31448dbabe75d0a574a1d675150630aeb42918be86cc4",
+    "CMakeFiles\\strata_kernels.dir\\src\\kernels\\cuda\\native_gdn_preprocess.dp.cpp.obj": "e403b100a51190872118c66f969c193ec0a0cd6f7ea95a8644f055cb0b7d6f31",
+    "CMakeFiles\\strata_kernels.dir\\src\\kernels\\cuda\\native_gr_norm.dp.cpp.obj": "76b58bab0c989d672901d7c91c5ee1bd3afa3bcc4e6161a5bd597e878e609401",
+    "CMakeFiles\\strata_kernels.dir\\src\\kernels\\cuda\\native_gr_postops.dp.cpp.obj": "1b706e1cc9b14037465653ac591a1b6e15235c1b1eb14ec6031dc08de1a29480",
+    "CMakeFiles\\strata_kernels.dir\\src\\kernels\\cuda\\native_mmvq.dp.cpp.obj": "58f4e108948c04aa5e860838b3c9c4c4d2ac6e211193d1c1a46eb60b0b6e9c2a",
+    "CMakeFiles\\strata_kernels.dir\\src\\kernels\\cuda\\native_moe.dp.cpp.obj": "abdac53522fdafc91b4061fa6abe532b7e5a9a3009e7876a3b0613fae538471a",
+    "CMakeFiles\\strata_kernels.dir\\src\\kernels\\cuda\\native_ple_postops.dp.cpp.obj": "cbff75f7ad373a4fd71e2ce2136747e394e6151edfb9e082aca14ca20fafdce7",
+    "CMakeFiles\\strata_kernels.dir\\src\\kernels\\cuda\\native_qsa.dp.cpp.obj": "ede95433b0292a909b849f9b912f421589b710e3d00817f1633595a71537c94b",
+    "CMakeFiles\\strata_kernels.dir\\src\\kernels\\cuda\\native_qsa_indexer.dp.cpp.obj": "2722fd0af8f2e994065fb843486d70cd8658ee2a8b8161ce0437022948e2eb58",
+    "CMakeFiles\\strata_kernels.dir\\src\\kernels\\cuda\\native_qsa_score.dp.cpp.obj": "0091710c54d6cb8452368db333fa3858577d62eb69b33bb75d9db52716c7a9cd",
+    "CMakeFiles\\strata_kernels.dir\\src\\kernels\\cuda\\native_router.dp.cpp.obj": "f25b1cde63070d25c106a1e5af70d9180a005f84eb1bdac0d95e9f1b9f599035",
+    "CMakeFiles\\strata_kernels.dir\\src\\kernels\\cuda\\ple.dp.cpp.obj": "3221f27dfcf1ff3b633dbeef3d5f0d75ad41c1adce243cbf7b9093f8d775cc4f",
+    "CMakeFiles\\strata_kernels.dir\\src\\kernels\\cuda\\qsa_decode_attn.dp.cpp.obj": "924e5d5cac1f175602c628484d11ed5e4a57ff2b57305285aeba3f8a9ee7e595",
+    "CMakeFiles\\strata_kernels.dir\\src\\kernels\\cuda\\qsa_prompt_attn.dp.cpp.obj": "631c337b2abffba5a3903f62382fe16cb2924d9332c65989e4596a248a1ccc34",
+    "CMakeFiles\\strata_kernels.dir\\src\\kernels\\cuda\\qsa_prompt_attn_xmx.dp.cpp.obj": "2178f02982ad1ba09bd8617b34ca9965682c594f93d72e8a444b4fcec4285423",
+    "CMakeFiles\\strata_kernels.dir\\src\\kernels\\cuda\\qsa_select.dp.cpp.obj": "6c6a91f47e2b70a96c91b678637fb6756470feaf2e638726eff49a02cedd9e35",
+    "CMakeFiles\\strata_kernels.dir\\src\\kernels\\cuda\\quantize_act.dp.cpp.obj": "f87374c3a139cc01a71327372a5d933ebc590028cdd37b350597a3d48ef8be2e",
+    "CMakeFiles\\strata_kernels.dir\\src\\kernels\\cuda\\rope.dp.cpp.obj": "9a57923819de17361bfc74caa7547161fca1046dd8335c4cd9ee23e5a326a1f2",
+    "CMakeFiles\\strata_kernels.dir\\src\\kernels\\cuda\\router_top10.dp.cpp.obj": "e0341ca739c2451caf56485c6aca88ac48a1e61cfe66d920df9a16768f8a9ad7",
+    "CMakeFiles\\strata_kernels.dir\\src\\kernels\\cuda\\s2_expert_grouped.dp.cpp.obj": "b87945c63105f5a14a590c6311ae3e56b8c2bf3e87595afb23e588b72c918bf3",
+    "CMakeFiles\\strata_kernels.dir\\src\\kernels\\cuda\\s2_gemv.dp.cpp.obj": "5e70b703825439e2d3317daa722d6ca682af8be42da0a25acbaf106ee3916202",
+    "CMakeFiles\\strata_kernels.dir\\src\\kernels\\cuda\\s2_gemv_fast.dp.cpp.obj": "16a56618fa7fefbdd85aa2499e6235c593056c6252f73d32b24883dd343a8350",
+    "CMakeFiles\\strata_kernels.dir\\src\\kernels\\cuda\\s2_gemv_q8.dp.cpp.obj": "6b7ee3b5e531091ce35d4839d01164efa1026f32391f9d6311ddf9b4f09f3bb4",
+    "CMakeFiles\\strata_kernels.dir\\src\\kernels\\cuda\\s2_gemv_quads.dp.cpp.obj": "55e820ffb2bd4634ccea1a2d61068aebc8ea368a6c0cea98671de97d78cbd785",
+    "CMakeFiles\\strata_kernels.dir\\src\\kernels\\cuda\\sampler.dp.cpp.obj": "0d017f7a3928fe6a9eb55d0550509c07ffd4d76a94d544b6b7f40239fd74fe59",
+    "CMakeFiles\\strata_kernels.dir\\src\\kernels\\cuda\\shared_expert.dp.cpp.obj": "63259ef1bd518c3322d878ddefa80841a28e635524d7836953105f825f8d4e71",
+    "CMakeFiles\\strata_kernels.dir\\src\\kernels\\cuda\\s_gemv.dp.cpp.obj": "6b07c53d45e432960883a8a1ed5e5e171ea6301ed801aa291346f937b607685f",
+    "CMakeFiles\\strata_kernels.dir\\src\\kernels\\cuda\\verify_kernels.dp.cpp.obj": "0744db37736680a6c937741c5f9615b55b027f000ad9f91b98a305ab06a3e4fe",
+    "CMakeFiles\\strata_kernels.dir\\src\\ngram\\ple_reader.cpp.obj": "90b27cd14352e613b63b5475ab84e741e7dcfe3128d44b315cd0cd1d195d7ba4",
+    "CMakeFiles\\strata_kernels.dir\\src\\platform\\direct_file.cpp.obj": "23daba7ad0e3e6e6b89d8a0347d10a58baf697b7ca132e396918905fddca801a",
+    "CMakeFiles\\strata_prefill.dir\\src\\prefill\\gemm.dp.cpp.obj": "09cda01b2cb0c2d0f2067ebee7d999b14c3993819d1c13271e6cbaf62ba6b832",
+    "CMakeFiles\\strata_prefill.dir\\src\\prefill\\kernels.dp.cpp.obj": "5d407fef10eb0037456af8fd7dc161a6232f2e877b87012e50818b255863ee55",
+    "CMakeFiles\\strata_prefill.dir\\src\\prefill\\moe_fused_stub.cpp.obj": "47329c6f177b667bda6d85d04a0bc5b3a76d767151c2007b99799a2ee74f18b5",
+    "CMakeFiles\\strata_prefill.dir\\src\\prefill\\prefill.cpp.obj": "12687071239c149d32b71d45e24067140066c7daf0aabb876da5ee2481d82683",
+    "ggml\\src\\CMakeFiles\\ggml-base.dir\\ggml-alloc.c.obj": "ed758359c65d998fcc92851f0782204bf3f826401977fdc6d47c981772eac981",
+    "ggml\\src\\CMakeFiles\\ggml-base.dir\\ggml-backend-meta.cpp.obj": "39623abdcf5b68be5a702332a28e5ef7f879fc988aa747274c30a0a60e5d7f0f",
+    "ggml\\src\\CMakeFiles\\ggml-base.dir\\ggml-backend.cpp.obj": "2ae4ab9c48c81be384dc20bc2dc4fb5334ba85b92bb20ccc1feb8b1b7dfe3e87",
+    "ggml\\src\\CMakeFiles\\ggml-base.dir\\ggml-opt.cpp.obj": "fedfaece65e27677d6565c909acb18c29831d2418a3a2b3e82a15abe1f6c3cda",
+    "ggml\\src\\CMakeFiles\\ggml-base.dir\\ggml-quants.c.obj": "e0fb70f7904aa48b0771fdcf295b898dfafab541fdaf2eca50cf550e189a0296",
+    "ggml\\src\\CMakeFiles\\ggml-base.dir\\ggml-threading.cpp.obj": "d9e8ac988c6c141480b18dba4de263103a8e7e6b4dca26251817c084c8b9e953",
+    "ggml\\src\\CMakeFiles\\ggml-base.dir\\ggml.c.obj": "24229784ec945d359b1349972082af071a9ddca5182043829b2be0cb8d5af59d",
+    "ggml\\src\\CMakeFiles\\ggml-base.dir\\ggml.cpp.obj": "32c8dde883578258179d547899fad5fcbfc236cb460e54716617df0c8b988967",
+    "ggml\\src\\CMakeFiles\\ggml-base.dir\\gguf.cpp.obj": "00b015a44741d624e0ae9bdd02dc53a97d3c70e7e925db958ba01805f31b8f61",
+    "ggml\\src\\CMakeFiles\\ggml-cpu.dir\\ggml-cpu\\binary-ops.cpp.obj": "0b8940263315a596827ce64d7c92c8df4fb7093489741cd13221350ce38808a1",
+    "ggml\\src\\CMakeFiles\\ggml-cpu.dir\\ggml-cpu\\ggml-cpu.c.obj": "622087fca6b7eab5334cd81e10722d83111076a10a655bdd772b17563cf3fa42",
+    "ggml\\src\\CMakeFiles\\ggml-cpu.dir\\ggml-cpu\\ggml-cpu.cpp.obj": "13e8c30050ab491128924d52bc83ec2d5495134a0e3c61e0e60ee45ce93f7377",
+    "ggml\\src\\CMakeFiles\\ggml-cpu.dir\\ggml-cpu\\hbm.cpp.obj": "48dbb0c49d17893b32a9d5f0a39d7bce7724360c696dbcb1257759d277e89cb6",
+    "ggml\\src\\CMakeFiles\\ggml-cpu.dir\\ggml-cpu\\iqp.cpp.obj": "f44e4ba829cd39a3f0c7228157f8964854b2203c095a4c66a09560e6672058b4",
+    "ggml\\src\\CMakeFiles\\ggml-cpu.dir\\ggml-cpu\\ops.cpp.obj": "513d2adbfc166e0a40d66fb5c6d59fd2c94b4e15b1896f4c73e3b0c3f92b8052",
+    "ggml\\src\\CMakeFiles\\ggml-cpu.dir\\ggml-cpu\\quants.c.obj": "f29cf34cc2f0b0514bfc442b002bd11060f8aac18b32a7e83faf457341b502b1",
+    "ggml\\src\\CMakeFiles\\ggml-cpu.dir\\ggml-cpu\\repack.cpp.obj": "e6ed404d11c8d412766a13b1c6a9ff068857d6e9b90137b8fc21c378a4c97378",
+    "ggml\\src\\CMakeFiles\\ggml-cpu.dir\\ggml-cpu\\traits.cpp.obj": "e898e80b2cb9ed149552602ba3e8ce3f5671e59348fba493ee09f3c5532ef267",
+    "ggml\\src\\CMakeFiles\\ggml-cpu.dir\\ggml-cpu\\unary-ops.cpp.obj": "be173100175160040b2add402e18d92f2da3451e7de4a5f60c32233b00c0fdc8",
+    "ggml\\src\\CMakeFiles\\ggml-cpu.dir\\ggml-cpu\\vec.cpp.obj": "e49c2438cc9795d800e66e6956b251a746701a3a656ab7f0745f9ae7dd42e901",
+    "ggml\\src\\CMakeFiles\\ggml-cpu.dir\\ggml-cpu\\amx\\amx.cpp.obj": "406927472cff98116b11e2a7d31a6b014ef3ac93550c03f091902321b5f588a3",
+    "ggml\\src\\CMakeFiles\\ggml-cpu.dir\\ggml-cpu\\amx\\mmq.cpp.obj": "15e51306d50c4f003b2dc66be9590ef605489be9e791677eb477cf9f51848ba9",
+    "ggml\\src\\CMakeFiles\\ggml-cpu.dir\\ggml-cpu\\arch\\x86\\quants.c.obj": "e1c0c18f8476d753a54b133fc3dbbdb5141c48666822ad827fd25d36e8848b60",
+    "ggml\\src\\CMakeFiles\\ggml-cpu.dir\\ggml-cpu\\arch\\x86\\repack.cpp.obj": "a39388100b75b75e93c2cbf92aad267b5b84b7532fd3afe90183bce5a5f0b331",
+    "strata_core.lib": "fe7a34a2cce8612bc1c802398ca0490b06052f9fab1a5bba8477718d8ab3e9ca",
+    "strata_kernels_cpu.lib": "a1e0f86f3479b1eb95275e546bf1af0fa875b1883eb85738cc05bca65e051737",
+    "strata_prefill.lib": "db7030439dcbe4ac607bb3a2e426a7720a6ae060c9f29bc1f9bc4682fa944377",
+    "ggml\\src\\ggml-base.lib": "70ef3d2dee608b4c9cfc31ca16475e0f7c1c911a932f9510dea956d4a5b32d9c",
+    "ggml\\src\\ggml-cpu.lib": "b4c7c6b83c168cd511b023f6311ad2b02baad1693e9a201fdce61f21f16a46e4"
+  },
+  "runs": [
+    {
+      "shape": "small",
+      "candidate": false,
+      "exe_sha256": "88007ee20be476736ca5016ecacc465be890263f22ae2b477878211b63ccb893",
+      "returncode": 0,
+      "benches": [
+        {
+          "bf16": false,
+          "engine": true,
+          "submit_us": 6783.29375,
+          "total_us": 6785.7375,
+          "n": 1280,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "engine": true,
+          "submit_us": 6960.66875,
+          "total_us": 6962.425,
+          "n": 1280,
+          "k": 2560
+        }
+      ],
+      "batches": [
+        {
+          "bf16": false,
+          "batch": 0,
+          "submit_us": 6807.09375,
+          "total_us": 6808.53125,
+          "n": 1280,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 1,
+          "submit_us": 6635.5625,
+          "total_us": 6637.25625,
+          "n": 1280,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 2,
+          "submit_us": 6645.175,
+          "total_us": 6647.35625,
+          "n": 1280,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 3,
+          "submit_us": 6824.8125,
+          "total_us": 6826.70625,
+          "n": 1280,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 4,
+          "submit_us": 6783.29375,
+          "total_us": 6785.7375,
+          "n": 1280,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 0,
+          "submit_us": 6997.59375,
+          "total_us": 6999.0875,
+          "n": 1280,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 1,
+          "submit_us": 6924.525,
+          "total_us": 6926.1375,
+          "n": 1280,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 2,
+          "submit_us": 6948.7625,
+          "total_us": 6951.19375,
+          "n": 1280,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 3,
+          "submit_us": 6984.525,
+          "total_us": 6986.0,
+          "n": 1280,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 4,
+          "submit_us": 6960.66875,
+          "total_us": 6962.425,
+          "n": 1280,
+          "k": 2560
+        }
+      ],
+      "summary": [
+        {
+          "checks": 6,
+          "mismatched_cases": 0
+        }
+      ]
+    },
+    {
+      "shape": "small",
+      "candidate": true,
+      "exe_sha256": "cc8e29bb77a359e8b33aef63dc8d6f2fd491988636a05b05bef93222299442cc",
+      "returncode": 0,
+      "benches": [
+        {
+          "bf16": false,
+          "engine": true,
+          "submit_us": 6625.00625,
+          "total_us": 6626.375,
+          "n": 1280,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "engine": true,
+          "submit_us": 6635.79375,
+          "total_us": 6636.89375,
+          "n": 1280,
+          "k": 2560
+        }
+      ],
+      "batches": [
+        {
+          "bf16": false,
+          "batch": 0,
+          "submit_us": 6665.30625,
+          "total_us": 6666.66875,
+          "n": 1280,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 1,
+          "submit_us": 6625.00625,
+          "total_us": 6626.375,
+          "n": 1280,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 2,
+          "submit_us": 6639.8,
+          "total_us": 6641.7625,
+          "n": 1280,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 3,
+          "submit_us": 6580.7375,
+          "total_us": 6581.9,
+          "n": 1280,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 4,
+          "submit_us": 6589.425,
+          "total_us": 6591.325,
+          "n": 1280,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 0,
+          "submit_us": 6641.2375,
+          "total_us": 6642.70625,
+          "n": 1280,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 1,
+          "submit_us": 6582.3375,
+          "total_us": 6583.89375,
+          "n": 1280,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 2,
+          "submit_us": 6635.79375,
+          "total_us": 6636.89375,
+          "n": 1280,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 3,
+          "submit_us": 6642.96875,
+          "total_us": 6646.225,
+          "n": 1280,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 4,
+          "submit_us": 6588.09375,
+          "total_us": 6589.65625,
+          "n": 1280,
+          "k": 2560
+        }
+      ],
+      "summary": [
+        {
+          "checks": 6,
+          "mismatched_cases": 0
+        }
+      ]
+    },
+    {
+      "shape": "small",
+      "candidate": false,
+      "exe_sha256": "88007ee20be476736ca5016ecacc465be890263f22ae2b477878211b63ccb893",
+      "returncode": 0,
+      "benches": [
+        {
+          "bf16": false,
+          "engine": true,
+          "submit_us": 6675.6875,
+          "total_us": 6678.7375,
+          "n": 1280,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "engine": true,
+          "submit_us": 6645.1625,
+          "total_us": 6647.08125,
+          "n": 1280,
+          "k": 2560
+        }
+      ],
+      "batches": [
+        {
+          "bf16": false,
+          "batch": 0,
+          "submit_us": 6725.05,
+          "total_us": 6726.9875,
+          "n": 1280,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 1,
+          "submit_us": 6675.6875,
+          "total_us": 6678.7375,
+          "n": 1280,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 2,
+          "submit_us": 6626.48125,
+          "total_us": 6628.375,
+          "n": 1280,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 3,
+          "submit_us": 6644.25,
+          "total_us": 6646.15,
+          "n": 1280,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 4,
+          "submit_us": 6686.00625,
+          "total_us": 6687.75625,
+          "n": 1280,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 0,
+          "submit_us": 6639.8375,
+          "total_us": 6641.4375,
+          "n": 1280,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 1,
+          "submit_us": 6645.1625,
+          "total_us": 6647.08125,
+          "n": 1280,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 2,
+          "submit_us": 6639.375,
+          "total_us": 6641.36875,
+          "n": 1280,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 3,
+          "submit_us": 6673.13125,
+          "total_us": 6674.9125,
+          "n": 1280,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 4,
+          "submit_us": 6669.1375,
+          "total_us": 6670.95625,
+          "n": 1280,
+          "k": 2560
+        }
+      ],
+      "summary": [
+        {
+          "checks": 6,
+          "mismatched_cases": 0
+        }
+      ]
+    },
+    {
+      "shape": "small",
+      "candidate": true,
+      "exe_sha256": "cc8e29bb77a359e8b33aef63dc8d6f2fd491988636a05b05bef93222299442cc",
+      "returncode": 0,
+      "benches": [
+        {
+          "bf16": false,
+          "engine": true,
+          "submit_us": 6636.475,
+          "total_us": 6638.1125,
+          "n": 1280,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "engine": true,
+          "submit_us": 6643.65625,
+          "total_us": 6645.58125,
+          "n": 1280,
+          "k": 2560
+        }
+      ],
+      "batches": [
+        {
+          "bf16": false,
+          "batch": 0,
+          "submit_us": 6663.7375,
+          "total_us": 6665.90625,
+          "n": 1280,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 1,
+          "submit_us": 6699.5625,
+          "total_us": 6701.3125,
+          "n": 1280,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 2,
+          "submit_us": 6633.53125,
+          "total_us": 6635.13125,
+          "n": 1280,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 3,
+          "submit_us": 6636.475,
+          "total_us": 6638.1125,
+          "n": 1280,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 4,
+          "submit_us": 6618.10625,
+          "total_us": 6619.78125,
+          "n": 1280,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 0,
+          "submit_us": 6670.50625,
+          "total_us": 6672.8375,
+          "n": 1280,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 1,
+          "submit_us": 6643.65625,
+          "total_us": 6645.58125,
+          "n": 1280,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 2,
+          "submit_us": 6673.25625,
+          "total_us": 6675.14375,
+          "n": 1280,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 3,
+          "submit_us": 6638.58125,
+          "total_us": 6640.5,
+          "n": 1280,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 4,
+          "submit_us": 6612.68125,
+          "total_us": 6614.60625,
+          "n": 1280,
+          "k": 2560
+        }
+      ],
+      "summary": [
+        {
+          "checks": 6,
+          "mismatched_cases": 0
+        }
+      ]
+    },
+    {
+      "shape": "small",
+      "candidate": false,
+      "exe_sha256": "88007ee20be476736ca5016ecacc465be890263f22ae2b477878211b63ccb893",
+      "returncode": 0,
+      "benches": [
+        {
+          "bf16": false,
+          "engine": true,
+          "submit_us": 6683.25625,
+          "total_us": 6685.33125,
+          "n": 1280,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "engine": true,
+          "submit_us": 6649.8375,
+          "total_us": 6652.41875,
+          "n": 1280,
+          "k": 2560
+        }
+      ],
+      "batches": [
+        {
+          "bf16": false,
+          "batch": 0,
+          "submit_us": 6683.25625,
+          "total_us": 6685.33125,
+          "n": 1280,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 1,
+          "submit_us": 6617.6875,
+          "total_us": 6619.66875,
+          "n": 1280,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 2,
+          "submit_us": 6612.075,
+          "total_us": 6613.65625,
+          "n": 1280,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 3,
+          "submit_us": 6692.48125,
+          "total_us": 6694.1625,
+          "n": 1280,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 4,
+          "submit_us": 6689.075,
+          "total_us": 6690.63125,
+          "n": 1280,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 0,
+          "submit_us": 6599.425,
+          "total_us": 6600.73125,
+          "n": 1280,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 1,
+          "submit_us": 6676.575,
+          "total_us": 6678.15,
+          "n": 1280,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 2,
+          "submit_us": 6682.76875,
+          "total_us": 6684.38125,
+          "n": 1280,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 3,
+          "submit_us": 6643.33125,
+          "total_us": 6644.75625,
+          "n": 1280,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 4,
+          "submit_us": 6649.8375,
+          "total_us": 6652.41875,
+          "n": 1280,
+          "k": 2560
+        }
+      ],
+      "summary": [
+        {
+          "checks": 6,
+          "mismatched_cases": 0
+        }
+      ]
+    },
+    {
+      "shape": "large",
+      "candidate": false,
+      "exe_sha256": "88007ee20be476736ca5016ecacc465be890263f22ae2b477878211b63ccb893",
+      "returncode": 0,
+      "benches": [
+        {
+          "bf16": false,
+          "engine": true,
+          "submit_us": 7604.4,
+          "total_us": 7606.01875,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "engine": true,
+          "submit_us": 17042.03125,
+          "total_us": 17043.625,
+          "n": 12288,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "engine": true,
+          "submit_us": 7813.975,
+          "total_us": 7815.89375,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "engine": true,
+          "submit_us": 16372.925,
+          "total_us": 16375.50625,
+          "n": 12288,
+          "k": 2560
+        }
+      ],
+      "batches": [
+        {
+          "bf16": false,
+          "batch": 0,
+          "submit_us": 7604.4,
+          "total_us": 7606.01875,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 1,
+          "submit_us": 7633.60625,
+          "total_us": 7634.8375,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 2,
+          "submit_us": 7543.95,
+          "total_us": 7545.85,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 3,
+          "submit_us": 7607.00625,
+          "total_us": 7608.24375,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 4,
+          "submit_us": 7576.58125,
+          "total_us": 7578.0875,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 0,
+          "submit_us": 17042.03125,
+          "total_us": 17043.625,
+          "n": 12288,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 1,
+          "submit_us": 17490.1875,
+          "total_us": 17492.6,
+          "n": 12288,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 2,
+          "submit_us": 17006.625,
+          "total_us": 17008.44375,
+          "n": 12288,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 3,
+          "submit_us": 17275.8625,
+          "total_us": 17277.6875,
+          "n": 12288,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 4,
+          "submit_us": 16530.14375,
+          "total_us": 16533.10625,
+          "n": 12288,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 0,
+          "submit_us": 7578.4125,
+          "total_us": 7579.9625,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 1,
+          "submit_us": 7608.45625,
+          "total_us": 7609.89375,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 2,
+          "submit_us": 7816.43125,
+          "total_us": 7818.25625,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 3,
+          "submit_us": 7966.58125,
+          "total_us": 7968.25,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 4,
+          "submit_us": 7813.975,
+          "total_us": 7815.89375,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 0,
+          "submit_us": 16369.05625,
+          "total_us": 16370.86875,
+          "n": 12288,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 1,
+          "submit_us": 16427.0625,
+          "total_us": 16428.875,
+          "n": 12288,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 2,
+          "submit_us": 16390.0625,
+          "total_us": 16391.78125,
+          "n": 12288,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 3,
+          "submit_us": 16372.925,
+          "total_us": 16375.50625,
+          "n": 12288,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 4,
+          "submit_us": 16327.98125,
+          "total_us": 16329.5875,
+          "n": 12288,
+          "k": 2560
+        }
+      ],
+      "summary": [
+        {
+          "checks": 12,
+          "mismatched_cases": 0
+        }
+      ]
+    },
+    {
+      "shape": "large",
+      "candidate": true,
+      "exe_sha256": "cc8e29bb77a359e8b33aef63dc8d6f2fd491988636a05b05bef93222299442cc",
+      "returncode": 0,
+      "benches": [
+        {
+          "bf16": false,
+          "engine": true,
+          "submit_us": 7575.5625,
+          "total_us": 7577.39375,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "engine": true,
+          "submit_us": 16491.49375,
+          "total_us": 16493.3625,
+          "n": 12288,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "engine": true,
+          "submit_us": 7583.7125,
+          "total_us": 7585.4125,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "engine": true,
+          "submit_us": 16283.5625,
+          "total_us": 16285.4,
+          "n": 12288,
+          "k": 2560
+        }
+      ],
+      "batches": [
+        {
+          "bf16": false,
+          "batch": 0,
+          "submit_us": 7535.23125,
+          "total_us": 7537.79375,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 1,
+          "submit_us": 7557.71875,
+          "total_us": 7559.64375,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 2,
+          "submit_us": 7575.5625,
+          "total_us": 7577.39375,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 3,
+          "submit_us": 7656.30625,
+          "total_us": 7658.18125,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 4,
+          "submit_us": 7687.8625,
+          "total_us": 7689.75,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 0,
+          "submit_us": 16286.5625,
+          "total_us": 16288.08125,
+          "n": 12288,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 1,
+          "submit_us": 16755.3,
+          "total_us": 16757.8,
+          "n": 12288,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 2,
+          "submit_us": 16854.1375,
+          "total_us": 16855.75,
+          "n": 12288,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 3,
+          "submit_us": 16491.49375,
+          "total_us": 16493.3625,
+          "n": 12288,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 4,
+          "submit_us": 16466.73125,
+          "total_us": 16468.46875,
+          "n": 12288,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 0,
+          "submit_us": 7535.71875,
+          "total_us": 7537.9625,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 1,
+          "submit_us": 7588.41875,
+          "total_us": 7589.84375,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 2,
+          "submit_us": 7583.7125,
+          "total_us": 7585.4125,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 3,
+          "submit_us": 7562.15,
+          "total_us": 7563.9,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 4,
+          "submit_us": 7627.41875,
+          "total_us": 7629.01875,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 0,
+          "submit_us": 16163.95,
+          "total_us": 16165.71875,
+          "n": 12288,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 1,
+          "submit_us": 16387.15625,
+          "total_us": 16388.9875,
+          "n": 12288,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 2,
+          "submit_us": 16278.9125,
+          "total_us": 16280.76875,
+          "n": 12288,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 3,
+          "submit_us": 16283.5625,
+          "total_us": 16285.4,
+          "n": 12288,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 4,
+          "submit_us": 16324.13125,
+          "total_us": 16325.9625,
+          "n": 12288,
+          "k": 2560
+        }
+      ],
+      "summary": [
+        {
+          "checks": 12,
+          "mismatched_cases": 0
+        }
+      ]
+    },
+    {
+      "shape": "large",
+      "candidate": false,
+      "exe_sha256": "88007ee20be476736ca5016ecacc465be890263f22ae2b477878211b63ccb893",
+      "returncode": 0,
+      "benches": [
+        {
+          "bf16": false,
+          "engine": true,
+          "submit_us": 7602.23125,
+          "total_us": 7604.05625,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "engine": true,
+          "submit_us": 16422.975,
+          "total_us": 16424.8625,
+          "n": 12288,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "engine": true,
+          "submit_us": 7623.9375,
+          "total_us": 7625.7375,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "engine": true,
+          "submit_us": 16387.9875,
+          "total_us": 16389.80625,
+          "n": 12288,
+          "k": 2560
+        }
+      ],
+      "batches": [
+        {
+          "bf16": false,
+          "batch": 0,
+          "submit_us": 7685.3625,
+          "total_us": 7687.15625,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 1,
+          "submit_us": 7714.4125,
+          "total_us": 7716.28125,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 2,
+          "submit_us": 7602.23125,
+          "total_us": 7604.05625,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 3,
+          "submit_us": 7596.55,
+          "total_us": 7599.2625,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 4,
+          "submit_us": 7580.66875,
+          "total_us": 7582.4,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 0,
+          "submit_us": 16422.975,
+          "total_us": 16424.8625,
+          "n": 12288,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 1,
+          "submit_us": 16426.15,
+          "total_us": 16429.325,
+          "n": 12288,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 2,
+          "submit_us": 16314.425,
+          "total_us": 16316.24375,
+          "n": 12288,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 3,
+          "submit_us": 16602.84375,
+          "total_us": 16604.38125,
+          "n": 12288,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 4,
+          "submit_us": 16377.025,
+          "total_us": 16378.875,
+          "n": 12288,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 0,
+          "submit_us": 7898.45,
+          "total_us": 7900.21875,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 1,
+          "submit_us": 7674.95625,
+          "total_us": 7677.29375,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 2,
+          "submit_us": 7588.09375,
+          "total_us": 7589.4375,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 3,
+          "submit_us": 7616.2375,
+          "total_us": 7618.08125,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 4,
+          "submit_us": 7623.9375,
+          "total_us": 7625.7375,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 0,
+          "submit_us": 16672.2875,
+          "total_us": 16674.38125,
+          "n": 12288,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 1,
+          "submit_us": 16487.59375,
+          "total_us": 16489.14375,
+          "n": 12288,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 2,
+          "submit_us": 16387.9875,
+          "total_us": 16389.80625,
+          "n": 12288,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 3,
+          "submit_us": 16314.94375,
+          "total_us": 16316.50625,
+          "n": 12288,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 4,
+          "submit_us": 16336.65,
+          "total_us": 16338.28125,
+          "n": 12288,
+          "k": 2560
+        }
+      ],
+      "summary": [
+        {
+          "checks": 12,
+          "mismatched_cases": 0
+        }
+      ]
+    },
+    {
+      "shape": "large",
+      "candidate": true,
+      "exe_sha256": "cc8e29bb77a359e8b33aef63dc8d6f2fd491988636a05b05bef93222299442cc",
+      "returncode": 0,
+      "benches": [
+        {
+          "bf16": false,
+          "engine": true,
+          "submit_us": 7722.81875,
+          "total_us": 7724.98125,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "engine": true,
+          "submit_us": 16221.58125,
+          "total_us": 16224.025,
+          "n": 12288,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "engine": true,
+          "submit_us": 7556.10625,
+          "total_us": 7557.1875,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "engine": true,
+          "submit_us": 16268.6375,
+          "total_us": 16271.41875,
+          "n": 12288,
+          "k": 2560
+        }
+      ],
+      "batches": [
+        {
+          "bf16": false,
+          "batch": 0,
+          "submit_us": 7722.81875,
+          "total_us": 7724.98125,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 1,
+          "submit_us": 7763.74375,
+          "total_us": 7765.41875,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 2,
+          "submit_us": 7749.01875,
+          "total_us": 7750.425,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 3,
+          "submit_us": 7614.99375,
+          "total_us": 7616.3625,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 4,
+          "submit_us": 7564.30625,
+          "total_us": 7565.43125,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 0,
+          "submit_us": 16221.58125,
+          "total_us": 16224.025,
+          "n": 12288,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 1,
+          "submit_us": 16343.85625,
+          "total_us": 16346.20625,
+          "n": 12288,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 2,
+          "submit_us": 16187.98125,
+          "total_us": 16189.85,
+          "n": 12288,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 3,
+          "submit_us": 16282.36875,
+          "total_us": 16284.3125,
+          "n": 12288,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 4,
+          "submit_us": 16204.3625,
+          "total_us": 16206.875,
+          "n": 12288,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 0,
+          "submit_us": 7598.95625,
+          "total_us": 7600.94375,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 1,
+          "submit_us": 7564.2,
+          "total_us": 7566.04375,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 2,
+          "submit_us": 7531.7375,
+          "total_us": 7533.1,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 3,
+          "submit_us": 7556.10625,
+          "total_us": 7557.1875,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 4,
+          "submit_us": 7485.46875,
+          "total_us": 7486.85,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 0,
+          "submit_us": 16275.98125,
+          "total_us": 16277.6375,
+          "n": 12288,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 1,
+          "submit_us": 16217.88125,
+          "total_us": 16219.6375,
+          "n": 12288,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 2,
+          "submit_us": 16233.725,
+          "total_us": 16235.46875,
+          "n": 12288,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 3,
+          "submit_us": 16390.1375,
+          "total_us": 16391.7375,
+          "n": 12288,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 4,
+          "submit_us": 16268.6375,
+          "total_us": 16271.41875,
+          "n": 12288,
+          "k": 2560
+        }
+      ],
+      "summary": [
+        {
+          "checks": 12,
+          "mismatched_cases": 0
+        }
+      ]
+    },
+    {
+      "shape": "large",
+      "candidate": false,
+      "exe_sha256": "88007ee20be476736ca5016ecacc465be890263f22ae2b477878211b63ccb893",
+      "returncode": 0,
+      "benches": [
+        {
+          "bf16": false,
+          "engine": true,
+          "submit_us": 7482.91875,
+          "total_us": 7485.15,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "engine": true,
+          "submit_us": 16104.73125,
+          "total_us": 16106.225,
+          "n": 12288,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "engine": true,
+          "submit_us": 7491.84375,
+          "total_us": 7493.85625,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "engine": true,
+          "submit_us": 16166.44375,
+          "total_us": 16168.4,
+          "n": 12288,
+          "k": 2560
+        }
+      ],
+      "batches": [
+        {
+          "bf16": false,
+          "batch": 0,
+          "submit_us": 7488.375,
+          "total_us": 7489.7,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 1,
+          "submit_us": 7464.9875,
+          "total_us": 7466.3875,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 2,
+          "submit_us": 7498.66875,
+          "total_us": 7500.075,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 3,
+          "submit_us": 7454.2875,
+          "total_us": 7455.7125,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 4,
+          "submit_us": 7482.91875,
+          "total_us": 7485.15,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 0,
+          "submit_us": 16092.525,
+          "total_us": 16094.15,
+          "n": 12288,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 1,
+          "submit_us": 16148.70625,
+          "total_us": 16150.425,
+          "n": 12288,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 2,
+          "submit_us": 16132.6375,
+          "total_us": 16135.0125,
+          "n": 12288,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 3,
+          "submit_us": 16104.73125,
+          "total_us": 16106.225,
+          "n": 12288,
+          "k": 2560
+        },
+        {
+          "bf16": false,
+          "batch": 4,
+          "submit_us": 16094.4125,
+          "total_us": 16096.15625,
+          "n": 12288,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 0,
+          "submit_us": 7530.79375,
+          "total_us": 7532.11875,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 1,
+          "submit_us": 7481.19375,
+          "total_us": 7484.0875,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 2,
+          "submit_us": 7510.84375,
+          "total_us": 7512.08125,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 3,
+          "submit_us": 7491.84375,
+          "total_us": 7493.85625,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 4,
+          "submit_us": 7451.55,
+          "total_us": 7452.88125,
+          "n": 4096,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 0,
+          "submit_us": 16179.9125,
+          "total_us": 16181.90625,
+          "n": 12288,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 1,
+          "submit_us": 16102.13125,
+          "total_us": 16103.7625,
+          "n": 12288,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 2,
+          "submit_us": 16137.2125,
+          "total_us": 16138.7375,
+          "n": 12288,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 3,
+          "submit_us": 16166.44375,
+          "total_us": 16168.4,
+          "n": 12288,
+          "k": 2560
+        },
+        {
+          "bf16": true,
+          "batch": 4,
+          "submit_us": 16260.6375,
+          "total_us": 16262.5625,
+          "n": 12288,
+          "k": 2560
+        }
+      ],
+      "summary": [
+        {
+          "checks": 12,
+          "mismatched_cases": 0
+        }
+      ]
+    }
+  ],
+  "comparisons": [
+    {
+      "shape": "small",
+      "candidate_run": 1,
+      "bf16": false,
+      "n": 1280,
+      "baseline": 6732.024918730341,
+      "candidate": 6626.375,
+      "throughput_change_pct": 1.5943848443582098,
+      "baseline_drift_pct": -1.576836710821783,
+      "eligible": true
+    },
+    {
+      "shape": "small",
+      "candidate_run": 1,
+      "bf16": true,
+      "n": 1280,
+      "baseline": 6802.926184520251,
+      "candidate": 6636.89375,
+      "throughput_change_pct": 2.5016587695147363,
+      "baseline_drift_pct": -4.529222935974175,
+      "eligible": false
+    },
+    {
+      "shape": "small",
+      "candidate_run": 3,
+      "bf16": false,
+      "n": 1280,
+      "baseline": 6682.0335616709435,
+      "candidate": 6638.1125,
+      "throughput_change_pct": 0.6616498540954696,
+      "baseline_drift_pct": 0.09872749153563287,
+      "eligible": true
+    },
+    {
+      "shape": "small",
+      "candidate_run": 3,
+      "bf16": true,
+      "n": 1280,
+      "baseline": 6649.749464474089,
+      "candidate": 6645.58125,
+      "throughput_change_pct": 0.06272159375206865,
+      "baseline_drift_pct": 0.08029840164809343,
+      "eligible": true
+    },
+    {
+      "shape": "large",
+      "candidate_run": 1,
+      "bf16": false,
+      "n": 4096,
+      "baseline": 7605.037436696462,
+      "candidate": 7577.39375,
+      "throughput_change_pct": 0.364817872853207,
+      "baseline_drift_pct": -0.02580193481642734,
+      "eligible": true
+    },
+    {
+      "shape": "large",
+      "candidate_run": 1,
+      "bf16": false,
+      "n": 12288,
+      "baseline": 16731.383598691486,
+      "candidate": 16493.3625,
+      "throughput_change_pct": 1.4431326461871397,
+      "baseline_drift_pct": -3.630463003028994,
+      "eligible": false
+    },
+    {
+      "shape": "large",
+      "candidate_run": 1,
+      "bf16": true,
+      "n": 4096,
+      "baseline": 7720.2301821507,
+      "candidate": 7585.4125,
+      "throughput_change_pct": 1.7773282883521535,
+      "baseline_drift_pct": -2.432943129504539,
+      "eligible": true
+    },
+    {
+      "shape": "large",
+      "candidate_run": 1,
+      "bf16": true,
+      "n": 12288,
+      "baseline": 16382.654689737072,
+      "candidate": 16285.4,
+      "throughput_change_pct": 0.5971894441467285,
+      "baseline_drift_pct": 0.08732554451562624,
+      "eligible": true
+    },
+    {
+      "shape": "large",
+      "candidate_run": 3,
+      "bf16": false,
+      "n": 4096,
+      "baseline": 7544.368869540214,
+      "candidate": 7724.98125,
+      "throughput_change_pct": -2.3380300173516333,
+      "baseline_drift_pct": -1.5637213362276192,
+      "eligible": true
+    },
+    {
+      "shape": "large",
+      "candidate_run": 3,
+      "bf16": false,
+      "n": 12288,
+      "baseline": 16264.763478731023,
+      "candidate": 16224.025,
+      "throughput_change_pct": 0.2510997038714047,
+      "baseline_drift_pct": -1.9399705781402932,
+      "eligible": true
+    },
+    {
+      "shape": "large",
+      "candidate_run": 3,
+      "bf16": true,
+      "n": 4096,
+      "baseline": 7559.509284684713,
+      "candidate": 7557.1875,
+      "throughput_change_pct": 0.03072286726659712,
+      "baseline_drift_pct": -1.7294228918842358,
+      "eligible": true
+    },
+    {
+      "shape": "large",
+      "candidate_run": 3,
+      "bf16": true,
+      "n": 12288,
+      "baseline": 16278.726712261621,
+      "candidate": 16271.41875,
+      "throughput_change_pct": 0.04491287682963918,
+      "baseline_drift_pct": -1.3508777750194656,
+      "eligible": true
+    }
+  ],
+  "large_checks": [],
+  "candidate_source_sha256": "b14f1cdbfe37de2813e7ff78c736047216bffa82029cd2b548a5b8fdcc82e5da",
+  "retention_rule": "Exact parity; screen and independent confirmation must each have positive median throughput gain across drift-eligible shapes for both candidate rounds; no shape geometric mean regression worse than 1%. Adjacent baseline drift must be <=3%; no 3% gain requirement.",
+  "support_sha256": {
+    "build-sycl-deepinfer-20261023\\check_widen_weights.py": "bcf6a3a387543e718c8ddc47431bcffb7e374d0471329473e6d873d6dc9534a3",
+    "G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\build_prefill_widen.py": "a8ed9c26232364c852255ad0c8bd0c533f910a308b5959a9788e61a39ad01cb5",
+    "G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\build.py": "750e0d51953c4116a7d82036c9bfd3bb9df1e6dd18eaedf706cbe939c6e048e9",
+    "G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\environment.cmd": "d70363c4cba4758c54c994c490ff59866586a02069d7b5ebdf04835877feb688",
+    "G:\\GitHub\\Strata\\tools\\bench_deepinfer.py": "10cf806bfdffc9cb4ba110d87503d6b28b8c163a789c1567c4a0dde0c1a83730"
+  },
+  "reused_candidate": "G:\\GitHub\\Strata\\build-sycl-deepinfer-20261023\\prefill-widen-weights-vector\\build",
+  "candidate_build_sha256": "cc48a1eb1e5fbfa497dbecfa9933a73d4fa98bdd4772eaf50dcfd18dee145ff9",
+  "env": {
+    "STRATA_SYCL_BIN": "build-sycl-a770-unified-operators\\bin\\strata-unified-all-operators.exe",
+    "ZES_ENABLE_SYSMAN": "1",
+    "STRATA_MIRROR_MIB": "49152",
+    "ONEAPI_DEVICE_SELECTOR": "level_zero:0",
+    "UR_L0_ENABLE_RELAXED_ALLOCATION_LIMITS": "1",
+    "STRATA_VERIFY_DEVICE_PLAN": "1",
+    "STRATA_VERIFY_NO_HOST": "1",
+    "STRATA_VERIFY_EAGER": "1",
+    "STRATA_STAGER_THREADS": "12",
+    "STRATA_VERIFY_ADAPT": "1",
+    "STRATA_ADAPT_COST_WEIGHTED": "1",
+    "STRATA_PREFILL_FIRST": "0",
+    "STRATA_GDN_SG16": "1",
+    "STRATA_IQ4_XS_SG16": "2",
+    "STRATA_VERIFY_FUSED_ACT": "1",
+    "STRATA_VERIFY_DESC_CACHE": "1",
+    "STRATA_SERVE_QUIET": "1",
+    "STRATA_GU_LANES": "16",
+    "STRATA_DOWN_LANES": "4",
+    "SYCL_PROGRAM_COMPILE_OPTIONS": "-cl-fp32-correctly-rounded-divide-sqrt",
+    "STRATA_MTP_LAST_DRAFT_MIN_P": "0.6",
+    "STRATA_GU_IQ2S_SG16": "1",
+    "STRATA_GU_IQ2S_SINGLE_GROUP": "1",
+    "STRATA_GDN_Q8_TAIL": "1",
+    "STRATA_QSA_Q8_TAIL": "1",
+    "STRATA_NO_BATCH_KV_STEP": "1",
+    "STRATA_MTP_CUM_MIN_P": "0",
+    "STRATA_PREFILL_GPU_WIDEN": "1",
+    "STRATA_PREFILL_BF16_GPU_WIDEN": "1",
+    "STRATA_PREFILL_HALF_OUTPUT": "0",
+    "STRATA_PREFILL_HALF_BF16": "0",
+    "STRATA_PREFILL_HALF_PROFILE": "0",
+    "UR_L0_USM_ALLOCATOR": "1;512M;host:128M,8,64K;device:128M,8,64K;shared:128M,8,64K"
+  },
+  "production_unchanged": true,
+  "workspace_sources_unchanged": true,
+  "unchanged_dependencies": 96
+}

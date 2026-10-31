@@ -6,8 +6,11 @@
 #include "conversation_checked.hpp"
 
 #include <array>
+#include <cstdio>
+#include <cstdlib>
 #include <cstring>
 #include <limits>
+#include <memory>
 
 namespace strata::core {
 namespace {
@@ -108,26 +111,28 @@ bool valid(const QsaState& st, const Layout& l, int64_t upto, std::string& error
     return true;
 }
 
-bool transfer(void *dst, const void *src, size_t n, std::string &error) try {
+bool sync(std::string& error) {
+    try {
+        dpct::get_in_order_queue().wait_and_throw();
+        return true;
+    } catch (sycl::exception const& e) {
+        error = std::string("conversation snapshot synchronize: ") + e.what();
+        // A failed wait cannot prove host buffers are no longer in use. Keep the existing fatal-copy policy.
+        std::fprintf(stderr, "%s\n", error.c_str());
+        std::exit(1);
+    }
+}
+
+bool transfer(void* dst, const void* src, size_t n, std::string& error, bool asynchronous = false) try {
     if (!n) return true;
     if (!src || !dst) { error = "conversation snapshot: missing state buffer"; return false; }
     // Default handles both device allocations and device-mapped host pool aliases.
-    const dpct::err0 e =
-        DPCT_CHECK_ERROR(dpct::get_in_order_queue().memcpy(dst, src, n).wait());
-    if (e == 0) return true;
-    /*
-    DPCT1009: SYCL reports errors using exceptions and does not use error
-    codes. Please replace the "get_error_string_dummy(...)" with a real
-    error-handling function.
-    */
-    error = std::string("conversation snapshot copy: ") +
-            dpct::get_error_string_dummy(e);
+    dpct::get_in_order_queue().memcpy(dst, src, n);
+    return asynchronous || sync(error);
+} catch (sycl::exception const& e) {
+    sync(error); // Drain earlier copies before their caller can release host buffers.
+    error = std::string("conversation snapshot copy: ") + e.what();
     return false;
-}
-catch (sycl::exception const &exc) {
-  std::cerr << exc.what() << "Exception caught at file:" << __FILE__
-            << ", line:" << __LINE__ << std::endl;
-  std::exit(1);
 }
 } // namespace
 
@@ -175,18 +180,26 @@ bool conversation_kv_save(ConversationKv& image, const QsaState& st, const Model
     const auto src = pools(st);
     const std::array<size_t,5> sizes = {l.data, l.value_data, l.scales, l.value_scales, l.pooled};
     const std::array<ConversationBuffer*,5> dst = {&image.k, &image.v, &image.k_scale, &image.v_scale, &image.pooled};
+    std::array<size_t,5> keep{};
     for (size_t i = 0; i < dst.size(); ++i) {
         // Recopy the partial page and the indexer's moving spare row. Completed
         // pages/rows strictly before the first rewritten token remain identical.
-        const size_t keep = i == 4 ? (index ? size_t(unchanged_tokens / strata::kernels::qsa_real_shapes().idx_block) * g.idx_key_dim * 4 : 0)
-                                  : l.cells ? (sizes[i] / size_t(l.cells)) * size_t(whole_cells) : 0;
-        if (keep > dst[i]->size()) { error = "conversation snapshot: missing reusable prefix"; return false; }
-        dst[i]->resize(sizes[i]);
-        if (!dst[i]->visit(keep, sizes[i] - keep, [&](uint8_t* p, size_t n, size_t at) {
-                return transfer(p, src[i] ? static_cast<const uint8_t*>(src[i]) + at : nullptr, n, error);
-            })) return false;
-        if (reused_bytes) *reused_bytes += keep;
+        keep[i] = i == 4 ? (index ? size_t(unchanged_tokens / strata::kernels::qsa_real_shapes().idx_block) * g.idx_key_dim * 4 : 0)
+                        : l.cells ? (sizes[i] / size_t(l.cells)) * size_t(whole_cells) : 0;
+        if (keep[i] > dst[i]->size()) { error = "conversation snapshot: missing reusable prefix"; return false; }
+        if (sizes[i] > keep[i] && !src[i]) { error = "conversation snapshot: missing state buffer"; return false; }
     }
+    // Allocate everything before submitting copies: a later allocation failure must not free an in-flight target.
+    for (size_t i = 0; i < dst.size(); ++i)
+        dst[i]->resize(sizes[i]);
+    // ponytail: batch one layer on the existing in-order queue; every host buffer stays alive until the wait.
+    for (size_t i = 0; i < dst.size(); ++i) {
+        if (!dst[i]->visit(keep[i], sizes[i] - keep[i], [&](uint8_t* p, size_t n, size_t at) {
+                return transfer(p, static_cast<const uint8_t*>(src[i]) + at, n, error, true);
+            })) { sync(error); return false; }
+    }
+    if (!sync(error)) return false;
+    if (reused_bytes) for (size_t n : keep) *reused_bytes += n;
     return true;
 }
 
@@ -218,8 +231,8 @@ bool conversation_kv_restore(const ConversationKv& image, const QsaState& st, co
     const auto dst = pools(st);
     for (size_t i = 0; i < src.size(); ++i)
         if (!src[i]->visit(0, src[i]->size(), [&](const uint8_t* p, size_t n, size_t at) {
-                return transfer(static_cast<uint8_t*>(dst[i]) + at, p, n, error);
-            })) return false;
+                return transfer(static_cast<uint8_t*>(dst[i]) + at, p, n, error, true);
+            })) { sync(error); return false; }
     // VRAM slots still contain the outgoing conversation. Resolve must refill
     // them from the restored authoritative pools before any attention reads.
     if (st.kv_mode == 1) strata::kernels::kv_stream_reset(st.map, nullptr);
@@ -230,21 +243,35 @@ bool conversation_kv_restore(const ConversationKv& image, const QsaState& st, co
         strata::kernels::kv_ring_restore(qsa_attn_pools(st), st.host, qsa_kv_format(st),
                                         std::max<int64_t>(0, end - st.n_slots), end, st.n_slots, shapes, nullptr);
     }
-    /*
-    DPCT1010: SYCL uses exceptions to report errors and does not use the
-    error codes. The cudaGetLastError function call was replaced with 0. You
-    need to rewrite this code.
-    */
-    const auto status = 0;
-    if (status == 0) return true;
-    /*
-    DPCT1009: SYCL reports errors using exceptions and does not use error
-    codes. Please replace the "get_error_string_dummy(...)" with a real
-    error-handling function.
-    */
-    error = std::string("conversation snapshot residency restore: ") +
-            dpct::get_error_string_dummy(status);
-    return false;
+    return sync(error);
+}
+
+bool conversation_kv_part_sizes(const QsaState& st, const ModelGeometry& g, int64_t upto, bool index,
+                                std::array<uint64_t, 5>& sizes, std::string& error) {
+    Layout l{};
+    if (!layout(st, g, upto, index, l, error)) return false;
+    sizes = {l.data, l.value_data, l.scales, l.value_scales, l.pooled};
+    return true;
+}
+
+bool conversation_kv_source(SessionKvSource& out, const QsaState& st, const ModelGeometry& g,
+                            int64_t upto, bool index, std::string& error) {
+    Layout l{};
+    if (!layout(st, g, upto, index, l, error) || !valid(st, l, upto, error)) return false;
+    SessionKvSource s;
+    s.format = l.format; s.cells = l.cells; s.heads = g.n_head_kv; s.head_dim = g.head_dim;
+    s.page_size = l.page_size; s.pooled_rows = l.pooled_rows; s.idx_dim = g.idx_key_dim;
+    s.sizes = {l.data, l.value_data, l.scales, l.value_scales, l.pooled};
+    const auto src = pools(st);
+    const auto sizes = s.sizes;
+    auto why = std::make_shared<std::string>();
+    s.read = [src, sizes, why](size_t part, size_t offset, void* dst, size_t n) {
+        if (part >= 5 || offset > sizes[part] || n > sizes[part] - offset) { *why = "K/V read out of range"; return false; }
+        return transfer(dst, src[part] ? static_cast<const uint8_t*>(src[part]) + offset : nullptr, n, *why);
+    };
+    s.error = [why] { return *why; };
+    out = std::move(s);
+    return true;
 }
 
 bool conversation_kv_verify(const ConversationKv& image, const QsaState& st, const ModelGeometry& g,

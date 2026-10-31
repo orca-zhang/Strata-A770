@@ -26,6 +26,7 @@
 namespace {
 
 void check(dpct::err0 e, const char *what) {
+    if (e) { std::fprintf(stderr, "%s failed: %d\n", what, (int)e); std::exit(1); }
 }
 
 // The host reference for the specified order: top_k -> top_p -> temperature -> argmax.
@@ -333,7 +334,8 @@ SelList mirror_select(const float* l, int nv, const std::vector<int>& window, co
 }
 
 // The tail of `sampler_kernel` over a list (its first `k` entries): top_p, min_p, temperature, the Philox draw.
-int mirror_pick(const SelList& sel, int k, const strata::kernels::SamplerParams& p, int row) {
+int mirror_pick(const SelList& sel, int k, const strata::kernels::SamplerParams& p, int row,
+                double* probability = nullptr) {
     int n_keep = k;
     float mx = sel.logit[0];
     for (int i = 1; i < k; ++i) mx = std::fmax(mx, sel.logit[(size_t) i]);
@@ -362,11 +364,14 @@ int mirror_pick(const SelList& sel, int k, const strata::kernels::SamplerParams&
     for (int i = 0; i < n_keep; ++i) sum += std::exp((double) scaled(i) - (double) smx);
     const float u = host_philox_uniform(p.seed, p.counter + (uint64_t) row);
     double cum = 0.0;
+    int pi = n_keep > 0 ? n_keep - 1 : 0;
     int pick = sel.ids[(size_t) (n_keep > 0 ? n_keep - 1 : 0)];
     for (int i = 0; i < n_keep; ++i) {
         cum += std::exp((double) scaled(i) - (double) smx) / sum;
-        if ((double) u < cum) { pick = sel.ids[(size_t) i]; break; }
+        if ((double) u < cum) { pick = sel.ids[(size_t) i]; pi = i; break; }
     }
+    if (probability)
+        *probability = n_keep > 0 ? std::exp((double) scaled(pi) - (double) smx) / sum : 1.0;
     return pick;
 }
 
@@ -539,6 +544,8 @@ int main(int argc, char** argv) {
                                             : on("STRATA_SAMPLER_ONE_BLOCK") ? "one block (STRATA_SAMPLER_ONE_BLOCK)"
                                                                              : "split top_k (default)");
     }
+    std::printf("  probability accumulator: %s\n",
+                dpct::get_in_order_queue().get_device().has(sycl::aspect::fp64) ? "FP64" : "FP32");
     if (bench) {
         bench_sampled();
         return 0;
@@ -1444,6 +1451,107 @@ int main(int argc, char** argv) {
         }
         std::printf("  %-34s %s (%d of %d draws differ)\n", "fallbacks: graph capture, row cap",
                     wrong ? "*** WRONG ***" : "matches", wrong, draws);
+        bad += wrong;
+    }
+
+    // Coupled drafts must use the target's precision, counters and penalties, including after graph replay.
+    // Compare the picked probability with the independent FP64 host tail as well as the target's token.
+    {
+        constexpr int T = 6, H = 16;
+        auto& q = dpct::get_in_order_queue();
+        int wrong = 0, draws = 0;
+        double max_error = 0;
+        for (int nv : {512, 4103}) {
+            const bool subset = nv == 4103;
+            const int id_vocab = subset ? 2 * nv : nv;
+            struct Control {
+                strata::kernels::SamplerParams mapped, device;
+                int hist[H], ring[H + T], rec[T][2], pick[T];
+                float prob[T];
+            };
+            auto* c = sycl::malloc_shared<Control>(1, q);
+            auto* logits = sycl::malloc_shared<float>((size_t)T * nv, q);
+            auto* sub_to_id = sycl::malloc_shared<int>(nv, q);
+            auto* id_to_sub = sycl::malloc_shared<int>(id_vocab, q);
+            auto* scratch = sycl::malloc_device<uint8_t>(strata::kernels::coupled_draft_scratch_bytes(nv), q);
+            if (!c || !logits || !sub_to_id || !id_to_sub || !scratch) return 1;
+            std::fill(id_to_sub, id_to_sub + id_vocab, -1);
+            for (int v = 0; v < nv; ++v) {
+                sub_to_id[v] = subset ? 2 * v + 1 : v;
+                id_to_sub[sub_to_id[v]] = v;
+            }
+            std::vector<float> base((size_t)T * nv);
+            std::mt19937 rng(1900 + nv);
+            for (auto& x : base) x = float(int(rng() % 257) - 128) / 32.0f;
+            // Repeated high logits in the history make the penalties observable.
+            for (int j = 0; j < T; ++j) base[(size_t)j * nv + 7] = 5.0f;
+            for (int i = 0; i < H; ++i) c->hist[i] = sub_to_id[i % 3 ? 7 : i];
+            c->hist[0] = -1; c->hist[1] = id_vocab + 3;
+            dpct::experimental::command_graph_ptr graph = nullptr;
+            dpct::experimental::begin_recording(&q);
+            strata::kernels::coupled_draft_stage(&c->mapped, c->hist, &c->device, c->ring, H, &q);
+            for (int j = 0; j < T; ++j)
+                strata::kernels::coupled_draft_sample(
+                    logits + (size_t)j * nv, nv, subset ? sub_to_id : nullptr,
+                    subset ? id_to_sub : nullptr, id_vocab, &c->device, c->ring, H, j,
+                    c->rec[j], scratch, c->pick + j, c->prob + j, &q);
+            dpct::experimental::end_recording(&q, &graph);
+            auto exec = graph->finalize();
+            for (int config = 0; config < 6; ++config) {
+                std::vector<int> first;
+                std::vector<float> first_prob;
+                for (int replay = 0; replay < 3; ++replay) {
+                    auto& p = c->mapped;
+                    p = strata::kernels::SamplerParams{};
+                    p.top_k = config % 2 ? 64 : 20;
+                    p.top_p = config % 3 == 0 ? 1.0f : config % 3 == 1 ? 0.75f : 0.95f;
+                    p.min_p = config % 2 ? 0.05f : 0.0f;
+                    p.min_keep = 5; p.temperature = 0.7f; p.seed = 0x123456789abcdef0ULL + config;
+                    p.penalty_last_n = config < 3 ? 0 : H;
+                    p.penalty_repeat = 1.25f; p.penalty_freq = 0.25f; p.penalty_present = 0.5f;
+                    p.counter = 77 + (replay == 2 ? 12345 : 0);
+                    for (int j = 0; j < T; ++j) c->rec[j][0] = (int)p.counter + j - 1;
+                    std::copy(base.begin(), base.end(), logits);
+                    std::fill(c->ring, c->ring + H + T, -1);
+                    std::fill(c->pick, c->pick + T, -1);
+                    std::fill(c->prob, c->prob + T, -1.0f);
+                    q.ext_oneapi_graph(exec).wait_and_throw();
+                    std::vector<int> hist((size_t)T * H, -1);
+                    for (int j = 0; j < T; ++j)
+                        for (int i = 0; i < H; ++i) {
+                            int id = c->ring[j + i];
+                            hist[(size_t)j * H + i] = id >= 0 && id < id_vocab ? id_to_sub[id] : -1;
+                        }
+                    DeviceRows target(base, T, hist, H);
+                    const auto got = target.sample(p, &q);
+                    for (int j = 0; j < T; ++j) {
+                        const auto list = mirror_select(base.data() + (size_t)j * nv, nv,
+                                                       window_of(hist, H, j, p.penalty_last_n), p, p.top_k);
+                        double probability = 0;
+                        const int want = mirror_pick(list, p.top_k, p, j, &probability);
+                        const double error = std::abs((double)c->prob[j] - probability);
+                        max_error = std::max(max_error, error);
+                        const bool fail = got[j] != want || c->pick[j] != sub_to_id[want] ||
+                                          c->ring[H + j] != c->pick[j] || !std::isfinite(c->prob[j]) || error > 2e-6;
+                        if (fail && wrong < 8)
+                            std::printf("    coupled nv %d config %d replay %d row %d: want %d target %d draft %d error %.3g\n",
+                                        nv, config, replay, j, want, got[j], c->pick[j], error);
+                        wrong += fail; ++draws;
+                    }
+                    if (replay == 0) {
+                        first.assign(c->pick, c->pick + T); first_prob.assign(c->prob, c->prob + T);
+                    } else if (replay == 1) {
+                        wrong += !std::equal(first.begin(), first.end(), c->pick);
+                        wrong += !std::equal(first_prob.begin(), first_prob.end(), c->prob);
+                    }
+                }
+            }
+            delete graph;
+            sycl::free(scratch, q); sycl::free(id_to_sub, q); sycl::free(sub_to_id, q);
+            sycl::free(logits, q); sycl::free(c, q);
+        }
+        std::printf("  %-34s %s (%d of %d draws differ; max probability error %.3g)\n",
+                    "coupled graph/counter/probability", wrong ? "*** WRONG ***" : "matches", wrong, draws, max_error);
         bad += wrong;
     }
 

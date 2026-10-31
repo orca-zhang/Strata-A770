@@ -1,0 +1,64 @@
+{
+  "complete": true,
+  "date": "2026-10-24T08:06:03",
+  "source_sha256": {
+    "include/strata/prefill/gemm.hpp": "0086abbd6d169177e449d47388a7639aea59e72dae3ebf14dca7ab9040f85da6",
+    "sycl/src/prefill/gemm.dp.cpp": "685474fb450ef4088aade20ef4b5dbc711bf5388edbb1362df42de7905a0a782",
+    "sycl/src/prefill/gemm_parity.cpp": "3e0deeda915014d157b6bdf2c76546697aa4ffdae3fe6afa764d5be045273440",
+    "sycl/src/prefill/prefill.cpp": "0697919ce830d355110bc6c40e734f64c2b0a9d48d9c0af4bf30c6d32a95c531"
+  },
+  "build_sha256": "54b50c570ac140274e818fe614f0c8493827bdb0a8db6b646908cce52b8051a2",
+  "extra_source_sha256": {
+    "sycl/CMakeLists.txt": "7a4783c78e8c7bcd4507020ef76ea17b540e544ea0e4e331c1ac97ce971d553c",
+    "docs/DEEPINFER_OPTIMIZATIONS.md": "c41d9487119363237cbcad067ed37dbb60b0e5d21086201cfc8ec94deda510b6",
+    "sycl/src/kernels/cuda/sampler.dp.cpp": "7a49a2c2b137f3bfbb7ac5383be0e347f50eb958dbcb0fb9249d4204740a2ec5"
+  },
+  "unchanged_dependency_objects_libraries": 96,
+  "bf16_function_unchanged": true,
+  "production_sha256": {
+    "exe": "8f0d866ded297cf5a409e84cf5dd61f437c56c8a89aaeb2a85569265b6a3e122",
+    "config": "1a755372f0e6c90c0bfa2af865d67b51f8df49c10aa1613b041b08da8184ca88"
+  },
+  "production_unchanged": true,
+  "operator_confirmation": [
+    {
+      "directory": "prefill-widen-output-stage-operators",
+      "valid_fp16_pairs": [
+        {
+          "candidate_run": 1,
+          "bf16": false,
+          "baseline": 26223.544286230168,
+          "candidate": 7186.89375,
+          "throughput_change_pct": 264.8800886506798,
+          "baseline_drift_pct": 0.9704096891527847,
+          "meets_screen": true
+        }
+      ]
+    },
+    {
+      "directory": "prefill-widen-output-stage-operators-confirm",
+      "valid_fp16_pairs": [
+        {
+          "candidate_run": 1,
+          "bf16": false,
+          "baseline": 25603.6249582304,
+          "candidate": 7159.50625,
+          "throughput_change_pct": 257.61718845109465,
+          "baseline_drift_pct": -0.011423511050301371,
+          "meets_screen": true
+        },
+        {
+          "candidate_run": 3,
+          "bf16": false,
+          "baseline": 25897.057891667442,
+          "candidate": 7161.40625,
+          "throughput_change_pct": 261.6197292489508,
+          "baseline_drift_pct": 2.316942953549339,
+          "meets_screen": true
+        }
+      ]
+    }
+  ],
+  "default_switch": "off",
+  "model_speed_claim": false
+}

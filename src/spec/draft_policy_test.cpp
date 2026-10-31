@@ -9,6 +9,7 @@
 #include "strata/spec/draft_policy.hpp"
 
 #include <cstdio>
+#include <limits>
 
 using strata::spec::DraftPolicy;
 
@@ -23,6 +24,49 @@ double cost(int t) { return 19.0 + 10.5 * (t - 1); }   // ms per round, measured
 
 int main() {
     std::printf("draft_policy_test\n");
+    {
+        using strata::spec::mtp_confidence_window;
+        const float p[] = {0.75f, 0.75f, 0.75f, 0.75f, 0.75f, 0.75f, 0.75f};
+        for (int t = 1; t <= 8; ++t) {
+            check(mtp_confidence_window(t, p, 0.5f) == t, "confidence: disabled cumulative floor keeps the old window");
+            check(mtp_confidence_window(t, nullptr, 0.0f) == t, "confidence: both floors off do not read probabilities");
+        }
+        check(mtp_confidence_window(4, p, 0.5f, 0.5f) == 3,
+              "confidence: cumulative floor cuts individually confident drafts");
+        check(mtp_confidence_window(4, p, 0.0f, 0.5f) == 3,
+              "confidence: cumulative rule works without a per-token floor");
+        const float half[] = {0.5f, 0.5f, 0.5f};
+        check(mtp_confidence_window(4, half, 0.5f, 0.25f) == 3,
+              "confidence: equality at either threshold is accepted");
+        check(mtp_confidence_window(4, half, 0.6f, 0.1f) == 1,
+              "confidence: cumulative rule cannot bypass the per-token floor");
+        const float partial[] = {0.75f, 0.75f, std::numeric_limits<float>::quiet_NaN()};
+        check(mtp_confidence_window(3, partial, 0.0f, 0.5f) == 3,
+              "confidence: early drafting reads only completed probabilities");
+        const float stopped[] = {0.75f, 0.75f, 0.75f, 0, 0, 0, 0};
+        check(mtp_confidence_window(8, stopped, 0.0f, 0.5f) ==
+              mtp_confidence_window(8, p, 0.0f, 0.5f),
+              "confidence: zeroed uncomputed suffix keeps the full-chain window");
+        const float rejected[] = {0.25f, 0, 0};
+        check(mtp_confidence_window(4, rejected, 0.0f, 0.5f) == 1,
+              "confidence: the first rejected draft leaves only the fed-back row");
+        check(mtp_confidence_window(5, p, 0.5f, 0.0f, 0.8f) == 4 &&
+              mtp_confidence_window(4, p, 0.5f, 0.0f, 0.8f) == 4,
+              "confidence: last-draft override still applies only to five rows");
+        check(mtp_confidence_window(1, nullptr, 0.5f, 0.5f) == 1 &&
+              mtp_confidence_window(4, nullptr, 0.5f, 0.5f) == 1,
+              "confidence: no drafts or missing probabilities stay at one row");
+        const float ones[] = {1, 1, 1, 1, 1, 1, 1};
+        check(mtp_confidence_window(8, ones, 0.0f, 1.0f) == 8 &&
+              mtp_confidence_window(4, p, 0.0f, 1.0f) == 1,
+              "confidence: cumulative floor one retains only certain drafts");
+        for (float bad : {-0.1f, 1.1f, std::numeric_limits<float>::infinity(),
+                          std::numeric_limits<float>::quiet_NaN()}) {
+            const float invalid[] = {1.0f, bad, 1.0f};
+            check(mtp_confidence_window(4, invalid, 0.0f, 0.5f) == 2,
+                  "confidence: invalid draft confidence ends the prefix");
+        }
+    }
     {
         DraftPolicy p(6);
         for (int i = 0; i < 50; ++i) p.observe(false, 4, 2, 0, cost(4));   // MTP windows of 4: 3 tokens each
@@ -74,6 +118,45 @@ int main() {
         for (int i = 0; i < 30; ++i) q.observe_chain(4, 3, 3, 4, cost(7));       // reached, never accepted
         check(q.chain(4, 0.9, 3, 4) == 0, "chain: dear rows, never accepted -> none");
         check(q.chain(4, 0.9, 0, 4) == 0 && q.chain(8, 1.0, 3, 40) == 0, "chain: nothing proposed / no room -> none");
+    }
+    {
+        DraftPolicy p(6);
+        for (int i = 0; i < 7; ++i) p.observe(false, 4, 0, 0, 40.0);
+        check(p.choose_mtp(4) == 4, "MTP: first eight windows retain the threshold policy");
+        p.observe(false, 4, 0, 0, 40.0);
+        check(p.choose_mtp(4) == 1, "MTP: rejected drafts favor the cheapest prefix");
+        check(p.choose_mtp(1) == 1 && p.choose_mtp(0) == 1, "MTP: no drafts stays at one row");
+        for (int i = 0; i < 7; ++i) p.observe(false, 4, 0, 0, 40.0);
+        check(p.choose_mtp(4) == 4, "MTP: round sixteen refreshes the full threshold window");
+        p.observe(false, 4, 0, 0, 40.0);
+        check(p.choose_mtp(4) == 1, "MTP: selection resumes after the refresh");
+        p.observe(false, 1, 0, 0, 100.0);
+        check(p.choose_mtp(4) > 1, "MTP: a measured expensive prefix overrides its prior cost");
+    }
+    {
+        DraftPolicy p(6);
+        for (int i = 0; i < 20; ++i) p.observe(true, 4, 0, 30, 40.0);
+        check(p.choose_mtp(4) == 4, "MTP: suffix results do not train MTP prefix acceptance");
+        for (double bad : {0.0, -1.0, std::numeric_limits<double>::infinity(),
+                           std::numeric_limits<double>::quiet_NaN()})
+            for (int i = 0; i < 10; ++i) p.observe(false, 4, 0, 0, bad);
+        check(p.choose_mtp(4) == 4, "MTP: invalid times do not count as observations");
+        for (int i = 0; i < 8; ++i) p.observe(false, 4, 3, 0, 40.0);
+        check(p.choose_mtp(4) == 4, "MTP: all accepted drafts keep the long window");
+        check(p.choose_mtp(2) <= 2, "MTP: selection never exceeds the probability threshold cap");
+        DraftPolicy single(1);
+        for (int i = 0; i < 20; ++i) single.observe(false, 1, 0, 0, 1.0);
+        check(single.choose_mtp(8) == 1, "MTP: one-row verifier stays at one row");
+    }
+    {
+        DraftPolicy p(6);
+        for (int i = 0; i < 8; ++i) p.observe(false, 4, 1, 0, 40.0);
+        check(p.choose_mtp(4) == 2, "MTP: partial acceptance learns the committed prefix");
+        // All shorter prefixes cost enough that none clears the 3% switching margin.
+        DraftPolicy near(4);
+        for (int t = 1; t <= 4; ++t)
+            for (int i = 0; i < 8; ++i) near.observe(false, t, t - 1, 0, t == 4 ? 4.0 : t / 1.02);
+        check(near.choose_mtp(4) == 4, "MTP: a two-percent predicted gain does not switch windows");
     }
     std::printf(g_fail ? "FAIL\n" : "PASS\n");
     return g_fail ? 1 : 0;

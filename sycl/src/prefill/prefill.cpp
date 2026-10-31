@@ -33,6 +33,9 @@
 #include "strata/prefill/moe_mmq.hpp"
 #include "strata/core/peer_experts.hpp"
 #include "strata/prefill/kernels.hpp"
+#if defined(STRATA_NATIVE_EXPERTS)
+#include "strata/prefill/fp16_pair.hpp"
+#endif
 
 #include <algorithm>
 #include <chrono>
@@ -86,6 +89,13 @@ void experts_native(const Batch&, const NativeGeom&, int, int64_t, const void*, 
 #endif
 
 namespace strata::prefill {
+void finite_count_async(const float*, int64_t, uint32_t*, void*);
+void finite_count16_async(const uint16_t*, int64_t, bool, uint32_t*, void*);
+void capture_down_async(const uint16_t*, const uint16_t*, const float*, int64_t, int64_t,
+                        int64_t, int64_t, int64_t, int64_t*, uint16_t*, uint16_t*, float*, void*);
+void gr_write_finite(float*, const float*, const float*, int64_t, int64_t, void*, uint32_t*, bool = false);
+void gr_write_norm_rs_finite(float*, const float*, const float*, int64_t, const float*, float,
+                             float*, uint16_t*, int64_t, void*, uint16_t*, uint32_t*, bool = false);
 namespace {
 
 using Clock = std::chrono::steady_clock;
@@ -519,10 +529,19 @@ struct Prefill::Impl {
     const int32_t* host_res = nullptr;
     int64_t T = 0, T_max = 0;
     bool borrowed = false;
-    dpct::queue_ptr cs = &dpct::get_in_order_queue(),
-                    copy = &dpct::get_in_order_queue();
+    dpct::queue_ptr cs = nullptr, copy = nullptr;
     Gemm gemm;
+#if defined(STRATA_NATIVE_EXPERTS)
+    void* pair_workspace = nullptr; // Alias of the existing GEMM workspace; no device allocation.
+#endif
     std::vector<void*> owned;
+    uint32_t* finite_counts = nullptr; // opt-in diagnostics, outside the borrowed cache region
+    uint32_t* gdn_finite_counts = nullptr;
+    uint32_t* moe_finite_counts = nullptr;
+    int64_t* down_capture_meta = nullptr;
+    uint16_t *down_capture_x = nullptr, *down_capture_w = nullptr;
+    float* down_capture_y = nullptr;
+    bool down_capture_saved = false;
     // chunk buffers
     float *emb = nullptr, *R = nullptr, *xn = nullptr, *lo = nullptr, *gated = nullptr, *inj = nullptr;
     float* grs = nullptr;                    // F-1: the hyper-connection read's row scales (T x 4)
@@ -675,7 +694,13 @@ void Prefill::release() {
 
 namespace {
 constexpr int64_t GEMM_SCRATCH = 32ll << 20;        // FP16 elements for the largest dequantized dense weight
-constexpr size_t GEMM_WS = 32u << 20;               // cuBLAS workspace
+// ponytail: bytes_needed, init and relayout must count the same widening workspace.
+const size_t GEMM_WS = [] {
+        const char* f16 = std::getenv("STRATA_PREFILL_GPU_WIDEN");
+        const char* bf16 = std::getenv("STRATA_PREFILL_BF16_GPU_WIDEN");
+        return ((f16 && std::strcmp(f16, "1") == 0) || (bf16 && std::strcmp(bf16, "1") == 0))
+                   ? 128u << 20 : 32u << 20;
+    }();
 
 // THE ATTENTION HALF AND THE MoE HALF SHARE THEIR BUFFERS.  A layer runs its attention (GDN or QSA), writes it back
 // into the residual, and only then its MoE, so the three sets of scratch are never live at once: one region the size
@@ -952,6 +977,9 @@ bool Prefill::init(const core::WeightTable &wt, const core::ModelGeometry &g,
         void* ws = o.take<uint8_t>(GEMM_WS, ok);
         if (!ok) { err = "prefill: GEMM scratch does not fit"; return false; }
         if (!m.gemm.init_external(stream, gs, GEMM_SCRATCH, ws, GEMM_WS, err)) return false;
+#if defined(STRATA_NATIVE_EXPERTS)
+        m.pair_workspace = ws;
+#endif
     }
     if (!carve(T, &o)) {
         err = "prefill: device buffers for a chunk of " + std::to_string(chunk) + " tokens do not fit";
@@ -1072,6 +1100,9 @@ bool Prefill::relayout(int64_t chunk, void *borrow, uint64_t borrow_bytes,
     uint16_t* gs = o.take<uint16_t>((size_t) GEMM_SCRATCH, ok);
     void* ws = o.take<uint8_t>(GEMM_WS, ok);
     if (ok) m.gemm.rebind(gs, GEMM_SCRATCH, ws, GEMM_WS);
+#if defined(STRATA_NATIVE_EXPERTS)
+    if (ok) m.pair_workspace = ws;
+#endif
     if (!ok || !carve((size_t) chunk, &o)) {
         err = "prefill: device buffers for a chunk of " + std::to_string(chunk) + " tokens do not fit";
         return false;
@@ -1530,6 +1561,8 @@ struct PfTimer {
     bool sync = prefill_sync_env();
     long long n_sync = 0;
     void mark(int phase, dpct::queue_ptr s) {
+        if (trace_env() && (phase < kPfWaitCopy || phase > kPfGemmD))
+            std::fprintf(stderr, "strata trace: prefill submitting %s\n", kPfNames[phase]);
         if (sync) {
             const auto t0 = std::chrono::steady_clock::now();
             s->wait();
@@ -1653,10 +1686,109 @@ bool Prefill::run(const int64_t *tokens, int64_t n, int64_t pos0,
     core::SessionState& ss = *m.ss;
     const auto t_start = Clock::now();
     const int64_t LB = stage_lb_, LE = stage_le_;
+    static const char* finite_mode = std::getenv("STRATA_PREFILL_FINITE_ASYNC");
+    static const char* capture_down = std::getenv("STRATA_PREFILL_CAPTURE_DOWN");
+    const bool finite_async = finite_mode != nullptr;
+    const bool finite_last = finite_async && std::strcmp(finite_mode, "last") == 0;
+    const bool finite_moe_weights = finite_async && std::strcmp(finite_mode, "moe-weights") == 0;
+    const char* pair_setting = std::getenv("STRATA_PREFILL_FP16_PAIR");
+    if (pair_setting && std::strcmp(pair_setting, "0") && std::strcmp(pair_setting, "1")) {
+        err = "prefill: STRATA_PREFILL_FP16_PAIR requires 0 or 1";
+        return false;
+    }
+    bool pair_on = pair_setting && pair_setting[0] == '1';
+#if defined(STRATA_ORCA_NATIVE) && defined(STRATA_NATIVE_EXPERTS)
+    // ponytail: default only on the measured A770 XMX chain; explicit 0 keeps the original path.
+    if (!pair_setting) {
+        const char* xmx = std::getenv("STRATA_PREFILL_NATIVE_XMX");
+        const char* chain = std::getenv("STRATA_PREFILL_XMX_EXPERT_CHAIN");
+        pair_on = xmx && std::strcmp(xmx, "1") == 0 && chain && std::strcmp(chain, "1") == 0 &&
+            m.cs->get_device().get_info<sycl::info::device::name>().find("A770") != std::string::npos;
+    }
+#endif
+#if defined(STRATA_NATIVE_EXPERTS)
+    size_t pair_calls = 0, pair_leftover = 0;
+    if (pair_on) {
+        const auto enabled = [](const char* name) {
+            const char* value = std::getenv(name);
+            return value && std::strcmp(value, "1") == 0;
+        };
+        if (m.cs->get_device().get_info<sycl::info::device::name>().find("A770") == std::string::npos ||
+            !enabled("STRATA_PREFILL_NATIVE_XMX") || !enabled("STRATA_PREFILL_XMX_EXPERT_CHAIN")
+#ifndef STRATA_ORCA_NATIVE
+            || enabled("STRATA_PREFILL_XMX_EXPERT_BATCH")
+#endif
+            ) {
+            err = "prefill: FP16 pair requires A770 native XMX expert chain (SYCL also requires batch8 off)";
+            return false;
+        }
+    }
+#else
+    if (pair_on) {
+        err = "prefill: FP16 pair requires a native-expert backend";
+        return false;
+    }
+#endif
+    const bool finite_moe = finite_moe_weights || (finite_async && std::strcmp(finite_mode, "moe-all") == 0);
+    const bool finite_gdn_all = finite_async && std::strcmp(finite_mode, "gdn-all") == 0;
+    const bool finite_all = finite_moe || finite_gdn_all;
+    const bool finite_gdn = finite_gdn_all || (finite_async && std::strcmp(finite_mode, "gdn") == 0);
+    const bool finite_fused = finite_all || finite_gdn || (finite_async && std::strcmp(finite_mode, "fused") == 0);
+    constexpr const char* gdn_stages[] = {"mixed", "state_in", "qkv", "z", "ab", "h",
+                                         "gate", "beta", "y", "state_out", "bo", "inj",
+                                         "hc_rs", "hc_xn16", "hc_lo", "hc_lo16", "hc_gated",
+                                         "mixed_h", "mixed_bf"};
+    constexpr size_t gdn_stage_count = sizeof(gdn_stages) / sizeof(*gdn_stages);
+    constexpr const char* moe_stages[] = {"mixed", "mixed_h", "logits", "weights", "shared_gate",
+                                         "shared_up", "shared_down", "shared_scalar", "xs", "gu",
+                                         "hidden", "down", "bo", "inj", "gu_weights", "down_weights"};
+    constexpr size_t moe_stage_count = sizeof(moe_stages) / sizeof(*moe_stages);
+    int64_t finite_half = finite_last ? LE * 2 - 1 : -1;
+    if (finite_async && std::strncmp(finite_mode, "half:", 5) == 0) {
+        char* end = nullptr;
+        finite_half = std::strtoll(finite_mode + 5, &end, 10);
+        if (end == finite_mode + 5 || *end || finite_half < 0 || finite_half >= g.n_layers * 2) {
+            err = "prefill: finite diagnostic half is outside the model";
+            return false;
+        }
+    }
+    const bool finite_tail = finite_half >= 0 || (finite_async && std::strcmp(finite_mode, "tail") == 0);
+    const bool poison_region = finite_async && std::strcmp(finite_mode, "poison") == 0;
+    if (poison_region)
+        std::fputs("strata finite async: poisoning reused attention/MoE scratch (diagnostic, timings invalid)\n", stderr);
+    if (finite_async && !m.finite_counts) {
+        m.finite_counts = sycl::malloc_host<uint32_t>((size_t) g.n_layers * 2, *m.cs);
+        if (!m.finite_counts) { err = "prefill: cannot allocate diagnostic counters"; return false; }
+        m.owned.push_back(m.finite_counts);
+    }
+    if (finite_gdn && !m.gdn_finite_counts) {
+        m.gdn_finite_counts = sycl::malloc_host<uint32_t>((size_t) g.n_layers * gdn_stage_count, *m.cs);
+        if (!m.gdn_finite_counts) { err = "prefill: cannot allocate GDN diagnostic counters"; return false; }
+        m.owned.push_back(m.gdn_finite_counts);
+    }
+    if (finite_moe && !m.moe_finite_counts) {
+        m.moe_finite_counts = sycl::malloc_host<uint32_t>((size_t) g.n_layers * moe_stage_count, *m.cs);
+        if (!m.moe_finite_counts) { err = "prefill: cannot allocate MoE diagnostic counters"; return false; }
+        m.owned.push_back(m.moe_finite_counts);
+    }
+    if (capture_down && !m.down_capture_meta) {
+        auto host = [&](size_t bytes) {
+            void* p = sycl::malloc_host(bytes, *m.cs);
+            if (!p) throw std::runtime_error("prefill: cannot allocate Down capture");
+            m.owned.push_back(p);
+            return p;
+        };
+        m.down_capture_x = static_cast<uint16_t*>(host((size_t) m.T_max * 640 * 2));
+        m.down_capture_w = static_cast<uint16_t*>(host(2560 * 640 * 2));
+        m.down_capture_y = static_cast<float*>(host((size_t) m.T_max * 2560 * 4));
+        m.down_capture_meta = static_cast<int64_t*>(host(6 * sizeof(int64_t)));
+        std::fill_n(m.down_capture_meta, 6, int64_t(0));
+    }
     // the next stage reads chunk c on a thread while this one reads chunk c + 1 (declared first: an early return
     // waits for it before anything it reads goes away)
     std::string next_err;
     std::future<bool> next_run;
+    static const bool recent_tail = [] { const char* v = std::getenv("STRATA_PREFILL_CACHE_TAIL64"); return v && v[0] == '1'; }();
     int hand_buf = 0;
     double host_sync_ms = 0, host_chunk_ms = 0, host_setup_ms = 0;   // STRATA_PREFILL_TIMING: the host's share
     double grp_wait_ms = 0, grp_cpu_ms = 0;   // the per-layer grouping: the drain wait, the host's loops
@@ -2149,6 +2281,9 @@ bool Prefill::run(const int64_t *tokens, int64_t n, int64_t pos0,
             dpct::select_device(pd);
         }
         host_setup_ms += ms_since(tsetup);
+        if (finite_async) m.cs->fill(m.finite_counts, uint32_t(0), (size_t) g.n_layers * 2);
+        if (finite_gdn) m.cs->fill(m.gdn_finite_counts, uint32_t(0), (size_t) g.n_layers * gdn_stage_count);
+        if (finite_moe) m.cs->fill(m.moe_finite_counts, uint32_t(0), (size_t) g.n_layers * moe_stage_count);
         bool normed = false;   // F-2: the previous half's write already normed R for this half (grs, xn16)
         // #579 #613 (opt-in diagnosis, STRATA_PF_STEP_SYNC=1): the compute and copy streams are waited for after each
         // step named below, a step that took over 250 ms is logged, and a stall's report names the step it is in.
@@ -2183,10 +2318,32 @@ bool Prefill::run(const int64_t *tokens, int64_t n, int64_t pos0,
         }
         };
         for (int64_t l = LB; l < LE; ++l) {
+            if (trace_env()) std::fprintf(stderr, "strata trace: prefill layer %lld, position %lld, rows %lld, after %.1f ms\n",
+                                         (long long) l, (long long) p0, (long long) T, ms_since(t_start));
             core::progress_beat();   // the serve watchdog: a prompt chunk of 8192 tokens is still moving
             if (l > LB) pf_step("reading the prompt (batched, step sync): the experts and the rest of layer", l - 1);
             core::progress_at("reading the prompt (batched): layer", l, p0);   // #251: a stall names layer and chunk
             const core::LayerView v(*m.wt, l);
+            // Diagnostic only: compare the first two layers and audit the scalar
+            // shared-expert gate against its actual BF16 inputs on the CPU.
+            auto dump_layer = [&](int half, const char* name, const void* data,
+                                  int64_t rows, int64_t columns, int64_t element) {
+                static const char* prefix = std::getenv("STRATA_PREFILL_DUMP_LAYER");
+                if (!prefix || l > 1) return true;
+                const std::string path = std::string(prefix) + ".layer" + std::to_string(l) +
+                    ".half" + std::to_string(half) + "." + name + ".bin";
+                std::vector<uint8_t> host((size_t)rows * columns * element);
+                m.cs->memcpy(host.data(), data, host.size()).wait_and_throw();
+                std::FILE* file = std::fopen(path.c_str(), "wb");
+                if (!file) { err = "prefill: cannot open diagnostic " + path; return false; }
+                const int64_t header[] = {p0, T, l, half, rows, columns, element};
+                const bool wrote = std::fwrite(header, sizeof(header), 1, file) == 1 &&
+                    std::fwrite(host.data(), 1, host.size(), file) == host.size();
+                const bool closed = std::fclose(file) == 0;
+                if (!wrote || !closed) { err = "prefill: cannot write diagnostic " + path; return false; }
+                return true;
+            };
+            if (!dump_layer(-1, "residual", m.R, 1, D, 4)) return false;
             if (l == std::max<int64_t>(LB, 1) && !ple_land()) return false;   // the PLE rows, read from layer 1 on
             // ---- the PLE block at layer 1, token by token (its conv reads the previous tokens' rows)
             if (l == 1 && ple_on && ple_batch) {
@@ -2244,6 +2401,8 @@ bool Prefill::run(const int64_t *tokens, int64_t n, int64_t pos0,
                 stats_.ms_ple += ms_since(tp);
             }
             for (int half = 0; half < 2; ++half) {
+                if (poison_region) m.cs->memset(m.region, 0xff, (size_t)m.region_bytes);
+                if (!dump_layer(half, "input", m.R, 1, D, 4)) return false;
                 // ---- the hyper-connection read of this half
                 const char* pre = half == 0 ? "hc_attn_" : "hc_ffn_";
                 const std::string sn = std::string(pre) + "norm.weight", sd = std::string(pre) + "down.weight",
@@ -2274,17 +2433,48 @@ bool Prefill::run(const int64_t *tokens, int64_t n, int64_t pos0,
                     pt.mark(kPfGdn, cs);
                     float* state = ss.gdn_state + (size_t) (gdn_index - ss.gdn_ord0) * gdn_floats;
                     float* conv = state + (uint64_t) g.ssm_state_size * g.ssm_v_heads * g.ssm_state_size;
+                    // ponytail: reuse the checked reduction for opt-in stage diagnostics;
+                    // extra scans alter scheduling, so these runs cannot measure performance.
+                    auto gdn_finite = [&](size_t stage, const float* data, int64_t count) {
+                        if (finite_gdn) finite_count_async(data, count,
+                            m.gdn_finite_counts + (size_t) l * gdn_stage_count + stage, m.cs);
+                    };
+                    gdn_finite(0, m.mixed, T * N);
+                    gdn_finite(1, state, (int64_t) gdn_floats);
+                    if (finite_gdn_all) {
+                        auto finite16 = [&](size_t stage, const uint16_t* data, int64_t count, bool bf16) {
+                            finite_count16_async(data, count, bf16,
+                                m.gdn_finite_counts + (size_t) l * gdn_stage_count + stage, m.cs);
+                        };
+                        if (!gr_unfused()) gdn_finite(12, m.grs, T * HC);
+                        finite16(13, m.xn16, T * D, true);
+                        gdn_finite(14, m.lo, T * LR);
+                        finite16(15, m.lo16, T * LR, true);
+                        gdn_finite(16, m.gated, T * D);
+                        finite16(17, m.mixed_h, T * N, false);
+                        finite16(18, m.mixed_bf, T * N, true);
+                    }
                     if (!native_proj(m.gemm, wqkv, m.mixed_h, m.qkv, T, v.name("attn_qkv.weight"), err)) return false;
                     if (!native_proj(m.gemm, wg, m.mixed_h, m.z, T, v.name("attn_gate.weight"), err)) return false;
                     if (!bf16_proj(m.gemm, wa, m.mixed_bf, m.ab, T, v.name("ssm_alpha.weight"), err, 2 * HV, m.mixed_bf_lo)) return false;
                     if (!bf16_proj(m.gemm, wb, m.mixed_bf, m.ab + HV, T, v.name("ssm_beta.weight"), err, 2 * HV, m.mixed_bf_lo)) return false;
+                    gdn_finite(2, m.qkv, T * C);
+                    gdn_finite(3, m.z, T * ZV);
+                    gdn_finite(4, m.ab, T * 2 * HV);
                     pt.mark(kPfGdnConv, cs);   // "gdn" is the projections in; the rest on their own lines
                     gdn_gates(m.ab, (const float*) wdt->data, (const float*) wsa->data, m.gate, m.beta, T, m.cs);
                     gdn_conv(conv, m.qkv, (const float*) wc->data, m.hbuf, T, EPS, m.cs);
+                    gdn_finite(5, m.hbuf, T * C);
+                    gdn_finite(6, m.gate, T * HV);
+                    gdn_finite(7, m.beta, T * HV);
                     pt.mark(kPfGdnRec, cs);
                     gdn_recurrence(state, m.hbuf, m.gate, m.beta, m.z, (const float*) wnm->data, EPS, m.y, m.y_h, T, m.cs);
+                    gdn_finite(8, m.y, T * ZV);
+                    gdn_finite(9, state, (int64_t) gdn_floats);
                     pt.mark(kPfGdnOut, cs);
                     if (!native_proj(m.gemm, wo, m.y_h, m.bo, T, v.name("ssm_out.weight"), err)) return false;
+                    gdn_finite(10, m.bo, T * N);
+                    gdn_finite(11, m.inj, T * HC);
                     ++gdn_index;
                 } else if (half == 0) {
                     // ======================= QSA =======================
@@ -2578,6 +2768,9 @@ bool Prefill::run(const int64_t *tokens, int64_t n, int64_t pos0,
                     if (wgi->kind != core::WeightKind::Bf16InF32) { err = "prefill: shared gate is not BF16"; return false; }
                     m.gemm.bf16(m.mixed_bf, (const uint16_t*) wgi->data, m.sg, T, 1, N);
                     if (m.mixed_bf_lo) m.gemm.bf16(m.mixed_bf_lo, (const uint16_t*) wgi->data, m.sg, T, 1, N, 0, 1.0f);
+                    if (!dump_layer(half, "gate_x", m.mixed_bf, T, N, 2) ||
+                        !dump_layer(half, "gate_w", wgi->data, 1, N, 2) ||
+                        !dump_layer(half, "gate_y", m.sg, T, 1, 4)) return false;
                     // #136: STRATA_PF_FUSED=1 - the Q2_0 pack's experts on the fused int8 kernels (moe_fused.hpp),
                     // grouped on the GPU: no host sync.  Only where every expert's place is known before the routing -
                     // the streamed walk, in which every non-resident expert of the layer comes through the ring in id
@@ -2697,13 +2890,16 @@ bool Prefill::run(const int64_t *tokens, int64_t n, int64_t pos0,
                                 dpct::select_device(pe.dev); m.pp->s->wait();
                                 pe.fold(); dpct::select_device(pd);
                         }
+                        // ponytail: reuse the existing histogram; normalize its mass when shortening the measured tail.
+                        const int64_t tail_rows = std::min<int64_t>(T, recent_tail ? 64 : 256);
+                        const float tail_weight = (float) std::min<int64_t>(T, 256) / (float) tail_rows;
                         std::fill(m.cnt.begin(), m.cnt.end(), 0);
                         for (int64_t i = 0; i < T * K; ++i) {
                             const int32_t e = ids_h[(size_t) i];
                             if (e < 0 || e >= m.g->n_expert) { err = "prefill: routed id out of range"; return false; }
                             ++m.cnt[(size_t) e];
-                            if (!stats_.routing_tail.empty() && i >= std::max<int64_t>(0, T - 256) * K)
-                                stats_.routing_tail[(size_t) (l * m.g->n_expert + e)] += 1.0f;
+                            if (!stats_.routing_tail.empty() && i >= (T - tail_rows) * K)
+                                stats_.routing_tail[(size_t) (l * m.g->n_expert + e)] += tail_weight;
                         }
                         // multi-GPU: the rows of the experts the peer computes go last, as one block [rows_local, T*K)
                         const bool pre_mmq = mmq_plan().any && mmq_plan().layer[(size_t) l];
@@ -3297,22 +3493,81 @@ bool Prefill::run(const int64_t *tokens, int64_t n, int64_t pos0,
                             if (lay.native) {
                                 // plan v0.3 P6: a native pack's layer, dequantized by llama.cpp's own formulas
                                 const auto& f = lay.fmt[(size_t) l];
-                                strata::kernels::iq_dequant_gu_f16(f.gu_type, blob_dev, blob_dev + f.up_off, f.n_ff, f.n_embd,
-                                                                   m.dq_gu[q], m.cs);
-                                strata::kernels::iq_dequant_f16(f.d_type, blob_dev + f.down_off, f.n_embd * f.n_ff, m.dq_d[q], m.cs);
+                                static const bool fused_dq = [] {
+                                    const char* v = std::getenv("STRATA_PREFILL_FUSED_DEQUANT");
+                                    return v && std::strcmp(v, "1") == 0;
+                                }();
+                                if (!fused_dq || !strata::kernels::iq_fused_dequant_eligible(
+                                        f.gu_type, f.d_type, m.cnt[(size_t)e], f.n_ff, f.n_embd) ||
+                                    !strata::kernels::iq_dequant_expert_f16(
+                                        f.gu_type, f.d_type, blob_dev, blob_dev + f.up_off, blob_dev + f.down_off,
+                                        f.n_ff, f.n_embd, m.dq_gu[q], m.dq_d[q], m.cs)) {
+                                    strata::kernels::iq_dequant_gu_f16(f.gu_type, blob_dev, blob_dev + f.up_off,
+                                                                     f.n_ff, f.n_embd, m.dq_gu[q], m.cs);
+                                    strata::kernels::iq_dequant_f16(f.d_type, blob_dev + f.down_off,
+                                                                  f.n_embd * f.n_ff, m.dq_d[q], m.cs);
+                                }
                             } else {
                                 blob_dequant_f16(blob_dev, m.dq_gu[q], m.dq_d[q], m.cs);
+                            }
+                            if (finite_moe_weights) {
+                                // Check each dequantized operand before its GEMM and before this DQ slot is reused.
+                                finite_count16_async(m.dq_gu[q], 1280 * N, false,
+                                    m.moe_finite_counts + (size_t) l * moe_stage_count + 14, m.cs);
+                                finite_count16_async(m.dq_d[q], N * 640, false,
+                                    m.moe_finite_counts + (size_t) l * moe_stage_count + 15, m.cs);
                             }
                             if (slot >= 0) {
                                 mark_event(m.used[slot], m.cs);
                                 m.used_of[slot] = slot;
                             }
                             const int64_t o0 = m.off[(size_t) e], ne = m.cnt[(size_t) e];
+                            static const bool chain = [] {
+                                const char* v=std::getenv("STRATA_PREFILL_XMX_EXPERT_CHAIN");
+                                return v && std::strcmp(v,"1")==0;
+                            }();
+                            static const bool batch = [] {
+                                const char* v=std::getenv("STRATA_PREFILL_XMX_EXPERT_BATCH");
+                                return v && std::strcmp(v,"1")==0;
+                            }();
+                            // ponytail: at most eight experts; the in-order queue protects DQ and padding reuse.
+                            const bool finish = !batch || (j+1)%8==0 || j+1==order.size();
+#if defined(STRATA_NATIVE_EXPERTS)
+                            if (pair_on && lay.native && N == 2560 && !peer_now && !finite_moe_weights && !capture_down &&
+                                lay.fmt[(size_t) l].n_embd == 2560 && lay.fmt[(size_t) l].n_ff == 640) {
+                                static_assert(DQ == 2);
+                                // ponytail: eligibility is layer-wide; two existing DQ slots, odd leftover uses the original chain.
+                                if (j % 2 == 0 && j + 1 < order.size()) return true;
+                                if (j % 2) {
+                                    const int previous = order[j - 1];
+                                    const size_t offset = (size_t) m.off[(size_t) previous];
+                                    const fp16_pair::Expert a{m.Xs + offset * 2560, m.dq_gu[0], m.dq_d[0],
+                                        m.GU + offset * 1280, m.Hh + offset * 640, m.Dm + offset * 2560,
+                                        m.cnt[(size_t) previous]};
+                                    const fp16_pair::Expert b{m.Xs + o0 * 2560, m.dq_gu[1], m.dq_d[1],
+                                        m.GU + o0 * 1280, m.Hh + o0 * 640, m.Dm + o0 * 2560, (int) ne};
+                                    if (!fp16_pair::execute(*m.cs, a, b, m.pair_workspace, GEMM_WS, finish)) {
+                                        err = "prefill: validated FP16 pair was refused";
+                                        return false;
+                                    }
+                                    ++pair_calls;
+                                    return true;
+                                }
+                                ++pair_leftover;
+                            }
+#endif
                             pt.mark(kPfGemmGU, cs);
+                            if (!(chain && N == 2560 && m.gemm.f16_expert(m.Xs + o0 * N, m.dq_gu[q], m.dq_d[q],
+                                    m.GU + o0 * 1280, m.Hh + o0 * 640, m.Dm + o0 * N, ne, finish))) {
                             m.gemm.f16(m.Xs + o0 * N, m.dq_gu[q], m.GU + o0 * 1280, ne, 1280, N);
                             swiglu_interleaved(m.GU + o0 * 1280, m.Hh + o0 * 640, ne, m.cs);
                             pt.mark(kPfGemmD, cs);
                             m.gemm.f16(m.Hh + o0 * 640, m.dq_d[q], m.Dm + o0 * N, ne, N, 640);
+                            }
+                            if (capture_down && !m.down_capture_saved)
+                                capture_down_async(m.Hh + o0 * 640, m.dq_d[q], m.Dm + o0 * N,
+                                    ne, m.T_max, l, e, p0, m.down_capture_meta,
+                                    m.down_capture_x, m.down_capture_w, m.down_capture_y, m.cs);
                             return true;
                         }
                         catch (sycl::exception const &exc) {
@@ -3397,6 +3652,34 @@ bool Prefill::run(const int64_t *tokens, int64_t n, int64_t pos0,
                         {*m.pp->ev_done}); // multi-GPU: the peer's rows are in
                                            // Dm
                     moe_combine(m.Dm, m.slot_dev, m.w, m.shared, m.sg, m.bo, T, m.cs);
+                    if (finite_moe) {
+                        auto finite = [&](size_t stage, const float* data, int64_t count) {
+                            finite_count_async(data, count, m.moe_finite_counts + (size_t) l * moe_stage_count + stage, m.cs);
+                        };
+                        auto finite16 = [&](size_t stage, const uint16_t* data, int64_t count) {
+                            finite_count16_async(data, count, false,
+                                m.moe_finite_counts + (size_t) l * moe_stage_count + stage, m.cs);
+                        };
+                        finite(0, m.mixed, T * N);
+                        finite16(1, m.mixed_h, T * N);
+                        finite(2, m.logits, T * m.g->n_expert);
+                        finite(3, m.w, T * K);
+                        finite(4, m.sgate, T * 640);
+                        finite(5, m.sup, T * 640);
+                        finite(6, m.shared, T * N);
+                        finite(7, m.sg, T);
+                        if (!fused_l) {
+                            finite(9, m.GU, T * K * 1280);
+                            if (use_mmq) finite(10, m.H, T * K * 640);
+                            else {
+                                finite16(8, m.Xs, T * K * N);
+                                finite16(10, m.Hh, T * K * 640);
+                            }
+                        }
+                        finite(11, m.Dm, T * K * N);
+                        finite(12, m.bo, T * N);
+                        finite(13, m.inj, T * HC);
+                    }
                     // debug: STRATA_DBG_NAN=1 reports the first layer of a chunk whose MoE produced non-finite values
                     if (debug_nan_env()) {
                         m.cs->wait();
@@ -3466,14 +3749,25 @@ bool Prefill::run(const int64_t *tokens, int64_t n, int64_t pos0,
                     if (!wnn) return false;
                 }
                 if (wnn) {
-                    gr_write_norm_rs(m.R, m.bo, m.inj, HC, (const float*) wnn->data, EPS, m.grs, m.xn16, T, m.cs,
-                                     m.xn16_lo);
+                    if (finite_fused)
+                        gr_write_norm_rs_finite(m.R, m.bo, m.inj, HC, (const float*) wnn->data, EPS, m.grs,
+                                                m.xn16, T, m.cs, m.xn16_lo, m.finite_counts + l * 2 + half, finite_all);
+                    else
+                        gr_write_norm_rs(m.R, m.bo, m.inj, HC, (const float*) wnn->data, EPS, m.grs, m.xn16, T, m.cs,
+                                         m.xn16_lo);
                     normed = true;
                 } else {
-                    gr_write(m.R, m.bo, m.inj, HC, T, m.cs);
+                    if (finite_fused)
+                        gr_write_finite(m.R, m.bo, m.inj, HC, T, m.cs, m.finite_counts + l * 2 + half, finite_all);
+                    else
+                        gr_write(m.R, m.bo, m.inj, HC, T, m.cs);
                 }
                 if (half == 1 && strata::kernels::cvec().covers(l))   // --control-vector-scaled
                     strata::kernels::cvec_apply(m.R, l, T, D, nullptr, 0, nullptr, 0, false, m.cs);
+                if (!dump_layer(half, "output", m.R, 1, D, 4)) return false;
+                if (finite_async && !finite_fused && (finite_half < 0 || l * 2 + half == finite_half))
+                    finite_count_async(finite_tail ? m.R + (T - 1) * D : m.R, finite_tail ? D : T * D,
+                                       m.finite_counts + l * 2 + half, m.cs);
             }
         }
         if (!ple_land()) return false;   // a stage that ends before layer 1: the rows land anyway, the next gather starts
@@ -3538,7 +3832,7 @@ bool Prefill::run(const int64_t *tokens, int64_t n, int64_t pos0,
                 std::fclose(f);
             }
         }
-        if (on_chunk || on_stage_chunk) {
+        if (on_chunk || on_stage_chunk || finite_async || capture_down) {
             const auto toc = Clock::now();
             if (DPCT_CHECK_ERROR(m.cs->wait()) != 0) {
                 /*
@@ -3557,6 +3851,42 @@ bool Prefill::run(const int64_t *tokens, int64_t n, int64_t pos0,
                 return false;
             }
             const auto toc2 = Clock::now();
+            if (capture_down && !m.down_capture_saved && m.down_capture_meta[0]) {
+                const size_t rows = (size_t) m.down_capture_meta[0];
+                std::FILE* file = std::fopen(capture_down, "wb");
+                if (!file) { err = "prefill: cannot open Down capture"; return false; }
+                const bool wrote = std::fwrite(m.down_capture_meta, sizeof(int64_t), 6, file) == 6 &&
+                    std::fwrite(m.down_capture_x, 2, rows * 640, file) == rows * 640 &&
+                    std::fwrite(m.down_capture_w, 2, 2560 * 640, file) == 2560 * 640 &&
+                    std::fwrite(m.down_capture_y, 4, rows * 2560, file) == rows * 2560;
+                const bool closed = std::fclose(file) == 0;
+                if (!wrote || !closed) { err = "prefill: cannot write Down capture"; return false; }
+                m.down_capture_saved = true;
+                std::fprintf(stderr, "strata Down capture: rows %lld layer %lld expert %lld position %lld: %s\n",
+                    (long long) rows, (long long) m.down_capture_meta[3], (long long) m.down_capture_meta[4],
+                    (long long) m.down_capture_meta[5], capture_down);
+            }
+            if (finite_async) {
+                if (finite_moe)
+                    for (int64_t l = LB; l < LE; ++l) for (size_t stage = 0; stage < moe_stage_count; ++stage)
+                        if (const uint32_t bad = m.moe_finite_counts[(size_t) l * moe_stage_count + stage])
+                            std::fprintf(stderr, "strata moe finite: layer %lld stage %s: %u non-finite values\n",
+                                         (long long) l, moe_stages[stage], bad);
+                if (finite_gdn)
+                    for (int64_t l = LB; l < LE; ++l) for (size_t stage = 0; stage < gdn_stage_count; ++stage)
+                        if (const uint32_t bad = m.gdn_finite_counts[(size_t) l * gdn_stage_count + stage])
+                            std::fprintf(stderr, "strata gdn finite: layer %lld stage %s: %u non-finite values\n",
+                                         (long long) l, gdn_stages[stage], bad);
+                int bad_halves = 0;
+                for (int64_t l = LB; l < LE; ++l) for (int half = 0; half < 2; ++half)
+                    if (const uint32_t bad = m.finite_counts[l * 2 + half]) {
+                        ++bad_halves;
+                        std::fprintf(stderr, "strata finite async: layer %lld half %d: %u non-finite residual values\n",
+                                     (long long) l, half, bad);
+                    }
+                std::fprintf(stderr, "strata finite async: position %lld rows %lld: %d bad halves\n",
+                             (long long) p0, (long long) T, bad_halves);
+            }
             if (on_stage_chunk && !on_stage_chunk(p0 + T, err)) return false;
             if (on_chunk && !on_chunk(m.R, T, p0, err)) return false;
             host_sync_ms += std::chrono::duration<double, std::milli>(toc2 - toc).count();
@@ -3566,6 +3896,10 @@ bool Prefill::run(const int64_t *tokens, int64_t n, int64_t pos0,
     if (next_run.valid() && !next_run.get()) { err = next_err; return false; }
     ss.ple_prev[0] = prev[0];
     ss.ple_prev[1] = prev[1];
+#if defined(STRATA_NATIVE_EXPERTS)
+    if (pair_on) std::fprintf(stderr, "PREFILL_FP16_PAIR pairs=%zu leftover=%zu scratch_added=0 workspace=gemm\n",
+                              pair_calls, pair_leftover);
+#endif
     if (debug_nan_env()) {   // debug: the state the prompt leaves for the token path
         m.cs->wait();
         auto bad = [&](const float *d, int64_t n) {

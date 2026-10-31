@@ -68,6 +68,7 @@ class Tokenizer:
     def __init__(self, tokens: list[str], merges: list[str], token_types: list[int] | None = None,
                  pre: str = "qwen35", special_ids: dict[str, int] | None = None):
         self.tokens = tokens
+        self._bytes_cache: dict[int, bytes] = {}
         self.pre = pre
         self.token_types = token_types
         self.special_ids = special_ids or {}
@@ -249,22 +250,19 @@ class Tokenizer:
 
     def token_bytes(self, i: int) -> bytes:
         """The raw bytes of one token (a multi-byte character can be split across tokens)."""
-        cache = self.__dict__.setdefault("_bytes_cache", {})
+        cache = self._bytes_cache
         b = cache.get(i)
         if b is None:
             if i < 0 or i >= len(self.tokens):
                 raise IndexError("token id %d is outside the vocabulary (%d)" % (i, len(self.tokens)))
-            raw = bytearray()
-            for ch in self.tokens[i]:
-                v = UNICODE_TO_BYTE.get(ch)
-                if v is None:
-                    raise KeyError("token %d contains a character outside the byte alphabet: %r" % (i, ch))
-                raw.append(v)
-            b = cache[i] = bytes(raw)
+            try:
+                b = cache[i] = bytes(map(UNICODE_TO_BYTE.__getitem__, self.tokens[i]))
+            except KeyError as exc:
+                raise KeyError("token %d contains a character outside the byte alphabet: %r" % (i, exc.args[0])) from None
         return b
 
     def decode(self, ids: list[int], errors: str = "replace") -> str:
-        return b"".join(self.token_bytes(i) for i in ids).decode("utf-8", errors=errors)
+        return b"".join(map(self.token_bytes, ids)).decode("utf-8", errors=errors)
 
 
 # ------------------------------------------------------------------ the pack's tokenizer/ directory

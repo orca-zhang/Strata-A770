@@ -33,7 +33,6 @@
 #include <memory>
 #include <mutex>
 #include <thread>
-#include <unordered_map>
 #include <utility>
 #include <string>
 #include <vector>
@@ -641,7 +640,8 @@ private:
     std::unique_ptr<std::atomic<uint32_t>[]> warm_stamp_;   ///< per (layer, expert): epoch_ + 1 when warmed
     std::atomic<int64_t> warm_hits_{0}, warm_count_{0};
     mutable std::atomic<int64_t> direct_fallbacks_{0};
-    std::unordered_map<int64_t, size_t> stage_of_;
+    // ponytail: dense layer * n_expert + expert keys; 0 = absent, otherwise slot + 1. Allocate only when staging.
+    std::vector<size_t> stage_of_;
     uint64_t stage_blob_ = 0;
     uint64_t stage_seq_ = 0;
     uint64_t epoch_ = 0;

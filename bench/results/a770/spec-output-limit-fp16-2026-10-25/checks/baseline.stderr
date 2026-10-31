@@ -1,0 +1,352 @@
+strata generate: this CPU has no AVX-512: the expert kernels run on AVX-2 (multi-token for the i-quant gate/up rows)
+strata generate: native pack: G:\GitHub\Strata-data\packs\iq2_xs experts (largest blob 1.51 MB), token embedding IQ4_XS in mapped host memory (322 MiB)
+strata generate: 1466 MiB of weights loaded from G:\GitHub\Strata-data\packs\iq2_xs (302 canonical tensors skipped: served natively)
+strata generate: 300 native projection matrices, 1474.85 MiB of weights
+strata generate: the SSD is kept awake while rows are read: one page of the table after 100 ms without a read, until 60 s after the last request (STRATA_SSD_KEEPALIVE=0 turns it off)
+strata generate: profile G:\GitHub\Strata\data\expert-profile.bin: 24576 ranked pairs, built for 24576 slots
+strata generate: PLE on, table 320001536 rows of G:\GitHub\Strata-data\models\IQ2_XS\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00002-of-00002.gguf
+strata mtp: draft layer loaded, 807 MiB of VRAM (experts 675, dense 111), files read in 0.52 s (1524 MiB/s)
+strata generate: native head type 23, 337715200 bytes
+strata generate: GPU 0: Intel(R) Arc(TM) A770 Graphics, compute capability 12.55
+strata generate: WARNING: this engine was compiled with CUDA 12.8 headers but loaded a CUDA 0.1 runtime (libcudart): GPU properties can read wrong and some kernels go unused. Rebuild it against one toolkit (cmake -DCUDAToolkit_ROOT=<the toolkit>, with its libcudart.so present) (#542)
+strata generate: experts streamed from the GGUF on demand (--stream-experts): no host arena; every expert must fit the VRAM cache
+strata trace: 10181 MiB free after the weights, the session and the drafter
+strata generate: expert cache 4191 slots, 5.63 GiB of VRAM; policy is
+strata trace: 4419 MiB free after opening the expert cache
+strata generate: the GPU computes the experts in the cache; it rounds differently from the CPU,
+                 so a reply can differ slightly from a run without the cache (same quality:
+                 bench/results/2026-09-27-cache-parity).
+                 PROFILE, ranked by routing frequency, no eviction.
+strata generate: profile fill: 5.63 GiB in 2.8 s (2.13 GB/s, pipelined)
+strata trace: 4390 MiB free after the profile fill
+strata generate: pre-filled 4191 of 4191 slots from the profile; slot 0 verified
+strata generate: 24576 of 24576 experts missing from VRAM mirrored in pinned host memory (33.02 GiB, 18.1 s); the GPU reads them over PCIe
+strata trace: 4380 MiB free after the R4 hit path
+strata generate: R4 hit path ON - resident experts are computed on the GPU
+strata generate: 21 expert-pool workers + the host thread
+strata trace: 4380 MiB free after the expert cache and the graphs
+strata generate: session is up (engine 0.1.39-sycl)
+strata generate: token graph hit path: 4191 resident experts, decided on the device
+strata serve: the prompt path borrows 2571 CUDA0 cache slots (3.43 GiB)
+strata trace: 4380 MiB free after the head and the prompt path
+strata verify: window up to 6 tokens, 56.4 MiB of device buffers
+strata mtp: coupled draft sampling on (STRATA_SPEC_COUPLED): sampled requests draft with the target's chain and Philox draw over 248320 tokens
+strata trace: 4315 MiB free after the verifier and the drafter's binding
+strata serve: 4315 MiB of VRAM free with everything loaded
+strata trace: request 23 0
+strata trace: prompt start 22 -1
+strata trace: read 16 tokens (windows) in 786.8 ms
+strata trace: read 6 tokens (windows) in 237.9 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 22 1
+strata trace: window 23 4
+strata trace: window 26 4
+strata trace: window 30 4
+strata trace: window 32 4
+strata trace: window 36 4
+strata trace: window 37 4
+strata serve: conversation cache: parked 38 tokens in 98.1 ms; parked=1 bytes=237256840 evictions=0 snapshot_bytes=237256840 reused_kv_bytes=0
+strata trace: request 23 0
+strata trace: prompt start 22 -1
+strata trace: read 6 tokens (windows) in 233.6 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 22 1
+strata serve: conversation cache: dropped 1 superseded copy of this conversation; parked=0
+strata serve: conversation cache: parked 23 tokens in 107.5 ms; parked=1 bytes=236806220 evictions=0 snapshot_bytes=236806220 reused_kv_bytes=0
+strata trace: request 23 0
+strata trace: prompt start 22 -1
+strata trace: read 6 tokens (windows) in 235.4 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 22 1
+strata trace: window 23 4
+strata serve: conversation cache: dropped 1 superseded copy of this conversation; parked=0
+strata serve: conversation cache: parked 26 tokens in 98.0 ms; parked=1 bytes=236918872 evictions=0 snapshot_bytes=236918872 reused_kv_bytes=0
+strata trace: request 23 0
+strata trace: prompt start 22 -1
+strata trace: read 6 tokens (windows) in 236.7 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 22 1
+strata trace: window 23 4
+strata serve: conversation cache: dropped 1 superseded copy of this conversation; parked=0
+strata serve: conversation cache: parked 26 tokens in 98.3 ms; parked=1 bytes=236918872 evictions=0 snapshot_bytes=236918872 reused_kv_bytes=0
+strata trace: request 23 0
+strata trace: prompt start 22 -1
+strata trace: read 6 tokens (windows) in 235.1 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 22 1
+strata trace: window 23 4
+strata serve: conversation cache: dropped 1 superseded copy of this conversation; parked=0
+strata serve: conversation cache: parked 26 tokens in 94.1 ms; parked=1 bytes=236918872 evictions=0 snapshot_bytes=236918872 reused_kv_bytes=0
+strata trace: request 23 0
+strata trace: prompt start 22 -1
+strata trace: read 6 tokens (windows) in 237.3 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 22 1
+strata trace: window 23 4
+strata trace: window 26 4
+strata serve: conversation cache: dropped 1 superseded copy of this conversation; parked=0
+strata serve: conversation cache: parked 30 tokens in 108.8 ms; parked=1 bytes=237031528 evictions=0 snapshot_bytes=237031528 reused_kv_bytes=0
+strata trace: request 23 0
+strata trace: prompt start 22 -1
+strata trace: read 6 tokens (windows) in 235.4 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 22 1
+strata trace: window 23 4
+strata trace: window 25 4
+strata trace: window 28 4
+strata trace: window 32 4
+strata trace: window 34 4
+strata trace: window 36 4
+strata serve: conversation cache: dropped 1 superseded copy of this conversation; parked=0
+strata serve: conversation cache: parked 40 tokens in 106.4 ms; parked=1 bytes=237262992 evictions=0 snapshot_bytes=237262992 reused_kv_bytes=0
+strata trace: request 23 0
+strata trace: prompt start 22 -1
+strata trace: read 6 tokens (windows) in 248.9 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 22 1
+strata serve: conversation cache: dropped 1 superseded copy of this conversation; parked=0
+strata serve: conversation cache: parked 23 tokens in 100.2 ms; parked=1 bytes=236806220 evictions=0 snapshot_bytes=236806220 reused_kv_bytes=0
+strata trace: request 23 0
+strata trace: prompt start 22 -1
+strata trace: read 6 tokens (windows) in 248.2 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 22 1
+strata trace: window 23 4
+strata serve: conversation cache: dropped 1 superseded copy of this conversation; parked=0
+strata serve: conversation cache: parked 25 tokens in 93.4 ms; parked=1 bytes=236918868 evictions=0 snapshot_bytes=236918868 reused_kv_bytes=0
+strata trace: request 23 0
+strata trace: prompt start 22 -1
+strata trace: read 6 tokens (windows) in 249.4 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 22 1
+strata trace: window 23 4
+strata serve: conversation cache: dropped 1 superseded copy of this conversation; parked=0
+strata serve: conversation cache: parked 25 tokens in 87.6 ms; parked=1 bytes=236918868 evictions=0 snapshot_bytes=236918868 reused_kv_bytes=0
+strata trace: request 23 0
+strata trace: prompt start 22 -1
+strata trace: read 6 tokens (windows) in 250.0 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 22 1
+strata trace: window 23 4
+strata trace: window 25 4
+strata serve: conversation cache: dropped 1 superseded copy of this conversation; parked=0
+strata serve: conversation cache: parked 28 tokens in 96.3 ms; parked=1 bytes=236925024 evictions=0 snapshot_bytes=236925024 reused_kv_bytes=0
+strata trace: request 23 0
+strata trace: prompt start 22 -1
+strata trace: read 6 tokens (windows) in 246.6 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 22 1
+strata trace: window 23 4
+strata trace: window 25 4
+strata serve: conversation cache: dropped 1 superseded copy of this conversation; parked=0
+strata serve: conversation cache: parked 28 tokens in 91.8 ms; parked=1 bytes=236925024 evictions=0 snapshot_bytes=236925024 reused_kv_bytes=0
+strata trace: request 23 0
+strata trace: prompt start 22 -1
+strata trace: read 6 tokens (windows) in 248.3 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 22 1
+strata serve: conversation cache: dropped 1 superseded copy of this conversation; parked=0
+strata serve: conversation cache: parked 23 tokens in 102.3 ms; parked=1 bytes=236806220 evictions=0 snapshot_bytes=236806220 reused_kv_bytes=0
+strata trace: request 23 0
+strata trace: prompt start 22 -1
+strata trace: read 6 tokens (windows) in 246.2 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 22 1
+strata trace: window 23 4
+strata trace: window 25 4
+strata serve: conversation cache: dropped 1 superseded copy of this conversation; parked=0
+strata serve: conversation cache: parked 28 tokens in 89.4 ms; parked=1 bytes=236925024 evictions=0 snapshot_bytes=236925024 reused_kv_bytes=0
+strata trace: request 23 0
+strata trace: prompt start 22 -1
+strata trace: read 6 tokens (windows) in 247.8 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 22 1
+strata trace: window 23 4
+strata trace: window 26 4
+strata serve: conversation cache: dropped 1 superseded copy of this conversation; parked=0
+strata serve: conversation cache: parked 30 tokens in 95.0 ms; parked=1 bytes=237031528 evictions=0 snapshot_bytes=237031528 reused_kv_bytes=0
+strata trace: request 2 0
+strata trace: prompt start 1 -1
+strata trace: read 1 tokens (windows) in 102.6 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 1 1
+strata trace: window 2 4
+strata serve: conversation cache: parked 3 tokens in 59.9 ms; parked=1 bytes=118179524 evictions=0 snapshot_bytes=118179524 reused_kv_bytes=0
+strata serve: SNAPSHOT_VERIFY draft=6d5427357b878b3f cells=32 mode=0 source=ram resident=8192
+strata serve: conversation cache: restored 16 tokens (checkpoint) in 40.0 ms; parked=1 bytes=119084364
+strata trace: request 28 0
+strata trace: prompt start 27 -1
+strata trace: read 11 tokens (windows) in 485.1 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 27 1
+strata trace: window 28 4
+strata trace: window 30 4
+strata trace: window 32 4
+strata serve: conversation cache: parked 36 tokens in 107.0 ms; parked=2 bytes=357702356 evictions=0 snapshot_bytes=239522832 reused_kv_bytes=442368
+strata trace: request 34 0
+strata trace: prompt start 33 -1
+strata trace: read 17 tokens (windows) in 720.1 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 33 1
+strata trace: window 34 4
+strata serve: conversation cache: dropped 1 superseded copy of this conversation; parked=1
+strata serve: conversation cache: parked 37 tokens in 98.4 ms; parked=2 bytes=355436360 evictions=0 snapshot_bytes=237256836 reused_kv_bytes=0
+strata trace: request 23 0
+strata trace: prompt start 22 -1
+strata trace: read 6 tokens (windows) in 246.5 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 22 1
+strata trace: window 23 4
+strata trace: window 26 4
+strata trace: window 30 4
+strata trace: window 32 4
+strata trace: window 36 1
+strata trace: window 37 4
+strata serve: conversation cache: dropped 1 superseded copy of this conversation; parked=1
+strata serve: conversation cache: parked 38 tokens in 89.0 ms; parked=2 bytes=355436364 evictions=0 snapshot_bytes=237256840 reused_kv_bytes=0
+strata trace: request 23 0
+strata trace: prompt start 22 -1
+strata trace: read 6 tokens (windows) in 248.3 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 22 1
+strata serve: conversation cache: dropped 1 superseded copy of this conversation; parked=1
+strata serve: conversation cache: parked 23 tokens in 105.0 ms; parked=2 bytes=354985744 evictions=0 snapshot_bytes=236806220 reused_kv_bytes=0
+strata trace: request 23 0
+strata trace: prompt start 22 -1
+strata trace: read 6 tokens (windows) in 249.1 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 22 1
+strata trace: window 23 4
+strata serve: conversation cache: dropped 1 superseded copy of this conversation; parked=1
+strata serve: conversation cache: parked 26 tokens in 104.9 ms; parked=2 bytes=355098396 evictions=0 snapshot_bytes=236918872 reused_kv_bytes=0
+strata trace: request 23 0
+strata trace: prompt start 22 -1
+strata trace: read 6 tokens (windows) in 247.0 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 22 1
+strata trace: window 23 4
+strata serve: conversation cache: dropped 1 superseded copy of this conversation; parked=1
+strata serve: conversation cache: parked 26 tokens in 91.2 ms; parked=2 bytes=355098396 evictions=0 snapshot_bytes=236918872 reused_kv_bytes=0
+strata trace: request 23 0
+strata trace: prompt start 22 -1
+strata trace: read 6 tokens (windows) in 250.3 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 22 1
+strata trace: window 23 4
+strata serve: conversation cache: dropped 1 superseded copy of this conversation; parked=1
+strata serve: conversation cache: parked 26 tokens in 93.7 ms; parked=2 bytes=355098396 evictions=0 snapshot_bytes=236918872 reused_kv_bytes=0
+strata trace: request 23 0
+strata trace: prompt start 22 -1
+strata trace: read 6 tokens (windows) in 246.8 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 22 1
+strata trace: window 23 4
+strata trace: window 26 4
+strata serve: conversation cache: dropped 1 superseded copy of this conversation; parked=1
+strata serve: conversation cache: parked 30 tokens in 83.1 ms; parked=2 bytes=355211052 evictions=0 snapshot_bytes=237031528 reused_kv_bytes=0
+strata trace: request 23 0
+strata trace: prompt start 22 -1
+strata trace: read 6 tokens (windows) in 249.5 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 22 1
+strata trace: window 23 4
+strata trace: window 25 2
+strata trace: window 27 4
+strata trace: window 28 4
+strata trace: window 32 4
+strata trace: window 34 2
+strata trace: window 36 4
+strata serve: conversation cache: dropped 1 superseded copy of this conversation; parked=1
+strata serve: conversation cache: parked 40 tokens in 91.8 ms; parked=2 bytes=355442516 evictions=0 snapshot_bytes=237262992 reused_kv_bytes=0
+strata trace: request 23 0
+strata trace: prompt start 22 -1
+strata trace: read 6 tokens (windows) in 248.9 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 22 1
+strata serve: conversation cache: dropped 1 superseded copy of this conversation; parked=1
+strata serve: conversation cache: parked 23 tokens in 95.5 ms; parked=2 bytes=354985744 evictions=0 snapshot_bytes=236806220 reused_kv_bytes=0
+strata trace: request 23 0
+strata trace: prompt start 22 -1
+strata trace: read 6 tokens (windows) in 245.4 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 22 1
+strata trace: window 23 4
+strata serve: conversation cache: dropped 1 superseded copy of this conversation; parked=1
+strata serve: conversation cache: parked 25 tokens in 97.2 ms; parked=2 bytes=355098392 evictions=0 snapshot_bytes=236918868 reused_kv_bytes=0
+strata trace: request 23 0
+strata trace: prompt start 22 -1
+strata trace: read 6 tokens (windows) in 246.6 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 22 1
+strata trace: window 23 4
+strata serve: conversation cache: dropped 1 superseded copy of this conversation; parked=1
+strata serve: conversation cache: parked 25 tokens in 92.1 ms; parked=2 bytes=355098392 evictions=0 snapshot_bytes=236918868 reused_kv_bytes=0
+strata trace: request 23 0
+strata trace: prompt start 22 -1
+strata trace: read 6 tokens (windows) in 246.9 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 22 1
+strata trace: window 23 4
+strata trace: window 25 2
+strata serve: conversation cache: dropped 1 superseded copy of this conversation; parked=1
+strata serve: conversation cache: parked 27 tokens in 95.1 ms; parked=2 bytes=355098400 evictions=0 snapshot_bytes=236918876 reused_kv_bytes=0
+strata trace: request 23 0
+strata trace: prompt start 22 -1
+strata trace: read 6 tokens (windows) in 249.0 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 22 1
+strata trace: window 23 4
+strata trace: window 25 2
+strata trace: window 27 4
+strata serve: conversation cache: dropped 1 superseded copy of this conversation; parked=1
+strata serve: conversation cache: parked 28 tokens in 98.2 ms; parked=2 bytes=355104548 evictions=0 snapshot_bytes=236925024 reused_kv_bytes=0
+strata trace: request 23 0
+strata trace: prompt start 22 -1
+strata trace: read 6 tokens (windows) in 248.0 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 22 1
+strata serve: conversation cache: dropped 1 superseded copy of this conversation; parked=1
+strata serve: conversation cache: parked 23 tokens in 98.3 ms; parked=2 bytes=354985744 evictions=0 snapshot_bytes=236806220 reused_kv_bytes=0
+strata trace: request 23 0
+strata trace: prompt start 22 -1
+strata trace: read 6 tokens (windows) in 247.5 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 22 1
+strata trace: window 23 4
+strata trace: window 25 2
+strata trace: window 27 4
+strata serve: conversation cache: dropped 1 superseded copy of this conversation; parked=1
+strata serve: conversation cache: parked 28 tokens in 93.0 ms; parked=2 bytes=355104548 evictions=0 snapshot_bytes=236925024 reused_kv_bytes=0
+strata trace: request 23 0
+strata trace: prompt start 22 -1
+strata trace: read 6 tokens (windows) in 251.7 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 22 1
+strata trace: window 23 4
+strata trace: window 26 4
+strata serve: conversation cache: dropped 1 superseded copy of this conversation; parked=1
+strata serve: conversation cache: parked 30 tokens in 99.9 ms; parked=2 bytes=355211052 evictions=0 snapshot_bytes=237031528 reused_kv_bytes=0
+strata trace: request 2 0
+strata trace: prompt start 1 -1
+strata trace: read 1 tokens (windows) in 100.8 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 1 1
+strata trace: window 2 1
+strata serve: conversation cache: parked 3 tokens in 67.5 ms; parked=2 bytes=236359048 evictions=0 snapshot_bytes=118179524 reused_kv_bytes=0
+strata serve: SNAPSHOT_VERIFY draft=014531d0c60be790 cells=32 mode=0 source=ram resident=8192
+strata serve: conversation cache: restored 16 tokens (checkpoint) in 47.1 ms; parked=2 bytes=237263888
+strata trace: request 28 0
+strata trace: prompt start 27 -1
+strata trace: read 11 tokens (windows) in 485.1 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 27 1
+strata trace: window 28 2
+strata trace: window 30 4
+strata trace: window 32 4
+strata serve: conversation cache: parked 36 tokens in 100.3 ms; parked=2 bytes=357702356 evictions=1 snapshot_bytes=239522832 reused_kv_bytes=442368
+strata trace: request 34 0
+strata trace: prompt start 33 -1
+strata trace: read 17 tokens (windows) in 714.5 ms
+strata trace: prompt done (slots refilled) -1 -1
+strata trace: window 33 1
+strata trace: window 34 3

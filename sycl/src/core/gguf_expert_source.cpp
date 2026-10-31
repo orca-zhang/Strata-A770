@@ -6,6 +6,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <cstdint>
+#include <limits>
 #include <fcntl.h>
 #ifdef _WIN32
 // No unistd.h / pread on Windows: CRT open/close plus positional reads through the Win32
@@ -55,6 +56,7 @@ int portable_close(int fd) { return ::close(fd); }
 
 namespace {
 constexpr size_t kRing = 512;   // blobs alive at once: the prompt path holds a layer's worth of streamed experts
+static_assert(kRing <= std::numeric_limits<uint16_t>::max()); // where_ stores slot + 1
 // ponytail: stay below Arc's 4 GiB USM allocation ceiling; make configurable only if another driver needs it.
 constexpr uint64_t kMirrorChunk = 2ull << 30;
 
@@ -72,6 +74,7 @@ int gguf_lookahead_reads() {
 GgufExpertSource::~GgufExpertSource() { close(); }
 
 void GgufExpertSource::close() {
+    inputs_.clear();
     for (uint8_t* chunk : mirror_chunks_) sycl::free(chunk, dpct::get_in_order_queue());
     mirror_chunks_.clear(); mirror_bytes_ = 0; mirror_count_ = 0; warmed_.store(0, std::memory_order_relaxed);
     warm_hits_.store(0, std::memory_order_relaxed);
@@ -84,10 +87,17 @@ void GgufExpertSource::close() {
     fds_.clear(); names_.clear(); layer_fd_.clear(); ring_.clear(); ring_key_.clear(); where_.clear();
     ring_next_ = 0;
     reads_ = 0;
+    n_layers_ = n_expert_ = 0;
 }
 
 bool GgufExpertSource::open(const std::string& shard1, int64_t n_layers, int64_t n_expert, std::string& err) {
     close();
+    if (n_layers <= 0 || n_expert <= 0 ||
+        (uint64_t) n_layers > (uint64_t) std::numeric_limits<int64_t>::max() / 3 ||
+        (uint64_t) n_layers > where_.max_size() / (uint64_t) n_expert) {
+        err = "--stream-experts: invalid expert geometry";
+        return false;
+    }
     const auto& lay = strata::kernels::cpu::expert_layout();
     if (!lay.native || lay.gguf_off.size() < (size_t) (3 * n_layers)) {
         err = "--stream-experts needs a native (IQ) pack whose native_experts.txt carries the GGUF tensor offsets";
@@ -111,7 +121,13 @@ bool GgufExpertSource::open(const std::string& shard1, int64_t n_layers, int64_t
     ring_.resize(kRing);
     for (auto& b : ring_) b.resize((size_t) lay.max_blob);
     ring_key_.assign(kRing, -1);
+    where_.assign((size_t) (n_layers * n_expert), 0);
     warm_stamp_.reset(new std::atomic<uint32_t>[(size_t) (n_layers * n_expert)]());
+    static const char* roles[] = {"gate", "up", "down"};
+    for (int64_t l = 0; l < n_layers; ++l)
+        for (int r = 0; r < 3; ++r)
+            inputs_.push_back({"expert blk." + std::to_string(l) + ".ffn_" + roles[r],
+                               names_[(size_t) layer_fd_[(size_t) (3 * l + r)]]});
     return true;
 }
 
@@ -146,17 +162,16 @@ const uint8_t* GgufExpertSource::blob(int64_t layer, int64_t expert) {
     // the arena loader's gather, for one expert: [gate | up | down] from the three tensors
     const uint64_t per[3] = {fm.up_off, fm.up_off, blob - fm.down_off};
     const uint64_t at[3] = {0, fm.up_off, fm.down_off};
-    const int64_t key = ((int64_t) layer << 20) | expert;
+    const int64_t key = layer * n_expert_ + expert;
     size_t slot;
     {
         std::lock_guard<std::mutex> lk(mu_);
-        auto it = where_.find(key);
-        if (it != where_.end()) { ++reads_; return ring_[it->second].data(); }   // still resident
+        if (where_[(size_t) key] != 0) { ++reads_; return ring_[where_[(size_t) key] - 1].data(); }
         slot = ring_next_;
         ring_next_ = (ring_next_ + 1) % ring_.size();
-        if (ring_key_[slot] >= 0) where_.erase(ring_key_[slot]);
+        if (ring_key_[slot] >= 0) where_[(size_t) ring_key_[slot]] = 0;
         ring_key_[slot] = key;
-        where_[key] = slot;
+        where_[(size_t) key] = (uint16_t) (slot + 1);
     }
     std::vector<uint8_t>& buf = ring_[slot];
     for (int r = 0; r < 3; ++r) {
@@ -165,7 +180,7 @@ const uint8_t* GgufExpertSource::blob(int64_t layer, int64_t expert) {
         uint64_t done = 0;
         while (done < per[r]) {
             const int64_t n = portable_pread(fd, buf.data() + at[r] + done, (size_t) (per[r] - done), src + done);
-            if (n <= 0) { std::lock_guard<std::mutex> lk(mu_); where_.erase(key); ring_key_[slot] = -1; return nullptr; }
+            if (n <= 0) { std::lock_guard<std::mutex> lk(mu_); where_[(size_t) key] = 0; ring_key_[slot] = -1; return nullptr; }
             done += (uint64_t) n;
         }
     }
@@ -283,9 +298,9 @@ void GgufExpertSource::warm(int64_t layer, const int64_t* experts, int64_t n) {
             if (s != 0 && (uint64_t) s + 3 >= stamp) continue;
         }
         {
-            const int64_t key = ((int64_t) layer << 20) | e;
+            const int64_t key = layer * n_expert_ + e;
             std::lock_guard<std::mutex> lk(mu_);
-            if (where_.find(key) != where_.end()) continue;
+            if (where_[(size_t) key] != 0) continue;
         }
         const size_t max_blob = (size_t) strata::kernels::cpu::expert_layout().max_blob;
         if (scratch.size() < max_blob) scratch.resize(max_blob);

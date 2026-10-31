@@ -29,7 +29,10 @@
 #include "strata/core/layer.hpp"
 #include "strata/core/session.hpp"
 #include "strata/kernels/sampler.hpp"
+#include "strata/l0_sync.hpp"
 
+#include <array>
+#include <map>
 #include <atomic>
 #include <cstdint>
 #include <chrono>
@@ -137,6 +140,38 @@ public:
     /// Waits for the last commit graph when commit() did not (an event recorded after it, not the whole device);
     /// false with `err` when it failed.  Free when nothing is pending.
     bool wait_commit(std::string& err);
+
+    // A batch window holds S INDEPENDENT sequences, one token each: row s is slot s, at slot s's own position,
+    // reading and writing slot s's own state (GDN recurrence and conv history, QSA K/V and indexer, PLE history),
+    // which lives in `slots[s]` - a session carved like this verifier's own (same layer range, same max_cells).
+    // Everything that is per row already (hyper-connections, dense projections, router, shared expert, the
+    // routed experts on the GPU and the CPU, the head) runs once over the S rows, so the weights are read once
+    // per window for all the sequences.  Row s's arithmetic is the single-token window's, so a slot's greedy
+    // tokens are its solo greedy tokens (modulo the multi-token CPU kernel choice: STRATA_IQ_MT_MIN=1).
+    //
+    // Contiguous proposals for a slot share its recurrence; commit accepts a prefix per slot.  `init_slots` once after `init` (S <= max_t); a layer
+    // split's stages each get their own sessions, and run_slots/commit_slots continue into the next stage.
+    bool init_slots(const std::vector<SessionState*>& slots, std::string& err);
+    int n_slots() const { return (int) slots_.size(); }
+    /// One batch window over slots [0, S): tokens[s] at positions pos[s]; out[s] = the greedy pick after it.
+    bool run_slots(int S, const int32_t* tokens, const int64_t* pos, PoolMultiFn pool, void* user, int32_t* out,
+                   std::string& err);
+    /// The same over the S slots `rows` (row t is slot rows[t], any distinct slots in any order): the slots not
+    /// listed are not touched, so an idle slot keeps its state (a finished conversation it may continue later).
+    bool run_slot_rows(const int* rows, int S, const int32_t* tokens, const int64_t* pos, PoolMultiFn pool, void* user,
+                       int32_t* out, std::string& err);
+    /// Keep every row of the last batch window.
+    bool commit_slots(std::string& err);
+    /// Commit an accepted prefix in each contiguous slot group of the last window. `keep` has
+    /// one entry per slot (indexed by slot ID), each in 1..that slot's group length.
+    bool commit_slot_prefixes(const int* keep, std::string& err);
+    /// --batch-mtp: slot rotation makes many row layouts, so bound the captured batch graph pairs (LRU). 0 = unbounded.
+    void set_batch_graph_limit(size_t n) { batch_graph_limit_ = n; }
+
+    void set_slot_sampling(int slot, const strata::kernels::SamplerParams& sp) {
+        if (slot >= 0 && slot < (int) slot_sp_.size()) slot_sp_[(size_t) slot] = sp;
+        if (next_) next_->set_slot_sampling(slot, sp);
+    }
 
     /// Measurement hook (STRATA_LOGPOS): after run(), write one line per row t of the last window's head -
     /// "pos target logprob top top_logprob hit extra_logprob target_logprob_without_extra" - where row t is the
@@ -255,6 +290,37 @@ private:
     int64_t prof_rows_ = 0;
     int64_t prof_windows_ = 0;
 
+    // batch windows (see init_slots)
+    std::vector<SessionState*> slots_;
+    bool batch_rec_ = false;               ///< record_window is capturing a batch window
+    int row_base_ = 0;                     ///< ... its hand-off rows start here (a pipeline group's own rows)
+    int brow_[8] = {};                     ///< ... and row t is slot brow_[t]
+    bool last_batch_ = false;              ///< the last run was a batch window (set_plan_slot: one group)
+    using BatchKey = std::array<int, 11>;   // row count, base, doorbell flag, then up to eight ordered slot IDs
+    std::map<BatchKey, dpct::experimental::command_graph_exec_ptr> exec_bm_, commit_bm_;   ///< full row layout avoids slot-ID collisions
+    std::map<BatchKey, uint64_t> bm_used_;   ///< last use of each captured layout (LRU, only with a graph limit)
+    uint64_t bm_tick_ = 0;
+    size_t batch_graph_limit_ = 0;         ///< 0: keep every captured batch graph (0.1.39); N: LRU-evict beyond N layouts
+    int last_rows_[8] = {};                ///< the slots of the last batch window's rows
+    BatchKey bkey(const int* rows, int S, int hbase) const {   // #871: the device-plan variant has its own graphs
+        // ponytail: stage_batch validates S <= 8; fixed storage avoids an allocation on every lookup.
+        BatchKey k{S, hbase, device_plan_ ? 1 : 0};
+        for (int t = 0; t < S; ++t) k[3 + t] = rows[t];
+        return k;
+    }
+    std::vector<strata::kernels::SamplerParams> slot_sp_;
+    int32_t* h_commitb_ = nullptr; int32_t* m_commitb_ = nullptr;
+    int32_t* commitb_ = nullptr;
+    float* tail_snap_b_ = nullptr;
+    void* arena_b_ = nullptr;
+    int64_t last_pos_b_[8] = {};
+    bool capture_batch(const int* rows, int S, int hbase, std::string& err);
+    bool capture_commit_batch(const int* rows, int S, int hbase, std::string& err);
+    bool stage_batch(const int* rows, int S, int hbase, const int32_t* tokens, const int64_t* pos, std::string& err);
+    bool sample_rows(int S, std::string& err);
+    bool execute_window(int T, const int32_t* tokens, int64_t pos0, PoolMultiFn pool, void* user,
+                        int32_t* out, std::chrono::steady_clock::time_point t0, std::string& err);
+
     const WeightTable* wt_ = nullptr;
     const ModelGeometry* g_ = nullptr;
     SessionState* ss_ = nullptr;
@@ -286,6 +352,7 @@ private:
     uint32_t* h_flagA_ = nullptr; uint32_t* m_flagA_ = nullptr;  // the GPU plan is in place
     uint32_t* h_flagB_ = nullptr; uint32_t* m_flagB_ = nullptr;  // the PCIe share's DMA copies have landed
     uint32_t* h_skip_ = nullptr; uint32_t* m_skip_ = nullptr;    // stable device-plan decision for each layer/group
+    L0QueueSync l0_sync_;
     bool l0_events_ = false;                                      // opt-in Windows Level Zero host event gates
     void* l0_event_pool_ = nullptr;
     std::vector<void*> l0_native_events_;

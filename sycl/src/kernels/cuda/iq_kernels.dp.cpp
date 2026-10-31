@@ -130,25 +130,30 @@ __dpct_inline__ int swar_ne4(unsigned x) { return dpct::vectorized_binary<sycl::
 __dpct_inline__ int swar_sub4(unsigned a, unsigned s) { return dpct::vectorized_binary<sycl::uchar4>(a, s, std::minus<>()); }
 #endif
 
+__dpct_inline__ sycl::int2 load8_a2(const uint8_t* p);
+
 __dpct_inline__ float vec_dot_iq2_xxs_q8_1(const void *__restrict__ vbq,
                                            const block_q8_1 *__restrict__ bq8_1,
                                            const int &kbx, const int &iqs) {
     const block_iq2_xxs* bq2 = (const block_iq2_xxs*) vbq + kbx;
-    const int q2 = get_int_b2(bq2->qs, iqs);
+    const sycl::int2 packed = load8_a2(reinterpret_cast<const uint8_t*>(bq2->qs) + 4 * iqs);
+    const uint32_t q2 = packed.x(), aux32 = packed.y();
     const uint8_t* aux8 = (const uint8_t*) &q2;
-    const uint32_t aux32 = get_int_b2(bq2->qs, iqs + 1);
     int sumi = 0;
 #pragma unroll
     for (int k0 = 0; k0 < 8; k0 += 2) {
         const sycl::uint2 grid_pos =
             ((const sycl::uint2 *)iq2xxs_grid)[aux8[k0 / 2]];
-        const uint32_t signs = unpack_ksigns(aux32 >> (7 * k0 / 2));
-        const int signs0 = swar_ne4(signs & 0x08040201);
-        const int grid0 = swar_sub4(grid_pos.x() ^ signs0, signs0);
+        const uint32_t code = (aux32 >> (7 * k0 / 2)) & 127;
+        const uint32_t bits = code | ((sycl::popcount(code) & 1) << 7);
+        // ponytail: spread each sign nibble into four byte masks with integer multiplies.
+        const uint32_t signs0 = (((bits & 15) * 0x00204081u) & 0x01010101u) * 255u;
+        const uint32_t signs1 = (((bits >> 4) * 0x00204081u) & 0x01010101u) * 255u;
+        // IQ2_XXS grid bytes are nonzero, so adding the sign bits cannot carry into the next byte.
+        const int grid0 = int((grid_pos.x() ^ signs0) + (signs0 & 0x01010101u));
         const int u0 = get_int_b4(bq8_1[iqs / 2].qs, k0 + 0);
         sumi = ggml_cuda_dp4a(grid0, u0, sumi);
-        const int signs1 = swar_ne4(signs & 0x80402010);
-        const int grid1 = swar_sub4(grid_pos.y() ^ signs1, signs1);
+        const int grid1 = int((grid_pos.y() ^ signs1) + (signs1 & 0x01010101u));
         const int u1 = get_int_b4(bq8_1[iqs / 2].qs, k0 + 1);
         sumi = ggml_cuda_dp4a(grid1, u1, sumi);
     }
@@ -1191,10 +1196,11 @@ template <> struct Multi<22> {   // iq2_s
         for (int l0 = 0; l0 < 8; l0 += 2) {
             const int gi = qs[l0 / 2] | ((qh << (8 - l0)) & 0x300);
             const int* grid_pos = G ? (const int*) (G + gi) : (const int*) (iq2s_grid + gi);
-            const int signs0 = swar_ne4(((sp[l0 / 2] & 0x03) << 7) | ((sp[l0 / 2] & 0x0C) << 21));
-            const int signs1 = swar_ne4(((sp[l0 / 2] & 0x30) << 3) | ((sp[l0 / 2] & 0xC0) << 17));
-            m.w[l0 + 0] = swar_sub4(grid_pos[0] ^ signs0, signs0);
-            m.w[l0 + 1] = swar_sub4(grid_pos[1] ^ signs1, signs1);
+            // ponytail: IQ2_S grid bytes are nonzero; spread sign nibbles as in IQ2_XXS.
+            const uint32_t signs0 = (((sp[l0 / 2] & 15u) * 0x00204081u) & 0x01010101u) * 255u;
+            const uint32_t signs1 = (((sp[l0 / 2] >> 4) * 0x00204081u) & 0x01010101u) * 255u;
+            m.w[l0 + 0] = int((uint32_t(grid_pos[0]) ^ signs0) + (signs0 & 0x01010101u));
+            m.w[l0 + 1] = int((uint32_t(grid_pos[1]) ^ signs1) + (signs1 & 0x01010101u));
         }
         m.a = bq2->scales[iqs / 2] & 0x0F;
         m.b = bq2->scales[iqs / 2] >> 4;
@@ -1280,12 +1286,12 @@ template <> struct Multi<42> {   // q2_0 (down)
     static constexpr bool has = true; static constexpr int NW = 8;
     __dpct_inline__ static void prep(const void* vbq, int kbx, int iqs, MultiW& m, const void* = nullptr) {
         const block_q2_0* bq2_0 = (const block_q2_0*) vbq + kbx;
-        const int16_t* qs = (const int16_t*) bq2_0->qs + iqs * 4;
+        // ponytail: use the existing page-safe 8-byte reader; keep codes and integer dots unchanged.
+        const sycl::int2 packed = load8_a2(bq2_0->qs + iqs * 8);
 #pragma unroll
-        for (int j = 0; j < 4; ++j) {
-            const int q = qs[j];
-            m.w[2 * j + 0] = q2_0_unpack4(uint8_t(q));
-            m.w[2 * j + 1] = q2_0_unpack4(uint8_t(q >> 8));
+        for (int j = 0; j < 8; ++j) {
+            const uint32_t word = j < 4 ? uint32_t(packed.x()) : uint32_t(packed.y());
+            m.w[j] = q2_0_unpack4(uint8_t(word >> (8 * (j % 4))));
         }
         m.d = bq2_0->d;
     }
@@ -1309,32 +1315,40 @@ __dpct_inline__ void row_dot_multi(const uint8_t* row, const block_q8_1* const* 
     for (int e = 0; e < E; ++e) s[e] = 0.f;
     for (int k = sub; k < nb * F::ipb; k += LANES) {
         const int kbx = k / F::ipb, iqs = F::step * (k % F::ipb);
-        MultiW m;
-        M::prep(row, kbx, iqs, m, grid);
+        if constexpr (TY == 29) {
+            // ponytail: reuse the existing IQ1_M decoder for two entries, preserving every dot and reduction.
+            const auto w = Split<TY>::load(row, kbx, iqs);
 #pragma unroll
-        for (int e = 0; e < E; ++e) {
-            int u[8];
-            float ds;
-            M::acts(xs[e] + kbx * (F::qk / 32), iqs, u, ds);
-            int s0 = 0, s1 = 0;
+            for (int e = 0; e < E; ++e)
+                s[e] += Split<TY>::apply(w, xs[e] + kbx * (F::qk / 32), iqs);
+        } else {
+            MultiW m;
+            M::prep(row, kbx, iqs, m, grid);
 #pragma unroll
-            for (int j = 0; j < M::NW / 2; ++j) s0 = ggml_cuda_dp4a(m.w[j], u[j], s0);
+            for (int e = 0; e < E; ++e) {
+                int u[8];
+                float ds;
+                M::acts(xs[e] + kbx * (F::qk / 32), iqs, u, ds);
+                int s0 = 0, s1 = 0;
 #pragma unroll
-            for (int j = M::NW / 2; j < M::NW; ++j) s1 = ggml_cuda_dp4a(m.w[j], u[j], s1);
-            s[e] += M::finish(s0, s1, m, ds);
+                for (int j = 0; j < M::NW / 2; ++j) s0 = ggml_cuda_dp4a(m.w[j], u[j], s0);
+#pragma unroll
+                for (int j = M::NW / 2; j < M::NW; ++j) s1 = ggml_cuda_dp4a(m.w[j], u[j], s1);
+                s[e] += M::finish(s0, s1, m, ds);
+            }
         }
     }
 #pragma unroll
     for (int e = 0; e < E; ++e) out[e] = lanes_sum<LANES>(s[e]);
 }
 
-template <int E>
-__dpct_inline__ void iq2s_gu_pair_chunk(const uint8_t* blob, const block_q8_1* xq,
+template <int TY, int LANES, int E>
+__dpct_inline__ void gu_pair_chunk(const uint8_t* blob, const block_q8_1* xq,
                                       const int32_t* ent_tok, int e, NativeExpertLayout L,
                                       int row, int lane, float* gate, float* up) {
 #pragma clang fp contract(off)
-    using F = Fmt<22>;
-    using M = Multi<22>;
+    using F = Fmt<TY>;
+    using M = Multi<TY>;
     const block_q8_1* xs[E];
     float gs[E], us[E];
 #pragma unroll
@@ -1345,7 +1359,7 @@ __dpct_inline__ void iq2s_gu_pair_chunk(const uint8_t* blob, const block_q8_1* x
     const uint8_t* gr = blob + (size_t) row * L.gu_row;
     const uint8_t* ur = gr + L.up_off;
     const int nb = L.n_embd / F::qk;
-    for (int k = lane; k < nb * F::ipb; k += 16) {
+    for (int k = lane; k < nb * F::ipb; k += LANES) {
         const int kbx = k / F::ipb, iqs = F::step * (k % F::ipb);
         MultiW gm, um;
         M::prep(gr, kbx, iqs, gm);
@@ -1373,7 +1387,7 @@ __dpct_inline__ void iq2s_gu_pair_chunk(const uint8_t* blob, const block_q8_1* x
     }
 #pragma unroll
     for (int j = 0; j < E; ++j) {
-        const float g = lanes_sum<16>(gs[j]), u = lanes_sum<16>(us[j]);
+        const float g = lanes_sum<LANES>(gs[j]), u = lanes_sum<LANES>(us[j]);
         if (lane == 0) {
             gate[(size_t) (e + j) * L.n_ff + row] = g;
             up[(size_t) (e + j) * L.n_ff + row] = u;
@@ -1381,15 +1395,15 @@ __dpct_inline__ void iq2s_gu_pair_chunk(const uint8_t* blob, const block_q8_1* x
     }
 }
 
-template <bool FIXED = false, int WG = 256>
-__dpct_inline__ void iq2s_gu_pair_kernel(const unsigned long long* grp_ptr,
+template <int TY, int LANES, bool FIXED = false, int WG = 256>
+__dpct_inline__ void gu_pair_kernel(const unsigned long long* grp_ptr,
                                        const int32_t* grp_start, const int32_t* n_groups,
                                        const int32_t* ent_tok, const block_q8_1* xq,
                                        NativeExpertLayout L, float* gate, float* up) {
     if constexpr (FIXED) L.n_embd = 2560;
     auto item = sycl::ext::oneapi::this_work_item::get_nd_item<3>();
-    const int row = item.get_group(2) * (WG / 16) + item.get_local_id(2) / 16;
-    const int lane = item.get_local_id(2) & 15;
+    const int row = item.get_group(2) * (WG / LANES) + item.get_local_id(2) / LANES;
+    const int lane = item.get_local_id(2) & (LANES - 1);
     if (row >= L.n_ff) return;
     const int ng = *n_groups;
     for (int g = item.get_group(1); g < ng; g += item.get_group_range(1)) {
@@ -1397,12 +1411,12 @@ __dpct_inline__ void iq2s_gu_pair_kernel(const unsigned long long* grp_ptr,
         const int e1 = grp_start[g + 1];
         int e = grp_start[g];
         for (; e + 4 <= e1; e += 4)
-            iq2s_gu_pair_chunk<4>(blob, xq, ent_tok, e, L, row, lane, gate, up);
+            gu_pair_chunk<TY, LANES, 4>(blob, xq, ent_tok, e, L, row, lane, gate, up);
         if (e + 2 <= e1) {
-            iq2s_gu_pair_chunk<2>(blob, xq, ent_tok, e, L, row, lane, gate, up);
+            gu_pair_chunk<TY, LANES, 2>(blob, xq, ent_tok, e, L, row, lane, gate, up);
             e += 2;
         }
-        if (e < e1) iq2s_gu_pair_chunk<1>(blob, xq, ent_tok, e, L, row, lane, gate, up);
+        if (e < e1) gu_pair_chunk<TY, LANES, 1>(blob, xq, ent_tok, e, L, row, lane, gate, up);
     }
 }
 
@@ -1412,7 +1426,16 @@ __dpct_inline__ void row_entries(const uint8_t* wr, const block_q8_1* x, int x_s
                                  int e0, int e1, int nb, int sub, float* dst, size_t dst_stride,
                                  const void* grid = nullptr) {
     int e = e0;
-    if constexpr (Multi<TY>::has) {
+    if constexpr (TY == 29) {
+        // IQ1_M: reuse the existing decoded weights for each pair; an odd tail keeps its single dot.
+        for (; e + 2 <= e1; e += 2) {
+            const block_q8_1* xs[2] = {x + (size_t) ent_idx[e] * x_stride,
+                                       x + (size_t) ent_idx[e + 1] * x_stride};
+            float o[2];
+            row_dot_multi<TY, LANES, 2>(wr, xs, nb, sub, o, grid);
+            if (sub == 0) { dst[(size_t) e * dst_stride] = o[0]; dst[(size_t) (e + 1) * dst_stride] = o[1]; }
+        }
+    } else if constexpr (Multi<TY>::has) {
         for (; e + 4 <= e1; e += 4) {
             const block_q8_1* xs[4] = {x + (size_t) ent_idx[e] * x_stride, x + (size_t) ent_idx[e + 1] * x_stride,
                                        x + (size_t) ent_idx[e + 2] * x_stride, x + (size_t) ent_idx[e + 3] * x_stride};
@@ -1632,16 +1655,25 @@ __dpct_inline__ void native_down_multi_kernel(
 // value i of a q8_1 row set (the warp holds block i / 32, lane = i % 32)
 __dpct_inline__ void q8_1_store(const float xi, block_q8_1 *__restrict__ y,
                                 const long long i) {
+    auto sg = sycl::ext::oneapi::this_work_item::get_sub_group();
     float amax = sycl::fabs(xi), sum = xi;
 #pragma unroll
     for (int o = 16; o > 0; o >>= 1) {
-        amax = sycl::fmax(amax, sycl::permute_group_by_xor(sycl::ext::oneapi::this_work_item::get_sub_group(), amax, o));
-        sum += sycl::permute_group_by_xor(sycl::ext::oneapi::this_work_item::get_sub_group(), sum, o);
+        amax = sycl::fmax(amax, sycl::permute_group_by_xor(sg, amax, o));
+        sum += sycl::permute_group_by_xor(sg, sum, o);
     }
     const float d = q8_1_finite(amax / 127.0f);   // #606: q8_1_finite.hpp - the same bits for every finite block
     const int8_t q = q8_1_quant(xi, d, amax);
     const long long ib = i / 32, iqs = i % 32;
-    y[ib].qs[iqs] = q;
+
+    uint32_t u0 = static_cast<uint8_t>(q);
+    const uint32_t u1 = sycl::permute_group_by_xor(sg, u0, 1);
+    if ((iqs & 1) == 0) u0 |= (u1 << 8);
+    const uint32_t u2 = sycl::permute_group_by_xor(sg, u0, 2);
+    if ((iqs & 3) == 0) {
+        u0 |= (u2 << 16);
+        *reinterpret_cast<uint32_t*>(&y[ib].qs[iqs]) = u0;
+    }
     if (iqs == 0) y[ib].ds = q8_1_ds(d, sum);
 }
 
@@ -2635,6 +2667,36 @@ void iq_dequant_gu_f16(int t, const void* gate, const void* up, int64_t n_ff, in
     check("iq_dequant_gu_f16");
 }
 
+template<int GT>
+static void iq_dequant_pair42_f16(const void* gate, const void* up, const void* down,
+                                 int64_t nf, int64_t ne, uint16_t* gu, uint16_t* d, void* stream) {
+    const int64_t per_row = ne / 256, blocks = nf * per_row;
+    auto* q = strata::q_of(stream);
+    dpct::has_capability_or_fail(q->get_device(), {sycl::aspect::fp16});
+    const auto props = sycl::ext::oneapi::experimental::properties{
+        sycl::ext::oneapi::experimental::use_root_sync};
+    // ponytail: specialize the two measured pairs; reuse the existing decoders and FP16 conversion.
+    q->parallel_for(sycl::nd_range<3>({1, 3, size_t(blocks) * 32}, {1, 1, 32}), props,
+        [=](sycl::nd_item<3> item) {
+            const int64_t i = item.get_group(2);
+            const int role = int(item.get_group(1)), tid = int(item.get_local_id(2));
+            auto* out = role == 2 ? (sycl::half*)d + i * 256 :
+                (sycl::half*)gu + ((2 * (i / per_row) + role) * per_row + i % per_row) * 256;
+            if (role == 2) dq_q2_0(down, i, out, tid);
+            else if constexpr (GT == 16) dq_iq2_xxs(role ? up : gate, i, out, tid);
+            else dq_iq2_s(role ? up : gate, i, out, tid);
+        });
+}
+
+bool iq_dequant_expert_f16(int gt, int dt, const void* gate, const void* up, const void* down,
+                           int64_t nf, int64_t ne, uint16_t* gu, uint16_t* d, void* stream) {
+    if (dt != 42 || (gt != 16 && gt != 22) || nf <= 0 || ne <= 0 || ne % 256 || nf > (INT64_MAX / 2) / ne)
+        return false;
+    if (gt == 16) iq_dequant_pair42_f16<16>(gate, up, down, nf, ne, gu, d, stream);
+    else iq_dequant_pair42_f16<22>(gate, up, down, nf, ne, gu, d, stream);
+    return true;
+}
+
 bool native_expert_supported(int gu_type, int d_type, int64_t n_embd, int64_t n_ff) noexcept {
     const int qg = gu_qk(gu_type), qd = d_qk(d_type);
     return qg > 0 && qd > 0 && is_iq(gu_type) && is_iq(d_type) && n_embd % qg == 0 && n_ff % qd == 0 &&
@@ -2689,21 +2751,26 @@ void native_expert_grouped(const NativeExpertLayout& L, const unsigned long long
     const int64_t gy = (v1 || grid_groups <= 0 || grid_groups > cap_groups) ? cap_groups : grid_groups;
     // ponytail: single Intel GPU; re-key this check if mixed-device submissions are added.
     static const bool a770 = s->get_device().get_info<sycl::info::device::name>().find("A770") != std::string::npos;
-    if (a770 && !v1 && !g_old_kernels && !g_split_multi && L.gu_type == 22 &&
-        gu_lanes() == 16 && g_gu_sg16 && g_gu_single) {
+    if (a770 && !v1 && !g_old_kernels && !g_split_multi &&
+        ((L.gu_type == 22 && gu_lanes() == 16 && g_gu_sg16 && g_gu_single) ||
+         (L.gu_type == 42 && L.n_embd == 2560 && gu_lanes() == 8))) {
         if (L.n_embd == 2560) {
-        s->parallel_for<dpct_kernel_name<class iq2s_gu_pair_wg128>>(
-            sycl::nd_range<3>(sycl::range<3>(1, (size_t) gy, (size_t) ((L.n_ff + 7) / 8) * 128),
+        const bool q2 = L.gu_type == 42;
+        const int rows = q2 ? 16 : 8;
+        s->parallel_for<dpct_kernel_name<class gu_pair_wg128>>(
+            sycl::nd_range<3>(sycl::range<3>(1, (size_t) gy, (size_t) ((L.n_ff + rows - 1) / rows) * 128),
                              sycl::range<3>(1, 1, 128)),
             [=](sycl::nd_item<3>) [[sycl::reqd_sub_group_size(16)]] {
-                iq2s_gu_pair_kernel<true, 128>(grp_ptr, grp_start, n_groups, ent_tok, X, L, gate, up);
+                // ponytail: keep Q2's eight-lane sum order while sharing the activation decode.
+                if (q2) gu_pair_kernel<42, 8, true, 128>(grp_ptr, grp_start, n_groups, ent_tok, X, L, gate, up);
+                else gu_pair_kernel<22, 16, true, 128>(grp_ptr, grp_start, n_groups, ent_tok, X, L, gate, up);
             });
         } else {
         s->parallel_for<dpct_kernel_name<class iq2s_gu_pair>>(
             sycl::nd_range<3>(sycl::range<3>(1, (size_t) gy, (size_t) ((L.n_ff + 15) / 16) * 256),
                              sycl::range<3>(1, 1, 256)),
             [=](sycl::nd_item<3>) [[sycl::reqd_sub_group_size(16)]] {
-                iq2s_gu_pair_kernel(grp_ptr, grp_start, n_groups, ent_tok, X, L, gate, up);
+                gu_pair_kernel<22, 16>(grp_ptr, grp_start, n_groups, ent_tok, X, L, gate, up);
             });
         }
     } else {

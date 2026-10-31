@@ -402,7 +402,7 @@ class Assembler:
         item, self.item = self.item, None
         if item is None:
             return []
-        at, out = self.response["output"].index(item), []
+        at, out = self.index, []
         item["status"] = status
         if item["type"] == "message":
             part = item["content"][0]

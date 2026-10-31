@@ -1,0 +1,25 @@
+device: Intel(R) Arc(TM) A770 Graphics (GPU), sub-groups: 8 16 32
+prefill T=7 seed=2025 heads=48: state=0 y=0 fp16=0 mismatches; max_abs=0 max_rel=0; baseline=1.659 ms xe=0.314 ms
+prefill production + T=0: OK
+prefill T=7 seed=2026 heads=48: state=0 y=0 fp16=0 mismatches; max_abs=0 max_rel=0; baseline=0.317 ms xe=0.266 ms
+prefill production + T=0: OK
+prefill gdn: 0 failures
+  modulo vs interleave head pairing          yes  (142.04% apart)
+  decay before vs after the update           yes  (76.93% apart)
+
+  o vs reference                             rel 1.987e-07
+  state (read via (S,h_v,S)) vs reference    rel 5.752e-08
+  gate=beta=0 from a zero state is a no-op   yes
+
+  conv weight layout is observable           yes  (132.6% apart)
+  conv out vs reference                      rel 1.092e-08
+  conv state slide (mapped) vs reference     rel 0.000e+00
+
+  eps on sum vs on mean is observable        yes  (1031.4% apart)
+  l2_norm vs reference                       rel 3.287e-08
+
+  out norm (rms * ssm_norm * sigmoid z)      rel 2.408e-08
+  sigmoid vs SiLU on the gate is observable  yes  (86.78% apart)
+
+gdn: 0 failures
+gdn_parity OK
