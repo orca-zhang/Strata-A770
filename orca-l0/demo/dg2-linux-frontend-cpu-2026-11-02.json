@@ -1,0 +1,183 @@
+{
+  "date": "2026-11-02",
+  "complete": true,
+  "scope": "Full native DG2 Linux frontend compile/link, three CPU checks and dependency audits; no GPU execution.",
+  "platform": "Ubuntu 24.04.5 private userland in WSL; Intel oneAPI 2025.3.2-832",
+  "validation": {
+    "frontend_compiled": true,
+    "elf_architecture": "ELF64 little-endian x86-64",
+    "cpu_check_cases": 3,
+    "dependency_audits": 4,
+    "image_packs_generated": 48,
+    "no_missing_dynamic_libraries": true,
+    "removed_runtime_dependency_audit_passed": true,
+    "public_runner_ninja_only_environment_passed": true,
+    "extra_gcc_cpu_check_cases": 3,
+    "gpu_executed": false,
+    "linux_gpu_validated": false,
+    "native_modules_baked_on_linux": false,
+    "production_changed": false,
+    "separate_linux_installation_modified": false,
+    "temporary_procfs_in_private_mount_namespace": true,
+    "procfs_mount_left_outside_namespace": false
+  },
+  "reproduction": {
+    "frontend_command": "CMAKE_GENERATOR=Ninja python3 tools/check_orca_native_linux.py --frontend --out NEW_FRONTEND_OUTPUT --ggml-dir build-sycl/_deps/strata_llamacpp-src",
+    "cpu_command": "python3 tools/check_orca_native_linux.py --out NEW_CPU_OUTPUT",
+    "source_overlay_sha256": "61c5fac074a852e58e147cb838987f9bb322f3277b1af3a21daaff80b0227a22",
+    "public_runner_sha256": "946a7eecd65972947e3557fac8e0928093fdf19b6e2d7c0fef3a58573e72e467",
+    "compiler_setup_sha256": "d8084979dae008939a5641e508b9ee41892d0a1fadc5127df409ab3034ec4df5",
+    "source_snapshot": "build-orca-native-lower-20261031/dg2-current-handoff-20261102-v2",
+    "full_frontend_elf_sha256": {
+      "runtime/orca-l0-ring-check": "449edc2925b88e517775733968cb521fd4956a7fcd6f5417d3ef9105ab6899fd",
+      "runtime/orca-l0-drm-submit-check": "16f00b474e847974d251f8424c42ca658a68ee9c4b3679011b7d2a61f0148ed3",
+      "runtime/orca-l0-drm-compute-check": "44cb498f978ea12649c24b159cbd96891bbbb25deac360a9bf1c9b2555bbd6a2",
+      "strata": "05b9b274392f5881c64103fd0a9e5802bc9ae7e0cfdd6af45aac0b89b9660ff6"
+    },
+    "commands": [
+      {
+        "label": "ring-cpu",
+        "args": [
+          "unshare",
+          "--mount",
+          "--propagation",
+          "private",
+          "python3",
+          "/mnt/g/GitHub/Strata/build-orca-native-lower-20261031/linux-frontend-compiler-20261102/with_proc.py",
+          "chroot",
+          "/opt/orca-sycl-check-20261102-v1",
+          "/usr/bin/env",
+          "PATH=/opt/intel/oneapi/compiler/2025.3/bin:/usr/bin:/bin",
+          "LD_LIBRARY_PATH=/opt/intel/oneapi/compiler/2025.3/lib",
+          "/work/Strata/build-full-frontend-v2/build/runtime/orca-l0-ring-check"
+        ],
+        "exit_code": 0
+      },
+      {
+        "label": "packets-cpu",
+        "args": [
+          "unshare",
+          "--mount",
+          "--propagation",
+          "private",
+          "python3",
+          "/mnt/g/GitHub/Strata/build-orca-native-lower-20261031/linux-frontend-compiler-20261102/with_proc.py",
+          "chroot",
+          "/opt/orca-sycl-check-20261102-v1",
+          "/usr/bin/env",
+          "PATH=/opt/intel/oneapi/compiler/2025.3/bin:/usr/bin:/bin",
+          "LD_LIBRARY_PATH=/opt/intel/oneapi/compiler/2025.3/lib",
+          "/work/Strata/build-full-frontend-v2/build/runtime/orca-l0-drm-submit-check",
+          "--self-check"
+        ],
+        "exit_code": 0
+      },
+      {
+        "label": "encoder-cpu",
+        "args": [
+          "unshare",
+          "--mount",
+          "--propagation",
+          "private",
+          "python3",
+          "/mnt/g/GitHub/Strata/build-orca-native-lower-20261031/linux-frontend-compiler-20261102/with_proc.py",
+          "chroot",
+          "/opt/orca-sycl-check-20261102-v1",
+          "/usr/bin/env",
+          "PATH=/opt/intel/oneapi/compiler/2025.3/bin:/usr/bin:/bin",
+          "LD_LIBRARY_PATH=/opt/intel/oneapi/compiler/2025.3/lib",
+          "/work/Strata/build-full-frontend-v2/build/runtime/orca-l0-drm-compute-check",
+          "--self-check"
+        ],
+        "exit_code": 0
+      },
+      {
+        "label": "dependencies-0",
+        "args": [
+          "unshare",
+          "--mount",
+          "--propagation",
+          "private",
+          "python3",
+          "/mnt/g/GitHub/Strata/build-orca-native-lower-20261031/linux-frontend-compiler-20261102/with_proc.py",
+          "chroot",
+          "/opt/orca-sycl-check-20261102-v1",
+          "/usr/bin/env",
+          "PATH=/opt/intel/oneapi/compiler/2025.3/bin:/usr/bin:/bin",
+          "LD_LIBRARY_PATH=/opt/intel/oneapi/compiler/2025.3/lib",
+          "ldd",
+          "/work/Strata/build-full-frontend-v2/build/runtime/orca-l0-ring-check"
+        ],
+        "exit_code": 0
+      },
+      {
+        "label": "dependencies-1",
+        "args": [
+          "unshare",
+          "--mount",
+          "--propagation",
+          "private",
+          "python3",
+          "/mnt/g/GitHub/Strata/build-orca-native-lower-20261031/linux-frontend-compiler-20261102/with_proc.py",
+          "chroot",
+          "/opt/orca-sycl-check-20261102-v1",
+          "/usr/bin/env",
+          "PATH=/opt/intel/oneapi/compiler/2025.3/bin:/usr/bin:/bin",
+          "LD_LIBRARY_PATH=/opt/intel/oneapi/compiler/2025.3/lib",
+          "ldd",
+          "/work/Strata/build-full-frontend-v2/build/runtime/orca-l0-drm-submit-check"
+        ],
+        "exit_code": 0
+      },
+      {
+        "label": "dependencies-2",
+        "args": [
+          "unshare",
+          "--mount",
+          "--propagation",
+          "private",
+          "python3",
+          "/mnt/g/GitHub/Strata/build-orca-native-lower-20261031/linux-frontend-compiler-20261102/with_proc.py",
+          "chroot",
+          "/opt/orca-sycl-check-20261102-v1",
+          "/usr/bin/env",
+          "PATH=/opt/intel/oneapi/compiler/2025.3/bin:/usr/bin:/bin",
+          "LD_LIBRARY_PATH=/opt/intel/oneapi/compiler/2025.3/lib",
+          "ldd",
+          "/work/Strata/build-full-frontend-v2/build/runtime/orca-l0-drm-compute-check"
+        ],
+        "exit_code": 0
+      },
+      {
+        "label": "dependencies-3",
+        "args": [
+          "unshare",
+          "--mount",
+          "--propagation",
+          "private",
+          "python3",
+          "/mnt/g/GitHub/Strata/build-orca-native-lower-20261031/linux-frontend-compiler-20261102/with_proc.py",
+          "chroot",
+          "/opt/orca-sycl-check-20261102-v1",
+          "/usr/bin/env",
+          "PATH=/opt/intel/oneapi/compiler/2025.3/bin:/usr/bin:/bin",
+          "LD_LIBRARY_PATH=/opt/intel/oneapi/compiler/2025.3/lib",
+          "ldd",
+          "/work/Strata/build-full-frontend-v2/build/strata"
+        ],
+        "exit_code": 0
+      }
+    ],
+    "local_directory": "build-orca-native-lower-20261031/linux-frontend-compiler-20261102"
+  },
+  "build_environment_fix": "The public runner now selects installed Ninja when CMAKE_GENERATOR is unspecified. An actual Make-free GCC build and the same three CPU checks pass.",
+  "caveats": [
+    "No Linux GPU kernel or model was executed. Numerical correctness, PPL, performance and desktop coexistence remain unvalidated on Linux.",
+    "The 48 generated kernel packs are frontend SPIR-V images; fresh Linux-driver native baking is still required before DG2 GPU execution.",
+    "The full source overlay used the pre-fix runner with explicit CMAKE_GENERATOR=Ninja. The current public runner was separately checked without Make or that environment override.",
+    "The original full build completed but its encoder postcheck could not read /proc/self/maps in the private userland. Three checks and four dependency audits later passed against the same ELF files with private procfs.",
+    "The first configure failed because Make was absent. A subsequent BusyBox --mount-proc attempt failed before a check ran. Both incomplete records are retained.",
+    "The same three raw CPU check cases ran in both the oneAPI and GCC builds; these are not six different tests.",
+    "The staged shared-heap, partial-state and low-priority candidates were not adopted into this Linux source snapshot."
+  ]
+}

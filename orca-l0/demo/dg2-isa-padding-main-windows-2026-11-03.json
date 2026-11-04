@@ -1,0 +1,167 @@
+{
+  "date": "2026-11-03",
+  "complete": true,
+  "source_adopted": true,
+  "production_executable_changed": false,
+  "production_configuration_changed": false,
+  "hardware": "Intel Arc A770 C0",
+  "driver": "32.0.101.9034",
+  "os": "Windows",
+  "linux_gpu_tested": false,
+  "adoption": {
+    "complete": true,
+    "version": 12,
+    "source_adopted": true,
+    "executable_changed": false,
+    "configuration_changed": false,
+    "before_sha256": {
+      "sycl/orca_dg2_backend.hpp": "0bdaf70c9dff491c7ca3da7a9defc1ed3ba16bbdedc5457cc6e69b8248da9602",
+      "sycl/orca_queue.hpp": "1b7cc25c2b31653595b85d3a577ec96d6cc3a0a7156a53d9b63f8a8948ed26bf",
+      "orca-l0/include/orca_l0/dg2.hpp": "4d3337560bdd5f01145acfbce90db2fba118625c927a967ae5bd87fdd4d41245",
+      "orca-l0/src/drm/recording.inl": "32d5cf6f8ed85c095eb1a0efdf9fd3f20844c402a230c5c97dad97795e143f75",
+      "orca-l0/src/drm/memory.cl": "85d783197963e676419aba04b172481695d54a0f09dafa4cf6dcb3f9b06a16d5",
+      "orca-l0/src/drm/zebin.hpp": "a927dfee4f823ca74bf85a84b07a6790c9caa752d4504cbfc10227e39a789283",
+      "orca-l0/src/drm/runtime.cpp": "5a0887da3c8757df38a945001df8d6c5ae7f969238edf32724475c27a9f921d8",
+      "orca-l0/src/wddm/runtime.cpp": "3f594ba68f2cad9ed9344412e3787c3d99cec31bcece904176cba3b036bef135",
+      "orca-l0/tests/drm_compute_check.cpp": "52446e5396dcafa88447fda2bdc72e2644ed0faa2613a486005149028ce357c0",
+      "sycl/orca/include/dpct/dpct.hpp": "9c6f2d8669692666389cb8b47e38a29dfb967b158a881e5c2bff1149b438ec38",
+      "orca-l0/src/drm/encoding.hpp": "55a243ccefdb918661ffaaf1a3b912b275a4a51497b6c23538ba4c37b8037a09",
+      "orca-l0/tests/denorm.cl": "ebcf7b88c788e1711ed027de8e0d6d1a0df4599addeb93ecf2958e4d5d00ed48"
+    },
+    "candidate_sha256": {
+      "sycl/orca_dg2_backend.hpp": "0bdaf70c9dff491c7ca3da7a9defc1ed3ba16bbdedc5457cc6e69b8248da9602",
+      "sycl/orca_queue.hpp": "1b7cc25c2b31653595b85d3a577ec96d6cc3a0a7156a53d9b63f8a8948ed26bf",
+      "orca-l0/include/orca_l0/dg2.hpp": "4d3337560bdd5f01145acfbce90db2fba118625c927a967ae5bd87fdd4d41245",
+      "orca-l0/src/drm/recording.inl": "38477bf29662ac29cc129a8aa255776c143cbbe2e0b6b89b3b0778f7271be15e",
+      "orca-l0/src/drm/memory.cl": "85d783197963e676419aba04b172481695d54a0f09dafa4cf6dcb3f9b06a16d5",
+      "orca-l0/src/drm/zebin.hpp": "a927dfee4f823ca74bf85a84b07a6790c9caa752d4504cbfc10227e39a789283",
+      "orca-l0/src/drm/runtime.cpp": "5a0887da3c8757df38a945001df8d6c5ae7f969238edf32724475c27a9f921d8",
+      "orca-l0/src/wddm/runtime.cpp": "3f594ba68f2cad9ed9344412e3787c3d99cec31bcece904176cba3b036bef135",
+      "orca-l0/tests/drm_compute_check.cpp": "52446e5396dcafa88447fda2bdc72e2644ed0faa2613a486005149028ce357c0",
+      "sycl/orca/include/dpct/dpct.hpp": "9c6f2d8669692666389cb8b47e38a29dfb967b158a881e5c2bff1149b438ec38",
+      "orca-l0/src/drm/encoding.hpp": "55a243ccefdb918661ffaaf1a3b912b275a4a51497b6c23538ba4c37b8037a09",
+      "orca-l0/tests/denorm.cl": "ebcf7b88c788e1711ed027de8e0d6d1a0df4599addeb93ecf2958e4d5d00ed48"
+    },
+    "changed_sources": [
+      "orca-l0/src/drm/recording.inl"
+    ],
+    "parent_adoption_sha256": "fd2148425ea6bb7f7538d44b5340d9e79553b4c2f1aae17ec478ff4c2bfd1b13",
+    "model_report_sha256": "d432ced7307d0c0558d80a8351f220c7dafa379bd23cdf1a1a1c10664ba3f895",
+    "rationale": "Windows DG2 ISA padding4096->512;two opposite Short orderings+1.267%/+0.607% versus native controls. No native win over matched L0. Linux keeps4096pendingGPUtest.109kernels save390656capturedbytes;retained5MiB unchanged."
+  },
+  "checks": {
+    "windows": 15,
+    "linux_cpu": 3,
+    "full_buffer_comparisons": 864,
+    "gpu_tail_epochs": 1032,
+    "exact_smoke_requests": 1,
+    "windows_selected_source_matches_measured": true,
+    "linux_selected_source_matches_control": true
+  },
+  "comparisons": {
+    "first": {
+      "decode_tok_s": {
+        "control": 48.580064146096504,
+        "compact": 49.195716082668994,
+        "l0": 49.53577782364956,
+        "compact_vs_control_pct": 1.2672933792780006,
+        "compact_vs_l0_pct": -0.6864972266938163,
+        "control_drift_pct": 1.0472528445274243,
+        "l0_drift_pct": 0.4767995054899776
+      },
+      "ttft_ms": {
+        "control": 899.0121996666718,
+        "compact": 890.0484000041615,
+        "l0": 886.7184205832477,
+        "compact_vs_control_pct": -0.9970720826518065,
+        "compact_vs_l0_pct": 0.37553966892032165,
+        "control_drift_pct": -2.1472836303788267,
+        "l0_drift_pct": -1.1117832444816678
+      },
+      "prompt_ms": {
+        "control": 853.9196244378039,
+        "compact": 842.05,
+        "l0": 844.5106393645967,
+        "compact_vs_control_pct": -1.3900165891630123,
+        "compact_vs_l0_pct": -0.29136866368529857,
+        "control_drift_pct": -2.251939330786157,
+        "l0_drift_pct": -1.1595738418977097
+      },
+      "request_ms": {
+        "control": 2418.283406001684,
+        "compact": 2392.2313499933807,
+        "l0": 2380.3320919769467,
+        "compact_vs_control_pct": -1.0772954048167915,
+        "compact_vs_l0_pct": 0.4998990710809226,
+        "control_drift_pct": -1.5181596190844027,
+        "l0_drift_pct": -0.7426501964287846
+      }
+    },
+    "reverse": {
+      "decode_tok_s": {
+        "control": 48.80868461956847,
+        "compact": 49.10512557698691,
+        "compact_vs_control_pct": 0.6073528916605841,
+        "compact_drift_pct": 0.05170296688949971
+      },
+      "ttft_ms": {
+        "control": 890.6003499869257,
+        "compact": 888.1728999217443,
+        "compact_vs_control_pct": -0.2725633405844863,
+        "compact_drift_pct": -0.1060885551588231
+      },
+      "prompt_ms": {
+        "control": 845.4,
+        "compact": 843.1496204707679,
+        "compact_vs_control_pct": -0.26619109643152283,
+        "compact_drift_pct": -0.18958469103621534
+      },
+      "request_ms": {
+        "control": 2402.25405000092,
+        "compact": 2390.910984353229,
+        "compact_vs_control_pct": -0.47218426576016714,
+        "compact_drift_pct": 0.07990313372059354
+      }
+    }
+  },
+  "footprint": {
+    "result_sha256": "1d82d5eb53120e45144a76e55afd74fbeabbd44b6fc320c19962c18fa7ce4192",
+    "loaded_kernels": 109,
+    "captured_byte_reduction": 390656,
+    "retained_isa_byte_reduction": 0,
+    "control_retained_isa_bytes": 5242880,
+    "compact_retained_isa_bytes": 5242880,
+    "exact_diagnostic_requests": 2,
+    "variants": {
+      "control": {
+        "loaded_kernels": 109,
+        "text_bytes": 3514112,
+        "captured_bytes": 3960576,
+        "isa_allocations": 5,
+        "retained_isa_bytes": 5242880,
+        "retained_device_isa_bytes": 4194304,
+        "exact_output": true
+      },
+      "compact": {
+        "loaded_kernels": 109,
+        "text_bytes": 3514112,
+        "captured_bytes": 3569920,
+        "isa_allocations": 5,
+        "retained_isa_bytes": 5242880,
+        "retained_device_isa_bytes": 4194304,
+        "exact_output": true
+      }
+    }
+  },
+  "native_full_model_win": false,
+  "evidence_files": 91,
+  "caveats": [
+    "One conditional padding expression adopted;Windows selected source matches measured512byte candidate,Linux matches4096byte control.",
+    "Exact adopted stage rebuilt and checked. Additional singleShort is correctness-only;no extra performance claim.",
+    "ParentV11 verifier expecting live sources becomes historical.Productionbinaries/config,MTP,rootREADME,Linuxbundles preserved."
+  ],
+  "reproduction": {
+    "verify": "python build-orca-native-lower-20261031/adopt_dg2_isa_padding.py --verify"
+  },
+  "archive_sha256": "fde911032508df52c7a6ac7509bc2efe8f228975464380f95c54c3ab7d999f61"
+}

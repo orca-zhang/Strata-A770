@@ -1,0 +1,568 @@
+{
+  "complete": true,
+  "date": "2026-11-01",
+  "hardware": {
+    "os": "Windows",
+    "gpu": "Intel Arc A770 16 GB",
+    "pci_device": "0x56a0",
+    "driver": "32.0.101.9034",
+    "wddm": 2700,
+    "compiler": "Intel oneAPI 2025.3.2"
+  },
+  "scope": {
+    "production_changed": false,
+    "runtime_changed": false,
+    "linux_gpu_validated": false,
+    "full_model_throughput_claimed": false,
+    "one_ordered_queue": true
+  },
+  "workload": {
+    "lists": 16,
+    "kernels_per_list": 25,
+    "host_values": 262144,
+    "warmups_per_phase": 128,
+    "retained_per_phase": 512,
+    "phases": 9,
+    "total_includes_identical_independent_cpu_work": true,
+    "recording_and_initialization_excluded": true
+  },
+  "sample_columns": [
+    "phase",
+    "mode",
+    "sample",
+    "total_us",
+    "completion_span_us",
+    "calling_thread_cycles",
+    "explicit_queries",
+    "wait_invocations"
+  ],
+  "caveats": [
+    "Completion span for overlap includes independent CPU work before collecting GPU completion.",
+    "Cycles measure calling-thread execution cost, not CPU percentage, power or driver threads.",
+    "Explicit query counts exclude internal wait probes. A wait invocation does not prove an OS sleep.",
+    "Tail waits are appropriate only when no intermediate CPU result is needed.",
+    "Batch collection releases the completed prefix and waits for the first pending sequence without waiting to fill a batch.",
+    "A same-queue ordering benchmark does not show concurrent kernels or compatible-GEMM merging.",
+    "No fixed GPU clock; retain adjacent polling controls and apply a 3% drift limit.",
+    "The full Strata native adapter and Linux GPU validation remain unfinished.",
+    "Serial mode has no stable pair in the final run; its apparent slowdown has no stable percentage estimate.",
+    "Prefix collection reports completed work; frozen-list/allocation lifetime and the whole-queue CPU-access restriction remain unchanged.",
+    "Mode order is fixed and GPU clocks are not locked. Adjacent controls constrain drift but do not remove all mode-dependent clock/wakeup effects.",
+    "The earlier short v1 run is retained as exploratory evidence and is not pooled with the final run."
+  ],
+  "source_sha256": {
+    "orca-l0/CMakeLists.txt": "0f31fa8aa903788830c8d8ce96bd8faf57951b030950f8ca3acebf87e92f37e0",
+    "orca-l0/compiler/build.py": "0ea57601e57093496268bb4228b5ae29f09e8eb6d5b4924ca3867228dee37fca",
+    "orca-l0/compiler/CMakeLists.txt": "faee1659689acfe7359df45ab6cc60a1346554f519d8527cdab696b9318b93f6",
+    "orca-l0/compiler/native_pack.cpp": "0fdedfc6e302178df52f31a0628344b2571db8ebe018dc0948a916ae5301e8fd",
+    "orca-l0/demo/CMakeLists.txt": "1e763314817d9cd9572a96f9ae6cdf86af13a24e60b43e231715216d67962c71",
+    "orca-l0/demo/dispatch.cpp": "bd184678e907165a6bb17998b0109e860195e1ba7c5eb8e7f70fc64ad1b924bb",
+    "orca-l0/include/orca_l0/dg2.hpp": "7f36a9c06e64de66fa04c6f51ddde410774d14c290913ccec10f3cd130c762b6",
+    "orca-l0/include/orca_l0/direct_driver.hpp": "cd87a73ef80e8b2052a192ddd2ff174d36be595d79c42e454e0bb1b3d86e61c0",
+    "orca-l0/include/orca_l0/drm.hpp": "70e59f5457776676f9a5e0868dbe77ab13a4419d9f342f621e5ac364b1ea8822",
+    "orca-l0/include/orca_l0/ring.hpp": "c0bc88a290d32ba5ee6cf26f2fe82c38cced25a334a02c23591e11bb67f75112",
+    "orca-l0/include/orca_l0/runtime.hpp": "1b800beb8a4ec7b1777192afc599a4cf519870acd2438b1aea43e79ffafc0869",
+    "orca-l0/include/orca_l0/compiler/dg2.hpp": "05b85ca8fe77f00c333e7b86faf287c4564d8d0aee8510f0bb81f0cb0636a09b",
+    "orca-l0/include/orca_l0/compiler/local_accessor.hpp": "749634fcbcd2a094d87b8f3cac4610aa095317e840e8c807fdb1beb342d81fc2",
+    "orca-l0/include/orca_l0/compiler/program.hpp": "3aedf164c9bc4320e2be356acc93cd2dae03f75fc49058cdb6f29671fbf02a25",
+    "orca-l0/include/orca_l0/compiler/stream.hpp": "5a0b8badff512b7dc8b737f00b1cb2ddfedb35c0cdbc6e89fc77ee89b390a136",
+    "orca-l0/include/orca_l0/compiler/sycl.hpp": "78c74406a5b0f702fbcfe8b1bedf73cb377ead1c7b2e9f0dd7188f493879e7dc",
+    "orca-l0/src/direct_api.inc": "e1fe46e7376f8a44ad9d27e2850cd175258c6f2a19aa5ad21a327e74020af281",
+    "orca-l0/src/direct_driver.cpp": "7fe701e2c34dccd80868685b29b83fc846406bf531faa4579a220c7bc4107548",
+    "orca-l0/src/direct_tables.inc": "5aa57dd8a7b89110fe6621b6840e8c36ad53e72792cf3b88f20a4db909231275",
+    "orca-l0/src/runtime.cpp": "2065f4be1abade4be029573f02d58d73f1b7d6a23cfc5ee85140669880bcf531",
+    "orca-l0/src/drm/arguments.hpp": "6ecc58ee8f11b4d07072096c1e0ef5d68ac4fd2f0539abc36493a2836eb00695",
+    "orca-l0/src/drm/encoding.hpp": "69e720361cb461eb7613273404742569649b87379052727138abfca0bda9bc6f",
+    "orca-l0/src/drm/memory.cl": "f92e9123f256e505b1e0c9d3bd3e0899f8b131f49cab3a227798deb485ec805d",
+    "orca-l0/src/drm/recording.inl": "045f7acee096f71f230db07d351e2c1d761986ac74882701b91941fe0bd18feb",
+    "orca-l0/src/drm/runtime.cpp": "7208f36be6f7473c52566691274de428c0ad72e551742a967d21c4ecb3d46199",
+    "orca-l0/src/drm/zebin.hpp": "9721fa8a206a2a730a04289594e44568ef2c854bd896f4f3d693cea6ef60cb70",
+    "orca-l0/src/wddm/allocation.hpp": "5348b408fb0942796b7d37f80ed6f96df4aa3ff188193341f46917a652afe31c",
+    "orca-l0/src/wddm/runtime.cpp": "36a8ba942e8fa89b3e8cc2d9abdd87b679b3e6d4b773fa45842848fc51e39b19",
+    "orca-l0/tests/compiler_check.cpp": "0cec3be040240834476916155bade46c0edbf76cf81aa528d92fc4a0707f2ab1",
+    "orca-l0/tests/compiler_flags_check.py": "8fa480a5df5dcdc1f08a4ba64a4d6bea290d55795c076828d299c20039e014fd",
+    "orca-l0/tests/dg2_compiler_check.cpp": "a9e04111ac9c9ad98366d2bd9a88c3cd31b0895a441552630df976ffa548fdf9",
+    "orca-l0/tests/dispatch3d.cl": "0d70ceb4fdc897b246e0e3590df708c2cb80d7242600b085243172dbd3697641",
+    "orca-l0/tests/drm_compute_check.cpp": "493f785ff8ba4a769e45c224c29f9d633b72cd53695e7c9c8419f785271145e2",
+    "orca-l0/tests/drm_submit_check.cpp": "a2fd00de705be46804d2913cc10af3a58623ea253bf4e16963921922e73540a8",
+    "orca-l0/tests/inference.cl": "03647efb665f6d2ef16b95ee47526bf42832a71355b6f1c5b78668beefbee1b2",
+    "orca-l0/tests/native_pack_check.cpp": "631ed0ecb003351464fb999113ff444721b5e8f70562bf1fdc0656989338dc51",
+    "orca-l0/tests/ring_check.cpp": "edf589faf8df29b1c4d190a0e7a2e83d698f1726aa2365f3112e3bec5b529798",
+    "orca-l0/tests/runtime_check.cpp": "3aecdf8facd2ad0426dd90ea89ce869c12cdc4d882385dab9f9935bc1b5909ec",
+    "orca-l0/tests/runtime_dependencies.hpp": "f7fad56243713663e4936a9af44011364fc59cea27be0494d84b216e65cc5709",
+    "orca-l0/tests/submit_check.cpp": "e8634fdb6547448a3bf54efc9773da5ef6325e826858cea02f2c63a93dd1901e",
+    "orca-l0/tests/wddm_memory_check.cpp": "3e8b17e4b72db0a7b4e53737d747cfc299cceb9207e7d520ba03c43cbbe7071e",
+    "orca-l0/third_party/intel-dg2/packets.hpp": "579559e752d0e4d4d44b903dea0a8f2d172afdd6d0fad63afa445d183bc1165b"
+  },
+  "executable_sha256": "f75ecd8428384354394f45dd11b4276de29929cfd308976210d101bf75237903",
+  "image_sha256": "94e4970f3f8f9820a25ece27e3ea6ea2a792d1f34a520326a47ce1a10e397800",
+  "production_sha256": {
+    "strata-iq2_xs.json": "9c45e51de69e66c3f1cd020359c8d70d639fbd1aba5d87ead84082fbe73fd531",
+    "build-orca-default-pair-20261031/strata.exe": "7be641375e905b0ceb64424ab4875afcdf9f7f6f1e2c60d6b0fcff4ece5ff4b5"
+  },
+  "summary": [
+    {
+      "mode": "serial",
+      "stable_pairs": 0,
+      "stable_cycle_pairs": 0,
+      "latency_change_pct": null,
+      "calling_thread_cycles_change_pct": null,
+      "observed_median_total_us": 1960.85,
+      "median_explicit_queries": 0.0,
+      "median_wait_invocations": 16.0
+    },
+    {
+      "mode": "tail",
+      "stable_pairs": 3,
+      "stable_cycle_pairs": 3,
+      "latency_change_pct": 10.344141930922547,
+      "calling_thread_cycles_change_pct": -77.82918854085186,
+      "observed_median_total_us": 1024.4,
+      "median_explicit_queries": 0.0,
+      "median_wait_invocations": 1.0
+    },
+    {
+      "mode": "batch",
+      "stable_pairs": 3,
+      "stable_cycle_pairs": 3,
+      "latency_change_pct": 6.727543052571039,
+      "calling_thread_cycles_change_pct": -67.56844147722852,
+      "observed_median_total_us": 976.1500000000001,
+      "median_explicit_queries": 16.0,
+      "median_wait_invocations": 15.0
+    },
+    {
+      "mode": "overlap",
+      "stable_pairs": 3,
+      "stable_cycle_pairs": 3,
+      "latency_change_pct": -5.573503873329,
+      "calling_thread_cycles_change_pct": -68.17864053174328,
+      "observed_median_total_us": 866.6,
+      "median_explicit_queries": 15.0,
+      "median_wait_invocations": 14.0
+    }
+  ],
+  "comparison": "Adjacent poll/candidate/poll; geometric mean controls; absolute wall drift <=3%; cycles also require <=3% cycle drift; at least three stable pairs.",
+  "validation": {
+    "windows_ctest": "10/10",
+    "linux_cpu_ctest": "4/4",
+    "measurement_rounds": 3,
+    "retained_samples": 13824,
+    "waves_including_warmups": 17280,
+    "ordered_submissions": 276480,
+    "full_gpu_cpu_outputs_and_padding_checked": true,
+    "unchanged_production_hashes_verified": true
+  },
+  "measurement_rounds": [
+    {
+      "round": 0,
+      "seconds": 8.64000000001397,
+      "phases": [
+        {
+          "phase": 0,
+          "mode": "poll",
+          "median_total_us": 1069.5,
+          "p95_total_us": 1212.5,
+          "median_completion_span_us": 962.0,
+          "median_thread_cycles": 2352349.0,
+          "median_explicit_queries": 44965.0,
+          "median_wait_invocations": 0.0
+        },
+        {
+          "phase": 1,
+          "mode": "serial",
+          "median_total_us": 1704.05,
+          "p95_total_us": 2156.8,
+          "median_completion_span_us": 1609.45,
+          "median_thread_cycles": 810418.0,
+          "median_explicit_queries": 0.0,
+          "median_wait_invocations": 16.0
+        },
+        {
+          "phase": 2,
+          "mode": "poll",
+          "median_total_us": 915.8,
+          "p95_total_us": 1094.7,
+          "median_completion_span_us": 819.45,
+          "median_thread_cycles": 2013648.0,
+          "median_explicit_queries": 44407.5,
+          "median_wait_invocations": 0.0
+        },
+        {
+          "phase": 3,
+          "mode": "tail",
+          "median_total_us": 1008.3499999999999,
+          "p95_total_us": 1238.1,
+          "median_completion_span_us": 886.95,
+          "median_thread_cycles": 440543.5,
+          "median_explicit_queries": 0.0,
+          "median_wait_invocations": 1.0
+        },
+        {
+          "phase": 4,
+          "mode": "poll",
+          "median_total_us": 911.85,
+          "p95_total_us": 1126.6,
+          "median_completion_span_us": 813.8499999999999,
+          "median_thread_cycles": 2006323.5,
+          "median_explicit_queries": 44738.5,
+          "median_wait_invocations": 0.0
+        },
+        {
+          "phase": 5,
+          "mode": "batch",
+          "median_total_us": 970.55,
+          "p95_total_us": 1272.6,
+          "median_completion_span_us": 861.4000000000001,
+          "median_thread_cycles": 648917.5,
+          "median_explicit_queries": 16.0,
+          "median_wait_invocations": 15.0
+        },
+        {
+          "phase": 6,
+          "mode": "poll",
+          "median_total_us": 906.9,
+          "p95_total_us": 1114.6,
+          "median_completion_span_us": 813.8,
+          "median_thread_cycles": 1995457.0,
+          "median_explicit_queries": 44440.5,
+          "median_wait_invocations": 0.0
+        },
+        {
+          "phase": 7,
+          "mode": "overlap",
+          "median_total_us": 852.1500000000001,
+          "p95_total_us": 1073.2,
+          "median_completion_span_us": 852.1500000000001,
+          "median_thread_cycles": 626979.0,
+          "median_explicit_queries": 15.0,
+          "median_wait_invocations": 14.0
+        },
+        {
+          "phase": 8,
+          "mode": "poll",
+          "median_total_us": 930.05,
+          "p95_total_us": 1114.1,
+          "median_completion_span_us": 830.45,
+          "median_thread_cycles": 2043992.0,
+          "median_explicit_queries": 43653.0,
+          "median_wait_invocations": 0.0
+        }
+      ],
+      "pairs": [
+        {
+          "mode": "serial",
+          "total_latency_change_pct": 72.18353490327891,
+          "calling_thread_cycles_change_pct": -62.763708337702354,
+          "wall_control_drift_pct": -14.371201496026186,
+          "cycle_control_drift_pct": -14.39841622140252,
+          "stable_wall": false,
+          "stable_cycles": false
+        },
+        {
+          "mode": "tail",
+          "total_latency_change_pct": 10.344141930922547,
+          "calling_thread_cycles_change_pct": -78.08222116715137,
+          "wall_control_drift_pct": -0.4313168814151447,
+          "cycle_control_drift_pct": -0.3637428190031211,
+          "stable_wall": true,
+          "stable_cycles": true
+        },
+        {
+          "mode": "batch",
+          "total_latency_change_pct": 6.727543052571039,
+          "calling_thread_cycles_change_pct": -67.56844147722852,
+          "wall_control_drift_pct": -0.5428524428359949,
+          "cycle_control_drift_pct": -0.5416125564994823,
+          "stable_wall": true,
+          "stable_cycles": true
+        },
+        {
+          "mode": "overlap",
+          "total_latency_change_pct": -7.213840591776877,
+          "calling_thread_cycles_change_pct": -68.95496082667331,
+          "wall_control_drift_pct": 2.5526518910574447,
+          "cycle_control_drift_pct": 2.4322749124636722,
+          "stable_wall": true,
+          "stable_cycles": true
+        }
+      ]
+    },
+    {
+      "round": 1,
+      "seconds": 9.10899999999674,
+      "phases": [
+        {
+          "phase": 0,
+          "mode": "poll",
+          "median_total_us": 989.3,
+          "p95_total_us": 1217.8,
+          "median_completion_span_us": 880.75,
+          "median_thread_cycles": 2176634.0,
+          "median_explicit_queries": 44264.5,
+          "median_wait_invocations": 0.0
+        },
+        {
+          "phase": 1,
+          "mode": "serial",
+          "median_total_us": 1960.85,
+          "p95_total_us": 2293.1,
+          "median_completion_span_us": 1764.3,
+          "median_thread_cycles": 1121812.0,
+          "median_explicit_queries": 0.0,
+          "median_wait_invocations": 16.0
+        },
+        {
+          "phase": 2,
+          "mode": "poll",
+          "median_total_us": 925.15,
+          "p95_total_us": 1104.6,
+          "median_completion_span_us": 822.7,
+          "median_thread_cycles": 2034995.0,
+          "median_explicit_queries": 44107.5,
+          "median_wait_invocations": 0.0
+        },
+        {
+          "phase": 3,
+          "mode": "tail",
+          "median_total_us": 1058.4,
+          "p95_total_us": 1255.8,
+          "median_completion_span_us": 901.75,
+          "median_thread_cycles": 498234.0,
+          "median_explicit_queries": 0.0,
+          "median_wait_invocations": 1.0
+        },
+        {
+          "phase": 4,
+          "mode": "poll",
+          "median_total_us": 926.0,
+          "p95_total_us": 1151.2,
+          "median_completion_span_us": 825.6500000000001,
+          "median_thread_cycles": 2036597.0,
+          "median_explicit_queries": 44421.0,
+          "median_wait_invocations": 0.0
+        },
+        {
+          "phase": 5,
+          "mode": "batch",
+          "median_total_us": 1016.65,
+          "p95_total_us": 1283.5,
+          "median_completion_span_us": 874.45,
+          "median_thread_cycles": 813956.0,
+          "median_explicit_queries": 16.0,
+          "median_wait_invocations": 15.0
+        },
+        {
+          "phase": 6,
+          "mode": "poll",
+          "median_total_us": 919.05,
+          "p95_total_us": 1112.1,
+          "median_completion_span_us": 820.55,
+          "median_thread_cycles": 2020916.0,
+          "median_explicit_queries": 44226.5,
+          "median_wait_invocations": 0.0
+        },
+        {
+          "phase": 7,
+          "mode": "overlap",
+          "median_total_us": 866.6,
+          "p95_total_us": 1047.4,
+          "median_completion_span_us": 866.55,
+          "median_thread_cycles": 785563.5,
+          "median_explicit_queries": 14.0,
+          "median_wait_invocations": 13.0
+        },
+        {
+          "phase": 8,
+          "mode": "poll",
+          "median_total_us": 914.5,
+          "p95_total_us": 1133.3,
+          "median_completion_span_us": 818.4000000000001,
+          "median_thread_cycles": 2012116.0,
+          "median_explicit_queries": 44859.0,
+          "median_wait_invocations": 0.0
+        }
+      ],
+      "pairs": [
+        {
+          "mode": "serial",
+          "total_latency_change_pct": 104.96244418225098,
+          "calling_thread_cycles_change_pct": -46.69773014050681,
+          "wall_control_drift_pct": -6.484382896997875,
+          "cycle_control_drift_pct": -6.5072492665280475,
+          "stable_wall": false,
+          "stable_cycles": false
+        },
+        {
+          "mode": "tail",
+          "total_latency_change_pct": 14.350550909106484,
+          "calling_thread_cycles_change_pct": -75.52632785575834,
+          "wall_control_drift_pct": 0.09187699292005913,
+          "cycle_control_drift_pct": 0.0787225521438728,
+          "stable_wall": true,
+          "stable_cycles": true
+        },
+        {
+          "mode": "batch",
+          "total_latency_change_pct": 10.203757375222434,
+          "calling_thread_cycles_change_pct": -59.87876915743067,
+          "wall_control_drift_pct": -0.7505399568034643,
+          "cycle_control_drift_pct": -0.7699608710019734,
+          "stable_wall": true,
+          "stable_cycles": true
+        },
+        {
+          "mode": "overlap",
+          "total_latency_change_pct": -5.472698507382923,
+          "calling_thread_cycles_change_pct": -61.04343481246526,
+          "wall_control_drift_pct": -0.49507643762580766,
+          "cycle_control_drift_pct": -0.4354461046376934,
+          "stable_wall": true,
+          "stable_cycles": true
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "seconds": 8.875,
+      "phases": [
+        {
+          "phase": 0,
+          "mode": "poll",
+          "median_total_us": 993.1,
+          "p95_total_us": 1209.8,
+          "median_completion_span_us": 891.45,
+          "median_thread_cycles": 2184957.5,
+          "median_explicit_queries": 44602.0,
+          "median_wait_invocations": 0.0
+        },
+        {
+          "phase": 1,
+          "mode": "serial",
+          "median_total_us": 1968.9,
+          "p95_total_us": 2316.6,
+          "median_completion_span_us": 1786.8,
+          "median_thread_cycles": 1113946.0,
+          "median_explicit_queries": 0.0,
+          "median_wait_invocations": 16.0
+        },
+        {
+          "phase": 2,
+          "mode": "poll",
+          "median_total_us": 934.2,
+          "p95_total_us": 1140.7,
+          "median_completion_span_us": 824.6,
+          "median_thread_cycles": 2052203.0,
+          "median_explicit_queries": 43472.5,
+          "median_wait_invocations": 0.0
+        },
+        {
+          "phase": 3,
+          "mode": "tail",
+          "median_total_us": 1024.4,
+          "p95_total_us": 1260.0,
+          "median_completion_span_us": 891.9,
+          "median_thread_cycles": 453959.5,
+          "median_explicit_queries": 0.0,
+          "median_wait_invocations": 1.0
+        },
+        {
+          "phase": 4,
+          "mode": "poll",
+          "median_total_us": 928.45,
+          "p95_total_us": 1127.8,
+          "median_completion_span_us": 829.85,
+          "median_thread_cycles": 2042917.0,
+          "median_explicit_queries": 43474.5,
+          "median_wait_invocations": 0.0
+        },
+        {
+          "phase": 5,
+          "mode": "batch",
+          "median_total_us": 976.1500000000001,
+          "p95_total_us": 1255.0,
+          "median_completion_span_us": 873.1,
+          "median_thread_cycles": 617235.0,
+          "median_explicit_queries": 16.0,
+          "median_wait_invocations": 15.0
+        },
+        {
+          "phase": 6,
+          "mode": "poll",
+          "median_total_us": 910.7,
+          "p95_total_us": 1109.1,
+          "median_completion_span_us": 817.6500000000001,
+          "median_thread_cycles": 2003947.0,
+          "median_explicit_queries": 44517.5,
+          "median_wait_invocations": 0.0
+        },
+        {
+          "phase": 7,
+          "mode": "overlap",
+          "median_total_us": 870.85,
+          "p95_total_us": 1103.2,
+          "median_completion_span_us": 870.8,
+          "median_thread_cycles": 645551.0,
+          "median_explicit_queries": 15.0,
+          "median_wait_invocations": 14.0
+        },
+        {
+          "phase": 8,
+          "mode": "poll",
+          "median_total_us": 933.95,
+          "p95_total_us": 1126.9,
+          "median_completion_span_us": 833.45,
+          "median_thread_cycles": 2053702.0,
+          "median_explicit_queries": 43549.0,
+          "median_wait_invocations": 0.0
+        }
+      ],
+      "pairs": [
+        {
+          "mode": "serial",
+          "total_latency_change_pct": 104.41239965162032,
+          "calling_thread_cycles_change_pct": -47.39433895267102,
+          "wall_control_drift_pct": -5.930923371261699,
+          "cycle_control_drift_pct": -6.075839003733485,
+          "stable_wall": false,
+          "stable_cycles": false
+        },
+        {
+          "mode": "tail",
+          "total_latency_change_pct": 9.994350101113358,
+          "calling_thread_cycles_change_pct": -77.82918854085186,
+          "wall_control_drift_pct": -0.6154998929565392,
+          "cycle_control_drift_pct": -0.45248934925053996,
+          "stable_wall": true,
+          "stable_cycles": true
+        },
+        {
+          "mode": "batch",
+          "total_latency_change_pct": 6.157242772144511,
+          "calling_thread_cycles_change_pct": -69.49422464847453,
+          "wall_control_drift_pct": -1.9117884646453809,
+          "cycle_control_drift_pct": -1.9075664845904172,
+          "stable_wall": true,
+          "stable_cycles": true
+        },
+        {
+          "mode": "overlap",
+          "total_latency_change_pct": -5.573503873329,
+          "calling_thread_cycles_change_pct": -68.17864053174328,
+          "wall_control_drift_pct": 2.5529812232348847,
+          "cycle_control_drift_pct": 2.4828500953368637,
+          "stable_wall": true,
+          "stable_cycles": true
+        }
+      ]
+    }
+  ],
+  "api_changes": false,
+  "runtime_default_changes": false,
+  "local_evidence": [
+    "windows-dg2-completion-v2",
+    "linux-dg2-completion-cpu-v2",
+    "windows-dg2-completion-measure-v1",
+    "windows-dg2-completion-measure-v2"
+  ]
+}

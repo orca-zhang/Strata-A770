@@ -1,0 +1,147 @@
+{
+  "date": "2026-11-02",
+  "complete": true,
+  "diagnostic_only": true,
+  "gpu_work_run_by_this_audit": false,
+  "compared_backends": [
+    "Orca L0",
+    "native DG2"
+  ],
+  "parent_report_sha256": "3d86e726d61fdded9a0ade6610bcc266d56b783e2746d00ebbe5df753d3c7a9b",
+  "effective_policy": {
+    "spec_min_p": 0.5,
+    "cumulative_min_p": 0.0,
+    "last_min_p": 0.5,
+    "spec": 4,
+    "bare_cli_default_spec_min_p": 0.0,
+    "last_inherits_spec_min_p": true
+  },
+  "relevant_environment": {
+    "STRATA_MTP_CUM_MIN_P": null,
+    "STRATA_MTP_LAST_MIN_P": null,
+    "STRATA_MTP_LAST_DRAFT_MIN_P": "0.6"
+  },
+  "frozen_policy_source_blocks": {
+    "native": {
+      "cumulative": "const float g_env_mtp_cum_min_p = [] {\n    const char* v = std::getenv(\"STRATA_MTP_CUM_MIN_P\");\n    if (v == nullptr) return 0.0f;\n    char* end = nullptr;\n    const double x = std::strtod(v, &end);\n    if (end != v && *end == '\\0' && std::isfinite(x) && x >= 0.0 && x <= 1.0) {\n        if (x > 0.0) std::fprintf(stderr, \"strata: MTP cumulative confidence floor %.6g (draft and verify windows)\\n\", x);\n        return (float) x;\n    }\n    std::fprintf(stderr, \"strata: STRATA_MTP_CUM_MIN_P must be a number in [0,1]; cumulative floor disabled\\n\");\n    return 0.0f;\n}();\n",
+      "last": "const double g_env_mtp_last_min_p = [] {\n    const char* v = std::getenv(\"STRATA_MTP_LAST_MIN_P\");\n    if (v == nullptr) return -1.0;\n    char* end = nullptr;\n    const double x = std::strtod(v, &end);\n    return end != v && *end == '\\0' && std::isfinite(x) ? std::clamp(x, 0.0, 1.0) : -1.0;\n}();\n"
+    },
+    "l0": {
+      "cumulative": "const float g_env_mtp_cum_min_p = [] {\n    const char* v = std::getenv(\"STRATA_MTP_CUM_MIN_P\");\n    if (v == nullptr) return 0.0f;\n    char* end = nullptr;\n    const double x = std::strtod(v, &end);\n    if (end != v && *end == '\\0' && std::isfinite(x) && x >= 0.0 && x <= 1.0) {\n        if (x > 0.0) std::fprintf(stderr, \"strata: MTP cumulative confidence floor %.6g (draft and verify windows)\\n\", x);\n        return (float) x;\n    }\n    std::fprintf(stderr, \"strata: STRATA_MTP_CUM_MIN_P must be a number in [0,1]; cumulative floor disabled\\n\");\n    return 0.0f;\n}();\n",
+      "last": "const double g_env_mtp_last_min_p = [] {\n    const char* v = std::getenv(\"STRATA_MTP_LAST_MIN_P\");\n    if (v == nullptr) return -1.0;\n    char* end = nullptr;\n    const double x = std::strtod(v, &end);\n    return end != v && *end == '\\0' && std::isfinite(x) ? std::clamp(x, 0.0, 1.0) : -1.0;\n}();\n"
+    }
+  },
+  "executable_evidence": {
+    "native": {
+      "path": "G:\\GitHub\\Strata\\build-orca-native-lower-20261031\\windows-dg2-one-gib-build-v1\\strata.exe",
+      "sha256": "001c31d1f57326b63f65680001ae0eb825a005fa867ea142de6c34f6bb4a728b",
+      "threshold_key_string_counts": {
+        "STRATA_MTP_CUM_MIN_P": 2,
+        "STRATA_MTP_LAST_MIN_P": 1,
+        "STRATA_MTP_LAST_DRAFT_MIN_P": 0
+      }
+    },
+    "l0": {
+      "path": "G:\\GitHub\\Strata\\build-orca-native-lower-20261031\\windows-dg2-subphase-profile-v1\\l0\\strata.exe",
+      "sha256": "df1110c71a6531abc0de2eadfe087f1f5a851e874d5dc788d4acb206bac77e76",
+      "threshold_key_string_counts": {
+        "STRATA_MTP_CUM_MIN_P": 2,
+        "STRATA_MTP_LAST_MIN_P": 1,
+        "STRATA_MTP_LAST_DRAFT_MIN_P": 0
+      }
+    }
+  },
+  "observed_arms": [
+    {
+      "label": "release-l0-before",
+      "mode": "release",
+      "requests": 15,
+      "observed_tokens": 76,
+      "accepted_offered": [
+        57,
+        57
+      ],
+      "profile_windows": null,
+      "profile_avg_t": null
+    },
+    {
+      "label": "release-native",
+      "mode": "release",
+      "requests": 15,
+      "observed_tokens": 76,
+      "accepted_offered": [
+        57,
+        57
+      ],
+      "profile_windows": null,
+      "profile_avg_t": null
+    },
+    {
+      "label": "release-l0-after",
+      "mode": "release",
+      "requests": 15,
+      "observed_tokens": 76,
+      "accepted_offered": [
+        57,
+        57
+      ],
+      "profile_windows": null,
+      "profile_avg_t": null
+    },
+    {
+      "label": "profile-l0-before",
+      "mode": "profile",
+      "requests": 15,
+      "observed_tokens": 76,
+      "accepted_offered": [
+        57,
+        57
+      ],
+      "profile_windows": 20,
+      "profile_avg_t": 3.85
+    },
+    {
+      "label": "profile-native",
+      "mode": "profile",
+      "requests": 15,
+      "observed_tokens": 76,
+      "accepted_offered": [
+        57,
+        57
+      ],
+      "profile_windows": 20,
+      "profile_avg_t": 3.85
+    },
+    {
+      "label": "profile-l0-after",
+      "mode": "profile",
+      "requests": 15,
+      "observed_tokens": 76,
+      "accepted_offered": [
+        57,
+        57
+      ],
+      "profile_windows": 20,
+      "profile_avg_t": 3.85
+    }
+  ],
+  "matching_requests": 90,
+  "production_changed": false,
+  "provenance": {
+    "compiler_environment_file_sha256": "7f30c32ff2d0819b938eaa87cc6f8dc812837742c3cdc566908459e07bbf9991",
+    "configuration_sha256": "9c45e51de69e66c3f1cd020359c8d70d639fbd1aba5d87ead84082fbe73fd531",
+    "measurement_sha256": "c9db2e6c3f048ec023735d4b1fd14cbbbdc9df9b108eb4b2645ad50bf5f2ccb2",
+    "raw_measurement_directories": [
+      "G:\\GitHub\\Strata\\build-orca-native-lower-20261031\\windows-dg2-one-gib-short-v2",
+      "G:\\GitHub\\Strata\\build-orca-native-lower-20261031\\windows-dg2-one-gib-short-v1"
+    ]
+  },
+  "findings": [
+    "Both frozen backends have identical cumulative/last-threshold implementation, a common environment and explicit --spec-min-p 0.5.",
+    "Cumulative threshold is unset and defaults to zero; last threshold is unset and inherits the request step threshold.",
+    "STRATA_MTP_LAST_DRAFT_MIN_P=0.6 is a stale configuration key absent from both frozen executable strings and policy sources. It does not set the effective last threshold.",
+    "All 90 requests have the same output length/draft totals; all 45 instrumented requests have 20 windows and average T=3.85.",
+    "This audit does not compare separately running cumulative-threshold candidates or claim new throughput."
+  ],
+  "archive_sha256": "2520485d607776a9a3aa22690a5541c911ff3d40e3e3f93b947f33cee19ead80"
+}

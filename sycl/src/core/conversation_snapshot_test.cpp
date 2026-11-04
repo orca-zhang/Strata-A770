@@ -253,6 +253,26 @@ void full_session(int fmt, int mode, int experts) {
           restored.live.dead==a.live.dead && restored.live.block_pos==a.live.block_pos &&
           equal(restored.kv[0],a.kv[0]) && equal(restored.kv[1],a.kv[1]),"whole-session A/B/A exactness including spare key");
     check(ss.ple_prev[0]==64 && ss.ple_prev[1]==65,"PLE token window reconstructed");
+    {
+        const auto foreign = b.checkpoints[0];
+        check(conversation_snapshot_restore(b,ss,g,draft.state,err,foreign)==ConversationRestore::invalid,
+              "reject a running checkpoint outside the snapshot");
+        check(conversation_snapshot_save(restored,view,ss,g,draft.state,err) && restored.live.gdn==a.live.gdn &&
+              equal(restored.kv[0],a.kv[0]),"foreign checkpoint refusal preserves running state and K/V");
+        SavedConversation expected;
+        check(conversation_snapshot_restore(b,ss,g,draft.state,err)==ConversationRestore::restored &&
+              conversation_checkpoint_restore(b.checkpoints[0],ss,g,err) &&
+              conversation_snapshot_save(expected,view,ss,g,draft.state,err),"legacy two-step rewind reference");
+        fill(91);
+        check(conversation_snapshot_restore(b,ss,g,draft.state,err,b.checkpoints[0])==ConversationRestore::restored,
+              "restore directly at a retained checkpoint");
+        check(ss.ple_prev[0]==2 && ss.ple_prev[1]==3,"direct restore reconstructs target PLE token window");
+        check(conversation_snapshot_save(restored,view,ss,g,draft.state,err) &&
+              restored.live.gdn==expected.live.gdn && restored.live.ple==expected.live.ple &&
+              restored.live.tails==expected.live.tails && restored.live.dead==expected.live.dead &&
+              restored.live.block_pos==expected.live.block_pos && equal(restored.kv[0],expected.kv[0]) &&
+              equal(restored.kv[1],expected.kv[1]),"direct restore equals two-step rewind including spare rows");
+    }
     for (int64_t dirty : {65, 3, 0}) {
         check(conversation_snapshot_restore(a,ss,g,draft.state,err)==ConversationRestore::restored,"restore growth fixture base");
         ConversationKvReuse reuse{a.kv,65,dirty};

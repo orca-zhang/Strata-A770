@@ -1,0 +1,83 @@
+{
+  "date": "2026-11-03",
+  "complete": true,
+  "source_adopted": false,
+  "production_changed": false,
+  "hardware": "Intel Arc A770 C0",
+  "driver": "32.0.101.9034",
+  "os": "Windows",
+  "linux_gpu_tested": false,
+  "scope": "V11 tail barrier ownership. Remove redundant Stream freeze barrier; Linux close now emits the final host-visible barrier, matching Windows. No math/grouping/parameter/wait/owner/policy changes.",
+  "checks": {
+    "exact_model_requests": 100,
+    "windows_checks": 15,
+    "linux_cpu_checks": 3,
+    "adapter_batch_limits": [
+      64,
+      1
+    ],
+    "rebuilt_host_objects": 80,
+    "parallel_compilers": 4,
+    "inflight_submissions": 64,
+    "mathematical_zebins": 1242,
+    "comparisons": {
+      "decode_tok_s": {
+        "control": 47.52234192640601,
+        "candidate": 47.35946471724344,
+        "l0": 48.356876825050605,
+        "change_pct": -0.3427381786335393,
+        "vs_l0_pct": -2.0626065480111144,
+        "host_drift_pct": 0.3006437124354111,
+        "l0_drift_pct": -0.13361064134050915
+      },
+      "ttft_ms": {
+        "control": 894.90613650148,
+        "candidate": 897.6511000073515,
+        "l0": 886.2117054642637,
+        "change_pct": 0.30673200170496795,
+        "vs_l0_pct": 1.2908196170908104,
+        "host_drift_pct": -0.29682430468623844,
+        "l0_drift_pct": 0.2681729728957416
+      },
+      "prompt_ms": {
+        "control": 848.0990788227517,
+        "candidate": 850.45,
+        "l0": 842.1741090772146,
+        "change_pct": 0.27719888347381705,
+        "vs_l0_pct": 0.9826817084003681,
+        "host_drift_pct": -0.29434273267793243,
+        "l0_drift_pct": 0.2913371781913199
+      },
+      "request_ms": {
+        "control": 2449.0865408230597,
+        "candidate": 2456.1639000021387,
+        "l0": 2416.6474786180456,
+        "change_pct": 0.28897954650064506,
+        "vs_l0_pct": 1.6351752472681946,
+        "host_drift_pct": -0.3862187339554457,
+        "l0_drift_pct": 0.18404783609116127
+      }
+    },
+    "policy": {
+      "step": 0.5,
+      "last": 0.5,
+      "cumulative": 0,
+      "max_mtp": 4,
+      "expert_slots": 5771,
+      "reserve_mib": 1536
+    }
+  },
+  "evidence_files": 364,
+  "caveats": [
+    "Decode excludes preparation/init/prefill; TTFT separate. No inner timers, GPU timestamps or telemetry.",
+    "Clocks unlocked; bracket observations and control drift are not confidence intervals. Linux GPU deferred.",
+    "All 80 host objects recompiled against one candidate header; Windows runtime remains exact V11. Linux tail placement has compile/CPU checks only."
+  ],
+  "reproduction": {
+    "verify": "python build-orca-native-lower-20261031/publish_dg2_tail_barrier.py --verify",
+    "bench": "python build-orca-native-lower-20261031/check_dg2_tail_barrier.py --bench",
+    "build": "Recorded configure/build/check and 80 host compile/archive/link commands; interrupted build resumed by resume_dg2_tail_barrier_parallel.py.",
+    "prerequisites": "Exact frozen inputs in results.json and V11 baseline archive. Original builder queue invocation is superseded by the resumer: queue.exe accepts one queue-native-preflight pack directory, memory via environment."
+  },
+  "archive_sha256": "0ed6946095403916679385972d1af3f0308d9946014a1e871c165a38bdb7a09d"
+}

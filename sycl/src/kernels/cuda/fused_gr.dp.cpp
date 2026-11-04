@@ -254,6 +254,24 @@ struct GrMulti {
     float* part2 = nullptr;    ///< SYCL port: [GRS_SLICES][kFusedGrMaxT][GRS_PITCH] padded private slice partials
 };
 
+// ponytail: copy only norm inputs; retain all eight token slots and the exact math.
+struct GrNormRow {
+    const float *R, *bo_prev, *inj_prev, *w_norm;
+    float* rs;
+    float eps;
+    bool apply;
+};
+struct GrNormMulti { GrNormRow a[kFusedGrMaxT]; float* xn; };
+GrNormMulti gr_norm_args(const GrMulti& m) {
+    GrNormMulti result{};
+    result.xn = m.xn;
+    for (int i = 0; i < m.T; ++i) {
+        const auto& a = m.a[i];
+        result.a[i] = {a.R, a.bo_prev, a.inj_prev, a.w_norm, a.rs, a.eps, a.apply};
+    }
+    return result;
+}
+
 // Step 1 of `gr_down_kernel`, one block per token, same threads and reduction order: rs[t] and xn[t] to global.
 /*
 DPCT1110: The total declared local variable size in device function
@@ -330,12 +348,12 @@ auto &part =
 // elements of stream c in the same order as in the per-token kernel (i = 4t + 1024k), and the warp and cross-warp
 // sums run in the same order, so rs and xn are bitwise the old kernel's. The scaled values stay in registers
 // (at most 3 float4 per thread) instead of a second pass over global memory.
-__dpct_inline__ void gr_norm_split_port_kernel(GrMulti m) {
+__dpct_inline__ void gr_norm_split_port_kernel(GrNormMulti m) {
     auto item = sycl::ext::oneapi::this_work_item::get_nd_item<3>();
     auto& part = *sycl::ext::oneapi::group_local_memory_for_overwrite<float[WARPS]>(item.get_group());
     auto& s_rs = *sycl::ext::oneapi::group_local_memory_for_overwrite<float>(item.get_group());
     const int tok = (int) item.get_group(2) / HC, c = (int) item.get_group(2) % HC;
-    const FusedGrArgs& a = m.a[tok];
+    const GrNormRow& a = m.a[tok];
     float* xn = m.xn + (size_t) tok * D;
     const int t = (int) item.get_local_id(2), lane = t & 31, warp = t >> 5;
     const float gw = a.apply ? 2.0f * sigmoidf_(a.inj_prev[c] / (float) HC) : 0.0f;
@@ -1853,7 +1871,7 @@ bool fused_gr_read_multi(const FusedGrArgs* a, int n_tok, float* xn_scratch, voi
             st->parallel_for<dpct_kernel_name<class gr_norm_split_k>>(
 #endif
                 sycl::nd_range<3>(sycl::range(1, 1, n_tok * HC) * sycl::range(1, 1, THREADS), sycl::range(1, 1, THREADS)),
-                [=](sycl::nd_item<3>) [[sycl::reqd_sub_group_size(32)]] { gr_norm_split_port_kernel(m); });
+                [norm = gr_norm_args(m)](sycl::nd_item<3>) [[sycl::reqd_sub_group_size(32)]] { gr_norm_split_port_kernel(norm); });
         else
 #if STRATA_SYCL_HC_BATCH_SUBMIT
         cgh.parallel_for<dpct_kernel_name<class gr_norm_multi_kernel_2f4d92>>(

@@ -1,9 +1,11 @@
 #include "strata/orca_engine.hpp"
+#ifndef STRATA_ORCA_DG2
 #include <level_zero/zes_api.h>
+#endif
 #include <fstream>
 #include <cstring>
 #include <cstdlib>
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(STRATA_ORCA_DG2)
 #include <windows.h>
 #include <dxgi1_4.h>
 #endif
@@ -12,14 +14,16 @@ namespace strata::l0 {
 namespace {
 std::filesystem::path image_directory;
 struct Engine {
+    Runtime runtime;
+    Program program;
+    Queue queue;
+#ifndef STRATA_ORCA_DG2
     using Import = ze_result_t(ZE_APICALL*)(ze_driver_handle_t, void*, size_t);
     using Release = ze_result_t(ZE_APICALL*)(ze_driver_handle_t, void*);
-    orca::l0::Runtime runtime;
-    orca::l0::compiler::Program program;
-    Queue queue;
     Import import = nullptr;
     Release release = nullptr;
     ze_result_t import_status = ZE_RESULT_ERROR_UNSUPPORTED_FEATURE;
+#endif
     explicit Engine(const std::filesystem::path& images)
         : program(runtime, images / "elementwise"), queue(runtime, program) {
         std::ifstream manifest(images / "packs.txt");
@@ -32,6 +36,7 @@ struct Engine {
             program.add(images / name);
         }
         if (!manifest.eof()) throw std::runtime_error("cannot read Orca image manifest");
+#ifndef STRATA_ORCA_DG2
         void* function = nullptr;
         import_status = zeDriverGetExtensionFunctionAddress(runtime.native_driver(), "zexDriverReleaseImportedPointer", &function);
         if (import_status == ZE_RESULT_SUCCESS && function) {
@@ -41,6 +46,7 @@ struct Engine {
             if (import_status == ZE_RESULT_SUCCESS) import = reinterpret_cast<Import>(function);
         }
         if (import_status == ZE_RESULT_SUCCESS && !import) import_status = ZE_RESULT_ERROR_UNSUPPORTED_FEATURE;
+#endif
     }
 };
 Engine& engine() {
@@ -50,7 +56,8 @@ Engine& engine() {
 }
 Queue& engine_queue() { return engine().queue; }
 
-bool sysman_memory(orca::l0::Runtime& runtime, size_t& free_bytes, size_t& total_bytes) {
+#ifndef STRATA_ORCA_DG2
+bool sysman_memory(Runtime& runtime, size_t& free_bytes, size_t& total_bytes) {
     static zes_device_handle_t device = [&] {
         if (zesInit(0) != ZE_RESULT_SUCCESS) return zes_device_handle_t{};
         uint32_t count = 0;
@@ -104,6 +111,7 @@ bool sysman_memory(orca::l0::Runtime& runtime, size_t& free_bytes, size_t& total
     total_bytes = total;
     return true;
 }
+#endif
 }
 
 void install_engine(const std::filesystem::path& images) {
@@ -123,6 +131,10 @@ Queue* create_copy_queue() {
 
 void memory_info(size_t& free_bytes, size_t& total_bytes) {
     auto& queue = stream_of(nullptr);
+#ifdef STRATA_ORCA_DG2
+    const auto memory = queue.runtime().memory_info();
+    free_bytes = size_t(memory.available); total_bytes = size_t(memory.total);
+#else
     size_t device_free = 0, device_total = 0;
     const bool have_sysman = sysman_memory(queue.runtime(), device_free, device_total);
 #ifdef _WIN32
@@ -169,20 +181,29 @@ void memory_info(size_t& free_bytes, size_t& total_bytes) {
         throw std::runtime_error("Orca cannot query available device memory (DXGI/Sysman unavailable)");
     free_bytes = device_free;
     total_bytes = device_total;
+#endif
 }
 
 int import_host(void* pointer, size_t bytes) {
+#ifdef STRATA_ORCA_DG2
+    return engine().runtime.import_host(pointer, bytes);
+#else
     if (!pointer || !bytes) return int(ZE_RESULT_ERROR_INVALID_ARGUMENT);
     auto& owner = engine();
     if (!owner.import) return int(owner.import_status);
     return int(owner.import(owner.runtime.native_driver(), pointer, bytes));
+#endif
 }
 
 void release_host(void* pointer) {
     if (!pointer) return;
     dpct::get_current_device().queues_wait_and_throw();
     auto& owner = engine();
+#ifdef STRATA_ORCA_DG2
+    owner.runtime.release_host(pointer);
+#else
     if (!owner.release) throw std::runtime_error("native host release extension unavailable");
     orca::l0::check(owner.release(owner.runtime.native_driver(), pointer), "native host release");
+#endif
 }
 }

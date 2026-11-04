@@ -95,6 +95,11 @@ enum class ConversationRestore { restored, invalid, transfer_failed };
 ConversationRestore conversation_snapshot_restore(const SavedConversation& image, SessionState& session,
                                                    const ModelGeometry& g, const QsaState& draft,
                                                    std::string& error);
+// Restore directly at a retained checkpoint instead of uploading live running state that the caller would
+// immediately overwrite. `running` must be image.live or an element of image.checkpoints; K/V is restored in full.
+ConversationRestore conversation_snapshot_restore(const SavedConversation& image, SessionState& session,
+                                                   const ModelGeometry& g, const QsaState& draft,
+                                                   std::string& error, const ConversationCheckpoint& running);
 
 // The same with `draft == nullptr`: an image WITHOUT the draft layer's K/V (kv holds the session's own QSA layers
 // only).  A layer split's later stages park this way; the draft ring is saved once, with the first stage's image.

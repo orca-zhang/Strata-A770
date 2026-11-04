@@ -370,6 +370,17 @@ bool qsa_prompt_attn_xmx(const float* q, const QsaAttnPools& pools, const int32_
         !pools.page_table)
         return false;
     dpct::queue_ptr st = strata::q_of(stream);
+    // ponytail: one Intel device per engine; cache this per device if mixed GPUs are supported.
+    static const bool supported = [&] {
+        namespace qi = sycl::ext::oneapi::experimental::info;
+        for (const auto& c : st->get_device().get_info<qi::device::matrix_combinations>())
+            if (c.atype == jm::matrix_type::fp16 && c.btype == jm::matrix_type::fp16 &&
+                c.ctype == jm::matrix_type::fp32 && c.dtype == jm::matrix_type::fp32 &&
+                (c.max_msize >= 16 || c.msize == 16) && (c.max_nsize >= 16 || c.nsize == 16) &&
+                (c.max_ksize >= 16 || c.ksize == 16)) return true;
+        return false;
+    }();
+    if (!supported) return false;
     const size_t have = st->get_device().get_info<sycl::info::device::local_mem_size>();
     const bool ch64 = mode != 32 && have >= Layout<64>::bytes;
     static bool told = false;

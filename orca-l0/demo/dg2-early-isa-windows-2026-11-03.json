@@ -1,0 +1,243 @@
+{
+  "date": "2026-11-03",
+  "source_adopted": false,
+  "production_changed": false,
+  "hardware": "Intel Arc A770 C0",
+  "driver": "32.0.101.9034",
+  "os": "Windows",
+  "linux_gpu_tested": false,
+  "policy": {
+    "step": 0.5,
+    "last": 0.5,
+    "cumulative": 0,
+    "max_mtp": 4,
+    "expert_slots": 5771,
+    "reserve_mib": 1536
+  },
+  "checks": {
+    "windows_candidate": 15,
+    "linux_cpu": 3,
+    "full_buffer_comparisons": 864,
+    "gpu_tail_epochs": 1032,
+    "exact_performance_requests": 160,
+    "exact_diagnostic_requests": 11,
+    "first": {
+      "decode_tok_s": {
+        "control": 49.19019430221654,
+        "early": 49.422869828384414,
+        "l0": 49.739905192107294,
+        "early_vs_control_pct": 0.4730120087315548,
+        "early_vs_l0_pct": -0.637386345025015,
+        "control_drift_pct": 0.20407429407878208,
+        "l0_drift_pct": -0.3006044924634521
+      },
+      "ttft_ms": {
+        "control": 891.4587488789216,
+        "early": 883.6253000044962,
+        "l0": 882.2275055673714,
+        "early_vs_control_pct": -0.8787225302658741,
+        "early_vs_l0_pct": 0.1584392266511747,
+        "control_drift_pct": -0.241435407331414,
+        "l0_drift_pct": 0.19521365509544975
+      },
+      "prompt_ms": {
+        "control": 846.7241847260535,
+        "early": 838.7,
+        "l0": 839.824642410545,
+        "early_vs_control_pct": -0.9476739735088113,
+        "early_vs_l0_pct": -0.13391395700380615,
+        "control_drift_pct": -0.2771553249204084,
+        "l0_drift_pct": 0.1847327334485449
+      },
+      "request_ms": {
+        "control": 2389.9278643241314,
+        "early": 2377.4430000048596,
+        "l0": 2367.0363178262246,
+        "early_vs_control_pct": -0.5223950272993938,
+        "early_vs_l0_pct": 0.43965029603736383,
+        "control_drift_pct": -0.10192807922611014,
+        "l0_drift_pct": 0.2734974808193513
+      }
+    },
+    "reverse": {
+      "decode_tok_s": {
+        "control": 49.21801684885652,
+        "early": 49.32827231538945,
+        "early_vs_control_pct": 0.22401444347404098,
+        "early_drift_pct": 0.2599597413356358
+      },
+      "ttft_ms": {
+        "control": 885.1809500047239,
+        "early": 885.6099013822777,
+        "early_vs_control_pct": 0.048459174087689405,
+        "early_drift_pct": -0.09434239695945701
+      },
+      "prompt_ms": {
+        "control": 840.35,
+        "early": 840.9499271657023,
+        "early_vs_control_pct": 0.07139015478101474,
+        "early_drift_pct": -0.0832045643646695
+      },
+      "request_ms": {
+        "control": 2386.8998500111047,
+        "early": 2381.9994390862153,
+        "early_vs_control_pct": -0.20530442133408489,
+        "early_drift_pct": -0.06754016772982929
+      }
+    },
+    "packet_summary": {
+      "v12": {
+        "submissions": 136,
+        "files": 136,
+        "bytes": 7418376,
+        "failures": 0
+      },
+      "early": {
+        "submissions": 136,
+        "files": 136,
+        "bytes": 7351912,
+        "failures": 0
+      },
+      "l0": {
+        "submissions": 795,
+        "files": 1009,
+        "bytes": 7258772,
+        "failures": 0
+      }
+    },
+    "packet_counts": {
+      "v12": {
+        "CFE_STATE": 2894,
+        "COMPUTE_WALKER": 40778,
+        "MI_BATCH_BUFFER_END": 136,
+        "MI_LOAD_REGISTER_IMM": 2894,
+        "PIPELINE_SELECT": 2894,
+        "PIPE_CONTROL": 34550,
+        "STATE_BASE_ADDRESS": 1004,
+        "STATE_COMPUTE_MODE": 2894
+      },
+      "early": {
+        "CFE_STATE": 2626,
+        "COMPUTE_WALKER": 40778,
+        "MI_BATCH_BUFFER_END": 136,
+        "MI_LOAD_REGISTER_IMM": 2626,
+        "PIPELINE_SELECT": 2626,
+        "PIPE_CONTROL": 34282,
+        "STATE_BASE_ADDRESS": 468,
+        "STATE_COMPUTE_MODE": 2626
+      },
+      "l0": {
+        "CFE_STATE": 97,
+        "COMPUTE_WALKER": 40932,
+        "MI_BATCH_BUFFER_END": 795,
+        "MI_BATCH_BUFFER_START": 214,
+        "MI_NOOP": 97,
+        "MI_SEMAPHORE_WAIT": 39,
+        "MI_STORE_DATA_IMM": 97,
+        "PIPE_CONTROL": 34281,
+        "STATE_BASE_ADDRESS": 214,
+        "STATE_COMPUTE_MODE": 2392,
+        "_3DSTATE_BINDING_TABLE_POOL_ALLOC": 117
+      }
+    },
+    "instruction_only_changes": {
+      "v12": 268,
+      "early": 0
+    },
+    "serialized_base_fields": {
+      "SBA.address.bindless": {
+        "0": 272,
+        "18446603339582341120": 2,
+        "18446603339582537728": 80,
+        "18446603350264840192": 114
+      },
+      "SBA.address.general": {
+        "18446603349106098176": 468
+      },
+      "SBA.address.instruction": {
+        "18446603336221196288": 468
+      },
+      "SBA.address.surface": {
+        "0": 272,
+        "18446603339582341120": 2,
+        "18446603339582537728": 80,
+        "18446603350264840192": 114
+      },
+      "SBA.serialized.change_mask": {
+        "0": 234,
+        "12": 98
+      },
+      "SBA.serialized.initial": {
+        "1": 136
+      }
+    }
+  },
+  "retained_decode_dispersion": {
+    "l0-before": {
+      "median": 49.8148343595987,
+      "min": 49.673202614379086,
+      "max": 49.89823386514346,
+      "mad": 0.06367062110200905
+    },
+    "control-before": {
+      "median": 49.14007872305696,
+      "min": 48.62132940950675,
+      "max": 49.572761072337094,
+      "mad": 0.20114989886361556
+    },
+    "early": {
+      "median": 49.422869828384414,
+      "min": 48.931238732938446,
+      "max": 49.65697484482195,
+      "mad": 0.10789159158570527
+    },
+    "control-after": {
+      "median": 49.24036099182079,
+      "min": 48.928088585591965,
+      "max": 49.379507504385685,
+      "mad": 0.06706436904754298
+    },
+    "l0-after": {
+      "median": 49.66508872960052,
+      "min": 49.273858921161825,
+      "max": 49.80014415831204,
+      "mad": 0.0923223844525225
+    },
+    "reverse-early-before": {
+      "median": 49.26428022908455,
+      "min": 49.070247933884296,
+      "max": 49.485610105482486,
+      "mad": 0.10040306756954465
+    },
+    "reverse-control": {
+      "median": 49.21801684885652,
+      "min": 48.99432697266632,
+      "max": 49.44375772558715,
+      "mad": 0.09250039414443023
+    },
+    "reverse-early-after": {
+      "median": 49.39234752453894,
+      "min": 49.1336953710887,
+      "max": 49.608355091383814,
+      "mad": 0.11688704570421393
+    }
+  },
+  "evidence_files": 242,
+  "scope": "One Windows-only initialization block preallocates1MiBbootstrap and4MiBmathcode slabs before tensors,with identical kernel code,80Host objects,matched schedules and fixed model policy.",
+  "native_full_model_win": false,
+  "caveats": [
+    "All160performance requests match76tokens,57/57drafts,naturalstop,zero reuse;tenwarmups/tenretained per arm. Decode excludes prep/init/prefill;TTFT is separate.",
+    "No inner timers or GPU telemetry run in performance arms. The11 packet-diagnostic requests are separate and excluded from timing.",
+    "First decode change+0.473%,reverse+0.224%;native control drift+0.204%,reverse candidate drift+0.260%. Point estimates are small and do not establish a guaranteed gain.",
+    "First candidate remains0.637%below matchedL0. Reverse contains noL0 arm. TTFT gain does not repeat.",
+    "A CPU-only archive publication ran during the first bracket;reverse timing had no parallel archive/compiler job. No causal share of timing variation is assigned.",
+    "Command reduction is independently observed:268 fewer full preambles,536fewerSBA,unchanged40778walkers and136submissions. Counts alone do not quantify timing cost.",
+    "Preallocation changes code allocation size/placement and may shift tensor VA/physical placement. No physical cache-traffic cause or new copy/lock census is claimed.",
+    "WindowslocalISA now reserves5MiBupfront in this candidate,including4MiBdevicecode. Existing slab growth remains;small programs can retain unused initial space. No new whole-model retained-code census is claimed.",
+    "Linux retains prior allocation behavior and passes compilation/3CPUchecks;LinuxGPU is deferred.Productionexecutables/config,MTP,rootREADME and immutableLinuxbundles are preserved."
+  ],
+  "reproduction": {
+    "verify": "python build-orca-native-lower-20261031/publish_dg2_early_isa.py --verify"
+  },
+  "archive_sha256": "537f7a6ed7e07bb5eb75f8ab43fba193248248cbc4684aef747f534fdaf747f9"
+}

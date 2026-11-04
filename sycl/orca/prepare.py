@@ -33,6 +33,36 @@ def transform(text):
 
 def engine_source(text):
     # These are runtime interoperability sites, rather than numerical kernels.
+    if 'const float g_env_mtp_cum_min_p = [] {' in text:
+        before = '    const char* v = std::getenv("STRATA_MTP_CUM_MIN_P");'
+        if text.count(before) != 1:
+            raise ValueError('MTP cumulative switch changed; review the Orca L0 default')
+        # Reuse the existing draft/verify early stop; explicit zero retains the old window.
+        text = text.replace(before, before + '''
+#ifndef STRATA_ORCA_DG2
+    if (v == nullptr) v = "0.5";
+#endif''')
+        for marker, condition, remaining in (
+            ('                    drafted = !use_mtp || last ||',
+             'use_mtp && !last', 'max_new - produced_n'),
+            ('            const bool drafted = !use_mtp || (int64_t) produced.size() >= o.max_new ||',
+             'use_mtp && (int64_t) produced.size() < o.max_new', 'o.max_new - (int64_t) produced.size()'),
+        ):
+            if text.count(marker) != 1:
+                raise ValueError('MTP draft site changed; review the Orca L0 output budget')
+            indent = marker[:len(marker) - len(marker.lstrip())]
+            text = text.replace(marker, '#ifndef STRATA_ORCA_DG2\n' +
+                indent + '// ponytail: the existing cap trims unused tail steps; the first draft also maintains KV.\n' +
+                indent + f'if ({condition})\n' +
+                indent + f'    mtp.set_max_drafts((int) std::min<int64_t>(S_mtp - 1, {remaining} - 1));\n' +
+                '#endif\n' + marker)
+    # Native waits use signed nanoseconds; normalize the legacy teardown sentinel.
+    text = text.replace("wait_verify_queue(cs_, l0_sync_, UINT64_MAX)",
+                        "wait_verify_queue(cs_, l0_sync_, uint64_t(INT64_MAX))")
+    text = re.sub(r"(const uint8_t\* (?:Gguf|File|Arena)ExpertSource::device_alias\([^)]*\) const \{)(.*?)(^\})",
+        lambda match: match[1] + re.sub(r"\breturn (?!nullptr;)([^;\n]+);",
+            r"return strata::l0::device_pointer(\1, dpct::get_in_order_queue());", match[2]) + match[3],
+        text, flags=re.S | re.M)
     for target in ("m.copy", "copy_"):
         text = text.replace(target + " = dpct::get_current_device().create_queue(true)",
                             target + " = strata::l0::create_copy_queue()")
@@ -65,8 +95,8 @@ def engine_source(text):
 }
 
 ''' + text[end:]
-        text = text.replace("cudaHostRegister PORTABLE ok", "Level Zero external host import ok")
-        text = text.replace("cudaHostRegister FAILED", "Level Zero external host import FAILED")
+        text = text.replace("cudaHostRegister PORTABLE ok", "Orca external host import ok")
+        text = text.replace("cudaHostRegister FAILED", "Orca external host import FAILED")
     context = '''    const sycl::context context = cs_->get_context();
     const sycl::device device = cs_->get_device();
     const ze_context_handle_t ze_context =
@@ -82,6 +112,69 @@ def engine_source(text):
         sycl::make_event<sycl::backend::ext_oneapi_level_zero>(input, queue->get_context()));'''
     text = text.replace(imported, '''    l0_gate_events_.push_back(strata::l0::Event::borrow(
         (ze_event_handle_t) l0_native_events_[i]));''')
+    if "bool Verifier::init_l0_events(" in text:
+        begin = text.index("bool Verifier::init_l0_events(")
+        end = text.index("bool Verifier::release_gpu_waits(", begin)
+        native = '''#ifdef STRATA_ORCA_DG2
+using NativeHostEvent = strata::l0::dg2_backend::HostEvent;
+bool Verifier::init_l0_events(std::string& err) {
+    if (!skip_words_ || skip_words_ > UINT32_MAX / 3) {
+        err = "verify: invalid native event count"; return false;
+    }
+    l0_events_ = true; return true;
+}
+bool Verifier::reset_l0_events(size_t count, std::string& err) try {
+    if (!count || count > skip_words_) {
+        err = "verify: invalid active native event count"; return false;
+    }
+    l0_event_error_.store(0, std::memory_order_release);
+    l0_gate_events_.clear();
+    const size_t total = skip_words_ * 3;
+    if (!l0_native_events_.empty()) {
+        if (l0_native_events_.size() != total) {
+            err = "verify: incomplete native event allocation"; return false;
+        }
+        for (void* raw : l0_native_events_) static_cast<NativeHostEvent*>(raw)->reset();
+    } else {
+        l0_native_events_.reserve(total); l0_gate_events_.reserve(total);
+        for (size_t i = 0; i < total; ++i) {
+            auto event = std::make_unique<NativeHostEvent>(cs_->runtime());
+            l0_native_events_.push_back(event.release());
+        }
+    }
+    return true;
+} catch (const std::exception& error) {
+    err = std::string("verify: native event reset/create failed: ") + error.what(); return false;
+}
+void Verifier::wait_l0_event(int phase, uint32_t ring, dpct::queue_ptr queue) {
+    const size_t i = size_t(phase) * skip_words_ + ring - 1;
+    auto* event = static_cast<NativeHostEvent*>(l0_native_events_.at(i));
+    l0_gate_events_.push_back(strata::l0::Event::borrow(event->handle()));
+    queue->ext_oneapi_submit_barrier({l0_gate_events_.back()});
+}
+void Verifier::signal_l0_event(int phase, uint32_t ring) {
+    if (!l0_events_ || !ring || ring > skip_words_) return;
+    try { static_cast<NativeHostEvent*>(l0_native_events_.at(size_t(phase) * skip_words_ + ring - 1))->signal(); }
+    catch (...) { l0_event_error_.store(1, std::memory_order_release); }
+}
+void Verifier::signal_all_l0_events() {
+    if (!l0_events_) return;
+    for (void* raw : l0_native_events_) try { static_cast<NativeHostEvent*>(raw)->signal(); } catch (...) {}
+}
+void Verifier::destroy_l0_events() {
+    l0_gate_events_.clear();
+    for (void* raw : l0_native_events_) delete static_cast<NativeHostEvent*>(raw);
+    l0_native_events_.clear(); l0_event_pool_ = nullptr; l0_events_ = false;
+}
+#else
+'''
+        text = text[:begin] + native + text[begin:end] + '#endif\n\n' + text[end:]
+        text = text.replace('#if defined(STRATA_HAS_LEVEL_ZERO_EVENTS)\n#include <level_zero/',
+                            '#if defined(STRATA_HAS_LEVEL_ZERO_EVENTS) && !defined(STRATA_ORCA_DG2)\n#include <level_zero/', 1)
+        text = text.replace('#if defined(STRATA_ORCA_NATIVE)\n        const auto& clock =',
+                            '#if defined(STRATA_ORCA_DG2)\n'
+                            '        err = "verify: native DG2 GPU timestamp profiling is not implemented"; return false;\n'
+                            '#elif defined(STRATA_ORCA_NATIVE)\n        const auto& clock =')
     profiled = r"new sycl::queue\(dev.get_context\(\), dev, dpct::exception_handler,\s*" \
                r"sycl::property_list\{sycl::property::queue::in_order\{\},\s*" \
                r"sycl::property::queue::enable_profiling\{\}\}\)"
@@ -95,7 +188,7 @@ def engine_source(text):
         begin = text.index('#else\n        std::fprintf(\n            stderr, "strata generate: GPU %d: %s, compute capability')
         end = text.index('#endif\n        const std::string e =', begin)
         text = text[:begin] + '''#else
-        std::fprintf(stderr, "strata generate: GPU %d: %s, native Orca Level Zero\\n", dev, name);
+        std::fprintf(stderr, "strata generate: GPU %d: %s, %s\\n", dev, name, strata::core::compiled_gpu_archs());
 ''' + text[end:]
     if "sycl::get_native" in text or "sycl::make_event" in text:
         raise ValueError("unmapped native engine interoperability site")
@@ -178,10 +271,10 @@ def iq_check(text):
         raise ValueError("IQ parity harness changed; review native setup")
     text = transform(text)
     setup = '''    if (argc != 3) throw std::invalid_argument("usage: strata-orca-iq-check images fixtures");
-    check_runtime_dependencies();
-    orca::l0::Runtime runtime;
+    check_iq_dependencies();
+    strata::l0::Runtime runtime;
     const std::filesystem::path images(argv[1]);
-    orca::l0::compiler::Program program(runtime, images / "elementwise");
+    strata::l0::Program program(runtime, images / "elementwise");
     std::ifstream manifest(images / "packs.txt");
     if (!manifest) throw std::runtime_error("missing native pack manifest");
     std::string pack;
@@ -195,7 +288,7 @@ def iq_check(text):
     strata::l0::bind_default(default_queue);
     const std::string dir = argv[2];'''
     text = text.replace(begin, setup).replace(finish,
-        '    dpct::get_current_device().destroy_queue(s);\n    check_runtime_dependencies();\n' + finish)
+        '    dpct::get_current_device().destroy_queue(s);\n    check_iq_dependencies();\n' + finish)
     # Reuse the existing CPU oracle and comparisons, exercising native capture
     # including first-use table initialization and every multi-column shape.
     one_column = '''            for (int c = 0; c < MC; ++c)
@@ -216,7 +309,17 @@ def iq_check(text):
                 auto multiple = s->end_recording();
                 s->replay(multiple);
                 s->wait();''')
-    return '#include "runtime_dependencies.hpp"\n' + text
+    return '''#include "runtime_dependencies.hpp"
+namespace {
+void check_iq_dependencies() {
+#ifdef STRATA_ORCA_DG2
+    check_runtime_dependencies(true);
+#else
+    check_runtime_dependencies();
+#endif
+}
+}
+''' + text
 
 
 if __name__ == "__main__":

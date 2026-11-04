@@ -1,0 +1,154 @@
+{
+  "date": "2026-10-31",
+  "complete": true,
+  "hardware": {
+    "os": "Windows",
+    "gpu": "Intel Arc A770 16 GB",
+    "pci_device": "0x56a0",
+    "driver": "32.0.101.9034",
+    "wddm": 2700,
+    "compiler": "Intel oneAPI 2025.3.2"
+  },
+  "scope": {
+    "backend": "Orca::DG2",
+    "device_local_memory": true,
+    "full_model_integrated": false,
+    "performance_gain_claimed": false,
+    "linux_gpu_validated": false,
+    "production_changed": false
+  },
+  "allocation": {
+    "api": "Runtime::allocate_device",
+    "cpu_mapping": null,
+    "gpu_transfers_required": true,
+    "byte_alignment": 65536,
+    "windows_max_single_allocation_bytes": 4294901760,
+    "windows_transport": "D3DKMTCreateAllocation2, MakeResident, GPU-memory residency check, GPU VA mapping",
+    "windows_descriptor_bytes": 2376,
+    "local_only": true,
+    "not_lockable": true,
+    "compressed": false,
+    "descriptor_process_pointers_and_allocation_ids_zero": true,
+    "calibrated_local_only": {
+      "byte_offset": 38,
+      "mask": 4
+    },
+    "calibrated_not_lockable": {
+      "byte_offset": 39,
+      "mask": 1
+    },
+    "descriptor_driver_build": {
+      "byte_offset": 2248,
+      "value": 1019034
+    },
+    "linux_transport": "i915 GEM_CREATE_EXT_MEMORY_REGIONS, device-only placement; GPU unvalidated",
+    "linux_gpu_va_alignment_and_padded_span_bytes": 2097152
+  },
+  "validation": {
+    "windows_ctest": "5/5",
+    "linux_cpu_ctest": "4/4",
+    "device_roundtrip_replays": 12,
+    "device_roundtrip_buffer_bytes": [
+      65536,
+      16842752,
+      335609856
+    ],
+    "transfers_per_replay": [
+      "H2D",
+      "D2D",
+      "D2H"
+    ],
+    "device_buffers_per_roundtrip": 2,
+    "changed_inputs_and_exact_full_buffer_comparison": true,
+    "local_gemv_replays": 48,
+    "local_xmx_replays": 144,
+    "local_kernel_fixture_max_abs_error": 0,
+    "kernel_fixture_inputs": "exactly representable dyadic values; not general numerical equivalence",
+    "full_input_output_guards": true,
+    "invalid_size_closed_recording_and_cpu_access_rejected": true,
+    "system_memory_regressions": {
+      "xmx_replays": 144,
+      "gemv_replays": 48,
+      "scratch_replays": 12,
+      "private_replays": 16,
+      "atomic_replays": 24
+    },
+    "allocation_only_residency_probe": {
+      "bytes": 16777216,
+      "gpu_memory_residency_status": 1,
+      "local_before": 0,
+      "local_after": 16777216,
+      "shared_before": 0,
+      "shared_after": 0,
+      "gpu_commands_submitted": false
+    },
+    "no_level_zero_umd_gmm_or_compiler_loaded_during_windows_execution": true
+  },
+  "calibration": {
+    "version": "A770 PCI 0x56a0 / 32.0.101.9034 only",
+    "method": "Process-local driver observation and structToTokens flag perturbation; calibration loads vendor libraries.",
+    "execution_uses_vendor_libraries": false,
+    "token_to_struct_roundtrip_succeeded": false,
+    "allocation_without_not_lockable_failed": true,
+    "driver_build_must_be_preserved": true
+  },
+  "source_sha256": {
+    "orca-l0/CMakeLists.txt": "10c6d7a85b7d3f4ced004394572ce66efda67c11c3765939d2d81b2314b75c25",
+    "orca-l0/compiler/CMakeLists.txt": "495fd91dc356f203b3dea0a6ff5277a13a4e1db1eda6cff59208f8567bd1c24e",
+    "orca-l0/compiler/native_pack.cpp": "0fdedfc6e302178df52f31a0628344b2571db8ebe018dc0948a916ae5301e8fd",
+    "orca-l0/demo/CMakeLists.txt": "1e763314817d9cd9572a96f9ae6cdf86af13a24e60b43e231715216d67962c71",
+    "orca-l0/demo/dispatch.cpp": "bd184678e907165a6bb17998b0109e860195e1ba7c5eb8e7f70fc64ad1b924bb",
+    "orca-l0/include/orca_l0/dg2.hpp": "e7f9b29e485eb6bb4809aad929632878a3521589240ee925155a012fa219f0f6",
+    "orca-l0/include/orca_l0/direct_driver.hpp": "cd87a73ef80e8b2052a192ddd2ff174d36be595d79c42e454e0bb1b3d86e61c0",
+    "orca-l0/include/orca_l0/drm.hpp": "46808da289dbb63cbb9310f9b4ea806fbec4eeff76dcfbd3b53478f0bf46f245",
+    "orca-l0/include/orca_l0/ring.hpp": "c0bc88a290d32ba5ee6cf26f2fe82c38cced25a334a02c23591e11bb67f75112",
+    "orca-l0/include/orca_l0/runtime.hpp": "1b800beb8a4ec7b1777192afc599a4cf519870acd2438b1aea43e79ffafc0869",
+    "orca-l0/include/orca_l0/compiler/program.hpp": "3aedf164c9bc4320e2be356acc93cd2dae03f75fc49058cdb6f29671fbf02a25",
+    "orca-l0/include/orca_l0/compiler/stream.hpp": "5a0b8badff512b7dc8b737f00b1cb2ddfedb35c0cdbc6e89fc77ee89b390a136",
+    "orca-l0/include/orca_l0/compiler/sycl.hpp": "8b740f4a4a3e4ef5dd84212f47d7b71315b7f1a196701dbcfc9f3a7e4c47ab9a",
+    "orca-l0/src/direct_driver.cpp": "7fe701e2c34dccd80868685b29b83fc846406bf531faa4579a220c7bc4107548",
+    "orca-l0/src/runtime.cpp": "2065f4be1abade4be029573f02d58d73f1b7d6a23cfc5ee85140669880bcf531",
+    "orca-l0/src/drm/arguments.hpp": "d02a58394c4e1974e77db036bc39e1ba829db00cfbab48e03f9af23033cb838a",
+    "orca-l0/src/drm/encoding.hpp": "ec9e31dc4c0a9ccacfa2a9bb00f9a8504cbafb8efb60df0fc335498d785c38ae",
+    "orca-l0/src/drm/recording.inl": "c930d157180680a9b39576a3521da62d5084b69b20d989723c3da80e0a9dd2d7",
+    "orca-l0/src/drm/runtime.cpp": "26d86bc9685d84611278fa81e6821696548a530168baf896fef15fab92da5e88",
+    "orca-l0/src/drm/zebin.hpp": "c5390c43c409246e3566f4c0c8d4ebf1e5a1c05224d5cc0ffb70eebfa6ab9ae8",
+    "orca-l0/src/wddm/runtime.cpp": "43606455e91f62c3e173878c1d3699a28f75e7a32171fb0bb61765e08194d313",
+    "orca-l0/tests/compiler_check.cpp": "0cec3be040240834476916155bade46c0edbf76cf81aa528d92fc4a0707f2ab1",
+    "orca-l0/tests/dispatch3d.cl": "0d70ceb4fdc897b246e0e3590df708c2cb80d7242600b085243172dbd3697641",
+    "orca-l0/tests/drm_compute_check.cpp": "a0737f6155484732c21c05c0ceae55cb2a6b03a29d155697a194f75d4ed6591e",
+    "orca-l0/tests/drm_submit_check.cpp": "a2fd00de705be46804d2913cc10af3a58623ea253bf4e16963921922e73540a8",
+    "orca-l0/tests/inference.cl": "03647efb665f6d2ef16b95ee47526bf42832a71355b6f1c5b78668beefbee1b2",
+    "orca-l0/tests/native_pack_check.cpp": "631ed0ecb003351464fb999113ff444721b5e8f70562bf1fdc0656989338dc51",
+    "orca-l0/tests/ring_check.cpp": "edf589faf8df29b1c4d190a0e7a2e83d698f1726aa2365f3112e3bec5b529798",
+    "orca-l0/tests/runtime_check.cpp": "3aecdf8facd2ad0426dd90ea89ce869c12cdc4d882385dab9f9935bc1b5909ec",
+    "orca-l0/tests/runtime_dependencies.hpp": "6b082542cf1b130441a3de93ae1d6e04cb7680600b429fa636ed9bf48cfec451",
+    "orca-l0/tests/submit_check.cpp": "e8634fdb6547448a3bf54efc9773da5ef6325e826858cea02f2c63a93dd1901e",
+    "orca-l0/tests/wddm_memory_check.cpp": "3e8b17e4b72db0a7b4e53737d747cfc299cceb9207e7d520ba03c43cbbe7071e",
+    "orca-l0/third_party/intel-dg2/packets.hpp": "579559e752d0e4d4d44b903dea0a8f2d172afdd6d0fad63afa445d183bc1165b",
+    "orca-l0/src/wddm/allocation.hpp": "5348b408fb0942796b7d37f80ed6f96df4aa3ff188193341f46917a652afe31c"
+  },
+  "executable_sha256": "b5a85778f786aa04563317cd652f3144c0d6f62120eea5dda6879a39a7cff5d0",
+  "image_sha256": "94e4970f3f8f9820a25ece27e3ea6ea2a792d1f34a520326a47ce1a10e397800",
+  "production_sha256": {
+    "strata-iq2_xs.json": "9c45e51de69e66c3f1cd020359c8d70d639fbd1aba5d87ead84082fbe73fd531",
+    "build-orca-default-pair-20261031/strata.exe": "7be641375e905b0ceb64424ab4875afcdf9f7f6f1e2c60d6b0fcff4ece5ff4b5"
+  },
+  "caveats": [
+    "Correctness only; no device-memory bandwidth, GPU speedup or full-model tok/s is established.",
+    "The largest executed single local allocation is 335,609,856 bytes; sizes approaching 4 GiB are not validated.",
+    "Windows single local allocations of 4 GiB or more are explicitly rejected.",
+    "The copy fixture uses a Strata float4 kernel; it is not a public arbitrary-byte copy/fill API.",
+    "Current runtime still has one ordered reusable list and one pending submission, without multiqueue completion batching.",
+    "Allocations remain owned until runtime destruction; live allocation reclamation and the full Strata adapter remain unfinished.",
+    "Linux CPU checks do not establish native Linux GPU memory placement or execution.",
+    "Earlier performance reports use their own source revisions and system-memory heaps."
+  ],
+  "previous_host_memory_report_sha256": "197e9ef786a56c14203d1c37467a0c0f31a4a4339b3b4c66a23e051438fab38f",
+  "local_evidence": [
+    "windows-dg2-device-memory-v2",
+    "linux-dg2-device-memory-cpu-v2",
+    "windows-wddm-native-local-v7",
+    "windows-wddm-resource-layout-v3"
+  ]
+}

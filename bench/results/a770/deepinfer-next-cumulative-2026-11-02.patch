@@ -1,0 +1,18 @@
+--- a/sycl/orca/prepare.py
++++ b/sycl/orca/prepare.py
+@@ -33,6 +33,15 @@
+ 
+ def engine_source(text):
+     # These are runtime interoperability sites, rather than numerical kernels.
++    if 'const float g_env_mtp_cum_min_p = [] {' in text:
++        before = '    const char* v = std::getenv("STRATA_MTP_CUM_MIN_P");'
++        if text.count(before) != 1:
++            raise ValueError('MTP cumulative switch changed; review the Orca L0 default')
++        # Reuse the existing draft/verify early stop; explicit zero retains the old window.
++        text = text.replace(before, before + '''
++#ifndef STRATA_ORCA_DG2
++    if (v == nullptr) v = "0.5";
++#endif''')
+     # Native waits use signed nanoseconds; normalize the legacy teardown sentinel.
+     text = text.replace("wait_verify_queue(cs_, l0_sync_, UINT64_MAX)",
+                         "wait_verify_queue(cs_, l0_sync_, uint64_t(INT64_MAX))")

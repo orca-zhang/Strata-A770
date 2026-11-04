@@ -1,0 +1,172 @@
+{
+  "schema": 1,
+  "scope": "Router GEMV/input quantization overlap on the matching-stage Windows A770 C0 candidate.",
+  "production_changed": false,
+  "candidate_adopted": false,
+  "checks": {
+    "exact_model_requests": 160,
+    "full_buffer_comparisons": 1280,
+    "gpu_tail_epochs": 1920,
+    "scalar_oracle_max_error": 2.23517418e-08,
+    "full_quantization_oracle": false,
+    "policy": {
+      "step": 0.5,
+      "last": 0.5,
+      "cumulative": 0,
+      "max_mtp": 4,
+      "expert_slots": 5771,
+      "reserve_mib": 1536
+    },
+    "comparisons": {
+      "decode_tok_s": {
+        "matching": 47.46968866858929,
+        "candidate": 47.86956485999255,
+        "l0": 47.26317026902599,
+        "candidate_vs_matching_pct": 0.84238216558572,
+        "candidate_vs_l0_pct": 1.2830171728111184,
+        "matching_drift_pct": -0.26499516393028166,
+        "l0_drift_pct": 0.32643405941565895
+      },
+      "ttft_ms": {
+        "matching": 906.1189527782182,
+        "candidate": 904.4989500107476,
+        "l0": 907.1582344765551,
+        "candidate_vs_matching_pct": -0.1787847790296726,
+        "candidate_vs_l0_pct": -0.29314449946451493,
+        "matching_drift_pct": -0.40302860264057605,
+        "l0_drift_pct": -0.11125821883822828
+      },
+      "prompt_ms": {
+        "matching": 859.7979006720126,
+        "candidate": 857.6,
+        "l0": 861.7245557601339,
+        "candidate_vs_matching_pct": -0.25562991841393545,
+        "candidate_vs_l0_pct": -0.4786396920644198,
+        "matching_drift_pct": -0.44098874318209136,
+        "l0_drift_pct": -0.20287502898215237
+      },
+      "request_ms": {
+        "matching": 2467.370596450713,
+        "candidate": 2448.1723999924725,
+        "l0": 2476.0209643939484,
+        "candidate_vs_matching_pct": -0.7780832148140626,
+        "candidate_vs_l0_pct": -1.1247305576951083,
+        "matching_drift_pct": 0.37205720121706864,
+        "l0_drift_pct": -0.47816806931265665
+      }
+    },
+    "reverse_comparisons": {
+      "decode_tok_s": {
+        "candidate": 47.73461798623516,
+        "l0": 46.61575844881794,
+        "candidate_vs_l0_pct": 2.4001744788635593,
+        "candidate_drift_pct": 0.14284517977647404
+      },
+      "ttft_ms": {
+        "candidate": 906.7339149924708,
+        "l0": 917.253299994627,
+        "candidate_vs_l0_pct": -1.146835340054686,
+        "candidate_drift_pct": -0.3703088286001299
+      },
+      "prompt_ms": {
+        "candidate": 859.9739007667616,
+        "l0": 871.25,
+        "candidate_vs_l0_pct": -1.2942438144319501,
+        "candidate_drift_pct": -0.31926626806755287
+      },
+      "request_ms": {
+        "candidate": 2458.614322983024,
+        "l0": 2507.3398499953328,
+        "candidate_vs_l0_pct": -1.9433156224274661,
+        "candidate_drift_pct": -0.4812457276613835
+      }
+    },
+    "retained_decode_dispersion": {
+      "l0-before": {
+        "samples": 10,
+        "median": 47.18621707627339,
+        "minimum": 46.358423813590335,
+        "maximum": 47.592209906694215,
+        "q1": 46.83057912641002,
+        "q3": 47.43332032635112,
+        "mad": 0.32275786416982655
+      },
+      "matching-before": {
+        "samples": 10,
+        "median": 47.53271013882404,
+        "minimum": 46.945456791648645,
+        "maximum": 47.8921167055265,
+        "q1": 47.16542697841971,
+        "q3": 47.703550248280976,
+        "mad": 0.33892056109268864
+      },
+      "router-quant": {
+        "samples": 10,
+        "median": 47.86956485999255,
+        "minimum": 47.20496894409938,
+        "maximum": 48.217231315822865,
+        "q1": 47.51191365694764,
+        "q3": 48.08836100185901,
+        "mad": 0.28642825489531276
+      },
+      "matching-after": {
+        "samples": 10,
+        "median": 47.406750755671155,
+        "minimum": 46.89621127977293,
+        "maximum": 47.765696687826036,
+        "q1": 46.96651833631074,
+        "q3": 47.71097198936413,
+        "mad": 0.35444369858495506
+      },
+      "l0-after": {
+        "samples": 10,
+        "median": 47.34024896016015,
+        "minimum": 46.746217246893835,
+        "maximum": 47.66384446534964,
+        "q1": 47.03934365867364,
+        "q3": 47.44662476814249,
+        "mad": 0.18463692222082884
+      },
+      "candidate-before": {
+        "samples": 10,
+        "median": 47.70056116784856,
+        "minimum": 47.07631318136769,
+        "maximum": 48.055643376541255,
+        "q1": 47.27106183312396,
+        "q3": 47.966930966478635,
+        "mad": 0.3444517731081973
+      },
+      "l0-middle": {
+        "samples": 10,
+        "median": 46.61575844881794,
+        "minimum": 45.85218702865762,
+        "maximum": 47.216699801192846,
+        "q1": 46.35037855897281,
+        "q3": 46.71891927966002,
+        "mad": 0.21278488705537768
+      },
+      "candidate-after": {
+        "samples": 10,
+        "median": 47.768699120203166,
+        "minimum": 47.12009424018848,
+        "maximum": 48.13477737665463,
+        "q1": 47.42458736554825,
+        "q3": 47.89975186047533,
+        "mad": 0.26657734991104576
+      }
+    },
+    "linux_gpu_validated": false,
+    "physical_concurrency_proven": false
+  },
+  "evidence_files": 66,
+  "caveats": [
+    "Kernel-window checks use the exact candidate fragment and a subset scalar GEMV oracle; Q8 outputs use full-buffer parity, not an independent CPU oracle.",
+    "The L0 baseline lacks the two experimental expert/router schedules. This compares complete implementations, not the isolated cost of bypassing an API layer.",
+    "Decode excludes preparation/init/prefill; TTFT is separate. No inner timers or GPU telemetry run during the model bracket.",
+    "Control drift and descriptive sample dispersion are not confidence intervals; independent submission does not prove simultaneous hardware execution.",
+    "User confirmed an idle desktop; the shared experiment lock was acquired after another live test completed.",
+    "The original CPU-only preparation snapshot is preserved; subsequent numerical/model records are separate.",
+    "Unchanged 79 Host objects and mathematical modules reference the immutable preceding fork trial."
+  ],
+  "archive_sha256": "03ba3c46b6262c363b4fd57c5467f24edf766405b06c83689a8b44e4986ae2d2"
+}

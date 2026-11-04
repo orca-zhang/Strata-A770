@@ -1,0 +1,331 @@
+{
+  "date": "2026-11-04",
+  "started_date": "2026-11-03",
+  "hardware": "Intel Arc A770 G10 C0 0x56a0 revision8",
+  "driver": "32.0.101.9034",
+  "os": "Windows",
+  "complete": true,
+  "source_adopted": false,
+  "production_changed": false,
+  "linux_gpu_tested": false,
+  "stable_native_over_l0_gain_claimed": false,
+  "checks": {
+    "native_all_t_cases": 32,
+    "l0_all_t_cases": 32,
+    "exact_short_requests": 180,
+    "capture_argument_bytes": {
+      "before": 1256,
+      "after": 728
+    },
+    "closure_bytes": {
+      "before": 1264,
+      "after": 736
+    },
+    "resources_before": {
+      "grf_count": 128,
+      "simd_size": 32,
+      "slm_size": 0,
+      "private_size": 40192,
+      "spill_size": 2208
+    },
+    "resources_after": {
+      "grf_count": 128,
+      "simd_size": 32,
+      "slm_size": 0,
+      "private_size": 23296,
+      "spill_size": 2208
+    },
+    "unchanged_other_capture_abis": 24,
+    "selected_image": "fused_gr/image_3.zebin",
+    "unchanged_other_math_modules": 1241,
+    "args": [
+      "--pack",
+      "G:\\GitHub\\Strata-data\\packs\\iq2_xs",
+      "--native",
+      "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00001-of-00002.gguf",
+      "--ple-gguf",
+      "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00002-of-00002.gguf",
+      "--expert-profile",
+      "G:\\GitHub\\Strata\\data\\expert-profile.bin",
+      "--expert-cache",
+      "5500",
+      "--prefill",
+      "8192",
+      "--spec",
+      "4",
+      "--spec-min-p",
+      "0.5",
+      "--mtp",
+      "G:\\GitHub\\Strata-data\\mtp\\rt-full-vocab-current",
+      "--max-context",
+      "8192",
+      "--stream-experts",
+      "--vram-reserve-mib",
+      "1536",
+      "--pcie-frac",
+      "0.16",
+      "--prompt-cache",
+      "0",
+      "--short-read",
+      "1024",
+      "--adapt-every",
+      "1",
+      "--adapt-swaps",
+      "32",
+      "--prefill-borrow",
+      "--mtp-window",
+      "1024",
+      "--mtp-hnorm",
+      "stream",
+      "--adapt-decay",
+      "0.5"
+    ],
+    "policy": {
+      "step": 0.5,
+      "last": 0.5,
+      "cumulative": 0,
+      "max_mtp": 4,
+      "expert_slots": 5771,
+      "reserve_mib": 1536
+    },
+    "comparisons": {
+      "decode_tok_s": {
+        "native_control": 48.45089274285705,
+        "native_candidate": 49.23087381076965,
+        "l0_control": 48.33081564827516,
+        "l0_candidate": 48.142535811150694,
+        "native_change_pct": 1.609838382240314,
+        "l0_change_pct": -0.3895647830458038,
+        "native_candidate_vs_l0_candidate_pct": 2.2606578180430548,
+        "native_control_drift_pct": -1.0806892598241968,
+        "l0_control_drift_pct": -0.1774365960418245
+      },
+      "ttft_ms": {
+        "native_control": 912.0010289818389,
+        "native_candidate": 902.9369500058237,
+        "l0_control": 906.7816108268694,
+        "l0_candidate": 912.0224499929463,
+        "native_change_pct": -0.9938671874234917,
+        "l0_change_pct": 0.5779604596632737,
+        "native_candidate_vs_l0_candidate_pct": -0.996192581355082,
+        "native_control_drift_pct": 0.9241023590740527,
+        "l0_control_drift_pct": -0.11074810750536512
+      },
+      "prompt_ms": {
+        "native_control": 865.8688064597316,
+        "native_candidate": 858.4,
+        "l0_control": 863.2995815474487,
+        "l0_candidate": 868.3,
+        "native_change_pct": -0.8625794582286961,
+        "l0_change_pct": 0.5792216930753158,
+        "native_candidate_vs_l0_candidate_pct": -1.1401589312449611,
+        "native_control_drift_pct": 0.7593322513331779,
+        "l0_control_drift_pct": -0.19672510559508583
+      },
+      "request_ms": {
+        "native_control": 2436.2377808436786,
+        "native_candidate": 2403.3105000125943,
+        "l0_control": 2434.6632309167558,
+        "l0_candidate": 2446.62370000151,
+        "native_change_pct": -1.3515626877636522,
+        "l0_change_pct": 0.4912576381354672,
+        "native_candidate_vs_l0_candidate_pct": -1.7703253667038732,
+        "native_control_drift_pct": 1.0102456689571326,
+        "l0_control_drift_pct": 0.04765654486018622
+      }
+    },
+    "reverse_comparisons": {
+      "decode_tok_s": {
+        "l0_control": 48.66038934300872,
+        "native": 48.85740220113669,
+        "native_vs_l0_pct": 0.40487316437036736,
+        "l0_control_drift_pct": 0.25041167396651076
+      },
+      "ttft_ms": {
+        "l0_control": 905.7215132421751,
+        "native": 907.6401500205975,
+        "native_vs_l0_pct": 0.2118351778522154,
+        "l0_control_drift_pct": -0.4046950985701292
+      },
+      "prompt_ms": {
+        "l0_control": 862.0977946265725,
+        "native": 862.25,
+        "native_vs_l0_pct": 0.017655232895408268,
+        "l0_control_drift_pct": -0.4513627683583099
+      },
+      "request_ms": {
+        "l0_control": 2425.5915564337165,
+        "native": 2418.656549998559,
+        "native_vs_l0_pct": -0.2859099017212041,
+        "l0_control_drift_pct": -0.15647840294228388
+      }
+    },
+    "retained_decode_dispersion": {
+      "l0-before": {
+        "samples": 10,
+        "median_tok_s": 48.37375107115864,
+        "min_tok_s": 48.07996457265768,
+        "max_tok_s": 48.68985841501697,
+        "mad_tok_s": 0.21028330158348751
+      },
+      "native-before": {
+        "samples": 10,
+        "median_tok_s": 48.71483578006155,
+        "min_tok_s": 48.37375087518299,
+        "max_tok_s": 48.97538342569919,
+        "mad_tok_s": 0.2022309392241617
+      },
+      "native-candidate": {
+        "samples": 10,
+        "median_tok_s": 49.23087381076965,
+        "min_tok_s": 48.92493884382644,
+        "max_tok_s": 49.540447167720494,
+        "mad_tok_s": 0.19359652509168512
+      },
+      "l0-candidate": {
+        "samples": 10,
+        "median_tok_s": 48.142535811150694,
+        "min_tok_s": 47.75069112842423,
+        "max_tok_s": 48.78988251909867,
+        "mad_tok_s": 0.26700414585209487
+      },
+      "native-after": {
+        "samples": 10,
+        "median_tok_s": 48.18837978184543,
+        "min_tok_s": 47.75069112842423,
+        "max_tok_s": 48.71482597269406,
+        "mad_tok_s": 0.29957338144097534
+      },
+      "l0-after": {
+        "samples": 10,
+        "median_tok_s": 48.28791833388023,
+        "min_tok_s": 47.86798513573093,
+        "max_tok_s": 48.89346371590324,
+        "mad_tok_s": 0.24803174790295301
+      },
+      "reverse-l0-before": {
+        "samples": 10,
+        "median_tok_s": 48.59957788070006,
+        "min_tok_s": 48.349131624149116,
+        "max_tok_s": 48.86202906004886,
+        "mad_tok_s": 0.20663189608706745
+      },
+      "reverse-native": {
+        "samples": 10,
+        "median_tok_s": 48.85740220113669,
+        "min_tok_s": 48.07692307692308,
+        "max_tok_s": 49.23555325213786,
+        "mad_tok_s": 0.1394334642987829
+      },
+      "reverse-l0-after": {
+        "samples": 10,
+        "median_tok_s": 48.72127689721178,
+        "min_tok_s": 47.40223289465477,
+        "max_tok_s": 49.057578104828295,
+        "mad_tok_s": 0.2731315216715906
+      }
+    },
+    "arms": [
+      {
+        "label": "l0-before",
+        "summary": {
+          "decode_tok_s": 48.37375107115864,
+          "ttft_ms": 907.2841500164941,
+          "prompt_ms": 864.15,
+          "request_ms": 2434.083300002385
+        }
+      },
+      {
+        "label": "native-before",
+        "summary": {
+          "decode_tok_s": 48.71483578006155,
+          "ttft_ms": 907.8161000070395,
+          "prompt_ms": 862.6,
+          "request_ms": 2424.0242499945452
+        }
+      },
+      {
+        "label": "native-candidate",
+        "summary": {
+          "decode_tok_s": 49.23087381076965,
+          "ttft_ms": 902.9369500058237,
+          "prompt_ms": 858.4,
+          "request_ms": 2403.3105000125943
+        }
+      },
+      {
+        "label": "l0-candidate",
+        "summary": {
+          "decode_tok_s": 48.142535811150694,
+          "ttft_ms": 912.0224499929463,
+          "prompt_ms": 868.3,
+          "request_ms": 2446.62370000151
+        }
+      },
+      {
+        "label": "native-after",
+        "summary": {
+          "decode_tok_s": 48.18837978184543,
+          "ttft_ms": 916.2052500032587,
+          "prompt_ms": 869.15,
+          "request_ms": 2448.512849994586
+        }
+      },
+      {
+        "label": "l0-after",
+        "summary": {
+          "decode_tok_s": 48.28791833388023,
+          "ttft_ms": 906.2793499906547,
+          "prompt_ms": 862.45,
+          "request_ms": 2435.2433000021847
+        }
+      }
+    ],
+    "reverse_arms": [
+      {
+        "label": "l0-before",
+        "summary": {
+          "decode_tok_s": 48.59957788070006,
+          "ttft_ms": 907.5598000054015,
+          "prompt_ms": 864.05,
+          "request_ms": 2427.491549999104
+        }
+      },
+      {
+        "label": "native",
+        "summary": {
+          "decode_tok_s": 48.85740220113669,
+          "ttft_ms": 907.6401500205975,
+          "prompt_ms": 862.25,
+          "request_ms": 2418.656549998559
+        }
+      },
+      {
+        "label": "l0-after",
+        "summary": {
+          "decode_tok_s": 48.72127689721178,
+          "ttft_ms": 903.8869499781867,
+          "prompt_ms": 860.15,
+          "request_ms": 2423.6930499901064
+        }
+      }
+    ]
+  },
+  "evidence_files": 463,
+  "scope": "Isolated eight-row Q8-up capture reduction, same arithmetic/reduction/barriers/geometry. Only selected up image changes, both Host ABIs rebuilt. All-T byte parity, six clean forward arms and three reverse arms use frozen older norm baseline.",
+  "caveats": [
+    "Private-memory metadata falls42.038%,not a measured memory-traffic or throughput reduction. SIMD32/128GRFs/spill2208 stay fixed; runtime scratch still rounds4096.",
+    "Each model arm runs10warmups+10retainedShorts. Decode excludes preparation/init/prefill. TTFT separate. No inner timers/GPUtimestamps/telemetry. Clocks unlocked.",
+    "Identical candidate math pack is used on native and L0. Same5771slots/reserve1536MiB/MTP4/step-last0.5/cumulative0,76exacttokens,57of57drafts,naturalstop,no reuse/resume.",
+    "Before/after geometric controls quantify drift,not confidence intervals or general speed guarantees. Forward and reverse candidate comparisons are fixed-Short observations,not a general backend guarantee. The within-backend up-capture ablation has one forward bracket.",
+    "V1 compiled/baked successfully but incorrectly compared closure size against the argument-only size;preserved. V2 corrects the8Blocalaccessor assertion and reuses compiled bytes.",
+    "First model attempt incorrectly reused an older Host object/header ABI with the newer Queue;candidate exited during initialization. Two completed20-request controls and the failed candidate logs are preserved,excluded from the fresh complete comparison. Corrected model rebuilds each changed Host object with its own exact frozen model command/headers.",
+    "Native numerical probe uses its older frozen oneGiB runtime;clean full-model tests use the later frozen BCS-fill runtime and matched expert schedule. Neither is a live production executable.",
+    "Other1241mathematical modules are byte-identical within each comparison. Reproduction requires archived command inputs;immutable runtime/model reports and hash manifests identify borrowed objects."
+  ],
+  "reproduction": {
+    "verify": "python build-orca-native-lower-20261031/publish_dg2_hc_up.py --verify",
+    "rerun": "Use fresh stage directories with archived commands, pinned inputs and shared GPU lease; never overwrite completed evidence."
+  },
+  "archive_sha256": "3d3adb52a278b81cdc6431c3123238ae09bb3e6ccb982187220a5787dfa9c7e1"
+}

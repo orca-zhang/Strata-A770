@@ -49,6 +49,8 @@ def main():
     parser.add_argument('--pair',action='store_true',help='Same-binary FP16 pair OFF/ON/OFF; supply its frozen config')
     parser.add_argument('--repeats',type=int,default=1,help='Retained Code2K/Long8K cycles after the Short primer')
     parser.add_argument('--tokens',type=int,default=16)
+    parser.add_argument('--expert-cache',type=int,default=6250,
+                        help='Requested expert count (not MiB); 6250 previously produced 6561 A770 slots')
     parser.add_argument('--self-check',action='store_true')
     args=parser.parse_args()
     if args.self_check:
@@ -65,12 +67,12 @@ def main():
         assert comparisons(runs)[3]['medians_A0_B_A1']==[100,90,100]
         print('PASS phase-boundary attribution and gain/drift gates; no GPU');return
     if not args.out:parser.error('new --out required')
-    if args.repeats<1 or args.tokens<1 or (args.pair and (args.profile or args.repeats<2)):
-        parser.error('positive repeats/tokens required; --pair needs >=2 repeats and excludes --profile')
+    if args.repeats<1 or args.tokens<1 or args.expert_cache<1 or (args.pair and (args.profile or args.repeats<2)):
+        parser.error('positive repeats/tokens/expert-cache required; --pair needs >=2 repeats and excludes --profile')
     cfg=read(args.config);assert cfg['backend']=='orca'
     inputs=b.prompts(cfg);env,selected=runtime_env(cfg['env'],cfg['lib_dirs'])
     model_args=cfg['args'].copy()
-    for key,value in {'--expert-cache':'5500','--adapt-swaps':'0','--pcie-frac':'0'}.items():
+    for key,value in {'--expert-cache':str(args.expert_cache),'--adapt-swaps':'0','--pcie-frac':'0'}.items():
         model_args[model_args.index(key)+1]=value
     assert model_args[model_args.index('--spec-min-p')+1]=='0.5'
     out=args.out.resolve();out.mkdir(parents=True,exist_ok=False)
@@ -81,7 +83,8 @@ def main():
     manifest=lambda:{p.relative_to(images).as_posix():b.sha(p) for p in images.rglob('*') if p.is_file()}
     d=dict(complete=False,production_changed=False,performance_confirmed=False,
            diagnostic_only=args.profile,linux_gpu_validated=False,exe=cfg['exe'],args=model_args,
-           protocol='Same native binary, fixed5771 expert slots/adapt0/pcie0/minp0.5. '
+           requested_experts=args.expert_cache,
+           protocol='Same native binary, equal measured expert slots across arms/adapt0/pcie0/minp0.5. '
                     +('FP16 pair OFF/ON/OFF; ' if args.pair else 'Screen default/batch0/chain0/default; ')
                     +f'Short16 primer, then {args.repeats} retained Code2K/Long8K cycles, {args.tokens} output tokens. '
                     'No discarded batched warmup; first cycle retained. Pair: >=1% gain and <=3% baseline drift, '
@@ -103,7 +106,10 @@ def main():
                 d['runs'].append(arm);save();print('RUN',label,flush=True)
                 engine=b.Engine(Path(cfg['exe']),model_args,runenv,out/label);arm['info']=engine.info
                 try:
-                    assert re.search(r'\bexpert_slots=5771\b',engine.info)
+                    slots=int(re.search(r'\bexpert_slots=(\d+)\b',engine.info)[1])
+                    assert slots>=args.expert_cache, 'expert cache smaller than requested'
+                    if 'expert_slots' not in d:d['expert_slots']=slots
+                    assert slots==d['expert_slots'], 'expert slots changed between arms'
                     arm['primer']=engine.gen(inputs['Short'],16,keys='temperature=0')
                     cases=['Code2K'] if args.profile else ['Code2K','Long8K']*args.repeats
                     for i,case in enumerate(cases):

@@ -6,14 +6,27 @@
 #include <strata/prefill/gemm.hpp>
 #include <strata/prefill/kernels.hpp>
 #include <strata/prefill/fp16_pair.hpp>
+#include <algorithm>
 #include <array>
+#include <atomic>
 #include <cmath>
 #include <cstdio>
 #include <limits>
+#include <memory>
 #include <vector>
 #include <chrono>
 #include <cstring>
 #include "../../orca-l0/tests/runtime_dependencies.hpp"
+
+namespace {
+void dependencies() {
+#ifdef STRATA_ORCA_DG2
+    check_runtime_dependencies(true);
+#else
+    check_runtime_dependencies();
+#endif
+}
+}
 
 namespace strata::prefill {
 void finite_count_async(const float*, int64_t, uint32_t*, void*);
@@ -28,13 +41,13 @@ void orca_xmx_gemm(const uint16_t*, const uint16_t*, float*, int64_t, int64_t, i
 }
 
 int main(int argc, char** argv) try {
-    if (argc < 2 || argc > 3 || (argc == 3 && std::string(argv[2]) != "--bench-batch"))
-        throw std::invalid_argument("usage: strata-orca-kernel-check image-directory [--bench-batch]");
-    check_runtime_dependencies();
+    if (argc < 2 || argc > 3 || (argc == 3 && std::string(argv[2]) != "--bench-batch" && std::string(argv[2]) != "--bench-pair"))
+        throw std::invalid_argument("usage: strata-orca-kernel-check image-directory [--bench-batch|--bench-pair]");
+    dependencies();
     namespace k = strata::kernels;
-    orca::l0::Runtime runtime;
+    strata::l0::Runtime runtime;
     const std::filesystem::path images(argv[1]);
-    orca::l0::compiler::Program program(runtime, images / "elementwise");
+    strata::l0::Program program(runtime, images / "elementwise");
     std::ifstream packs(images / "packs.txt");
     if (!packs) throw std::runtime_error("missing native pack manifest");
     std::string pack;
@@ -46,11 +59,37 @@ int main(int argc, char** argv) try {
     }
     strata::l0::Queue stream(runtime, program);
     strata::l0::bind_default(stream);
+#ifdef STRATA_ORCA_DG2
+    {
+        strata::l0::Queue blocked(runtime, program);
+        auto gate = std::make_shared<strata::l0::NativeEvent>(runtime);
+        struct Release {
+            std::shared_ptr<strata::l0::NativeEvent> gate;
+            ~Release() { try { strata::l0::signal_event(gate->handle); } catch (...) {} }
+        } release{gate};
+        auto* observed = static_cast<float*>(runtime.allocate(4 * sizeof(float), strata::l0::Memory::host));
+        blocked.ext_oneapi_submit_barrier({strata::l0::Event::borrow(gate->handle)});
+        stream.begin_recording();
+        stream.fill(observed, -1.f, 4);
+        dpct::constant_memory<float, 1> table(sycl::range<1>(4), {1.f,2.f,3.f,4.f});
+        auto* values = table.get_ptr(); // First-use upload must escape this capture and the unrelated gate.
+        k::scale_inplace(values, 4, 2.f, &stream);
+        stream.memcpy(observed, values, 4 * sizeof(float));
+        auto recorded = stream.end_recording();
+        stream.replay(recorded).wait_and_throw(); stream.wait_and_throw();
+        for (int i = 0; i < 4; ++i)
+            if (observed[i] != float(2 * (i + 1))) throw std::runtime_error("native captured constant-table initialization mismatch");
+        if (blocked.ext_oneapi_empty()) throw std::runtime_error("constant-table initialization released the unrelated queue");
+        strata::l0::signal_event(gate->handle); blocked.wait_and_throw();
+        recorded.reset(); runtime.deallocate(values); runtime.deallocate(observed);
+    }
+    std::puts("PASS native constant table: initialized during capture while an unrelated queue stays gated");
+#endif
     {
         constexpr int rows = 9, n = 2560, k = 640;
         std::vector<void*> allocations;
         auto host = [&](size_t bytes) {
-            auto* p = runtime.allocate(bytes, orca::l0::Memory::host);
+            auto* p = runtime.allocate(bytes, strata::l0::Memory::host);
             allocations.push_back(p); return p;
         };
         auto* x = static_cast<uint16_t*>(host(rows * k * 2));
@@ -97,8 +136,8 @@ int main(int argc, char** argv) try {
     }
     {
         constexpr int length = 4111;
-        auto* values = static_cast<float*>(runtime.allocate(length * sizeof(float), orca::l0::Memory::host));
-        auto* counts = static_cast<uint32_t*>(runtime.allocate(3 * sizeof(uint32_t), orca::l0::Memory::host));
+        auto* values = static_cast<float*>(runtime.allocate(length * sizeof(float), strata::l0::Memory::host));
+        auto* counts = static_cast<uint32_t*>(runtime.allocate(3 * sizeof(uint32_t), strata::l0::Memory::host));
         for (int i = 0; i < length; ++i) values[i] = float(i);
         counts[0] = 17; counts[1] = 0; counts[2] = 29;
         strata::prefill::finite_count_async(values, length, counts + 1, &stream);
@@ -116,8 +155,8 @@ int main(int argc, char** argv) try {
     }
     {
         constexpr int length = 65536; // Exhaust every FP16/BF16 bit pattern, including signed NaNs and subnormals.
-        auto* values = static_cast<uint16_t*>(runtime.allocate(length * sizeof(uint16_t), orca::l0::Memory::host));
-        auto* counts = static_cast<uint32_t*>(runtime.allocate(3 * sizeof(uint32_t), orca::l0::Memory::host));
+        auto* values = static_cast<uint16_t*>(runtime.allocate(length * sizeof(uint16_t), strata::l0::Memory::host));
+        auto* counts = static_cast<uint32_t*>(runtime.allocate(3 * sizeof(uint32_t), strata::l0::Memory::host));
         for (int i = 0; i < length; ++i) values[i] = uint16_t(i);
         for (bool brain : {false, true}) {
             counts[0] = 17; counts[1] = 0; counts[2] = 29;
@@ -135,7 +174,7 @@ int main(int argc, char** argv) try {
         constexpr int tokens = 2, n = 2560, hc = 4, dim = n * hc;
         std::vector<void*> allocations;
         auto host = [&](size_t size) {
-            auto* p = runtime.allocate(size, orca::l0::Memory::host);
+            auto* p = runtime.allocate(size, strata::l0::Memory::host);
             allocations.push_back(p);
             return p;
         };
@@ -190,8 +229,8 @@ int main(int argc, char** argv) try {
     auto* codes = static_cast<uint8_t*>(device(count / 4));
     auto* embedded = static_cast<float*>(device(count * sizeof(float)));
     auto* scales = static_cast<float*>(device(count / 32 * sizeof(float)));
-    auto* seq = static_cast<uint32_t*>(runtime.allocate(sizeof(uint32_t), orca::l0::Memory::host));
-    auto* flag = static_cast<uint32_t*>(runtime.allocate(sizeof(uint32_t), orca::l0::Memory::host));
+    auto* seq = static_cast<uint32_t*>(runtime.allocate(sizeof(uint32_t), strata::l0::Memory::host));
+    auto* flag = static_cast<uint32_t*>(runtime.allocate(sizeof(uint32_t), strata::l0::Memory::host));
     *seq = 0;
     *flag = 1;
     std::vector<float> input(count), add(count), weights(width), scale(count / 32, 0.5f);
@@ -531,7 +570,7 @@ int main(int argc, char** argv) try {
         gemm.set_auto_batch(true);
         runtime.deallocate(dx); runtime.deallocate(dw); runtime.deallocate(dy);
     }
-    check_runtime_dependencies();
+    dependencies();
     std::printf("PASS Strata numerical sources on %s: embedding, scale/add, gate, RMSNorm, FP16/BF16, Q8_0, doorbells; 3 native graph replays\n",
                 runtime.properties().name);
     std::puts("PASS Strata native XMX FP16/BF16 GEMM: 36 shapes, padded strides and partial tiles, exact outputs and guards");
@@ -581,7 +620,15 @@ int main(int argc, char** argv) try {
                 checks += 3;
             }
         };
-        for (auto shape : {std::pair{1, 1}, {3, 5}, {4, 4}, {4, 5}, {7, 9}, {8, 16}, {127, 129}}) {
+        for (auto shape : {std::pair{1, 1}, {3, 5}, {4, 4}, {4, 5}, {7, 9}, {8, 16},
+                           {1, 129}, {129, 1}, {32, 32}, {31, 33}, {127, 129}, {129, 129}}) {
+            if (shape == std::pair{129, 129}) {
+                std::fill(x.begin(), x.end(), k::f16_from_f32(0.5f));
+                for (size_t i = 0; i < wg.size(); ++i)
+                    wg[i] = k::f16_from_f32(i / n % 2 == 0 ? 0.5f : (i / n % 4 == 1 ? 1.f : -1.f));
+                stream.memcpy(px, x.data(), x.size() * 2);
+                stream.memcpy(pgw, wg.data(), wg.size() * 2);
+            }
             const fp16_pair::Expert first{px, pgw, pdw, pgu + guard, ph + guard, py + guard, shape.first};
             const fp16_pair::Expert second{px + gx, pgw + gw, pdw + dw,
                 pgu + gs + guard, ph + hs + guard, py + ys + guard, shape.second};
@@ -589,6 +636,10 @@ int main(int argc, char** argv) try {
             for (auto e : {first, second})
                 reference.f16_expert(e.x, e.gu_weight, e.down_weight, e.gu, e.hidden, e.output, e.rows);
             outputs(true);
+            if (shape == std::pair{129, 129} &&
+                (std::find(expected_h.begin(), expected_h.end(), uint16_t(0x7bff)) == expected_h.end() ||
+                 std::find(expected_h.begin(), expected_h.end(), uint16_t(0xfbff)) == expected_h.end()))
+                throw std::runtime_error("native pair saturation coverage missing");
             for (int bank = 0; bank < 2; ++bank) {
                 const int rows = bank ? shape.second : shape.first;
                 for (size_t i = 0; i < gs; ++i)
@@ -605,9 +656,13 @@ int main(int argc, char** argv) try {
             }
             for (int mode : {0, 1, 2, 3}) {
                 reset();
+                auto host_done = std::make_shared<std::atomic<bool>>(false);
+                if (mode == 0) stream.host_task([host_done] { host_done->store(true, std::memory_order_release); });
                 if (mode >= 2) stream.begin_recording(mode == 3);
                 if (!fp16_pair::execute(stream, first, second, pad + guard, pad_bytes, mode == 0))
                     throw std::runtime_error("native FP16 pair dispatch refused");
+                if (mode == 0 && !host_done->load(std::memory_order_acquire))
+                    throw std::runtime_error("native FP16 pair finish skipped an earlier host task");
                 if (mode >= 2) {
                     auto graph = stream.end_recording();
                     stream.replay(graph);
@@ -640,6 +695,44 @@ int main(int argc, char** argv) try {
             }
         }
         std::printf("PASS native FP16 expert pair: %d full-output checks, distinct weights, M4/tail guards, async/capture and rejected inputs\n", checks);
+        if (argc == 3 && std::string(argv[2]) == "--bench-pair") {
+            for (size_t i = 0; i < x.size(); ++i) x[i] = k::f16_from_f32(float(int(i % 23) - 11) / 32.f);
+            for (size_t i = 0; i < wg.size(); ++i) wg[i] = k::f16_from_f32(float(int(i % 29) - 14) / 64.f);
+            stream.memcpy(px, x.data(), x.size() * 2);
+            stream.memcpy(pgw, wg.data(), wg.size() * 2).wait_and_throw();
+            constexpr int batch = 32;
+            for (auto shape : {std::pair{1, 1}, {8, 16}, {31, 33}, {32, 32}, {40, 40}, {127, 129}}) {
+                const fp16_pair::Expert a{px, pgw, pdw, pgu + guard, ph + guard, py + guard, shape.first};
+                const fp16_pair::Expert b{px + gx, pgw + gw, pdw + dw, pgu + gs + guard,
+                                         ph + hs + guard, py + ys + guard, shape.second};
+                for (bool replay : {false, true}) {
+                    decltype(stream.end_recording()) graph;
+                    if (replay) {
+                        stream.begin_recording();
+                        for (int i = 0; i < batch; ++i) fp16_pair::execute(stream, a, b, pad + guard, pad_bytes, false);
+                        graph = stream.end_recording();
+                    }
+                    std::vector<double> submission, completion;
+                    for (int repeat = 0; repeat < 9; ++repeat) {
+                        const auto start = std::chrono::steady_clock::now();
+                        if (replay) stream.replay(graph);
+                        else for (int i = 0; i < batch; ++i) fp16_pair::execute(stream, a, b, pad + guard, pad_bytes, false);
+                        const auto submitted = std::chrono::steady_clock::now();
+                        stream.wait_and_throw();
+                        const auto complete = std::chrono::steady_clock::now();
+                        if (repeat >= 2) {
+                            submission.push_back(std::chrono::duration<double, std::micro>(submitted - start).count() / batch);
+                            completion.push_back(std::chrono::duration<double, std::micro>(complete - start).count() / batch);
+                        }
+                    }
+                    std::sort(submission.begin(), submission.end());
+                    std::sort(completion.begin(), completion.end());
+                    std::printf("PAIR_BENCH rows_a=%d rows_b=%d mode=%s batch=%d samples=7 submit_us=%.3f complete_us=%.3f\n",
+                        shape.first, shape.second, replay ? "replay" : "eager", batch, submission[3], completion[3]);
+                }
+            }
+            return 0;
+        }
     }
     std::printf("PASS Strata Gemm API: %d cases, strides/beta/unaligned dimensions/chunked workspace\n", gemm_cases);
     std::puts("PASS Strata native dequant GEMM: sliced scratch, padded strides, beta and output guards");
@@ -701,6 +794,7 @@ int main(int argc, char** argv) try {
             runtime.deallocate(bx); runtime.deallocate(bw); runtime.deallocate(by);
         }
     }
+    dependencies();
     return 0;
 } catch (const std::exception& e) {
     std::fprintf(stderr, "%s\n", e.what());

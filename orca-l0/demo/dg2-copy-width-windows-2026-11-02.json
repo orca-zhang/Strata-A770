@@ -1,0 +1,230 @@
+{
+  "date": "2026-11-02",
+  "complete": true,
+  "production_changed": false,
+  "candidate_adopted": false,
+  "matching_requests": 200,
+  "same_math_zebins": 1242,
+  "same_native_executable": true,
+  "conclusion": "SIMD32 first-trial improvement is not reproduced at the same magnitude in the larger repeat. No stable model speedup or native win over L0 is established; keep the existing SIMD16 module.",
+  "source_sha256": {
+    "sycl/orca_dg2_backend.hpp": "0bdaf70c9dff491c7ca3da7a9defc1ed3ba16bbdedc5457cc6e69b8248da9602",
+    "sycl/orca_queue.hpp": "1b7cc25c2b31653595b85d3a577ec96d6cc3a0a7156a53d9b63f8a8948ed26bf",
+    "orca-l0/include/orca_l0/dg2.hpp": "4d3337560bdd5f01145acfbce90db2fba118625c927a967ae5bd87fdd4d41245",
+    "orca-l0/src/drm/recording.inl": "06b7b235a267938b333391da97831997a1519d9feaf757553f1f3f53e460a4f9",
+    "orca-l0/src/drm/memory.cl": "d2825a86f3551d4a08cefe745a45ce44bd5607f256d304470abe18ca43772943",
+    "orca-l0/src/drm/zebin.hpp": "a927dfee4f823ca74bf85a84b07a6790c9caa752d4504cbfc10227e39a789283",
+    "orca-l0/src/drm/runtime.cpp": "1a10b18843bbb694ba0ad7bbad3f86aa73617f76672075cc0feba09dadf1446b",
+    "orca-l0/src/wddm/runtime.cpp": "e005a697e557ea75330a96303a42fa140505a83496aae396ab4bfee9149f0113",
+    "orca-l0/tests/drm_compute_check.cpp": "1cf070b9de9427c97199134e6e168958284631c2c820a20fe932bb7c502fda01",
+    "sycl/orca/include/dpct/dpct.hpp": "9c6f2d8669692666389cb8b47e38a29dfb967b158a881e5c2bff1149b438ec38",
+    "orca-l0/src/drm/encoding.hpp": "fd8eeca92142cf0cc96d2db3137d0cb174cb4662539d6a358d62f397b0ddde1d"
+  },
+  "policy": {
+    "step": 0.5,
+    "last": 0.5,
+    "cumulative": 0,
+    "max_mtp": 4,
+    "expert_slots": 5771,
+    "reserve_mib": 1536
+  },
+  "scope": "Only the offline copy/fill module SIMD width changes. Mathematical ISA, runtime, Host objects, ownership, packet/cache policies and model thresholds remain fixed.",
+  "trials": {
+    "initial": {
+      "comparisons": {
+        "simd8": {
+          "decode_tok_s": {
+            "control": 43.71167739248843,
+            "candidate": 43.31471560469623,
+            "l0": 47.29603584541664,
+            "change_pct": -0.9081367073330737,
+            "drift_pct": -1.245999085505245,
+            "vs_l0_pct": -8.417873019491607
+          },
+          "ttft_ms": {
+            "control": 950.9994789303098,
+            "candidate": 975.6390999973519,
+            "l0": 914.7221000021091,
+            "change_pct": 2.5909184613599257,
+            "drift_pct": 3.3572047840522146,
+            "vs_l0_pct": 6.659618259480382
+          },
+          "prompt_ms": {
+            "control": 897.6609604967791,
+            "candidate": 922.2,
+            "l0": 869.9,
+            "change_pct": 2.7336645552281436,
+            "drift_pct": 3.5827664399092907,
+            "vs_l0_pct": 6.0121853086561705
+          },
+          "request_ms": {
+            "control": 2642.560838984259,
+            "candidate": 2658.9862999971956,
+            "l0": 2480.478999990737,
+            "change_pct": 0.6215736179322917,
+            "drift_pct": 1.603697403984583,
+            "vs_l0_pct": 7.19648503402468
+          }
+        },
+        "simd32": {
+          "decode_tok_s": {
+            "control": 43.71167739248843,
+            "candidate": 44.700623456063994,
+            "l0": 47.29603584541664,
+            "change_pct": 2.2624299101948964,
+            "drift_pct": -1.245999085505245,
+            "vs_l0_pct": -5.487589695329953
+          },
+          "ttft_ms": {
+            "control": 950.9994789303098,
+            "candidate": 981.9333000050392,
+            "l0": 914.7221000021091,
+            "change_pct": 3.2527695082992025,
+            "drift_pct": 3.3572047840522146,
+            "vs_l0_pct": 7.347717957484035
+          },
+          "prompt_ms": {
+            "control": 897.6609604967791,
+            "candidate": 928.6,
+            "l0": 869.9,
+            "change_pct": 3.4466286119983147,
+            "drift_pct": 3.5827664399092907,
+            "vs_l0_pct": 6.747902057707789
+          },
+          "request_ms": {
+            "control": 2642.560838984259,
+            "candidate": 2656.2452999933157,
+            "l0": 2480.478999990737,
+            "change_pct": 0.5178484751297674,
+            "drift_pct": 1.603697403984583,
+            "vs_l0_pct": 7.085982183410344
+          }
+        }
+      },
+      "matching_requests": 75,
+      "warmups": 10,
+      "retained": 5
+    },
+    "repeat": {
+      "comparisons": {
+        "decode_tok_s": {
+          "control": 45.577258601609934,
+          "candidate": 45.739046701974004,
+          "change_pct": 0.3549754972721253,
+          "drift_pct": 0.28827097471624263,
+          "l0": 47.0828777787607,
+          "l0_drift_pct": 1.1213555943184739,
+          "vs_l0_pct": -2.8541821149957403
+        },
+        "ttft_ms": {
+          "control": 933.9575742776278,
+          "candidate": 935.9754000033718,
+          "change_pct": 0.2160511120973263,
+          "drift_pct": -0.10371961994289913,
+          "l0": 917.1206345524316,
+          "l0_drift_pct": -0.9372413380902223,
+          "vs_l0_pct": 2.0558653617189115
+        },
+        "prompt_ms": {
+          "control": 883.7498854313928,
+          "candidate": 886.2,
+          "change_pct": 0.2772407226294904,
+          "drift_pct": 0.10189063738255122,
+          "l0": 871.3937514120698,
+          "l0_drift_pct": -0.7545444152280756,
+          "vs_l0_pct": 1.6991456002452443
+        },
+        "request_ms": {
+          "control": 2551.818588091385,
+          "candidate": 2546.2441999989096,
+          "change_pct": -0.21844766389310655,
+          "drift_pct": -0.1594139052533694,
+          "l0": 2496.469969701329,
+          "l0_drift_pct": -1.9154857115581958,
+          "vs_l0_pct": 1.9937844597239573
+        }
+      },
+      "matching_requests": 125,
+      "warmups": 10,
+      "retained": 15
+    }
+  },
+  "builds": {
+    "stock": {
+      "image_sha256": "69e4091d470e3a30d20c1b4519bc597f75d491bc3c100940e6c8bdd4bc08f05f",
+      "ze_info": "---\nversion:         '1.73'\nkernels:\n  - name:            orca_copy\n    user_attributes:\n      intel_reqd_workgroup_walk_order: [ 0, 1, 2 ]\n      reqd_work_group_size: [ 256, 1, 1 ]\n    execution_env:\n      grf_count:       128\n      has_4gb_buffers: true\n      has_no_stateless_write: true\n      inline_data_payload_size: 32\n      offset_to_skip_per_thread_data_load: 192\n      required_work_group_size: [ 256, 1, 1 ]\n      simd_size:       16\n      subgroup_independent_forward_progress: true\n      eu_thread_count: 8\n    payload_arguments:\n      - arg_type:        global_id_offset\n        offset:          0\n        size:            12\n      - arg_type:        arg_bypointer\n        offset:          16\n        size:            8\n        arg_index:       0\n        addrmode:        stateless\n        addrspace:       global\n        access_type:     readwrite\n      - arg_type:        arg_bypointer\n        offset:          24\n        size:            8\n        arg_index:       1\n        addrmode:        stateless\n        addrspace:       global\n        access_type:     readwrite\n      - arg_type:        arg_byvalue\n        offset:          32\n        size:            8\n        arg_index:       2\n      - arg_type:        global_size\n        offset:          40\n        size:            12\n    per_thread_payload_arguments:\n      - arg_type:        local_id\n        offset:          0\n        size:            96\n  - name:            orca_fill\n    user_attributes:\n      intel_reqd_workgroup_walk_order: [ 0, 1, 2 ]\n      reqd_work_group_size: [ 256, 1, 1 ]\n    execution_env:\n      grf_count:       128\n      has_4gb_buffers: true\n      has_no_stateless_write: true\n      inline_data_payload_size: 32\n      offset_to_skip_per_thread_data_load: 192\n      required_work_group_size: [ 256, 1, 1 ]\n      simd_size:       16\n      subgroup_independent_forward_progress: true\n      eu_thread_count: 8\n    payload_arguments:\n      - arg_type:        global_id_offset\n        offset:          0\n        size:            12\n      - arg_type:        arg_bypointer\n        offset:          16\n        size:            8\n        arg_index:       0\n        addrmode:        stateless\n        addrspace:       global\n        access_type:     readwrite\n      - arg_type:        arg_byvalue\n        offset:          24\n        size:            8\n        arg_index:       1\n      - arg_type:        arg_byvalue\n        offset:          32\n        size:            16\n        arg_index:       2\n      - arg_type:        global_size\n        offset:          48\n        size:            12\n    per_thread_payload_arguments:\n      - arg_type:        local_id\n        offset:          0\n        size:            96\n  - name:            orca_fill_wide\n    user_attributes:\n      intel_reqd_workgroup_walk_order: [ 0, 1, 2 ]\n      reqd_work_group_size: [ 256, 1, 1 ]\n    execution_env:\n      grf_count:       128\n      has_4gb_buffers: true\n      has_no_stateless_write: true\n      inline_data_payload_size: 32\n      offset_to_skip_per_thread_data_load: 192\n      required_work_group_size: [ 256, 1, 1 ]\n      simd_size:       16\n      subgroup_independent_forward_progress: true\n      eu_thread_count: 8\n    payload_arguments:\n      - arg_type:        global_id_offset\n        offset:          0\n        size:            12\n      - arg_type:        arg_bypointer\n        offset:          16\n        size:            8\n        arg_index:       0\n        addrmode:        stateless\n        addrspace:       global\n        access_type:     readwrite\n      - arg_type:        arg_bypointer\n        offset:          24\n        size:            8\n        arg_index:       2\n        addrmode:        stateless\n        addrspace:       global\n        access_type:     readwrite\n      - arg_type:        arg_byvalue\n        offset:          32\n        size:            8\n        arg_index:       1\n      - arg_type:        arg_byvalue\n        offset:          40\n        size:            4\n        arg_index:       3\n      - arg_type:        global_size\n        offset:          44\n        size:            12\n    per_thread_payload_arguments:\n      - arg_type:        local_id\n        offset:          0\n        size:            96\n  - name:            orca_copy_2d\n    user_attributes:\n      intel_reqd_workgroup_walk_order: [ 0, 1, 2 ]\n      reqd_work_group_size: [ 256, 1, 1 ]\n    execution_env:\n      grf_count:       128\n      has_4gb_buffers: true\n      has_no_stateless_write: true\n      indirect_stateless_count: 4\n      inline_data_payload_size: 32\n      offset_to_skip_per_thread_data_load: 192\n      required_work_group_size: [ 256, 1, 1 ]\n      simd_size:       16\n      subgroup_independent_forward_progress: true\n      eu_thread_count: 8\n    payload_arguments:\n      - arg_type:        global_id_offset\n        offset:          0\n        size:            12\n      - arg_type:        arg_bypointer\n        offset:          16\n        size:            8\n        arg_index:       0\n        addrmode:        stateless\n        addrspace:       global\n        access_type:     readwrite\n      - arg_type:        arg_bypointer\n        offset:          24\n        size:            8\n        arg_index:       1\n        addrmode:        stateless\n        addrspace:       global\n        access_type:     readwrite\n      - arg_type:        arg_byvalue\n        offset:          32\n        size:            8\n        arg_index:       2\n      - arg_type:        arg_byvalue\n        offset:          40\n        size:            8\n        arg_index:       3\n      - arg_type:        arg_byvalue\n        offset:          48\n        size:            8\n        arg_index:       4\n      - arg_type:        arg_byvalue\n        offset:          56\n        size:            8\n        arg_index:       5\n      - arg_type:        global_size\n        offset:          64\n        size:            12\n    per_thread_payload_arguments:\n      - arg_type:        local_id\n        offset:          0\n        size:            96\nkernels_misc_info:\n  - name:            orca_copy\n    args_info:\n      - index:           0\n        name:            destination\n        address_qualifier: __global\n        access_qualifier: NONE\n        type_name:       'int4*;8'\n        type_qualifiers: NONE\n      - index:           1\n        name:            source\n        address_qualifier: __global\n        access_qualifier: NONE\n        type_name:       'int4*;8'\n        type_qualifiers: NONE\n      - index:           2\n        name:            bytes\n        address_qualifier: __private\n        access_qualifier: NONE\n        type_name:       'long;8'\n        type_qualifiers: NONE\n  - name:            orca_fill\n    args_info:\n      - index:           0\n        name:            destination\n        address_qualifier: __global\n        access_qualifier: NONE\n        type_name:       'int4*;8'\n        type_qualifiers: NONE\n      - index:           1\n        name:            bytes\n        address_qualifier: __private\n        access_qualifier: NONE\n        type_name:       'long;8'\n        type_qualifiers: NONE\n      - index:           2\n        name:            pattern\n        address_qualifier: __private\n        access_qualifier: NONE\n        type_name:       'int4;16'\n        type_qualifiers: NONE\n  - name:            orca_fill_wide\n    args_info:\n      - index:           0\n        name:            destination\n        address_qualifier: __global\n        access_qualifier: NONE\n        type_name:       'int4*;8'\n        type_qualifiers: NONE\n      - index:           1\n        name:            bytes\n        address_qualifier: __private\n        access_qualifier: NONE\n        type_name:       'long;8'\n        type_qualifiers: NONE\n      - index:           2\n        name:            pattern\n        address_qualifier: __global\n        access_qualifier: NONE\n        type_name:       'int4*;8'\n        type_qualifiers: NONE\n      - index:           3\n        name:            mask\n        address_qualifier: __private\n        access_qualifier: NONE\n        type_name:       'int;4'\n        type_qualifiers: NONE\n  - name:            orca_copy_2d\n    args_info:\n      - index:           0\n        name:            destination\n        address_qualifier: __global\n        access_qualifier: NONE\n        type_name:       'char*;8'\n        type_qualifiers: NONE\n      - index:           1\n        name:            source\n        address_qualifier: __global\n        access_qualifier: NONE\n        type_name:       'char*;8'\n        type_qualifiers: NONE\n      - index:           2\n        name:            destination_pitch\n        address_qualifier: __private\n        access_qualifier: NONE\n        type_name:       'long;8'\n        type_qualifiers: NONE\n      - index:           3\n        name:            source_pitch\n        address_qualifier: __private\n        access_qualifier: NONE\n        type_name:       'long;8'\n        type_qualifiers: NONE\n      - index:           4\n        name:            width\n        address_qualifier: __private\n        access_qualifier: NONE\n        type_name:       'long;8'\n        type_qualifiers: NONE\n      - index:           5\n        name:            height\n        address_qualifier: __private\n        access_qualifier: NONE\n        type_name:       'long;8'\n        type_qualifiers: NONE\n...\n",
+      "isa_sha256": {
+        ".text.orca_copy": "35dd2a628bce0e5cd8e6fd1f24ec55894b537c73690bcf9696022b7c092bbdb0",
+        ".text.orca_fill": "0272302bd8ebf56fe4d1b8be4ed2a32349a7b42c3627a1bddf151712b61dc221",
+        ".text.orca_fill_wide": "14fdb7d49698069cfa1d5a6be8b724353c55e27e5ef8c8a8728ab743e7389549",
+        ".text.orca_copy_2d": "9411a7bc6788a118caf4149a972ee882f35bcc50f9469f286513a5683e6ace1d"
+      },
+      "isa_bytes": {
+        ".text.orca_copy": 2112,
+        ".text.orca_fill": 2112,
+        ".text.orca_fill_wide": 2112,
+        ".text.orca_copy_2d": 8000
+      },
+      "simd": 16
+    },
+    "simd8": {
+      "image_sha256": "922fcfad18f78563baf6ea853b79fc7d303f0adaf92d694fda36cf823d0d3be1",
+      "ze_info": "---\nversion:         '1.73'\nkernels:\n  - name:            orca_copy\n    user_attributes:\n      intel_reqd_sub_group_size: 8\n      intel_reqd_workgroup_walk_order: [ 0, 1, 2 ]\n      reqd_work_group_size: [ 256, 1, 1 ]\n    execution_env:\n      grf_count:       128\n      has_4gb_buffers: true\n      has_no_stateless_write: true\n      inline_data_payload_size: 32\n      offset_to_skip_per_thread_data_load: 192\n      required_work_group_size: [ 256, 1, 1 ]\n      simd_size:       8\n      subgroup_independent_forward_progress: true\n      eu_thread_count: 8\n    payload_arguments:\n      - arg_type:        global_id_offset\n        offset:          0\n        size:            12\n      - arg_type:        arg_bypointer\n        offset:          16\n        size:            8\n        arg_index:       0\n        addrmode:        stateless\n        addrspace:       global\n        access_type:     readwrite\n      - arg_type:        arg_bypointer\n        offset:          24\n        size:            8\n        arg_index:       1\n        addrmode:        stateless\n        addrspace:       global\n        access_type:     readwrite\n      - arg_type:        arg_byvalue\n        offset:          32\n        size:            8\n        arg_index:       2\n      - arg_type:        global_size\n        offset:          40\n        size:            12\n    per_thread_payload_arguments:\n      - arg_type:        local_id\n        offset:          0\n        size:            96\n  - name:            orca_fill\n    user_attributes:\n      intel_reqd_sub_group_size: 8\n      intel_reqd_workgroup_walk_order: [ 0, 1, 2 ]\n      reqd_work_group_size: [ 256, 1, 1 ]\n    execution_env:\n      grf_count:       128\n      has_4gb_buffers: true\n      has_no_stateless_write: true\n      inline_data_payload_size: 32\n      offset_to_skip_per_thread_data_load: 192\n      required_work_group_size: [ 256, 1, 1 ]\n      simd_size:       8\n      subgroup_independent_forward_progress: true\n      eu_thread_count: 8\n    payload_arguments:\n      - arg_type:        global_id_offset\n        offset:          0\n        size:            12\n      - arg_type:        arg_bypointer\n        offset:          16\n        size:            8\n        arg_index:       0\n        addrmode:        stateless\n        addrspace:       global\n        access_type:     readwrite\n      - arg_type:        arg_byvalue\n        offset:          24\n        size:            8\n        arg_index:       1\n      - arg_type:        arg_byvalue\n        offset:          32\n        size:            16\n        arg_index:       2\n      - arg_type:        global_size\n        offset:          48\n        size:            12\n    per_thread_payload_arguments:\n      - arg_type:        local_id\n        offset:          0\n        size:            96\n  - name:            orca_fill_wide\n    user_attributes:\n      intel_reqd_sub_group_size: 8\n      intel_reqd_workgroup_walk_order: [ 0, 1, 2 ]\n      reqd_work_group_size: [ 256, 1, 1 ]\n    execution_env:\n      grf_count:       128\n      has_4gb_buffers: true\n      has_no_stateless_write: true\n      inline_data_payload_size: 32\n      offset_to_skip_per_thread_data_load: 192\n      required_work_group_size: [ 256, 1, 1 ]\n      simd_size:       8\n      subgroup_independent_forward_progress: true\n      eu_thread_count: 8\n    payload_arguments:\n      - arg_type:        global_id_offset\n        offset:          0\n        size:            12\n      - arg_type:        arg_bypointer\n        offset:          16\n        size:            8\n        arg_index:       0\n        addrmode:        stateless\n        addrspace:       global\n        access_type:     readwrite\n      - arg_type:        arg_bypointer\n        offset:          24\n        size:            8\n        arg_index:       2\n        addrmode:        stateless\n        addrspace:       global\n        access_type:     readwrite\n      - arg_type:        arg_byvalue\n        offset:          32\n        size:            8\n        arg_index:       1\n      - arg_type:        arg_byvalue\n        offset:          40\n        size:            4\n        arg_index:       3\n      - arg_type:        global_size\n        offset:          44\n        size:            12\n    per_thread_payload_arguments:\n      - arg_type:        local_id\n        offset:          0\n        size:            96\n  - name:            orca_copy_2d\n    user_attributes:\n      intel_reqd_sub_group_size: 8\n      intel_reqd_workgroup_walk_order: [ 0, 1, 2 ]\n      reqd_work_group_size: [ 256, 1, 1 ]\n    execution_env:\n      grf_count:       128\n      has_4gb_buffers: true\n      has_no_stateless_write: true\n      indirect_stateless_count: 4\n      inline_data_payload_size: 32\n      offset_to_skip_per_thread_data_load: 192\n      required_work_group_size: [ 256, 1, 1 ]\n      simd_size:       8\n      subgroup_independent_forward_progress: true\n      eu_thread_count: 8\n    payload_arguments:\n      - arg_type:        global_id_offset\n        offset:          0\n        size:            12\n      - arg_type:        arg_bypointer\n        offset:          16\n        size:            8\n        arg_index:       0\n        addrmode:        stateless\n        addrspace:       global\n        access_type:     readwrite\n      - arg_type:        arg_bypointer\n        offset:          24\n        size:            8\n        arg_index:       1\n        addrmode:        stateless\n        addrspace:       global\n        access_type:     readwrite\n      - arg_type:        arg_byvalue\n        offset:          32\n        size:            8\n        arg_index:       2\n      - arg_type:        arg_byvalue\n        offset:          40\n        size:            8\n        arg_index:       3\n      - arg_type:        arg_byvalue\n        offset:          48\n        size:            8\n        arg_index:       4\n      - arg_type:        arg_byvalue\n        offset:          56\n        size:            8\n        arg_index:       5\n      - arg_type:        global_size\n        offset:          64\n        size:            12\n    per_thread_payload_arguments:\n      - arg_type:        local_id\n        offset:          0\n        size:            96\nkernels_misc_info:\n  - name:            orca_copy\n    args_info:\n      - index:           0\n        name:            destination\n        address_qualifier: __global\n        access_qualifier: NONE\n        type_name:       'int4*;8'\n        type_qualifiers: NONE\n      - index:           1\n        name:            source\n        address_qualifier: __global\n        access_qualifier: NONE\n        type_name:       'int4*;8'\n        type_qualifiers: NONE\n      - index:           2\n        name:            bytes\n        address_qualifier: __private\n        access_qualifier: NONE\n        type_name:       'long;8'\n        type_qualifiers: NONE\n  - name:            orca_fill\n    args_info:\n      - index:           0\n        name:            destination\n        address_qualifier: __global\n        access_qualifier: NONE\n        type_name:       'int4*;8'\n        type_qualifiers: NONE\n      - index:           1\n        name:            bytes\n        address_qualifier: __private\n        access_qualifier: NONE\n        type_name:       'long;8'\n        type_qualifiers: NONE\n      - index:           2\n        name:            pattern\n        address_qualifier: __private\n        access_qualifier: NONE\n        type_name:       'int4;16'\n        type_qualifiers: NONE\n  - name:            orca_fill_wide\n    args_info:\n      - index:           0\n        name:            destination\n        address_qualifier: __global\n        access_qualifier: NONE\n        type_name:       'int4*;8'\n        type_qualifiers: NONE\n      - index:           1\n        name:            bytes\n        address_qualifier: __private\n        access_qualifier: NONE\n        type_name:       'long;8'\n        type_qualifiers: NONE\n      - index:           2\n        name:            pattern\n        address_qualifier: __global\n        access_qualifier: NONE\n        type_name:       'int4*;8'\n        type_qualifiers: NONE\n      - index:           3\n        name:            mask\n        address_qualifier: __private\n        access_qualifier: NONE\n        type_name:       'int;4'\n        type_qualifiers: NONE\n  - name:            orca_copy_2d\n    args_info:\n      - index:           0\n        name:            destination\n        address_qualifier: __global\n        access_qualifier: NONE\n        type_name:       'char*;8'\n        type_qualifiers: NONE\n      - index:           1\n        name:            source\n        address_qualifier: __global\n        access_qualifier: NONE\n        type_name:       'char*;8'\n        type_qualifiers: NONE\n      - index:           2\n        name:            destination_pitch\n        address_qualifier: __private\n        access_qualifier: NONE\n        type_name:       'long;8'\n        type_qualifiers: NONE\n      - index:           3\n        name:            source_pitch\n        address_qualifier: __private\n        access_qualifier: NONE\n        type_name:       'long;8'\n        type_qualifiers: NONE\n      - index:           4\n        name:            width\n        address_qualifier: __private\n        access_qualifier: NONE\n        type_name:       'long;8'\n        type_qualifiers: NONE\n      - index:           5\n        name:            height\n        address_qualifier: __private\n        access_qualifier: NONE\n        type_name:       'long;8'\n        type_qualifiers: NONE\n...\n",
+      "isa_sha256": {
+        ".text.orca_copy": "d46e7f2a4e986a4feb8ebd81e1c487f0f8718c72f6f3a75a8f5008bf01fc31db",
+        ".text.orca_fill": "e7640ec2b492f516c3c5b78b3d0a6edcedb7526c0e648d650eceb51301ece2fc",
+        ".text.orca_fill_wide": "41be9ed9e025fca7b313fd9b6c9cd400a132de7575409a210d383ff11e72963b",
+        ".text.orca_copy_2d": "ebc958d16b31e10e0086bea10ba84b9cf7a50a56c1c1b53b42b637a7c3a9ce68"
+      },
+      "isa_bytes": {
+        ".text.orca_copy": 1728,
+        ".text.orca_fill": 1856,
+        ".text.orca_fill_wide": 1792,
+        ".text.orca_copy_2d": 6528
+      },
+      "simd": 8,
+      "source_sha256": "65e606e97c0aed375173c5d42ed3364ea226ff0997abe95524e15cc443b0df3e"
+    },
+    "simd32": {
+      "image_sha256": "a21178583c56cd403f2ccedc806b1ee4add9435afeaeac527adae7d545f47366",
+      "ze_info": "---\nversion:         '1.73'\nkernels:\n  - name:            orca_copy\n    user_attributes:\n      intel_reqd_sub_group_size: 32\n      intel_reqd_workgroup_walk_order: [ 0, 1, 2 ]\n      reqd_work_group_size: [ 256, 1, 1 ]\n    execution_env:\n      grf_count:       128\n      has_4gb_buffers: true\n      has_no_stateless_write: true\n      inline_data_payload_size: 32\n      offset_to_skip_per_thread_data_load: 192\n      required_work_group_size: [ 256, 1, 1 ]\n      simd_size:       32\n      subgroup_independent_forward_progress: true\n      eu_thread_count: 8\n    payload_arguments:\n      - arg_type:        global_id_offset\n        offset:          0\n        size:            12\n      - arg_type:        arg_bypointer\n        offset:          16\n        size:            8\n        arg_index:       0\n        addrmode:        stateless\n        addrspace:       global\n        access_type:     readwrite\n      - arg_type:        arg_bypointer\n        offset:          24\n        size:            8\n        arg_index:       1\n        addrmode:        stateless\n        addrspace:       global\n        access_type:     readwrite\n      - arg_type:        arg_byvalue\n        offset:          32\n        size:            8\n        arg_index:       2\n      - arg_type:        global_size\n        offset:          40\n        size:            12\n    per_thread_payload_arguments:\n      - arg_type:        local_id\n        offset:          0\n        size:            192\n  - name:            orca_fill\n    user_attributes:\n      intel_reqd_sub_group_size: 32\n      intel_reqd_workgroup_walk_order: [ 0, 1, 2 ]\n      reqd_work_group_size: [ 256, 1, 1 ]\n    execution_env:\n      grf_count:       128\n      has_4gb_buffers: true\n      has_no_stateless_write: true\n      inline_data_payload_size: 32\n      offset_to_skip_per_thread_data_load: 192\n      required_work_group_size: [ 256, 1, 1 ]\n      simd_size:       32\n      subgroup_independent_forward_progress: true\n      eu_thread_count: 8\n    payload_arguments:\n      - arg_type:        global_id_offset\n        offset:          0\n        size:            12\n      - arg_type:        arg_bypointer\n        offset:          16\n        size:            8\n        arg_index:       0\n        addrmode:        stateless\n        addrspace:       global\n        access_type:     readwrite\n      - arg_type:        arg_byvalue\n        offset:          24\n        size:            8\n        arg_index:       1\n      - arg_type:        arg_byvalue\n        offset:          32\n        size:            16\n        arg_index:       2\n      - arg_type:        global_size\n        offset:          48\n        size:            12\n    per_thread_payload_arguments:\n      - arg_type:        local_id\n        offset:          0\n        size:            192\n  - name:            orca_fill_wide\n    user_attributes:\n      intel_reqd_sub_group_size: 32\n      intel_reqd_workgroup_walk_order: [ 0, 1, 2 ]\n      reqd_work_group_size: [ 256, 1, 1 ]\n    execution_env:\n      grf_count:       128\n      has_4gb_buffers: true\n      has_no_stateless_write: true\n      inline_data_payload_size: 32\n      offset_to_skip_per_thread_data_load: 192\n      required_work_group_size: [ 256, 1, 1 ]\n      simd_size:       32\n      subgroup_independent_forward_progress: true\n      eu_thread_count: 8\n    payload_arguments:\n      - arg_type:        global_id_offset\n        offset:          0\n        size:            12\n      - arg_type:        arg_bypointer\n        offset:          16\n        size:            8\n        arg_index:       0\n        addrmode:        stateless\n        addrspace:       global\n        access_type:     readwrite\n      - arg_type:        arg_bypointer\n        offset:          24\n        size:            8\n        arg_index:       2\n        addrmode:        stateless\n        addrspace:       global\n        access_type:     readwrite\n      - arg_type:        arg_byvalue\n        offset:          32\n        size:            8\n        arg_index:       1\n      - arg_type:        arg_byvalue\n        offset:          40\n        size:            4\n        arg_index:       3\n      - arg_type:        global_size\n        offset:          44\n        size:            12\n    per_thread_payload_arguments:\n      - arg_type:        local_id\n        offset:          0\n        size:            192\n  - name:            orca_copy_2d\n    user_attributes:\n      intel_reqd_sub_group_size: 32\n      intel_reqd_workgroup_walk_order: [ 0, 1, 2 ]\n      reqd_work_group_size: [ 256, 1, 1 ]\n    execution_env:\n      grf_count:       128\n      has_4gb_buffers: true\n      has_no_stateless_write: true\n      indirect_stateless_count: 8\n      inline_data_payload_size: 32\n      offset_to_skip_per_thread_data_load: 192\n      required_work_group_size: [ 256, 1, 1 ]\n      simd_size:       32\n      subgroup_independent_forward_progress: true\n      eu_thread_count: 8\n    payload_arguments:\n      - arg_type:        global_id_offset\n        offset:          0\n        size:            12\n      - arg_type:        arg_bypointer\n        offset:          16\n        size:            8\n        arg_index:       0\n        addrmode:        stateless\n        addrspace:       global\n        access_type:     readwrite\n      - arg_type:        arg_bypointer\n        offset:          24\n        size:            8\n        arg_index:       1\n        addrmode:        stateless\n        addrspace:       global\n        access_type:     readwrite\n      - arg_type:        arg_byvalue\n        offset:          32\n        size:            8\n        arg_index:       2\n      - arg_type:        arg_byvalue\n        offset:          40\n        size:            8\n        arg_index:       3\n      - arg_type:        arg_byvalue\n        offset:          48\n        size:            8\n        arg_index:       4\n      - arg_type:        arg_byvalue\n        offset:          56\n        size:            8\n        arg_index:       5\n      - arg_type:        global_size\n        offset:          64\n        size:            12\n    per_thread_payload_arguments:\n      - arg_type:        local_id\n        offset:          0\n        size:            192\nkernels_misc_info:\n  - name:            orca_copy\n    args_info:\n      - index:           0\n        name:            destination\n        address_qualifier: __global\n        access_qualifier: NONE\n        type_name:       'int4*;8'\n        type_qualifiers: NONE\n      - index:           1\n        name:            source\n        address_qualifier: __global\n        access_qualifier: NONE\n        type_name:       'int4*;8'\n        type_qualifiers: NONE\n      - index:           2\n        name:            bytes\n        address_qualifier: __private\n        access_qualifier: NONE\n        type_name:       'long;8'\n        type_qualifiers: NONE\n  - name:            orca_fill\n    args_info:\n      - index:           0\n        name:            destination\n        address_qualifier: __global\n        access_qualifier: NONE\n        type_name:       'int4*;8'\n        type_qualifiers: NONE\n      - index:           1\n        name:            bytes\n        address_qualifier: __private\n        access_qualifier: NONE\n        type_name:       'long;8'\n        type_qualifiers: NONE\n      - index:           2\n        name:            pattern\n        address_qualifier: __private\n        access_qualifier: NONE\n        type_name:       'int4;16'\n        type_qualifiers: NONE\n  - name:            orca_fill_wide\n    args_info:\n      - index:           0\n        name:            destination\n        address_qualifier: __global\n        access_qualifier: NONE\n        type_name:       'int4*;8'\n        type_qualifiers: NONE\n      - index:           1\n        name:            bytes\n        address_qualifier: __private\n        access_qualifier: NONE\n        type_name:       'long;8'\n        type_qualifiers: NONE\n      - index:           2\n        name:            pattern\n        address_qualifier: __global\n        access_qualifier: NONE\n        type_name:       'int4*;8'\n        type_qualifiers: NONE\n      - index:           3\n        name:            mask\n        address_qualifier: __private\n        access_qualifier: NONE\n        type_name:       'int;4'\n        type_qualifiers: NONE\n  - name:            orca_copy_2d\n    args_info:\n      - index:           0\n        name:            destination\n        address_qualifier: __global\n        access_qualifier: NONE\n        type_name:       'char*;8'\n        type_qualifiers: NONE\n      - index:           1\n        name:            source\n        address_qualifier: __global\n        access_qualifier: NONE\n        type_name:       'char*;8'\n        type_qualifiers: NONE\n      - index:           2\n        name:            destination_pitch\n        address_qualifier: __private\n        access_qualifier: NONE\n        type_name:       'long;8'\n        type_qualifiers: NONE\n      - index:           3\n        name:            source_pitch\n        address_qualifier: __private\n        access_qualifier: NONE\n        type_name:       'long;8'\n        type_qualifiers: NONE\n      - index:           4\n        name:            width\n        address_qualifier: __private\n        access_qualifier: NONE\n        type_name:       'long;8'\n        type_qualifiers: NONE\n      - index:           5\n        name:            height\n        address_qualifier: __private\n        access_qualifier: NONE\n        type_name:       'long;8'\n        type_qualifiers: NONE\n...\n",
+      "isa_sha256": {
+        ".text.orca_copy": "fc6663eaead0d17596766f8d22206604364bb1b879531c96dc78802335e9efed",
+        ".text.orca_fill": "11021ce2e97432cb59a0c69157d2422eeb49289fb3bf75cae8d1fe7b0f232eda",
+        ".text.orca_fill_wide": "4a8a1e61bcb4301671d6d8bca5f49b8b32a0d1f903a17a71017bff7c5dec3e55",
+        ".text.orca_copy_2d": "702516173329b179fc0aba7fa9a12a5c28179024a7956b9f279cf70d3aae6aab"
+      },
+      "isa_bytes": {
+        ".text.orca_copy": 3584,
+        ".text.orca_fill": 3456,
+        ".text.orca_fill_wide": 3584,
+        ".text.orca_copy_2d": 14144
+      },
+      "simd": 32,
+      "source_sha256": "dcc7370ec69a255b1326ce8fac013efcb7cac039f125e56d7ae8a7c96b11e924"
+    }
+  },
+  "caveats": [
+    "Warm recorded-copy timings include submit/wait and are not physical bus bandwidth or model timings.",
+    "Exact-copy numerical tests are separate from uninstrumented Short decode_ms.",
+    "Decode excludes preparation/init/prefill; TTFT is separate; unlocked clocks.",
+    "Linux GPU and other steppings unvalidated; no production adoption.",
+    "Microbenchmark submit/wait times have substantial control drift; no isolated GPU-copy speedup is established.",
+    "This clean model trial supplies no new transfer or application-lock census.",
+    "Initial and repeat absolute rates are separate comparisons and must not be combined.",
+    "The v7 copy/lock census remains the source for operation-count parity."
+  ],
+  "reproduction": {
+    "runners": {
+      "initial": "build-orca-native-lower-20261031/windows-dg2-copy-width-v3/runner.py",
+      "repeat": "build-orca-native-lower-20261031/windows-dg2-copy-width-repeat-v1/runner.py"
+    },
+    "results_sha256": {
+      "initial": "492191deebf70be0c87298fb216be5d39a08337dde0a73d2039546e62c1e825f",
+      "repeat": "fc5b1aa607499b877fe359f282d93470fd7e73c5678faf02bd1d514a2fed8491"
+    },
+    "verify": "python build-orca-native-lower-20261031/publish_dg2_copy_width.py --verify"
+  },
+  "evidence_files": 120,
+  "archive_sha256": "1b41f8a9e9fc1578a2a51a9e020be61b367642fd501d610a05fd9cf92c8e00f1"
+}

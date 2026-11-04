@@ -1,0 +1,164 @@
+--- a/sycl/orca/prepare.py
++++ b/sycl/orca/prepare.py
+@@ -42,6 +42,20 @@
+ #ifndef STRATA_ORCA_DG2
+     if (v == nullptr) v = "0.5";
+ #endif''')
++        for marker, condition, remaining in (
++            ('                    drafted = !use_mtp || last ||',
++             'use_mtp && !last', 'max_new - produced_n'),
++            ('            const bool drafted = !use_mtp || (int64_t) produced.size() >= o.max_new ||',
++             'use_mtp && (int64_t) produced.size() < o.max_new', 'o.max_new - (int64_t) produced.size()'),
++        ):
++            if text.count(marker) != 1:
++                raise ValueError('MTP draft site changed; review the Orca L0 output budget')
++            indent = marker[:len(marker) - len(marker.lstrip())]
++            text = text.replace(marker, '#ifndef STRATA_ORCA_DG2\n' +
++                indent + '// ponytail: the existing cap trims unused tail steps; the first draft also maintains KV.\n' +
++                indent + f'if ({condition})\n' +
++                indent + f'    mtp.set_max_drafts((int) std::min<int64_t>(S_mtp - 1, {remaining} - 1));\n' +
++                '#endif\n' + marker)
+     # Native waits use signed nanoseconds; normalize the legacy teardown sentinel.
+     text = text.replace("wait_verify_queue(cs_, l0_sync_, UINT64_MAX)",
+                         "wait_verify_queue(cs_, l0_sync_, uint64_t(INT64_MAX))")
+--- a/tools/bench_mtp_prefix.py
++++ b/tools/bench_mtp_prefix.py
+@@ -4,6 +4,7 @@
+ Use --functional for threshold/sampling regression; otherwise collect an A/B/A bracket.
+ Use --candidate-exe to check a rebuilt candidate with its default switch unset.
+ Add --candidate-cumulative-default for a rebuilt 0.5 confidence default; draft work may differ.
++Use --cumulative 0.5 to compare other candidates against the current confidence baseline.
+ """
+ import argparse
+ import json
+@@ -18,6 +19,7 @@
+     ap.add_argument('--exe', type=Path, required=True)
+     ap.add_argument('--candidate-exe', type=Path)
+     ap.add_argument('--candidate-cumulative-default', action='store_true')
++    ap.add_argument('--cumulative', type=float, default=0.0, help='Confidence product floor for both arms')
+     ap.add_argument('--config', type=Path, default=b.ROOT / 'strata-iq2_xs.json')
+     ap.add_argument('--out', type=Path, required=True)
+     ap.add_argument('--cases', default='Short,Code2K,Prose2K,Long8K')
+@@ -28,10 +30,12 @@
+     ap.add_argument('--reuse-prompt', action='store_true', help='Group repeated prompts and reuse their cached state')
+     ap.add_argument('--keep-suffix', action='store_true', help='Keep the configured suffix lookup policy')
+     a = ap.parse_args()
+-    assert a.tokens >= 2 and a.warmup >= 0 and a.retained >= 1
++    assert a.tokens >= 1 and a.warmup >= 0 and a.retained >= 1
++    assert 0 <= a.cumulative <= 1
+     assert a.exe.is_file(), a.exe
+     assert a.candidate_exe is None or a.candidate_exe.is_file(), a.candidate_exe
+     assert not a.candidate_cumulative_default or a.candidate_exe
++    assert not a.candidate_cumulative_default or a.cumulative == 0
+     cfg = json.loads(a.config.read_text('utf8'))
+     inputs = b.prompts(cfg)
+     fixture = json.loads((b.ROOT / 'sycl/orca/short-anchor-v1.json').read_text('utf8'))
+@@ -61,8 +65,8 @@
+     save = lambda: b.save(a.out / 'results.json', d)
+     save()
+     reference = {}
+-    settings = [(0.5, 0.0, 'temperature=0')]
+-    if a.functional and not a.candidate_cumulative_default:
++    settings = [(0.5, a.cumulative, 'temperature=0')]
++    if a.functional and not a.candidate_cumulative_default and a.cumulative != 0.5:
+         settings += [(0.5, 0.5, 'temperature=0')]
+     try:
+         with b.gpu_lock():
+@@ -110,7 +114,7 @@
+                                 row.update(case=name, repeat=repeat, query=query, keys=keys, retained=repeat >= a.warmup)
+                                 run['rows'].append(row)
+                                 save()
+-                                assert row['generated'] >= 2 and any(row['tokens']) and row['decode_ms'] > 0
++                                assert row['generated'] >= 1 and any(row['tokens']) and row['decode_ms'] > 0
+                                 if not a.reuse_prompt:
+                                     assert row['reused'] == row['resume'] == 0
+                                 key = index, repeat, name, query
+--- /dev/null
++++ b/tools/test_mtp_budget.py
+@@ -0,0 +1,86 @@
++"""Compile the real Orca draft-budget bounds without loading a model.
++
++Run with a configured C++ compiler: --cxx <compiler> --out <fresh-directory>.
++"""
++import argparse
++import importlib.util
++from pathlib import Path
++import re
++import subprocess
++
++from bench_deepinfer import ROOT, gpu_lock
++
++
++def main():
++    ap = argparse.ArgumentParser(description=__doc__)
++    ap.add_argument('--cxx', default='c++')
++    ap.add_argument('--out', type=Path, required=True)
++    a = ap.parse_args()
++    a.out = a.out.resolve()
++    a.out.mkdir(parents=True, exist_ok=False)
++    spec = importlib.util.spec_from_file_location('prepare', ROOT / 'sycl/orca/prepare.py')
++    prepare = importlib.util.module_from_spec(spec)
++    spec.loader.exec_module(prepare)
++    generated = prepare.engine_source((ROOT / 'sycl/src/program/generate.cpp').read_text('utf8'))
++    bounds = re.findall(r'#ifndef STRATA_ORCA_DG2\n\s*//[^\n]*\n'
++                        r'\s*if \([^\n]+\)\n\s*mtp.set_max_drafts\([^\n]+\);\n#endif', generated)
++    assert len(bounds) == 2, bounds
++    cpp = a.out / 'budget.cpp'
++    cpp.write_text('''#include <algorithm>
++#include <cassert>
++#include <cstdint>
++#include <cstdio>
++#include <limits>
++#include <vector>
++struct Draft { int cap = -7; void set_max_drafts(int k) { cap = k; } };
++int main() {
++    int checks = 0;
++    for (int S_mtp = 1; S_mtp <= 8; ++S_mtp)
++    for (int64_t max_new : {int64_t(1), int64_t(2), int64_t(3), int64_t(8), int64_t(128),
++                            std::numeric_limits<int64_t>::max()})
++    for (int64_t produced_n : {int64_t(0), max_new / 2, max_new - 1, max_new})
++    for (bool use_mtp : {false, true}) {
++        const bool last = produced_n >= max_new;
++        struct { int64_t max_new; } o{max_new};
++        // Only size() is used in the real CLI bound; keep INT64_MAX cases allocation-free.
++        struct { int64_t n; size_t size() const { return (size_t)n; } } produced{produced_n};
++        Draft mtp;
++        ''' + bounds[0] + '''
++        const int service = mtp.cap;
++        mtp.cap = -7;
++        ''' + bounds[1] + '''
++        assert(mtp.cap == service);
++#ifdef STRATA_ORCA_DG2
++        assert(service == -7);
++#else
++        if (!use_mtp || last) { assert(service == -7); continue; }
++        const int64_t remaining = max_new - produced_n;
++        assert(service >= 0 && service < S_mtp && service < remaining);
++        // A later long request restores full depth after an earlier short request.
++        assert((remaining >= S_mtp) == (service == S_mtp - 1));
++        // With both confidence floors zero, the existing verify budget still excludes uncomputed drafts.
++        const int generated = std::max(1, service); // The first draft also maintains KV.
++        for (int proposed = 1; proposed <= S_mtp; ++proposed)
++            assert(std::min<int64_t>(proposed, remaining) - 1 <= generated);
++#endif
++        ++checks;
++    }
++    assert(checks > 0);
++    std::printf("PASS %d budget cases\\n", checks);
++}
++''', encoding='utf8')
++    with gpu_lock():
++        for backend in ('l0', 'dg2'):
++            exe = a.out / (backend + '.exe')
++            flags = ['-Qstd:c++20', '/Od'] if Path(a.cxx).name.lower() == 'icx.exe' else ['-std=c++20', '-O0']
++            command = [a.cxx, *flags, str(cpp), '-o', str(exe)]
++            if backend == 'dg2':
++                command.append('-DSTRATA_ORCA_DG2=1')
++            subprocess.run(command, cwd=a.out, check=True)
++            result = subprocess.check_output([str(exe.resolve())], text=True)
++            (a.out / (backend + '.stdout')).write_text(result, encoding='utf8')
++            print(backend, result.strip(), flush=True)
++
++
++if __name__ == '__main__':
++    main()

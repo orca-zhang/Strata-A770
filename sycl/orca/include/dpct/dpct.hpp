@@ -21,19 +21,27 @@ inline Queue& stream_of(const void* stream) {
     return *native;
 }
 void memory_info(size_t& free_bytes, size_t& total_bytes);
-template<class T = void> T* allocate(size_t count, orca::l0::Memory kind, Queue& queue) {
+template<class T = void> T* allocate(size_t count, Memory kind, Queue& queue) {
     constexpr size_t size = [] { if constexpr (std::is_void_v<T>) return size_t(1); else return sizeof(T); }();
     if (count > SIZE_MAX / size) throw std::invalid_argument("native allocation overflow");
     return count ? static_cast<T*>(queue.runtime().allocate(count * size, kind)) : nullptr;
 }
-template<class T = void> T* malloc_device(size_t count, Queue& queue) { return allocate<T>(count, orca::l0::Memory::device, queue); }
+template<class T = void> T* malloc_device(size_t count, Queue& queue) { return allocate<T>(count, Memory::device, queue); }
 template<class T = void> T* aligned_alloc_device(size_t alignment, size_t count, Queue& queue) {
     constexpr size_t size = [] { if constexpr (std::is_void_v<T>) return size_t(1); else return sizeof(T); }();
     if (count > SIZE_MAX / size) throw std::invalid_argument("native aligned allocation overflow");
-    return count ? static_cast<T*>(queue.runtime().allocate(count * size, orca::l0::Memory::device, alignment)) : nullptr;
+    return count ? static_cast<T*>(queue.runtime().allocate(count * size, Memory::device, alignment)) : nullptr;
 }
-template<class T = void> T* malloc_host(size_t count, Queue& queue) { return allocate<T>(count, orca::l0::Memory::host, queue); }
-template<class T = void> T* malloc_shared(size_t count, Queue& queue) { return allocate<T>(count, orca::l0::Memory::shared, queue); }
+template<class T = void> T* malloc_host(size_t count, Queue& queue) { return allocate<T>(count, Memory::host, queue); }
+template<class T = void> T* malloc_shared(size_t count, Queue& queue) { return allocate<T>(count, Memory::shared, queue); }
+// Integer pointer tables bypass kernel-argument translation; serialize a GPU VA explicitly.
+template<class T> T* device_pointer(T* pointer, Queue& queue) {
+#ifdef STRATA_ORCA_DG2
+    return queue.runtime().invoke([&] { return reinterpret_cast<T*>(queue.runtime().gpu.gpu_address(pointer)); });
+#else
+    (void)queue; return pointer;
+#endif
+}
 inline void free(void* pointer, Queue& queue) {
     if (pointer) { queue.wait_and_throw(); queue.runtime().deallocate(pointer); }
 }
@@ -95,7 +103,7 @@ struct KernelDevice {
         info = {get_info<sycl::info::device::name>(), get_info<sycl::info::device::global_mem_size>(), get_max_compute_units()};
     }
 };
-inline int get_major_version(const KernelDevice&) { return ZE_MAJOR_VERSION(ZE_API_VERSION_CURRENT); }
+inline int get_major_version(const KernelDevice&) { return 1; }
 inline KernelDevice& get_current_device() { static KernelDevice device; return device; }
 inline int get_current_device_id() { (void)get_in_order_queue(); return 0; }
 inline KernelDevice& get_device(int ordinal) {
@@ -209,10 +217,16 @@ public:
             // Initialization also runs before the first captured launch. Upload
             // outside that recording, then make the table visible before use.
             if (!initial_.empty()) {
+#ifdef STRATA_ORCA_DG2
+                strata::l0::Stream upload(queue.runtime(), queue.program(), owner_->initial_upload_queue);
+                upload.copy(data_, initial_.data(), initial_.size() * sizeof(T));
+                if (!upload.wait()) throw std::runtime_error("native table upload timeout");
+#else
                 auto& upload = owner_->commands(true, true, true);
                 upload.copy(data_, initial_.data(), initial_.size() * sizeof(T));
                 if (!upload.wait()) throw std::runtime_error("native table upload timeout");
                 owner_->discard(upload);
+#endif
             }
         } catch (...) {
             // A timed-out upload can still reference this allocation. Runtime
@@ -226,7 +240,7 @@ public:
 private:
     size_t count_, columns_;
     std::vector<T> initial_;
-    orca::l0::Runtime* owner_ = nullptr;
+    strata::l0::Runtime* owner_ = nullptr;
     T* data_ = nullptr;
 };
 template<class T, int Dimensions> using constant_memory = global_memory<T, Dimensions>;

@@ -1,19 +1,90 @@
 #pragma once
 // Native engine queue: eager kernels, graph replay and copy completion share
 // one Level Zero stream. SYCL headers are used only by the device compiler.
+#ifdef STRATA_ORCA_DG2
+#include "orca_dg2_backend.hpp"
+#else
 #include <orca_l0/compiler/stream.hpp>
+#include "orca_device.hpp"
+#endif
 #include <orca_l0/ring.hpp>
 #include <atomic>
 #include <functional>
 #include <thread>
 #include <deque>
 #include <bit>
-#include "orca_device.hpp"
 
 namespace strata::l0 {
+#ifdef STRATA_ORCA_DG2
+using Runtime = dg2_backend::Runtime;
+using Program = dg2_backend::Program;
+using Stream = dg2_backend::Stream;
+using Commands = dg2_backend::Commands;
+using DeviceView = dg2_backend::DeviceView;
+using EventHandle = dg2_backend::EventHandle;
+using Ordering = dg2_backend::Ordering;
+using Memory = dg2_backend::Memory;
+using dg2_backend::signal_event;
+using dg2_backend::event_ready;
+using dg2_backend::event_wait;
+#else
+using Runtime = orca::l0::Runtime;
+using Program = orca::l0::compiler::Program;
+using Stream = orca::l0::compiler::Stream;
+using Commands = orca::l0::Commands;
+using EventHandle = ze_event_handle_t;
+using Ordering = orca::l0::Ordering;
+using Memory = orca::l0::Memory;
+inline void signal_event(EventHandle event) { orca::l0::check(zeEventHostSignal(event), "native callback completion"); }
+inline bool event_ready(EventHandle event) {
+    const auto result = zeEventQueryStatus(event);
+    if (result == ZE_RESULT_NOT_READY) return false;
+    orca::l0::check(result, "native event query"); return true;
+}
+inline bool event_wait(EventHandle event, uint64_t ns) {
+    const auto result = zeEventHostSynchronize(event, ns);
+    if (result == ZE_RESULT_NOT_READY) return false;
+    orca::l0::check(result, "native event wait"); return true;
+}
+#endif
 class Queue;
 template<class Name> class RangeKernel;
 
+#ifdef STRATA_ORCA_DG2
+class EventPool {
+public:
+    explicit EventPool(Runtime& runtime) {
+        runtime.invoke([&] {
+        const auto memory = runtime.staging(events_.size() * 64);
+        runtime.gpu.cpu_access(*memory, true);
+        for (size_t i = 0; i < events_.size(); ++i) {
+            auto& event = events_[i]; event.runtime = &runtime;
+            event.tag_memory = memory; event.tag_address = memory->gpu + i * 64;
+            event.tag = new (static_cast<std::byte*>(memory->data) + i * 64) std::atomic<uint64_t>(0);
+            _mm_clflush(event.tag);
+        }
+        _mm_mfence();
+        });
+    }
+    uint32_t take(bool reset = true) {
+        auto live = live_.load(std::memory_order_relaxed);
+        while (live != UINT64_MAX) {
+            const auto slot = uint32_t(std::countr_zero(~live));
+            if (!live_.compare_exchange_weak(live, live | (uint64_t{1} << slot),
+                    std::memory_order_acquire, std::memory_order_relaxed)) continue;
+            try { if (reset) dg2_backend::reset_event(&events_[slot]); }
+            catch (...) { give(slot); throw; }
+            return slot;
+        }
+        return UINT32_MAX;
+    }
+    void give(uint32_t slot) noexcept { live_.fetch_and(~(uint64_t{1} << slot), std::memory_order_release); }
+    EventHandle handle(uint32_t slot) noexcept { return &events_[slot]; }
+private:
+    std::array<dg2_backend::Event, 64> events_;
+    std::atomic<uint64_t> live_{0};
+};
+#else
 class EventPool {
 public:
     static_assert(std::atomic<uint64_t>::is_always_lock_free);
@@ -61,21 +132,22 @@ private:
     std::array<ze_event_handle_t, 64> handles_{};
     std::atomic<uint64_t> live_{0};
 };
+#endif
 
 struct NativeEvent {
     // The last reference returns a slot only after all submitting/waiting queues
     // retire their references. Slots can be returned by the callback consumer.
     std::shared_ptr<EventPool> storage;
     uint32_t slot = UINT32_MAX;
-    ze_event_handle_t handle = nullptr;
-    explicit NativeEvent(orca::l0::Runtime& runtime) {
+    EventHandle handle = nullptr;
+    explicit NativeEvent(Runtime& runtime) {
         storage = std::make_shared<EventPool>(runtime);
         slot = storage->take();
         handle = storage->handle(slot);
     }
     NativeEvent(std::shared_ptr<EventPool> pool, uint32_t index) noexcept
         : storage(std::move(pool)), slot(index), handle(storage->handle(index)) {}
-    explicit NativeEvent(ze_event_handle_t borrowed) : handle(borrowed) {
+    explicit NativeEvent(EventHandle borrowed) : handle(borrowed) {
         if (!handle) throw std::invalid_argument("null borrowed event");
     }
     ~NativeEvent() { if (storage) storage->give(slot); }
@@ -90,6 +162,10 @@ class Event {
         std::weak_ptr<int> lifetime;
         uint64_t completed_through = 0;
         std::shared_ptr<NativeEvent> native;
+#ifdef STRATA_ORCA_DG2
+        std::shared_ptr<dg2_backend::Point> completion;
+        bool coarse_completion = false;
+#endif
     };
     friend class Queue;
     friend struct NativeGraph;
@@ -98,27 +174,38 @@ class Event {
     void retire() const;
 public:
     Event() = default;
-    static Event borrow(ze_event_handle_t handle) {
+    static Event borrow(EventHandle handle) {
         auto state = std::make_shared<State>();
         state->native = std::make_shared<NativeEvent>(handle);
         return Event(std::move(state));
     }
-    ze_event_handle_t native() const;
+    EventHandle native() const;
     bool ready() const {
         auto handle = native();
         if (!handle) return true;
-        const auto result = zeEventQueryStatus(handle);
-        if (result == ZE_RESULT_NOT_READY) return false;
-        orca::l0::check(result, "native event query");
+#ifdef STRATA_ORCA_DG2
+        if (state_->coarse_completion) {
+            if (state_->completion && !state_->completion->ready()) return false;
+            retire(); return true;
+        }
+#endif
+        if (!event_ready(handle)) return false;
         retire();
         return true;
     }
     bool wait(uint64_t timeout_ns = 30000000000ULL) const {
+#ifdef STRATA_ORCA_DG2
+        if (timeout_ns > uint64_t(INT64_MAX)) throw std::invalid_argument("DG2 event timeout exceeds INT64_MAX");
+#endif
         auto handle = native();
         if (!handle) return true;
-        const auto result = zeEventHostSynchronize(handle, timeout_ns);
-        if (result == ZE_RESULT_NOT_READY) return false;
-        orca::l0::check(result, "native event wait");
+#ifdef STRATA_ORCA_DG2
+        if (state_->coarse_completion) {
+            if (state_->completion && !state_->completion->wait(timeout_ns)) return false;
+            retire(); return true;
+        }
+#endif
+        if (!event_wait(handle, timeout_ns)) return false;
         retire();
         return true;
     }
@@ -136,20 +223,20 @@ public:
 };
 
 struct NativeGraph {
-    NativeGraph(orca::l0::Runtime& owner, orca::l0::Commands& list,
+    NativeGraph(Runtime& owner, Commands& list,
                 std::vector<std::shared_ptr<Event::State>> markers,
                 std::vector<sycl::ext::oneapi::experimental::node_type> types)
         : commands(&list), events(std::move(markers)), nodes(types.size()),
           node_types(std::move(types)), runtime(owner) {}
-    ~NativeGraph() { runtime.discard(*commands); }
+    ~NativeGraph() { try { runtime.discard(*commands); } catch (...) { /* Runtime retains failed cleanup until teardown. */ } }
     NativeGraph(const NativeGraph&) = delete;
     NativeGraph& operator=(const NativeGraph&) = delete;
-    orca::l0::Commands* commands;
+    Commands* commands;
     std::vector<std::shared_ptr<Event::State>> events;
     size_t nodes;
     std::vector<sycl::ext::oneapi::experimental::node_type> node_types;
 private:
-    orca::l0::Runtime& runtime;
+    Runtime& runtime;
 };
 
 class Queue {
@@ -160,7 +247,7 @@ class Queue {
         std::function<void()> body;
     };
 public:
-    Queue(orca::l0::Runtime& runtime, orca::l0::compiler::Program& program, bool copy_engine = false)
+    Queue(Runtime& runtime, Program& program, bool copy_engine = false)
         : runtime_(runtime), program_(program), device_(runtime), stream_(runtime, program, copy_engine) {}
     ~Queue() {
         try { wait_and_throw(); } catch (...) {}
@@ -255,6 +342,15 @@ public:
         auto state = std::make_shared<Event::State>();
         state->owner = this;
         state->lifetime = lifetime_;
+#ifdef STRATA_ORCA_DG2
+        if (!recording_) {
+            state->native = completion_event();
+            state->completion = state->native->handle->point;
+            state->coarse_completion = true;
+            retain(state); state->completed_through = sequence_;
+            return Event(std::move(state));
+        }
+#endif
         state->native = make_event();
         retain(state);
         if (recording_) stream_.reset_event(state->native->handle);
@@ -271,7 +367,7 @@ public:
         // submitter materializes markers or mutates the resource ledgers.
         if (std::this_thread::get_id() != owner_thread_) {
             if (deferred_.load(std::memory_order_acquire)) return false;
-            if (!orca::l0::wait(stream_.native_handle(), timeout_ns)) return false;
+            if (!stream_.observe_wait(timeout_ns)) return false;
             check_worker();
             return !deferred_.load(std::memory_order_acquire);
         }
@@ -285,7 +381,7 @@ public:
     void wait_and_throw() { if (!wait()) throw std::runtime_error("native queue timeout"); }
     bool ext_oneapi_empty() const {
         return !deferred_.load(std::memory_order_acquire) &&
-            orca::l0::wait(stream_.native_handle(), 0) && !deferred_.load(std::memory_order_acquire);
+            stream_.observe_wait(0) && !deferred_.load(std::memory_order_acquire);
     }
     // Typed operators may combine consecutive ready requests until the next
     // queue operation. No worker, timer or wait-to-fill policy is involved.
@@ -321,7 +417,7 @@ public:
     // relaxed list. Opt in only when the caller can identify independent work.
     void begin_recording(bool allow_independent) {
         before();
-        stream_.begin_recording(allow_independent ? orca::l0::Ordering::relaxed : orca::l0::Ordering::in_order);
+        stream_.begin_recording(allow_independent ? Ordering::relaxed : Ordering::in_order);
         recording_ = true;
         relaxed_ = allow_independent;
         needs_barrier_ = false;
@@ -390,19 +486,41 @@ private:
             needs_barrier_ = type != sycl::ext::oneapi::experimental::node_type::ext_oneapi_barrier;
         }
     }
-    std::shared_ptr<NativeEvent> make_event() {
+    std::shared_ptr<NativeEvent> make_event(bool reset = true) {
         for (const auto& pool : event_pools_) {
+#ifdef STRATA_ORCA_DG2
+            const auto slot = pool->take(reset);
+#else
             const auto slot = pool->take();
+#endif
             if (slot == UINT32_MAX) continue;
             try { return std::make_shared<NativeEvent>(pool, slot); }
             catch (...) { pool->give(slot); throw; }
         }
         event_pools_.push_back(std::make_shared<EventPool>(runtime_));
         const auto& pool = event_pools_.back();
+#ifdef STRATA_ORCA_DG2
+        const auto slot = pool->take(reset);
+#else
         const auto slot = pool->take();
+#endif
         try { return std::make_shared<NativeEvent>(pool, slot); }
         catch (...) { pool->give(slot); throw; }
     }
+#ifdef STRATA_ORCA_DG2
+    std::shared_ptr<NativeEvent> completion_event() {
+        auto point = stream_.checkpoint();
+        auto event = make_event(false);
+        // The slot is exclusively owned until its State is published. Reuse the
+        // immutable queue fence; no tag reset, extra GPU signal or empty submit.
+        auto* value = event->handle;
+        value->gate = {}; value->gate_created = false;
+        value->point = std::move(point); value->inline_value = false;
+        value->kind = value->point ? dg2_backend::Event::Kind::gpu : dg2_backend::Event::Kind::host;
+        value->signaled = !value->point;
+        return event;
+    }
+#endif
     Event marker() {
         // A completion returned after a typed request must include that work.
         // Earlier markers were materialized when defer() first accepted it.
@@ -428,6 +546,17 @@ private:
     }
     void before() {
         if (auto state = pending_.lock()) {
+#ifdef STRATA_ORCA_DG2
+            if (!recording_) {
+                auto native = completion_event();
+                state->completion = native->handle->point;
+                state->coarse_completion = true;
+                retain(state);
+                state->native = std::move(native);
+                state->completed_through = sequence_;
+                state->pending.store(nullptr, std::memory_order_release);
+            } else {
+#endif
             auto native = make_event();
             retain(state);
             // A graph reuses its internal markers. Reset on the GPU in list
@@ -440,6 +569,9 @@ private:
             state->native = std::move(native);
             state->completed_through = sequence_;
             state->pending.store(nullptr, std::memory_order_release);
+#ifdef STRATA_ORCA_DG2
+            }
+#endif
         }
         pending_.reset();
         if (deferred_owner_) {
@@ -482,17 +614,16 @@ private:
             }
             // Release the GPU gate even when the callback fails; wait() reports
             // that exception after completion instead of leaving a deadlocked GPU.
-            const auto result = zeEventHostSignal(task->done->handle);
-            if (result != ZE_RESULT_SUCCESS && !failed_.load(std::memory_order_relaxed)) {
-                try { orca::l0::check(result, "native callback completion"); }
-                catch (...) { failure_ = std::current_exception(); failed_.store(true, std::memory_order_release); }
-            }
+            try { signal_event(task->done->handle); }
+            catch (...) { if (!failed_.load(std::memory_order_relaxed)) {
+                failure_ = std::current_exception(); failed_.store(true, std::memory_order_release);
+            } }
         }
     }
-    orca::l0::Runtime& runtime_;
-    orca::l0::compiler::Program& program_;
+    Runtime& runtime_;
+    Program& program_;
     DeviceView device_;
-    orca::l0::compiler::Stream stream_;
+    Stream stream_;
     std::vector<std::shared_ptr<EventPool>> event_pools_;
     std::weak_ptr<Event::State> pending_;
     std::vector<std::shared_ptr<Event::State>> recorded_events_;
@@ -514,7 +645,7 @@ private:
     std::exception_ptr failure_;
 };
 
-inline ze_event_handle_t Event::native() const {
+inline EventHandle Event::native() const {
     if (!state_) return nullptr;
     if (auto* pending = state_->pending.load(std::memory_order_acquire)) {
         if (state_->lifetime.expired())

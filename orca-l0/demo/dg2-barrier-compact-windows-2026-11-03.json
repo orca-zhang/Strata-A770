@@ -1,0 +1,199 @@
+{
+  "date": "2026-11-03",
+  "hardware": "Intel Arc A770 G10 C0 0x56a0 revision8",
+  "driver": "32.0.101.9034",
+  "os": "Windows",
+  "linux_gpu_tested": false,
+  "source_adopted": false,
+  "production_changed": false,
+  "native_full_model_win": false,
+  "policy": {
+    "step": 0.5,
+    "last": 0.5,
+    "cumulative": 0,
+    "max_mtp": 4,
+    "expert_slots": 5771,
+    "reserve_mib": 1536
+  },
+  "checks": {
+    "windows": 15,
+    "linux_cpu": 3,
+    "full_buffer_comparisons": 864,
+    "tail_epochs": 1032,
+    "exact_performance_requests": 160,
+    "exact_diagnostic_requests": 11,
+    "first": {
+      "decode_tok_s": {
+        "control": 48.1241772261052,
+        "compact": 47.329921404879684,
+        "l0": 48.08346149428155,
+        "compact_vs_control_pct": -1.6504299231835384,
+        "compact_vs_l0_pct": -1.5671502549613359,
+        "control_drift_pct": -0.13266223749553996,
+        "l0_drift_pct": -2.375390237850994
+      },
+      "ttft_ms": {
+        "control": 908.5421478289437,
+        "compact": 920.0052999949548,
+        "l0": 909.1080494639683,
+        "compact_vs_control_pct": 1.2617083525958028,
+        "compact_vs_l0_pct": 1.1986749580989553,
+        "control_drift_pct": 0.1883577368192224,
+        "l0_drift_pct": 2.198658075691484
+      },
+      "prompt_ms": {
+        "control": 861.748942558098,
+        "compact": 873.3,
+        "l0": 865.848976438732,
+        "compact_vs_control_pct": 1.3404202629611284,
+        "compact_vs_l0_pct": 0.860545402723023,
+        "control_drift_pct": 0.3138075313807276,
+        "l0_drift_pct": 2.1949795680093365
+      },
+      "request_ms": {
+        "control": 2440.4975412556405,
+        "compact": 2478.8887500035344,
+        "l0": 2446.7465650270456,
+        "compact_vs_control_pct": 1.573089425369445,
+        "compact_vs_l0_pct": 1.3136703831904128,
+        "control_drift_pct": 0.08275505885795287,
+        "l0_drift_pct": 2.3456137556864043
+      }
+    },
+    "reverse": {
+      "decode_tok_s": {
+        "control": 47.31370303069377,
+        "compact": 48.22494257195756,
+        "compact_vs_control_pct": 1.9259527005794475,
+        "compact_drift_pct": 0.09517141679016294
+      },
+      "ttft_ms": {
+        "control": 917.0335999951931,
+        "compact": 908.858148287716,
+        "compact_vs_control_pct": -0.891510595415479,
+        "compact_drift_pct": 0.3487190682440966
+      },
+      "prompt_ms": {
+        "control": 870.7,
+        "compact": 862.4743909241596,
+        "compact_vs_control_pct": -0.9447121943080838,
+        "compact_drift_pct": 0.23797086307968396
+      },
+      "request_ms": {
+        "control": 2476.6684000060195,
+        "compact": 2438.1412179213908,
+        "compact_vs_control_pct": -1.5556051865697973,
+        "compact_drift_pct": 0.05929428433786299
+      }
+    },
+    "old_adjacent_ordinary_barriers": {
+      "v14": 1863,
+      "l0": 1727
+    },
+    "packet_counts": {
+      "v14": {
+        "CFE_STATE": 2531,
+        "COMPUTE_WALKER": 40778,
+        "MI_BATCH_BUFFER_END": 136,
+        "MI_LOAD_REGISTER_IMM": 2531,
+        "PIPELINE_SELECT": 2531,
+        "PIPE_CONTROL": 34187,
+        "STATE_BASE_ADDRESS": 278,
+        "STATE_COMPUTE_MODE": 2531
+      },
+      "compact": {
+        "CFE_STATE": 2531,
+        "COMPUTE_WALKER": 40778,
+        "MI_BATCH_BUFFER_END": 136,
+        "MI_LOAD_REGISTER_IMM": 2531,
+        "PIPELINE_SELECT": 2531,
+        "PIPE_CONTROL": 32324,
+        "STATE_BASE_ADDRESS": 278,
+        "STATE_COMPUTE_MODE": 2531
+      }
+    },
+    "packet_summary": {
+      "v14": {
+        "submissions": 136,
+        "files": 136,
+        "bytes": 7328352,
+        "failures": 0
+      },
+      "compact": {
+        "submissions": 136,
+        "files": 136,
+        "bytes": 7283640,
+        "failures": 0
+      }
+    },
+    "removed_ordinary_barriers": 1863,
+    "command_bytes_removed": 44712,
+    "mathematical_walkers": 39985,
+    "ordered_all_walkers_equal": false
+  },
+  "retained_decode_dispersion": {
+    "first-l0-before": {
+      "median": 48.664926214470555,
+      "min": 48.367593712212816,
+      "max": 48.73981914961842,
+      "mad": 0.0748929351478651
+    },
+    "first-control-before": {
+      "median": 48.156130327038454,
+      "min": 47.75069112842423,
+      "max": 48.5498914015587,
+      "mad": 0.2006925611899888
+    },
+    "first-compact": {
+      "median": 47.329921404879684,
+      "min": 47.06173756888971,
+      "max": 47.681786812221596,
+      "mad": 0.16595569693670242
+    },
+    "first-control-after": {
+      "median": 48.09224532705534,
+      "min": 47.52673378775562,
+      "max": 48.42306467027716,
+      "mad": 0.18120074997075264
+    },
+    "first-l0-after": {
+      "median": 47.50894430791463,
+      "min": 47.18738358375761,
+      "max": 47.81979487824829,
+      "mad": 0.10523305020800322
+    },
+    "reverse-compact-before": {
+      "median": 48.20201075851284,
+      "min": 47.84086617147174,
+      "max": 48.518896833503575,
+      "mad": 0.11947367893792205
+    },
+    "reverse-control": {
+      "median": 47.31370303069377,
+      "min": 47.12301587301587,
+      "max": 47.586250078266865,
+      "mad": 0.13092122600675182
+    },
+    "reverse-compact-after": {
+      "median": 48.24788529507306,
+      "min": 47.68477851675242,
+      "max": 48.658684935015046,
+      "mad": 0.21070359470183675
+    }
+  },
+  "evidence_files": 1448,
+  "adoption_decision": "Isolated candidate; no live-source adoption in this report.",
+  "scope": "Frozen v14 runtime, same 80 Host objects/math pack and matched schedules. Compact at Windows calibrated C0 list close only, before final host flush. No new work at replay. Concurrent live local-ID payload caching is excluded; not a full latest-engine benchmark.",
+  "caveats": [
+    "Only adjacent byte-identical ordinary GPU dependencies collapse. Host-visible/invalidation/signal/timestamp/wait packets, walker payloads and intervening commands are preserved. CPU checks include barrier-shaped inline data, idempotence and truncation.",
+    "All 160 performance and 11 separate diagnostic requests match full 76-token natural output,57/57 drafts and zero reuse. Each timing process discards10warmups and retains10requests.",
+    "Decode excludes preparation/init/prefill;TTFT separate. No inner timing/GPUtimestamp/telemetry in performance arms;clocks unlocked. Light script preparation/offline parsing may occur, but no compiler/archive jobs overlap timing.",
+    "First native control48.124,candidate47.330,L0control48.083tok/s: candidate-1.650%versusnative, native drift-0.133%,L0drift-2.375%. Reverse control47.314,candidate48.225tok/s:+1.926%,candidate drift+0.095%. TTFT also reverses+1.262%/-0.892%. No repeatable throughput or TTFT gain;keep isolated.",
+    "The first attempt failed to compile a CPU test using MI_NOOP absent from the minimal packet subset. V2 emits the existing zero word instead. Runtime helper and close path are byte-identical between attempts;no GPU/model run occurred in the failed attempt.",
+    "Command bytes do not measure physical memory/PCIe traffic or assign packet timing cost. The historical D2D/imported-lock census is not rerun. No Linux GPU,production binary/config,MTP,root README or immutable Linux bundle changes."
+  ],
+  "reproduction": {
+    "verify": "python build-orca-native-lower-20261031/publish_dg2_barrier_compact.py --verify"
+  },
+  "archive_sha256": "9f3267525ead6ab0d49c34d818e27a13a3a0e7e9a71292269b601cf05841c967"
+}

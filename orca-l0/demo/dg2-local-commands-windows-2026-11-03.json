@@ -1,0 +1,77 @@
+{
+  "date": "2026-11-03",
+  "complete": true,
+  "source_adopted": false,
+  "production_changed": false,
+  "hardware": "Intel Arc A770 C0",
+  "driver": "32.0.101.9034",
+  "os": "Windows",
+  "linux_gpu_tested": false,
+  "scope": "V11 host vs local command buffers >=16KiB. Upload only at close; no uploads for immutable replay. Unchanged math, parameters, owner, waits and policy.",
+  "checks": {
+    "exact_model_requests": 100,
+    "windows_checks": 15,
+    "guarded_placement_replays": 24,
+    "inflight_submissions": 64,
+    "mathematical_zebins": 1242,
+    "comparisons": {
+      "decode_tok_s": {
+        "host": 47.50683828155537,
+        "local": 47.374201083210565,
+        "l0": 48.17217665743726,
+        "change_pct": -0.2791960129165272,
+        "vs_l0_pct": -1.656507198961077,
+        "host_drift_pct": -0.4707739716065418,
+        "l0_drift_pct": -0.04743058036910108
+      },
+      "ttft_ms": {
+        "host": 894.8884979203137,
+        "local": 897.0920499996282,
+        "l0": 891.8005173901714,
+        "change_pct": 0.2462376133379074,
+        "vs_l0_pct": 0.5933538393700699,
+        "host_drift_pct": 0.25963126102215295,
+        "l0_drift_pct": -0.6268270894492556
+      },
+      "prompt_ms": {
+        "host": 847.6992863038165,
+        "local": 850.0,
+        "l0": 847.59585741083,
+        "change_pct": 0.27140682236683755,
+        "vs_l0_pct": 0.2836425600891923,
+        "host_drift_pct": 0.25986298133711117,
+        "l0_drift_pct": -0.6233460746839059
+      },
+      "request_ms": {
+        "host": 2449.6096015842136,
+        "local": 2449.2713999934494,
+        "l0": 2426.607927737525,
+        "change_pct": -0.013806346551936688,
+        "vs_l0_pct": 0.9339569032503325,
+        "host_drift_pct": 0.22694013010560177,
+        "l0_drift_pct": -0.03946912529199098
+      }
+    },
+    "policy": {
+      "step": 0.5,
+      "last": 0.5,
+      "cumulative": 0,
+      "max_mtp": 4,
+      "expert_slots": 5771,
+      "reserve_mib": 1536
+    }
+  },
+  "evidence_files": 82,
+  "caveats": [
+    "Decode excludes preparation/init/prefill; TTFT separate. No inner timers, GPU timestamps or telemetry.",
+    "Clocks unlocked; bracket observations and control drift are not confidence intervals. Linux unchanged and GPU deferred.",
+    "An extra immutable command mirror costs GPU memory and an upload at close. No default change without a clean model gain."
+  ],
+  "reproduction": {
+    "verify": "python build-orca-native-lower-20261031/publish_dg2_local_commands.py --verify",
+    "build": "python build-orca-native-lower-20261031/check_dg2_local_commands.py --build",
+    "bench": "python build-orca-native-lower-20261031/check_dg2_local_commands.py --bench",
+    "prerequisites": "Exact frozen inputs in results.json; baseline V11 archive dg2-local-parameters-current-main-windows-2026-11-03.json.gz. Fresh output directory required."
+  },
+  "archive_sha256": "25094cd084cadf14aa52cd20cb869db4bce52b594955f453b1f7c6443e85e88a"
+}

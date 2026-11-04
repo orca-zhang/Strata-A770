@@ -1,0 +1,220 @@
+{
+  "date": "2026-11-03",
+  "source_adopted": false,
+  "production_changed": false,
+  "hardware": "Intel Arc A770 C0",
+  "driver": "32.0.101.9034",
+  "os": "Windows",
+  "linux_gpu_tested": false,
+  "policy": {
+    "step": 0.5,
+    "last": 0.5,
+    "cumulative": 0,
+    "max_mtp": 4,
+    "expert_slots": 5771,
+    "reserve_mib": 1536
+  },
+  "checks": {
+    "windows_candidate": 15,
+    "linux_cpu": 3,
+    "full_buffer_comparisons": 864,
+    "gpu_tail_epochs": 1032,
+    "exact_performance_requests": 160,
+    "exact_diagnostic_requests": 11,
+    "first": {
+      "decode_tok_s": {
+        "control": 48.15106629210018,
+        "retained": 48.32632007445595,
+        "l0": 48.798006582437054,
+        "retained_vs_control_pct": 0.3639665657508395,
+        "retained_vs_l0_pct": -0.9666101978658914,
+        "control_drift_pct": 0.6387920946711034,
+        "l0_drift_pct": -4.204238852080644
+      },
+      "ttft_ms": {
+        "control": 910.7531309856997,
+        "retained": 902.0147999981418,
+        "l0": 897.5563627752676,
+        "retained_vs_control_pct": -0.9594620858563996,
+        "retained_vs_l0_pct": 0.4967306130044591,
+        "control_drift_pct": -0.3646135684773566,
+        "l0_drift_pct": 4.088260207554395
+      },
+      "prompt_ms": {
+        "control": 865.1973286482107,
+        "retained": 856.5,
+        "l0": 854.5269159014243,
+        "retained_vs_control_pct": -1.0052421985397797,
+        "retained_vs_l0_pct": 0.23089782918006563,
+        "control_drift_pct": -0.49576295613074084,
+        "l0_drift_pct": 4.107462686567165
+      },
+      "request_ms": {
+        "control": 2444.3072841905855,
+        "retained": 2432.4666500033345,
+        "l0": 2410.6514003293505,
+        "retained_vs_control_pct": -0.48441676150271507,
+        "retained_vs_l0_pct": 0.9049524817650312,
+        "control_drift_pct": -0.599325344546886,
+        "l0_drift_pct": 3.886431353516784
+      }
+    },
+    "reverse": {
+      "decode_tok_s": {
+        "control": 47.81384623631941,
+        "retained": 48.14889614921916,
+        "retained_vs_control_pct": 0.7007382573737564,
+        "retained_drift_pct": -0.7068335176205864
+      },
+      "ttft_ms": {
+        "control": 913.1510000006529,
+        "retained": 910.8263522736224,
+        "retained_vs_control_pct": -0.25457429571108525,
+        "retained_drift_pct": 1.3705772835200136
+      },
+      "prompt_ms": {
+        "control": 867.5,
+        "retained": 865.3980875874408,
+        "retained_vs_control_pct": -0.24229537896935938,
+        "retained_drift_pct": 1.589797344514321
+      },
+      "request_ms": {
+        "control": 2459.876950000762,
+        "retained": 2446.1555184916656,
+        "retained_vs_control_pct": -0.5578096704834001,
+        "retained_drift_pct": 1.1930184857031678
+      }
+    },
+    "old_scratch_attribution": {
+      "null_to_bound": 97,
+      "bound_to_bound": 1,
+      "mapped_unique_kernel_addresses": 84
+    },
+    "packet_counts": {
+      "v13": {
+        "CFE_STATE": 2626,
+        "COMPUTE_WALKER": 40778,
+        "MI_BATCH_BUFFER_END": 136,
+        "MI_LOAD_REGISTER_IMM": 2626,
+        "PIPELINE_SELECT": 2626,
+        "PIPE_CONTROL": 34282,
+        "STATE_BASE_ADDRESS": 468,
+        "STATE_COMPUTE_MODE": 2626
+      },
+      "retained": {
+        "CFE_STATE": 2531,
+        "COMPUTE_WALKER": 40778,
+        "MI_BATCH_BUFFER_END": 136,
+        "MI_LOAD_REGISTER_IMM": 2531,
+        "PIPELINE_SELECT": 2531,
+        "PIPE_CONTROL": 34187,
+        "STATE_BASE_ADDRESS": 278,
+        "STATE_COMPUTE_MODE": 2531
+      }
+    },
+    "packet_summary": {
+      "v13": {
+        "submissions": 136,
+        "files": 136,
+        "bytes": 7351912,
+        "failures": 0
+      },
+      "retained": {
+        "submissions": 136,
+        "files": 136,
+        "bytes": 7328352,
+        "failures": 0
+      }
+    },
+    "surface_changes": {
+      "v13": 98,
+      "retained": 3
+    },
+    "starts": [
+      {
+        "before_bound": false,
+        "after_bound": false,
+        "count": 41
+      },
+      {
+        "before_bound": false,
+        "after_bound": true,
+        "count": 95
+      }
+    ],
+    "mathematical_walker_count": 39985,
+    "moved_file_matches": {
+      "93.bin": "94.bin",
+      "94.bin": "93.bin"
+    }
+  },
+  "retained_decode_dispersion": {
+    "l0-before": {
+      "median": 49.85732057809645,
+      "min": 49.62455109369899,
+      "max": 50.01974463604054,
+      "mad": 0.09319156936573236
+    },
+    "control-before": {
+      "median": 47.998006600407955,
+      "min": 47.044258743423086,
+      "max": 48.525092580768735,
+      "mad": 0.14225776057203632
+    },
+    "retained": {
+      "median": 48.32632007445595,
+      "min": 47.77470455116922,
+      "max": 48.658684935015046,
+      "mad": 0.27676425569891805
+    },
+    "control-after": {
+      "median": 48.30461407217108,
+      "min": 47.75669222068618,
+      "max": 48.60267314702308,
+      "mad": 0.21443908573798964
+    },
+    "l0-after": {
+      "median": 47.76119973574572,
+      "min": 46.806676110118865,
+      "max": 48.08604871875988,
+      "mad": 0.17541305651853634
+    },
+    "reverse-retained-before": {
+      "median": 48.319969858217476,
+      "min": 48.06780089810891,
+      "max": 48.661800486618006,
+      "mad": 0.22022613105391642
+    },
+    "reverse-control": {
+      "median": 47.81384623631941,
+      "min": 47.19910570115513,
+      "max": 48.571611171470565,
+      "mad": 0.3992510211996212
+    },
+    "reverse-retained-after": {
+      "median": 47.97842811555543,
+      "min": 47.25486538581111,
+      "max": 48.655569782330346,
+      "mad": 0.3338217777221324
+    }
+  },
+  "evidence_files": 261,
+  "scope": "One runtime source delta keeps already allocated queue scratch slots available to no-scratch kernels; private memory stays demand-bound. Kernel binaries,80 frozen Host objects and matched expert/router schedules are fixed. This is not a full latest-engine benchmark.",
+  "native_full_model_win": false,
+  "caveats": [
+    "All160performance and11separate diagnostic requests match76tokens,57/57drafts,naturalstop and zero reuse. Each performance process discards10warmups and retains10requests.",
+    "Decode excludes preparation/initialization/prefill;TTFT is separate. No inner timers,GPU timestamps or telemetry in performance arms. No parallel archive/compiler job during timing;lightweight offline trace analysis/script preparation did occur.",
+    "The first candidate is0.967%below matchedL0. Native control drift+0.639%;L0drift-4.204% makes backend comparison especially uncertain. No stable native-over-L0win is established.",
+    "First/reverse decode point estimates are+0.364%/+0.701%,with native-control/candidate drift+0.639%/-0.707%. The gains are near drift. TTFT point estimates improve0.959%/0.255%,with reverse TTFT drift+1.371%;no stable TTFT gain is established.",
+    "Timing point estimates and all raw samples are retained. Do not combine percentages with earlier ISA,parameter or schedule rounds;command counts alone do not assign timing cost.",
+    "Existing v13 packets reconstruct84observed kernel addresses from old module load order and ELF metadata,checking every walker address,SIMD and GRF. Old-process GPUVAs are not reused as mappings.",
+    "The observed model pack uses scratchslot0 only.97oldnull-to-bound changes and1bound-to-bound growth become2null-to-bound and1growth;95initial list programs now bind an existing pool.",
+    "All40778walker shapes match as a multiset and mathematical walker order matches. Two independently submitted memory lists exchange file order,so direct per-file comparison is invalid. Command bytes are not physical memory/PCIe traffic.",
+    "The runtime still owns per-queue writable pools and immutable descriptors;retained lists explicitly retain their allocations. No new copy/lock/retained-memory census or auto-expert-cache benchmark is claimed.",
+    "Windows15checks,864full-buffer comparisons/1032tail epochs and Linuxbuild/3CPUchecks pass. LinuxGPU remains deferred. Productionexecutables/config,MTP,rootREADME and immutableLinuxbundles stay unchanged."
+  ],
+  "reproduction": {
+    "verify": "python build-orca-native-lower-20261031/publish_dg2_scratch_retain.py --verify"
+  },
+  "archive_sha256": "a6eccc5507ee27624b4f8aeb2821332463506ad4d7154ca34e3f170deb641b9c"
+}

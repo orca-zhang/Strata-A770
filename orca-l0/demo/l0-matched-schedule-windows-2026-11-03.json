@@ -1,0 +1,205 @@
+{
+  "schema": 1,
+  "scope": "Windows A770 C0: identical expert/router schedules and native device pack on L0 and direct DG2.",
+  "hardware": {
+    "video_controllers": [
+      {
+        "Name": "GameViewer Virtual Display Adapter",
+        "DriverVersion": "15.6.5.199"
+      },
+      {
+        "Name": "Intel(R) Arc(TM) A770 Graphics",
+        "DriverVersion": "32.0.101.9034"
+      }
+    ],
+    "experiment_device": "Intel Arc A770 C0",
+    "clock_locked": false,
+    "query": "Win32_VideoController once before validation/performance; no polling"
+  },
+  "production_changed": false,
+  "candidate_adopted": false,
+  "checks": {
+    "exact_model_requests": 160,
+    "full_buffer_comparisons": 2144,
+    "gpu_tail_epochs": 2952,
+    "policy": {
+      "step": 0.5,
+      "last": 0.5,
+      "cumulative": 0,
+      "max_mtp": 4,
+      "expert_slots": 5771,
+      "reserve_mib": 1536
+    },
+    "comparisons": {
+      "decode_tok_s": {
+        "l0_serial": 47.212360906261296,
+        "l0_matched": 48.46573079016595,
+        "dg2_matched": 47.6431087120575,
+        "dg2_vs_matched_l0_pct": -1.6973272964149078,
+        "l0_schedule_change_pct": 2.6547494339314692,
+        "dg2_vs_serial_l0_pct": 0.9123623507230283,
+        "l0_serial_drift_pct": -0.30390950997484234,
+        "l0_matched_drift_pct": -0.38464141150121867
+      },
+      "ttft_ms": {
+        "l0_serial": 906.5362861505821,
+        "l0_matched": 899.9123285187968,
+        "dg2_matched": 909.3870500073535,
+        "dg2_vs_matched_l0_pct": 1.0528493930238358,
+        "l0_schedule_change_pct": -0.7306886368457,
+        "dg2_vs_serial_l0_pct": 0.3144677053002143,
+        "l0_serial_drift_pct": 0.14528990797921804,
+        "l0_matched_drift_pct": 0.27872585465265054
+      },
+      "prompt_ms": {
+        "l0_serial": 861.7994198187881,
+        "l0_matched": 856.4992279622907,
+        "dg2_matched": 862.8,
+        "dg2_vs_matched_l0_pct": 0.7356424655162286,
+        "l0_schedule_change_pct": -0.6150145538055596,
+        "dg2_vs_serial_l0_pct": 0.1161036034837748,
+        "l0_serial_drift_pct": 0.23234200743493805,
+        "l0_matched_drift_pct": 0.26889577365989403
+      },
+      "request_ms": {
+        "l0_serial": 2473.757520487284,
+        "l0_matched": 2425.894684660948,
+        "dg2_matched": 2464.968649990624,
+        "dg2_vs_matched_l0_pct": 1.6107032830708912,
+        "l0_schedule_change_pct": -1.9348232569256885,
+        "dg2_vs_serial_l0_pct": -0.35528423557572575,
+        "l0_serial_drift_pct": 0.675850909485054,
+        "l0_matched_drift_pct": 0.3024397447475291
+      }
+    },
+    "reverse_comparisons": {
+      "decode_tok_s": {
+        "dg2_matched": 47.63556983252284,
+        "l0_matched": 48.32300116154056,
+        "dg2_vs_matched_l0_pct": -1.4225758179209125,
+        "dg2_matched_drift_pct": 0.32640033586366357
+      },
+      "ttft_ms": {
+        "dg2_matched": 909.8483891173396,
+        "l0_matched": 904.6029999881284,
+        "dg2_vs_matched_l0_pct": 0.5798553762567771,
+        "dg2_matched_drift_pct": 0.4213726179618238
+      },
+      "prompt_ms": {
+        "dg2_matched": 863.2474456956128,
+        "l0_matched": 860.7,
+        "dg2_vs_matched_l0_pct": 0.2959737069377022,
+        "dg2_matched_drift_pct": 0.48771990942344523
+      },
+      "request_ms": {
+        "dg2_matched": 2460.27381877144,
+        "l0_matched": 2434.194749992457,
+        "dg2_vs_matched_l0_pct": 1.0713632826240937,
+        "dg2_matched_drift_pct": -0.4016502149596368
+      }
+    },
+    "retained_decode_dispersion": {
+      "l0-serial-before": {
+        "min": 46.35276896804099,
+        "max": 47.577313133842495,
+        "median": 47.2842662706015,
+        "quartiles": [
+          47.07549738824753,
+          47.2842662706015,
+          47.51116082359495
+        ],
+        "mad": 0.18755516547664186
+      },
+      "l0-matched-before": {
+        "min": 47.843877872206484,
+        "max": 48.80554842024146,
+        "median": 48.55921018261501,
+        "quartiles": [
+          48.39336155908589,
+          48.55921018261501,
+          48.6945500333846
+        ],
+        "mad": 0.10726842053460572
+      },
+      "dg2-matched": {
+        "min": 47.19324391455539,
+        "max": 47.907211296016136,
+        "median": 47.6431087120575,
+        "quartiles": [
+          47.28941436115416,
+          47.6431087120575,
+          47.767197904014594
+        ],
+        "mad": 0.12559040814566913
+      },
+      "l0-matched-after": {
+        "min": 48.00707472680185,
+        "max": 48.633774876815764,
+        "median": 48.37243135115476,
+        "quartiles": [
+          48.12567024584034,
+          48.37243135115476,
+          48.56152491089184
+        ],
+        "mad": 0.1914209752612024
+      },
+      "l0-serial-after": {
+        "min": 46.5943228496107,
+        "max": 47.243115559147135,
+        "median": 47.140564888683315,
+        "quartiles": [
+          46.76932042288014,
+          47.140564888683315,
+          47.2013059196828
+        ],
+        "mad": 0.07748111615156716
+      },
+      "dg2-matched-before": {
+        "min": 46.988994682824284,
+        "max": 47.88608153235461,
+        "median": 47.55801829736015,
+        "quartiles": [
+          47.122380686932416,
+          47.55801829736015,
+          47.73572270184384
+        ],
+        "mad": 0.2528247095059726
+      },
+      "l0-matched": {
+        "min": 47.95557799091368,
+        "max": 48.68985841501697,
+        "median": 48.32300116154056,
+        "quartiles": [
+          48.12723347391476,
+          48.32300116154056,
+          48.542970720352926
+        ],
+        "mad": 0.17523599823113756
+      },
+      "dg2-matched-after": {
+        "min": 47.47922783782095,
+        "max": 47.877031624039304,
+        "median": 47.71324782881283,
+        "quartiles": [
+          47.58401724081373,
+          47.71324782881283,
+          47.855176871525586
+        ],
+        "mad": 0.13033630274860286
+      }
+    },
+    "linux_gpu_validated": false,
+    "physical_concurrency_proven": false
+  },
+  "evidence_files": 645,
+  "caveats": [
+    "All 80 L0 Host objects are rebuilt with consistent L0 layouts; the device pack and scheduling source are shared byte-for-byte with the tested native candidate.",
+    "Decode excludes preparation/init/prefill. TTFT is separate; no inner timers or GPU telemetry during model brackets.",
+    "This isolates complete runtime/back-end paths after equalizing engine scheduling, not one API-call cost or hardware concurrency.",
+    "Sample dispersion and adjacent-control drift are descriptive, not confidence intervals or fixed gains.",
+    "No new transfer/lock census; prior counters do not measure physical traffic or private driver locks.",
+    "Numerical quantization checks use full-byte cross-schedule parity, not an independent CPU quantizer oracle.",
+    "Linux GPU execution remains untested. Production configuration and binaries are unchanged."
+  ],
+  "archive_sha256": "7afe9f0ec2de045868943f5be6cf6c9813d7ed6995b734a63bbd1624c2ca3d98"
+}

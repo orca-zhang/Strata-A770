@@ -352,6 +352,7 @@ bool prompt_f16() { return false; }
 
 namespace fp16_pair {
 class OrcaFp16ExpertPair;
+class OrcaFp16PairSwiGLU;
 namespace {
 
 void multiply(strata::l0::Queue& q, Expert a, Expert b, uint16_t* padding, bool down) {
@@ -359,7 +360,7 @@ void multiply(strata::l0::Queue& q, Expert a, Expert b, uint16_t* padding, bool 
     constexpr int SG = 8, NSG = 8, ROWS = 4, TILE = 8;
     const int n = down ? 2560 : 1280, k = down ? 640 : 2560;
     const int tiles_a = (a.rows + ROWS - 1) / ROWS, tiles_b = (b.rows + ROWS - 1) / ROWS;
-    if (a.rows % TILE || b.rows % TILE) {
+    if (!down && (a.rows % TILE || b.rows % TILE)) {
         q.parallel_for(sycl::range<1>(2 * TILE * size_t(k)), [=](sycl::id<1> id) {
             const size_t i = id[0];
             const int which = int(i / (TILE * k)), offset = int(i % (TILE * k));
@@ -419,10 +420,43 @@ bool execute(strata::l0::Queue& q, Expert a, Expert b, void* workspace, size_t b
         if (e.rows <= 0 || e.rows > INT_MAX / 2 - 7 || !e.x || !e.gu_weight || !e.down_weight ||
             !e.gu || !e.hidden || !e.output) return false;
     if ((a.rows % 8 || b.rows % 8) && (!workspace || bytes < 2 * 8 * 2560 * sizeof(uint16_t))) return false;
+#ifdef STRATA_ORCA_DG2
+    if (!q.runtime().on_owner()) {
+        // ponytail: one synchronous encoder handoff per pair; keep GPU waits on the submitting thread.
+        q.flush();
+        q.runtime().invoke([&] { execute(q, a, b, workspace, bytes, false); });
+        if (finish) q.wait_and_throw();
+        return true;
+    }
+#endif
     auto* padding = static_cast<uint16_t*>(workspace);
     multiply(q, a, b, padding, false);
-    strata::prefill::swiglu_interleaved(a.gu, a.hidden, a.rows, &q);
-    strata::prefill::swiglu_interleaved(b.gu, b.hidden, b.rows, &q);
+    // ponytail: activate both buffers and prepare the Down tails in one launch using the existing padding.
+    const size_t rows_a = a.rows, rows_b = b.rows;
+    const size_t count_a = (rows_a + 7) / 8 * 8 * 640, count = count_a + (rows_b + 7) / 8 * 8 * 640;
+    const float *gu_a = a.gu, *gu_b = b.gu;
+    uint16_t *h_a = a.hidden, *h_b = b.hidden;
+    q.parallel_for<OrcaFp16PairSwiGLU>(sycl::nd_range<1>(sycl::range<1>((count + 255) / 256 * 256),
+        sycl::range<1>(256)), [=](sycl::nd_item<1> it) {
+        size_t i = it.get_global_id(0);
+        if (i >= count) return;
+        const bool second = i >= count_a;
+        const float* gu = second ? gu_b : gu_a;
+        uint16_t* hidden = second ? h_b : h_a;
+        const size_t rows = second ? rows_b : rows_a;
+        if (second) i -= count_a;
+        uint16_t value = 0;
+        if (i < rows * 640) {
+            const float g = gu[i * 2], u = gu[i * 2 + 1];
+            const float f = g / (1.0f + sycl::native::exp(-g)) * u;
+            const float saturated = sycl::isnan(f) ? f : sycl::fmin(sycl::fmax(f, -65504.0f), 65504.0f);
+            value = sycl::bit_cast<unsigned short, sycl::half>(
+                sycl::vec<float, 1>(saturated).convert<sycl::half, sycl::rounding_mode::rte>()[0]);
+            hidden[i] = value;
+        }
+        if (rows % 8 && i >= rows / 8 * 8 * 640)
+            padding[size_t(second) * 8 * 2560 + i - rows / 8 * 8 * 640] = value;
+    });
     multiply(q, a, b, padding, true);
     if (finish) q.wait_and_throw();
     return true;

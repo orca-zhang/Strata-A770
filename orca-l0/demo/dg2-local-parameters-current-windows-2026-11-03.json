@@ -1,0 +1,64 @@
+{
+  "date": "2026-11-03",
+  "complete": true,
+  "diagnostic_only": true,
+  "source_adopted": false,
+  "production_changed": false,
+  "hardware": "Intel Arc A770 C0",
+  "driver": "32.0.101.9034",
+  "os": "Windows",
+  "linux_gpu_tested": false,
+  "checks": {
+    "comparisons": {
+      "decode_tok_s": {
+        "host": 46.49031740731584,
+        "local": 46.94692650504266,
+        "l0": 47.67058531356112,
+        "change_pct": 0.982159561799345,
+        "vs_l0_pct": -1.5180405353919513,
+        "host_drift_pct": 0.06727535032660104,
+        "l0_drift_pct": -0.03451522241312288
+      },
+      "ttft_ms": {
+        "host": 910.501035200197,
+        "local": 912.9127499909373,
+        "l0": 900.5537091238513,
+        "change_pct": 0.2648777648242895,
+        "vs_l0_pct": 1.3723824289292086,
+        "host_drift_pct": 0.03607455829868211,
+        "l0_drift_pct": -0.21384483459582215
+      },
+      "prompt_ms": {
+        "host": 862.3249706462175,
+        "local": 865.7,
+        "l0": 856.0246929849628,
+        "change_pct": 0.39138717637428044,
+        "vs_l0_pct": 1.130260271032535,
+        "host_drift_pct": 0.05219812086765252,
+        "l0_drift_pct": -0.16924423694193447
+      },
+      "request_ms": {
+        "host": 2497.578428583081,
+        "local": 2485.8612500102026,
+        "l0": 2452.4656844398905,
+        "change_pct": -0.46914156683862673,
+        "vs_l0_pct": 1.361713877678139,
+        "host_drift_pct": -0.2223140493968767,
+        "l0_drift_pct": 0.02252680719594391
+      }
+    },
+    "matching_requests": 100,
+    "windows_checks_per_variant": 15,
+    "numerical_lifecycle_groups_per_variant": 8,
+    "linux_cpu_checks": 3
+  },
+  "evidence_files": 309,
+  "caveats": [
+    "Same frozen80Host objects,1242mathzebins,fixed MTP4/min-p.5/5771slots/reserve1536/no reuse;all100full76token outputs,57of57drafts,naturalstop match.",
+    "Only local policy differs between host/local builds. Host captures stay immutable;new ranges batch by slab at close,bootstrap pools remain separate,no uploads at replay.",
+    "Decode excludes preparation,initialization and prefill;TTFT/request reported separately. No inner timers,GPU timestamps,telemetry or fresh copy/lock census.",
+    "One bracket with unlocked clocks;control drift is not a confidence interval. Earlier local-parameter trial predatesV10;standalone placement proof is separate.",
+    "Linux compiles with host-backed parameters;Linux GPU execution deferred. Failed runner invocation is retained;production sources,binaries,config and bundles preserved."
+  ],
+  "archive_sha256": "633212c4d9a71cc23f4c093925caca76d1055dd17504472350f411be3af9761f"
+}

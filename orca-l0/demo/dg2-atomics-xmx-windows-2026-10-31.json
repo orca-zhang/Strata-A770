@@ -1,0 +1,328 @@
+{
+  "date": "2026-10-31",
+  "complete": true,
+  "hardware": {
+    "os": "Windows",
+    "gpu": "Intel Arc A770 16 GB",
+    "pci_device": "0x56a0",
+    "driver": "32.0.101.9034",
+    "wddm": 2700,
+    "compiler": "Intel oneAPI 2025.3.2"
+  },
+  "scope": {
+    "backend": "Orca::DG2",
+    "level_zero_intel_umd_gmm_compiler_loaded_during_checks": false,
+    "vendor_compiler_used_for_offline_xyz_bake": true,
+    "full_model_integrated": false,
+    "linux_gpu_validated": false,
+    "production_changed": false,
+    "performance_gain_claimed": false
+  },
+  "features": {
+    "dispatch_dimensions": [
+      "x",
+      "y",
+      "z"
+    ],
+    "original_1d_overload_retained": true,
+    "sycl_range3_order": [
+      "z",
+      "y",
+      "x"
+    ],
+    "max_local_threads": 1024,
+    "local_thread_count_power_of_two": true,
+    "max_total_work_items": 4294967295,
+    "required_local_tuple_checked": true,
+    "malformed_required_local_tuples_rejected": true,
+    "per_axis_hidden_local_global_group_sizes": true,
+    "global_atomic_metadata_validated": true,
+    "global_atomic_instructions_and_fences_in_isa": true,
+    "eu_fusion_disable_inverted_cfe_bit": true,
+    "eu_fusion_in_state_cache_key": true,
+    "no_new_submit_allocation_or_per_kernel_work": true
+  },
+  "validation": {
+    "windows_ctest": "4/4",
+    "linux_cpu_ctest": "4/4",
+    "atomics": {
+      "replays": 24,
+      "elements": 8195,
+      "formats": [
+        "FP32",
+        "FP16",
+        "BF16"
+      ],
+      "fp32_reduction_repeated_twice": true,
+      "cases": [
+        "all finite",
+        "all Inf/NaN",
+        "mixed signed Inf/NaN"
+      ],
+      "dependent_doorbell": true,
+      "exact_counts_and_full_input_output_guards": true
+    },
+    "xmx": {
+      "replays": 144,
+      "formats": [
+        "FP16 M4",
+        "BF16 M8"
+      ],
+      "grfs": [
+        128,
+        256
+      ],
+      "subgroups": [
+        1,
+        8
+      ],
+      "shapes_t_n_k": [
+        [
+          8,
+          64,
+          32
+        ],
+        [
+          17,
+          72,
+          48
+        ],
+        [
+          5,
+          8,
+          16
+        ]
+      ],
+      "input_strides": [
+        40,
+        56,
+        24
+      ],
+      "changed_inputs_each_replay": true,
+      "max_abs_error": 0,
+      "dyadic_fixture_only": true,
+      "tail_input_and_partial_rows_columns": true,
+      "multiple_group_y_z": true,
+      "non_dpas_xmx_non_dpas_transitions": true,
+      "full_input_stride_tail_output_counter_guards": true
+    },
+    "xyz": {
+      "replays": 32,
+      "local_tuples": [
+        [
+          4,
+          2,
+          2
+        ],
+        [
+          8,
+          4,
+          2
+        ],
+        [
+          16,
+          2,
+          2
+        ],
+        [
+          1,
+          1,
+          1
+        ]
+      ],
+      "group_tuples": [
+        [
+          3,
+          5,
+          7
+        ],
+        [
+          2,
+          3,
+          4
+        ],
+        [
+          3,
+          2,
+          2
+        ],
+        [
+          3,
+          2,
+          5
+        ]
+      ],
+      "exact_local_group_global_ids_and_sizes": true,
+      "partial_full_simd": true,
+      "prefix_and_full_output_guards": true
+    },
+    "existing_regressions": {
+      "scratch_replays": 12,
+      "private_replays": 16,
+      "gate_replays": 24,
+      "gemv_replays": 48
+    }
+  },
+  "native_pack_census": {
+    "total": 1243,
+    "accepted_metadata": 1233,
+    "rejected_metadata": 10,
+    "previous_accepted_metadata": 1210,
+    "rejection_reasons": {
+      "DG2: zebin targets a different GPU family": 10
+    },
+    "all_accepted_exports_gpu_validated": false
+  },
+  "source_sha256": {
+    "orca-l0\\CMakeLists.txt": "b738d979177870626d76480fe360a81d45f8f839af194bef657638db708d8a01",
+    "orca-l0\\compiler\\CMakeLists.txt": "495fd91dc356f203b3dea0a6ff5277a13a4e1db1eda6cff59208f8567bd1c24e",
+    "orca-l0\\compiler\\native_pack.cpp": "0fdedfc6e302178df52f31a0628344b2571db8ebe018dc0948a916ae5301e8fd",
+    "orca-l0\\demo\\CMakeLists.txt": "1e763314817d9cd9572a96f9ae6cdf86af13a24e60b43e231715216d67962c71",
+    "orca-l0\\demo\\dispatch.cpp": "bd184678e907165a6bb17998b0109e860195e1ba7c5eb8e7f70fc64ad1b924bb",
+    "orca-l0\\include\\orca_l0\\dg2.hpp": "6404fa1d5c878c74ade948e8e28d150f62c5cbcf2efa45369bf5777dbc24fcbc",
+    "orca-l0\\include\\orca_l0\\direct_driver.hpp": "cd87a73ef80e8b2052a192ddd2ff174d36be595d79c42e454e0bb1b3d86e61c0",
+    "orca-l0\\include\\orca_l0\\drm.hpp": "46808da289dbb63cbb9310f9b4ea806fbec4eeff76dcfbd3b53478f0bf46f245",
+    "orca-l0\\include\\orca_l0\\ring.hpp": "c0bc88a290d32ba5ee6cf26f2fe82c38cced25a334a02c23591e11bb67f75112",
+    "orca-l0\\include\\orca_l0\\runtime.hpp": "1b800beb8a4ec7b1777192afc599a4cf519870acd2438b1aea43e79ffafc0869",
+    "orca-l0\\include\\orca_l0\\compiler\\program.hpp": "3aedf164c9bc4320e2be356acc93cd2dae03f75fc49058cdb6f29671fbf02a25",
+    "orca-l0\\include\\orca_l0\\compiler\\stream.hpp": "5a0b8badff512b7dc8b737f00b1cb2ddfedb35c0cdbc6e89fc77ee89b390a136",
+    "orca-l0\\include\\orca_l0\\compiler\\sycl.hpp": "8b740f4a4a3e4ef5dd84212f47d7b71315b7f1a196701dbcfc9f3a7e4c47ab9a",
+    "orca-l0\\src\\direct_driver.cpp": "7fe701e2c34dccd80868685b29b83fc846406bf531faa4579a220c7bc4107548",
+    "orca-l0\\src\\runtime.cpp": "2065f4be1abade4be029573f02d58d73f1b7d6a23cfc5ee85140669880bcf531",
+    "orca-l0\\src\\drm\\arguments.hpp": "49538ea894f90fe24bb8ab8cd144ed446ca506a8f64ef77fa051ea17c66a56c7",
+    "orca-l0\\src\\drm\\encoding.hpp": "ec9e31dc4c0a9ccacfa2a9bb00f9a8504cbafb8efb60df0fc335498d785c38ae",
+    "orca-l0\\src\\drm\\recording.inl": "70892c9daaf20942f47a739feabcc5694cad1975e983aca2f215a5be9c6674c3",
+    "orca-l0\\src\\drm\\runtime.cpp": "29b8901666e152dd1d6f9d8936712fac2c4f4d6872700a98c7978eb9033d2a4f",
+    "orca-l0\\src\\drm\\zebin.hpp": "c5390c43c409246e3566f4c0c8d4ebf1e5a1c05224d5cc0ffb70eebfa6ab9ae8",
+    "orca-l0\\src\\wddm\\runtime.cpp": "47f1696e40a54f419e8f5ef0376e2e3413305b66285c47ebaef9f08e15756026",
+    "orca-l0\\tests\\compiler_check.cpp": "0cec3be040240834476916155bade46c0edbf76cf81aa528d92fc4a0707f2ab1",
+    "orca-l0\\tests\\dispatch3d.cl": "0d70ceb4fdc897b246e0e3590df708c2cb80d7242600b085243172dbd3697641",
+    "orca-l0\\tests\\drm_compute_check.cpp": "727e16c328e0f33dd0c33b10e36f20324967d68962d3b3bcbd15506bbccae3b0",
+    "orca-l0\\tests\\drm_submit_check.cpp": "a2fd00de705be46804d2913cc10af3a58623ea253bf4e16963921922e73540a8",
+    "orca-l0\\tests\\inference.cl": "03647efb665f6d2ef16b95ee47526bf42832a71355b6f1c5b78668beefbee1b2",
+    "orca-l0\\tests\\native_pack_check.cpp": "631ed0ecb003351464fb999113ff444721b5e8f70562bf1fdc0656989338dc51",
+    "orca-l0\\tests\\ring_check.cpp": "edf589faf8df29b1c4d190a0e7a2e83d698f1726aa2365f3112e3bec5b529798",
+    "orca-l0\\tests\\runtime_check.cpp": "3aecdf8facd2ad0426dd90ea89ce869c12cdc4d882385dab9f9935bc1b5909ec",
+    "orca-l0\\tests\\runtime_dependencies.hpp": "6b082542cf1b130441a3de93ae1d6e04cb7680600b429fa636ed9bf48cfec451",
+    "orca-l0\\tests\\submit_check.cpp": "e8634fdb6547448a3bf54efc9773da5ef6325e826858cea02f2c63a93dd1901e",
+    "orca-l0\\tests\\wddm_memory_check.cpp": "3e8b17e4b72db0a7b4e53737d747cfc299cceb9207e7d520ba03c43cbbe7071e",
+    "orca-l0\\third_party\\intel-dg2\\packets.hpp": "579559e752d0e4d4d44b903dea0a8f2d172afdd6d0fad63afa445d183bc1165b"
+  },
+  "executable_sha256": "4bd9f4a3290dde63325ed198eee725012a69b1f793939bec9148a381ee436ce5",
+  "production_sha256": {
+    "strata-iq2_xs.json": "9c45e51de69e66c3f1cd020359c8d70d639fbd1aba5d87ead84082fbe73fd531",
+    "build-orca-default-pair-20261031/strata.exe": "7be641375e905b0ceb64424ab4875afcdf9f7f6f1e2c60d6b0fcff4ece5ff4b5"
+  },
+  "kernel_images": [
+    {
+      "path": "build-orca-native-lower-20261031\\windows-native-compatible-v4\\images\\prefill_helpers\\image_3.zebin",
+      "kernel": "_ZTSZN6strata7prefill18finite_count_asyncEPKfxPjPvEUlN4sycl3_V17nd_itemILi1EEEE_",
+      "sha256": "67a3878046caeca24fc74123b2d9048886e727f095a31209419cba51cb6d1ac5"
+    },
+    {
+      "path": "build-orca-native-lower-20261031\\windows-native-compatible-v4\\images\\prefill_helpers\\image_2.zebin",
+      "kernel": "_ZTSZN6strata7prefill20finite_count16_asyncEPKtxbPjPvE13Finite16Count",
+      "sha256": "9f0dae6884d8337880061520cbb861e4d8ee1fcb96069acde04ff12acf5ba68d"
+    },
+    {
+      "path": "build-orca-native-lower-20261031\\windows-native-compatible-v4\\images\\elementwise\\image_13.zebin",
+      "kernel": "_ZTS16dpct_kernel_nameIJZN6strata7kernels13doorbell_ringEPjPvE27doorbell_ring_kernel_b862a4EE",
+      "sha256": "94b82f1b186d937e56e7ee0f614c469de2b28bf45f9c9f528d8333296bb2b638"
+    },
+    {
+      "path": "build-orca-native-lower-20261031\\windows-native-compatible-v4\\images\\xmx\\image_0.zebin",
+      "kernel": "_ZTSZZN6strata7prefill20native_xmx_launch_m4IN4sycl3_V16detail9half_impl4halfELi8EEEvPKtS8_PfxxxxPNS_2l05QueueES8_ENKUlRSB_E_clESD_EUlNS3_7nd_itemILi3EEEE_",
+      "sha256": "0679def3e65acb4bcd8ef9aeb08d1582d1dde6d205452415a49a02968e5854cc"
+    },
+    {
+      "path": "build-orca-native-lower-20261031\\windows-native-compatible-v4\\images\\xmx\\image_1.zebin",
+      "kernel": "_ZTSZZN6strata7prefill17native_xmx_launchIN4sycl3_V13ext6oneapi8bfloat16ELi8EEEvPKtS8_PfxxxxPNS_2l05QueueES8_ENKUlRSB_E_clESD_EUlNS3_7nd_itemILi3EEEE_",
+      "sha256": "45b41c98a8fbb47c044ab344b80ef576a434bd93b830df8c34ac9adaaba6f93c"
+    },
+    {
+      "path": "build-orca-native-lower-20261031\\windows-native-compatible-v4\\images\\xmx\\image_2.zebin",
+      "kernel": "_ZTSZZN6strata7prefill17native_xmx_launchIN4sycl3_V13ext6oneapi8bfloat16ELi1EEEvPKtS8_PfxxxxPNS_2l05QueueES8_ENKUlRSB_E_clESD_EUlNS3_7nd_itemILi3EEEE_",
+      "sha256": "827ebfb4971ee060970b44ac95615d7ab9d40a3c961e74b23c501a11beb612f1"
+    },
+    {
+      "path": "build-orca-native-lower-20261031\\windows-dg2-xyz-fixture-v1\\native\\image_0.zebin",
+      "kernel": "grid3d",
+      "sha256": "fa58da97556335d74bc224a0b1f35375a7182f585f3cb85ab7b9ee2361396637"
+    }
+  ],
+  "fixture_compilation": {
+    "complete": true,
+    "commands": [
+      {
+        "label": "compile",
+        "args": [
+          "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin\\compiler\\clang.exe",
+          "-cc1",
+          "-triple",
+          "spir64-unknown-unknown",
+          "-x",
+          "cl",
+          "-cl-std=CL2.0",
+          "-finclude-default-header",
+          "-O2",
+          "-emit-llvm-bc",
+          "G:\\GitHub\\Strata\\orca-l0\\tests\\dispatch3d.cl",
+          "-o",
+          "G:\\GitHub\\Strata\\build-orca-native-lower-20261031\\windows-dg2-xyz-fixture-v1\\input.bc"
+        ],
+        "exit_code": 0
+      },
+      {
+        "label": "translate",
+        "args": [
+          "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin\\compiler\\llvm-spirv.exe",
+          "-spirv-max-version=1.2",
+          "-spirv-ext=-all",
+          "G:\\GitHub\\Strata\\build-orca-native-lower-20261031\\windows-dg2-xyz-fixture-v1\\input.bc",
+          "-o",
+          "G:\\GitHub\\Strata\\build-orca-native-lower-20261031\\windows-dg2-xyz-fixture-v1\\source\\grid3d.spv"
+        ],
+        "exit_code": 0
+      },
+      {
+        "label": "bake",
+        "args": [
+          "G:\\GitHub\\Strata\\build-orca-native-lower-20261031\\first-check\\loader\\orca-l0-native-pack.exe",
+          "G:\\GitHub\\Strata\\build-orca-native-lower-20261031\\windows-dg2-xyz-fixture-v1\\source",
+          "G:\\GitHub\\Strata\\build-orca-native-lower-20261031\\windows-dg2-xyz-fixture-v1\\native"
+        ],
+        "exit_code": 0
+      }
+    ],
+    "source_sha256": "0d70ceb4fdc897b246e0e3590df708c2cb80d7242600b085243172dbd3697641",
+    "image_sha256": "fa58da97556335d74bc224a0b1f35375a7182f585f3cb85ab7b9ee2361396637"
+  },
+  "fixture_source_index": "grid3d.spv\tgrid3d\n",
+  "reference_revision": "ee495cce3db8f870a89697febbd7e8b6680151b2",
+  "reference_source_sha256": {
+    "shared/source/xe_hpg_core/preamble_xe_hpg_core.cpp": "f65a790ec966f1a481a05d2c849672c3e70070cb54d6dec2f9ea33750f4599b4",
+    "shared/source/xe_hpg_core/gfx_core_helper_xe_hpg_core.cpp": "f1f1efb10715ecc88f67416eeeb7141b416b7b7b0a6dbee295fa1f17a46fab76",
+    "shared/source/device_binary_format/zebin/zeinfo_decoder.cpp": "d4cba79eb15f90f5a7dae280af38c3d3ce13f2e684551bc06d902ac7f81b90f1"
+  },
+  "remaining": [
+    "Native Linux GPU calibration/parity",
+    "Full Strata integration",
+    "Device-local large allocations",
+    "Multiqueue/events",
+    "Concurrent host/GPU doorbell handoff",
+    "All accepted exports have not been individually executed."
+  ],
+  "caveats": [
+    "Kernel parity is not full-model prefill performance or general numerical equivalence for every input.",
+    "Only final reports marked complete establish passing checks.",
+    "Earlier XMX fixture failures used incorrect scalar/pointer lambda ABI order; fixed using preserved SPIR-V, not source function parameter order.",
+    "GPU/private ABI remains bound to A770 0x56a0/32.0.101.9034.",
+    "No Linux GPU or production throughput/default change is claimed."
+  ],
+  "local_evidence": [
+    "windows-dg2-atomics-xmx-v4",
+    "windows-dg2-mixed-xmx-v1",
+    "linux-dg2-atomics-xmx-cpu-v1",
+    "windows-dg2-xyz-fixture-v1"
+  ]
+}

@@ -1,0 +1,136 @@
+{
+  "date": "2026-11-03",
+  "complete": true,
+  "diagnostic_only": true,
+  "performance_claimed": false,
+  "source_adopted": false,
+  "production_changed": false,
+  "hardware": "Intel Arc A770 C0",
+  "driver": "32.0.101.9034",
+  "os": "Windows",
+  "linux_gpu_tested": false,
+  "checks": {
+    "exact_model_requests": 22,
+    "summaries": {
+      "native": {
+        "requests": 11,
+        "sleep_0ms_calls": 0,
+        "sleep_1ms_calls": 0,
+        "sleep_2_to_99ms_calls": 0,
+        "sleep_1000ms_calls": 23,
+        "final_histogram": [
+          {
+            "request": 11,
+            "bucket": 0,
+            "calls": 0,
+            "requested_ms": 0,
+            "first_rva": "0",
+            "multiple_sites": false,
+            "first_symbol": null
+          },
+          {
+            "request": 11,
+            "bucket": 1,
+            "calls": 0,
+            "requested_ms": 0,
+            "first_rva": "0",
+            "multiple_sites": false,
+            "first_symbol": null
+          },
+          {
+            "request": 11,
+            "bucket": 2,
+            "calls": 0,
+            "requested_ms": 0,
+            "first_rva": "0",
+            "multiple_sites": false,
+            "first_symbol": null
+          },
+          {
+            "request": 11,
+            "bucket": 3,
+            "calls": 2,
+            "requested_ms": 2000,
+            "first_rva": "a6f05",
+            "multiple_sites": false,
+            "first_symbol": "??$sleep_for@_JU?$ratio@$00$00@std@@@this_thread@std@@YAXAEBV?$duration@_JU?$ratio@$00$00@std@@@chrono@1@@Z"
+          }
+        ]
+      },
+      "l0": {
+        "requests": 11,
+        "sleep_0ms_calls": 0,
+        "sleep_1ms_calls": 0,
+        "sleep_2_to_99ms_calls": 0,
+        "sleep_1000ms_calls": 22,
+        "final_histogram": [
+          {
+            "request": 11,
+            "bucket": 0,
+            "calls": 0,
+            "requested_ms": 0,
+            "first_rva": "0",
+            "multiple_sites": false,
+            "first_symbol": null
+          },
+          {
+            "request": 11,
+            "bucket": 1,
+            "calls": 0,
+            "requested_ms": 0,
+            "first_rva": "0",
+            "multiple_sites": false,
+            "first_symbol": null
+          },
+          {
+            "request": 11,
+            "bucket": 2,
+            "calls": 0,
+            "requested_ms": 0,
+            "first_rva": "0",
+            "multiple_sites": false,
+            "first_symbol": null
+          },
+          {
+            "request": 11,
+            "bucket": 3,
+            "calls": 1,
+            "requested_ms": 1000,
+            "first_rva": "9a185",
+            "multiple_sites": false,
+            "first_symbol": "??$sleep_for@_JU?$ratio@$00$00@std@@@this_thread@std@@YAXAEBV?$duration@_JU?$ratio@$00$00@std@@@chrono@1@@Z"
+          }
+        ]
+      }
+    },
+    "call_chain": {
+      "native": {
+        "image_base": 5368709120,
+        "sleep_iat": 5376352584,
+        "thrd_sleep_for": 5376230928,
+        "thunk_hex": "48ff2531db0100",
+        "point_wait": 5369311296,
+        "point_end": 5369312528,
+        "point_call": 5369312240
+      },
+      "l0": {
+        "image_base": 5368709120,
+        "sleep_iat": 5373350432,
+        "thrd_sleep_for": 5373332776,
+        "thunk_hex": "48ff25f1440000"
+      }
+    }
+  },
+  "evidence_files": 71,
+  "caveats": [
+    "Histogram categories0ms,1ms,2..99ms,>=100ms;requested duration is not measured elapsed time.",
+    "Callers mapped to nearest linker symbol;inlining may require assembly/source review. Only application imports,not private DLL sleeps.",
+    "Counter publication uses atomic operations and can perturb execution;no performance claims from these runs. Original Sleep duration/function preserved.",
+    "Zero short Sleep calls in all22decode requests excludes the observed inline25us sleep fallback as this fixture's current gap cause;other waits/spins are not covered.",
+    "Actual compiled Point::wait calls a static _Thrd_sleep_for thunk that jumps to the application Sleep IAT;Sleep(1) active/inactive control passes.",
+    "Initial1ns sleep_for positive controls were invalid:deadline can expire before any sleep. Both rejected attempts are preserved and never establish zero counts.",
+    "One-second helper matches the existing watchdog duration;histogram does not itself unwind callers of that helper. No background policy changed.",
+    "No new clean performance/copy/lock comparison. V11 source,production binaries/configuration/MTP/rootREADME/Linux bundles preserved."
+  ],
+  "archive_sha256": "bbd49c3e424998d9d2ec7476553d014ff9a4128fb341196037c58903d4e86f92"
+}

@@ -4,7 +4,13 @@
 #include <cstdio>
 
 namespace strata::core {
-const char* compiled_gpu_archs() { return "Intel Level Zero"; }
+const char* compiled_gpu_archs() {
+#ifdef STRATA_ORCA_DG2
+    return "Intel DG2 (Orca native)";
+#else
+    return "Intel Level Zero";
+#endif
+}
 int device_count() { try { return dpct::device_count(); } catch (...) { return 0; } }
 std::string gpu_arch_problem(int ordinal) {
     return ordinal == 0 ? "" : "Orca currently exposes one Intel GPU";
@@ -19,7 +25,7 @@ bool device_summary(int ordinal, std::string& name, std::string& detail) {
         auto& device = dpct::get_in_order_queue().get_device();
         name = device.get_info<sycl::info::device::name>();
         char buffer[128];
-        std::snprintf(buffer, sizeof(buffer), "Intel Level Zero (Orca), %.1f GiB",
+        std::snprintf(buffer, sizeof(buffer), "%s, %.1f GiB", compiled_gpu_archs(),
                       double(device.get_info<sycl::info::device::global_mem_size>()) / (1ull << 30));
         detail = buffer;
         return true;
@@ -31,14 +37,16 @@ DeviceInfo device_info(int ordinal) {
     DeviceInfo info;
     info.ordinal = ordinal;
     info.name = queue.get_device().get_info<sycl::info::device::name>();
-    info.arch = "Intel Level Zero";
+    info.arch = compiled_gpu_archs();
     info.multi_processor_count = queue.get_device().get_info<sycl::info::device::max_compute_units>();
     size_t available = 0, total = 0;
     l0::memory_info(available, total);
     info.free_bytes = available;
     info.total_bytes = total;
+#ifndef STRATA_ORCA_DG2
     info.driver_version = int(queue.runtime().driver_properties().driverVersion);
     info.runtime_version = int(ZE_API_VERSION_CURRENT);
+#endif
     return info;
 }
 DeviceArena::DeviceArena(uint64_t bytes, int ordinal, bool poison)
@@ -46,7 +54,7 @@ DeviceArena::DeviceArena(uint64_t bytes, int ordinal, bool poison)
     if (!bytes || bytes > SIZE_MAX) throw CudaError("invalid native DeviceArena size", -1);
     dpct::select_device(ordinal);
     auto& queue = dpct::get_in_order_queue();
-    base_ = queue.runtime().allocate(size_t(bytes), orca::l0::Memory::device, 256);
+    base_ = queue.runtime().allocate(size_t(bytes), l0::Memory::device, 256);
     if (poison_) {
         try { queue.fill(static_cast<float*>(base_), std::bit_cast<float>(0x7fc00000u), size_t(bytes / 4)).wait_and_throw(); }
         catch (...) {

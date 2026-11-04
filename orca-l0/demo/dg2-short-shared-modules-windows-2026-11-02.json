@@ -1,0 +1,346 @@
+{
+  "date": "2026-11-02",
+  "complete": true,
+  "scope": "Short28/natural76 current L0 portable/current L0 zebin/native DG2/current L0 zebin/current L0 portable diagnostic",
+  "hardware": "Intel Arc A770 16 GB (0x56a0), Windows, driver 32.0.101.9034",
+  "configuration": {
+    "spec_min_p": 0.5,
+    "requested_vram_reserve_mib": 1536,
+    "matched_expert_slots": 5771,
+    "warmups_per_process": 10,
+    "retained_per_process": 5,
+    "retained_statistic": "median",
+    "bracket_reference": "geometric mean of control medians",
+    "prefix_reuse": false,
+    "decode_scope": "Internal engine decode_ms; excludes loading, initialization, preparation and prefill.",
+    "cpu_scope": "Host-observed REUSED-to-DONE interval, close to but distinct from engine decode_ms.",
+    "logical_cpus": 44
+  },
+  "runs": [
+    {
+      "label": "l0-portable-before",
+      "summary": {
+        "decode_tok_s": 48.76796714579055,
+        "prompt_ms": 837.0,
+        "ttft_ms": 880.6571999957669,
+        "request_ms": 2400.254500003939,
+        "decode_cpu_ms": 1593.75,
+        "decode_cpu_cores": 1.02545370736823,
+        "decode_system_busy_pct": 4.886363636363633,
+        "decode_cpu_wall_gap_abs_pct": 0.006883918241418208
+      },
+      "info": "INFO context=8192 kv=fp16 kv_resident=0 expert_slots=5771 expert_cache_mib=7922 expert_slots_primary=5771 expert_cache_primary_mib=7922 spec=6 mtp_max=4 lookup=3 vram_free_mib=2759 cvec=0 arena_mib=33812 pool_workers=21 pcie_frac=0.16 spec_min_p=0.50 conversation_cache_mib=0 conversation_cache_slots=4 conversation_cache_min_free_mib=2560 tail_role_token=-1 vram_elastic=0 engine=0.1.39-orca",
+      "executable_sha256": "ba393287a9c8ae4988148a885c291b3f2aacd4e635ace7111e436ceb9ac7b4ea",
+      "exit_code": 0
+    },
+    {
+      "label": "l0-shared-before",
+      "summary": {
+        "decode_tok_s": 48.69609790478631,
+        "prompt_ms": 836.0,
+        "ttft_ms": 879.9141000054078,
+        "request_ms": 2393.498899997212,
+        "decode_cpu_ms": 1609.375,
+        "decode_cpu_cores": 1.0301582982447415,
+        "decode_system_busy_pct": 7.681787098244818,
+        "decode_cpu_wall_gap_abs_pct": 0.0025667285412533936
+      },
+      "info": "INFO context=8192 kv=fp16 kv_resident=0 expert_slots=5771 expert_cache_mib=7922 expert_slots_primary=5771 expert_cache_primary_mib=7922 spec=6 mtp_max=4 lookup=3 vram_free_mib=2720 cvec=0 arena_mib=33812 pool_workers=21 pcie_frac=0.16 spec_min_p=0.50 conversation_cache_mib=0 conversation_cache_slots=4 conversation_cache_min_free_mib=2560 tail_role_token=-1 vram_elastic=0 engine=0.1.39-orca",
+      "executable_sha256": "ba393287a9c8ae4988148a885c291b3f2aacd4e635ace7111e436ceb9ac7b4ea",
+      "exit_code": 0
+    },
+    {
+      "label": "native-shared",
+      "summary": {
+        "decode_tok_s": 39.288668320926384,
+        "prompt_ms": 972.4,
+        "ttft_ms": 1029.2944999964675,
+        "request_ms": 2907.349399996747,
+        "decode_cpu_ms": 46.875,
+        "decode_cpu_cores": 0.02409792161530875,
+        "decode_system_busy_pct": 1.7508293402137887,
+        "decode_cpu_wall_gap_abs_pct": 0.0035096800911071924
+      },
+      "info": "INFO context=8192 kv=fp16 kv_resident=0 expert_slots=5771 expert_cache_mib=7922 expert_slots_primary=5771 expert_cache_primary_mib=7922 spec=6 mtp_max=4 lookup=3 vram_free_mib=2426 cvec=0 arena_mib=33812 pool_workers=21 pcie_frac=0.16 spec_min_p=0.50 conversation_cache_mib=0 conversation_cache_slots=4 conversation_cache_min_free_mib=2560 tail_role_token=-1 vram_elastic=0 engine=0.1.39-orca",
+      "executable_sha256": "b5df8b350bb7882b1ed067d5e757a798805d7afa52007f660e51d5352db60229",
+      "exit_code": 0
+    },
+    {
+      "label": "l0-shared-after",
+      "summary": {
+        "decode_tok_s": 48.71482597269406,
+        "prompt_ms": 836.9,
+        "ttft_ms": 881.0215999983484,
+        "request_ms": 2396.5389000004507,
+        "decode_cpu_ms": 1609.375,
+        "decode_cpu_cores": 1.0316802687666926,
+        "decode_system_busy_pct": 6.320797462618943,
+        "decode_cpu_wall_gap_abs_pct": 0.0050353697749083715
+      },
+      "info": "INFO context=8192 kv=fp16 kv_resident=0 expert_slots=5771 expert_cache_mib=7922 expert_slots_primary=5771 expert_cache_primary_mib=7922 spec=6 mtp_max=4 lookup=3 vram_free_mib=2807 cvec=0 arena_mib=33812 pool_workers=21 pcie_frac=0.16 spec_min_p=0.50 conversation_cache_mib=0 conversation_cache_slots=4 conversation_cache_min_free_mib=2560 tail_role_token=-1 vram_elastic=0 engine=0.1.39-orca",
+      "executable_sha256": "ba393287a9c8ae4988148a885c291b3f2aacd4e635ace7111e436ceb9ac7b4ea",
+      "exit_code": 0
+    },
+    {
+      "label": "l0-portable-after",
+      "summary": {
+        "decode_tok_s": 48.73044370351372,
+        "prompt_ms": 834.7,
+        "ttft_ms": 878.7631000013789,
+        "request_ms": 2401.2156000026152,
+        "decode_cpu_ms": 1609.375,
+        "decode_cpu_cores": 1.0326716620330254,
+        "decode_system_busy_pct": 5.648064806480646,
+        "decode_cpu_wall_gap_abs_pct": 0.004847823295239806
+      },
+      "info": "INFO context=8192 kv=fp16 kv_resident=0 expert_slots=5771 expert_cache_mib=7922 expert_slots_primary=5771 expert_cache_primary_mib=7922 spec=6 mtp_max=4 lookup=3 vram_free_mib=2779 cvec=0 arena_mib=33812 pool_workers=21 pcie_frac=0.16 spec_min_p=0.50 conversation_cache_mib=0 conversation_cache_slots=4 conversation_cache_min_free_mib=2560 tail_role_token=-1 vram_elastic=0 engine=0.1.39-orca",
+      "executable_sha256": "ba393287a9c8ae4988148a885c291b3f2aacd4e635ace7111e436ceb9ac7b4ea",
+      "exit_code": 0
+    }
+  ],
+  "comparisons": {
+    "native_vs_shared_l0": {
+      "decode_tok_s": {
+        "control": 48.70546103858311,
+        "candidate": 39.288668320926384,
+        "change_pct": -19.334161954030172,
+        "control_drift_pct": 0.03845907313633212
+      },
+      "prompt_ms": {
+        "control": 836.4498789527081,
+        "candidate": 972.4,
+        "change_pct": 16.253229807087855,
+        "control_drift_pct": 0.10765550239233423
+      },
+      "ttft_ms": {
+        "control": 880.4676758677011,
+        "candidate": 1029.2944999964675,
+        "change_pct": 16.90315592586604,
+        "control_drift_pct": 0.12586455802148233
+      },
+      "request_ms": {
+        "control": 2395.0184176643834,
+        "candidate": 2907.349399996747,
+        "change_pct": 21.391525783421205,
+        "control_drift_pct": 0.1270107123609865
+      },
+      "decode_cpu_ms": {
+        "control": 1609.375,
+        "candidate": 46.875,
+        "change_pct": -97.0873786407767,
+        "control_drift_pct": 0.0
+      },
+      "decode_cpu_cores": {
+        "control": 1.0309190026405437,
+        "candidate": 0.02409792161530875,
+        "change_pct": -97.66248157676931,
+        "control_drift_pct": 0.14774142231774867
+      },
+      "decode_system_busy_pct": {
+        "control": 6.96814325333261,
+        "candidate": 1.7508293402137887,
+        "change_pct": -74.87380387341447,
+        "control_drift_pct": -17.717096532613386
+      },
+      "decode_cpu_wall_gap_abs_pct": {
+        "control": 0.003595055954644099,
+        "candidate": 0.0035096800911071924,
+        "change_pct": -2.3748132049688286,
+        "control_drift_pct": 96.17850871169583
+      }
+    },
+    "shared_l0_vs_portable_l0": {
+      "decode_tok_s": {
+        "control": 48.74920181431439,
+        "candidate": 48.70546103858311,
+        "change_pct": -0.08972613725634071,
+        "control_drift_pct": -0.07694280584764623
+      },
+      "prompt_ms": {
+        "control": 835.8492088887804,
+        "candidate": 836.4498789527081,
+        "change_pct": 0.07186344827989632,
+        "control_drift_pct": -0.27479091995220584
+      },
+      "ttft_ms": {
+        "control": 879.7096402261456,
+        "candidate": 880.4676758677011,
+        "change_pct": 0.08616884559327076,
+        "control_drift_pct": -0.21507801155740136
+      },
+      "request_ms": {
+        "control": 2400.735001907944,
+        "candidate": 2395.0184176643834,
+        "change_pct": -0.23811808629513598,
+        "control_drift_pct": 0.0400415872014781
+      },
+      "decode_cpu_ms": {
+        "control": 1601.5434450085954,
+        "candidate": 1609.375,
+        "change_pct": 0.4890004711275653,
+        "control_drift_pct": 0.9803921568627416
+      },
+      "decode_cpu_cores": {
+        "control": 1.029056356243854,
+        "candidate": 1.0309190026405437,
+        "change_pct": 0.18100528560831552,
+        "control_drift_pct": 0.703879133005425
+      },
+      "decode_system_busy_pct": {
+        "control": 5.253427308549365,
+        "candidate": 6.96814325333261,
+        "change_pct": 32.63994805815125,
+        "control_drift_pct": 15.58830301634817
+      },
+      "decode_cpu_wall_gap_abs_pct": {
+        "control": 0.005776852015871051,
+        "candidate": 0.003595055954644099,
+        "change_pct": -37.767906382797904,
+        "control_drift_pct": -29.577558517878778
+      }
+    },
+    "native_vs_portable_l0": {
+      "decode_tok_s": {
+        "control": 48.74920181431439,
+        "candidate": 39.288668320926384,
+        "change_pct": -19.406540294594276,
+        "control_drift_pct": -0.07694280584764623
+      },
+      "prompt_ms": {
+        "control": 835.8492088887804,
+        "candidate": 972.4,
+        "change_pct": 16.33677338676398,
+        "control_drift_pct": -0.27479091995220584
+      },
+      "ttft_ms": {
+        "control": 879.7096402261456,
+        "candidate": 1029.2944999964675,
+        "change_pct": 17.00389002578946,
+        "control_drift_pct": -0.21507801155740136
+      },
+      "request_ms": {
+        "control": 2400.735001907944,
+        "candidate": 2907.349399996747,
+        "change_pct": 21.10247060530126,
+        "control_drift_pct": 0.0400415872014781
+      },
+      "decode_cpu_ms": {
+        "control": 1601.5434450085954,
+        "candidate": 46.875,
+        "change_pct": -97.07313590860794,
+        "control_drift_pct": 0.9803921568627416
+      },
+      "decode_cpu_cores": {
+        "control": 1.029056356243854,
+        "candidate": 0.02409792161530875,
+        "change_pct": -97.6582505448712,
+        "control_drift_pct": 0.703879133005425
+      },
+      "decode_system_busy_pct": {
+        "control": 5.253427308549365,
+        "candidate": 1.7508293402137887,
+        "change_pct": -66.67262650870775,
+        "control_drift_pct": 15.58830301634817
+      },
+      "decode_cpu_wall_gap_abs_pct": {
+        "control": 0.005776852015871051,
+        "candidate": 0.0035096800911071924,
+        "change_pct": -39.245802359747785,
+        "control_drift_pct": -29.577558517878778
+      }
+    }
+  },
+  "decode_controls_within_3pct": {
+    "native_vs_shared_l0": true,
+    "shared_l0_vs_portable_l0": true,
+    "native_vs_portable_l0": true
+  },
+  "validation": {
+    "matching_requests": 75,
+    "every_output_id_matches": true,
+    "accepted_drafts_per_request": 57,
+    "offered_drafts_per_request": 57,
+    "all_owned_processes_exited": true,
+    "native_runtime_module_audit_passed": true,
+    "defaults_changed": false,
+    "production_changed": false,
+    "candidate_adopted": false,
+    "desktop_fix_confirmed": false,
+    "linux_gpu_validated": false
+  },
+  "reproduction": {
+    "local_directory": "build-orca-native-lower-20261031/windows-dg2-short-shared-modules-v3",
+    "raw_results_sha256": "dd77ba1bf3ab9b85baf83089d87fb427977f1248fc32b128d1560e6a21d23477",
+    "runner_sha256": "c55ae1bfc2a0e5b06031f38042f3b6c8336fdcde05e52a78fe6158caf10488a2",
+    "candidate_preparation_sha256": "7ba6dda03f8315f5b960751c0de6c875049796bb8e2970cda0b8d61015559fcf",
+    "fixture_sha256": "0c7d7a1436a5f412d5c552ff8950fe7117dd3c15dafd6d72672782c0c8dc0a62",
+    "args": [
+      "--pack",
+      "G:\\GitHub\\Strata-data\\packs\\iq2_xs",
+      "--native",
+      "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00001-of-00002.gguf",
+      "--ple-gguf",
+      "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00002-of-00002.gguf",
+      "--expert-profile",
+      "G:\\GitHub\\Strata\\data\\expert-profile.bin",
+      "--expert-cache",
+      "5500",
+      "--prefill",
+      "8192",
+      "--spec",
+      "4",
+      "--spec-min-p",
+      "0.5",
+      "--mtp",
+      "G:\\GitHub\\Strata-data\\mtp\\rt-full-vocab-current",
+      "--max-context",
+      "8192",
+      "--stream-experts",
+      "--vram-reserve-mib",
+      "1536",
+      "--pcie-frac",
+      "0.16",
+      "--prompt-cache",
+      "0",
+      "--short-read",
+      "1024",
+      "--adapt-every",
+      "1",
+      "--adapt-swaps",
+      "32",
+      "--prefill-borrow",
+      "--mtp-window",
+      "1024",
+      "--mtp-hnorm",
+      "stream",
+      "--adapt-decay",
+      "0.5"
+    ],
+    "production_sha256": {
+      "strata-iq2_xs.json": "9c45e51de69e66c3f1cd020359c8d70d639fbd1aba5d87ead84082fbe73fd531",
+      "build-orca-default-pair-20261031/strata.exe": "7be641375e905b0ceb64424ab4875afcdf9f7f6f1e2c60d6b0fcff4ece5ff4b5"
+    }
+  },
+  "caveats": [
+    "CPU accounting brackets host receipt of REUSED and DONE; it is close to but distinct from internal decode timestamps.",
+    "GetProcessTimes is visibly quantized in 15.625-ms steps here. Small native/native CPU ratios are imprecise.",
+    "System-wide CPU busy percentage includes unrelated work and drifts strongly; it is not a causal comparison.",
+    "Much lower native process CPU use does not distinguish GPU execution cost from fence notification/wakeup latency.",
+    "No desktop observation or display instrumentation confirms a cursor fix or the cause of flickering.",
+    "The L0 control is a freshly compiled current-source engine when current_l0_control is present; otherwise it is production Orca L0. Neither is original SYCL.",
+    "Only Short was run. No long-context, broad PPL or Linux GPU claim follows from this diagnostic."
+  ],
+  "current_l0_control": {
+    "build_results_sha256": "c622f71fe80ef34ad57b7bc2c57c7ed1fc84cb494987677dc03f274d7e0f328a",
+    "build_directory": "G:\\GitHub\\Strata\\build-orca-native-lower-20261031\\windows-l0-current-control-v1\\build",
+    "executable_sha256": "ba393287a9c8ae4988148a885c291b3f2aacd4e635ace7111e436ceb9ac7b4ea"
+  },
+  "shared_modules": {
+    "native_files": 1242,
+    "active_packs": 46,
+    "excluded_spirv_entries": 24,
+    "shared_input_hashes_verified": true,
+    "loader_spirv_fallback_possible": false,
+    "scope": "Identical zebin input files. Driver relocation or patching is not an on-device instruction-byte comparison."
+  }
+}

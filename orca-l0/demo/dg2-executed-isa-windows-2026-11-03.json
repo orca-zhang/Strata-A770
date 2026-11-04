@@ -1,0 +1,53 @@
+{
+  "date": "2026-11-03",
+  "complete": true,
+  "diagnostic_only": true,
+  "source_adopted": false,
+  "production_changed": false,
+  "hardware": "Intel Arc A770 C0",
+  "driver": "32.0.101.9034",
+  "os": "Windows",
+  "linux_gpu_tested": false,
+  "readbacks": [
+    {
+      "mode": "l0",
+      "guarded_cases": 32,
+      "observed_walkers": 16,
+      "entry": 140737492549824,
+      "start": 18446603336225390592,
+      "mapped_base": 18446603336225390592,
+      "mapped_bytes": 4194304,
+      "skip": 192,
+      "bytes": 30592,
+      "differing_bytes": 0,
+      "sha256": "70d9572baab1c667d7dbc99071a4bb30fff94d9283123ba9025e9137b42a408b"
+    },
+    {
+      "mode": "native",
+      "guarded_cases": 32,
+      "observed_walkers": 16,
+      "entry": 140737498906816,
+      "start": 18446603336231747584,
+      "mapped_base": 18446603336231747584,
+      "mapped_bytes": 1048576,
+      "skip": 192,
+      "bytes": 30592,
+      "differing_bytes": 0,
+      "sha256": "70d9572baab1c667d7dbc99071a4bb30fff94d9283123ba9025e9137b42a408b"
+    }
+  ],
+  "guarded_cases": 64,
+  "windows_checks": 7,
+  "identical_bytes_per_backend": 30592,
+  "evidence_files": 221,
+  "caveats": [
+    "Complements prior standalone1892-section loaded-pack proof with observed entry addresses from completed16-GDN dispatches at currentV10;not a full-model capture.",
+    "Independent reader check uses two changed64KiB patterns,4099-byte interior reads,full destination guards and three rejected invalid ranges.",
+    "The source address derives from actual instructionSBA+walkerIDD minus the192-byte hardware-local-ID prologue skip;the complete text including prologue is compared.",
+    "Original owner stays alive;original hDevice/hAllocation is local-resident before/after GPU readback.No source mapping,unmapping or residency changes by the reader.",
+    "Reader allocation validation range and observer hooks are staged only;production remainsV10. First max-macro compile failure is archived;no GPU run in that attempt.",
+    "Instrumented timing is perturbed by hooks/readbacks and is not a performance result.No new model throughput,copy/lock census or physical bus-traffic measurement.",
+    "This rules out differing executed code bytes for this GDN fixture,not all kernels,internal heaps,cache policy,contexts or hardware state."
+  ],
+  "archive_sha256": "c5b19eff6b741d5c320955cf5c8ad4a5d6f61dac7713d8444415700f81881a3b"
+}

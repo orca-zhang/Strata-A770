@@ -17,10 +17,10 @@ jobs:
       - name: Install Level Zero development files
         run: |
           sudo apt-get update
-          sudo apt-get install -y libze-dev ninja-build
+          sudo apt-get install -y libze-dev libdrm-dev ninja-build
       - name: Build host runtime without SYCL or ocloc
         run: |
-          cmake -S orca-l0 -B build-orca-l0 -G Ninja -DCMAKE_BUILD_TYPE=Release -DORCA_L0_BUILD_GPU_CHECKS=OFF
+          cmake -S orca-l0 -B build-orca-l0 -G Ninja -DCMAKE_BUILD_TYPE=Release -DORCA_L0_BUILD_GPU_CHECKS=OFF -DORCA_L0_BUILD_DRM_CHECKS=ON
           cmake --build build-orca-l0
-      - name: Check the request and completion rings
+      - name: Check rings, DRM packets and zebin ABI without a GPU
         run: ctest --test-dir build-orca-l0 --output-on-failure

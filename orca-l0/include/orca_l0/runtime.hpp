@@ -67,6 +67,10 @@ public:
     ze_module_handle_t module(const std::filesystem::path& file,
                              ze_module_format_t format = ZE_MODULE_FORMAT_IL_SPIRV,
                              const char* build_flags = "");
+    // Compile once with the same effective flags as module(), then release the
+    // temporary module. The result includes the driver's native ABI metadata.
+    std::vector<uint8_t> compile_native(const std::filesystem::path& file, const char* build_flags = "");
+    std::string binary_identity() const;
     ze_kernel_handle_t kernel(ze_module_handle_t module, const char* name);
     ze_event_handle_t event();
     // Regular lists replay on the compute queue. Immediate copy lists use a copy engine if available.

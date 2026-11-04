@@ -949,6 +949,21 @@ bool Verifier::record_window(int T, dpct::queue_ptr cs, std::string &err) {
     phase_done();
     }
 
+#ifdef STRATA_ORCA_NATIVE
+    // ponytail: only the audited one-group, <=4-row chain; other cases stay serial.
+    auto full_fork = [&](int64_t l, int n) {
+        static const bool enabled = std::getenv("STRATA_VERIFY_EXPERT_FORK") == nullptr || env_on("STRATA_VERIFY_EXPERT_FORK");
+        if (!enabled || n > 4 || !cs->allows_independent() || G != 1 || !collect_routing_ || !descriptor_cache_ ||
+            prof_on_ || trace_m_ || !g_verify_fused_act || !strata::kernels::cpu::expert_layout().native ||
+            native_grouped_v1_enabled() || !shared_expert_native_bf16_enabled()) return false;
+        const auto& w = layer_weights_[(size_t)l];
+        if (!w.shared_gate || !w.shared_up || !w.shared_down || !w.shared_gate_inp) return false;
+        auto primitive = [](int t) { return t == 8 || t == 14 || t == 21 || t == 23; };
+        const int d = w.shared_down->native_type;
+        return primitive(w.shared_gate->native_type) && primitive(w.shared_up->native_type) &&
+               (d == 8 || d == 20 || d == 23);
+    };
+#endif
     // ---------------------------------------------------------------- pre(l, group): up to the ring
     auto pre = [&](int64_t l, int grp) -> bool {
         const int tb = tb_[grp], te = te_[grp], n = te - tb;
@@ -1462,6 +1477,7 @@ bool Verifier::record_window(int T, dpct::queue_ptr cs, std::string &err) {
             event_stamp(l, 30, grp);
             phase_done();
         }
+        bool route_quant_prepared = false;
         // the window's rows routed in 2 launches (one router GEMV reading the weight once, one
         // top-10) instead of 2 per token; every row's arithmetic is the single-token call's (STRATA_DEC_BATCH=0: old)
         {
@@ -1471,8 +1487,23 @@ bool Verifier::record_window(int T, dpct::queue_ptr cs, std::string &err) {
         const WeightRef* w_router = cached ? cached->router : v.get("ffn_gate_inp.weight");
         if (dec_batch && n > 1 && w_router != nullptr && native_router_enabled() && (NE == 512 || NE == 256) && K == 10) {
             try {   // SYCL port: the fused multi-token router for 256 experts as well (it was 512-only)
-                bf16_gemv_fp32_mmvf_multi(mixed_ + tb * N, N, (const uint16_t*) w_router->data, logits_ + tb * NE, NE, N,
-                                          NE, n, cs);
+                auto router_projection = [&] {
+                    bf16_gemv_fp32_mmvf_multi(mixed_ + tb * N, N, (const uint16_t*) w_router->data, logits_ + tb * NE, NE, N,
+                                              NE, n, cs);
+                };
+#ifdef STRATA_ORCA_NATIVE
+                static const bool route_quant_enabled = std::getenv("STRATA_VERIFY_ROUTER_QUANT") == nullptr || env_on("STRATA_VERIFY_ROUTER_QUANT");
+                if (route_quant_enabled && full_fork(l, n)) {
+                    cs->independent([&] {
+                        quantize_q8_1_rows_bf16(xm, n, N, nat_xq_ + (size_t) tb * (N / 32) * 36,
+                                                sh_bf16_ + tb * N, cs);
+                        if (!g_verify_qdedup) native_quantize_q8_1(xm, xq_, (int)N, n, cs);
+                        router_projection();
+                    });
+                    route_quant_prepared = true;
+                } else
+#endif
+                router_projection();
                 event_stamp(l, 31, grp);
                 native_router_top10_multi_ne(logits_ + tb * NE, ids_ + tb * K, w_ + tb * K, n, (int) NE, cs);
                 event_stamp(l, 32, grp);
@@ -1536,15 +1567,23 @@ bool Verifier::record_window(int T, dpct::queue_ptr cs, std::string &err) {
 #ifdef STRATA_EZPP
                 EZPP_EX("verify.submit.pre.shared.prepare");
 #endif
+            if (!route_quant_prepared) {
             if (fused_act)
                 quantize_q8_1_rows_bf16(xm, n, N, nat_xq_ + (size_t) tb * (N / 32) * 36,
                                          sh_bf16_ + tb * N, cs);
             else if (dec_batch) f32_to_bf16_bulk(mixed_ + tb * N, sh_bf16_ + tb * N, (int64_t) n * N, cs);   // contiguous rows
             else for (int t = tb; t < te; ++t) f32_to_bf16_bulk(mixed_ + t * N, sh_bf16_ + t * N, N, cs);
             }
+            }
             try {
 #ifdef STRATA_EZPP
                 EZPP_EX("verify.submit.pre.shared.run");
+#endif
+#ifdef STRATA_ORCA_NATIVE
+                if (full_fork(l, n)) {
+                    // xq_ stays live until the shared projections consume it in post().
+                    if (!qdedup && !route_quant_prepared) native_quantize_q8_1(xm, xq_, (int)N, n, cs);
+                } else
 #endif
                 shared_expert_multi(n, xm, sh_bf16_ + tb * N, nsw, (const uint16_t*) wgi->data, sh_gate_ + (size_t) tb * g.n_ff,
                                     sh_up_ + (size_t) tb * g.n_ff, sh_g_ + tb, shared_ + tb * N, N, g.n_ff, cs,
@@ -1606,13 +1645,21 @@ bool Verifier::record_window(int T, dpct::queue_ptr cs, std::string &err) {
         const auto& lay = strata::kernels::cpu::expert_layout();
         // plan v0.3 P6: the VRAM groups now; the PCIe groups once the copy engine has landed them in staging.
         // `gy`: the native launch's groups side by side (0: cap, one block row per possible group).
-        auto grouped = [&](const unsigned long long* gp, const int32_t* gs, const int32_t* gn, int64_t gy) {
+        auto grouped = [&](const unsigned long long* gp, const int32_t* gs, const int32_t* gn, int64_t gy
+#ifdef STRATA_ORCA_NATIVE
+                           , int phase = 0
+#endif
+                           ) {
             if (lay.native) {
                 // the layer's GGUF formats (i-quant gate/up, Q2_0 / IQ4_NL down)
                 const auto& f = lay.fmt[(size_t) l];
                 const NativeExpertLayout L = native_expert_layout(f.gu_type, f.d_type, f.n_embd, f.n_ff);
                 native_expert_grouped(L, gp, gs, gn, p_dst, p_tok, cap, cap,
-                                      nat_xq_ + (size_t) tb * (N / 32) * 36, hit_scratch_, hit_out, cs, gy);
+                                      nat_xq_ + (size_t) tb * (N / 32) * 36, hit_scratch_, hit_out, cs, gy
+#ifdef STRATA_ORCA_NATIVE
+                                      , phase
+#endif
+                                      );
             } else {
                 moe_grouped_s2(gp, gs, gn, p_dst, p_tok, cap, cap, hit_xq_ + (size_t) tb * (N / 32) * 34,
                                hit_xs_ + (size_t) tb * (N / 32), hit_scratch_, hit_out, cs);
@@ -1621,6 +1668,27 @@ bool Verifier::record_window(int T, dpct::queue_ptr cs, std::string &err) {
         {
 #ifdef STRATA_EZPP
         EZPP_EX("verify.submit.post.experts");
+#endif
+#ifdef STRATA_ORCA_NATIVE
+        if (full_fork(l, n)) {
+            const auto& w = layer_weights_[(size_t)l];
+            NativeSharedWeights nw;
+            nw.gate_type = w.shared_gate->native_type; nw.gate_data = w.shared_gate->native_data;
+            nw.up_type = w.shared_up->native_type; nw.up_data = w.shared_up->native_data;
+            nw.down_type = w.shared_down->native_type; nw.down_data = w.shared_down->native_data;
+            nw.q8_1 = xq_;
+            auto shared_phase = [&](int phase) {
+                shared_expert_multi(n, mixed_ + tb*N, sh_bf16_ + tb*N, nw, (const uint16_t*)w.shared_gate_inp->data,
+                    sh_gate_ + (size_t)tb*g.n_ff, sh_up_ + (size_t)tb*g.n_ff, sh_g_ + tb, shared_ + tb*N, N, g.n_ff, cs,
+                    g_verify_qdedup ? (const void*)(nat_xq_ + (size_t)tb*(N/32)*36) : xq_, 0, phase);
+            };
+            static const bool logged = [] { std::fprintf(stderr, "strata: Orca shared/routed matching stages enabled\n"); return true; }();
+            (void)logged;
+            cs->independent([&] { shared_phase(5); grouped(p_ptr, p_start, p_counts, 0, 1); });
+            cs->independent([&] { shared_phase(2); grouped(p_ptr, p_start, p_counts, 0, 2); });
+            cs->independent([&] { shared_phase(3); grouped(p_ptr, p_start, p_counts, 0, 3); });
+            shared_phase(4);
+        } else
 #endif
         grouped(p_ptr, p_start, p_counts, 0);
         phase_done();
@@ -1924,6 +1992,22 @@ bool Verifier::capture(int T, std::string &err) try {
         std::fprintf(stderr, "strata verify: the %d-token window graph has %zu nodes:", T, nn);
         for (size_t i = 0; i < v.size() && i < 40; ++i) std::fprintf(stderr, " %d x %.60s;", v[i].first, v[i].second.c_str());
         std::fprintf(stderr, "\n");
+#ifdef STRATA_ORCA_DG2
+        const auto& native = *graph->native();
+        size_t signals = 0, inline_signals = 0, waits = 0, copies = 0, uploads = 0;
+        size_t readback_bytes = 0, upload_bytes = 0;
+        for (const auto& segment : native.commands->segments) {
+            signals += segment.signals.size(); waits += segment.waits.size();
+            copies += segment.copies.size(); uploads += segment.uploads.size();
+            for (const auto& signal : segment.signals) inline_signals += signal.inline_value;
+            for (const auto& copy : segment.copies) readback_bytes += copy.bytes;
+            for (const auto& upload : segment.uploads) upload_bytes += upload.bytes;
+        }
+        std::fprintf(stderr, "strata verify: native DG2 graph T=%d segments=%zu signals=%zu inline=%zu "
+                             "queue_waits=%zu staged_readbacks=%zu readback_bytes=%zu uploads=%zu upload_bytes=%zu\n",
+                     T, native.commands->segments.size(), signals, inline_signals, waits,
+                     copies, readback_bytes, uploads, upload_bytes);
+#endif
     }
     const dpct::err0 ie = DPCT_CHECK_ERROR(
         exec_[T] = new sycl::ext::oneapi::experimental::command_graph<
@@ -2469,9 +2553,10 @@ bool Verifier::execute_window(int T, const int32_t* tokens, int64_t pos0, PoolMu
                 .wait();
         const int64_t L = g.n_layers;
 #if defined(STRATA_ORCA_NATIVE)
+        if (!g_verify_eager) {
         const auto& clock = cs_->runtime().properties();
         if (!clock.timerResolution || !clock.timestampValidBits || clock.timestampValidBits > 64) {
-            err = "verify: invalid Level Zero timestamp properties";
+            err = "verify: invalid GPU timestamp calibration (DG2 requires STRATA_ORCA_DG2_TIMESTAMP_HZ and _BITS)";
             return false;
         }
         const uint64_t mask = clock.timestampValidBits == 64 ? UINT64_MAX :
@@ -2482,6 +2567,7 @@ bool Verifier::execute_window(int T, const int32_t* tokens, int64_t pos0, PoolMu
         // ponytail: one window is shorter than a device-clock wrap; rebase before scaling to avoid overflow.
         for (auto& tick : prof_h_)
             if (tick) tick = 1 + ((tick - origin) & mask) * clock.timerResolution;
+        }
 #endif
         auto at = [&](int64_t l, int i) { return prof_h_[(size_t) (l * kProfPer + i)]; };
         // D8: the derived columns below read stamps the hc-read kernels write themselves or the next
@@ -2775,7 +2861,7 @@ catch (sycl::exception const &exc) {
 bool Verifier::warm(std::string &err) {
     for (int T = 1; T <= max_t_; ++T)
         if (!capture(T, err)) return false;
-    return true;
+    return capture_commit(err);
 }
 
 bool Verifier::commit_finish(std::string &err) try {

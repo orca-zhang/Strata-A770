@@ -1,0 +1,240 @@
+{
+  "date": "2026-11-03",
+  "complete": true,
+  "source_adopted": true,
+  "production_executable_changed": false,
+  "production_configuration_changed": false,
+  "adoption": {
+    "complete": true,
+    "version": 10,
+    "source_adopted": true,
+    "executable_changed": false,
+    "configuration_changed": false,
+    "before_sha256": {
+      "sycl/orca_dg2_backend.hpp": "0bdaf70c9dff491c7ca3da7a9defc1ed3ba16bbdedc5457cc6e69b8248da9602",
+      "sycl/orca_queue.hpp": "1b7cc25c2b31653595b85d3a577ec96d6cc3a0a7156a53d9b63f8a8948ed26bf",
+      "orca-l0/include/orca_l0/dg2.hpp": "4d3337560bdd5f01145acfbce90db2fba118625c927a967ae5bd87fdd4d41245",
+      "orca-l0/src/drm/recording.inl": "06b7b235a267938b333391da97831997a1519d9feaf757553f1f3f53e460a4f9",
+      "orca-l0/src/drm/memory.cl": "d2825a86f3551d4a08cefe745a45ce44bd5607f256d304470abe18ca43772943",
+      "orca-l0/src/drm/zebin.hpp": "a927dfee4f823ca74bf85a84b07a6790c9caa752d4504cbfc10227e39a789283",
+      "orca-l0/src/drm/runtime.cpp": "1a10b18843bbb694ba0ad7bbad3f86aa73617f76672075cc0feba09dadf1446b",
+      "orca-l0/src/wddm/runtime.cpp": "e005a697e557ea75330a96303a42fa140505a83496aae396ab4bfee9149f0113",
+      "orca-l0/tests/drm_compute_check.cpp": "f12b3a3ed5405c3806becf77c413164064b923b49abdd75761ca011939f2e34c",
+      "sycl/orca/include/dpct/dpct.hpp": "9c6f2d8669692666389cb8b47e38a29dfb967b158a881e5c2bff1149b438ec38",
+      "orca-l0/src/drm/encoding.hpp": "55a243ccefdb918661ffaaf1a3b912b275a4a51497b6c23538ba4c37b8037a09",
+      "orca-l0/tests/denorm.cl": "ebcf7b88c788e1711ed027de8e0d6d1a0df4599addeb93ecf2958e4d5d00ed48"
+    },
+    "candidate_sha256": {
+      "sycl/orca_dg2_backend.hpp": "0bdaf70c9dff491c7ca3da7a9defc1ed3ba16bbdedc5457cc6e69b8248da9602",
+      "sycl/orca_queue.hpp": "1b7cc25c2b31653595b85d3a577ec96d6cc3a0a7156a53d9b63f8a8948ed26bf",
+      "orca-l0/include/orca_l0/dg2.hpp": "4d3337560bdd5f01145acfbce90db2fba118625c927a967ae5bd87fdd4d41245",
+      "orca-l0/src/drm/recording.inl": "eb37bbb24d9de190b8450b0491af567e15b01f75ef3c947b98bbdfea33589976",
+      "orca-l0/src/drm/memory.cl": "85d783197963e676419aba04b172481695d54a0f09dafa4cf6dcb3f9b06a16d5",
+      "orca-l0/src/drm/zebin.hpp": "a927dfee4f823ca74bf85a84b07a6790c9caa752d4504cbfc10227e39a789283",
+      "orca-l0/src/drm/runtime.cpp": "4a70365f603134f5c6ae0f54b5c349207f62fcfb84fc7e1777e67a1929487798",
+      "orca-l0/src/wddm/runtime.cpp": "7afb997f9d4c7cafd69c7d118441ee9f8a3a727543df4d816db9a1c8aab3a821",
+      "orca-l0/tests/drm_compute_check.cpp": "b73f9855db5d299dc589fd1dd2d762b2f5e5d80195b630446f897f4ef59ad2e2",
+      "sycl/orca/include/dpct/dpct.hpp": "9c6f2d8669692666389cb8b47e38a29dfb967b158a881e5c2bff1149b438ec38",
+      "orca-l0/src/drm/encoding.hpp": "55a243ccefdb918661ffaaf1a3b912b275a4a51497b6c23538ba4c37b8037a09",
+      "orca-l0/tests/denorm.cl": "ebcf7b88c788e1711ed027de8e0d6d1a0df4599addeb93ecf2958e4d5d00ed48"
+    },
+    "changed_sources": [
+      "orca-l0/src/drm/memory.cl",
+      "orca-l0/src/drm/recording.inl",
+      "orca-l0/src/drm/runtime.cpp",
+      "orca-l0/src/wddm/runtime.cpp",
+      "orca-l0/tests/drm_compute_check.cpp"
+    ],
+    "parent_adoption_sha256": "47d1d9a1dc10c4a39199af6ba1124e514de73f5cea01b0c00cd7daffad439ff2",
+    "micro_report_sha256": "459c68be0f2b6392e02883eeefe91034b41798f15c3eec8231c504622e61c3b1",
+    "model_report_sha256": "3a3be3a0405853a223efee98664d081d73e8afe91be27b790a32066dd632886b",
+    "rationale": "Optional co-aligned copy kernel peels at most15bytes; select only at recording, cache module capability. Keep original aligned copy execution body and old-module/unequal-alignment fallback. Large standalone D2D benefit with no material observed Short regression; full-model win not established. Fresh134D2D/659H2D and separate application-lock census. LinuxCPU passes;LinuxGPU deferred."
+  },
+  "hardware": "Intel Arc A770 C0",
+  "driver": "32.0.101.9034",
+  "os": "Windows",
+  "linux_gpu_tested": false,
+  "linux_cpu_checks": 3,
+  "windows_checks": 7,
+  "transfer_replays": 1840,
+  "exact_model_requests": 133,
+  "policy": {
+    "step": 0.5,
+    "last": 0.5,
+    "cumulative": 0,
+    "max_mtp": 4,
+    "expert_slots": 5771,
+    "reserve_mib": 1536
+  },
+  "comparisons": {
+    "decode_tok_s": {
+      "native": 46.75919159994927,
+      "candidate": 46.65868773001414,
+      "l0": 48.171393568923506,
+      "change_pct": -0.21493928037721322,
+      "vs_l0_pct": -3.140257582012851,
+      "native_drift_pct": 0.11687543017186997,
+      "l0_drift_pct": 0.03804089988417303
+    },
+    "ttft_ms": {
+      "native": 902.9217998324034,
+      "candidate": 903.6284500034526,
+      "l0": 889.0564227549347,
+      "change_pct": 0.07826261046974814,
+      "vs_l0_pct": 1.6390441456306304,
+      "native_drift_pct": 0.11541429684491789,
+      "l0_drift_pct": 0.014201455326046108
+    },
+    "prompt_ms": {
+      "native": 854.9999064327434,
+      "candidate": 855.75,
+      "l0": 844.5999052806009,
+      "change_pct": 0.08773025138519852,
+      "vs_l0_pct": 1.320162913787537,
+      "native_drift_pct": 0.09361104610343673,
+      "l0_drift_pct": 0.09476427386874153
+    },
+    "request_ms": {
+      "native": 2480.7883365107164,
+      "candidate": 2483.855049984413,
+      "l0": 2426.57596703128,
+      "change_pct": 0.12361850580167033,
+      "vs_l0_pct": 2.360489996248072,
+      "native_drift_pct": -0.20363279689386005,
+      "l0_drift_pct": -0.1355374371247886
+    }
+  },
+  "copy_census": {
+    "d2d_calls": 134,
+    "d2d_bytes": 4554752,
+    "h2d_calls": 659,
+    "h2d_bytes": 968318976
+  },
+  "lock_census": {
+    "native": {
+      "imported_mutex_acquisitions": 130,
+      "runtime_mutex_acquisitions": 0,
+      "shared_srw_acquisitions": 0,
+      "exclusive_srw_acquisitions": 0,
+      "foreground_io_acquisitions": 40,
+      "background_io_acquisitions": 90,
+      "keepalive_reads": 15,
+      "business_ssd_reads": 0,
+      "background_boundary_delta": 0,
+      "mutex_sites": [
+        {
+          "calls": 20,
+          "rva": "1cad9f",
+          "symbol": "?issue@PleReader@ngram@strata@@QEAA?AUTicket@123@PEBI_KPEAE@Z"
+        },
+        {
+          "calls": 20,
+          "rva": "1ccc7b",
+          "symbol": "?collect@PleReader@ngram@strata@@QEAA_NUTicket@123@AEAV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z"
+        },
+        {
+          "calls": 15,
+          "rva": "1d24fa",
+          "symbol": "?submit@DirectFile@platform@strata@@QEAA_N_KPEAXI0AEAV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z"
+        },
+        {
+          "calls": 15,
+          "rva": "1d28a2",
+          "symbol": "?wait@DirectFile@platform@strata@@QEAAHPEAUCompletion@23@HH@Z"
+        },
+        {
+          "calls": 15,
+          "rva": "1d355f",
+          "symbol": "??$_Invoke@V?$tuple@V<lambda_1>@?0??open@DirectFile@platform@strata@@QEAA_NAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@AEAV67@@Z@@std@@$0A@@thread@std@@CAIPEAX@Z"
+        },
+        {
+          "calls": 15,
+          "rva": "1d3a70",
+          "symbol": "??$_Invoke@V?$tuple@V<lambda_1>@?0??open@DirectFile@platform@strata@@QEAA_NAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@AEAV67@@Z@@std@@$0A@@thread@std@@CAIPEAX@Z"
+        },
+        {
+          "calls": 15,
+          "rva": "1d29d5",
+          "symbol": "?wait@DirectFile@platform@strata@@QEAAHPEAUCompletion@23@HH@Z"
+        },
+        {
+          "calls": 15,
+          "rva": "1cfcad",
+          "symbol": "??$_Invoke@V?$tuple@V<lambda_1>@?0??open@PleReader@ngram@strata@@QEAA_NAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@_K1I1AEAV67@_NI@Z@@std@@$0A@@thread@std@@CAIPEAX@Z"
+        }
+      ]
+    },
+    "l0": {
+      "imported_mutex_acquisitions": 130,
+      "runtime_mutex_acquisitions": 0,
+      "shared_srw_acquisitions": 0,
+      "exclusive_srw_acquisitions": 0,
+      "foreground_io_acquisitions": 40,
+      "background_io_acquisitions": 90,
+      "keepalive_reads": 15,
+      "business_ssd_reads": 0,
+      "background_boundary_delta": 0,
+      "mutex_sites": [
+        {
+          "calls": 20,
+          "rva": "1b4b2f",
+          "symbol": "?issue@PleReader@ngram@strata@@QEAA?AUTicket@123@PEBI_KPEAE@Z"
+        },
+        {
+          "calls": 20,
+          "rva": "1b6a0b",
+          "symbol": "?collect@PleReader@ngram@strata@@QEAA_NUTicket@123@AEAV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z"
+        },
+        {
+          "calls": 15,
+          "rva": "1bc28a",
+          "symbol": "?submit@DirectFile@platform@strata@@QEAA_N_KPEAXI0AEAV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z"
+        },
+        {
+          "calls": 15,
+          "rva": "1bc632",
+          "symbol": "?wait@DirectFile@platform@strata@@QEAAHPEAUCompletion@23@HH@Z"
+        },
+        {
+          "calls": 15,
+          "rva": "1bd2ef",
+          "symbol": "??$_Invoke@V?$tuple@V<lambda_1>@?0??open@DirectFile@platform@strata@@QEAA_NAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@AEAV67@@Z@@std@@$0A@@thread@std@@CAIPEAX@Z"
+        },
+        {
+          "calls": 15,
+          "rva": "1bd800",
+          "symbol": "??$_Invoke@V?$tuple@V<lambda_1>@?0??open@DirectFile@platform@strata@@QEAA_NAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@AEAV67@@Z@@std@@$0A@@thread@std@@CAIPEAX@Z"
+        },
+        {
+          "calls": 15,
+          "rva": "1bc765",
+          "symbol": "?wait@DirectFile@platform@strata@@QEAAHPEAUCompletion@23@HH@Z"
+        },
+        {
+          "calls": 15,
+          "rva": "1b9a3d",
+          "symbol": "??$_Invoke@V?$tuple@V<lambda_1>@?0??open@PleReader@ngram@strata@@QEAA_NAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@_K1I1AEAV67@_NI@Z@@std@@$0A@@thread@std@@CAIPEAX@Z"
+        }
+      ]
+    }
+  },
+  "native_full_model_win": false,
+  "caveats": [
+    "Decode excludes preparation/init/prefill; TTFT separate; GPU clocks unlocked.",
+    "No inner timings,GPU timestamps,telemetry or new D2D/lock census in model runs.",
+    "Standalone copy benefit does not establish model throughput; unequal alignment remains byte fallback.",
+    "Linux GPU deferred; production executables/configuration unchanged.",
+    "Fresh native transfer census; L0 payload reference is the earlier exact same fixture, not a fresh L0 payload census.",
+    "Fresh imported mutex/SRW observations for both paths; exclude observer guards, private/inlined/driver locks and contention.",
+    "Actual background keepalive counts can vary with the observation window; no keepalive policy change.",
+    "Submitted logical copies, not physical PCIe/VRAM transactions. Instrumented executables never establish performance.",
+    "Source adopted; existing executables/configuration and immutable Linux handoffs remain unchanged.",
+    "Use a newly baked five-export memory module for the new path; four-export modules keep prior behavior."
+  ],
+  "reproduction": {
+    "verify": "python build-orca-native-lower-20261031/adopt_dg2_copy_prefix.py --verify"
+  },
+  "evidence_files": 29,
+  "unique_blobs": 22,
+  "archive_sha256": "8ad91bf731803cc29d562a8770f85357267c0dcc166dc23ac652b5f40ee50e9b"
+}

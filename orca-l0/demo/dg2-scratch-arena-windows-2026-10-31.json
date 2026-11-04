@@ -1,0 +1,357 @@
+{
+  "date": "2026-10-31",
+  "complete": true,
+  "hardware": {
+    "os": "Windows",
+    "gpu": "Intel Arc A770 16 GB",
+    "pci_device": "0x56a0",
+    "driver": "32.0.101.9034",
+    "wddm": 2700,
+    "compiler": "Intel oneAPI 2025.3.2"
+  },
+  "scope": {
+    "backend": "Orca::DG2",
+    "level_zero_intel_umd_gmm_compiler_loaded": false,
+    "full_model_integrated": false,
+    "linux_gpu_validated": false,
+    "production_changed": false,
+    "performance_control": "Previously validated reusable DG2 runtime, not SYCL or Level Zero."
+  },
+  "features": {
+    "scratch_slots_metadata": [
+      0,
+      1
+    ],
+    "scratch_slot_gpu_validated": 0,
+    "scratch_bytes_per_thread_gpu_validated": 2048,
+    "private_bytes_per_thread_gpu_validated": 512,
+    "physical_thread_slots": 4096,
+    "thread_pool_guard_bytes_per_side": 65536,
+    "recording_slab_bytes": 1048576,
+    "capture_alignment": 64,
+    "isa_padding_bytes": 4096,
+    "first_parameter_base_valid_for_inline_kernels": true,
+    "captures_immutable_across_replays_and_resets": true,
+    "no_allocation_parsing_or_per_kernel_call_during_submit": true
+  },
+  "validation": {
+    "windows_ctest_passed": 3,
+    "windows_ctest_total": 3,
+    "wsl_linux_cpu_ctest_passed": 4,
+    "wsl_linux_cpu_ctest_total": 4,
+    "cvec": {
+      "replays": 12,
+      "n": 4096,
+      "streams": 257,
+      "modes": [
+        "project",
+        "add",
+        "fused write"
+      ],
+      "max_abs_error": 1.1920929e-07,
+      "changed_input_and_enable": true,
+      "cpu_reference_before_submission": true,
+      "aggregate_pointer_abi": true,
+      "input_and_full_padded_output_and_scratch_guards": true
+    },
+    "q3k_bf16": {
+      "replays": 16,
+      "rows": 19,
+      "columns": 512,
+      "row_offset": 1,
+      "max_bit_error": 0,
+      "scale_codes": [
+        7,
+        25,
+        39,
+        57
+      ],
+      "varies_scale_quant_high_mask_and_half_per_block": true,
+      "cpu_reference_before_submission": true,
+      "all_guards": true
+    },
+    "slab_rollover": {
+      "immutable_captures": 17000,
+      "slab_bytes": 1048576,
+      "exact_gpu_sum": true,
+      "full_padded_output_guards": true
+    },
+    "strata_gate_replays": 24,
+    "strata_bf16_gemv_replays": 48,
+    "pending_guard_access_rejected": true
+  },
+  "native_pack_census": {
+    "total": 1243,
+    "accepted_metadata": 1210,
+    "rejected_metadata": 33,
+    "previous_accepted_metadata": 640,
+    "first_rejection_reasons": {
+      "DG2: unsupported execution field has_global_atomics": 12,
+      "DG2: unsupported execution field require_disable_eufusion": 11,
+      "DG2: zebin targets a different GPU family": 10
+    },
+    "all_accepted_exports_gpu_validated": false
+  },
+  "performance": {
+    "rounds_initial": 3,
+    "pipeline_retry_rounds": 3,
+    "retry_reason": "Initial pipeline comparison had 2/3 stable completion pairs; all extra attempts retained.",
+    "order": [
+      "previous DG2",
+      "shared-heap DG2",
+      "previous DG2"
+    ],
+    "processes": 27,
+    "retained_samples": 13824,
+    "warmups": 128,
+    "retained_per_process": 512,
+    "shared_gpu_lock": true,
+    "stable_pair_max_abs_drift_pct": 3,
+    "stable_pairs_required": 3,
+    "timing_excludes": [
+      "setup",
+      "allocation",
+      "module load",
+      "recording",
+      "parameter update",
+      "CPU/guard checks"
+    ],
+    "summary": [
+      {
+        "wait": "poll",
+        "workload": "pipeline",
+        "pair_count": 6,
+        "submit_median_us": {
+          "baseline_us": 10.02273018820453,
+          "candidate_us": 9.850000000000001,
+          "latency_change_pct": -1.6811388590030618,
+          "max_abs_control_drift_pct": 13.541666666666675,
+          "stable_pairs": 1,
+          "stable_latency_change_pct": null
+        },
+        "complete_median_us": {
+          "baseline_us": 95.55733319592954,
+          "candidate_us": 92.725,
+          "latency_change_pct": -6.070607756963953,
+          "max_abs_control_drift_pct": 12.158341187558896,
+          "stable_pairs": 3,
+          "stable_latency_change_pct": -6.147629281721889
+        }
+      },
+      {
+        "wait": "poll",
+        "workload": "chain400",
+        "pair_count": 3,
+        "submit_median_us": {
+          "baseline_us": 10.6,
+          "candidate_us": 10.5,
+          "latency_change_pct": -0.9433962264150941,
+          "max_abs_control_drift_pct": 13.636363636363624,
+          "stable_pairs": 1,
+          "stable_latency_change_pct": null
+        },
+        "complete_median_us": {
+          "baseline_us": 383.51267254159933,
+          "candidate_us": 387.5,
+          "latency_change_pct": -0.4703036496215174,
+          "max_abs_control_drift_pct": 1.6165067683006962,
+          "stable_pairs": 3,
+          "stable_latency_change_pct": -0.4703036496215174
+        }
+      }
+    ],
+    "baseline_source_archive": "dg2-wait-modes-windows-2026-10-31.json.gz",
+    "original_sycl_comparison": false,
+    "full_model_gain_established": false,
+    "caveats": [
+      "Times are separately aggregated; percentages are medians of paired ratios.",
+      "Only three of six pipeline pairs passed the drift rule; all attempts are retained.",
+      "Chain median change below 1% is not a meaningful additional gain.",
+      "GPU/CPU clocks are not fixed; this does not isolate command-programming cost."
+    ]
+  },
+  "latest_level_zero_pipeline_control": {
+    "processes": 9,
+    "summary": [
+      {
+        "wait": "poll",
+        "workload": "pipeline",
+        "submit_median_us": {
+          "baseline_us": 17.004999264922066,
+          "candidate_us": 10.3,
+          "latency_change_pct": -39.42957691714311,
+          "max_abs_control_drift_pct": 23.529411764705866,
+          "stable_pairs": 0,
+          "stable_latency_change_pct": null
+        },
+        "complete_median_us": {
+          "baseline_us": 91.35912652822377,
+          "candidate_us": 97.65,
+          "latency_change_pct": 7.442640045457738,
+          "max_abs_control_drift_pct": 14.148073022312357,
+          "stable_pairs": 0,
+          "stable_latency_change_pct": null
+        }
+      }
+    ],
+    "conclusion": "Zero stable completion pairs; no claim that the existing L0 pipeline gap is eliminated."
+  },
+  "remaining": [
+    "Native Linux GPU calibration/parity",
+    "Full Strata integration",
+    "Device-local large allocations",
+    "Multiqueue/events",
+    "Global atomic metadata (12)",
+    "EU-fusion disable semantics (11)",
+    "Ten different-target images correctly rejected; not all accepted exports have been executed."
+  ],
+  "build": {
+    "complete": true,
+    "commands": [
+      {
+        "label": "configure",
+        "args": [
+          "cmake",
+          "-S",
+          "G:\\GitHub\\Strata\\orca-l0",
+          "-B",
+          "G:\\GitHub\\Strata\\build-orca-native-lower-20261031\\windows-dg2-arena-build-v1\\build",
+          "-G",
+          "Ninja",
+          "-DCMAKE_BUILD_TYPE=Release",
+          "-DORCA_L0_BUILD_RUNTIME=ON",
+          "-DORCA_L0_BUILD_WDDM_BACKEND=ON",
+          "-DORCA_L0_BUILD_WDDM_CHECKS=ON",
+          "-DORCA_L0_BUILD_GPU_CHECKS=OFF",
+          "-DORCA_L0_DIRECT_DRIVER=ON",
+          "-DORCA_L0_SDK=C:/Program Files/LevelZeroSDK/1.33.1",
+          "-DORCA_L0_WDDM_ZEBIN=G:\\GitHub\\Strata\\build-orca-native-lower-20261031\\first-check\\loader-native-pack\\image_0.zebin",
+          "-DCMAKE_CXX_COMPILER=C:/Program Files (x86)/Intel/oneAPI/compiler/2025.3/bin/icx.exe"
+        ],
+        "exit_code": 0,
+        "seconds": 5.818101399985608
+      },
+      {
+        "label": "build",
+        "args": [
+          "cmake",
+          "--build",
+          "G:\\GitHub\\Strata\\build-orca-native-lower-20261031\\windows-dg2-arena-build-v1\\build",
+          "--target",
+          "orca-l0-dg2-bench",
+          "orca-l0-dg2-check",
+          "orca-l0-wddm-baseline-check",
+          "orca-l0-ring-check",
+          "-j",
+          "1"
+        ],
+        "exit_code": 0,
+        "seconds": 35.08076930002426
+      },
+      {
+        "label": "ctest",
+        "args": [
+          "ctest",
+          "--test-dir",
+          "G:\\GitHub\\Strata\\build-orca-native-lower-20261031\\windows-dg2-arena-build-v1\\build",
+          "--output-on-failure",
+          "-R",
+          "^(orca-l0-ring|orca-l0-dg2-cpu|orca-l0-dg2-gpu)$"
+        ],
+        "exit_code": 0,
+        "seconds": 0.5757720000110567
+      },
+      {
+        "label": "scratch",
+        "args": [
+          "G:\\GitHub\\Strata\\build-orca-native-lower-20261031\\windows-dg2-arena-build-v1\\build\\orca-l0-dg2-check.exe",
+          "--strata-scratch",
+          "G:\\GitHub\\Strata\\build-orca-native-lower-20261031\\windows-native-compatible-v4\\images"
+        ],
+        "exit_code": 0,
+        "seconds": 1.1137578999914695
+      },
+      {
+        "label": "private",
+        "args": [
+          "G:\\GitHub\\Strata\\build-orca-native-lower-20261031\\windows-dg2-arena-build-v1\\build\\orca-l0-dg2-check.exe",
+          "--strata-private",
+          "G:\\GitHub\\Strata\\build-orca-native-lower-20261031\\windows-native-compatible-v4\\images"
+        ],
+        "exit_code": 0,
+        "seconds": 0.049072800000431016
+      },
+      {
+        "label": "gate",
+        "args": [
+          "G:\\GitHub\\Strata\\build-orca-native-lower-20261031\\windows-dg2-arena-build-v1\\build\\orca-l0-dg2-check.exe",
+          "--strata-gate",
+          "G:\\GitHub\\Strata\\build-orca-native-lower-20261031\\windows-native-compatible-v4\\images"
+        ],
+        "exit_code": 0,
+        "seconds": 0.19656350000877865
+      },
+      {
+        "label": "gemv",
+        "args": [
+          "G:\\GitHub\\Strata\\build-orca-native-lower-20261031\\windows-dg2-arena-build-v1\\build\\orca-l0-dg2-check.exe",
+          "--strata-gemv",
+          "G:\\GitHub\\Strata\\build-orca-native-lower-20261031\\windows-native-compatible-v4\\images"
+        ],
+        "exit_code": 0,
+        "seconds": 0.36187349999090657
+      }
+    ]
+  },
+  "source_sha256": {
+    "tools/bench_orca_wddm.py": "a8758d84c6303b5f5f570d174a7c6a051b52aabc8da66a9288eab65725401bf6",
+    "orca-l0/tests/wddm_memory_check.cpp": "3e8b17e4b72db0a7b4e53737d747cfc299cceb9207e7d520ba03c43cbbe7071e",
+    "orca-l0/src/drm/encoding.hpp": "609935e6bd86480add0e9713c4f2a9e6b592c0481d4c7bd60c2df7d5b45d7553",
+    "orca-l0/src/wddm/runtime.cpp": "47f1696e40a54f419e8f5ef0376e2e3413305b66285c47ebaef9f08e15756026",
+    "orca-l0/src/drm/recording.inl": "1197cb33aee937d9e44b560e06ccdf678a46fe0dd8cf47c4b881e96b420aa27b",
+    "orca-l0/src/drm/arguments.hpp": "2345accd90193116524c32f300f28b895af9379f29c817649968cce5c9c72aeb",
+    "orca-l0/src/drm/zebin.hpp": "ec9e0239f5e71b29c35c8f0db86a68fb2237c16a0508b0bb541e918bc560bd26",
+    "orca-l0/include/orca_l0/dg2.hpp": "9a7354f0e903aecffa1b7637bebdbe4a7c0bf008114c2e00b2f2d19621940778",
+    "orca-l0/CMakeLists.txt": "3a4e59d2f4c5b4b5bc78c8af8b92dc9cf8e114751ba241594becdd6cd6fa2ea7",
+    "orca-l0/third_party/intel-dg2/packets.hpp": "579559e752d0e4d4d44b903dea0a8f2d172afdd6d0fad63afa445d183bc1165b",
+    "orca-l0/src/runtime.cpp": "2065f4be1abade4be029573f02d58d73f1b7d6a23cfc5ee85140669880bcf531",
+    "orca-l0/src/direct_driver.cpp": "7fe701e2c34dccd80868685b29b83fc846406bf531faa4579a220c7bc4107548",
+    "orca-l0/include/orca_l0/runtime.hpp": "1b800beb8a4ec7b1777192afc599a4cf519870acd2438b1aea43e79ffafc0869",
+    "orca-l0/src/drm/runtime.cpp": "29b8901666e152dd1d6f9d8936712fac2c4f4d6872700a98c7978eb9033d2a4f",
+    "orca-l0/tests/drm_compute_check.cpp": "c75d6051eab20fdd85c1091561c1a0f7800e7df0611c8781d2bbcc155bb4a613",
+    "orca-l0/include/orca_l0/drm.hpp": "46808da289dbb63cbb9310f9b4ea806fbec4eeff76dcfbd3b53478f0bf46f245"
+  },
+  "executable_sha256": {
+    "baseline": "641775c271bb7f9f44f8916eab808b84de8fb7f23ddcf8c0c63d64aeff0eaab2",
+    "candidate": "94418ba458291d72edda5ac95f136bbcf9c35214218d1d006ac18fce038b2d67"
+  },
+  "check_executable_sha256": "652c6bb7063b41ae80e6828c9d815d6f1cffdb38761f70733852c0bdb384d031",
+  "kernel_images": [
+    {
+      "path": "build-orca-native-lower-20261031\\windows-native-compatible-v4\\images\\cvec\\image_0.zebin",
+      "kernel": "_ZTS16dpct_kernel_nameIJZZN6strata7kernels10cvec_applyEPfxxxPKfxS4_xbPvENKUlRNS0_2l05QueueEE_clES8_E18cvec_kernel_a17328EE",
+      "sha256": "9238a2c0d6fb4ad40b934a4f103cc993316e8d877f51cb5d36dd83937d91765d"
+    },
+    {
+      "path": "build-orca-native-lower-20261031\\windows-native-compatible-v4\\images\\dequant_bf16\\image_7.zebin",
+      "kernel": "_ZTS16dpct_kernel_nameIJZZN6strata7kernels12_GLOBAL__N_16launchItEEviPKvxxxPT_PvENKUlRNS0_2l05QueueEE3_clESB_E21dequant_kernel_ec931118dpct_kernel_scalarILi11EEtEE",
+      "sha256": "0492edc1b6a32376fd62fa9c7b8d852f978a9b3d37ec2fb25cb2f9ffb508c447"
+    }
+  ],
+  "reference_image_sha256": "94e4970f3f8f9820a25ece27e3ea6ea2a792d1f34a520326a47ce1a10e397800",
+  "driver_path": "C:\\Windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\ze_intel_gpu64.dll",
+  "driver_sha256": "e291d6c88c85d85751d3e2ba26d5510e1abb3a1f6d255f8f25b9aa2843ecf96d",
+  "production_sha256": {
+    "strata-iq2_xs.json": "9c45e51de69e66c3f1cd020359c8d70d639fbd1aba5d87ead84082fbe73fd531",
+    "build-orca-default-pair-20261031/strata.exe": "7be641375e905b0ceb64424ab4875afcdf9f7f6f1e2c60d6b0fcff4ece5ff4b5"
+  },
+  "local_evidence": [
+    "windows-dg2-arena-build-v1",
+    "windows-dg2-arena-checks-v2",
+    "windows-dg2-private-scales-v2",
+    "linux-dg2-scratch-arena-cpu-v3",
+    "windows-dg2-arena-direct-perf-v2",
+    "windows-dg2-arena-pipeline-retry-v2",
+    "windows-dg2-arena-l0-pipeline-v2"
+  ]
+}

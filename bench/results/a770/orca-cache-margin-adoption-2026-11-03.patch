@@ -1,0 +1,15 @@
+--- a/sycl/src/program/generate.cpp
++++ b/sycl/src/program/generate.cpp
+@@ -6324,7 +6324,12 @@
+                     const int64_t bytes = strata::kernels::cpu::expert_layout().blob_bytes(layer);
+                     for (size_t& j = adapt_cursor[adapt_size_class[(size_t) layer]]; j < adapt_vict.size(); ++j) {
+                         auto& v = adapt_vict[j];
++                        // ponytail: fixed A770 heat margin; recalibrate when the GPU or pack changes.
++#if defined(STRATA_ORCA_NATIVE) && !defined(STRATA_ORCA_DG2)
++                        if (c.first < v.first + 1.5f) break;
++#else
+                         if (c.first < v.first + 0.5f) break;
++#endif
+                         if (v.second < 0) continue;
+                         const int32_t slot = host_res[(size_t) v.second];
+                         if (xcache.bytes_of(slot + 1) - xcache.bytes_of(slot) < bytes) continue;

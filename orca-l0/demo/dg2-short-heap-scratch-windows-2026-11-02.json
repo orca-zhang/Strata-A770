@@ -1,0 +1,344 @@
+{
+  "date": "2026-11-02",
+  "complete": true,
+  "scope": "Short28/natural76 native/shared-heap/combined heap-scratch/shared-heap/native bracket",
+  "hardware": "Intel Arc A770 16 GB (0x56a0), Windows, driver 32.0.101.9034",
+  "configuration": {
+    "spec_min_p": 0.5,
+    "requested_vram_reserve_mib": 1536,
+    "matched_expert_slots": 5771,
+    "warmups_per_process": 10,
+    "retained_per_process": 5,
+    "retained_statistic": "median",
+    "bracket_reference": "geometric mean of control medians",
+    "prefix_reuse": false,
+    "decode_scope": "Internal engine decode_ms; excludes loading, initialization, preparation and prefill.",
+    "cpu_scope": "Host-observed REUSED-to-DONE interval, close to but distinct from engine decode_ms.",
+    "logical_cpus": 44
+  },
+  "runs": [
+    {
+      "label": "native-before",
+      "summary": {
+        "decode_tok_s": 39.20961667440541,
+        "prompt_ms": 977.4,
+        "ttft_ms": 1035.5374999999185,
+        "request_ms": 2917.187400002149,
+        "decode_cpu_ms": 31.25,
+        "decode_cpu_cores": 0.015975193821275564,
+        "decode_system_busy_pct": 7.954545454545459,
+        "decode_cpu_wall_gap_abs_pct": 0.013324591486796322
+      },
+      "info": "INFO context=8192 kv=fp16 kv_resident=0 expert_slots=5771 expert_cache_mib=7922 expert_slots_primary=5771 expert_cache_primary_mib=7922 spec=6 mtp_max=4 lookup=3 vram_free_mib=2359 cvec=0 arena_mib=33812 pool_workers=21 pcie_frac=0.16 spec_min_p=0.50 conversation_cache_mib=0 conversation_cache_slots=4 conversation_cache_min_free_mib=2560 tail_role_token=-1 vram_elastic=0 engine=0.1.39-orca",
+      "executable_sha256": "b5df8b350bb7882b1ed067d5e757a798805d7afa52007f660e51d5352db60229",
+      "exit_code": 0
+    },
+    {
+      "label": "heap-before",
+      "summary": {
+        "decode_tok_s": 39.71156860695998,
+        "prompt_ms": 959.8,
+        "ttft_ms": 1016.501199999766,
+        "request_ms": 2872.6870999962557,
+        "decode_cpu_ms": 62.5,
+        "decode_cpu_cores": 0.032642078563999234,
+        "decode_system_busy_pct": 4.6976142038098745,
+        "decode_cpu_wall_gap_abs_pct": 0.0025643693107868515
+      },
+      "info": "INFO context=8192 kv=fp16 kv_resident=0 expert_slots=5771 expert_cache_mib=7922 expert_slots_primary=5771 expert_cache_primary_mib=7922 spec=6 mtp_max=4 lookup=3 vram_free_mib=2378 cvec=0 arena_mib=33812 pool_workers=21 pcie_frac=0.16 spec_min_p=0.50 conversation_cache_mib=0 conversation_cache_slots=4 conversation_cache_min_free_mib=2560 tail_role_token=-1 vram_elastic=0 engine=0.1.39-orca",
+      "executable_sha256": "5b2767abf5aa2b15ad77b02354f401bda23743e92c83b7a4e1cec240bebd564b",
+      "exit_code": 0
+    },
+    {
+      "label": "heap-scratch",
+      "summary": {
+        "decode_tok_s": 42.309191115069865,
+        "prompt_ms": 881.2,
+        "ttft_ms": 933.4931999983382,
+        "request_ms": 2682.42559999635,
+        "decode_cpu_ms": 31.25,
+        "decode_cpu_cores": 0.017395932936646683,
+        "decode_system_busy_pct": 3.1727146539758055,
+        "decode_cpu_wall_gap_abs_pct": 0.005815841029943591
+      },
+      "info": "INFO context=8192 kv=fp16 kv_resident=0 expert_slots=5771 expert_cache_mib=7922 expert_slots_primary=5771 expert_cache_primary_mib=7922 spec=6 mtp_max=4 lookup=3 vram_free_mib=2369 cvec=0 arena_mib=33812 pool_workers=21 pcie_frac=0.16 spec_min_p=0.50 conversation_cache_mib=0 conversation_cache_slots=4 conversation_cache_min_free_mib=2560 tail_role_token=-1 vram_elastic=0 engine=0.1.39-orca",
+      "executable_sha256": "d343875e6c1fdfcac92ddf2eb47d197b111752f20f82ec826e06df3472f134ab",
+      "exit_code": 0
+    },
+    {
+      "label": "heap-after",
+      "summary": {
+        "decode_tok_s": 39.69082932943388,
+        "prompt_ms": 955.9,
+        "ttft_ms": 1012.7294000049005,
+        "request_ms": 2871.236700004374,
+        "decode_cpu_ms": 31.25,
+        "decode_cpu_cores": 0.01631926391712049,
+        "decode_system_busy_pct": 2.7900960827790144,
+        "decode_cpu_wall_gap_abs_pct": 0.0044046441401657255
+      },
+      "info": "INFO context=8192 kv=fp16 kv_resident=0 expert_slots=5771 expert_cache_mib=7922 expert_slots_primary=5771 expert_cache_primary_mib=7922 spec=6 mtp_max=4 lookup=3 vram_free_mib=2394 cvec=0 arena_mib=33812 pool_workers=21 pcie_frac=0.16 spec_min_p=0.50 conversation_cache_mib=0 conversation_cache_slots=4 conversation_cache_min_free_mib=2560 tail_role_token=-1 vram_elastic=0 engine=0.1.39-orca",
+      "executable_sha256": "5b2767abf5aa2b15ad77b02354f401bda23743e92c83b7a4e1cec240bebd564b",
+      "exit_code": 0
+    },
+    {
+      "label": "native-after",
+      "summary": {
+        "decode_tok_s": 39.12081124208576,
+        "prompt_ms": 972.5,
+        "ttft_ms": 1030.0575000001118,
+        "request_ms": 2911.7473000005702,
+        "decode_cpu_ms": 62.5,
+        "decode_cpu_cores": 0.03194885239211026,
+        "decode_system_busy_pct": 5.883431085043989,
+        "decode_cpu_wall_gap_abs_pct": 0.002877438616366579
+      },
+      "info": "INFO context=8192 kv=fp16 kv_resident=0 expert_slots=5771 expert_cache_mib=7922 expert_slots_primary=5771 expert_cache_primary_mib=7922 spec=6 mtp_max=4 lookup=3 vram_free_mib=2404 cvec=0 arena_mib=33812 pool_workers=21 pcie_frac=0.16 spec_min_p=0.50 conversation_cache_mib=0 conversation_cache_slots=4 conversation_cache_min_free_mib=2560 tail_role_token=-1 vram_elastic=0 engine=0.1.39-orca",
+      "executable_sha256": "b5df8b350bb7882b1ed067d5e757a798805d7afa52007f660e51d5352db60229",
+      "exit_code": 0
+    }
+  ],
+  "comparisons": {
+    "scratch_retention_vs_heap": {
+      "decode_tok_s": {
+        "control": 39.701197613963146,
+        "candidate": 42.309191115069865,
+        "change_pct": 6.569054985357603,
+        "control_drift_pct": -0.052224775433484805
+      },
+      "prompt_ms": {
+        "control": 957.8480150838127,
+        "candidate": 881.2,
+        "change_pct": -8.002106166822909,
+        "control_drift_pct": -0.4063346530527201
+      },
+      "ttft_ms": {
+        "control": 1014.613547307557,
+        "candidate": 933.4931999983382,
+        "change_pct": -7.995196547935413,
+        "control_drift_pct": -0.37105711187220836
+      },
+      "request_ms": {
+        "control": 2871.961808440075,
+        "candidate": 2682.42559999635,
+        "change_pct": -6.599537914700648,
+        "control_drift_pct": -0.0504893133638995
+      },
+      "decode_cpu_ms": {
+        "control": 44.19417382415922,
+        "candidate": 31.25,
+        "change_pct": -29.289321881345252,
+        "control_drift_pct": -50.0
+      },
+      "decode_cpu_cores": {
+        "control": 0.023080179697941804,
+        "candidate": 0.017395932936646683,
+        "change_pct": -24.628260419488935,
+        "control_drift_pct": -50.0054388842783
+      },
+      "decode_system_busy_pct": {
+        "control": 3.6203307843976065,
+        "candidate": 3.1727146539758055,
+        "change_pct": -12.363956695638812,
+        "control_drift_pct": -40.606104253597884
+      },
+      "decode_cpu_wall_gap_abs_pct": {
+        "control": 0.0033608234493912536,
+        "candidate": 0.005815841029943591,
+        "change_pct": 73.0480972154909,
+        "control_drift_pct": 71.76325272798574
+      }
+    },
+    "shared_heap_vs_native": {
+      "decode_tok_s": {
+        "control": 39.165188787926866,
+        "candidate": 39.701197613963146,
+        "change_pct": 1.3685848137709344,
+        "control_drift_pct": -0.22648890719102477
+      },
+      "prompt_ms": {
+        "control": 974.9469216321471,
+        "candidate": 957.8480150838127,
+        "change_pct": -1.7538294822972866,
+        "control_drift_pct": -0.5013300593411096
+      },
+      "ttft_ms": {
+        "control": 1032.7938653992296,
+        "candidate": 1014.613547307557,
+        "change_pct": -1.760304616511732,
+        "control_drift_pct": -0.5291937761604193
+      },
+      "request_ms": {
+        "control": 2914.4660807001924,
+        "candidate": 2871.961808440075,
+        "change_pct": -1.4583896701211851,
+        "control_drift_pct": -0.1864844199441773
+      },
+      "decode_cpu_ms": {
+        "control": 44.19417382415922,
+        "candidate": 44.19417382415922,
+        "change_pct": 0.0,
+        "control_drift_pct": 100.0
+      },
+      "decode_cpu_cores": {
+        "control": 0.02259179296406739,
+        "candidate": 0.023080179697941804,
+        "change_pct": 2.1617882859107374,
+        "control_drift_pct": 99.99038978520048
+      },
+      "decode_system_busy_pct": {
+        "control": 6.841054011968339,
+        "candidate": 3.6203307843976065,
+        "change_pct": -47.07934218814992,
+        "control_drift_pct": -26.036866359447043
+      },
+      "decode_cpu_wall_gap_abs_pct": {
+        "control": 0.006191986279976491,
+        "candidate": 0.0033608234493912536,
+        "change_pct": -45.72301524214596,
+        "control_drift_pct": -78.40505189807953
+      }
+    },
+    "combined_vs_native": {
+      "decode_tok_s": {
+        "control": 39.165188787926866,
+        "candidate": 42.309191115069865,
+        "change_pct": 8.027542888066396,
+        "control_drift_pct": -0.22648890719102477
+      },
+      "prompt_ms": {
+        "control": 974.9469216321471,
+        "candidate": 881.2,
+        "change_pct": -9.615592351961732,
+        "control_drift_pct": -0.5013300593411096
+      },
+      "ttft_ms": {
+        "control": 1032.7938653992296,
+        "candidate": 933.4931999983382,
+        "change_pct": -9.614761350514645,
+        "control_drift_pct": -0.5291937761604193
+      },
+      "request_ms": {
+        "control": 2914.4660807001924,
+        "candidate": 2682.42559999635,
+        "change_pct": -7.96168060559811,
+        "control_drift_pct": -0.1864844199441773
+      },
+      "decode_cpu_ms": {
+        "control": 44.19417382415922,
+        "candidate": 31.25,
+        "change_pct": -29.289321881345252,
+        "control_drift_pct": 100.0
+      },
+      "decode_cpu_cores": {
+        "control": 0.02259179296406739,
+        "candidate": 0.017395932936646683,
+        "change_pct": -22.9988829823503,
+        "control_drift_pct": 99.99038978520048
+      },
+      "decode_system_busy_pct": {
+        "control": 6.841054011968339,
+        "candidate": 3.1727146539758055,
+        "change_pct": -53.62242940305426,
+        "control_drift_pct": -26.036866359447043
+      },
+      "decode_cpu_wall_gap_abs_pct": {
+        "control": 0.006191986279976491,
+        "candidate": 0.005815841029943591,
+        "change_pct": -6.074710650591553,
+        "control_drift_pct": -78.40505189807953
+      }
+    }
+  },
+  "decode_controls_within_3pct": {
+    "scratch_retention_vs_heap": true,
+    "shared_heap_vs_native": true,
+    "combined_vs_native": true
+  },
+  "validation": {
+    "matching_requests": 75,
+    "every_output_id_matches": true,
+    "accepted_drafts_per_request": 57,
+    "offered_drafts_per_request": 57,
+    "all_owned_processes_exited": true,
+    "native_runtime_module_audit_passed": true,
+    "defaults_changed": false,
+    "production_changed": false,
+    "candidate_adopted": false,
+    "desktop_fix_confirmed": false,
+    "linux_gpu_validated": false,
+    "windows_ctests": 14,
+    "linux_cpu_ctests": 3,
+    "extra_gpu_numerical_groups": 5,
+    "mixed_scratch_private_scratch_three_queue_guards": true
+  },
+  "reproduction": {
+    "local_directory": "build-orca-native-lower-20261031/windows-dg2-short-heap-scratch-v1",
+    "raw_results_sha256": "6398d150d61dd018d281602c909e31afc3e29b553b159eaa85dbf72286fc591d",
+    "runner_sha256": "daedc43a1464d7ca83eea9811ba3a1f07ddd4ed4afe471330e5c2ff5dded3a11",
+    "candidate_preparation_sha256": "f6df8dc08455d1f7704a2142f47ef092b0b50111ca8b95aa4dc055734adb5911",
+    "fixture_sha256": "0c7d7a1436a5f412d5c552ff8950fe7117dd3c15dafd6d72672782c0c8dc0a62",
+    "args": [
+      "--pack",
+      "G:\\GitHub\\Strata-data\\packs\\iq2_xs",
+      "--native",
+      "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00001-of-00002.gguf",
+      "--ple-gguf",
+      "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00002-of-00002.gguf",
+      "--expert-profile",
+      "G:\\GitHub\\Strata\\data\\expert-profile.bin",
+      "--expert-cache",
+      "5500",
+      "--prefill",
+      "8192",
+      "--spec",
+      "4",
+      "--spec-min-p",
+      "0.5",
+      "--mtp",
+      "G:\\GitHub\\Strata-data\\mtp\\rt-full-vocab-current",
+      "--max-context",
+      "8192",
+      "--stream-experts",
+      "--vram-reserve-mib",
+      "1536",
+      "--pcie-frac",
+      "0.16",
+      "--prompt-cache",
+      "0",
+      "--short-read",
+      "1024",
+      "--adapt-every",
+      "1",
+      "--adapt-swaps",
+      "32",
+      "--prefill-borrow",
+      "--mtp-window",
+      "1024",
+      "--mtp-hnorm",
+      "stream",
+      "--adapt-decay",
+      "0.5"
+    ],
+    "production_sha256": {
+      "strata-iq2_xs.json": "9c45e51de69e66c3f1cd020359c8d70d639fbd1aba5d87ead84082fbe73fd531",
+      "build-orca-default-pair-20261031/strata.exe": "7be641375e905b0ceb64424ab4875afcdf9f7f6f1e2c60d6b0fcff4ece5ff4b5"
+    }
+  },
+  "caveats": [
+    "CPU accounting brackets host receipt of REUSED and DONE; it is close to but distinct from internal decode timestamps.",
+    "GetProcessTimes is visibly quantized in 15.625-ms steps here. Small native/native CPU ratios are imprecise.",
+    "System-wide CPU busy percentage includes unrelated work and drifts strongly; it is not a causal comparison.",
+    "Much lower native process CPU use does not distinguish GPU execution cost from fence notification/wakeup latency.",
+    "No desktop observation or display instrumentation confirms a cursor fix or the cause of flickering.",
+    "The L0 control is a freshly compiled current-source engine when current_l0_control is present; otherwise it is production Orca L0. Neither is original SYCL.",
+    "Only Short was run. No long-context, broad PPL or Linux GPU claim follows from this diagnostic.",
+    "The middle candidate combines shared heap windows and within-list scratch retention. The inner bracket isolates scratch retention against shared-heap controls, and the outer bracket directly measures net change against original native controls. Do not add independent experiment gains."
+  ],
+  "policy": "Shared checked 4-GiB heap windows plus retaining an already-owned scratch descriptor only within a valid recording for a no-scratch kernel. Fresh list state and required-scratch validation remain; all existing invalidations, workarounds, memory ownership and per-queue writable pools remain.",
+  "heap_control": {
+    "build_result_sha256": "0fcabd49ad268a35f268e4a51558b8bfb425a692f56cddae053fe7ef5b76bbdc",
+    "executable_sha256": "5b2767abf5aa2b15ad77b02354f401bda23743e92c83b7a4e1cec240bebd564b",
+    "report_sha256": "b026e5c7b778f6ea8b4b68f5b723f3695b41522ec6b3871f19ad8df76a50b93d"
+  }
+}

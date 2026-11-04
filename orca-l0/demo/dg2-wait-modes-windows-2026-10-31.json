@@ -1,0 +1,1456 @@
+{
+  "date": "2026-10-31",
+  "complete": true,
+  "hardware": {
+    "os": "Windows",
+    "gpu": "Intel Arc A770 16 GB",
+    "pci_device": "0x56a0",
+    "driver": "32.0.101.9034",
+    "wddm": 2700,
+    "compiler": "Intel oneAPI 2025.3.2"
+  },
+  "scope": {
+    "baseline": "Existing Orca L0 -> direct vendor DDI -> Intel UMD -> WDDM",
+    "candidate": "orca::l0::dg2::Runtime -> Orca-encoded walkers -> D3DKMTSubmitCommand",
+    "reusable_backend": true,
+    "original_sycl_comparison": false,
+    "full_model_integrated": false,
+    "end_to_end_speedup_established": false,
+    "linux_gpu_validated": false,
+    "production_changed": false
+  },
+  "method": {
+    "rounds": 3,
+    "order": [
+      "baseline",
+      "candidate",
+      "baseline"
+    ],
+    "warmups": 128,
+    "retained_per_process": 512,
+    "processes": 108,
+    "retained_samples": 55296,
+    "stable_pair_max_abs_drift_pct": 3,
+    "stable_pairs_required": 3,
+    "gpu_clocks_fixed": false,
+    "shared_gpu_lock": true,
+    "timing_excludes": [
+      "setup",
+      "allocation",
+      "module load",
+      "recording",
+      "parameter update",
+      "CPU/guard checks"
+    ],
+    "cpu_measurement": "QueryThreadCycleTime around the timed window; cycles, not CPU microseconds or energy.",
+    "sample_columns": [
+      "submit_us",
+      "complete_us",
+      "thread_cycles (new harness only)"
+    ]
+  },
+  "wait_modes": {
+    "native": "Existing Runtime wait; DG2 spins 128 times then uses a WDDM event.",
+    "hybrid50": "Poll for a 50 us budget after submit, then use native wait.",
+    "hybrid100": "Poll for a 100 us budget after submit, then use native wait.",
+    "poll": "Bounded pause loop until ready; 10-second safety timeout."
+  },
+  "workloads": {
+    "increment": {
+      "kernels": 1,
+      "elements": 1024,
+      "local": 64,
+      "groups": 16,
+      "delta": 3
+    },
+    "pipeline": {
+      "kernels": [
+        "rms_norm",
+        "gate_up",
+        "swiglu",
+        "advance"
+      ],
+      "width": 32,
+      "rows": 16,
+      "local": [
+        64,
+        32,
+        16,
+        16
+      ],
+      "groups": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "tolerance": "2e-4 * (1 + abs(expected))"
+    },
+    "chain400": {
+      "kernels": 400,
+      "dependent": true,
+      "elements": 1024,
+      "local": 64,
+      "groups": 16,
+      "delta": 3
+    }
+  },
+  "summary": [
+    {
+      "wait": "native",
+      "workload": "increment",
+      "submit_median_us": {
+        "baseline_us": 14.724129855444769,
+        "candidate_us": 10.7,
+        "latency_change_pct": -27.33017091639344,
+        "max_abs_control_drift_pct": 15.312499999999996,
+        "stable_pairs": 0,
+        "stable_latency_change_pct": null
+      },
+      "complete_median_us": {
+        "baseline_us": 68.24910255820218,
+        "candidate_us": 93.8,
+        "latency_change_pct": 38.023792942430475,
+        "max_abs_control_drift_pct": 9.765886287625413,
+        "stable_pairs": 1,
+        "stable_latency_change_pct": null
+      },
+      "pair_count": 3,
+      "thread_cycles": {
+        "baseline_median": 151149.32694193514,
+        "candidate_median": 65358.0,
+        "paired_cycle_change_pct": -56.75931787304111,
+        "stable_pairs": 1,
+        "max_abs_control_drift_pct": 9.614232912096888,
+        "stable_cycle_change_pct": null,
+        "pairs": [
+          {
+            "round": 0,
+            "baseline_cycles": 157159.72797762154,
+            "candidate_cycles": 63595.0,
+            "cycle_change_pct": -59.534798883683806,
+            "control_drift_pct": -9.614232912096888
+          },
+          {
+            "round": 1,
+            "baseline_cycles": 151149.32694193514,
+            "candidate_cycles": 65358.0,
+            "cycle_change_pct": -56.75931787304111,
+            "control_drift_pct": 1.3551092180064117
+          },
+          {
+            "round": 2,
+            "baseline_cycles": 147140.89362580344,
+            "candidate_cycles": 84084.0,
+            "cycle_change_pct": -42.854771418042716,
+            "control_drift_pct": -4.492184256931553
+          }
+        ]
+      },
+      "candidate_native_wait_calls_per_512_median": 512
+    },
+    {
+      "wait": "native",
+      "workload": "pipeline",
+      "submit_median_us": {
+        "baseline_us": 16.098757716047533,
+        "candidate_us": 11.4,
+        "latency_change_pct": -28.565916682275482,
+        "max_abs_control_drift_pct": 12.225705329153602,
+        "stable_pairs": 1,
+        "stable_latency_change_pct": null
+      },
+      "complete_median_us": {
+        "baseline_us": 83.33650160643893,
+        "candidate_us": 121.15,
+        "latency_change_pct": 46.0171693965185,
+        "max_abs_control_drift_pct": 10.127253446447504,
+        "stable_pairs": 0,
+        "stable_latency_change_pct": null
+      },
+      "pair_count": 3,
+      "thread_cycles": {
+        "baseline_median": 184542.0199954471,
+        "candidate_median": 71756.5,
+        "paired_cycle_change_pct": -61.71522344789384,
+        "stable_pairs": 0,
+        "max_abs_control_drift_pct": 10.289292027343578,
+        "stable_cycle_change_pct": null,
+        "pairs": [
+          {
+            "round": 0,
+            "baseline_cycles": 184542.0199954471,
+            "candidate_cycles": 70651.5,
+            "cycle_change_pct": -61.71522344789384,
+            "control_drift_pct": -3.68278583470274
+          },
+          {
+            "round": 1,
+            "baseline_cycles": 182518.4290695052,
+            "candidate_cycles": 71756.5,
+            "cycle_change_pct": -60.68533990467655,
+            "control_drift_pct": -4.836476945360479
+          },
+          {
+            "round": 2,
+            "baseline_cycles": 197720.04772404846,
+            "candidate_cycles": 72110.0,
+            "cycle_change_pct": -63.529242062169835,
+            "control_drift_pct": -10.289292027343578
+          }
+        ]
+      },
+      "candidate_native_wait_calls_per_512_median": 512
+    },
+    {
+      "wait": "native",
+      "workload": "chain400",
+      "submit_median_us": {
+        "baseline_us": 16.299309801338214,
+        "candidate_us": 11.850000000000001,
+        "latency_change_pct": -27.29753502183825,
+        "max_abs_control_drift_pct": 3.4700315457413033,
+        "stable_pairs": 2,
+        "stable_latency_change_pct": null
+      },
+      "complete_median_us": {
+        "baseline_us": 500.02929914156033,
+        "candidate_us": 457.3,
+        "latency_change_pct": -8.06621654107509,
+        "max_abs_control_drift_pct": 1.8034086405073424,
+        "stable_pairs": 3,
+        "stable_latency_change_pct": -8.06621654107509
+      },
+      "pair_count": 3,
+      "thread_cycles": {
+        "baseline_median": 1098586.5496341197,
+        "candidate_median": 97172.5,
+        "paired_cycle_change_pct": -91.11083494287175,
+        "stable_pairs": 3,
+        "max_abs_control_drift_pct": 1.9715585821288961,
+        "stable_cycle_change_pct": -91.11083494287175,
+        "pairs": [
+          {
+            "round": 0,
+            "baseline_cycles": 1093156.6617955544,
+            "candidate_cycles": 97172.5,
+            "cycle_change_pct": -91.11083494287175,
+            "control_drift_pct": -0.6919587204073818
+          },
+          {
+            "round": 1,
+            "baseline_cycles": 1114861.6326520077,
+            "candidate_cycles": 91305.0,
+            "cycle_change_pct": -91.81019443795857,
+            "control_drift_pct": -0.2102531684699982
+          },
+          {
+            "round": 2,
+            "baseline_cycles": 1098586.5496341197,
+            "candidate_cycles": 103111.0,
+            "cycle_change_pct": -90.61421241372919,
+            "control_drift_pct": -1.9715585821288961
+          }
+        ]
+      },
+      "candidate_native_wait_calls_per_512_median": 512
+    },
+    {
+      "wait": "hybrid50",
+      "workload": "increment",
+      "submit_median_us": {
+        "baseline_us": 15.124979338828863,
+        "candidate_us": 10.4,
+        "latency_change_pct": -31.72792956475926,
+        "max_abs_control_drift_pct": 3.9215686274509887,
+        "stable_pairs": 1,
+        "stable_latency_change_pct": null
+      },
+      "complete_median_us": {
+        "baseline_us": 68.19882696938416,
+        "candidate_us": 64.9,
+        "latency_change_pct": -5.042645608064333,
+        "max_abs_control_drift_pct": 5.614783226723508,
+        "stable_pairs": 2,
+        "stable_latency_change_pct": null
+      },
+      "pair_count": 3,
+      "thread_cycles": {
+        "baseline_median": 150652.68600327044,
+        "candidate_median": 143873.0,
+        "paired_cycle_change_pct": -4.724415177839192,
+        "stable_pairs": 2,
+        "max_abs_control_drift_pct": 5.3941160367787955,
+        "stable_cycle_change_pct": null,
+        "pairs": [
+          {
+            "round": 0,
+            "baseline_cycles": 148740.1696650908,
+            "candidate_cycles": 141154.0,
+            "cycle_change_pct": -5.100283052098242,
+            "control_drift_pct": 0.6705161760341083
+          },
+          {
+            "round": 1,
+            "baseline_cycles": 150652.68600327044,
+            "candidate_cycles": 164012.0,
+            "cycle_change_pct": 8.867624169966382,
+            "control_drift_pct": -1.1023829955772668
+          },
+          {
+            "round": 2,
+            "baseline_cycles": 151007.20742732778,
+            "candidate_cycles": 143873.0,
+            "cycle_change_pct": -4.724415177839192,
+            "control_drift_pct": -5.3941160367787955
+          }
+        ]
+      },
+      "candidate_native_wait_calls_per_512_median": 475
+    },
+    {
+      "wait": "hybrid50",
+      "workload": "pipeline",
+      "submit_median_us": {
+        "baseline_us": 15.052242357868147,
+        "candidate_us": 11.7,
+        "latency_change_pct": -22.27071739989527,
+        "max_abs_control_drift_pct": 17.266187050359715,
+        "stable_pairs": 1,
+        "stable_latency_change_pct": null
+      },
+      "complete_median_us": {
+        "baseline_us": 82.71801496651138,
+        "candidate_us": 127.75,
+        "latency_change_pct": 54.57028160308099,
+        "max_abs_control_drift_pct": 5.99294947121034,
+        "stable_pairs": 2,
+        "stable_latency_change_pct": null
+      },
+      "pair_count": 3,
+      "thread_cycles": {
+        "baseline_median": 182984.11386784373,
+        "candidate_median": 182524.0,
+        "paired_cycle_change_pct": 0.10346632095528108,
+        "stable_pairs": 1,
+        "max_abs_control_drift_pct": 6.21665086854184,
+        "stable_cycle_change_pct": null,
+        "pairs": [
+          {
+            "round": 0,
+            "baseline_cycles": 182984.11386784373,
+            "candidate_cycles": 177477.0,
+            "cycle_change_pct": -3.0096131032561257,
+            "control_drift_pct": 3.030403887437383
+          },
+          {
+            "round": 1,
+            "baseline_cycles": 193534.9982819645,
+            "candidate_cycles": 198648.0,
+            "cycle_change_pct": 2.641900309207257,
+            "control_drift_pct": 6.21665086854184
+          },
+          {
+            "round": 2,
+            "baseline_cycles": 182335.34432742326,
+            "candidate_cycles": 182524.0,
+            "cycle_change_pct": 0.10346632095528108,
+            "control_drift_pct": 1.439484746212094
+          }
+        ]
+      },
+      "candidate_native_wait_calls_per_512_median": 512
+    },
+    {
+      "wait": "hybrid50",
+      "workload": "chain400",
+      "submit_median_us": {
+        "baseline_us": 16.4,
+        "candidate_us": 11.8,
+        "latency_change_pct": -28.04878048780487,
+        "max_abs_control_drift_pct": 15.140845070422548,
+        "stable_pairs": 2,
+        "stable_latency_change_pct": null
+      },
+      "complete_median_us": {
+        "baseline_us": 499.72460915988523,
+        "candidate_us": 459.85,
+        "latency_change_pct": -7.633637149087691,
+        "max_abs_control_drift_pct": 5.405405405405395,
+        "stable_pairs": 2,
+        "stable_latency_change_pct": null
+      },
+      "pair_count": 3,
+      "thread_cycles": {
+        "baseline_median": 1099206.1281543148,
+        "candidate_median": 184758.0,
+        "paired_cycle_change_pct": -83.02465795807458,
+        "stable_pairs": 2,
+        "max_abs_control_drift_pct": 5.1434288085944635,
+        "stable_cycle_change_pct": null,
+        "pairs": [
+          {
+            "round": 0,
+            "baseline_cycles": 1068530.490169209,
+            "candidate_cycles": 184758.0,
+            "cycle_change_pct": -82.70915039862435,
+            "control_drift_pct": 5.1434288085944635
+          },
+          {
+            "round": 1,
+            "baseline_cycles": 1099206.1281543148,
+            "candidate_cycles": 186594.0,
+            "cycle_change_pct": -83.02465795807458,
+            "control_drift_pct": 0.34415682943755854
+          },
+          {
+            "round": 2,
+            "baseline_cycles": 1108993.5297870317,
+            "candidate_cycles": 181970.0,
+            "cycle_change_pct": -83.59142816325131,
+            "control_drift_pct": 0.6986900748729097
+          }
+        ]
+      },
+      "candidate_native_wait_calls_per_512_median": 512
+    },
+    {
+      "wait": "hybrid100",
+      "workload": "increment",
+      "submit_median_us": {
+        "baseline_us": 14.719374986730925,
+        "candidate_us": 8.8,
+        "latency_change_pct": -40.90109704867126,
+        "max_abs_control_drift_pct": 25.068870523415974,
+        "stable_pairs": 0,
+        "stable_latency_change_pct": null
+      },
+      "complete_median_us": {
+        "baseline_us": 69.56040540422404,
+        "candidate_us": 66.25,
+        "latency_change_pct": -5.603967173791535,
+        "max_abs_control_drift_pct": 10.687022900763344,
+        "stable_pairs": 0,
+        "stable_latency_change_pct": null
+      },
+      "pair_count": 3,
+      "thread_cycles": {
+        "baseline_median": 153868.20708645435,
+        "candidate_median": 146840.0,
+        "paired_cycle_change_pct": -5.334324101010379,
+        "stable_pairs": 0,
+        "max_abs_control_drift_pct": 10.811307323122143,
+        "stable_cycle_change_pct": null,
+        "pairs": [
+          {
+            "round": 0,
+            "baseline_cycles": 147658.58762699852,
+            "candidate_cycles": 139782.0,
+            "cycle_change_pct": -5.334324101010379,
+            "control_drift_pct": -3.5353199414660086
+          },
+          {
+            "round": 1,
+            "baseline_cycles": 153868.20708645435,
+            "candidate_cycles": 147349.0,
+            "cycle_change_pct": -4.236877266524186,
+            "control_drift_pct": 4.1327329159592585
+          },
+          {
+            "round": 2,
+            "baseline_cycles": 164502.73836018657,
+            "candidate_cycles": 146840.0,
+            "cycle_change_pct": -10.737048231691537,
+            "control_drift_pct": -10.811307323122143
+          }
+        ]
+      },
+      "candidate_native_wait_calls_per_512_median": 3
+    },
+    {
+      "wait": "hybrid100",
+      "workload": "pipeline",
+      "submit_median_us": {
+        "baseline_us": 15.84929020492716,
+        "candidate_us": 8.8,
+        "latency_change_pct": -36.27474877796008,
+        "max_abs_control_drift_pct": 16.573033707865147,
+        "stable_pairs": 2,
+        "stable_latency_change_pct": null
+      },
+      "complete_median_us": {
+        "baseline_us": 82.61183329281587,
+        "candidate_us": 93.0,
+        "latency_change_pct": 14.605898292423314,
+        "max_abs_control_drift_pct": 3.7102473498233257,
+        "stable_pairs": 1,
+        "stable_latency_change_pct": null
+      },
+      "pair_count": 3,
+      "thread_cycles": {
+        "baseline_median": 182519.316429796,
+        "candidate_median": 205637.5,
+        "paired_cycle_change_pct": 14.602622262100407,
+        "stable_pairs": 1,
+        "max_abs_control_drift_pct": 3.826187834425576,
+        "stable_cycle_change_pct": null,
+        "pairs": [
+          {
+            "round": 0,
+            "baseline_cycles": 178001.16260294482,
+            "candidate_cycles": 203994.0,
+            "cycle_change_pct": 14.602622262100407,
+            "control_drift_pct": 0.6153638084933633
+          },
+          {
+            "round": 1,
+            "baseline_cycles": 184285.43809875482,
+            "candidate_cycles": 205637.5,
+            "cycle_change_pct": 11.586407543390953,
+            "control_drift_pct": -3.826187834425576
+          },
+          {
+            "round": 2,
+            "baseline_cycles": 182519.316429796,
+            "candidate_cycles": 220017.0,
+            "cycle_change_pct": 20.54450142794999,
+            "control_drift_pct": 3.704178987892659
+          }
+        ]
+      },
+      "candidate_native_wait_calls_per_512_median": 39
+    },
+    {
+      "wait": "hybrid100",
+      "workload": "chain400",
+      "submit_median_us": {
+        "baseline_us": 16.097204726287107,
+        "candidate_us": 10.9,
+        "latency_change_pct": -34.138672239765775,
+        "max_abs_control_drift_pct": 3.7974683544303556,
+        "stable_pairs": 2,
+        "stable_latency_change_pct": null
+      },
+      "complete_median_us": {
+        "baseline_us": 498.12439711381336,
+        "candidate_us": 468.8,
+        "latency_change_pct": -5.886962630965698,
+        "max_abs_control_drift_pct": 4.1616038882138495,
+        "stable_pairs": 2,
+        "stable_latency_change_pct": null
+      },
+      "pair_count": 3,
+      "thread_cycles": {
+        "baseline_median": 1095355.92708626,
+        "candidate_median": 290829.0,
+        "paired_cycle_change_pct": -73.17975752034856,
+        "stable_pairs": 2,
+        "max_abs_control_drift_pct": 4.1441381765792045,
+        "stable_cycle_change_pct": null,
+        "pairs": [
+          {
+            "round": 0,
+            "baseline_cycles": 1064196.1951557617,
+            "candidate_cycles": 285420.0,
+            "cycle_change_pct": -73.17975752034856,
+            "control_drift_pct": -4.1441381765792045
+          },
+          {
+            "round": 1,
+            "baseline_cycles": 1095355.92708626,
+            "candidate_cycles": 309304.0,
+            "cycle_change_pct": -71.762237976584,
+            "control_drift_pct": 0.38985498894557047
+          },
+          {
+            "round": 2,
+            "baseline_cycles": 1111919.4604682482,
+            "candidate_cycles": 290829.0,
+            "cycle_change_pct": -73.84441856269635,
+            "control_drift_pct": -0.053316981593498625
+          }
+        ]
+      },
+      "candidate_native_wait_calls_per_512_median": 512
+    },
+    {
+      "wait": "poll",
+      "workload": "increment",
+      "submit_median_us": {
+        "baseline_us": 13.51832090165047,
+        "candidate_us": 9.2,
+        "latency_change_pct": -36.01276324973238,
+        "max_abs_control_drift_pct": 11.702127659574469,
+        "stable_pairs": 0,
+        "stable_latency_change_pct": null
+      },
+      "complete_median_us": {
+        "baseline_us": 66.44682084193343,
+        "candidate_us": 65.4,
+        "latency_change_pct": -1.5754265270623624,
+        "max_abs_control_drift_pct": 3.083700440528625,
+        "stable_pairs": 2,
+        "stable_latency_change_pct": null
+      },
+      "pair_count": 3,
+      "thread_cycles": {
+        "baseline_median": 146829.73148514575,
+        "candidate_median": 144969.0,
+        "paired_cycle_change_pct": -1.26727159841874,
+        "stable_pairs": 2,
+        "max_abs_control_drift_pct": 3.154797240298013,
+        "stable_cycle_change_pct": null,
+        "pairs": [
+          {
+            "round": 0,
+            "baseline_cycles": 146829.73148514575,
+            "candidate_cycles": 144969.0,
+            "cycle_change_pct": -1.26727159841874,
+            "control_drift_pct": 2.009960378604436
+          },
+          {
+            "round": 1,
+            "baseline_cycles": 145681.29656462424,
+            "candidate_cycles": 149325.0,
+            "cycle_change_pct": 2.501147038981366,
+            "control_drift_pct": 0.9718682425325031
+          },
+          {
+            "round": 2,
+            "baseline_cycles": 173234.4973727808,
+            "candidate_cycles": 144094.0,
+            "cycle_change_pct": -16.821417104974067,
+            "control_drift_pct": -3.154797240298013
+          }
+        ]
+      },
+      "candidate_native_wait_calls_per_512_median": 0
+    },
+    {
+      "wait": "poll",
+      "workload": "pipeline",
+      "submit_median_us": {
+        "baseline_us": 15.260406285548232,
+        "candidate_us": 8.4,
+        "latency_change_pct": -44.955593954566666,
+        "max_abs_control_drift_pct": 13.414634146341465,
+        "stable_pairs": 1,
+        "stable_latency_change_pct": null
+      },
+      "complete_median_us": {
+        "baseline_us": 82.69848849888369,
+        "candidate_us": 92.6,
+        "latency_change_pct": 12.903411871735205,
+        "max_abs_control_drift_pct": 2.593295382669192,
+        "stable_pairs": 3,
+        "stable_latency_change_pct": 12.903411871735205
+      },
+      "pair_count": 3,
+      "thread_cycles": {
+        "baseline_median": 183039.80202404066,
+        "candidate_median": 204613.5,
+        "paired_cycle_change_pct": 13.048929137507326,
+        "stable_pairs": 3,
+        "max_abs_control_drift_pct": 2.738612024236309,
+        "stable_cycle_change_pct": 13.048929137507326,
+        "pairs": [
+          {
+            "round": 0,
+            "baseline_cycles": 176988.85033809333,
+            "candidate_cycles": 200084.0,
+            "cycle_change_pct": 13.048929137507326,
+            "control_drift_pct": 2.738612024236309
+          },
+          {
+            "round": 1,
+            "baseline_cycles": 183129.95104979415,
+            "candidate_cycles": 204613.5,
+            "cycle_change_pct": 11.731313652983143,
+            "control_drift_pct": -0.750458326306569
+          },
+          {
+            "round": 2,
+            "baseline_cycles": 183039.80202404066,
+            "candidate_cycles": 217604.0,
+            "cycle_change_pct": 18.883432780057106,
+            "control_drift_pct": 1.1892658316892124
+          }
+        ]
+      },
+      "candidate_native_wait_calls_per_512_median": 0
+    },
+    {
+      "wait": "poll",
+      "workload": "chain400",
+      "submit_median_us": {
+        "baseline_us": 16.6,
+        "candidate_us": 10.1,
+        "latency_change_pct": -42.23132501633475,
+        "max_abs_control_drift_pct": 20.118343195266284,
+        "stable_pairs": 2,
+        "stable_latency_change_pct": null
+      },
+      "complete_median_us": {
+        "baseline_us": 504.69880126665646,
+        "candidate_us": 399.25,
+        "latency_change_pct": -20.893412269260136,
+        "max_abs_control_drift_pct": 1.6788248226241698,
+        "stable_pairs": 3,
+        "stable_latency_change_pct": -20.893412269260136
+      },
+      "pair_count": 3,
+      "thread_cycles": {
+        "baseline_median": 1110833.2381002335,
+        "candidate_median": 878177.0,
+        "paired_cycle_change_pct": -20.944299298977253,
+        "stable_pairs": 3,
+        "max_abs_control_drift_pct": 2.1931756565903404,
+        "stable_cycle_change_pct": -20.944299298977253,
+        "pairs": [
+          {
+            "round": 0,
+            "baseline_cycles": 1088888.3143203899,
+            "candidate_cycles": 881986.0,
+            "cycle_change_pct": -19.00124297408079,
+            "control_drift_pct": -2.1931756565903404
+          },
+          {
+            "round": 1,
+            "baseline_cycles": 1115140.04031422,
+            "candidate_cycles": 779093.5,
+            "cycle_change_pct": -30.134918321068447,
+            "control_drift_pct": 0.2627330341445244
+          },
+          {
+            "round": 2,
+            "baseline_cycles": 1110833.2381002335,
+            "candidate_cycles": 878177.0,
+            "cycle_change_pct": -20.944299298977253,
+            "control_drift_pct": -0.48350805569862265
+          }
+        ]
+      },
+      "candidate_native_wait_calls_per_512_median": 0
+    }
+  ],
+  "pairs": [
+    {
+      "round": 0,
+      "wait": "native",
+      "workload": "increment",
+      "submit_median_us": {
+        "baseline_us": 14.724129855444769,
+        "candidate_us": 10.7,
+        "latency_change_pct": -27.33017091639344,
+        "control_drift_pct": -15.312499999999996
+      },
+      "complete_median_us": {
+        "baseline_us": 71.00624972493618,
+        "candidate_us": 90.35,
+        "latency_change_pct": 27.242320711201586,
+        "control_drift_pct": -9.765886287625413
+      }
+    },
+    {
+      "round": 0,
+      "wait": "native",
+      "workload": "pipeline",
+      "submit_median_us": {
+        "baseline_us": 14.943225890014512,
+        "candidate_us": 10.7,
+        "latency_change_pct": -28.3956484446237,
+        "control_drift_pct": -12.225705329153602
+      },
+      "complete_median_us": {
+        "baseline_us": 83.33650160643893,
+        "candidate_us": 127.1,
+        "latency_change_pct": 52.51420152028521,
+        "control_drift_pct": -3.535651149086627
+      }
+    },
+    {
+      "round": 0,
+      "wait": "native",
+      "workload": "chain400",
+      "submit_median_us": {
+        "baseline_us": 16.122654868228125,
+        "candidate_us": 12.0,
+        "latency_change_pct": -25.5705707398871,
+        "control_drift_pct": 3.4700315457413033
+      },
+      "complete_median_us": {
+        "baseline_us": 497.4232352835963,
+        "candidate_us": 457.3,
+        "latency_change_pct": -8.06621654107509,
+        "control_drift_pct": -0.5313283208020048
+      }
+    },
+    {
+      "round": 0,
+      "wait": "hybrid50",
+      "workload": "increment",
+      "submit_median_us": {
+        "baseline_us": 15.124979338828863,
+        "candidate_us": 10.4,
+        "latency_change_pct": -31.239575492833172,
+        "control_drift_pct": -0.3300330033003229
+      },
+      "complete_median_us": {
+        "baseline_us": 67.19953496862907,
+        "candidate_us": 63.6,
+        "latency_change_pct": -5.356487913658103,
+        "control_drift_pct": 0.7468259895444307
+      }
+    },
+    {
+      "round": 0,
+      "wait": "hybrid50",
+      "workload": "pipeline",
+      "submit_median_us": {
+        "baseline_us": 15.052242357868147,
+        "candidate_us": 11.0,
+        "latency_change_pct": -26.921187299046835,
+        "control_drift_pct": 17.266187050359715
+      },
+      "complete_median_us": {
+        "baseline_us": 82.71801496651138,
+        "candidate_us": 119.25,
+        "latency_change_pct": 44.164484663079385,
+        "control_drift_pct": 2.633190447029987
+      }
+    },
+    {
+      "round": 0,
+      "wait": "hybrid50",
+      "workload": "chain400",
+      "submit_median_us": {
+        "baseline_us": 16.4,
+        "candidate_us": 11.8,
+        "latency_change_pct": -28.04878048780487,
+        "control_drift_pct": 0.0
+      },
+      "complete_median_us": {
+        "baseline_us": 486.231549778498,
+        "candidate_us": 457.25,
+        "latency_change_pct": -5.9604420551690795,
+        "control_drift_pct": 5.405405405405395
+      }
+    },
+    {
+      "round": 0,
+      "wait": "hybrid100",
+      "workload": "increment",
+      "submit_median_us": {
+        "baseline_us": 13.705838172107534,
+        "candidate_us": 8.1,
+        "latency_change_pct": -40.90109704867126,
+        "control_drift_pct": -10.034602076124566
+      },
+      "complete_median_us": {
+        "baseline_us": 66.74009289774776,
+        "candidate_us": 63.0,
+        "latency_change_pct": -5.603967173791535,
+        "control_drift_pct": -3.387334315169388
+      }
+    },
+    {
+      "round": 0,
+      "wait": "hybrid100",
+      "workload": "pipeline",
+      "submit_median_us": {
+        "baseline_us": 13.29962405483704,
+        "candidate_us": 8.6,
+        "latency_change_pct": -35.336518050882795,
+        "control_drift_pct": 1.5151515151515138
+      },
+      "complete_median_us": {
+        "baseline_us": 80.44961155903738,
+        "candidate_us": 92.2,
+        "latency_change_pct": 14.605898292423314,
+        "control_drift_pct": 0.6234413965087171
+      }
+    },
+    {
+      "round": 0,
+      "wait": "hybrid100",
+      "workload": "chain400",
+      "submit_median_us": {
+        "baseline_us": 16.097204726287107,
+        "candidate_us": 10.4,
+        "latency_change_pct": -35.392509588844575,
+        "control_drift_pct": 3.7974683544303556
+      },
+      "complete_median_us": {
+        "baseline_us": 483.4158148012951,
+        "candidate_us": 451.95,
+        "latency_change_pct": -6.509057800318119,
+        "control_drift_pct": -4.1616038882138495
+      }
+    },
+    {
+      "round": 0,
+      "wait": "poll",
+      "workload": "increment",
+      "submit_median_us": {
+        "baseline_us": 13.51832090165047,
+        "candidate_us": 8.649999999999999,
+        "latency_change_pct": -36.01276324973238,
+        "control_drift_pct": 6.488549618320616
+      },
+      "complete_median_us": {
+        "baseline_us": 66.44682084193343,
+        "candidate_us": 65.4,
+        "latency_change_pct": -1.5754265270623624,
+        "control_drift_pct": 1.9756838905774954
+      }
+    },
+    {
+      "round": 0,
+      "wait": "poll",
+      "workload": "pipeline",
+      "submit_median_us": {
+        "baseline_us": 13.498518437221176,
+        "candidate_us": 8.1,
+        "latency_change_pct": -39.993414553816194,
+        "control_drift_pct": 3.007518796992481
+      },
+      "complete_median_us": {
+        "baseline_us": 80.06843947523892,
+        "candidate_us": 90.4,
+        "latency_change_pct": 12.903411871735205,
+        "control_drift_pct": 2.593295382669192
+      }
+    },
+    {
+      "round": 0,
+      "wait": "poll",
+      "workload": "chain400",
+      "submit_median_us": {
+        "baseline_us": 16.49969696691427,
+        "candidate_us": 10.1,
+        "latency_change_pct": -38.7867545673545,
+        "control_drift_pct": -1.2048192771084487
+      },
+      "complete_median_us": {
+        "baseline_us": 496.1322227995275,
+        "candidate_us": 400.9,
+        "latency_change_pct": -19.194927969435295,
+        "control_drift_pct": -1.6788248226241698
+      }
+    },
+    {
+      "round": 1,
+      "wait": "native",
+      "workload": "increment",
+      "submit_median_us": {
+        "baseline_us": 14.787832836490951,
+        "candidate_us": 10.6,
+        "latency_change_pct": -28.319449393266837,
+        "control_drift_pct": 8.450704225352123
+      },
+      "complete_median_us": {
+        "baseline_us": 68.24910255820218,
+        "candidate_us": 94.2,
+        "latency_change_pct": 38.023792942430475,
+        "control_drift_pct": 1.0309278350515205
+      }
+    },
+    {
+      "round": 1,
+      "wait": "native",
+      "workload": "pipeline",
+      "submit_median_us": {
+        "baseline_us": 16.098757716047533,
+        "candidate_us": 11.5,
+        "latency_change_pct": -28.565916682275482,
+        "control_drift_pct": -2.4539877300613466
+      },
+      "complete_median_us": {
+        "baseline_us": 82.52454180424148,
+        "candidate_us": 120.5,
+        "latency_change_pct": 46.0171693965185,
+        "control_drift_pct": -4.8463356973995175
+      }
+    },
+    {
+      "round": 1,
+      "wait": "native",
+      "workload": "chain400",
+      "submit_median_us": {
+        "baseline_us": 16.548111674750086,
+        "candidate_us": 10.9,
+        "latency_change_pct": -34.131457327353246,
+        "control_drift_pct": -2.9761904761904767
+      },
+      "complete_median_us": {
+        "baseline_us": 506.5497014114212,
+        "candidate_us": 451.35,
+        "latency_change_pct": -10.897193554278262,
+        "control_drift_pct": -0.2169197396963196
+      }
+    },
+    {
+      "round": 1,
+      "wait": "hybrid50",
+      "workload": "increment",
+      "submit_median_us": {
+        "baseline_us": 15.672587533652507,
+        "candidate_us": 10.7,
+        "latency_change_pct": -31.72792956475926,
+        "control_drift_pct": 3.5714285714285587
+      },
+      "complete_median_us": {
+        "baseline_us": 68.19882696938416,
+        "candidate_us": 74.15,
+        "latency_change_pct": 8.726210251808952,
+        "control_drift_pct": -1.1661807580174877
+      }
+    },
+    {
+      "round": 1,
+      "wait": "hybrid50",
+      "workload": "pipeline",
+      "submit_median_us": {
+        "baseline_us": 13.499629624548964,
+        "candidate_us": 13.3,
+        "latency_change_pct": -1.4787785302341816,
+        "control_drift_pct": -1.4705882352941124
+      },
+      "complete_median_us": {
+        "baseline_us": 87.6128985937573,
+        "candidate_us": 136.9,
+        "latency_change_pct": 56.25553108883739,
+        "control_drift_pct": 5.99294947121034
+      }
+    },
+    {
+      "round": 1,
+      "wait": "hybrid50",
+      "workload": "chain400",
+      "submit_median_us": {
+        "baseline_us": 15.237125713204575,
+        "candidate_us": 11.5,
+        "latency_change_pct": -24.526447989898525,
+        "control_drift_pct": 15.140845070422548
+      },
+      "complete_median_us": {
+        "baseline_us": 499.72460915988523,
+        "candidate_us": 459.85,
+        "latency_change_pct": -7.979316693432537,
+        "control_drift_pct": 0.250450811460623
+      }
+    },
+    {
+      "round": 1,
+      "wait": "hybrid100",
+      "workload": "increment",
+      "submit_median_us": {
+        "baseline_us": 14.719374986730925,
+        "candidate_us": 8.8,
+        "latency_change_pct": -40.21485281859497,
+        "control_drift_pct": -12.101910828025463
+      },
+      "complete_median_us": {
+        "baseline_us": 69.56040540422404,
+        "candidate_us": 66.45,
+        "latency_change_pct": -4.4715170737563925,
+        "control_drift_pct": 4.181951577402776
+      }
+    },
+    {
+      "round": 1,
+      "wait": "hybrid100",
+      "workload": "pipeline",
+      "submit_median_us": {
+        "baseline_us": 16.258228685807072,
+        "candidate_us": 8.8,
+        "latency_change_pct": -45.87356242760857,
+        "control_drift_pct": -16.573033707865147
+      },
+      "complete_median_us": {
+        "baseline_us": 83.31011343168367,
+        "candidate_us": 93.0,
+        "latency_change_pct": 11.631104759282639,
+        "control_drift_pct": -3.7102473498233257
+      }
+    },
+    {
+      "round": 1,
+      "wait": "hybrid100",
+      "workload": "chain400",
+      "submit_median_us": {
+        "baseline_us": 13.798550648528272,
+        "candidate_us": 12.75,
+        "latency_change_pct": -7.598991192891036,
+        "control_drift_pct": 2.941176470588247
+      },
+      "complete_median_us": {
+        "baseline_us": 498.12439711381336,
+        "candidate_us": 468.8,
+        "latency_change_pct": -5.886962630965698,
+        "control_drift_pct": 0.31165175429777037
+      }
+    },
+    {
+      "round": 1,
+      "wait": "poll",
+      "workload": "increment",
+      "submit_median_us": {
+        "baseline_us": 13.386560424545209,
+        "candidate_us": 9.9,
+        "latency_change_pct": -26.045229797434388,
+        "control_drift_pct": 9.375
+      },
+      "complete_median_us": {
+        "baseline_us": 65.92419889539804,
+        "candidate_us": 67.5,
+        "latency_change_pct": 2.3903227206481414,
+        "control_drift_pct": 0.9908536585365946
+      }
+    },
+    {
+      "round": 1,
+      "wait": "poll",
+      "workload": "pipeline",
+      "submit_median_us": {
+        "baseline_us": 15.260406285548232,
+        "candidate_us": 8.4,
+        "latency_change_pct": -44.955593954566666,
+        "control_drift_pct": -13.414634146341465
+      },
+      "complete_median_us": {
+        "baseline_us": 82.79945651995548,
+        "candidate_us": 92.6,
+        "latency_change_pct": 11.836482861071062,
+        "control_drift_pct": -0.7220216606498076
+      }
+    },
+    {
+      "round": 1,
+      "wait": "poll",
+      "workload": "chain400",
+      "submit_median_us": {
+        "baseline_us": 18.52214890340751,
+        "candidate_us": 10.7,
+        "latency_change_pct": -42.23132501633475,
+        "control_drift_pct": 20.118343195266284
+      },
+      "complete_median_us": {
+        "baseline_us": 506.82440746278195,
+        "candidate_us": 353.9,
+        "latency_change_pct": -30.173055048461094,
+        "control_drift_pct": 0.3062938444817753
+      }
+    },
+    {
+      "round": 2,
+      "wait": "native",
+      "workload": "increment",
+      "submit_median_us": {
+        "baseline_us": 14.221550548375518,
+        "candidate_us": 13.3,
+        "latency_change_pct": -6.479958322693468,
+        "control_drift_pct": -11.881188118811858
+      },
+      "complete_median_us": {
+        "baseline_us": 66.43417795081083,
+        "candidate_us": 93.8,
+        "latency_change_pct": 41.19238454256384,
+        "control_drift_pct": -4.270986745213556
+      }
+    },
+    {
+      "round": 2,
+      "wait": "native",
+      "workload": "pipeline",
+      "submit_median_us": {
+        "baseline_us": 16.580711685570073,
+        "candidate_us": 11.4,
+        "latency_change_pct": -31.245412041503396,
+        "control_drift_pct": -9.195402298850563
+      },
+      "complete_median_us": {
+        "baseline_us": 89.3975670809894,
+        "candidate_us": 121.15,
+        "latency_change_pct": 35.518229361034614,
+        "control_drift_pct": -10.127253446447504
+      }
+    },
+    {
+      "round": 2,
+      "wait": "native",
+      "workload": "chain400",
+      "submit_median_us": {
+        "baseline_us": 16.299309801338214,
+        "candidate_us": 11.850000000000001,
+        "latency_change_pct": -27.29753502183825,
+        "control_drift_pct": 1.8575851393188847
+      },
+      "complete_median_us": {
+        "baseline_us": 500.02929914156033,
+        "candidate_us": 464.05,
+        "latency_change_pct": -7.195438187987946,
+        "control_drift_pct": -1.8034086405073424
+      }
+    },
+    {
+      "round": 2,
+      "wait": "hybrid50",
+      "workload": "increment",
+      "submit_median_us": {
+        "baseline_us": 14.996999699939986,
+        "candidate_us": 8.5,
+        "latency_change_pct": -43.32199659886628,
+        "control_drift_pct": -3.9215686274509887
+      },
+      "complete_median_us": {
+        "baseline_us": 68.3464702819392,
+        "candidate_us": 64.9,
+        "latency_change_pct": -5.042645608064333,
+        "control_drift_pct": -5.614783226723508
+      }
+    },
+    {
+      "round": 2,
+      "wait": "hybrid50",
+      "workload": "pipeline",
+      "submit_median_us": {
+        "baseline_us": 15.052242357868147,
+        "candidate_us": 11.7,
+        "latency_change_pct": -22.27071739989527,
+        "control_drift_pct": 17.266187050359715
+      },
+      "complete_median_us": {
+        "baseline_us": 82.64848758446824,
+        "candidate_us": 127.75,
+        "latency_change_pct": 54.57028160308099,
+        "control_drift_pct": 1.217285453438821
+      }
+    },
+    {
+      "round": 2,
+      "wait": "hybrid50",
+      "workload": "chain400",
+      "submit_median_us": {
+        "baseline_us": 16.899704139422088,
+        "candidate_us": 11.9,
+        "latency_change_pct": -29.584566085741315,
+        "control_drift_pct": -1.17647058823529
+      },
+      "complete_median_us": {
+        "baseline_us": 505.649443784921,
+        "candidate_us": 467.05,
+        "latency_change_pct": -7.633637149087691,
+        "control_drift_pct": 0.2970885323826611
+      }
+    },
+    {
+      "round": 2,
+      "wait": "hybrid100",
+      "workload": "increment",
+      "submit_median_us": {
+        "baseline_us": 15.711142542794269,
+        "candidate_us": 8.9,
+        "latency_change_pct": -43.35230569159414,
+        "control_drift_pct": -25.068870523415974
+      },
+      "complete_median_us": {
+        "baseline_us": 74.28135701506805,
+        "candidate_us": 66.25,
+        "latency_change_pct": -10.812076324129194,
+        "control_drift_pct": -10.687022900763344
+      }
+    },
+    {
+      "round": 2,
+      "wait": "hybrid100",
+      "workload": "pipeline",
+      "submit_median_us": {
+        "baseline_us": 15.84929020492716,
+        "candidate_us": 10.1,
+        "latency_change_pct": -36.27474877796008,
+        "control_drift_pct": 1.9108280254777066
+      },
+      "complete_median_us": {
+        "baseline_us": 82.61183329281587,
+        "candidate_us": 99.5,
+        "latency_change_pct": 20.44279376699507,
+        "control_drift_pct": 3.6352433764633263
+      }
+    },
+    {
+      "round": 2,
+      "wait": "hybrid100",
+      "workload": "chain400",
+      "submit_median_us": {
+        "baseline_us": 16.54992447112675,
+        "candidate_us": 10.9,
+        "latency_change_pct": -34.138672239765775,
+        "control_drift_pct": -0.6024096385542244
+      },
+      "complete_median_us": {
+        "baseline_us": 505.1999109263579,
+        "candidate_us": 482.55,
+        "latency_change_pct": -4.483356080729706,
+        "control_drift_pct": -0.1186943620178127
+      }
+    },
+    {
+      "round": 2,
+      "wait": "poll",
+      "workload": "increment",
+      "submit_median_us": {
+        "baseline_us": 17.66578614157887,
+        "candidate_us": 9.2,
+        "latency_change_pct": -47.921932676709325,
+        "control_drift_pct": -11.702127659574469
+      },
+      "complete_median_us": {
+        "baseline_us": 78.2154076892782,
+        "candidate_us": 65.0,
+        "latency_change_pct": -16.89616928390667,
+        "control_drift_pct": -3.083700440528625
+      }
+    },
+    {
+      "round": 2,
+      "wait": "poll",
+      "workload": "pipeline",
+      "submit_median_us": {
+        "baseline_us": 15.974980438172686,
+        "candidate_us": 8.7,
+        "latency_change_pct": -45.539839415320394,
+        "control_drift_pct": 0.31347962382446415
+      },
+      "complete_median_us": {
+        "baseline_us": 82.69848849888369,
+        "candidate_us": 98.5,
+        "latency_change_pct": 19.10737643207301,
+        "control_drift_pct": 1.2165450121654597
+      }
+    },
+    {
+      "round": 2,
+      "wait": "poll",
+      "workload": "chain400",
+      "submit_median_us": {
+        "baseline_us": 16.6,
+        "candidate_us": 9.0,
+        "latency_change_pct": -45.78313253012048,
+        "control_drift_pct": 0.0
+      },
+      "complete_median_us": {
+        "baseline_us": 504.69880126665646,
+        "candidate_us": 399.25,
+        "latency_change_pct": -20.893412269260136,
+        "control_drift_pct": -0.43495452748121277
+      }
+    }
+  ],
+  "caveats": [
+    "Both data heaps are resident CPU-visible system memory; allocations are separate.",
+    "ISA placement, cache policy, state programming and native wait implementation differ.",
+    "Native wait uses an OS event on WDDM and the driver's fence wait on L0.",
+    "Hybrid budgets 50/100 us after submit, checked every 32 polls; OS scheduling can extend wall time.",
+    "Thread cycles include timer/counter overhead and are CPU execution cost, not wall time or a power measurement.",
+    "Poll uses pause loops with bounded completion checks on both backends.",
+    "Native-wait calls count fallback invocation, not confirmed OS blocking or context switches.",
+    "Wait-policy medians come from separate processes; per-policy comparisons are observations, not direct A/B/A policy pairs.",
+    "CPU-cycle counters are collected outside wall-clock timing; their interval includes timer/counter overhead.",
+    "Only the calling thread is counted; driver/background threads and total system CPU use are not measured.",
+    "These workloads use no scratch/private memory and do not establish full-model speedup.",
+    "No production wait policy has been changed."
+  ],
+  "build": {
+    "complete": true,
+    "commands": [
+      {
+        "label": "configure",
+        "args": [
+          "cmake",
+          "-S",
+          "G:\\GitHub\\Strata\\orca-l0",
+          "-B",
+          "G:\\GitHub\\Strata\\build-orca-native-lower-20261031\\windows-dg2-waits-build-v1\\build",
+          "-G",
+          "Ninja",
+          "-DCMAKE_BUILD_TYPE=Release",
+          "-DORCA_L0_BUILD_RUNTIME=ON",
+          "-DORCA_L0_BUILD_WDDM_BACKEND=ON",
+          "-DORCA_L0_BUILD_WDDM_CHECKS=ON",
+          "-DORCA_L0_BUILD_GPU_CHECKS=OFF",
+          "-DORCA_L0_DIRECT_DRIVER=ON",
+          "-DORCA_L0_SDK=C:/Program Files/LevelZeroSDK/1.33.1",
+          "-DORCA_L0_WDDM_ZEBIN=G:\\GitHub\\Strata\\build-orca-native-lower-20261031\\first-check\\loader-native-pack\\image_0.zebin",
+          "-DCMAKE_CXX_COMPILER=C:/Program Files (x86)/Intel/oneAPI/compiler/2025.3/bin/icx.exe"
+        ],
+        "exit_code": 0
+      },
+      {
+        "label": "build",
+        "args": [
+          "cmake",
+          "--build",
+          "G:\\GitHub\\Strata\\build-orca-native-lower-20261031\\windows-dg2-waits-build-v1\\build",
+          "--target",
+          "orca-l0-dg2-bench",
+          "orca-l0-dg2-check",
+          "orca-l0-wddm-baseline-check",
+          "orca-l0-ring-check",
+          "-j",
+          "1"
+        ],
+        "exit_code": 0
+      },
+      {
+        "label": "ctest",
+        "args": [
+          "ctest",
+          "--test-dir",
+          "G:\\GitHub\\Strata\\build-orca-native-lower-20261031\\windows-dg2-waits-build-v1\\build",
+          "--output-on-failure",
+          "-R",
+          "^(orca-l0-ring|orca-l0-dg2-cpu|orca-l0-dg2-gpu)$"
+        ],
+        "exit_code": 0
+      }
+    ]
+  },
+  "validation": {
+    "windows_ctest_passed": 3,
+    "windows_ctest_total": 3,
+    "measured_processes_all_passed": true,
+    "samples_checked_outside_timing": true,
+    "archived_source_bytes_match_sha256": true,
+    "level_zero_intel_umd_compiler_gmm_absent_in_candidate": true,
+    "fixed_harness_ctest_passed": 7,
+    "fixed_harness_ctest_total": 7
+  },
+  "source_sha256": {
+    "tools/bench_orca_wddm.py": "1e14f1efc03ac5d5ba8c37a402ee379fbba121b722ab56f320ec12ee23c930b6",
+    "orca-l0/tests/wddm_memory_check.cpp": "3e8b17e4b72db0a7b4e53737d747cfc299cceb9207e7d520ba03c43cbbe7071e",
+    "orca-l0/src/drm/encoding.hpp": "8730c6176bfa5f1b96911524ee41ad1264696da70bce1d9634bf4ab08f50a558",
+    "orca-l0/src/wddm/runtime.cpp": "aff3d6cf7eb6b855aec363f3a71c015edd5d2314e783f2e6a9ab8ae0bec33549",
+    "orca-l0/src/drm/recording.inl": "bb2ad0ffb5ab1041f75ae94b3f4b31de6aa7d7d45189aea70df8c7209dc88e57",
+    "orca-l0/src/drm/arguments.hpp": "e42e4940a843cc81e7c7aace31f30b256df0e6a3f129ad2635f6e6b643cbfd15",
+    "orca-l0/src/drm/zebin.hpp": "ec9e0239f5e71b29c35c8f0db86a68fb2237c16a0508b0bb541e918bc560bd26",
+    "orca-l0/include/orca_l0/dg2.hpp": "9a7354f0e903aecffa1b7637bebdbe4a7c0bf008114c2e00b2f2d19621940778",
+    "orca-l0/CMakeLists.txt": "3a4e59d2f4c5b4b5bc78c8af8b92dc9cf8e114751ba241594becdd6cd6fa2ea7",
+    "orca-l0/third_party/intel-dg2/packets.hpp": "579559e752d0e4d4d44b903dea0a8f2d172afdd6d0fad63afa445d183bc1165b",
+    "orca-l0/src/runtime.cpp": "2065f4be1abade4be029573f02d58d73f1b7d6a23cfc5ee85140669880bcf531",
+    "orca-l0/src/direct_driver.cpp": "7fe701e2c34dccd80868685b29b83fc846406bf531faa4579a220c7bc4107548",
+    "orca-l0/include/orca_l0/runtime.hpp": "1b800beb8a4ec7b1777192afc599a4cf519870acd2438b1aea43e79ffafc0869"
+  },
+  "executable_sha256": {
+    "baseline": "c31b63d07352ff5256b90dd3b112541b3a53abe0d23b518c7bc595b83b773932",
+    "candidate": "641775c271bb7f9f44f8916eab808b84de8fb7f23ddcf8c0c63d64aeff0eaab2"
+  },
+  "image_sha256": "94e4970f3f8f9820a25ece27e3ea6ea2a792d1f34a520326a47ce1a10e397800",
+  "driver_path": "C:\\Windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\ze_intel_gpu64.dll",
+  "driver_sha256": "e291d6c88c85d85751d3e2ba26d5510e1abb3a1f6d255f8f25b9aa2843ecf96d",
+  "production_sha256": {
+    "strata-iq2_xs.json": "9c45e51de69e66c3f1cd020359c8d70d639fbd1aba5d87ead84082fbe73fd531",
+    "build-orca-default-pair-20261031/strata.exe": "7be641375e905b0ceb64424ab4875afcdf9f7f6f1e2c60d6b0fcff4ece5ff4b5"
+  },
+  "local_evidence": "build-orca-native-lower-20261031\\windows-dg2-wait-modes-v1"
+}

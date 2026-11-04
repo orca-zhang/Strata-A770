@@ -1,4 +1,12 @@
-# Strata native Level Zero integration
+# Strata integration: Orca Direct and Orca L0
+
+**Orca L0 is the recommended path. Orca Direct is WIP and an alternative.**
+Orca L0 uses Level Zero. Orca Direct names the DG2 backend (`STRATA_ORCA_DG2=ON`),
+with Windows D3DKMT or Linux DRM submission. Installer runtime identifiers
+remain `orca`. The [2026-11-04 frozen-version comparison](../../bench/results/a770/orca-direct-anchor-2026-11-04.md)
+records **49.30 tok/s Direct / 56.24 tok/s bracketed L0**. Linux GPU execution
+remains unvalidated. The build flow and historical measurements below describe
+the L0 path unless explicitly marked DG2/Direct.
 
 This is Strata's native Orca backend, now selected by the Intel installer. It builds a separate `strata`
 executable with native device/context ownership, memory, queues, events and

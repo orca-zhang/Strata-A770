@@ -1,0 +1,124 @@
+{
+  "schema": 1,
+  "scope": "Matching shared/routed expert stages on Windows A770 C0, V11 runtime.",
+  "production_changed": false,
+  "candidate_adopted": false,
+  "evidence_files": 79,
+  "checks": {
+    "exact_model_requests": 240,
+    "full_buffer_comparisons": 864,
+    "recompiled_host_objects": 2,
+    "reused_host_objects": 78,
+    "staged_format_layers": 43,
+    "total_layers": 48,
+    "policy": {
+      "step": 0.5,
+      "last": 0.5,
+      "cumulative": 0,
+      "max_mtp": 4,
+      "expert_slots": 5771,
+      "reserve_mib": 1536
+    },
+    "physical_concurrency_proven": false,
+    "linux_gpu_validated": false,
+    "comparisons": {
+      "decode_tok_s": {
+        "serial": 47.68404330339792,
+        "stage": 48.15690078881727,
+        "fork": 48.576268382973836,
+        "l0": 48.626016563744415,
+        "fork_vs_serial_pct": 1.8711187595795487,
+        "fork_vs_stage_pct": 0.8708359285735989,
+        "fork_vs_l0_pct": -0.10230774446712276,
+        "serial_drift_pct": 0.1412729968104376,
+        "stage_drift_pct": 0.11093855430446276,
+        "l0_drift_pct": -0.03837342419410472
+      },
+      "ttft_ms": {
+        "serial": 892.0733554747156,
+        "stage": 887.8319838630119,
+        "fork": 885.1349000033224,
+        "l0": 881.290817933923,
+        "fork_vs_serial_pct": -0.7777897892377816,
+        "fork_vs_stage_pct": -0.3037831378809308,
+        "fork_vs_l0_pct": 0.43618769096123167,
+        "serial_drift_pct": 0.25434342667647325,
+        "stage_drift_pct": -0.038108056730190576,
+        "l0_drift_pct": -0.15264225083748695
+      },
+      "prompt_ms": {
+        "serial": 845.2738816502022,
+        "stage": 841.8249818103524,
+        "fork": 840.05,
+        "l0": 837.7747280743195,
+        "fork_vs_serial_pct": -0.6180105364197219,
+        "fork_vs_stage_pct": -0.21084926780567947,
+        "fork_vs_l0_pct": 0.2715851707427719,
+        "serial_drift_pct": 0.3258679938381137,
+        "stage_drift_pct": -0.04156769596198595,
+        "l0_drift_pct": -0.16101139006501342
+      },
+      "request_ms": {
+        "serial": 2440.3822946687815,
+        "stage": 2418.9237133344545,
+        "fork": 2402.8016999945976,
+        "l0": 2400.042723018252,
+        "fork_vs_serial_pct": -1.5399470302780771,
+        "fork_vs_stage_pct": -0.6664953198392887,
+        "fork_vs_l0_pct": 0.1149553276649895,
+        "serial_drift_pct": -0.14076808973738641,
+        "stage_drift_pct": 0.08370238393946572,
+        "l0_drift_pct": -0.07677747554074577
+      }
+    },
+    "reverse_comparisons": {
+      "decode_tok_s": {
+        "serial": 46.79947082632572,
+        "fork": 47.9361080033887,
+        "l0": 47.29585093179847,
+        "fork_vs_serial_pct": 2.4287393788726463,
+        "fork_vs_l0_pct": 1.3537277773340017,
+        "fork_drift_pct": -3.1280437619586876,
+        "l0_drift_pct": -4.711076600583597
+      },
+      "ttft_ms": {
+        "serial": 911.04195000662,
+        "fork": 899.5375418867293,
+        "l0": 907.0788847297625,
+        "fork_vs_serial_pct": -1.2627747953655843,
+        "fork_vs_l0_pct": -0.831387762408331,
+        "fork_drift_pct": 2.025929254770631,
+        "l0_drift_pct": 4.777784467582413
+      },
+      "prompt_ms": {
+        "serial": 863.15,
+        "fork": 853.7601404961466,
+        "l0": 862.0145242395862,
+        "fork_vs_serial_pct": -1.087859526600632,
+        "fork_vs_l0_pct": -0.9575689865227166,
+        "fork_drift_pct": 1.9513925847081781,
+        "l0_drift_pct": 4.785654910343196
+      },
+      "request_ms": {
+        "serial": 2501.374850020511,
+        "fork": 2443.3521691831393,
+        "l0": 2467.5697813231527,
+        "fork_vs_serial_pct": -2.3196315752873287,
+        "fork_vs_l0_pct": -0.9814357560752551,
+        "fork_drift_pct": 3.1138735576226706,
+        "l0_drift_pct": 4.88855537702606
+      }
+    },
+    "changed_isa": {
+      "shared_expert": 0,
+      "iq_kernels": 0
+    }
+  },
+  "caveats": [
+    "Decode excludes preparation/init/prefill; TTFT is separate. No inner timing or GPU telemetry.",
+    "Control drift is not a confidence interval; independent command submission does not prove hardware concurrency.",
+    "An archive-index assertion and a missing summary import were corrected without repeating completed GPU work; original runner/errors are retained.",
+    "Unchanged Host objects/headers/grouped kernels reference the prior immutable trial; model and binary artifacts use hashes."
+  ],
+  "archive_sha256": "1abdad0162c4b344c4164bc136450015ea5988b4821448ea64b28ff983edefb6"
+}

@@ -521,6 +521,10 @@ before). A relative path is in the Strata folder; one file per model, and a prof
 (point the key at another file). The file is a fingerprint of what you used the model for: it stays on your PC.
 Without the key nothing is counted or written. Setup rewrites the config when run again: add the key again then.
 
+The Intel engine (SYCL, native DG2 and Orca L0) also saves after its first completed response with output,
+unless the interval is `0`. A cancelled response does not trigger this save; a failed write is retried after
+the next completed response. The existing interval and exit saves still apply.
+
 ---
 
 ## Using it

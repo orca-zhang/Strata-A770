@@ -1,0 +1,459 @@
+{
+  "date": "2026-11-03",
+  "timezone": "Asia/Shanghai",
+  "hardware": "Intel Arc A77016GB / Xeon E5-2696 v4 / Windows",
+  "production_changed": false,
+  "baseline_exe": "build-orca-mtp-budget-20261102/strata.exe",
+  "baseline_exe_sha256": "ed9a7c7525464375b812b2ebc3542f707c326e411d27882b075a1fa2206d5d8b",
+  "baseline_config_sha256": "102adb6093592ebaf373970c096e23e14b92c18063f9c105d149ef483463a4df",
+  "controls": {
+    "expert_slots": 5771,
+    "kv": "fp16",
+    "full_draft_vocab": 248320,
+    "verifier_capacity": 6,
+    "mtp_max": 4,
+    "lookup": 3,
+    "adapt_every": 1,
+    "adapt_swaps": 32,
+    "decay": 0.5,
+    "cumulative_confidence": 0.5,
+    "remaining_budget_pruning": true,
+    "prompt_cache_mib": 128,
+    "max_new_tokens": 128,
+    "production_pcie_and_adapt_enabled": true
+  },
+  "null_calibration": {
+    "scope": "Three independent engines with identical executable, arguments and environment; generic middle label B has no changed setting.",
+    "warmup_per_arm_case": 6,
+    "retained_per_arm_case": 3,
+    "comparisons": [
+      {
+        "case": "Code2K",
+        "median_ms_per_token": [
+          31.046875,
+          30.63671875,
+          31.22265625
+        ],
+        "baseline": 31.134641571113658,
+        "candidate": 30.63671875,
+        "throughput_change_pct": 1.6252485299642627,
+        "baseline_drift_pct": 0.5661801711122294,
+        "passes_1pct": true
+      },
+      {
+        "case": "Prose2K",
+        "median_ms_per_token": [
+          33.33515625,
+          33.4203125,
+          33.5921875
+        ],
+        "baseline": 33.46342509504664,
+        "candidate": 33.4203125,
+        "throughput_change_pct": 0.1290011727048901,
+        "baseline_drift_pct": 0.7710515831165665,
+        "passes_1pct": false
+      }
+    ],
+    "calibration_gate": {
+      "max_abs_baseline_drift_pct": 3,
+      "max_abs_null_middle_deviation_pct": 3
+    },
+    "calibration_passed": true,
+    "raw_protocol_audit_passed": true,
+    "telemetry_audit_passed": true,
+    "requests": 54,
+    "output_tokens": 6912,
+    "total_monitor_samples": 504,
+    "retained_request_samples": 77,
+    "telemetry_summary": [
+      {
+        "label": "A0",
+        "case": "Code2K",
+        "median_tok_s": 32.20936084549572,
+        "min_gpu_mhz": 2400.0,
+        "max_gpu_mhz": 2400.0,
+        "throttled_samples": 0,
+        "min_free_mib": 1378.27734375,
+        "max_temperature_c": 54.0
+      },
+      {
+        "label": "A0",
+        "case": "Prose2K",
+        "median_tok_s": 29.998359464716774,
+        "min_gpu_mhz": 2400.0,
+        "max_gpu_mhz": 2400.0,
+        "throttled_samples": 0,
+        "min_free_mib": 1370.03515625,
+        "max_temperature_c": 56.0
+      },
+      {
+        "label": "B",
+        "case": "Code2K",
+        "median_tok_s": 32.640571209996175,
+        "min_gpu_mhz": 2400.0,
+        "max_gpu_mhz": 2400.0,
+        "throttled_samples": 0,
+        "min_free_mib": 1447.47265625,
+        "max_temperature_c": 54.0
+      },
+      {
+        "label": "B",
+        "case": "Prose2K",
+        "median_tok_s": 29.921922483519566,
+        "min_gpu_mhz": 1350.0,
+        "max_gpu_mhz": 2400.0,
+        "throttled_samples": 0,
+        "min_free_mib": 1364.87109375,
+        "max_temperature_c": 54.0
+      },
+      {
+        "label": "A1",
+        "case": "Code2K",
+        "median_tok_s": 32.028024521456274,
+        "min_gpu_mhz": 2400.0,
+        "max_gpu_mhz": 2400.0,
+        "throttled_samples": 0,
+        "min_free_mib": 1235.875,
+        "max_temperature_c": 54.0
+      },
+      {
+        "label": "A1",
+        "case": "Prose2K",
+        "median_tok_s": 29.76882645704451,
+        "min_gpu_mhz": 2400.0,
+        "max_gpu_mhz": 2400.0,
+        "throttled_samples": 0,
+        "min_free_mib": 1393.27734375,
+        "max_temperature_c": 56.0
+      }
+    ],
+    "pci_status_codes": [
+      2013265923
+    ],
+    "retained_min_free_mib": 1235.875,
+    "retained_gpu_mhz_range": [
+      1350.0,
+      2400.0
+    ],
+    "retained_max_sensor_temperature_c": 56.0,
+    "retained_throttled_samples": 0,
+    "artifacts_sha256": {
+      "build-deepinfer-next-20261102\\baseline-monitored-calibration\\0-A0.protocol": "41b9a3f6c99abd0a4a4e9034594ca534c8c7560f6428321ac48c6ff86c465784",
+      "build-deepinfer-next-20261102\\baseline-monitored-calibration\\0-A0.stderr": "3f7921778fe23837e1f305126939f8a0b77dd4f5eed926001810132bad769cdf",
+      "build-deepinfer-next-20261102\\baseline-monitored-calibration\\0-A1.protocol": "8689b0b2d4decefae081046ad1ec02b871d4bd65f68e71d36946bcfe8205520a",
+      "build-deepinfer-next-20261102\\baseline-monitored-calibration\\0-A1.stderr": "c4a2818a2f01ca2e6cad0fc61f4026f44a2371afa73564e07e1cf6dcabfd8b74",
+      "build-deepinfer-next-20261102\\baseline-monitored-calibration\\0-B.protocol": "541622d2951d7fc15dd5fe8ff735d09ba1a867340b7a3cf836bcacc7dbfeb8e7",
+      "build-deepinfer-next-20261102\\baseline-monitored-calibration\\0-B.stderr": "869f80707478b0c62b8f2f9f2a4da987761738b6af2b65c350c269c665919e98",
+      "build-deepinfer-next-20261102\\baseline-monitored-calibration\\bench_monitored_swaps.py": "df0af4e02686f49474d3d180fee90ca6456c3db61941137e232727fcdc61cf8d",
+      "build-deepinfer-next-20261102\\baseline-monitored-calibration\\monitor-audit.json": "796b8aebaf14eb3e9dd1527ba810294b8e0938b73a8b7a4ba966fded12556cf5",
+      "build-deepinfer-next-20261102\\baseline-monitored-calibration\\monitor.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "build-deepinfer-next-20261102\\baseline-monitored-calibration\\monitor.stdout": "91c3585754d1613fa7512cb3b5dcf88c7d2d177eb3f49152b0738306549f8d40",
+      "build-deepinfer-next-20261102\\baseline-monitored-calibration\\results.json": "c429ca60cd63ab2f74e857dc54abdc9ff78c6278ce26f8622f759e41c0cedcde"
+    }
+  },
+  "stricter_adoption_gate": {
+    "geomean_min_pct": 3.5,
+    "max_abs_baseline_drift_pct": 3,
+    "max_scene_regression_pct": 2,
+    "full_four_case_screen_required": true,
+    "independent_unmonitored_confirmation_required": true,
+    "functional_sampling_required": true,
+    "reason": "Null middleCode2K deviation reached1.62524853%; gate tightened before candidate measurements."
+  },
+  "plans_sha256": {
+    "build-deepinfer-next-20261102\\baseline-calibration-plan.json": "a692daa796f2d091694cbb9895e327cf29203c590a3b66b76a1afacce901c477",
+    "build-deepinfer-next-20261102\\monitored-swaps16-plan-20261103.json": "df5e6aeb2c0e55abb525964f9e8465fb9f23b54a9e8e69360de1535b1a473a3a",
+    "build-deepinfer-next-20261102\\monitored-swaps16-gate-calibrated-20261103.json": "58561e0df4eda62124ab56f1f8f68086e5c2d482f8ff2f06c86fc3662b516a73",
+    "build-deepinfer-next-20261102\\swaps16-startup-guard-20261103.json": "9d7fd6341666f1186acc8e1267baa00f447b80cdf43ac2fa063c60446f76edf4"
+  },
+  "auditors_sha256": {
+    "build-deepinfer-next-20261102\\audit_window.py": "69b59585162ae3aaddb5bbdc6b53b1ef27acecc738166f11c8fe7da543ed4c0a",
+    "build-deepinfer-next-20261102\\audit_monitored.py": "66555535b67b81528e3934001a1df78f2d3ca02d6dffc0d172554dbf3a855fdc"
+  },
+  "limitation": "Only two repeated2K inputs calibrated. Whole-request approximate1Hz sampling cannot prove instantaneous minima or fixed clocks, isolate decode-only GPU time, identify old drift causes, or establish monitor overhead. No power, CPU frequency or usable PCIe traffic counters. No production performance gain inferred from null differences.",
+  "swaps16_monitored_screen": {
+    "adopted": false,
+    "production_changed": false,
+    "reason": "Long8K warm timing exceeds3% baseline drift, preventing a valid four-case gate. Additional startup guard found valid Code2K first3-request regression9.8474%; do not globally reduce swap limit.",
+    "independent_unmonitored_confirmation_run": false,
+    "functional_sampling_run": false,
+    "scope": "Same frozen budgetEXE/images; only --adapt-swaps32 to16. Six warmups and three retained requests per case/arm; repeated prompts with128MiB prompt cache.",
+    "raw_protocol_audit_passed": true,
+    "telemetry_audit_passed": true,
+    "only_swap_limit_differs_verified": true,
+    "warm": {
+      "comparisons": [
+        {
+          "case": "Short",
+          "median_ms_per_token": [
+            26.928571428571427,
+            25.80142857142857,
+            26.12857142857143
+          ],
+          "baseline": 26.52555564056701,
+          "candidate": 25.80142857142857,
+          "throughput_change_pct": 2.8065386656160207,
+          "baseline_drift_pct": -2.970822281167096,
+          "passes_1pct": true
+        },
+        {
+          "case": "Code2K",
+          "median_ms_per_token": [
+            30.40078125,
+            29.12265625,
+            29.74921875
+          ],
+          "baseline": 30.073235469053685,
+          "candidate": 29.12265625,
+          "throughput_change_pct": 3.264053975343284,
+          "baseline_drift_pct": -2.143242618148178,
+          "passes_1pct": true
+        },
+        {
+          "case": "Prose2K",
+          "median_ms_per_token": [
+            32.91875,
+            31.41484375,
+            32.0609375
+          ],
+          "baseline": 32.487012579308136,
+          "candidate": 31.41484375,
+          "throughput_change_pct": 3.4129370110527413,
+          "baseline_drift_pct": -2.6058477311562633,
+          "passes_1pct": true
+        },
+        {
+          "case": "Long8K",
+          "median_ms_per_token": [
+            36.74453125,
+            32.953125,
+            35.0640625
+          ],
+          "baseline": 35.89446392249372,
+          "candidate": 32.953125,
+          "throughput_change_pct": 8.925826981488761,
+          "baseline_drift_pct": -4.573384644823852,
+          "passes_1pct": false
+        }
+      ],
+      "raw_geometric_mean_throughput_change_pct": 4.572842131201327,
+      "geometric_mean_valid": false,
+      "excluded_timing_cases": [
+        "Long8K"
+      ],
+      "passes_numeric_adoption_gate": false
+    },
+    "startup_guard": {
+      "definition": "First3 requests per case, median decode_ms/generated, same A/B/A formula.",
+      "introduced_after_candidate_short_warming_observation_before_final_A1": true,
+      "comparisons": [
+        {
+          "case": "Short",
+          "median_ms_per_token": [
+            35.26285714285714,
+            40.16285714285714,
+            34.04857142857143
+          ],
+          "throughput_change_pct": -13.725272571786018,
+          "baseline_drift_pct": -3.443526170798905,
+          "timing_valid": false
+        },
+        {
+          "case": "Code2K",
+          "median_ms_per_token": [
+            31.30703125,
+            34.3546875,
+            30.63984375
+          ],
+          "throughput_change_pct": -9.847408762981368,
+          "baseline_drift_pct": -2.1311107229306514,
+          "timing_valid": true
+        },
+        {
+          "case": "Prose2K",
+          "median_ms_per_token": [
+            32.865625,
+            32.25546875,
+            32.0859375
+          ],
+          "throughput_change_pct": 0.6757692729935538,
+          "baseline_drift_pct": -2.3723495293334618,
+          "timing_valid": true
+        },
+        {
+          "case": "Long8K",
+          "median_ms_per_token": [
+            36.67890625,
+            33.27734375,
+            36.29609375
+          ],
+          "throughput_change_pct": 9.645163480849273,
+          "baseline_drift_pct": -1.043685701505892,
+          "timing_valid": true
+        }
+      ],
+      "passes": false,
+      "limitation": "Repeated cached-prompt learning stage, not a general cold-start, new-prompt or total-latency benchmark."
+    },
+    "requests": 108,
+    "output_tokens": 12258,
+    "total_monitor_samples": 914,
+    "retained_request_samples": 135,
+    "telemetry_summary": [
+      {
+        "label": "A0",
+        "case": "Code2K",
+        "median_tok_s": 32.89389150155475,
+        "min_gpu_mhz": 2400.0,
+        "max_gpu_mhz": 2400.0,
+        "throttled_samples": 0,
+        "min_free_mib": 1708.23046875,
+        "max_temperature_c": 54.0
+      },
+      {
+        "label": "A0",
+        "case": "Long8K",
+        "median_tok_s": 27.21493419513958,
+        "min_gpu_mhz": 2400.0,
+        "max_gpu_mhz": 2400.0,
+        "throttled_samples": 0,
+        "min_free_mib": 1588.3828125,
+        "max_temperature_c": 54.0
+      },
+      {
+        "label": "A0",
+        "case": "Prose2K",
+        "median_tok_s": 30.377824188342508,
+        "min_gpu_mhz": 2400.0,
+        "max_gpu_mhz": 2400.0,
+        "throttled_samples": 0,
+        "min_free_mib": 1706.38671875,
+        "max_temperature_c": 56.0
+      },
+      {
+        "label": "A0",
+        "case": "Short",
+        "median_tok_s": 37.13527851458886,
+        "min_gpu_mhz": 2400.0,
+        "max_gpu_mhz": 2400.0,
+        "throttled_samples": 0,
+        "min_free_mib": 1718.15234375,
+        "max_temperature_c": 48.0
+      },
+      {
+        "label": "B",
+        "case": "Code2K",
+        "median_tok_s": 34.33752716152051,
+        "min_gpu_mhz": 2400.0,
+        "max_gpu_mhz": 2400.0,
+        "throttled_samples": 0,
+        "min_free_mib": 1669.796875,
+        "max_temperature_c": 54.0
+      },
+      {
+        "label": "B",
+        "case": "Long8K",
+        "median_tok_s": 30.346135609293505,
+        "min_gpu_mhz": 2400.0,
+        "max_gpu_mhz": 2400.0,
+        "throttled_samples": 0,
+        "min_free_mib": 1894.078125,
+        "max_temperature_c": 56.0
+      },
+      {
+        "label": "B",
+        "case": "Prose2K",
+        "median_tok_s": 31.832085747680985,
+        "min_gpu_mhz": 2400.0,
+        "max_gpu_mhz": 2400.0,
+        "throttled_samples": 0,
+        "min_free_mib": 1674.99609375,
+        "max_temperature_c": 56.0
+      },
+      {
+        "label": "B",
+        "case": "Short",
+        "median_tok_s": 38.757543879076465,
+        "min_gpu_mhz": 2400.0,
+        "max_gpu_mhz": 2400.0,
+        "throttled_samples": 0,
+        "min_free_mib": 1642.140625,
+        "max_temperature_c": 54.0
+      },
+      {
+        "label": "A1",
+        "case": "Code2K",
+        "median_tok_s": 33.61432810735576,
+        "min_gpu_mhz": 2400.0,
+        "max_gpu_mhz": 2400.0,
+        "throttled_samples": 0,
+        "min_free_mib": 1899.58984375,
+        "max_temperature_c": 54.0
+      },
+      {
+        "label": "A1",
+        "case": "Long8K",
+        "median_tok_s": 28.519228198386884,
+        "min_gpu_mhz": 2400.0,
+        "max_gpu_mhz": 2400.0,
+        "throttled_samples": 0,
+        "min_free_mib": 1891.6484375,
+        "max_temperature_c": 54.0
+      },
+      {
+        "label": "A1",
+        "case": "Prose2K",
+        "median_tok_s": 31.190603830596032,
+        "min_gpu_mhz": 2400.0,
+        "max_gpu_mhz": 2400.0,
+        "throttled_samples": 0,
+        "min_free_mib": 1897.85546875,
+        "max_temperature_c": 56.0
+      },
+      {
+        "label": "A1",
+        "case": "Short",
+        "median_tok_s": 38.272279934390376,
+        "min_gpu_mhz": 2400.0,
+        "max_gpu_mhz": 2400.0,
+        "throttled_samples": 0,
+        "min_free_mib": 1910.9296875,
+        "max_temperature_c": 52.0
+      }
+    ],
+    "retained_gpu_mhz_range": [
+      2400.0,
+      2400.0
+    ],
+    "retained_throttled_samples": 0,
+    "retained_min_free_mib": 1588.3828125,
+    "retained_max_sensor_temperature_c": 56.0,
+    "pci_status_codes": [
+      2013265923
+    ],
+    "artifacts_sha256": {
+      "build-deepinfer-next-20261102\\swaps16-monitored-screen\\0-A0.protocol": "e4007fda27c941796ee281adc22a32ed315782433e029a2dd46db428ace2776c",
+      "build-deepinfer-next-20261102\\swaps16-monitored-screen\\0-A0.stderr": "18fdcab9c43dce5c6c64cde1bb9f18944fd10414261bedec95b5bc215407e978",
+      "build-deepinfer-next-20261102\\swaps16-monitored-screen\\0-A1.protocol": "3476a3f25499289f57719af64467b69f59fba1cc6cba21d773882699ca5b2fcf",
+      "build-deepinfer-next-20261102\\swaps16-monitored-screen\\0-A1.stderr": "41bb53adf70a3b99f1c244f77386905f23094eeef5fc5c0c0ce9949279fb2464",
+      "build-deepinfer-next-20261102\\swaps16-monitored-screen\\0-B.protocol": "2f0f2e29b4a70980cd548f07d12b0fe4d8e41758057a8c17646f42e60c7c89ac",
+      "build-deepinfer-next-20261102\\swaps16-monitored-screen\\0-B.stderr": "19a8b389f59dc6deb9297aaed8f2b023f8f9f128861e5dcc421deeb10b79c3e1",
+      "build-deepinfer-next-20261102\\swaps16-monitored-screen\\bench_monitored_swaps.py": "df0af4e02686f49474d3d180fee90ca6456c3db61941137e232727fcdc61cf8d",
+      "build-deepinfer-next-20261102\\swaps16-monitored-screen\\monitor-audit.json": "314608fa16bb9d494d1162219d595b7a4505b10f30d2da3e2a309ece4faecc98",
+      "build-deepinfer-next-20261102\\swaps16-monitored-screen\\monitor.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "build-deepinfer-next-20261102\\swaps16-monitored-screen\\monitor.stdout": "cb740805cbde0e958cf6d674e072018046204d60a4ac11bcf72ffc4ad069cac0",
+      "build-deepinfer-next-20261102\\swaps16-monitored-screen\\results.json": "e8e4c3fef0441a77e847c98c0dcbed73044871ea38a69bc11bda4eccaaa50f70"
+    },
+    "limitation": "No stable overall four-case or independently confirmed speedup. Retained whole-request samples all2400MHz with no throttle flag do not explain Long8K drift; no CPU frequency, power or usable PCIe traffic data."
+  },
+  "round_totals": {
+    "requests": 162,
+    "output_tokens": 19170,
+    "all_outputs_exact": true,
+    "raw_protocol_audits_passed": true,
+    "telemetry_clock_and_request_coverage_passed": true,
+    "production_changed": false,
+    "complete_monitor_samples": 1418,
+    "retained_request_samples": 212
+  }
+}

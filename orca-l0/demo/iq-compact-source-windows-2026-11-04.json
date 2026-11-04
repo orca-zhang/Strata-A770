@@ -1,0 +1,303 @@
+{
+  "date": "2026-11-04",
+  "hardware": "Intel Arc A770 G10 C0 0x56a0 revision8",
+  "driver": "32.0.101.9034",
+  "os": "Windows",
+  "complete": true,
+  "source_adopted": true,
+  "production_executables_changed": false,
+  "default_enabled": false,
+  "linux_gpu_tested": false,
+  "before_sha256": {
+    "sycl\\src\\kernels\\cuda\\iq_kernels.dp.cpp": "bca2d712b45280ba678c0819b9f735de832fabd27b6f3d49ff14a29bc3f697d2",
+    "sycl\\orca\\expert_schedule_check.cpp": "a6e024d0e820d306c71e67a3ef829118ac15902d7b250116010097c63fbae22e"
+  },
+  "after_sha256": {
+    "sycl\\src\\kernels\\cuda\\iq_kernels.dp.cpp": "06584af0a688f3ed0288eefb298333c3c481a5642e0f6c2b06fab1038164c48f",
+    "sycl\\orca\\expert_schedule_check.cpp": "7b511136a407602036e2947fab6bd134c96ece81b6abcf8d0456d04158ed21f2"
+  },
+  "checks": {
+    "unchanged_native_capture_abis": 252,
+    "unchanged_sycl_capture_abis": 261,
+    "added_entries": 2,
+    "unchanged_control_zebins": 1242,
+    "exact_prototype_text": true,
+    "native_canonical_cases": 192,
+    "l0_canonical_cases": 192,
+    "canonical_internal_comparisons": 4608,
+    "canonical_tail_epochs": 5504,
+    "new_entry_negative_controls": 4,
+    "repository_checker_comparisons": 1152,
+    "repository_checker_tail_epochs": 1376,
+    "sycl_compilation": {
+      "host_device_compilations": 4,
+      "unchanged_sycl_capture_abis": 261,
+      "added_entries": 2,
+      "added_abis": {
+        "_ZTS16dpct_kernel_nameIJZN6strata7kernels12_GLOBAL__N_122gu_pair_compact_launchILi22ELi16EEEvPN4sycl3_V15queueEPKyPKiSB_SB_PK10block_q8_1NS1_18NativeExpertLayoutEPfSG_xE21gu_pair_compact_wg12818dpct_kernel_scalarILi22EEEE": {
+          "parameters": [
+            [
+              "kind_pointer",
+              "8",
+              "0"
+            ],
+            [
+              "kind_pointer",
+              "8",
+              "8"
+            ],
+            [
+              "kind_pointer",
+              "8",
+              "16"
+            ],
+            [
+              "kind_pointer",
+              "8",
+              "24"
+            ],
+            [
+              "kind_pointer",
+              "8",
+              "32"
+            ],
+            [
+              "kind_std_layout",
+              "64",
+              "40"
+            ],
+            [
+              "kind_pointer",
+              "8",
+              "104"
+            ],
+            [
+              "kind_pointer",
+              "8",
+              "112"
+            ]
+          ],
+          "count": 8,
+          "size": 120
+        },
+        "_ZTS16dpct_kernel_nameIJZN6strata7kernels12_GLOBAL__N_122gu_pair_compact_launchILi42ELi8EEEvPN4sycl3_V15queueEPKyPKiSB_SB_PK10block_q8_1NS1_18NativeExpertLayoutEPfSG_xE21gu_pair_compact_wg12818dpct_kernel_scalarILi42EEEE": {
+          "parameters": [
+            [
+              "kind_pointer",
+              "8",
+              "0"
+            ],
+            [
+              "kind_pointer",
+              "8",
+              "8"
+            ],
+            [
+              "kind_pointer",
+              "8",
+              "16"
+            ],
+            [
+              "kind_pointer",
+              "8",
+              "24"
+            ],
+            [
+              "kind_pointer",
+              "8",
+              "32"
+            ],
+            [
+              "kind_std_layout",
+              "64",
+              "40"
+            ],
+            [
+              "kind_pointer",
+              "8",
+              "104"
+            ],
+            [
+              "kind_pointer",
+              "8",
+              "112"
+            ]
+          ],
+          "count": 8,
+          "size": 120
+        }
+      },
+      "compiler_failure": false,
+      "original_verifier_failure": "Incorrectly expected252native exports rather than261SYCL exports;all four compiler jobs succeeded. Original results/logs retained without recompilation."
+    },
+    "rebuilt_old_texts_exact": 250,
+    "rebuilt_old_resources_equal": 252,
+    "generic_rebuilt_bitwise_v1_comparisons": 252,
+    "generic_dimensions": [
+      512,
+      1024,
+      2048
+    ],
+    "exact_short_requests": 120,
+    "experiment_env": {
+      "ORCA_IQ_PAIR_COMPACT": "1"
+    },
+    "args": [
+      "--pack",
+      "G:\\GitHub\\Strata-data\\packs\\iq2_xs",
+      "--native",
+      "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00001-of-00002.gguf",
+      "--ple-gguf",
+      "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00002-of-00002.gguf",
+      "--expert-profile",
+      "G:\\GitHub\\Strata\\data\\expert-profile.bin",
+      "--expert-cache",
+      "5500",
+      "--prefill",
+      "8192",
+      "--spec",
+      "4",
+      "--spec-min-p",
+      "0.5",
+      "--mtp",
+      "G:\\GitHub\\Strata-data\\mtp\\rt-full-vocab-current",
+      "--max-context",
+      "8192",
+      "--stream-experts",
+      "--vram-reserve-mib",
+      "1536",
+      "--pcie-frac",
+      "0.16",
+      "--prompt-cache",
+      "0",
+      "--short-read",
+      "1024",
+      "--adapt-every",
+      "1",
+      "--adapt-swaps",
+      "32",
+      "--prefill-borrow",
+      "--mtp-window",
+      "1024",
+      "--mtp-hnorm",
+      "stream",
+      "--adapt-decay",
+      "0.5"
+    ],
+    "policy": {
+      "step": 0.5,
+      "last": 0.5,
+      "cumulative": 0,
+      "max_mtp": 4,
+      "expert_slots": 5771,
+      "reserve_mib": 1536
+    },
+    "comparisons": {
+      "decode_tok_s": {
+        "native_control": 50.233843215840544,
+        "native_candidate": 50.25460109143468,
+        "l0_control": 49.94014612040628,
+        "l0_candidate": 50.00333839263736,
+        "native_change_pct": 0.04132249150228251,
+        "l0_change_pct": 0.12653601789374136,
+        "native_candidate_vs_l0_candidate_pct": 0.5024918472929629,
+        "native_control_drift_pct": -0.10901999295193088,
+        "l0_control_drift_pct": -0.08906472527181464
+      },
+      "ttft_ms": {
+        "native_control": 878.9662792575125,
+        "native_candidate": 879.7894499875838,
+        "l0_control": 877.5744451338431,
+        "l0_candidate": 874.6838499937439,
+        "native_change_pct": 0.09365213996226363,
+        "l0_change_pct": -0.3293846073261997,
+        "native_candidate_vs_l0_candidate_pct": 0.5837080442123499,
+        "native_control_drift_pct": 0.043458203855717414,
+        "l0_control_drift_pct": 0.26266961946099787
+      },
+      "prompt_ms": {
+        "native_control": 834.8749966312322,
+        "native_candidate": 835.6500000000001,
+        "l0_control": 835.3994014841046,
+        "l0_candidate": 832.95,
+        "native_change_pct": 0.09282867158497687,
+        "l0_change_pct": -0.29320124957632476,
+        "native_candidate_vs_l0_candidate_pct": 0.32414910858995505,
+        "native_control_drift_pct": -0.017965147613641097,
+        "l0_control_drift_pct": 0.23969319271333056
+      },
+      "request_ms": {
+        "native_control": 2348.8459748992104,
+        "native_candidate": 2348.0656500032637,
+        "l0_control": 2358.1806472288617,
+        "l0_candidate": 2351.9904499844415,
+        "native_change_pct": -0.033221629016355614,
+        "l0_change_pct": -0.2624988569766451,
+        "native_candidate_vs_l0_candidate_pct": -0.1668714250605774,
+        "native_control_drift_pct": -0.0017902248210521776,
+        "l0_control_drift_pct": 0.08297546242510556
+      }
+    },
+    "retained_decode_dispersion": {
+      "l0-before": {
+        "samples": 10,
+        "median_tok_s": 49.962400514092295,
+        "min_tok_s": 49.51785248892364,
+        "max_tok_s": 50.27785128340831,
+        "mad_tok_s": 0.17397775875761567
+      },
+      "native-before": {
+        "samples": 10,
+        "median_tok_s": 50.26124809163933,
+        "min_tok_s": 49.78057247658348,
+        "max_tok_s": 50.65991201173177,
+        "mad_tok_s": 0.09462607841073734
+      },
+      "native-candidate": {
+        "samples": 10,
+        "median_tok_s": 50.25460109143468,
+        "min_tok_s": 49.83279784932136,
+        "max_tok_s": 50.639658848614076,
+        "mad_tok_s": 0.1611379166226108
+      },
+      "l0-candidate": {
+        "samples": 10,
+        "median_tok_s": 50.00333839263736,
+        "min_tok_s": 49.67969669237809,
+        "max_tok_s": 50.30447445062219,
+        "mad_tok_s": 0.13666698515187292
+      },
+      "native-after": {
+        "samples": 10,
+        "median_tok_s": 50.20645328251227,
+        "min_tok_s": 50.049390846229834,
+        "max_tok_s": 50.48827476250582,
+        "mad_tok_s": 0.11417716818946033
+      },
+      "l0-after": {
+        "samples": 10,
+        "median_tok_s": 49.91790163933521,
+        "min_tok_s": 49.74798717025594,
+        "max_tok_s": 50.15177510888214,
+        "mad_tok_s": 0.13935412529671964
+      }
+    }
+  },
+  "evidence_files": 528,
+  "scope": "Minimal shared E3/E4 GU helper/kernel/launch and cached ORCA_IQ_PAIR_COMPACT switch integrated in current source. Existing checker expands toT1..8 and capacity-ending tails. No runtime,policy,production executable or Linux-bundle change.",
+  "caveats": [
+    "Opt in withORCA_IQ_PAIR_COMPACT=1 after rebuilding host and images. Unset/0 retain original4/2/1 path. NoFORMAT_SPLIT/E3 switches are needed in integrated source. Existing A770/format/lane/shape guards remain.",
+    "Two selected kernel texts exactly match the preceding numerical/performance-tested prototype:38784/24192bytes,SIMD16/128GRFs,zeroSLM/private/spill,120bytecaptures. Old252native and261SYCL captureABIs remain;two entries added. Existing1242control mathzebins retained;totalpack grows.",
+    "Both backends compare192canonical fullbuffers acrossT1..8/formats22and42/readyOFF-ON/sixplans/serial-staged-independent replay,including full-capacity E3tails. Fourmissing-entry controls demonstrate newentryselection. The strengthened existing checker also executes1152comparisons/1376epochs.",
+    "Four original/candidate SYCL host/device compiles succeed with current headers and no native overlays. Initial verification incorrectly assumed the native252exportcount forSYCL;original failure retained. Independent verifier validates261unchanged SYCLABIs plus2newentries without recompilation.",
+    "Complete native regeneration keeps250oldtexts byte-identical and all252oldresource records equal. The fixed mixed GU differs only in8post-EOT marker bytes. The generic IQ2_S fallback changes zero-initialization order and scheduling tokens as well as markers;252extra bitwise-v1 comparisons at512/1024/2048dimensions pass using the actual regenerated pack. Raw old/new images and IGA disassembly are retained rather than calling alloldISA identical.",
+    "Six clean model processes retain10of20freshShorts each. All76tokens/57of57drafts/stop/zero reuse-resume exact. Same5771slots/reserve1536/MTP4/step-last0.5/cumulative0;frozen older norm,BCS-fill,expertfork andeight-rowQ8up controls. Decode excludesprep/init/prefill;TTFT separate;no inner probes/GPUtimestamps/histogram/telemetry;clocksunlocked anddrift is not aconfidenceinterval.",
+    "Model comparison is original4/2/1 versus the minimal shared-body integration,not the preceding E3increment. Same-new-math native/L0 comparison is one fresh ordering,not a broad/default speed guarantee. No LinuxGPU validation or new physicaltraffic/copy-lock census.",
+    "Compile-only history pins original live IQsource;this adoption verifier instead validates its immutable original snapshot plus exact live adopted source. Other historical inputs remain hashchecked. Raw protocols/commands/sources/ABIs/selectedimages and canonical representatives archived;model/runtime/toolchain and remaining fullbuffers require pinned external inputs."
+  ],
+  "reproduction": {
+    "verify": "python build-orca-native-lower-20261031/adopt_iq_compact_source.py --verify",
+    "rerun": "Use fresh stage directories with archived commands,matching pinned model/runtime/toolchain inputs and shared GPU lease;preserve completed evidence."
+  },
+  "archive_sha256": "d23dce0ac03c2b72a167a9785a87fb5c2cf146357d8cdc444de27443c78341c4"
+}

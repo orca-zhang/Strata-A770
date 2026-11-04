@@ -1,0 +1,684 @@
+{
+  "date": "2026-10-31",
+  "complete": true,
+  "hardware": {
+    "os": "Windows",
+    "gpu": "Intel Arc A770 16 GB",
+    "pci_device": "0x56a0",
+    "driver": "32.0.101.9034",
+    "wddm": 2700,
+    "compiler": "Intel oneAPI 2025.3.2"
+  },
+  "scope": {
+    "baseline": "Existing Orca L0 -> direct vendor DDI -> Intel UMD -> WDDM",
+    "candidate": "orca::l0::dg2::Runtime -> Orca-encoded walkers -> D3DKMTSubmitCommand",
+    "reusable_backend": true,
+    "original_sycl_comparison": false,
+    "full_model_integrated": false,
+    "end_to_end_speedup_established": false,
+    "linux_gpu_validated": false,
+    "production_changed": false
+  },
+  "method": {
+    "initial_rounds": 3,
+    "additional_poll_chain_rounds": 3,
+    "retry_reason": "Initial poll/chain400 had only 2/3 stable pairs; all three additional attempts retained.",
+    "order": [
+      "baseline",
+      "candidate",
+      "baseline"
+    ],
+    "warmups": 128,
+    "retained_per_process": 512,
+    "processes": 63,
+    "retained_samples": 32256,
+    "timing_excludes": [
+      "setup",
+      "allocation",
+      "module load",
+      "recording",
+      "parameter update",
+      "CPU/guard checks"
+    ],
+    "shared_gpu_lock": true,
+    "gpu_clocks_fixed": false,
+    "stable_pair_max_abs_drift_pct": 3,
+    "stable_pairs_required": 3,
+    "summary": "Median of paired ratios, using geometric mean of each pair of controls."
+  },
+  "workloads": {
+    "increment": {
+      "kernels": 1,
+      "elements": 1024,
+      "local": 64,
+      "groups": 16,
+      "delta": 3
+    },
+    "pipeline": {
+      "kernels": [
+        "rms_norm",
+        "gate_up",
+        "swiglu",
+        "advance"
+      ],
+      "width": 32,
+      "rows": 16,
+      "local": [
+        64,
+        32,
+        16,
+        16
+      ],
+      "groups": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "tolerance": "2e-4 * (1 + abs(expected))"
+    },
+    "chain400": {
+      "kernels": 400,
+      "dependent": true,
+      "elements": 1024,
+      "local": 64,
+      "groups": 16,
+      "delta": 3
+    }
+  },
+  "wait_modes": {
+    "native": "Runtime native wait: DG2 short spin then WDDM OS event; Intel UMD fence wait in control.",
+    "poll": "Same bounded pause loop: Runtime::ready() versus Commands::ready()."
+  },
+  "caveats": [
+    "Both data heaps are resident CPU-visible system memory; allocations are separate.",
+    "ISA placement, cache policy, state programming and native wait implementation differ.",
+    "Native wait uses an OS event on WDDM and the driver's fence wait on L0.",
+    "Poll uses pause loops with bounded completion checks on both backends.",
+    "These workloads use no scratch/private memory; new scratch/private GPU execution remains unvalidated.",
+    "Dispatch completion latency is not full-model token throughput.",
+    "Polling occupies a CPU thread; GPU clocks are not fixed.",
+    "ISA and captured arguments live in separate allocations in the reusable backend."
+  ],
+  "summary": [
+    {
+      "wait": "native",
+      "workload": "increment",
+      "pair_count": 3,
+      "submit_median_us": {
+        "baseline_us": 14.720224183075475,
+        "candidate_us": 11.2,
+        "latency_change_pct": -21.64766290009731,
+        "max_abs_control_drift_pct": 23.684210526315795,
+        "stable_pairs": 0,
+        "stable_latency_change_pct": null
+      },
+      "complete_median_us": {
+        "baseline_us": 73.0155462898142,
+        "candidate_us": 101.7,
+        "latency_change_pct": 39.285405872786484,
+        "max_abs_control_drift_pct": 12.854317732366516,
+        "stable_pairs": 0,
+        "stable_latency_change_pct": null
+      }
+    },
+    {
+      "wait": "native",
+      "workload": "pipeline",
+      "pair_count": 3,
+      "submit_median_us": {
+        "baseline_us": 16.180234856144704,
+        "candidate_us": 11.4,
+        "latency_change_pct": -22.928978140090518,
+        "max_abs_control_drift_pct": 19.45945945945946,
+        "stable_pairs": 0,
+        "stable_latency_change_pct": null
+      },
+      "complete_median_us": {
+        "baseline_us": 100.79866070538834,
+        "candidate_us": 159.35000000000002,
+        "latency_change_pct": 47.29413289224797,
+        "max_abs_control_drift_pct": 16.7202572347267,
+        "stable_pairs": 1,
+        "stable_latency_change_pct": null
+      }
+    },
+    {
+      "wait": "native",
+      "workload": "chain400",
+      "pair_count": 3,
+      "submit_median_us": {
+        "baseline_us": 15.697133496278868,
+        "candidate_us": 12.0,
+        "latency_change_pct": -19.73056734857398,
+        "max_abs_control_drift_pct": 3.749999999999998,
+        "stable_pairs": 2,
+        "stable_latency_change_pct": null
+      },
+      "complete_median_us": {
+        "baseline_us": 496.35874123460343,
+        "candidate_us": 459.45,
+        "latency_change_pct": -6.025630003051985,
+        "max_abs_control_drift_pct": 5.215550423402604,
+        "stable_pairs": 1,
+        "stable_latency_change_pct": null
+      }
+    },
+    {
+      "wait": "poll",
+      "workload": "increment",
+      "pair_count": 3,
+      "submit_median_us": {
+        "baseline_us": 16.321764610482532,
+        "candidate_us": 10.1,
+        "latency_change_pct": -37.50675712202634,
+        "max_abs_control_drift_pct": 21.62162162162162,
+        "stable_pairs": 1,
+        "stable_latency_change_pct": null
+      },
+      "complete_median_us": {
+        "baseline_us": 71.08459748778212,
+        "candidate_us": 69.8,
+        "latency_change_pct": -1.596122828123392,
+        "max_abs_control_drift_pct": 8.957415565345084,
+        "stable_pairs": 2,
+        "stable_latency_change_pct": null
+      }
+    },
+    {
+      "wait": "poll",
+      "workload": "pipeline",
+      "pair_count": 3,
+      "submit_median_us": {
+        "baseline_us": 14.712579651441144,
+        "candidate_us": 9.1,
+        "latency_change_pct": -35.53963745121388,
+        "max_abs_control_drift_pct": 15.328467153284686,
+        "stable_pairs": 0,
+        "stable_latency_change_pct": null
+      },
+      "complete_median_us": {
+        "baseline_us": 92.85472524325297,
+        "candidate_us": 106.25,
+        "latency_change_pct": 11.51583498525206,
+        "max_abs_control_drift_pct": 9.6057745696835,
+        "stable_pairs": 0,
+        "stable_latency_change_pct": null
+      }
+    },
+    {
+      "wait": "poll",
+      "workload": "chain400",
+      "pair_count": 6,
+      "submit_median_us": {
+        "baseline_us": 14.67003864744143,
+        "candidate_us": 9.2,
+        "latency_change_pct": -37.72071820489204,
+        "max_abs_control_drift_pct": 10.65292096219932,
+        "stable_pairs": 2,
+        "stable_latency_change_pct": null
+      },
+      "complete_median_us": {
+        "baseline_us": 496.16598603606747,
+        "candidate_us": 382.29999999999995,
+        "latency_change_pct": -23.41303368992684,
+        "max_abs_control_drift_pct": 4.434250764526004,
+        "stable_pairs": 5,
+        "stable_latency_change_pct": -23.623589606934704
+      }
+    }
+  ],
+  "pairs": [
+    {
+      "round": 0,
+      "wait": "native",
+      "workload": "increment",
+      "submit_median_us": {
+        "baseline_us": 14.294404499663495,
+        "candidate_us": 11.2,
+        "latency_change_pct": -21.64766290009731,
+        "control_drift_pct": 5.755395683453224
+      },
+      "complete_median_us": {
+        "baseline_us": 115.54927520326555,
+        "candidate_us": 136.0,
+        "latency_change_pct": 17.698704523034948,
+        "control_drift_pct": -10.442260442260443
+      }
+    },
+    {
+      "round": 0,
+      "wait": "native",
+      "workload": "pipeline",
+      "submit_median_us": {
+        "baseline_us": 14.791551642745262,
+        "candidate_us": 11.4,
+        "latency_change_pct": -22.928978140090518,
+        "control_drift_pct": 6.9930069930070005
+      },
+      "complete_median_us": {
+        "baseline_us": 128.04311773773708,
+        "candidate_us": 188.6,
+        "latency_change_pct": 47.29413289224797,
+        "control_drift_pct": -13.408430232558132
+      }
+    },
+    {
+      "round": 0,
+      "wait": "native",
+      "workload": "chain400",
+      "submit_median_us": {
+        "baseline_us": 16.124980620143393,
+        "candidate_us": 12.0,
+        "latency_change_pct": -25.581305908612695,
+        "control_drift_pct": -0.3095975232197956
+      },
+      "complete_median_us": {
+        "baseline_us": 496.35874123460343,
+        "candidate_us": 466.45,
+        "latency_change_pct": -6.025630003051985,
+        "control_drift_pct": -2.545743834526648
+      }
+    },
+    {
+      "round": 0,
+      "wait": "poll",
+      "workload": "increment",
+      "submit_median_us": {
+        "baseline_us": 16.321764610482532,
+        "candidate_us": 10.2,
+        "latency_change_pct": -37.50675712202634,
+        "control_drift_pct": 21.62162162162162
+      },
+      "complete_median_us": {
+        "baseline_us": 71.08459748778212,
+        "candidate_us": 69.95,
+        "latency_change_pct": -1.596122828123392,
+        "control_drift_pct": 8.957415565345084
+      }
+    },
+    {
+      "round": 0,
+      "wait": "poll",
+      "workload": "pipeline",
+      "submit_median_us": {
+        "baseline_us": 14.712579651441144,
+        "candidate_us": 10.95,
+        "latency_change_pct": -25.57389486127668,
+        "control_drift_pct": 15.328467153284686
+      },
+      "complete_median_us": {
+        "baseline_us": 92.85472524325297,
+        "candidate_us": 110.65,
+        "latency_change_pct": 19.164641013290897,
+        "control_drift_pct": 6.44444444444443
+      }
+    },
+    {
+      "round": 0,
+      "wait": "poll",
+      "workload": "chain400",
+      "submit_median_us": {
+        "baseline_us": 14.504309704360287,
+        "candidate_us": 9.1,
+        "latency_change_pct": -37.26002694727101,
+        "control_drift_pct": -10.130718954248374
+      },
+      "complete_median_us": {
+        "baseline_us": 489.6498749106345,
+        "candidate_us": 358.5,
+        "latency_change_pct": -26.784419159623095,
+        "control_drift_pct": -0.14285714285715567
+      }
+    },
+    {
+      "round": 1,
+      "wait": "native",
+      "workload": "increment",
+      "submit_median_us": {
+        "baseline_us": 14.93837340542805,
+        "candidate_us": 11.2,
+        "latency_change_pct": -25.025304321752095,
+        "control_drift_pct": -23.684210526315795
+      },
+      "complete_median_us": {
+        "baseline_us": 70.8073795589132,
+        "candidate_us": 100.5,
+        "latency_change_pct": 41.934358573998544,
+        "control_drift_pct": -12.854317732366516
+      }
+    },
+    {
+      "round": 1,
+      "wait": "native",
+      "workload": "pipeline",
+      "submit_median_us": {
+        "baseline_us": 16.602710622064098,
+        "candidate_us": 11.3,
+        "latency_change_pct": -31.938824585770252,
+        "control_drift_pct": -19.45945945945946
+      },
+      "complete_median_us": {
+        "baseline_us": 90.59801322324898,
+        "candidate_us": 126.95,
+        "latency_change_pct": 40.12448560783945,
+        "control_drift_pct": 1.3333333333333197
+      }
+    },
+    {
+      "round": 1,
+      "wait": "native",
+      "workload": "chain400",
+      "submit_median_us": {
+        "baseline_us": 13.84918770181125,
+        "candidate_us": 11.9,
+        "latency_change_pct": -14.074382871973977,
+        "control_drift_pct": -2.1428571428571463
+      },
+      "complete_median_us": {
+        "baseline_us": 484.4026063100817,
+        "candidate_us": 459.45,
+        "latency_change_pct": -5.151212232353009,
+        "control_drift_pct": -3.3985999797098487
+      }
+    },
+    {
+      "round": 1,
+      "wait": "poll",
+      "workload": "increment",
+      "submit_median_us": {
+        "baseline_us": 16.699700596118483,
+        "candidate_us": 10.1,
+        "latency_change_pct": -39.51987377338043,
+        "control_drift_pct": 1.2048192771084265
+      },
+      "complete_median_us": {
+        "baseline_us": 76.6472439165297,
+        "candidate_us": 69.8,
+        "latency_change_pct": -8.933450919626651,
+        "control_drift_pct": 1.7105263157894735
+      }
+    },
+    {
+      "round": 1,
+      "wait": "poll",
+      "workload": "pipeline",
+      "submit_median_us": {
+        "baseline_us": 14.804728974216314,
+        "candidate_us": 9.1,
+        "latency_change_pct": -38.53315372508056,
+        "control_drift_pct": -9.935897435897434
+      },
+      "complete_median_us": {
+        "baseline_us": 95.2779486554995,
+        "candidate_us": 106.25,
+        "latency_change_pct": 11.51583498525206,
+        "control_drift_pct": 4.396782841823055
+      }
+    },
+    {
+      "round": 1,
+      "wait": "poll",
+      "workload": "chain400",
+      "submit_median_us": {
+        "baseline_us": 13.749909090608563,
+        "candidate_us": 8.5,
+        "latency_change_pct": -38.18140946251307,
+        "control_drift_pct": 0.7299270072992803
+      },
+      "complete_median_us": {
+        "baseline_us": 511.4684741017769,
+        "candidate_us": 399.15,
+        "latency_change_pct": -21.95999945041124,
+        "control_drift_pct": -4.434250764526004
+      }
+    },
+    {
+      "round": 2,
+      "wait": "native",
+      "workload": "increment",
+      "submit_median_us": {
+        "baseline_us": 14.720224183075475,
+        "candidate_us": 11.649999999999999,
+        "latency_change_pct": -20.85718359239023,
+        "control_drift_pct": -4.966887417218535
+      },
+      "complete_median_us": {
+        "baseline_us": 73.0155462898142,
+        "candidate_us": 101.7,
+        "latency_change_pct": 39.285405872786484,
+        "control_drift_pct": 3.2707028531663296
+      }
+    },
+    {
+      "round": 2,
+      "wait": "native",
+      "workload": "pipeline",
+      "submit_median_us": {
+        "baseline_us": 16.180234856144704,
+        "candidate_us": 13.5,
+        "latency_change_pct": -16.564869916748094,
+        "control_drift_pct": 10.389610389610393
+      },
+      "complete_median_us": {
+        "baseline_us": 100.79866070538834,
+        "candidate_us": 159.35000000000002,
+        "latency_change_pct": 58.0874179129661,
+        "control_drift_pct": 16.7202572347267
+      }
+    },
+    {
+      "round": 2,
+      "wait": "native",
+      "workload": "chain400",
+      "submit_median_us": {
+        "baseline_us": 15.697133496278868,
+        "candidate_us": 12.6,
+        "latency_change_pct": -19.73056734857398,
+        "control_drift_pct": -3.749999999999998
+      },
+      "complete_median_us": {
+        "baseline_us": 505.8685600034854,
+        "candidate_us": 431.9,
+        "latency_change_pct": -14.622090766616491,
+        "control_drift_pct": -5.215550423402604
+      }
+    },
+    {
+      "round": 2,
+      "wait": "poll",
+      "workload": "increment",
+      "submit_median_us": {
+        "baseline_us": 14.330387294138285,
+        "candidate_us": 10.1,
+        "latency_change_pct": -29.520397511298857,
+        "control_drift_pct": -9.93377483443708
+      },
+      "complete_median_us": {
+        "baseline_us": 69.1712006546077,
+        "candidate_us": 68.1,
+        "latency_change_pct": -1.5486223232650365,
+        "control_drift_pct": 2.118334550766998
+      }
+    },
+    {
+      "round": 2,
+      "wait": "poll",
+      "workload": "pipeline",
+      "submit_median_us": {
+        "baseline_us": 13.49666625504239,
+        "candidate_us": 8.7,
+        "latency_change_pct": -35.53963745121388,
+        "control_drift_pct": -4.34782608695653
+      },
+      "complete_median_us": {
+        "baseline_us": 85.61582797590643,
+        "candidate_us": 93.0,
+        "latency_change_pct": 8.62477441224021,
+        "control_drift_pct": -9.6057745696835
+      }
+    },
+    {
+      "round": 2,
+      "wait": "poll",
+      "workload": "chain400",
+      "submit_median_us": {
+        "baseline_us": 13.93709080116794,
+        "candidate_us": 9.8,
+        "latency_change_pct": -29.68403420907072,
+        "control_drift_pct": -8.247422680412363
+      },
+      "complete_median_us": {
+        "baseline_us": 500.023499447776,
+        "candidate_us": 381.9,
+        "latency_change_pct": -23.623589606934704,
+        "control_drift_pct": -0.4887780548628373
+      }
+    },
+    {
+      "round": 3,
+      "wait": "poll",
+      "workload": "chain400",
+      "submit_median_us": {
+        "baseline_us": 14.835767590522574,
+        "candidate_us": 9.5,
+        "latency_change_pct": -35.965564693337356,
+        "control_drift_pct": -8.387096774193548
+      },
+      "complete_median_us": {
+        "baseline_us": 486.05653992102606,
+        "candidate_us": 382.75,
+        "latency_change_pct": -21.254017061021578,
+        "control_drift_pct": 2.7105921601334515
+      }
+    },
+    {
+      "round": 4,
+      "wait": "poll",
+      "workload": "chain400",
+      "submit_median_us": {
+        "baseline_us": 16.099689437998485,
+        "candidate_us": 9.3,
+        "latency_change_pct": -42.23491058125543,
+        "control_drift_pct": -1.2345679012345623
+      },
+      "complete_median_us": {
+        "baseline_us": 494.008603163953,
+        "candidate_us": 359.55,
+        "latency_change_pct": -27.217866713816818,
+        "control_drift_pct": 1.642857142857146
+      }
+    },
+    {
+      "round": 5,
+      "wait": "poll",
+      "workload": "chain400",
+      "submit_median_us": {
+        "baseline_us": 15.305391207022447,
+        "candidate_us": 8.9,
+        "latency_change_pct": -41.85055527416714,
+        "control_drift_pct": 10.65292096219932
+      },
+      "complete_median_us": {
+        "baseline_us": 498.323368908182,
+        "candidate_us": 382.7,
+        "latency_change_pct": -23.202477772918982,
+        "control_drift_pct": 0.5130268584649489
+      }
+    }
+  ],
+  "build": {
+    "complete": true,
+    "commands": [
+      {
+        "label": "configure",
+        "args": [
+          "cmake",
+          "-S",
+          "G:\\GitHub\\Strata\\orca-l0",
+          "-B",
+          "G:\\GitHub\\Strata\\build-orca-native-lower-20261031\\windows-dg2-perf-build-v1\\build",
+          "-G",
+          "Ninja",
+          "-DCMAKE_BUILD_TYPE=Release",
+          "-DORCA_L0_BUILD_RUNTIME=ON",
+          "-DORCA_L0_BUILD_WDDM_BACKEND=ON",
+          "-DORCA_L0_BUILD_WDDM_CHECKS=ON",
+          "-DORCA_L0_BUILD_GPU_CHECKS=OFF",
+          "-DORCA_L0_DIRECT_DRIVER=ON",
+          "-DORCA_L0_SDK=C:/Program Files/LevelZeroSDK/1.33.1",
+          "-DORCA_L0_WDDM_ZEBIN=G:\\GitHub\\Strata\\build-orca-native-lower-20261031\\first-check\\loader-native-pack\\image_0.zebin",
+          "-DCMAKE_CXX_COMPILER=C:/Program Files (x86)/Intel/oneAPI/compiler/2025.3/bin/icx.exe"
+        ],
+        "exit_code": 0
+      },
+      {
+        "label": "build",
+        "args": [
+          "cmake",
+          "--build",
+          "G:\\GitHub\\Strata\\build-orca-native-lower-20261031\\windows-dg2-perf-build-v1\\build",
+          "--target",
+          "orca-l0-dg2-bench",
+          "orca-l0-dg2-check",
+          "orca-l0-wddm-baseline-check",
+          "orca-l0-ring-check",
+          "-j",
+          "1"
+        ],
+        "exit_code": 0
+      },
+      {
+        "label": "ctest",
+        "args": [
+          "ctest",
+          "--test-dir",
+          "G:\\GitHub\\Strata\\build-orca-native-lower-20261031\\windows-dg2-perf-build-v1\\build",
+          "--output-on-failure",
+          "-R",
+          "^(orca-l0-ring|orca-l0-dg2-cpu|orca-l0-dg2-gpu)$"
+        ],
+        "exit_code": 0
+      }
+    ]
+  },
+  "validation": {
+    "windows_ctest_passed": 3,
+    "windows_ctest_total": 3,
+    "strata_gate_replays": 24,
+    "strata_bf16_gemv_replays": 48,
+    "measured_processes_all_passed": true,
+    "samples_checked_outside_timing": true,
+    "level_zero_intel_umd_compiler_gmm_absent_in_candidate": true
+  },
+  "source_sha256": {
+    "tools/bench_orca_wddm.py": "56b1dc23d91d15c4547d0a867bc52b508e00d1c0ff5926a81afcc924f441cd34",
+    "orca-l0/tests/wddm_memory_check.cpp": "20557d3ed95a45045fe83b74f76cdf418af53d0d8ded4f005981882cdcc16288",
+    "orca-l0/src/drm/encoding.hpp": "8730c6176bfa5f1b96911524ee41ad1264696da70bce1d9634bf4ab08f50a558",
+    "orca-l0/src/wddm/runtime.cpp": "aff3d6cf7eb6b855aec363f3a71c015edd5d2314e783f2e6a9ab8ae0bec33549",
+    "orca-l0/src/drm/recording.inl": "bb2ad0ffb5ab1041f75ae94b3f4b31de6aa7d7d45189aea70df8c7209dc88e57",
+    "orca-l0/src/drm/arguments.hpp": "e42e4940a843cc81e7c7aace31f30b256df0e6a3f129ad2635f6e6b643cbfd15",
+    "orca-l0/src/drm/zebin.hpp": "ec9e0239f5e71b29c35c8f0db86a68fb2237c16a0508b0bb541e918bc560bd26",
+    "orca-l0/include/orca_l0/dg2.hpp": "9a7354f0e903aecffa1b7637bebdbe4a7c0bf008114c2e00b2f2d19621940778",
+    "orca-l0/CMakeLists.txt": "3a4e59d2f4c5b4b5bc78c8af8b92dc9cf8e114751ba241594becdd6cd6fa2ea7",
+    "orca-l0/third_party/intel-dg2/packets.hpp": "579559e752d0e4d4d44b903dea0a8f2d172afdd6d0fad63afa445d183bc1165b",
+    "orca-l0/src/runtime.cpp": "2065f4be1abade4be029573f02d58d73f1b7d6a23cfc5ee85140669880bcf531",
+    "orca-l0/src/direct_driver.cpp": "7fe701e2c34dccd80868685b29b83fc846406bf531faa4579a220c7bc4107548",
+    "orca-l0/include/orca_l0/runtime.hpp": "1b800beb8a4ec7b1777192afc599a4cf519870acd2438b1aea43e79ffafc0869"
+  },
+  "executable_sha256": {
+    "baseline": "7a96b41f0a6d5ae6c5105a45344ade76fc98fe67b59655599af50f386d40dc66",
+    "candidate": "4e189b0871f6e1211ab0c43b1b79b488783ad9cebc012210064d88f5f7b0ae09"
+  },
+  "image_sha256": "94e4970f3f8f9820a25ece27e3ea6ea2a792d1f34a520326a47ce1a10e397800",
+  "driver_path": "C:\\Windows\\System32\\DriverStore\\FileRepository\\iigd_dch_d.inf_amd64_6a5efc7401ff0ebc\\ze_intel_gpu64.dll",
+  "driver_sha256": "e291d6c88c85d85751d3e2ba26d5510e1abb3a1f6d255f8f25b9aa2843ecf96d",
+  "production_sha256": {
+    "strata-iq2_xs.json": "9c45e51de69e66c3f1cd020359c8d70d639fbd1aba5d87ead84082fbe73fd531",
+    "build-orca-default-pair-20261031/strata.exe": "7be641375e905b0ceb64424ab4875afcdf9f7f6f1e2c60d6b0fcff4ece5ff4b5"
+  },
+  "local_evidence": [
+    "build-orca-native-lower-20261031\\windows-dg2-perf-v1",
+    "build-orca-native-lower-20261031\\windows-dg2-perf-poll-chain-retry-v1"
+  ]
+}

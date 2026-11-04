@@ -1,0 +1,292 @@
+{
+  "date": "2026-11-03",
+  "timezone": "Asia/Shanghai",
+  "complete": true,
+  "adopted": false,
+  "production_changed": false,
+  "scope": "Weighted global expert-cache heat margin0.5 ->1.5, existing swap cap32 retained, frozen Orca L0 budget baseline.",
+  "hardware": "Intel Arc A77016GB, Xeon E5-2696v4, Windows",
+  "production": {
+    "exe": "G:\\GitHub\\Strata\\build-orca-mtp-budget-20261102\\strata.exe",
+    "exe_sha256": "ed9a7c7525464375b812b2ebc3542f707c326e411d27882b075a1fa2206d5d8b",
+    "config": "G:\\GitHub\\Strata\\strata-iq2_xs.json",
+    "config_sha256": "102adb6093592ebaf373970c096e23e14b92c18063f9c105d149ef483463a4df"
+  },
+  "plan": {
+    "scope": "Orca L0 weighted heat margin 0.5 -> 1.5, existing non-device margin, cap32 retained; diagnostic before screen",
+    "production_changed": false,
+    "adoption_gate": {
+      "minimum_geometric_mean_throughput_gain_pct": 3.5,
+      "max_case_regression_pct": 2,
+      "max_abs_baseline_elapsed_drift_pct": 3,
+      "early_first_three_requests_guard": true,
+      "full_four_cases_required": true,
+      "independent_unmonitored_confirmation_required": true,
+      "exact_outputs_required": true,
+      "coupled_sampling_if_performance_passes": true
+    },
+    "controls": {
+      "cumulative": 0.5,
+      "adapt_every": 1,
+      "adapt_swaps": 32,
+      "adapt_decay": 0.5,
+      "expert_slots": 5771,
+      "verify": 6,
+      "mtp": 4,
+      "lookup": 3,
+      "kv": "fp16",
+      "draft_vocab": 248320
+    },
+    "screen": {
+      "cases": [
+        "Short",
+        "Code2K",
+        "Prose2K",
+        "Long8K"
+      ],
+      "max_new_tokens": 128,
+      "warmup": 6,
+      "retained": 3,
+      "monitor": "Existing read-only Sysman on every arm",
+      "early_guard": "Per-case median decode ms/generated of first three requests, same A/B/A and drift gate; applies in addition to retained samples"
+    },
+    "limitation": "Heat gain is a policy proxy, not measured PCIe bytes or future speedup. Trace timings never count as performance."
+  },
+  "isolated_build": {
+    "report": "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\orca-cache-margin-build\\build.json",
+    "actual_selection_checks": 18,
+    "checked_paths": [
+      "L0 margin1.5",
+      "DG2 fallback0.5"
+    ]
+  },
+  "diagnostic": {
+    "report": "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\cache-margin-diagnostic\\results.json",
+    "trace_audit": "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\cache-margin-diagnostic\\trace-audit.json",
+    "requests": 18,
+    "output_tokens": 2304,
+    "totals": {
+      "0.5": {
+        "batches": 371,
+        "swaps": 10468,
+        "below_candidate_margin": 4657,
+        "requested_copy_bytes": 15394662400,
+        "evicted_within_four_batches": 0,
+        "routing_windows": 363,
+        "routing_hits": 366411,
+        "routing_entries": 424800,
+        "routing_hit_pct": 86.25494350282486
+      },
+      "1.5": {
+        "batches": 371,
+        "swaps": 5107,
+        "below_candidate_margin": 0,
+        "requested_copy_bytes": 7454566400,
+        "evicted_within_four_batches": 0,
+        "routing_windows": 363,
+        "routing_hits": 365885,
+        "routing_entries": 424800,
+        "routing_hit_pct": 86.13112052730696
+      }
+    },
+    "requested_swap_copy_payload_reduction_pct": 51.576941368977344,
+    "limitation": "Requested adaptive swap payload, not hardware PCIe traffic. Four-batch turnover counter found no quick re-evictions. Instrumented timings excluded."
+  },
+  "monitored_screen": {
+    "report": "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\cache-margin-monitored-screen\\results.json",
+    "requests": 108,
+    "output_tokens": 12258,
+    "warm_comparisons": [
+      {
+        "case": "Short",
+        "median_ms_per_token": [
+          26.02857142857143,
+          26.24857142857143,
+          26.125714285714285
+        ],
+        "baseline": 26.077097622399684,
+        "candidate": 26.24857142857143,
+        "throughput_change_pct": -0.653269099380771,
+        "baseline_drift_pct": 0.3732162458836452,
+        "passes_3_5pct": false
+      },
+      {
+        "case": "Code2K",
+        "median_ms_per_token": [
+          29.66484375,
+          27.61015625,
+          30.20234375
+        ],
+        "baseline": 29.93238727912525,
+        "candidate": 27.61015625,
+        "throughput_change_pct": 8.41078553883683,
+        "baseline_drift_pct": 1.811909088514918,
+        "passes_3_5pct": true
+      },
+      {
+        "case": "Prose2K",
+        "median_ms_per_token": [
+          32.04453125,
+          29.646875,
+          33.0671875
+        ],
+        "baseline": 32.551843622034056,
+        "candidate": 29.646875,
+        "throughput_change_pct": 9.798566027731614,
+        "baseline_drift_pct": 3.191359680132644,
+        "passes_3_5pct": false
+      },
+      {
+        "case": "Long8K",
+        "median_ms_per_token": [
+          34.9953125,
+          33.040625,
+          34.96484375
+        ],
+        "baseline": 34.980074807594704,
+        "candidate": 33.040625,
+        "throughput_change_pct": 5.869894433276324,
+        "baseline_drift_pct": -0.08706523195070037,
+        "passes_3_5pct": true
+      }
+    ],
+    "warm_all_timing_valid": false,
+    "raw_four_case_geomean_pct": 5.778841213663677,
+    "valid_four_case_geomean_pct": null,
+    "early_first_three_request_comparisons": [
+      {
+        "case": "Short",
+        "median_ms_per_token": [
+          34.041428571428575,
+          34.31142857142857,
+          34.23285714285714
+        ],
+        "baseline": 34.13700867423052,
+        "candidate": 34.31142857142857,
+        "throughput_change_pct": -0.5083434425790401,
+        "baseline_drift_pct": 0.5623400058751837,
+        "timing_valid": true,
+        "passes": true
+      },
+      {
+        "case": "Code2K",
+        "median_ms_per_token": [
+          30.5921875,
+          29.634375,
+          31.8125
+        ],
+        "baseline": 31.196377431422228,
+        "candidate": 29.634375,
+        "throughput_change_pct": 5.270914036223906,
+        "baseline_drift_pct": 3.9889677715920113,
+        "timing_valid": false,
+        "passes": false
+      },
+      {
+        "case": "Prose2K",
+        "median_ms_per_token": [
+          32.0171875,
+          30.459375,
+          33.0796875
+        ],
+        "baseline": 32.54410172564156,
+        "candidate": 30.459375,
+        "throughput_change_pct": 6.844285956758989,
+        "baseline_drift_pct": 3.31853008637939,
+        "timing_valid": false,
+        "passes": false
+      },
+      {
+        "case": "Long8K",
+        "median_ms_per_token": [
+          36.16171875,
+          33.040625,
+          36.209375
+        ],
+        "baseline": 36.185539029607966,
+        "candidate": 33.040625,
+        "throughput_change_pct": 9.518324879169104,
+        "baseline_drift_pct": 0.1317864627217169,
+        "timing_valid": true,
+        "passes": true
+      }
+    ],
+    "passes_all_gates": false,
+    "telemetry": {
+      "complete_samples": 899,
+      "samples_inside_retained_requests": 129,
+      "min_gpu_mhz": 1350.0,
+      "max_gpu_mhz": 2400.0,
+      "throttled_samples": 0,
+      "max_sensor_temperature_c": 56.0,
+      "min_free_mib": 1870.4921875,
+      "unsupported_pci_status_codes": [
+        2013265923
+      ]
+    }
+  },
+  "decision": {
+    "adopted": false,
+    "reasons": [
+      "Warm Prose2K baseline elapsed drift exceeds3%.",
+      "Early Code2K and Prose2K baseline elapsed drift exceed3%."
+    ],
+    "independent_unmonitored_confirmation": "not run; screen gate failed",
+    "final_minimal_build": "prepared, not executed",
+    "coupled_sampling_suite": "not run; adoption already blocked"
+  },
+  "validation": {
+    "requests": 126,
+    "output_tokens": 14562,
+    "raw_protocol_audits_passed": true,
+    "exact_greedy_outputs": true,
+    "all_engine_exits_zero": true,
+    "telemetry_coverage_passed": true,
+    "trace_parser_self_check_passed": true,
+    "monitor_parser_self_check_passed": true,
+    "caveats": [
+      "Retained GPU frequency samples include1350MHz on A1 Code2K; whole-request samples include cache restore/prefill.",
+      "Prose2K retained request samples were2400MHz with no throttle flags; measured telemetry does not establish the cause of its drift.",
+      "No CPU frequency, power or usable hardware PCIe traffic measurement.",
+      "Repeated prompts with prompt cache128MiB are not a general new-prompt latency or production deployment claim."
+    ]
+  },
+  "files_sha256": {
+    "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\finalize_cache_margin.py": "058dbd726d4dabff7ef1f33aeb689ed0e68565c7cf01079b2bb41ff4ce1301d2",
+    "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\prepare_cache_margin.py": "34528b530e16be204ea4b77916311d3f8dd62e31f369524a90487f53f279a821",
+    "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\build_cache_margin.py": "f241babe08fae2974059830f8e12b17f79c809606dd70348ac59b2d9d8ae61c7",
+    "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\diagnose_cache_margin.py": "87da172a64698038e264739a5b414b01a5436ea2f861c06f43a7e36b56d739e7",
+    "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\audit_cache_margin.py": "aafad42a1238beec028bf21d6be1870da1d29a70cfc560603b102bb09195df2c",
+    "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\bench_cache_margin.py": "54ff71bfc879f1d68f857e3166f4770ab396e4423f64b5c90a2ce5ccd93c1c77",
+    "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\audit_window.py": "69b59585162ae3aaddb5bbdc6b53b1ef27acecc738166f11c8fe7da543ed4c0a",
+    "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\audit_monitored.py": "66555535b67b81528e3934001a1df78f2d3ca02d6dffc0d172554dbf3a855fdc",
+    "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\cache-margin-plan-20261103.json": "87178ff916a7f27387ecb198723beb5d5f11baab59c0e350c9a1dc5e2688cf24",
+    "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\cache-margin-confirm-plan-20261103.json": "85b21c94449ce63252ad806caa75dfa252da975ce45c6518bd1917b7cd04f751",
+    "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\bench_cache_margin_confirm.py": "4716f1a47a88d1356d781fe7ead18b27e0e3e416da468f6735f557e51f5816d2",
+    "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\build_cache_margin_final.py": "867bfca67edc38b8af5dec87d7934a713672eeb4fd3d18a387ba615932bdb96e",
+    "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\orca-cache-margin-build\\build.json": "46172cfdc95ebb33ee0013edde135534302d6e6484cc8b089faecfbfe77fe20f",
+    "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\orca-cache-margin-build\\trace.cpp": "3760f5c3fe28d5ad800a766727f831e04df3d792ff2584006c469c84dada4bdc",
+    "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\orca-cache-margin-build\\candidate.cpp": "a7e0cc6356ffe9af104554505f9406538834ada3de279e5789ebc8674cc2ea6f",
+    "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\orca-cache-margin-build\\selection-check.cpp": "c70cf62abc265e6786ed4ba43c401cb408da25b30b3839a97fdcb123ebeef8bd",
+    "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\orca-cache-margin-build\\l0-check.stdout": "fa07b80705786b5c4d2fed9eddaeb804742143e6f0d9844f61cb73d41835cb12",
+    "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\orca-cache-margin-build\\dg2-check.stdout": "fa07b80705786b5c4d2fed9eddaeb804742143e6f0d9844f61cb73d41835cb12",
+    "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\cache-margin-diagnostic\\results.json": "9a867570fea3637655dd1db511a6c8fa3a4efcfbb47f72ef3e6d4a8910407b06",
+    "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\cache-margin-diagnostic\\trace-audit.json": "f71b780edb8868348eb7870b73081feddab925942d3019542937c668d6f7cdef",
+    "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\cache-margin-diagnostic\\0-A0.protocol": "9542ef40fab37c9df323d7bf4a0f579cff15e50576b1ec5b259ceec7a10fe196",
+    "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\cache-margin-diagnostic\\0-A1.protocol": "b72c80f7539afc9d4f0705f0b25196076876b77b175941133870ca920fafe137",
+    "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\cache-margin-diagnostic\\0-B.protocol": "33dede9106c824ec32c1b4ac2b3041b1a9770297ee8b700c08f03d83bbebe67a",
+    "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\cache-margin-diagnostic\\0-A0.stderr": "7751f6de2cbd0a3f6d48ba83d4447146e3c62f5a511e09fe8bb5623ab8e28bb1",
+    "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\cache-margin-diagnostic\\0-A1.stderr": "a610552041b8882469398bc9110ffa9698949c7db99f120f3e573b91c89d005a",
+    "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\cache-margin-diagnostic\\0-B.stderr": "cbed666c65567b24339922eaf7d3e61a1aa954e11e1ac3eaaec532cfac7a3f1c",
+    "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\cache-margin-monitored-screen\\monitor-audit.json": "6e4b3b2f27a02198247ad24981e7d1384f0b8e6e43968716c0a8981915155b18",
+    "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\cache-margin-monitored-screen\\results.json": "eba5b85ade0473d69582e1d6b72f0f0001831c7d296bcc2bd07c81151ea9dbb3",
+    "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\cache-margin-monitored-screen\\0-A0.protocol": "061056d37d0963b9093f7145dbe11e68eee884bbcd62056b71640ae22d933ac5",
+    "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\cache-margin-monitored-screen\\0-A1.protocol": "6aa08bfc7531a2c6c0909d49d193867a07af7baf784a09422e49c7ac498b7c41",
+    "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\cache-margin-monitored-screen\\0-B.protocol": "25435222b8288d2e355d71f8fac04908eab77a2a1d6ff2b2bb88fec4a3f57b5c",
+    "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\cache-margin-monitored-screen\\0-A0.stderr": "25f934b444467a4fee21ea96dfcd8277c1e3647caef64aeb47c6ed66f18e89f9",
+    "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\cache-margin-monitored-screen\\0-A1.stderr": "02eb9d0d117685f55838d53d5c48d28ec3435dbaf749b4829b56bce24b38e899",
+    "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\cache-margin-monitored-screen\\0-B.stderr": "dab03a4abb34e9b7fb89ab8daa29fe6b7fd443ed5f474c04896b69a5039363b0",
+    "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\cache-margin-monitored-screen\\monitor.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\cache-margin-monitored-screen\\monitor.stdout": "224d771c9c93426f01a4f1fef45e9ccd10cfda1d9616d9cfb252b843966ea7cf"
+  }
+}

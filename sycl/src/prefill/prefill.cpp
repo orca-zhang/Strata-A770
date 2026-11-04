@@ -276,7 +276,6 @@ struct Stager {
     std::vector<uint8_t*> buf;
     std::vector<char> pinned;
     std::vector<std::vector<uint8_t>> pageable;   // the fallback when no more RAM can be pinned
-    std::vector<dpct::event_ptr> dma_done;
     uint64_t* done_seq = nullptr;            // page-locked: the copy queue's last finished DMA per buffer
     std::vector<uint64_t> want;              // the sequence number each buffer's last DMA writes
     uint64_t issue_seq = 0;
@@ -298,7 +297,6 @@ struct Stager {
         if (const char* v = stager_ring_env()) kRing = std::clamp(std::atoi(v), 2, 256);
         buf.assign((size_t) kRing, nullptr);
         pinned.assign((size_t) kRing, 0);
-        dma_done.assign((size_t) kRing, nullptr);
         want.assign((size_t) kRing, 0);
         done_seq = sycl::malloc_host<uint64_t>((size_t) kRing, dpct::get_in_order_queue());
         if (done_seq == nullptr) return false;
@@ -321,8 +319,6 @@ struct Stager {
                 pageable[(size_t)i].resize(blob_bytes);
                 buf[i] = pageable[(size_t) i].data();
             }
-            if (DPCT_CHECK_ERROR(dma_done[i] = new sycl::event()) !=
-                0) return false;
         }
         device = dpct::get_current_device_id();
         for (int t = 0; t < nthreads; ++t) threads.emplace_back([this] { work(); });
@@ -335,7 +331,6 @@ struct Stager {
         for (auto& t : threads) t.join();
         if (done_seq) sycl::free(done_seq, dpct::get_in_order_queue());
         for (int i = 0; i < kRing; ++i) {
-            if (dma_done[i]) dpct::destroy_event(dma_done[i]);
             if (buf[i] && pinned[i])
                 sycl::free(buf[i], dpct::get_in_order_queue());
         }
@@ -410,7 +405,6 @@ struct Stager {
         while (!ready[(size_t) j].load(std::memory_order_acquire)) std::this_thread::yield();
         return buf[j % kRing];
     }
-    /// The launching thread queued job j's DMA on `copy`: its buffer is free once that is done.
     /// The launching thread queued job j's DMA on `copy`: its buffer is free once that is done.
     // SYCL port: the copy queue writes a sequence number into page-locked host memory after the DMA and the stager
     // thread polls it, instead of waiting on an event. A stager thread's host wait on the copy queue's events (the

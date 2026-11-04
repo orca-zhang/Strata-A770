@@ -1,0 +1,375 @@
+{
+  "date": "2026-11-04",
+  "hardware": "Intel Arc A770 G10 C0 0x56a0 revision8",
+  "driver": "32.0.101.9034",
+  "os": "Windows",
+  "complete": true,
+  "source_adopted": false,
+  "production_changed": false,
+  "linux_gpu_tested": false,
+  "stable_native_over_l0_gain_claimed": false,
+  "checks": {
+    "native_all_t_cases": 32,
+    "l0_all_t_cases": 32,
+    "exact_short_requests": 180,
+    "unchanged_existing_capture_abis": 25,
+    "unchanged_control_zebins": 1242,
+    "added_images": [
+      "fused_gr/capacity_1.zebin",
+      "fused_gr/capacity_4.zebin"
+    ],
+    "capacities": {
+      "1": {
+        "name": "_ZTS16dpct_kernel_nameIJZZN6strata7kernels12_GLOBAL__N_118gr_up_small_launchILi1EEEvPNS0_2l05QueueERKNS2_7GrMultiEENKUlRS5_E_clESA_E24gr_up_capacity_q8_kernel18dpct_kernel_scalarILi1EEEE",
+        "abi": {
+          "parameters": [
+            [
+              "kind_std_layout",
+              "112",
+              "0"
+            ],
+            [
+              "kind_accessor",
+              "4064",
+              "112"
+            ]
+          ],
+          "count": 2,
+          "size": 120
+        },
+        "resources": {
+          "grf_count": 128,
+          "simd_size": 32,
+          "slm_size": 0,
+          "private_size": 3584,
+          "spill_size": 2112
+        },
+        "source_image": "image_9.zebin"
+      },
+      "4": {
+        "name": "_ZTS16dpct_kernel_nameIJZZN6strata7kernels12_GLOBAL__N_118gr_up_small_launchILi4EEEvPNS0_2l05QueueERKNS2_7GrMultiEENKUlRS5_E_clESA_E24gr_up_capacity_q8_kernel18dpct_kernel_scalarILi4EEEE",
+        "abi": {
+          "parameters": [
+            [
+              "kind_std_layout",
+              "376",
+              "0"
+            ],
+            [
+              "kind_accessor",
+              "4064",
+              "376"
+            ]
+          ],
+          "count": 2,
+          "size": 384
+        },
+        "resources": {
+          "grf_count": 128,
+          "simd_size": 32,
+          "slm_size": 0,
+          "private_size": 12032,
+          "spill_size": 2080
+        },
+        "source_image": "image_8.zebin"
+      }
+    },
+    "fallback_capacity": 8,
+    "baseline_resources": {
+      "grf_count": 128,
+      "simd_size": 32,
+      "slm_size": 0,
+      "private_size": 23296,
+      "spill_size": 2208
+    },
+    "args": [
+      "--pack",
+      "G:\\GitHub\\Strata-data\\packs\\iq2_xs",
+      "--native",
+      "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00001-of-00002.gguf",
+      "--ple-gguf",
+      "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00002-of-00002.gguf",
+      "--expert-profile",
+      "G:\\GitHub\\Strata\\data\\expert-profile.bin",
+      "--expert-cache",
+      "5500",
+      "--prefill",
+      "8192",
+      "--spec",
+      "4",
+      "--spec-min-p",
+      "0.5",
+      "--mtp",
+      "G:\\GitHub\\Strata-data\\mtp\\rt-full-vocab-current",
+      "--max-context",
+      "8192",
+      "--stream-experts",
+      "--vram-reserve-mib",
+      "1536",
+      "--pcie-frac",
+      "0.16",
+      "--prompt-cache",
+      "0",
+      "--short-read",
+      "1024",
+      "--adapt-every",
+      "1",
+      "--adapt-swaps",
+      "32",
+      "--prefill-borrow",
+      "--mtp-window",
+      "1024",
+      "--mtp-hnorm",
+      "stream",
+      "--adapt-decay",
+      "0.5"
+    ],
+    "policy": {
+      "step": 0.5,
+      "last": 0.5,
+      "cumulative": 0,
+      "max_mtp": 4,
+      "expert_slots": 5771,
+      "reserve_mib": 1536
+    },
+    "comparisons": {
+      "decode_tok_s": {
+        "native_control": 48.80744901555728,
+        "native_candidate": 48.64155697811823,
+        "l0_control": 49.41124868078188,
+        "l0_candidate": 48.48495287212114,
+        "native_change_pct": -0.3398908174573334,
+        "l0_change_pct": -1.8746658572524888,
+        "native_candidate_vs_l0_candidate_pct": 0.3229952732142216,
+        "native_control_drift_pct": -0.3408594485808214,
+        "l0_control_drift_pct": 2.4448464951277282
+      },
+      "ttft_ms": {
+        "native_control": 914.3357720037391,
+        "native_candidate": 911.1564500053646,
+        "l0_control": 888.253375258524,
+        "l0_candidate": 906.731299997773,
+        "native_change_pct": -0.34771930572147225,
+        "l0_change_pct": 2.080253816527411,
+        "native_candidate_vs_l0_candidate_pct": 0.4880332252346964,
+        "native_control_drift_pct": -0.09488178779505363,
+        "l0_control_drift_pct": -2.426091077610404
+      },
+      "prompt_ms": {
+        "native_control": 869.1749823827191,
+        "native_candidate": 865.8,
+        "l0_control": 845.5360429928461,
+        "l0_candidate": 863.15,
+        "native_change_pct": -0.3882972302616361,
+        "l0_change_pct": 2.083170451824601,
+        "native_candidate_vs_l0_candidate_pct": 0.3070150031859953,
+        "native_control_drift_pct": -0.04025996434117163,
+        "l0_control_drift_pct": -2.4299065420560706
+      },
+      "request_ms": {
+        "native_control": 2425.6503820933517,
+        "native_candidate": 2425.6656000070507,
+        "l0_control": 2383.634051577972,
+        "l0_candidate": 2431.821050005965,
+        "native_change_pct": 0.0006273745718488044,
+        "l0_change_pct": 2.02157702840724,
+        "native_candidate_vs_l0_candidate_pct": -0.2531210098250969,
+        "native_control_drift_pct": 0.1668716590035757,
+        "l0_control_drift_pct": -2.4744009484293894
+      }
+    },
+    "reverse_comparisons": {
+      "decode_tok_s": {
+        "l0_control": 50.140265502799025,
+        "native": 50.145162491094915,
+        "native_vs_l0_pct": 0.009766578311420915,
+        "l0_control_drift_pct": 0.2510264104436555
+      },
+      "ttft_ms": {
+        "l0_control": 876.507650827932,
+        "native": 883.0288500030292,
+        "native_vs_l0_pct": 0.7439979752529746,
+        "l0_control_drift_pct": -0.04696516970696951
+      },
+      "prompt_ms": {
+        "l0_control": 834.9749906434324,
+        "native": 838.75,
+        "native_vs_l0_pct": 0.45211047023798745,
+        "l0_control_drift_pct": -0.029936534546759486
+      },
+      "request_ms": {
+        "l0_control": 2353.258346831056,
+        "native": 2353.6223499977496,
+        "native_vs_l0_pct": 0.015468049531563999,
+        "l0_control_drift_pct": -0.10951146647485421
+      }
+    },
+    "retained_decode_dispersion": {
+      "l0-before": {
+        "samples": 10,
+        "median_tok_s": 48.81808858785952,
+        "min_tok_s": 48.50341438509158,
+        "max_tok_s": 49.0449148167269,
+        "mad_tok_s": 0.1285355426288568
+      },
+      "native-before": {
+        "samples": 10,
+        "median_tok_s": 48.89084467349431,
+        "min_tok_s": 48.28769299193087,
+        "max_tok_s": 49.3154240477581,
+        "mad_tok_s": 0.3335659444790622
+      },
+      "native-candidate": {
+        "samples": 10,
+        "median_tok_s": 48.64155697811823,
+        "min_tok_s": 48.238654395430025,
+        "max_tok_s": 49.070247933884296,
+        "mad_tok_s": 0.22365093973857952
+      },
+      "l0-candidate": {
+        "samples": 10,
+        "median_tok_s": 48.48495287212114,
+        "min_tok_s": 48.31224969804844,
+        "max_tok_s": 48.82122438491681,
+        "mad_tok_s": 0.1312066070050939
+      },
+      "native-after": {
+        "samples": 10,
+        "median_tok_s": 48.72419560993373,
+        "min_tok_s": 48.35528408729401,
+        "max_tok_s": 49.143226640801814,
+        "mad_tok_s": 0.16831722747863154
+      },
+      "l0-after": {
+        "samples": 10,
+        "median_tok_s": 50.011615915688154,
+        "min_tok_s": 49.660219550444324,
+        "max_tok_s": 50.36447978793903,
+        "mad_tok_s": 0.24300627035800204
+      },
+      "reverse-l0-before": {
+        "samples": 10,
+        "median_tok_s": 50.077451084336886,
+        "min_tok_s": 49.7740520007859,
+        "max_tok_s": 50.24129040787995,
+        "mad_tok_s": 0.13396628282762535
+      },
+      "reverse-native": {
+        "samples": 10,
+        "median_tok_s": 50.145162491094915,
+        "min_tok_s": 49.80667147257356,
+        "max_tok_s": 50.48827476250582,
+        "mad_tok_s": 0.2510490185840766
+      },
+      "reverse-l0-after": {
+        "samples": 10,
+        "median_tok_s": 50.20315871223557,
+        "min_tok_s": 49.826263685832295,
+        "max_tok_s": 50.29781601588352,
+        "mad_tok_s": 0.0846749374103446
+      }
+    },
+    "arms": [
+      {
+        "label": "l0-before",
+        "summary": {
+          "decode_tok_s": 48.81808858785952,
+          "ttft_ms": 899.228399983258,
+          "prompt_ms": 856.0,
+          "request_ms": 2413.683200007654
+        }
+      },
+      {
+        "label": "native-before",
+        "summary": {
+          "decode_tok_s": 48.89084467349431,
+          "ttft_ms": 914.7698499873513,
+          "prompt_ms": 869.35,
+          "request_ms": 2423.629049997544
+        }
+      },
+      {
+        "label": "native-candidate",
+        "summary": {
+          "decode_tok_s": 48.64155697811823,
+          "ttft_ms": 911.1564500053646,
+          "prompt_ms": 865.8,
+          "request_ms": 2425.6656000070507
+        }
+      },
+      {
+        "label": "l0-candidate",
+        "summary": {
+          "decode_tok_s": 48.48495287212114,
+          "ttft_ms": 906.731299997773,
+          "prompt_ms": 863.15,
+          "request_ms": 2431.821050005965
+        }
+      },
+      {
+        "label": "native-after",
+        "summary": {
+          "decode_tok_s": 48.72419560993373,
+          "ttft_ms": 913.9018999994732,
+          "prompt_ms": 869.0,
+          "request_ms": 2427.6734000013676
+        }
+      },
+      {
+        "label": "l0-after",
+        "summary": {
+          "decode_tok_s": 50.011615915688154,
+          "ttft_ms": 877.4123000039253,
+          "prompt_ms": 835.2,
+          "request_ms": 2353.9590000145836
+        }
+      }
+    ],
+    "reverse_arms": [
+      {
+        "label": "l0-before",
+        "summary": {
+          "decode_tok_s": 50.077451084336886,
+          "ttft_ms": 876.7135500092991,
+          "prompt_ms": 835.1,
+          "request_ms": 2354.5479499880457
+        }
+      },
+      {
+        "label": "native",
+        "summary": {
+          "decode_tok_s": 50.145162491094915,
+          "ttft_ms": 883.0288500030292,
+          "prompt_ms": 838.75,
+          "request_ms": 2353.6223499977496
+        }
+      },
+      {
+        "label": "l0-after",
+        "summary": {
+          "decode_tok_s": 50.20315871223557,
+          "ttft_ms": 876.3018000026932,
+          "prompt_ms": 834.85,
+          "request_ms": 2351.96944999916
+        }
+      }
+    ]
+  },
+  "evidence_files": 484,
+  "scope": "Q8-up capacity1/4 captures with eight-row fallback. Original arithmetic/reduction/barriers/geometry, all25 original ABIs and all existing model zebins stay fixed. Same frozen older norm and BCS-fill/expert-fork schedule as the preceding eight-row report.",
+  "caveats": [
+    "Private-memory and spill values are compiler metadata, not measured physical traffic or throughput reductions. All entries use SIMD32/128GRFs; rounded scratch remains4096B.",
+    "The numerical probe has its own internally consistent older frozen runtime. Full models recompile the changed Host object with each exact model command/header set.",
+    "Six forward arms compare capacity captures to the preceding optimized eight-row executable in each backend. Three reverse arms compare the same new native/L0 binaries. Incremental ablations have only one forward bracket.",
+    "Each model process discards10warmups and retains10Shorts. Decode excludes preparation/init/prefill. No GPUtimestamps/inner timers/telemetry; clocks unlocked. Bracket drift is not a confidence interval.",
+    "Forward and reverse use separate exclusive GPU windows. Another workspace experiment held the shared lease between them; no jobs overlap and continuous clock/thermal state is not assumed.",
+    "Same5771slots/reserve1536MiB/MTP4/step-last0.5/cumulative0;76exacttokens,57of57drafts,stop,no reuse/resume. This fixed Short cannot establish general quality or long-context speed.",
+    "First capacity attempt shortened the compile-time loop ceiling, baked successfully, then failed a source-hash assertion before Host compilation/GPU. Its resource metadata is preserved, excluded from performance claims. V2 keeps the original loop ceiling and fixes that assertion.",
+    "Reproduction needs the pinned model/runtime/toolchain inputs. Evidence preserves raw protocols, commands, canonical outputs, ABIs, selected binaries and complete hash manifests."
+  ],
+  "reproduction": {
+    "verify": "python build-orca-native-lower-20261031/publish_dg2_hc_up_capacity.py --verify",
+    "rerun": "Use fresh stage directories, archived commands, matching pinned inputs and the shared GPU lease; never overwrite completed evidence."
+  },
+  "archive_sha256": "e783723302bc07dc6ed307115bfffea434e98b71ad0e8e34d6822f143ea2ca1e"
+}

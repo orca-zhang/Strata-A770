@@ -1,0 +1,240 @@
+{
+  "date": "2026-11-03",
+  "complete": true,
+  "source_adopted": true,
+  "production_executable_changed": false,
+  "production_configuration_changed": false,
+  "hardware": "Intel Arc A770 C0",
+  "driver": "32.0.101.9034",
+  "os": "Windows",
+  "linux_gpu_tested": false,
+  "adoption": {
+    "complete": true,
+    "version": 11,
+    "source_adopted": true,
+    "executable_changed": false,
+    "configuration_changed": false,
+    "before_sha256": {
+      "sycl/orca_dg2_backend.hpp": "0bdaf70c9dff491c7ca3da7a9defc1ed3ba16bbdedc5457cc6e69b8248da9602",
+      "sycl/orca_queue.hpp": "1b7cc25c2b31653595b85d3a577ec96d6cc3a0a7156a53d9b63f8a8948ed26bf",
+      "orca-l0/include/orca_l0/dg2.hpp": "4d3337560bdd5f01145acfbce90db2fba118625c927a967ae5bd87fdd4d41245",
+      "orca-l0/src/drm/recording.inl": "eb37bbb24d9de190b8450b0491af567e15b01f75ef3c947b98bbdfea33589976",
+      "orca-l0/src/drm/memory.cl": "85d783197963e676419aba04b172481695d54a0f09dafa4cf6dcb3f9b06a16d5",
+      "orca-l0/src/drm/zebin.hpp": "a927dfee4f823ca74bf85a84b07a6790c9caa752d4504cbfc10227e39a789283",
+      "orca-l0/src/drm/runtime.cpp": "4a70365f603134f5c6ae0f54b5c349207f62fcfb84fc7e1777e67a1929487798",
+      "orca-l0/src/wddm/runtime.cpp": "7afb997f9d4c7cafd69c7d118441ee9f8a3a727543df4d816db9a1c8aab3a821",
+      "orca-l0/tests/drm_compute_check.cpp": "b73f9855db5d299dc589fd1dd2d762b2f5e5d80195b630446f897f4ef59ad2e2",
+      "sycl/orca/include/dpct/dpct.hpp": "9c6f2d8669692666389cb8b47e38a29dfb967b158a881e5c2bff1149b438ec38",
+      "orca-l0/src/drm/encoding.hpp": "55a243ccefdb918661ffaaf1a3b912b275a4a51497b6c23538ba4c37b8037a09",
+      "orca-l0/tests/denorm.cl": "ebcf7b88c788e1711ed027de8e0d6d1a0df4599addeb93ecf2958e4d5d00ed48"
+    },
+    "candidate_sha256": {
+      "sycl/orca_dg2_backend.hpp": "0bdaf70c9dff491c7ca3da7a9defc1ed3ba16bbdedc5457cc6e69b8248da9602",
+      "sycl/orca_queue.hpp": "1b7cc25c2b31653595b85d3a577ec96d6cc3a0a7156a53d9b63f8a8948ed26bf",
+      "orca-l0/include/orca_l0/dg2.hpp": "4d3337560bdd5f01145acfbce90db2fba118625c927a967ae5bd87fdd4d41245",
+      "orca-l0/src/drm/recording.inl": "32d5cf6f8ed85c095eb1a0efdf9fd3f20844c402a230c5c97dad97795e143f75",
+      "orca-l0/src/drm/memory.cl": "85d783197963e676419aba04b172481695d54a0f09dafa4cf6dcb3f9b06a16d5",
+      "orca-l0/src/drm/zebin.hpp": "a927dfee4f823ca74bf85a84b07a6790c9caa752d4504cbfc10227e39a789283",
+      "orca-l0/src/drm/runtime.cpp": "5a0887da3c8757df38a945001df8d6c5ae7f969238edf32724475c27a9f921d8",
+      "orca-l0/src/wddm/runtime.cpp": "3f594ba68f2cad9ed9344412e3787c3d99cec31bcece904176cba3b036bef135",
+      "orca-l0/tests/drm_compute_check.cpp": "52446e5396dcafa88447fda2bdc72e2644ed0faa2613a486005149028ce357c0",
+      "sycl/orca/include/dpct/dpct.hpp": "9c6f2d8669692666389cb8b47e38a29dfb967b158a881e5c2bff1149b438ec38",
+      "orca-l0/src/drm/encoding.hpp": "55a243ccefdb918661ffaaf1a3b912b275a4a51497b6c23538ba4c37b8037a09",
+      "orca-l0/tests/denorm.cl": "ebcf7b88c788e1711ed027de8e0d6d1a0df4599addeb93ecf2958e4d5d00ed48"
+    },
+    "changed_sources": [
+      "orca-l0/src/drm/recording.inl",
+      "orca-l0/src/drm/runtime.cpp",
+      "orca-l0/src/wddm/runtime.cpp",
+      "orca-l0/tests/drm_compute_check.cpp"
+    ],
+    "parent_adoption_sha256": "d37acc63251154bf2bd74ebc9a3d138315afb767950cd22bb63ea144bda8d84b",
+    "model_report_sha256": "e1a62eb99f8a5591647e65e404387cf227f50fe58c7dffe8cb5305167012b1ba",
+    "rationale": "Rebase existing immutable local parameter mirrors onto V10. New ranges merge per slab at close;separate bootstrap pools,no replay uploads. Two opposite policy controls and direct unchanged-V10 bracket improve clean Short. Fresh134D2D and runtime mutex/SRW0. Windows A770 C0 only;Linux host-backed,CPUchecks pass,GPU deferred. No full-model win overL0;preserve binaries/config/bundles."
+  },
+  "checks": {
+    "comparisons": [
+      {
+        "decode_tok_s": {
+          "host": 46.49031740731584,
+          "local": 46.94692650504266,
+          "l0": 47.67058531356112,
+          "change_pct": 0.982159561799345,
+          "vs_l0_pct": -1.5180405353919513,
+          "host_drift_pct": 0.06727535032660104,
+          "l0_drift_pct": -0.03451522241312288
+        },
+        "ttft_ms": {
+          "host": 910.501035200197,
+          "local": 912.9127499909373,
+          "l0": 900.5537091238513,
+          "change_pct": 0.2648777648242895,
+          "vs_l0_pct": 1.3723824289292086,
+          "host_drift_pct": 0.03607455829868211,
+          "l0_drift_pct": -0.21384483459582215
+        },
+        "prompt_ms": {
+          "host": 862.3249706462175,
+          "local": 865.7,
+          "l0": 856.0246929849628,
+          "change_pct": 0.39138717637428044,
+          "vs_l0_pct": 1.130260271032535,
+          "host_drift_pct": 0.05219812086765252,
+          "l0_drift_pct": -0.16924423694193447
+        },
+        "request_ms": {
+          "host": 2497.578428583081,
+          "local": 2485.8612500102026,
+          "l0": 2452.4656844398905,
+          "change_pct": -0.46914156683862673,
+          "vs_l0_pct": 1.361713877678139,
+          "host_drift_pct": -0.2223140493968767,
+          "l0_drift_pct": 0.02252680719594391
+        }
+      },
+      {
+        "decode_tok_s": {
+          "host": 46.561504699558725,
+          "local": 47.01952635403209,
+          "l0": 47.7021339906146,
+          "change_pct": 0.9836916943057883,
+          "vs_l0_pct": -1.4309792444858194,
+          "local_drift_pct": 0.07428501541690835,
+          "l0_drift_pct": 0.48760231664979337
+        },
+        "ttft_ms": {
+          "host": 916.1887000082061,
+          "local": 906.7451316913917,
+          "l0": 900.4585497464859,
+          "change_pct": -1.030744901866798,
+          "vs_l0_pct": 0.6981533960309205,
+          "local_drift_pct": -0.13868583732898898,
+          "l0_drift_pct": -0.5128125309045606
+        },
+        "prompt_ms": {
+          "host": 866.6500000000001,
+          "local": 859.2499068955433,
+          "l0": 855.9222365378762,
+          "change_pct": -0.8538733173088064,
+          "vs_l0_pct": 0.38878185606290305,
+          "local_drift_pct": -0.09306112952947032,
+          "l0_drift_pct": -0.5069339237851134
+        },
+        "request_ms": {
+          "host": 2500.506049997057,
+          "local": 2475.656580288111,
+          "l0": 2449.916843165781,
+          "change_pct": -0.9937776278915678,
+          "vs_l0_pct": 1.0506371754671173,
+          "local_drift_pct": -0.11639020212038664,
+          "l0_drift_pct": -0.38182682987479843
+        }
+      },
+      {
+        "decode_tok_s": {
+          "v10": 46.409003532024705,
+          "local": 47.03557031873837,
+          "change_pct": 1.3500974789973696,
+          "v10_drift_pct": -0.6965503964042385
+        },
+        "ttft_ms": {
+          "v10": 917.3111914660597,
+          "local": 905.9816500084708,
+          "change_pct": -1.2350815691545058,
+          "v10_drift_pct": 1.3112113462402375
+        },
+        "prompt_ms": {
+          "v10": 869.2816387684719,
+          "local": 858.15,
+          "change_pct": -1.2805560674492455,
+          "v10_drift_pct": 1.3084003936780109
+        },
+        "request_ms": {
+          "v10": 2508.0809398186257,
+          "local": 2477.4492000142345,
+          "change_pct": -1.2213218209220278,
+          "v10_drift_pct": 0.8500017248566971
+        }
+      }
+    ],
+    "copy_census": {
+      "native": {
+        "h2d_bytes": 968318976,
+        "h2d_calls": 659,
+        "d2h_bytes": 0,
+        "d2h_calls": 0,
+        "d2d_bytes": 4554752,
+        "d2d_calls": 134,
+        "h2h_bytes": 0,
+        "h2h_calls": 0,
+        "shared_bytes": 0,
+        "shared_calls": 0,
+        "fill_bytes": 0,
+        "fill_calls": 0,
+        "kernels": 40778,
+        "submission_api_calls": 136
+      },
+      "l0": {
+        "h2d_bytes": 968318976,
+        "h2d_calls": 659,
+        "d2h_bytes": 0,
+        "d2h_calls": 0,
+        "d2d_bytes": 4554752,
+        "d2d_calls": 134,
+        "h2h_bytes": 0,
+        "h2h_calls": 0,
+        "shared_bytes": 0,
+        "shared_calls": 0,
+        "fill_bytes": 0,
+        "fill_calls": 0,
+        "kernels": 39985,
+        "submission_api_calls": 97
+      }
+    },
+    "lock_census": {
+      "native": {
+        "imported_mutex_acquisitions": 130,
+        "runtime_mutex_acquisitions": 0,
+        "shared_srw_acquisitions": 0,
+        "exclusive_srw_acquisitions": 0,
+        "foreground_io_acquisitions": 40,
+        "background_io_acquisitions": 90,
+        "keepalive_reads": 15,
+        "background_boundary_delta": 0
+      },
+      "l0": {
+        "imported_mutex_acquisitions": 130,
+        "runtime_mutex_acquisitions": 0,
+        "shared_srw_acquisitions": 0,
+        "exclusive_srw_acquisitions": 0,
+        "foreground_io_acquisitions": 40,
+        "background_io_acquisitions": 90,
+        "keepalive_reads": 15,
+        "background_boundary_delta": 0
+      }
+    },
+    "exact_model_requests": 304,
+    "paired_logical_payload_censuses": 11,
+    "clean_requests": 260,
+    "counter_requests": 44,
+    "windows_checks_per_variant": 15,
+    "numerical_lifecycle_groups_per_variant": 8,
+    "linux_cpu_checks": 3
+  },
+  "native_full_model_win": false,
+  "evidence_files": 29,
+  "caveats": [
+    "Two opposite clean Short brackets;unlocked clocks,control drift is not a confidence interval. No inner timing/GPU timestamps/telemetry.",
+    "All304full76token outputs,57of57drafts,natural stop match;5771slots,reserve1536MiB,MTP4,min-p.5,cumulative0,no reuse. Additional60requests compare complete patch against unchangedV10.",
+    "Logical submitted payloads and imported application locks,not physical bus transactions or private/inlined/driver locks.",
+    "Separate payload and lock diagnostics;neither establishes speed. Keepalive remains at100ms,actual background totals preserved.",
+    "No uploads on immutable graph replay;new parameter ranges upload at close. Linux stays host-backed,GPU deferred.",
+    "First report retains failed invocation and all source/lifecycle checks. Current runtime,binaries,config and immutable bundles unchanged by this experiment.",
+    "Exact four validated files adopted;older verifiers expecting liveV10 are historical. Use this current-source verifier.",
+    "Windows local-parameter policy is calibrated only for A770 C0;Linux policy remains host-backed. Existing executables/configuration and immutable Linux handoffs are preserved."
+  ],
+  "reproduction": {
+    "verify": "python build-orca-native-lower-20261031/adopt_dg2_local_parameters_current.py --verify"
+  },
+  "archive_sha256": "bcd2980b9722ba94da9e7a50b6bce72744178ce1b9d6c0aa471fc8ef46212ec7"
+}

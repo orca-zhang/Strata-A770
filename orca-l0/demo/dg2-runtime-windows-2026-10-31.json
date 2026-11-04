@@ -1,0 +1,264 @@
+{
+  "date": "2026-10-31",
+  "complete": true,
+  "hardware": {
+    "os": "Windows",
+    "gpu": "Intel Arc A770 16 GB",
+    "pci_device": "0x56a0",
+    "driver": "32.0.101.9034",
+    "wddm": 2700,
+    "compiler": "Intel oneAPI 2025.3.2"
+  },
+  "scope": {
+    "backend": "Orca::DG2 / orca::l0::dg2::Runtime",
+    "execution": "Owned native context -> resident existing heaps -> Orca-encoded compute walkers -> D3DKMTSubmitCommand",
+    "build_without_level_zero_sdk": true,
+    "level_zero_loaded": false,
+    "intel_umd_loaded": false,
+    "gmm_loaded": false,
+    "gpu_compiler_loaded": false,
+    "full_model_integrated": false,
+    "linux_gpu_validated": false,
+    "production_changed": false,
+    "performance_gain_for_reusable_backend_established": false
+  },
+  "api": {
+    "header": "orca_l0/dg2.hpp",
+    "linux_compatibility_header": "orca_l0/drm.hpp",
+    "methods": [
+      "allocate",
+      "append",
+      "close",
+      "submit",
+      "ready",
+      "wait",
+      "reset",
+      "cpu_access"
+    ],
+    "local_arguments": "Argument::local(bytes)",
+    "pointer_contract": "Allocation::gpu is the GPU address; Allocation::data is the CPU mapping. They differ on Windows.",
+    "ownership": "Runtime owns allocations, ISA, module data, immutable captures and one reusable list until destruction.",
+    "replay": "No parsing, allocation, per-kernel system call or user-space lock during submit.",
+    "timeout": "A timeout leaves the list pending and blocks reset/CPU access/reuse until completion."
+  },
+  "validation": {
+    "windows_ctest_passed": 3,
+    "windows_ctest_total": 3,
+    "linux_wsl_cpu_ctest_passed": 4,
+    "linux_wsl_cpu_ctest_total": 4,
+    "reference_pipeline": "72 parameter updates; RMSNorm -> GEMV -> SwiGLU -> advance",
+    "increment": "72 replays alternating polling/native waits; 400 dependent kernels after reset; changed scalar capture; negative in-flight/ownership checks",
+    "strata_gate": {
+      "replays": 24,
+      "elements": 703,
+      "kernels": [
+        "Strata GDN gate",
+        "Strata copy_from_mapped"
+      ],
+      "max_abs_error": 9.53674316e-07,
+      "tolerance": "2e-4 * (1 + abs(expected))",
+      "dynamic_input": true,
+      "large_softplus_branch": true,
+      "inputs_unchanged": true,
+      "full_padded_output_guards": true
+    },
+    "strata_bf16_gemv": {
+      "replays": 48,
+      "rows": 19,
+      "columns": 1027,
+      "local_sizes": [
+        64,
+        256
+      ],
+      "dynamic_slm_bytes": [
+        256,
+        1024
+      ],
+      "max_abs_error": 0,
+      "tolerance_abs": 1e-05,
+      "reference_computed_before_submission": true,
+      "inputs": "Exactly representable BF16 values; no claim of zero error for arbitrary inputs",
+      "inputs_unchanged": true,
+      "full_padded_output_guards": true
+    }
+  },
+  "native_pack_census": {
+    "total": 1243,
+    "supported_metadata": 640,
+    "unsupported_metadata": 603,
+    "first_rejection_reasons": {
+      "DG2: unsupported kernel section per_thread_memory_buffers": 578,
+      "DG2: unsupported execution field has_global_atomics": 12,
+      "DG2: zebin targets a different GPU family": 10,
+      "DG2: unsupported execution field require_disable_eufusion": 3
+    },
+    "all_supported_exports_gpu_validated": false,
+    "initial_supported_metadata": 0
+  },
+  "kernel_images": [
+    {
+      "path": "build-orca-native-lower-20261031/windows-native-compatible-v4/images/elementwise/image_2.zebin",
+      "kernel": "_ZTS16dpct_kernel_nameIJZN6strata7kernels8gdn_gateEPKfS3_S3_PfxxPvE22gdn_gate_kernel_de22c0EE",
+      "sha256": "79273f33adee332414a699c1d175596b03ce96d70891f120710611a9bf05e2c9"
+    },
+    {
+      "path": "build-orca-native-lower-20261031/windows-native-compatible-v4/images/elementwise/image_9.zebin",
+      "kernel": "_ZTS16dpct_kernel_nameIJZN6strata7kernels16copy_from_mappedEPfPKfxPvE30copy_from_mapped_kernel_82951aEE",
+      "sha256": "0160ad62b46a6a2878f5c55f51d6a0860ba9ad4b17696bc6433ea5819c3e782d"
+    },
+    {
+      "path": "build-orca-native-lower-20261031/windows-native-compatible-v4/images/bf16_gemv/image_0.zebin",
+      "kernel": "_ZTS16dpct_kernel_nameIJZZN6strata7kernels15bf16_gemv_splitEPKtS3_PfxxiPvENKUlRNS0_2l05QueueEE_clES8_E29bf16_gemv_split_kernel_adfacfEE",
+      "sha256": "5c015640017bf7d0c2e500c0402441cd8d2115d72c61dd7edffe218b10715287"
+    }
+  ],
+  "build": {
+    "configure": {
+      "label": "configure",
+      "args": [
+        "cmake",
+        "-S",
+        "orca-l0",
+        "-B",
+        "G:\\GitHub\\Strata\\build-orca-native-lower-20261031\\windows-dg2-runtime-v1\\build",
+        "-G",
+        "Ninja",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_CXX_COMPILER=C:/Program Files (x86)/Intel/oneAPI/compiler/2025.3/bin/icx.exe",
+        "-DORCA_L0_BUILD_RUNTIME=OFF",
+        "-DORCA_L0_BUILD_WDDM_BACKEND=ON",
+        "-DORCA_L0_BUILD_WDDM_CHECKS=OFF",
+        "-DORCA_L0_WDDM_ZEBIN=G:\\GitHub\\Strata\\build-orca-native-lower-20261031\\first-check\\loader-native-pack\\image_0.zebin"
+      ],
+      "exit_code": 0,
+      "seconds": 5.756827800010797
+    },
+    "final_checks": [
+      {
+        "label": "build",
+        "args": [
+          "cmake",
+          "--build",
+          "G:\\GitHub\\Strata\\build-orca-native-lower-20261031\\windows-dg2-runtime-v1\\build",
+          "-j",
+          "1"
+        ],
+        "exit_code": 0
+      },
+      {
+        "label": "check",
+        "args": [
+          "ctest",
+          "--test-dir",
+          "G:\\GitHub\\Strata\\build-orca-native-lower-20261031\\windows-dg2-runtime-v1\\build",
+          "--output-on-failure"
+        ],
+        "exit_code": 0
+      },
+      {
+        "label": "strata-gate",
+        "args": [
+          "G:\\GitHub\\Strata\\build-orca-native-lower-20261031\\windows-dg2-runtime-v1\\build\\orca-l0-dg2-check.exe",
+          "--strata-gate",
+          "G:\\GitHub\\Strata\\build-orca-native-lower-20261031\\windows-native-compatible-v4\\images"
+        ],
+        "exit_code": 0
+      },
+      {
+        "label": "strata-gemv",
+        "args": [
+          "G:\\GitHub\\Strata\\build-orca-native-lower-20261031\\windows-dg2-runtime-v1\\build\\orca-l0-dg2-check.exe",
+          "--strata-gemv",
+          "G:\\GitHub\\Strata\\build-orca-native-lower-20261031\\windows-native-compatible-v4\\images"
+        ],
+        "exit_code": 0
+      },
+      {
+        "label": "inspect",
+        "args": [
+          "G:\\GitHub\\Strata\\build-orca-native-lower-20261031\\windows-dg2-runtime-v1\\build\\orca-l0-dg2-check.exe",
+          "--inspect-pack",
+          "G:\\GitHub\\Strata\\build-orca-native-lower-20261031\\windows-native-compatible-v4\\images"
+        ],
+        "exit_code": 0
+      }
+    ],
+    "executable": "build-orca-native-lower-20261031\\windows-dg2-runtime-v1\\build\\orca-l0-dg2-check.exe",
+    "exe_sha256": "7698e7afeaf404bf259449d002693d47eaf17e7c55c77a1b522f9d2888c801a1",
+    "source_sha256": {
+      "orca-l0/src/wddm/runtime.cpp": "57f761e75f7d6b24768cbb26c4e971454a167a82e4cc10b43a1640126a140033",
+      "orca-l0/src/drm/runtime.cpp": "4e4071e3052481b25ca61ad70ed37ccbdd8b0f072d84640106e67c446ec00316",
+      "orca-l0/src/drm/zebin.hpp": "68e65dbfd9403605d13e823ab98049364a749eb42bf213f432ebb450515b8fad",
+      "orca-l0/src/drm/arguments.hpp": "355316184f4ee3cf1a0f622c742cdaffced9e4ea888df853af650848a6468201",
+      "orca-l0/src/drm/encoding.hpp": "10a8a7917628f70ecf3eeec421b4cb03c2611ecbac5fe6bd47f846d9d84ca5f4",
+      "orca-l0/src/drm/recording.inl": "ef2ba8f6bf013636377ed8a4a4f457666a5d00289e1a4a8fba6afd6f133ddbad",
+      "orca-l0/tests/drm_compute_check.cpp": "6cf0c7ecae1936c9de707e507ec046227f108837357bd17fae384b5457a88110",
+      "orca-l0/include/orca_l0/dg2.hpp": "d8479bcf0ede90e4860dccb680af540c38f0a70b1a3eb33eca78cdb3338dec7e",
+      "orca-l0/include/orca_l0/drm.hpp": "46808da289dbb63cbb9310f9b4ea806fbec4eeff76dcfbd3b53478f0bf46f245",
+      "orca-l0/CMakeLists.txt": "19e657b21319901d718ea913b01e047cfd76e7f66295fbbb02b42836cb167ec3"
+    }
+  },
+  "linux_cpu_validation": {
+    "complete": true,
+    "linux_gpu_validated": false,
+    "commands": [
+      {
+        "name": "build",
+        "args": [
+          "cmake",
+          "--build",
+          "/tmp/orca-l0-linux-20261031",
+          "--target",
+          "orca-l0-ring-check",
+          "orca-l0-drm-submit-check",
+          "orca-l0-drm-compute-check",
+          "orca-l0-native-pack",
+          "-j",
+          "1"
+        ],
+        "exit_code": 0
+      },
+      {
+        "name": "check",
+        "args": [
+          "ctest",
+          "--test-dir",
+          "/tmp/orca-l0-linux-20261031",
+          "--output-on-failure"
+        ],
+        "exit_code": 0
+      }
+    ],
+    "source_sha256": {
+      "orca-l0/src/drm/encoding.hpp": "10a8a7917628f70ecf3eeec421b4cb03c2611ecbac5fe6bd47f846d9d84ca5f4",
+      "orca-l0/tests/drm_compute_check.cpp": "6cf0c7ecae1936c9de707e507ec046227f108837357bd17fae384b5457a88110",
+      "orca-l0/third_party/intel-dg2/packets.hpp": "7b65e080e827568d6f04693c236c4ec5f108c8046df24bbc3bc4ffb5139c5607"
+    }
+  },
+  "production_sha256": {
+    "strata-iq2_xs.json": "9c45e51de69e66c3f1cd020359c8d70d639fbd1aba5d87ead84082fbe73fd531",
+    "build-orca-default-pair-20261031/strata.exe": "7be641375e905b0ceb64424ab4875afcdf9f7f6f1e2c60d6b0fcff4ece5ff4b5"
+  },
+  "raw_evidence": {
+    "path": "dg2-runtime-windows-2026-10-31.json.gz",
+    "sha256": "ba29dddf7a729fcb7a60e0c864ffedf1285762cdcc8d8a1676a1471b166fe378",
+    "bytes": 21889,
+    "format": "gzip JSON with build/check logs, full native-pack census and current hashes"
+  },
+  "limitations": [
+    "One ordered reusable list per Runtime; no full Strata queue/event integration yet.",
+    "1D power-of-two local workgroups only.",
+    "Scratch/private buffers, global-atomic metadata, some target-note layouts and EU-fusion requirements remain rejected.",
+    "Windows existing-heap system memory only; no device-local allocations, 64 KiB granularity, maximum 256 MiB per allocation.",
+    "All captured payload allocations survive until Runtime destruction; frequent distinct re-recordings can grow memory use.",
+    "One initialized or zero-filled segment per global/constant category; data-segment relocations remain rejected.",
+    "The earlier -23.3% result belongs to the fixed-heap benchmark; the reusable interface needs a separate matched performance comparison.",
+    "Native Linux GPU testing remains deferred to the user."
+  ],
+  "next_work": [
+    "Implement calibrated scratch/private memory handling and validate real native kernels.",
+    "Support the remaining kernel ABI and multidimensional dispatch required by the model.",
+    "Add device-local memory and engine queue/event integration.",
+    "Compare complete model output and performance against existing Orca L0."
+  ]
+}

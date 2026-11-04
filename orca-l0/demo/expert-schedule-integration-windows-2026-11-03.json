@@ -1,0 +1,166 @@
+{
+  "schema": 1,
+  "scope": "Windows A770 C0: expert/router scheduling integrated into live source; equal-work frozen main for acceptance.",
+  "hardware": {
+    "video_controllers": [
+      {
+        "Name": "GameViewer Virtual Display Adapter",
+        "DriverVersion": "15.6.5.199"
+      },
+      {
+        "Name": "Intel(R) Arc(TM) A770 Graphics",
+        "DriverVersion": "32.0.101.9034"
+      }
+    ],
+    "experiment_device": "Intel Arc A770 C0",
+    "clock_locked": false,
+    "query": "Win32_VideoController once before validation/performance; no polling"
+  },
+  "schedule_integrated": true,
+  "default_enabled": true,
+  "production_binaries_changed": false,
+  "production_config_changed": false,
+  "checks": {
+    "ordinary_sycl_translation_units": 3,
+    "public_abi_modes": 2,
+    "full_buffer_comparisons": 1728,
+    "gpu_tail_epochs": 2064,
+    "exact_model_requests": 160
+  },
+  "policy": {
+    "step": 0.5,
+    "last": 0.5,
+    "cumulative": 0,
+    "max_mtp": 4,
+    "expert_slots": 5771,
+    "reserve_mib": 1536
+  },
+  "comparisons": {
+    "decode_tok_s": {
+      "l0_serial": 47.38205728830757,
+      "l0_default": 47.91712104424398,
+      "dg2_default": 47.94196885293303,
+      "l0_schedule_change_pct": 1.1292539551009284,
+      "dg2_vs_matched_l0_pct": 0.051855804663447636,
+      "l0_serial_drift_pct": 0.3931772187929061,
+      "l0_default_drift_pct": -0.19818118874641577
+    },
+    "ttft_ms": {
+      "l0_serial": 903.7688773071854,
+      "l0_default": 910.873555881452,
+      "dg2_default": 907.3312499967869,
+      "l0_schedule_change_pct": 0.7861167553628645,
+      "dg2_vs_matched_l0_pct": -0.38889106636070814,
+      "l0_serial_drift_pct": -0.3447965430529054,
+      "l0_default_drift_pct": -0.3675844101106218
+    },
+    "prompt_ms": {
+      "l0_serial": 858.2743879436225,
+      "l0_default": 867.3485242392472,
+      "dg2_default": 860.45,
+      "l0_schedule_change_pct": 1.0572535337289857,
+      "dg2_vs_matched_l0_pct": -0.7953578113593873,
+      "l0_serial_drift_pct": -0.23856627487489623,
+      "l0_default_drift_pct": -0.36826054433511946
+    },
+    "request_ms": {
+      "l0_serial": 2459.621788418578,
+      "l0_default": 2454.838357192277,
+      "dg2_default": 2449.0714499988826,
+      "l0_schedule_change_pct": -0.19447832381485064,
+      "dg2_vs_matched_l0_pct": -0.2349200376675742,
+      "l0_serial_drift_pct": -0.29516780406190213,
+      "l0_default_drift_pct": 0.037357704595142316
+    }
+  },
+  "reverse_comparisons": {
+    "decode_tok_s": {
+      "dg2_default": 48.342168450573055,
+      "l0_default": 48.710454801825364,
+      "dg2_vs_matched_l0_pct": -0.7560724956288234,
+      "dg2_default_drift_pct": 1.9459164947251306
+    },
+    "ttft_ms": {
+      "dg2_default": 902.9419221770099,
+      "l0_default": 899.8583999928087,
+      "dg2_vs_matched_l0_pct": 0.34266748904336897,
+      "dg2_default_drift_pct": -1.2636327762355237
+    },
+    "prompt_ms": {
+      "dg2_default": 857.0323520731291,
+      "l0_default": 856.05,
+      "dg2_vs_matched_l0_pct": 0.11475405328300603,
+      "dg2_default_drift_pct": -1.275288389078899
+    },
+    "request_ms": {
+      "dg2_default": 2431.0729558695116,
+      "l0_default": 2413.8491500052623,
+      "dg2_vs_matched_l0_pct": 0.7135411036025774,
+      "dg2_default_drift_pct": -1.6033702952720774
+    }
+  },
+  "retained_decode_dispersion": {
+    "l0-serial-before": {
+      "median": 47.28918334062771,
+      "min": 46.239961061085424,
+      "max": 47.80475531513398,
+      "mad": 0.3401602806721442
+    },
+    "l0-default-before": {
+      "median": 47.96467309539278,
+      "min": 47.589229805886035,
+      "max": 48.99748565534137,
+      "mad": 0.22951535702512516
+    },
+    "dg2-default": {
+      "median": 47.94196885293303,
+      "min": 47.50296893555847,
+      "max": 48.03134677368388,
+      "mad": 0.07572575674872795
+    },
+    "l0-default-after": {
+      "median": 47.869616136074,
+      "min": 47.46440169872596,
+      "max": 49.0449148167269,
+      "mad": 0.1145245725715327
+    },
+    "l0-serial-after": {
+      "median": 47.475113636476266,
+      "min": 46.87018193031144,
+      "max": 47.78371581263754,
+      "mad": 0.28608081777984395
+    },
+    "dg2-default-before": {
+      "median": 47.87857433540521,
+      "min": 47.577313133842495,
+      "max": 48.13477737665463,
+      "mad": 0.1922676735850395
+    },
+    "l0-default": {
+      "median": 48.710454801825364,
+      "min": 47.720708275775465,
+      "max": 48.959608323133416,
+      "mad": 0.2144858667630274
+    },
+    "dg2-default-after": {
+      "median": 48.8102514108371,
+      "min": 47.64890282131662,
+      "max": 49.19093851132686,
+      "mad": 0.25485701856792176
+    }
+  },
+  "evidence_files": 258,
+  "controls": {
+    "expert": "STRATA_VERIFY_EXPERT_FORK=0",
+    "router": "STRATA_VERIFY_ROUTER_QUANT=0"
+  },
+  "scope_limits": [
+    "Only the three current scheduling sources are recompiled per backend; 77 equal-work Host objects, main, V11 runtime and native modules are reused.",
+    "Current MTP work is preserved. Full latest engine, Linux GPU execution, other prompts, prefill gains and physical concurrency are not validated by this experiment.",
+    "Decode excludes preparation/init/prefill. TTFT is separate. Ten warmups and ten retained samples per arm; no inner timers or GPU telemetry.",
+    "Native versus L0 compares complete backends with matched scheduling, not isolated API call cost. Controls and dispersion do not give a fixed performance guarantee.",
+    "Full-buffer checks cover real shared weights and changed routed plans with batching off/on; quantization parity is cross-schedule byte equality.",
+    "Initial L0 link failed on the missing existing BF16 getter before any GPU execution; the failed records and exact repair are retained."
+  ],
+  "archive_sha256": "63a22f8c0c29c17865ad55ed07792e3a253bf6dec4cf2d31b89fac1a6ffbbbd4"
+}

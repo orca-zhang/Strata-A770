@@ -1,0 +1,203 @@
+{
+  "date": "2026-11-03",
+  "source_adopted": false,
+  "production_changed": false,
+  "hardware": "Intel Arc A770 G10 C0 0x56a0 revision8",
+  "driver": "32.0.101.9034",
+  "os": "Windows",
+  "linux_gpu_tested": false,
+  "policy": {
+    "step": 0.5,
+    "last": 0.5,
+    "cumulative": 0,
+    "max_mtp": 4,
+    "expert_slots": 5771,
+    "reserve_mib": 1536
+  },
+  "checks": {
+    "windows_candidate": 15,
+    "linux_cpu": 3,
+    "full_buffer_comparisons": 864,
+    "gpu_tail_epochs": 1032,
+    "exact_performance_requests": 160,
+    "exact_diagnostic_requests": 11,
+    "first": {
+      "decode_tok_s": {
+        "control": 48.15813215488449,
+        "single": 48.292369616638325,
+        "l0": 48.41444260188519,
+        "single_vs_control_pct": 0.27874308189965724,
+        "single_vs_l0_pct": -0.2521416723738401,
+        "control_drift_pct": -0.8328461858978509,
+        "l0_drift_pct": -0.9827058573335434
+      },
+      "ttft_ms": {
+        "control": 907.8965443932652,
+        "single": 905.8308000094257,
+        "l0": 900.8767812684882,
+        "single_vs_control_pct": -0.22753081246938978,
+        "single_vs_l0_pct": 0.5499108028915956,
+        "control_drift_pct": 1.2142102059971904,
+        "l0_drift_pct": 0.7276153711039068
+      },
+      "prompt_ms": {
+        "control": 861.5379852333848,
+        "single": 860.3,
+        "l0": 857.5955908818561,
+        "single_vs_control_pct": -0.14369479403156804,
+        "single_vs_l0_pct": 0.31534783374562725,
+        "control_drift_pct": 1.0618436406067522,
+        "l0_drift_pct": 0.6433877288413159
+      },
+      "request_ms": {
+        "control": 2441.363543852431,
+        "single": 2434.8466000083135,
+        "l0": 2428.0388936310137,
+        "single_vs_control_pct": -0.2669386892635406,
+        "single_vs_l0_pct": 0.2803788026277898,
+        "control_drift_pct": 0.5870647945600549,
+        "l0_drift_pct": 0.7585342524258465
+      }
+    },
+    "reverse": {
+      "decode_tok_s": {
+        "control": 48.21264317979032,
+        "single": 48.02314029353416,
+        "single_vs_control_pct": -0.3930564137491488,
+        "single_drift_pct": 0.2939060230467083
+      },
+      "ttft_ms": {
+        "control": 908.1293999915943,
+        "single": 910.7029688673499,
+        "single_vs_control_pct": 0.2833923090453272,
+        "single_drift_pct": -0.9560775005519551
+      },
+      "prompt_ms": {
+        "control": 861.9,
+        "single": 864.7658642661607,
+        "single_vs_control_pct": 0.33250542593812327,
+        "single_drift_pct": -0.9151079136690665
+      },
+      "request_ms": {
+        "control": 2444.380699991598,
+        "single": 2446.1938980883697,
+        "single_vs_control_pct": 0.07417822014297304,
+        "single_drift_pct": -0.7117671105524637
+      }
+    },
+    "reference_commit": "ee495cce3db8f870a89697febbd7e8b6680151b2",
+    "observed_v14_duplicate_pairs": 139,
+    "observed_l0_duplicate_pairs": 0,
+    "packet_counts": {
+      "v14": {
+        "CFE_STATE": 2531,
+        "COMPUTE_WALKER": 40778,
+        "MI_BATCH_BUFFER_END": 136,
+        "MI_LOAD_REGISTER_IMM": 2531,
+        "PIPELINE_SELECT": 2531,
+        "PIPE_CONTROL": 34187,
+        "STATE_BASE_ADDRESS": 278,
+        "STATE_COMPUTE_MODE": 2531
+      },
+      "single": {
+        "CFE_STATE": 2531,
+        "COMPUTE_WALKER": 40778,
+        "MI_BATCH_BUFFER_END": 136,
+        "MI_LOAD_REGISTER_IMM": 2531,
+        "PIPELINE_SELECT": 2531,
+        "PIPE_CONTROL": 34187,
+        "STATE_BASE_ADDRESS": 139,
+        "STATE_COMPUTE_MODE": 2531
+      }
+    },
+    "packet_summary": {
+      "v14": {
+        "submissions": 136,
+        "files": 136,
+        "bytes": 7328352,
+        "failures": 0
+      },
+      "single": {
+        "submissions": 136,
+        "files": 136,
+        "bytes": 7316120,
+        "failures": 0
+      }
+    },
+    "identical_adjacent_sba_pairs": {
+      "v14": 139,
+      "single": 0
+    },
+    "command_bytes_removed": 12232,
+    "mathematical_walker_count": 39985,
+    "ordered_all_walkers_equal": false
+  },
+  "retained_decode_dispersion": {
+    "l0-before": {
+      "median": 48.654096154255996,
+      "min": 48.25703219252016,
+      "max": 48.92178950756357,
+      "mad": 0.1922961058724546
+    },
+    "control-before": {
+      "median": 48.35993514822961,
+      "min": 47.843877872206484,
+      "max": 48.580925594477115,
+      "mad": 0.21633323474422994
+    },
+    "single": {
+      "median": 48.292369616638325,
+      "min": 47.73869346733668,
+      "max": 48.5995651617854,
+      "mad": 0.27925762444855096
+    },
+    "control-after": {
+      "median": 47.9571712728449,
+      "min": 46.75196850393701,
+      "max": 48.46011604922528,
+      "mad": 0.4088873601380989
+    },
+    "l0-after": {
+      "median": 48.175969501515425,
+      "min": 47.75669222068618,
+      "max": 48.58713719473213,
+      "mad": 0.18856991643829346
+    },
+    "reverse-single-before": {
+      "median": 47.952724022929566,
+      "min": 46.96576442961315,
+      "max": 48.429235965079975,
+      "mad": 0.41341296304247876
+    },
+    "reverse-control": {
+      "median": 48.21264317979032,
+      "min": 47.39336492890995,
+      "max": 48.41072679788521,
+      "mad": 0.1681021463925525
+    },
+    "reverse-single-after": {
+      "median": 48.09365996704792,
+      "min": 47.47329627084765,
+      "max": 48.62132940950675,
+      "mad": 0.17716870862766143
+    }
+  },
+  "evidence_files": 1458,
+  "native_full_model_win": false,
+  "adoption_decision": "Keep isolated;default source stays v14. Opposite-order model point estimates do not establish a throughput or TTFT gain.",
+  "scope": "One runtime conditional omits only the second identical SBA on the existing calibrated WindowsA770C0 profile. First SBA,all barriers/cachefields/globalstate/walkers/ownership stay. CPU assertions check selected count and profile transitions. Linux/othersteppings retain conservative duplicate.80frozenHost objects and same math pack/matched schedules;not a full latest-engine benchmark.",
+  "caveats": [
+    "All160performance and11separate diagnostic requests match76tokens,57/57drafts,naturalstop and zero reuse. Tenwarmups/tenretained per performance process.",
+    "Decode excludes preparation/initialization/prefill;TTFT separate.No inner timers,GPU timestamps or telemetry in timing arms.No parallel archive/compiler job during timing;lightweight script preparation/offline parsing may occur.Clocks unlocked.",
+    "First native control48.158,candidate48.292,L0control48.414tok/s.Candidate+0.279%versusv14,-0.252%versusL0.Control drift-0.833%,L0drift-0.983%.No stable native-over-L0win is established;all reverse values and raw dispersion remain explicit.",
+    "Reverse native control48.213,candidate48.023tok/s(-0.393%),with+0.294%candidate drift.The sign reverses from the first+0.279%.TTFT also changes direction(-0.228%first,+0.283%reverse).Candidate stays isolated;no speedup or default adoption claim.",
+    "The139removedSBAcommands save12232commandbytes;all other packet counts agree,as do40778walker shapes and39985mathematicalwalker order.Command bytes are not physical memory/PCIe traffic and do not assign timing cost.",
+    "Cached NEO commit ee495cce3db8f870a89697febbd7e8b6680151b2 requires repeats forG10B-before-C orG11;0x56a0belongsG10,revision8mapsC0,and the fix bound is exclusive.Matched installedL0capture independently haszeroadjacentduplicateSBApairs;reference source alone would not prove installed-driver behavior.",
+    "The first isolated attempt passed13GPUchecks but retained one old CPU equal-length assertion across profile flips.It failed before model timing.V2 corrects expected one-SBA length/count;runtime encoding is byte-identical to that first attempt.All failed sources/logs preserved.",
+    "Windows15checks,864full-buffercomparisons/1032tailepochs and Linuxbuild/3CPUchecks pass.LinuxGPUuntested.No new copy/lock/retained-memory/auto-expert-cache census.Productionexecutables/config,MTP,rootREADME and immutableLinuxbundles preserved."
+  ],
+  "reproduction": {
+    "verify": "python build-orca-native-lower-20261031/publish_dg2_single_sba.py --verify"
+  },
+  "archive_sha256": "b5726b45bfc6bf7231fce049660ce911e2f87e6ec979191949f00eefd361698a"
+}

@@ -1,0 +1,45 @@
+{
+  "date": "2026-11-02",
+  "complete": true,
+  "gpu_executed": false,
+  "production_changed": false,
+  "scope": "Current source/configuration audit; not an inspection of rebuilt executable behavior.",
+  "unset_environment_source_defaults": {
+    "step_cli_both": 0.0,
+    "cumulative_l0": 0.5,
+    "cumulative_native_dg2": 0.0
+  },
+  "current_configuration": {
+    "sha256": "3f1fb8f77a049931428852987d970eca71b13610e2b15325725205d60d4737a1",
+    "explicit_cumulative": 0.5,
+    "explicit_step": 0.5
+  },
+  "frozen_comparison_policy": {
+    "spec_min_p": 0.5,
+    "cumulative_min_p": 0.0,
+    "last_min_p": 0.5,
+    "spec": 4,
+    "bare_cli_default_spec_min_p": 0.0,
+    "last_inherits_spec_min_p": true
+  },
+  "frozen_audit_sha256": "d23e6cd2eaf78525f3ca59873054c46397c0be628e2b47755574edf389605668",
+  "current_hc_controls": {
+    "explicit_cumulative": 0.0,
+    "explicit_step": 0.5,
+    "explicit_last": 0.5,
+    "max_mtp": 4
+  },
+  "original_cumulative_source": "const float g_env_mtp_cum_min_p = [] {\n    const char* v = std::getenv(\"STRATA_MTP_CUM_MIN_P\");\n    if (v == nullptr) return 0.0f;\n    char* end = nullptr;\n    const double x = std::strtod(v, &end);\n    if (end != v && *end == '\\0' && std::isfinite(x) && x >= 0.0 && x <= 1.0) {\n        if (x > 0.0) std::fprintf(stderr, \"strata: MTP cumulative confidence floor %.6g (draft and verify windows)\\n\", x);\n        return (float) x;\n    }\n    std::fprintf(stderr, \"strata: STRATA_MTP_CUM_MIN_P must be a number in [0,1]; cumulative floor disabled\\n\");\n    return 0.0f;\n}();",
+  "generated_cumulative_source": "const float g_env_mtp_cum_min_p = [] {\n    const char* v = std::getenv(\"STRATA_MTP_CUM_MIN_P\");\n#ifndef STRATA_ORCA_DG2\n    if (v == nullptr) v = \"0.5\";\n#endif\n    if (v == nullptr) return 0.0f;\n    char* end = nullptr;\n    const double x = std::strtod(v, &end);\n    if (end != v && *end == '\\0' && std::isfinite(x) && x >= 0.0 && x <= 1.0) {\n        if (x > 0.0) std::fprintf(stderr, \"strata: MTP cumulative confidence floor %.6g (draft and verify windows)\\n\", x);\n        return (float) x;\n    }\n    std::fprintf(stderr, \"strata: STRATA_MTP_CUM_MIN_P must be a number in [0,1]; cumulative floor disabled\\n\");\n    return 0.0f;\n}();",
+  "source_sha256": {
+    "sycl/orca/prepare.py": "76b84bd2cea45848b15ec34c930f2a5fc222cfa4a2a7e2698569d8485a9b5ee3",
+    "sycl/src/program/generate.cpp": "955e99c8e29fb06401cb2b72e428767bb8321798cac6f3edcfbd3495746e023d"
+  },
+  "findings": [
+    "Current prepare.engine_source inserts an unset-environment cumulative default of 0.5 only when STRATA_ORCA_DG2 is not defined.",
+    "Current balanced configuration explicitly supplies cumulative 0.5, so both backends reading that configuration receive the same cumulative value.",
+    "The earlier frozen L0/DG2 comparison still used identical cumulative zero. Its archived source/executable evidence is unchanged.",
+    "All current HC comparisons explicitly use cumulative zero and step/last 0.5. Current defaults cannot explain those frozen-policy measurements."
+  ],
+  "archive_sha256": "c88a0573768d4cd2db720eeb61538a5d86c3aea4e313defa7c3efd778865040c"
+}

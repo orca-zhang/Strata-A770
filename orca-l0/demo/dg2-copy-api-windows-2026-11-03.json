@@ -1,0 +1,418 @@
+{
+  "date": "2026-11-03",
+  "hardware": "Intel Arc A770 G10 C0 0x56a0 revision8",
+  "driver": "32.0.101.9034",
+  "os": "Windows",
+  "complete": true,
+  "production_changed": false,
+  "source_adopted": false,
+  "linux_gpu_tested": false,
+  "full_model_performance_measured": true,
+  "checks": {
+    "full_buffer_fill_checks": 1632,
+    "host_tus_rebuilt": 80,
+    "adaptive_main_rebuilds": 1,
+    "adapter_tus_with_new_header": 69,
+    "old_adapter_definitions": 0,
+    "exact_short_requests": 256,
+    "clean_requests": 200,
+    "retained_clean_requests": 100,
+    "integration_requests": 12,
+    "diagnostic_requests": 44,
+    "args": [
+      "--pack",
+      "G:\\GitHub\\Strata-data\\packs\\iq2_xs",
+      "--native",
+      "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00001-of-00002.gguf",
+      "--ple-gguf",
+      "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00002-of-00002.gguf",
+      "--expert-profile",
+      "G:\\GitHub\\Strata\\data\\expert-profile.bin",
+      "--expert-cache",
+      "5500",
+      "--prefill",
+      "8192",
+      "--spec",
+      "4",
+      "--spec-min-p",
+      "0.5",
+      "--mtp",
+      "G:\\GitHub\\Strata-data\\mtp\\rt-full-vocab-current",
+      "--max-context",
+      "8192",
+      "--stream-experts",
+      "--vram-reserve-mib",
+      "1536",
+      "--pcie-frac",
+      "0.16",
+      "--prompt-cache",
+      "0",
+      "--short-read",
+      "1024",
+      "--adapt-every",
+      "1",
+      "--adapt-swaps",
+      "32",
+      "--prefill-borrow",
+      "--mtp-window",
+      "1024",
+      "--mtp-hnorm",
+      "stream",
+      "--adapt-decay",
+      "0.5"
+    ],
+    "policy": {
+      "step": 0.5,
+      "last": 0.5,
+      "cumulative": 0,
+      "max_mtp": 4,
+      "expert_slots": 5771,
+      "reserve_mib": 1536
+    },
+    "explicit_copy_roles": [
+      {
+        "variant": "eu",
+        "roles": [
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "variant": "bcs",
+        "roles": [
+          1,
+          1,
+          1
+        ]
+      }
+    ],
+    "comparisons": {
+      "first": {
+        "decode_tok_s": {
+          "bcs": 49.88844383896286,
+          "eu": 48.82798185189203,
+          "l0": 49.14862593008795,
+          "bcs_vs_eu_pct": 2.1718325166243613,
+          "bcs_vs_l0_pct": 1.5052667188036217,
+          "native_flank_drift_pct": -2.6275837495195686,
+          "l0_drift_pct": -2.918354157916303
+        },
+        "ttft_ms": {
+          "bcs": 883.2290000136709,
+          "eu": 892.4846006055303,
+          "l0": 888.3863542366859,
+          "bcs_vs_eu_pct": -1.0370599767861255,
+          "bcs_vs_l0_pct": -0.5805305538991834,
+          "native_flank_drift_pct": 2.5552654896361604,
+          "l0_drift_pct": 2.7228750843915517
+        },
+        "prompt_ms": {
+          "bcs": 838.3499999999999,
+          "eu": 847.2355560881518,
+          "l0": 845.6245029562472,
+          "bcs_vs_eu_pct": -1.0487704422106892,
+          "bcs_vs_l0_pct": -0.8602521486565373,
+          "native_flank_drift_pct": 2.4974607157794315,
+          "l0_drift_pct": 2.708533077660591
+        },
+        "request_ms": {
+          "bcs": 2362.5316000106977,
+          "eu": 2407.525782468208,
+          "l0": 2393.663016715894,
+          "bcs_vs_eu_pct": -1.868897221585808,
+          "bcs_vs_l0_pct": -1.300576417306587,
+          "native_flank_drift_pct": 2.7214302585753414,
+          "l0_drift_pct": 2.945839009037865
+        }
+      },
+      "reverse": {
+        "decode_tok_s": {
+          "bcs": 49.82726702902026,
+          "eu": 49.3026281409936,
+          "l0": 49.706035429847944,
+          "bcs_vs_eu_pct": 1.0641195161570804,
+          "bcs_vs_l0_pct": 0.24389714070722768,
+          "native_flank_drift_pct": -0.5263683296913291,
+          "l0_drift_pct": -0.7167514368019212
+        },
+        "ttft_ms": {
+          "bcs": 883.0363409537741,
+          "eu": 885.1566999946954,
+          "l0": 878.9257448307384,
+          "bcs_vs_eu_pct": -0.23954617763543018,
+          "bcs_vs_l0_pct": 0.46768411861997095,
+          "native_flank_drift_pct": 0.16054680650054998,
+          "l0_drift_pct": 0.7857459522030208
+        },
+        "prompt_ms": {
+          "bcs": 838.399785305316,
+          "eu": 840.5,
+          "l0": 836.4187826681082,
+          "bcs_vs_eu_pct": -0.24987682268697853,
+          "bcs_vs_l0_pct": 0.23684339451208736,
+          "native_flank_drift_pct": 0.1432322750059667,
+          "l0_drift_pct": 0.7741238598175659
+        },
+        "request_ms": {
+          "bcs": 2365.688518774555,
+          "eu": 2383.004500006791,
+          "l0": 2366.7762973833724,
+          "bcs_vs_eu_pct": -0.7266449237585015,
+          "bcs_vs_l0_pct": -0.04596034741516375,
+          "native_flank_drift_pct": 0.4383078976632149,
+          "l0_drift_pct": 0.906219071596337
+        }
+      }
+    },
+    "arm_summaries": [
+      {
+        "label": "first-l0-before",
+        "summary": {
+          "decode_tok_s": 49.881880243820945,
+          "ttft_ms": 876.5330499882111,
+          "prompt_ms": 834.4000000000001,
+          "request_ms": 2359.1666000138503
+        }
+      },
+      {
+        "label": "first-eu-before",
+        "summary": {
+          "decode_tok_s": 49.48240516696143,
+          "ttft_ms": 881.29590000608,
+          "prompt_ms": 836.8499999999999,
+          "request_ms": 2375.4200499970466
+        }
+      },
+      {
+        "label": "first-bcs",
+        "summary": {
+          "decode_tok_s": 49.88844383896286,
+          "ttft_ms": 883.2290000136709,
+          "prompt_ms": 838.3499999999999,
+          "request_ms": 2362.5316000106977
+        }
+      },
+      {
+        "label": "first-eu-after",
+        "summary": {
+          "decode_tok_s": 48.18221352992292,
+          "ttft_ms": 903.8153500005137,
+          "prompt_ms": 857.75,
+          "request_ms": 2440.065450005932
+        }
+      },
+      {
+        "label": "first-l0-after",
+        "summary": {
+          "decode_tok_s": 48.42615031767856,
+          "ttft_ms": 900.3999500127975,
+          "prompt_ms": 857.0,
+          "request_ms": 2428.6638500052504
+        }
+      },
+      {
+        "label": "reverse-l0-before",
+        "summary": {
+          "decode_tok_s": 49.88513313254854,
+          "ttft_ms": 875.4928999842377,
+          "prompt_ms": 833.2,
+          "request_ms": 2356.124549987726
+        }
+      },
+      {
+        "label": "reverse-bcs-before",
+        "summary": {
+          "decode_tok_s": 49.9589244865725,
+          "ttft_ms": 882.3283500096295,
+          "prompt_ms": 837.8,
+          "request_ms": 2360.521000009612
+        }
+      },
+      {
+        "label": "reverse-eu",
+        "summary": {
+          "decode_tok_s": 49.3026281409936,
+          "ttft_ms": 885.1566999946954,
+          "prompt_ms": 840.5,
+          "request_ms": 2383.004500006791
+        }
+      },
+      {
+        "label": "reverse-bcs-after",
+        "summary": {
+          "decode_tok_s": 49.695956530220776,
+          "ttft_ms": 883.744899998419,
+          "prompt_ms": 839.0,
+          "request_ms": 2370.867349978653
+        }
+      },
+      {
+        "label": "reverse-l0-after",
+        "summary": {
+          "decode_tok_s": 49.52758072407045,
+          "ttft_ms": 882.3720500076888,
+          "prompt_ms": 839.65,
+          "request_ms": 2377.4762000102783
+        }
+      }
+    ],
+    "packets_and_locks": [
+      {
+        "variant": "eu",
+        "nodes": [
+          {
+            "node": 5,
+            "submits": 136,
+            "primary_bytes": 7328504
+          }
+        ],
+        "packet_totals": {
+          "CFE_STATE": 2531,
+          "COMPUTE_WALKER": 40778,
+          "MI_BATCH_BUFFER_END": 136,
+          "MI_LOAD_REGISTER_IMM": 2531,
+          "PIPELINE_SELECT": 2531,
+          "PIPE_CONTROL": 34187,
+          "STATE_BASE_ADDRESS": 278,
+          "STATE_COMPUTE_MODE": 2531
+        },
+        "uncaptured_request_10_calls": {
+          "D3DKMTSubmitCommand": 136,
+          "D3DKMTWaitForSynchronizationObjectFromCpu": 96,
+          "D3DKMTWaitForSynchronizationObjectFromGpu": 0,
+          "D3DKMTMakeResident": 0,
+          "D3DKMTCreateAllocation2": 0,
+          "D3DKMTDestroyAllocation2": 0,
+          "D3DKMTMapGpuVirtualAddress": 0,
+          "D3DKMTQueryAllocationResidency": 0,
+          "D3DKMTSignalSynchronizationObjectFromCpu": 0,
+          "D3DKMTFreeGpuVirtualAddress": 0,
+          "D3DKMTReserveGpuVirtualAddress": 0,
+          "D3DKMTQueryVideoMemoryInfo": 0,
+          "_Mtx_lock": 130,
+          "_Mtx_unlock": 130,
+          "_Thrd_yield": 0,
+          "AcquireSRWLockExclusive": 0,
+          "ReleaseSRWLockExclusive": 0,
+          "AcquireSRWLockShared": 0,
+          "ReleaseSRWLockShared": 0,
+          "D3DKMTCreateDevice": 0,
+          "D3DKMTCreateContextVirtual": 0,
+          "D3DKMTDestroyContext": 0
+        },
+        "application_lock_acquisitions": 130
+      },
+      {
+        "variant": "bcs",
+        "nodes": [
+          {
+            "node": 2,
+            "submits": 20,
+            "primary_bytes": 144320
+          },
+          {
+            "node": 5,
+            "submits": 116,
+            "primary_bytes": 7207224
+          }
+        ],
+        "packet_totals": {
+          "CFE_STATE": 2511,
+          "COMPUTE_WALKER": 40138,
+          "MI_ARB_CHECK": 1280,
+          "MI_BATCH_BUFFER_END": 136,
+          "MI_FLUSH_DW": 1320,
+          "MI_LOAD_REGISTER_IMM": 2511,
+          "PIPELINE_SELECT": 2511,
+          "PIPE_CONTROL": 33487,
+          "STATE_BASE_ADDRESS": 238,
+          "STATE_COMPUTE_MODE": 2511,
+          "XY_BLOCK_COPY_BLT": 1280
+        },
+        "uncaptured_request_10_calls": {
+          "D3DKMTSubmitCommand": 136,
+          "D3DKMTWaitForSynchronizationObjectFromCpu": 96,
+          "D3DKMTWaitForSynchronizationObjectFromGpu": 0,
+          "D3DKMTMakeResident": 0,
+          "D3DKMTCreateAllocation2": 0,
+          "D3DKMTDestroyAllocation2": 0,
+          "D3DKMTMapGpuVirtualAddress": 0,
+          "D3DKMTQueryAllocationResidency": 0,
+          "D3DKMTSignalSynchronizationObjectFromCpu": 0,
+          "D3DKMTFreeGpuVirtualAddress": 0,
+          "D3DKMTReserveGpuVirtualAddress": 0,
+          "D3DKMTQueryVideoMemoryInfo": 0,
+          "_Mtx_lock": 124,
+          "_Mtx_unlock": 124,
+          "_Thrd_yield": 0,
+          "AcquireSRWLockExclusive": 0,
+          "ReleaseSRWLockExclusive": 0,
+          "AcquireSRWLockShared": 0,
+          "ReleaseSRWLockShared": 0,
+          "D3DKMTCreateDevice": 0,
+          "D3DKMTCreateContextVirtual": 0,
+          "D3DKMTDestroyContext": 0
+        },
+        "application_lock_acquisitions": 124
+      }
+    ],
+    "logical_transfers": [
+      {
+        "variant": "eu",
+        "retained_transfer_delta": {
+          "h2d_bytes": 968318976,
+          "h2d_calls": 659,
+          "d2h_bytes": 0,
+          "d2h_calls": 0,
+          "d2d_bytes": 4554752,
+          "d2d_calls": 134,
+          "h2h_bytes": 0,
+          "h2h_calls": 0,
+          "shared_bytes": 0,
+          "shared_calls": 0,
+          "fill_bytes": 0,
+          "fill_calls": 0,
+          "kernels": 40778,
+          "submission_api_calls": 136
+        }
+      },
+      {
+        "variant": "bcs",
+        "retained_transfer_delta": {
+          "h2d_bytes": 968318976,
+          "h2d_calls": 659,
+          "d2h_bytes": 0,
+          "d2h_calls": 0,
+          "d2d_bytes": 4554752,
+          "d2d_calls": 134,
+          "h2h_bytes": 0,
+          "h2h_calls": 0,
+          "shared_bytes": 0,
+          "shared_calls": 0,
+          "fill_bytes": 0,
+          "fill_calls": 0,
+          "kernels": 40138,
+          "submission_api_calls": 136
+        }
+      }
+    ],
+    "original_compile_failure": "Diagnostic logging used private Runtime::queue_index;allfailedlogsretained,v2logsroleonly,noGPUranv1."
+  },
+  "evidence_files": 1539,
+  "decision": "Explicit copy_engine routing and native BCS fills are validated as frozen Windows staging. No fixed queue ordinal. Read both clean brackets and drift;no stable or universal native-over-L0 advantage is inferred from small point estimates.",
+  "caveats": [
+    "All80frozenHostTUs are rebuilt with identical adapter headers,including the three integrated scheduling sources. No mixed old/new inline constructors. Mathematical device modules are unchanged. Concurrent live runtime/local-ID/storage/resident/lookup/MTP work is excluded.",
+    "ORCA_DG2_BCS_COPY=0/1 is cached at Stream construction and selects EU or native BCS for explicitly requested copy_engine streams. No per-token environment lookup. The API role,not a queue ordinal,selects the engine. This stage is not production-source/default adoption.",
+    "Raw XY_FAST_COLOR_BLT supports1..128-byte patterns,odd lengths,unaligned addresses and immutable replay. Common aligned patterns use compact rectangles;wide/unaligned patterns use disjoint strided color stripes,with byte tails. No SPIR-V,zebin or EU kernel is loaded by the1632-check fill executable. No fill-performance claim is made.",
+    "Clean timing uses L0/EU/BCS/EU/L0 and L0/BCS/EU/BCS/L0,ten warmups and ten retained requests per process. Initialization,graph preparation and prefill are outside decode;TTFT is separate. Clocks unlocked;report control drift with gains.",
+    "Packet/lock and logical-transfer counters are separate from clean timing. Lock census uses uncaptured request10;request11 packet work changes execution/worker timing. Only application mutex/SRW imports are covered;observerSRW excluded,private/inlined/vendor locks outside scope.",
+    "All11corresponding EU/BCS logical payloads are checked,not physical PCIe transactions. Correct GPU queue dependencies do not establish measured simultaneous execution. Short-only and Windows-only;Linux GPU deferred.",
+    "Initial private-diagnostic-access compile failure is preserved. No production binary/config,rootREADME,immutable Linux handoff or foreign-process/display changes. Earlier fixed-ordinal and standalone BLT reports remain immutable."
+  ],
+  "reproduction": {
+    "verify": "python build-orca-native-lower-20261031/publish_dg2_copy_api.py --verify",
+    "rerun": "Use fresh output stages;archived sources,80Hostcompilecommands,rawprotocols/packets,allrows,and source/object/module hashes pin this Windows A770 experiment."
+  },
+  "archive_sha256": "f45d4dec14fe8347d814451eb05b550b00f6b71643ff721ad3a3b5d05453370e"
+}

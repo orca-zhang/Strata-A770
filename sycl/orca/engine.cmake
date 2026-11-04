@@ -69,7 +69,7 @@ target_link_libraries(strata_orca_host PUBLIC strata_orca_kernels Threads::Threa
 add_executable(strata-orca-engine-check engine_check.cpp)
 target_compile_options(strata-orca-engine-check PRIVATE ${_flags} -fsycl -fsycl-host-only)
 target_link_libraries(strata-orca-engine-check PRIVATE strata_orca_engine)
-add_test(NAME strata-orca-engine COMMAND strata-orca-engine-check "${CMAKE_CURRENT_BINARY_DIR}/images")
+add_test(NAME strata-orca-engine COMMAND strata-orca-engine-check "${STRATA_ORCA_TEST_IMAGES}")
 set_tests_properties(strata-orca-engine PROPERTIES LABELS gpu TIMEOUT 120 RUN_SERIAL TRUE)
 if(WIN32)
   target_compile_definitions(strata_orca_host PUBLIC NOMINMAX= WIN32_LEAN_AND_MEAN=)
@@ -104,7 +104,7 @@ orca_host_sources(_snapshot_check core/conversation_snapshot_test.cpp)
 add_executable(strata-orca-snapshot-check ${_snapshot_check})
 target_compile_options(strata-orca-snapshot-check PRIVATE ${_flags} -fsycl -fsycl-host-only)
 target_link_libraries(strata-orca-snapshot-check PRIVATE strata_orca_engine)
-add_test(NAME strata-orca-snapshots COMMAND strata-orca-snapshot-check "${CMAKE_CURRENT_BINARY_DIR}/images")
+add_test(NAME strata-orca-snapshots COMMAND strata-orca-snapshot-check "${STRATA_ORCA_TEST_IMAGES}")
 set_tests_properties(strata-orca-snapshots PROPERTIES LABELS gpu TIMEOUT 120 RUN_SERIAL TRUE)
 
 # Tiny synthetic layout; exercise the real file ring without loading a model or touching the GPU.

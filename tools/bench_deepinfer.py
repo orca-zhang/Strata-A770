@@ -117,24 +117,27 @@ class Engine:
         self.log = stem.with_suffix(".stderr").open("x", encoding="utf-8")
         self.protocol = stem.with_suffix(".protocol").open("x", encoding="utf-8")
         self.lines = queue.Queue()
+        self.process_started = time.perf_counter()
         self.p = subprocess.Popen([str(exe), "--serve", *args], cwd=ROOT, env=env,
                                   stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=self.log,
                                   text=True, encoding="utf-8", errors="replace", bufsize=1)
         self.timing = env.get("STRATA_DECODE_TIMING") == "1"
         def read():
             for line in self.p.stdout:
+                stamp = time.perf_counter()
                 self.protocol.write(line)
                 self.protocol.flush()
-                self.lines.put((time.perf_counter(), line.strip()))
+                self.lines.put((stamp, line.strip()))
             self.lines.put((time.perf_counter(), None))
         self.reader = threading.Thread(target=read, daemon=True)
         self.reader.start()
         self.info = ""
         while True:
-            _, line = self.next()
+            stamp, line = self.next()
             if line.startswith("INFO "):
                 self.info = line
             if line.startswith("READY "):
+                self.ready_ms = 1000*(stamp-self.process_started)
                 break
 
     def next(self):
@@ -153,11 +156,14 @@ class Engine:
         started = time.perf_counter()
         self.send(f"GEN {n} {keys} " + ",".join(map(str, ids)))
         tokens, ttft, resume = [], None, 0
+        first_delivery_tokens, last_delivery_ms = 0, None
         while True:
             stamp, line = self.next()
             if line.startswith(("T ", "TB ")):
                 if ttft is None:
                     ttft = 1000*(stamp-started)
+                    first_delivery_tokens = len(line.split()) - (1 if line.startswith("T ") else 2)
+                last_delivery_ms = 1000*(stamp-started)
                 tokens.extend(map(int, line.split()[1:] if line.startswith("T ") else line.split()[2:]))
                 if cancel:
                     self.send("STOP")
@@ -169,10 +175,15 @@ class Engine:
                     busy(self.p.pid)
                 p = line.split()
                 assert len(tokens) == int(p[1])
+                delivery_span_ms = None if ttft is None else last_delivery_ms-ttft
                 return {"tokens": tokens, "generated": int(p[1]), "prompt_tokens": int(p[2]),
                         "prompt_ms": float(p[3]), "decode_ms": float(p[4]), "finish": p[5],
                         "accepted": int(p[6]), "offered": int(p[7]), "reused": int(p[8]),
-                        "resume": resume, "ttft_ms": ttft, "done": line}
+                        "resume": resume, "ttft_ms": ttft, "done": line,
+                        "request_ms": 1000*(stamp-started), "first_delivery_tokens": first_delivery_tokens,
+                        "last_delivery_ms": last_delivery_ms, "delivery_span_ms": delivery_span_ms,
+                        "post_first_delivery_tok_s": 1000*(len(tokens)-first_delivery_tokens)/delivery_span_ms
+                            if delivery_span_ms is not None and delivery_span_ms > 0 else None}
 
     def close(self):
         try:
@@ -214,7 +225,9 @@ def prompts(cfg):
     template = ChatTemplate(directory/"chat_template.jinja")
     messages, tools, kwargs = openai_to_messages({"messages": [{"role": "user", "content": "Explain why the sky is blue in three sentences."}], "reasoning_effort": "none"})
     short = tokenizer.encode(template.render(messages, tools, **kwargs), parse_special=True)
-    return dict(zip(("Short", "Code2K", "Prose2K", "Long8K"), [short, *large]))
+    messages, tools, kwargs = openai_to_messages({"messages": [{"role": "user", "content": "请用三句话解释天空为什么是蓝色的。"}], "reasoning_effort": "none"})
+    chinese = tokenizer.encode(template.render(messages, tools, **kwargs), parse_special=True)
+    return dict(zip(("Short", "Code2K", "Prose2K", "Long8K", "Chinese"), [short, *large, chinese]))
 
 
 def model_args(cfg, reproducible=False, threshold=.5, cache_mib=4000):

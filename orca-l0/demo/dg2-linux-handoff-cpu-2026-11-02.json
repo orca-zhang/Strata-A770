@@ -1,0 +1,133 @@
+{
+  "date": "2026-11-02",
+  "complete": true,
+  "scope": "Current-main source handoff, actual exported-source Linux GCC build, three CPU checks and dynamic dependency audit. No GPU execution or Linux frontend compilation.",
+  "validation": {
+    "raw_linux_cpu_checks": 3,
+    "all_check_commands_passed": true,
+    "gpu_executed": false,
+    "linux_gpu_validated": false,
+    "linux_frontend_compiled": false,
+    "missing_icpx_rejected_before_build": true,
+    "production_changed": false,
+    "linux_disk_mounted_or_modified": false,
+    "removed_runtime_dependency_audit_passed": true
+  },
+  "source_snapshot": {
+    "files": 1989,
+    "changed_sources_from_old_numerical_overlay": 21,
+    "files_previously_missing": 1683,
+    "source_overlay_sha256": "61c5fac074a852e58e147cb838987f9bb322f3277b1af3a21daaff80b0227a22",
+    "source_overlay_bytes": 10551666,
+    "local_directory": "build-orca-native-lower-20261031/dg2-current-handoff-20261102-v2",
+    "includes_full_engine_source": true,
+    "includes_pinned_ggml_source": true,
+    "staged_priority_or_heap_experiment_adopted": false
+  },
+  "reproduction": {
+    "cpu_command": "python3 tools/check_orca_native_linux.py --out NEW_CPU_OUTPUT",
+    "frontend_compile_only_command": "python3 tools/check_orca_native_linux.py --frontend --out NEW_FRONTEND_OUTPUT --ggml-dir build-sycl/_deps/strata_llamacpp-src",
+    "runner_sha256": "44ba0be14ad9cc059334049dbacd7dfa218ba0a1ff981d172a516592cf9651c3",
+    "actual_commands": [
+      {
+        "label": "configure",
+        "args": [
+          "cmake",
+          "-S",
+          "/mnt/g/GitHub/Strata/build-orca-native-lower-20261031/dg2-current-handoff-20261102-v2/snapshot/orca-l0",
+          "-B",
+          "/mnt/g/GitHub/Strata/build-orca-native-lower-20261031/dg2-current-handoff-20261102-v2/linux-cpu/build",
+          "-DCMAKE_BUILD_TYPE=Release",
+          "-DCMAKE_CXX_COMPILER=/usr/bin/g++",
+          "-DORCA_L0_BUILD_RUNTIME=OFF",
+          "-DORCA_L0_BUILD_CHECKS=ON",
+          "-DORCA_L0_BUILD_DRM_CHECKS=ON",
+          "-DORCA_L0_BUILD_GPU_CHECKS=OFF",
+          "-DORCA_L0_DG2_MEMORY_ZEBIN=",
+          "-DORCA_L0_WDDM_ZEBIN="
+        ],
+        "exit_code": 0
+      },
+      {
+        "label": "build",
+        "args": [
+          "cmake",
+          "--build",
+          "/mnt/g/GitHub/Strata/build-orca-native-lower-20261031/dg2-current-handoff-20261102-v2/linux-cpu/build",
+          "--target",
+          "orca-l0-ring-check",
+          "orca-l0-drm-submit-check",
+          "orca-l0-drm-compute-check",
+          "-j",
+          "2"
+        ],
+        "exit_code": 0
+      },
+      {
+        "label": "ring-cpu",
+        "args": [
+          "/mnt/g/GitHub/Strata/build-orca-native-lower-20261031/dg2-current-handoff-20261102-v2/linux-cpu/build/orca-l0-ring-check"
+        ],
+        "exit_code": 0
+      },
+      {
+        "label": "packets-cpu",
+        "args": [
+          "/mnt/g/GitHub/Strata/build-orca-native-lower-20261031/dg2-current-handoff-20261102-v2/linux-cpu/build/orca-l0-drm-submit-check",
+          "--self-check"
+        ],
+        "exit_code": 0
+      },
+      {
+        "label": "encoder-cpu",
+        "args": [
+          "/mnt/g/GitHub/Strata/build-orca-native-lower-20261031/dg2-current-handoff-20261102-v2/linux-cpu/build/orca-l0-drm-compute-check",
+          "--self-check"
+        ],
+        "exit_code": 0
+      },
+      {
+        "label": "dependencies-0",
+        "args": [
+          "ldd",
+          "/mnt/g/GitHub/Strata/build-orca-native-lower-20261031/dg2-current-handoff-20261102-v2/linux-cpu/build/orca-l0-ring-check"
+        ],
+        "exit_code": 0
+      },
+      {
+        "label": "dependencies-1",
+        "args": [
+          "ldd",
+          "/mnt/g/GitHub/Strata/build-orca-native-lower-20261031/dg2-current-handoff-20261102-v2/linux-cpu/build/orca-l0-drm-submit-check"
+        ],
+        "exit_code": 0
+      },
+      {
+        "label": "dependencies-2",
+        "args": [
+          "ldd",
+          "/mnt/g/GitHub/Strata/build-orca-native-lower-20261031/dg2-current-handoff-20261102-v2/linux-cpu/build/orca-l0-drm-compute-check"
+        ],
+        "exit_code": 0
+      }
+    ],
+    "platform": "Linux-6.18.40.1-microsoft-standard-WSL2-x86_64-with",
+    "executable_sha256": {
+      "build/orca-l0-ring-check": "58a1ddcdf1c7b2578c07e36f9c03a4452cd6518cd90b3e8a4c0303542308c194",
+      "build/orca-l0-drm-submit-check": "1174f98cf4f8eb9ddc9342c8233b1d8b2148fdb98f31621e1afc4560eb38b864",
+      "build/orca-l0-drm-compute-check": "188ab9dd65a79645d373e5732f60133fd8647310285df04f763c3522c908f0ee"
+    }
+  },
+  "production_sha256": {
+    "strata-iq2_xs.json": "9c45e51de69e66c3f1cd020359c8d70d639fbd1aba5d87ead84082fbe73fd531",
+    "build-orca-default-pair-20261031/strata.exe": "7be641375e905b0ceb64424ab4875afcdf9f7f6f1e2c60d6b0fcff4ece5ff4b5"
+  },
+  "caveats": [
+    "This is a Linux/WSL CPU build. No DRM GPU context, native kernel or full model was executed.",
+    "The --frontend path stopped in preflight because Linux icpx is absent; it is not a successful frontend build.",
+    "The source overlay is local, rather than embedded in this evidence archive. Its manifest hashes every exported file; preserve Linux edits before applying it.",
+    "WSL Python 3 was installed for this runner. The first export attempt did not reach configuration because Python 3 was missing; it remains incomplete and is archived.",
+    "The current main checkpoint is exported. Staged partial-state, shared-heap and WDDM low-priority experiments remain unadopted.",
+    "Windows native DG2 cursor flickering remains unresolved. Do not infer desktop coexistence, PPL or performance from these CPU checks. Native Linux testing still needs fresh frontend images and Linux-driver baking."
+  ]
+}

@@ -9,10 +9,21 @@
 #include <array>
 #include <cmath>
 #include <cstdio>
+#include <new>
+
+namespace {
+void dependencies() {
+#ifdef STRATA_ORCA_DG2
+    check_runtime_dependencies(true);
+#else
+    check_runtime_dependencies();
+#endif
+}
+}
 
 int main(int argc, char** argv) try {
     if (argc != 2) throw std::invalid_argument("usage: strata-orca-engine-check images");
-    check_runtime_dependencies();
+    dependencies();
     strata::l0::install_engine(argv[1]);
     {
         strata::prefill::Prefill unused;
@@ -25,6 +36,7 @@ int main(int argc, char** argv) try {
     std::printf("native engine: %s, free %.1f / total %.1f GiB\n", info.name.c_str(),
                 double(info.free_bytes) / (1ull << 30), double(info.total_bytes) / (1ull << 30));
     auto& queue = dpct::get_in_order_queue();
+#ifndef STRATA_ORCA_DG2
     {
         ze_driver_properties_t actual{};
         actual.stype = ZE_STRUCTURE_TYPE_DRIVER_PROPERTIES;
@@ -43,8 +55,13 @@ int main(int argc, char** argv) try {
             })) throw std::runtime_error("cached extension mismatch");
         std::puts("PASS cached native driver properties and extension capabilities match raw queries");
     }
-    if (info.free_bytes > (1ull << 30) &&
-        !(queue.runtime().properties().flags & ZE_DEVICE_PROPERTY_FLAG_INTEGRATED)) {
+    const bool discrete = !(queue.runtime().properties().flags & ZE_DEVICE_PROPERTY_FLAG_INTEGRATED);
+#else
+    if (info.arch != "Intel DG2 (Orca native)" || info.driver_version || info.runtime_version)
+        throw std::runtime_error("native device information contains invented Level Zero properties");
+    const bool discrete = true;
+#endif
+    if (info.free_bytes > (1ull << 30) && discrete) {
         constexpr size_t probe_bytes = 256u << 20;
         auto* probe = static_cast<uint32_t*>(queue.runtime().allocate(probe_bytes));
         queue.fill(probe, 0x12345678u, probe_bytes / sizeof(uint32_t)).wait_and_throw();
@@ -58,6 +75,7 @@ int main(int argc, char** argv) try {
         if (total != info.total_bytes || after > info.free_bytes - probe_bytes / 4)
             throw std::runtime_error("native free-memory query did not account for the touched allocation");
     }
+#ifndef STRATA_ORCA_DG2
     const auto limit = queue.runtime().properties().maxMemAllocSize;
     if (limit && limit < SIZE_MAX - (512ull << 20) &&
         info.free_bytes > std::max<uint64_t>(limit, 1ull << 32) + (512ull << 20)) {
@@ -82,6 +100,7 @@ int main(int argc, char** argv) try {
         std::printf("native relaxed allocation: %llu bytes > device limit %llu; both edges checked\n",
                     (unsigned long long)bytes, (unsigned long long)limit);
     } else std::puts("SKIP relaxed allocation check: insufficient free memory above the device limit");
+#endif
     strata::core::DeviceArena arena(4096, 0, true);
     auto* destination = static_cast<float*>(arena.alloc(256));
     std::array<float, 64> output;
@@ -148,7 +167,39 @@ int main(int argc, char** argv) try {
         std::printf("native host arena %d: imported %llu bytes; %s\n", attempt,
                     (unsigned long long)host.registered_bytes, host.note.c_str());
     }
-    check_runtime_dependencies();
+#ifdef STRATA_ORCA_DG2
+    {
+        constexpr size_t bytes = 65536;
+        struct Borrowed {
+            void* pointer = ::operator new(bytes, std::align_val_t(bytes));
+            bool imported = false;
+            ~Borrowed() {
+                try {
+                    if (imported) strata::l0::release_host(pointer);
+                    ::operator delete(pointer, std::align_val_t(bytes));
+                } catch (...) { /* Keep pages alive if native release cannot drain. */ }
+            }
+        } borrowed;
+        auto* values = static_cast<float*>(borrowed.pointer);
+        if (strata::l0::import_host(values, bytes - 1) == 0)
+            throw std::runtime_error("native host import accepted a partial owned page range");
+        for (int pass = 0; pass < 8; ++pass) {
+            if (strata::l0::import_host(values, bytes) != 0)
+                throw std::runtime_error("native aligned host import failed");
+            borrowed.imported = true;
+            if (strata::l0::import_host(values, bytes) == 0)
+                throw std::runtime_error("native host import accepted an overlapping mapping");
+            for (size_t i = 0; i < output.size(); ++i) values[i] = float(pass * 100 + i);
+            queue.memcpy(destination, values, sizeof(output));
+            queue.memcpy(output.data(), destination, sizeof(output)).wait_and_throw();
+            for (size_t i = 0; i < output.size(); ++i)
+                if (output[i] != values[i]) throw std::runtime_error("imported native host copy mismatch");
+            strata::l0::release_host(values); borrowed.imported = false;
+        }
+        std::puts("PASS native host import: eight borrowed-page reimports, overlap/alignment rejection and exact copies");
+    }
+#endif
+    dependencies();
     std::puts("PASS native engine bootstrap, arenas, pitched graph copy and Strata graph wrapper");
     return 0;
 } catch (const std::exception& e) { std::fprintf(stderr, "FAIL: %s\n", e.what()); return 1; }

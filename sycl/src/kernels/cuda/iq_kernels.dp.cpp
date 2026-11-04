@@ -1420,6 +1420,103 @@ __dpct_inline__ void gu_pair_kernel(const unsigned long long* grp_ptr,
     }
 }
 
+template <int TY, int LANES>
+__dpct_inline__ void gu_pair_chunk_34(const uint8_t* blob, const block_q8_1* xq,
+                                      const int32_t* ent_tok, int e, NativeExpertLayout L,
+                                      int row, int lane, float* gate, float* up, int entries) {
+#pragma clang fp contract(off)
+    constexpr int E = 4;
+    using F = Fmt<TY>;
+    using M = Multi<TY>;
+    const block_q8_1* xs[E];
+    float gs[E], us[E];
+#pragma unroll
+    for (int j = 0; j < E; ++j) if (j < entries) {
+        xs[j] = xq + (size_t) ent_tok[e + j] * (L.n_embd / 32);
+        gs[j] = us[j] = 0.0f;
+    }
+    const uint8_t* gr = blob + (size_t) row * L.gu_row;
+    const uint8_t* ur = gr + L.up_off;
+    const int nb = L.n_embd / F::qk;
+    for (int k = lane; k < nb * F::ipb; k += LANES) {
+        const int kbx = k / F::ipb, iqs = F::step * (k % F::ipb);
+        MultiW gm, um;
+        M::prep(gr, kbx, iqs, gm);
+        M::prep(ur, kbx, iqs, um);
+#pragma unroll
+        for (int j = 0; j < E; ++j) if (j < entries) {
+            int x[8];
+            float ds;
+            // ponytail: decode each Q8 activation once for the paired gate/up dots.
+            M::acts(xs[j] + kbx * (F::qk / 32), iqs, x, ds);
+            int g0 = 0, g1 = 0, u0 = 0, u1 = 0;
+#pragma unroll
+            for (int p = 0; p < 4; ++p) {
+                g0 = ggml_cuda_dp4a(gm.w[p], x[p], g0);
+                u0 = ggml_cuda_dp4a(um.w[p], x[p], u0);
+            }
+#pragma unroll
+            for (int p = 4; p < 8; ++p) {
+                g1 = ggml_cuda_dp4a(gm.w[p], x[p], g1);
+                u1 = ggml_cuda_dp4a(um.w[p], x[p], u1);
+            }
+            gs[j] += M::finish(g0, g1, gm, ds);
+            us[j] += M::finish(u0, u1, um, ds);
+        }
+    }
+#pragma unroll
+    for (int j = 0; j < E; ++j) if (j < entries) {
+        const float g = lanes_sum<LANES>(gs[j]), u = lanes_sum<LANES>(us[j]);
+        if (lane == 0) {
+            gate[(size_t) (e + j) * L.n_ff + row] = g;
+            up[(size_t) (e + j) * L.n_ff + row] = u;
+        }
+    }
+}
+template <int TY, int LANES, bool FIXED = false, int WG = 256>
+__dpct_inline__ void gu_pair_compact_kernel(const unsigned long long* grp_ptr,
+                                       const int32_t* grp_start, const int32_t* n_groups,
+                                       const int32_t* ent_tok, const block_q8_1* xq,
+                                       NativeExpertLayout L, float* gate, float* up) {
+    if constexpr (FIXED) L.n_embd = 2560;
+    auto item = sycl::ext::oneapi::this_work_item::get_nd_item<3>();
+    const int row = item.get_group(2) * (WG / LANES) + item.get_local_id(2) / LANES;
+    const int lane = item.get_local_id(2) & (LANES - 1);
+    if (row >= L.n_ff) return;
+    const int ng = *n_groups;
+    for (int g = item.get_group(1); g < ng; g += item.get_group_range(1)) {
+        const auto* blob = reinterpret_cast<const uint8_t*>(grp_ptr[g]);
+        const int e1 = grp_start[g + 1];
+        int e = grp_start[g];
+        for (; e + 3 <= e1;) {
+            const int entries = e + 4 <= e1 ? 4 : 3;
+            gu_pair_chunk_34<TY, LANES>(blob, xq, ent_tok, e, L, row, lane, gate, up, entries);
+            e += entries;
+        }
+        if (e + 2 <= e1) {
+            gu_pair_chunk<TY, LANES, 2>(blob, xq, ent_tok, e, L, row, lane, gate, up);
+            e += 2;
+        }
+        if (e < e1) gu_pair_chunk<TY, LANES, 1>(blob, xq, ent_tok, e, L, row, lane, gate, up);
+    }
+}
+
+// ponytail: share the E3/E4 body; preserve per-entry arithmetic and fixed geometry.
+template <int TY, int LANES>
+void gu_pair_compact_launch(dpct::queue_ptr s, const unsigned long long* grp_ptr,
+                          const int32_t* grp_start, const int32_t* n_groups,
+                          const int32_t* ent_tok, const block_q8_1* X,
+                          NativeExpertLayout L, float* gate, float* up, int64_t gy) {
+    constexpr int rows = 128 / LANES;
+    s->parallel_for<dpct_kernel_name<class gu_pair_compact_wg128, dpct_kernel_scalar<TY>>>(
+        sycl::nd_range<3>(sycl::range<3>(1, (size_t) gy, (size_t) ((L.n_ff + rows - 1) / rows) * 128),
+                         sycl::range<3>(1, 1, 128)),
+        [=](sycl::nd_item<3>) [[sycl::reqd_sub_group_size(16)]] {
+            gu_pair_compact_kernel<TY, LANES, true, 128>(grp_ptr, grp_start, n_groups, ent_tok, X, L, gate, up);
+        });
+}
+
+
 // The entries e0..e1 of one row: chunks of 4 through the multi-entry dot, the rest one at a time.
 template <int TY, int LANES>
 __dpct_inline__ void row_entries(const uint8_t* wr, const block_q8_1* x, int x_stride, const int32_t* ent_idx,
@@ -2726,6 +2823,9 @@ namespace {
 bool g_grouped_v1 = env_on("STRATA_GROUPED_V1");
 }  // namespace
 
+#ifdef STRATA_ORCA_NATIVE
+bool native_grouped_v1_enabled() { return g_grouped_v1; }
+#endif
 void native_grouped_set_v1(bool v1) { g_grouped_v1 = v1; }
 void native_gu_sg16_set(bool enabled) { g_gu_sg16 = enabled; }
 void native_gu_iq2s_single_set(bool enabled) { g_gu_single = enabled; }
@@ -2735,7 +2835,16 @@ void native_down_single_set(bool enabled) { g_down_single = enabled; }
 void native_expert_grouped(const NativeExpertLayout& L, const unsigned long long* grp_ptr, const int32_t* grp_start,
                            const int32_t* n_groups, const int32_t* ent_dst, const int32_t* ent_tok, int64_t cap_groups,
                            int64_t cap_entries, const void* x_q8_1, void* scratch, float* out, void* stream,
-                           int64_t grid_groups) {
+                           int64_t grid_groups
+#ifdef STRATA_ORCA_NATIVE
+                           , int phase
+#endif
+                           ) {
+#ifndef STRATA_ORCA_NATIVE
+    constexpr int phase = 0;
+#endif
+    if (phase < 0 || phase > 3 || (phase && g_grouped_v1))
+        throw std::invalid_argument("unsupported grouped expert phase");
     if (cap_groups <= 0 || cap_entries <= 0) return;
     if (L.n_ff % 32 != 0) { std::fprintf(stderr, "native_expert_grouped: n_ff %lld\n", (long long) L.n_ff); std::exit(1); }
     dpct::queue_ptr s = strata::q_of(stream);
@@ -2751,10 +2860,16 @@ void native_expert_grouped(const NativeExpertLayout& L, const unsigned long long
     const int64_t gy = (v1 || grid_groups <= 0 || grid_groups > cap_groups) ? cap_groups : grid_groups;
     // ponytail: single Intel GPU; re-key this check if mixed-device submissions are added.
     static const bool a770 = s->get_device().get_info<sycl::info::device::name>().find("A770") != std::string::npos;
+    if (phase == 0 || phase == 1) {
     if (a770 && !v1 && !g_old_kernels && !g_split_multi &&
         ((L.gu_type == 22 && gu_lanes() == 16 && g_gu_sg16 && g_gu_single) ||
          (L.gu_type == 42 && L.n_embd == 2560 && gu_lanes() == 8))) {
-        if (L.n_embd == 2560) {
+        // ponytail: opt in once per process; keep unmeasured shapes on the existing path.
+        static const bool pair_compact = env_on("ORCA_IQ_PAIR_COMPACT");
+        if (L.n_embd == 2560 && pair_compact) {
+            if (L.gu_type == 42) gu_pair_compact_launch<42, 8>(s, grp_ptr, grp_start, n_groups, ent_tok, X, L, gate, up, gy);
+            else gu_pair_compact_launch<22, 16>(s, grp_ptr, grp_start, n_groups, ent_tok, X, L, gate, up, gy);
+        } else if (L.n_embd == 2560) {
         const bool q2 = L.gu_type == 42;
         const int rows = q2 ? 16 : 8;
         s->parallel_for<dpct_kernel_name<class gu_pair_wg128>>(
@@ -2784,6 +2899,9 @@ void native_expert_grouped(const NativeExpertLayout& L, const unsigned long long
     }
     }
     check("native_expert_grouped/gu");
+    }
+    if (phase == 1) return;
+    if (phase == 0 || phase == 2) {
     const long long nh = (long long) cap_entries * L.n_ff;
     if (v1) {
         {
@@ -2832,6 +2950,8 @@ void native_expert_grouped(const NativeExpertLayout& L, const unsigned long long
             });
     }
     check("native_expert_grouped/swiglu");
+    }
+    if (phase == 2) return;
     const dpct::dim3 gd((unsigned)((L.n_embd + kExpertRows - 1) / kExpertRows), (unsigned)gy);
     switch (L.d_type) {
 #define STRATA_DOWN(T) case T: launch_down<T>(gd, s, grp_ptr, grp_start, n_groups, ent_dst, hq, L, out); break;
@@ -3043,8 +3163,12 @@ bool xmx_gemm_iq(int ty, const void* gate, const void* up, int64_t K, int n_out,
                  int64_t ldy, void* stream) {
     if (!is_iq(ty) || ty == 16 || ty == 17 || ty == 29 || ty == 23 || ty == 11) return false;
     dpct::queue_ptr q = strata::q_of(stream);
+#ifndef STRATA_ORCA_NATIVE
+    // Orca's DeviceView advertises only the checked SG8 DPAS shape. Do not
+    // export an unreachable SG16 image: DG2's IGC rejects it during full AOT.
     if (n_out % 16 == 0 && xmx::supports_fp16(q, 16))
         return xmx::launch<16>(ty, gate, up, K, n_out, X, M, Y, ldy, q);
+#endif
     if (xmx::supports_fp16(q, 8))
         return xmx::launch<8>(ty, gate, up, K, n_out, X, M, Y, ldy, q);
     return false;

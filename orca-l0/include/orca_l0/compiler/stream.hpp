@@ -75,6 +75,7 @@ public:
         return immediate_.wait(timeout_ns);
     }
     bool ready() { return wait(0); }
+    bool observe_wait(uint64_t timeout_ns) const { return l0::wait(immediate_.native_handle(), timeout_ns); }
     ze_command_list_handle_t native_handle() const noexcept { return immediate_.native_handle(); }
 private:
     Commands& target() { return recording_ ? *recording_ : immediate_; }

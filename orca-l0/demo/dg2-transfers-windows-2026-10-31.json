@@ -1,0 +1,180 @@
+{
+  "date": "2026-10-31",
+  "complete": true,
+  "hardware": {
+    "os": "Windows",
+    "gpu": "Intel Arc A770 16 GB",
+    "pci_device": "0x56a0",
+    "driver": "32.0.101.9034",
+    "wddm": 2700,
+    "compiler": "Intel oneAPI 2025.3.2"
+  },
+  "scope": {
+    "backend": "Orca::DG2",
+    "full_model_integrated": false,
+    "linux_gpu_validated": false,
+    "performance_gain_claimed": false,
+    "production_changed": false
+  },
+  "features": {
+    "apis": [
+      "set_memory_module",
+      "copy",
+      "fill"
+    ],
+    "byte_counts": "arbitrary, including zero and incomplete final patterns",
+    "fill_pattern_bytes": [
+      1,
+      2,
+      4,
+      8,
+      16,
+      32,
+      64,
+      128
+    ],
+    "aligned_vector_bytes": 16,
+    "unaligned_and_tail_path": "coalesced byte access",
+    "full_gpu_range_checks": true,
+    "exact_self_copy_noop": true,
+    "partial_copy_overlap_rejected": true,
+    "small_patterns": "1..16 bytes captured in kernel arguments",
+    "wide_patterns": "32..128 bytes captured in the existing immutable recording heap",
+    "no_memory_kernel_scratch_or_private_memory": true,
+    "replay_parsing_allocation_and_per_kernel_system_calls": false,
+    "required_local_size_execution_and_user_metadata_must_agree": true,
+    "successful_literal_error_checks_no_longer_allocate_strings": true
+  },
+  "validation": {
+    "windows_ctest": "6/6",
+    "linux_cpu_ctest": "4/4",
+    "memory_recordings": 138,
+    "memory_replays": 276,
+    "transfer_directions": [
+      "H2D",
+      "D2D",
+      "D2H",
+      "H2H"
+    ],
+    "byte_count_range": [
+      0,
+      2097189
+    ],
+    "tested_offsets": [
+      [
+        0,
+        0
+      ],
+      [
+        16,
+        32
+      ],
+      [
+        1,
+        3
+      ],
+      [
+        3,
+        1
+      ],
+      [
+        15,
+        15
+      ],
+      [
+        16,
+        17
+      ]
+    ],
+    "captured_patterns_modified_before_execution": true,
+    "changed_inputs": true,
+    "exact_full_source_destination_and_guard_checks": true,
+    "public_copy_local_roundtrips": 12,
+    "public_copy_local_roundtrip_bytes": [
+      65536,
+      16842752,
+      335609856
+    ],
+    "public_copy_local_gemv_replays": 48,
+    "public_copy_local_xmx_replays": 144,
+    "immutable_scalar_captures_across_one_mib_heap_rollover": 17000,
+    "system_memory_regressions": {
+      "xmx": 144,
+      "gemv": 48,
+      "scratch": 12,
+      "private": 16,
+      "atomics": 24
+    },
+    "windows_execution_without_level_zero_intel_umd_gmm_or_compiler": true
+  },
+  "memory_module": {
+    "source": "orca-l0/src/drm/memory.cl",
+    "source_sha256": "f92e9123f256e505b1e0c9d3bd3e0899f8b131f49cab3a227798deb485ec805d",
+    "zebin_sha256": "3d432bd171a7c2cc044bb8c08ee9e94a909f9121cce917c7544a69f8ebf368f3",
+    "offline_bake_uses_vendor_compiler": true,
+    "bake_linux_image_on_linux": true,
+    "native_entry_points": [
+      "orca_copy",
+      "orca_fill",
+      "orca_fill_wide"
+    ]
+  },
+  "source_sha256": {
+    "orca-l0/CMakeLists.txt": "856a1b2585556cdd6740348ff2be2c0f3302dfdc576f99625e23107367aa6eb2",
+    "orca-l0/compiler/CMakeLists.txt": "495fd91dc356f203b3dea0a6ff5277a13a4e1db1eda6cff59208f8567bd1c24e",
+    "orca-l0/compiler/native_pack.cpp": "0fdedfc6e302178df52f31a0628344b2571db8ebe018dc0948a916ae5301e8fd",
+    "orca-l0/demo/CMakeLists.txt": "1e763314817d9cd9572a96f9ae6cdf86af13a24e60b43e231715216d67962c71",
+    "orca-l0/demo/dispatch.cpp": "bd184678e907165a6bb17998b0109e860195e1ba7c5eb8e7f70fc64ad1b924bb",
+    "orca-l0/include/orca_l0/dg2.hpp": "21640f6a9d4b53a52863e3b066b292cf5c0cce944a5246dc139547cea6bfc9b0",
+    "orca-l0/include/orca_l0/direct_driver.hpp": "cd87a73ef80e8b2052a192ddd2ff174d36be595d79c42e454e0bb1b3d86e61c0",
+    "orca-l0/include/orca_l0/drm.hpp": "46808da289dbb63cbb9310f9b4ea806fbec4eeff76dcfbd3b53478f0bf46f245",
+    "orca-l0/include/orca_l0/ring.hpp": "c0bc88a290d32ba5ee6cf26f2fe82c38cced25a334a02c23591e11bb67f75112",
+    "orca-l0/include/orca_l0/runtime.hpp": "1b800beb8a4ec7b1777192afc599a4cf519870acd2438b1aea43e79ffafc0869",
+    "orca-l0/include/orca_l0/compiler/program.hpp": "3aedf164c9bc4320e2be356acc93cd2dae03f75fc49058cdb6f29671fbf02a25",
+    "orca-l0/include/orca_l0/compiler/stream.hpp": "5a0b8badff512b7dc8b737f00b1cb2ddfedb35c0cdbc6e89fc77ee89b390a136",
+    "orca-l0/include/orca_l0/compiler/sycl.hpp": "8b740f4a4a3e4ef5dd84212f47d7b71315b7f1a196701dbcfc9f3a7e4c47ab9a",
+    "orca-l0/src/direct_driver.cpp": "7fe701e2c34dccd80868685b29b83fc846406bf531faa4579a220c7bc4107548",
+    "orca-l0/src/runtime.cpp": "2065f4be1abade4be029573f02d58d73f1b7d6a23cfc5ee85140669880bcf531",
+    "orca-l0/src/drm/arguments.hpp": "b1aff67cf78247b86ac41e708d5809196e9195797253bb2f67f0cf97b525d396",
+    "orca-l0/src/drm/encoding.hpp": "ec9e31dc4c0a9ccacfa2a9bb00f9a8504cbafb8efb60df0fc335498d785c38ae",
+    "orca-l0/src/drm/recording.inl": "fba3a2e3502d1b5558a2dbbdb99e805adf90e2567d389ea539b0da1fad3b5ecf",
+    "orca-l0/src/drm/runtime.cpp": "a1313fce9dbf42e8741ee19ae77175c4965a45cc575d76a2c6ddb894c67ed57a",
+    "orca-l0/src/drm/zebin.hpp": "c2c80e4093c6a39cbb9b1e168aafbe47ecdff076a87427278f0e8a67a72e28ca",
+    "orca-l0/src/wddm/runtime.cpp": "f50f0c49e3308be1a81fcff920c9c6b545ddcc7bb713e177d13cf186b2743b9a",
+    "orca-l0/tests/compiler_check.cpp": "0cec3be040240834476916155bade46c0edbf76cf81aa528d92fc4a0707f2ab1",
+    "orca-l0/tests/dispatch3d.cl": "0d70ceb4fdc897b246e0e3590df708c2cb80d7242600b085243172dbd3697641",
+    "orca-l0/tests/drm_compute_check.cpp": "15b7ca7b436349787ff453f8fdb6c2f76d34052c9d2b2cbba22d72d26c52e1f2",
+    "orca-l0/tests/drm_submit_check.cpp": "a2fd00de705be46804d2913cc10af3a58623ea253bf4e16963921922e73540a8",
+    "orca-l0/tests/inference.cl": "03647efb665f6d2ef16b95ee47526bf42832a71355b6f1c5b78668beefbee1b2",
+    "orca-l0/tests/native_pack_check.cpp": "631ed0ecb003351464fb999113ff444721b5e8f70562bf1fdc0656989338dc51",
+    "orca-l0/tests/ring_check.cpp": "edf589faf8df29b1c4d190a0e7a2e83d698f1726aa2365f3112e3bec5b529798",
+    "orca-l0/tests/runtime_check.cpp": "3aecdf8facd2ad0426dd90ea89ce869c12cdc4d882385dab9f9935bc1b5909ec",
+    "orca-l0/tests/runtime_dependencies.hpp": "6b082542cf1b130441a3de93ae1d6e04cb7680600b429fa636ed9bf48cfec451",
+    "orca-l0/tests/submit_check.cpp": "e8634fdb6547448a3bf54efc9773da5ef6325e826858cea02f2c63a93dd1901e",
+    "orca-l0/tests/wddm_memory_check.cpp": "3e8b17e4b72db0a7b4e53737d747cfc299cceb9207e7d520ba03c43cbbe7071e",
+    "orca-l0/third_party/intel-dg2/packets.hpp": "579559e752d0e4d4d44b903dea0a8f2d172afdd6d0fad63afa445d183bc1165b",
+    "orca-l0/src/wddm/allocation.hpp": "5348b408fb0942796b7d37f80ed6f96df4aa3ff188193341f46917a652afe31c",
+    "orca-l0/src/drm/memory.cl": "f92e9123f256e505b1e0c9d3bd3e0899f8b131f49cab3a227798deb485ec805d"
+  },
+  "executable_sha256": "99154cff4d2c940566bc7f2c803eae0a257b4271d95d41d33bbd7cdae2388a2a",
+  "production_sha256": {
+    "strata-iq2_xs.json": "9c45e51de69e66c3f1cd020359c8d70d639fbd1aba5d87ead84082fbe73fd531",
+    "build-orca-default-pair-20261031/strata.exe": "7be641375e905b0ceb64424ab4875afcdf9f7f6f1e2c60d6b0fcff4ece5ff4b5"
+  },
+  "caveats": [
+    "Correctness evidence; no memory bandwidth or full-model throughput gain is established.",
+    "This API records GPU kernels; it does not expose a separate copy engine or overlapping multiqueue transfers.",
+    "Runtime still owns one ordered list and permits one pending submission.",
+    "One-time binding requires a matching driver-baked memory module, and its file must remain unchanged.",
+    "The Windows local-allocation limit below 4 GiB and lifetime ownership rules are unchanged.",
+    "Native Linux GPU execution, full Strata adapter integration, events/multiqueue and reclamation remain unfinished.",
+    "The earlier scalar float4 test helper has been removed; actual local GEMV/XMX now use the public byte-copy API."
+  ],
+  "previous_device_memory_report_sha256": "fdbc3f99dacec106af338fc5a642e68ce3240e620aba8b09d6a02fb079d14d9e",
+  "local_evidence": [
+    "windows-dg2-transfers-v5",
+    "linux-dg2-transfers-cpu-v1",
+    "windows-dg2-memory-module-v2",
+    "windows-dg2-transfer-captures-v1"
+  ]
+}

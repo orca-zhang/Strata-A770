@@ -265,6 +265,7 @@ __dpct_inline__ void moe_combine_kernel(const float *__restrict__ parts,
 }  // namespace
 
 void shared_expert_set_native_bf16(bool enabled) { native_bf16 = enabled; }
+bool shared_expert_native_bf16_enabled() { return native_bf16; }
 
 namespace {
 __dpct_inline__ void scale_rows_kernel(float *__restrict__ out,
@@ -279,7 +280,14 @@ __dpct_inline__ void scale_rows_kernel(float *__restrict__ out,
 
 void shared_expert_multi(int n_tok, const float* x, const uint16_t* x_bf16, const NativeSharedWeights& nw,
                          const uint16_t* gate_inp_bf16, float* gate, float* up, float* g, float* out, int64_t n_embd,
-                         int64_t n_ff, void* stream, const void* x_q8_1_ready, int lfuse) {
+                         int64_t n_ff, void* stream, const void* x_q8_1_ready, int lfuse
+#ifdef STRATA_ORCA_NATIVE
+                         , int phase
+#endif
+                         ) {
+#ifndef STRATA_ORCA_NATIVE
+    constexpr int phase = 0;
+#endif
     // The caller may share the routed experts' byte-identical q8_1 activation. The larger lfuse path still
     // needs a dedicated SYCL port.
     if (lfuse != 0) {
@@ -290,17 +298,25 @@ void shared_expert_multi(int n_tok, const float* x, const uint16_t* x_bf16, cons
         throw std::invalid_argument("shared_expert_multi: needs 1..8 tokens, native weights, scratch and a stream");
     dpct::queue_ptr cs = strata::q_of(stream);
     const void* x_q8_1 = x_q8_1_ready;
-    if (x_q8_1 == nullptr) {
+    if ((phase == 0 || phase == 1) && x_q8_1 == nullptr) {
         native_quantize_q8_1(x, nw.q8_1, (int) n_embd, n_tok, stream);
         x_q8_1 = nw.q8_1;
     }
     static const bool batch = [] { const char* v = std::getenv("STRATA_DEC_BATCH"); return v == nullptr || std::atoi(v) != 0; }();
-    bool early_scalar = false;
+    // Phase 5 appends projections inside the caller's independent interval.
+    auto raw_type = [](int t) { return t == 8 || t == 14 || t == 21 || t == 23; };
+    if (phase < 0 || phase > 5 || (phase == 5 && (!x_q8_1_ready || n_tok > 4 ||
+        !raw_type(nw.gate_type) || !raw_type(nw.up_type) ||
+        (nw.down_type != 8 && nw.down_type != 20 && nw.down_type != 23))) || (phase && (!native_bf16 ||
+        (x_q8_1_ready && n_tok > 4))))
+        throw std::invalid_argument("unsupported shared expert phase");
+    bool early_scalar = phase != 0;
 #ifdef STRATA_ORCA_NATIVE
     // ponytail: only audited single-launch projections; extend after checking
     // other formats' hidden dependencies. The scalar dot needs only x.
     auto primitive = [](int type) { return type == 8 || type == 14 || type == 21 || type == 23; };
-    early_scalar = cs->allows_independent() && native_bf16 && primitive(nw.gate_type) && primitive(nw.up_type);
+    early_scalar = phase != 0 || (cs->allows_independent() && native_bf16 && primitive(nw.gate_type) && primitive(nw.up_type));
+    if (phase == 0 || phase == 1 || phase == 5) {
     if (early_scalar) {
         static const bool logged = [&] {
             std::fprintf(stderr, "strata: Orca shared independent projections enabled (gate=%d up=%d)\n",
@@ -308,24 +324,35 @@ void shared_expert_multi(int n_tok, const float* x, const uint16_t* x_bf16, cons
             return true;
         }();
         (void)logged;
-        cs->independent([&] {
+        auto projections = [&] {
             native_mmvq(nw.gate_type, nw.gate_data, x_q8_1, gate, (int) n_embd, (int) n_ff, n_tok, stream);
             native_mmvq(nw.up_type, nw.up_data, x_q8_1, up, (int) n_embd, (int) n_ff, n_tok, stream);
             if (batch && n_tok > 1)
                 bf16_gemv_fp32_mmvf_multi(x, n_embd, gate_inp_bf16, g, 1, n_embd, 1, n_tok, stream);
             else for (int t = 0; t < n_tok; ++t)
                 bf16_gemv_fp32_mmvf(x + (size_t) t * n_embd, gate_inp_bf16, g + t, n_embd, 1, stream);
-        }); // Join before SwiGLU overwrites gate and reuses Q8 scratch.
+        };
+        if (phase == 5) projections();
+        else cs->independent(projections); // Join before reusing Q8 scratch.
     } else
 #endif
     {
         native_mmvq(nw.gate_type, nw.gate_data, x_q8_1, gate, (int) n_embd, (int) n_ff, n_tok, stream);
         native_mmvq(nw.up_type, nw.up_data, x_q8_1, up, (int) n_embd, (int) n_ff, n_tok, stream);
     }
+#ifdef STRATA_ORCA_NATIVE
+    }
+#endif
+    if (phase == 1 || phase == 5) return;
+    if (phase == 0 || phase == 2) {
     // Large caller-quantized windows retain the separate path; fusion loses on this A770 case.
     native_swiglu_q8_1(gate, up, nw.q8_1, (int) n_ff, n_tok, stream,
                        x_q8_1_ready == nullptr || n_tok <= 4);
-    native_mmvq(nw.down_type, nw.down_data, nw.q8_1, out, (int) n_ff, (int) n_embd, n_tok, stream);
+    }
+    if (phase == 0 || phase == 3)
+        native_mmvq(nw.down_type, nw.down_data, nw.q8_1, out, (int) n_ff, (int) n_embd, n_tok, stream);
+    if (phase == 3) return;
+    if (phase == 0 || phase == 2) {
     if (native_bf16 && batch && n_tok > 1) {   // one gemv for all rows (outputs identical), one sigmoid launch
         if (!early_scalar) bf16_gemv_fp32_mmvf_multi(x, n_embd, gate_inp_bf16, g, 1, n_embd, 1, n_tok, stream);
         /*
@@ -391,6 +418,8 @@ void shared_expert_multi(int n_tok, const float* x, const uint16_t* x_bf16, cons
                 });
         }
     }
+    }
+    if (phase == 2) return;
     {
         auto exp_props = sycl::ext::oneapi::experimental::properties{
             sycl::ext::oneapi::experimental::use_root_sync};

@@ -1,0 +1,71 @@
+{
+  "date": "2026-11-03",
+  "complete": true,
+  "diagnostic_only": true,
+  "production_changed": false,
+  "performance_claimed": false,
+  "new_model_requests": 0,
+  "physical_traffic_measured": false,
+  "hardware": "Intel Arc A770 C0, vendor0x8086/device0x56a0",
+  "driver": "32.0.101.9034",
+  "os": "Windows",
+  "probe": {
+    "complete": true,
+    "read_only": true,
+    "performance_claimed": false,
+    "production_changed": false,
+    "commands": [
+      {
+        "label": "compile",
+        "args": [
+          "C:/Program Files (x86)/Intel/oneAPI/compiler/2025.3/bin/icx.exe",
+          "/nologo",
+          "/std:c++17",
+          "/EHsc",
+          "/MD",
+          "/O2",
+          "/c",
+          "/IC:/Program Files/LevelZeroSDK/1.33.1/include",
+          "G:\\GitHub\\Strata\\build-orca-native-lower-20261031\\probe_dg2_pci.cpp",
+          "/Fo:G:\\GitHub\\Strata\\build-orca-native-lower-20261031\\windows-dg2-pci-availability-v1\\probe.obj"
+        ],
+        "exit_code": 0
+      },
+      {
+        "label": "link",
+        "args": [
+          "C:/Program Files (x86)/Intel/oneAPI/compiler/2025.3/bin/icx.exe",
+          "G:\\GitHub\\Strata\\build-orca-native-lower-20261031\\windows-dg2-pci-availability-v1\\probe.obj",
+          "C:/Program Files/LevelZeroSDK/1.33.1/lib/ze_loader.lib",
+          "/Fe:G:\\GitHub\\Strata\\build-orca-native-lower-20261031\\windows-dg2-pci-availability-v1\\probe.exe"
+        ],
+        "exit_code": 0
+      },
+      {
+        "label": "probe",
+        "args": [
+          "G:\\GitHub\\Strata\\build-orca-native-lower-20261031\\windows-dg2-pci-availability-v1\\probe.exe"
+        ],
+        "exit_code": 0
+      }
+    ],
+    "source_sha256": "430cfbc18719c9755bdc8e215280c9e56cc5d5b220d7d7769a9f55f999e91153",
+    "header_sha256": "c120719acd3fee242aece3ce010bbc38b9fac0cca1e1dc2f9a7661835c26dcdd",
+    "loader_sha256": "a56a109788c97ed42275803202e42a44c591a24064a038e6aa3cbc5908f98b4b",
+    "properties_status": "0x00000000",
+    "have_bandwidth_counters": false,
+    "stats_status": [
+      "0x78000003"
+    ],
+    "usable": false,
+    "executable_sha256": "fe2434c0b71ac4d3efb2d92ebb16c306aab0787873f6986f3d393ac6959f3d12"
+  },
+  "finding": "PCI properties succeed and advertise no byte/packet/replay counters; zesDevicePciGetStats returns ZE_RESULT_ERROR_UNSUPPORTED_FEATURE.",
+  "caveat": "This establishes unavailable counters on this driver, not zero PCIe traffic or Linux counter availability.",
+  "reproduction": {
+    "runner": "build-orca-native-lower-20261031/probe_dg2_pci.py",
+    "verify": "python build-orca-native-lower-20261031/publish_dg2_pci_availability.py --verify"
+  },
+  "evidence_files": 11,
+  "archive_sha256": "af51f33ae520f62c2359a2d0bb8cd439250471704176b56df5172499072e7b26"
+}

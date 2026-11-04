@@ -1,0 +1,96 @@
+{
+  "schema": 1,
+  "scope": "V11 same-list shared/routed expert stage scheduling on Windows A770 C0.",
+  "production_changed": false,
+  "candidate_adopted": false,
+  "evidence_files": 478,
+  "checks": {
+    "exact_model_requests": 100,
+    "full_buffer_comparisons": 576,
+    "rebuilt_host_objects": 80,
+    "staged_format_layers": 43,
+    "total_layers": 48,
+    "physical_concurrency_proven": false,
+    "linux_gpu_validated": false,
+    "policy": {
+      "step": 0.5,
+      "last": 0.5,
+      "cumulative": 0,
+      "max_mtp": 4,
+      "expert_slots": 5771,
+      "reserve_mib": 1536
+    },
+    "pack_audit": {
+      "shared_expert": {
+        "original_native_exports": 8,
+        "candidate_native_exports": 8,
+        "changed_isa": [
+          "_ZTS16dpct_kernel_nameIJZZN6strata7kernels19shared_expert_multiEiPKfPKtRKNS1_19NativeSharedWeightsES5_PfS9_S9_S9_xxPvPKviENKUlRNS0_2l05QueueEE_clESF_E35native_scalar_sigmoid_kernel_344179EE",
+          "_ZTS16dpct_kernel_nameIJZN6strata7kernels19shared_expert_multiEiPKfPKtRKNS1_19NativeSharedWeightsES5_PfS9_S9_S9_xxPvPKviE41native_scalar_sigmoid_multi_kernel_e0530dEE",
+          "_ZTS16dpct_kernel_nameIJZN6strata7kernels19shared_expert_multiEiPKfPKtRKNS1_19NativeSharedWeightsES5_PfS9_S9_S9_xxPvPKviE24scale_rows_kernel_4f17ecEE"
+        ],
+        "changed_metadata": [],
+        "added_native_exports": []
+      },
+      "iq_kernels": {
+        "original_native_exports": 252,
+        "candidate_native_exports": 252,
+        "changed_isa": [
+          "_ZTS16dpct_kernel_nameIJZN6strata7kernels21native_expert_groupedERKNS1_18NativeExpertLayoutEPKyPKiS8_S8_S8_xxPKvPvPfSB_xE33swiglu_q8_1_entries_kernel_115291EE",
+          "_ZTS16dpct_kernel_nameIJZN6strata7kernels21native_expert_groupedERKNS1_18NativeExpertLayoutEPKyPKiS8_S8_S8_xxPKvPvPfSB_xE28swiglu_entries_kernel_a4959cEE",
+          "_ZTS16dpct_kernel_nameIJZN6strata7kernels21native_expert_groupedERKNS1_18NativeExpertLayoutEPKyPKiS8_S8_S8_xxPKvPvPfSB_xE27quantize_q8_1_kernel_cfb6c5EE",
+          "_ZTS16dpct_kernel_nameIJZN6strata7kernels21native_expert_groupedERKNS1_18NativeExpertLayoutEPKyPKiS8_S8_S8_xxPKvPvPfSB_xE13gu_pair_wg128EE",
+          "_ZTS16dpct_kernel_nameIJZN6strata7kernels21native_expert_groupedERKNS1_18NativeExpertLayoutEPKyPKiS8_S8_S8_xxPKvPvPfSB_xE12iq2s_gu_pairEE"
+        ],
+        "changed_metadata": [],
+        "added_native_exports": []
+      }
+    },
+    "comparisons": {
+      "decode_tok_s": {
+        "serial": 47.52557429005588,
+        "overlap": 47.76569744253787,
+        "l0": 48.422615316149496,
+        "overlap_vs_serial_pct": 0.5052503963791866,
+        "overlap_vs_l0_pct": -1.3566344348041381,
+        "serial_drift_pct": 0.740635634798581,
+        "l0_drift_pct": 0.7193765340902214
+      },
+      "ttft_ms": {
+        "serial": 894.352746011242,
+        "overlap": 892.2115000023041,
+        "l0": 886.9389769545223,
+        "overlap_vs_serial_pct": -0.23941850891471272,
+        "overlap_vs_l0_pct": 0.5944628869379409,
+        "serial_drift_pct": -0.5339169823035173,
+        "l0_drift_pct": -1.3398530614976534
+      },
+      "prompt_ms": {
+        "serial": 847.2722083250459,
+        "overlap": 846.0,
+        "l0": 843.0303909112648,
+        "overlap_vs_serial_pct": -0.15015343505258016,
+        "overlap_vs_l0_pct": 0.3522540967384691,
+        "serial_drift_pct": -0.5120960621578852,
+        "l0_drift_pct": -1.35485391140433
+      },
+      "request_ms": {
+        "serial": 2445.4392580701947,
+        "overlap": 2438.9428500144277,
+        "l0": 2411.607543034408,
+        "overlap_vs_serial_pct": -0.26565403472313953,
+        "overlap_vs_l0_pct": 1.1334890313713597,
+        "serial_drift_pct": -0.5498228332822097,
+        "l0_drift_pct": -0.9952105625925745
+      }
+    }
+  },
+  "caveats": [
+    "Decode excludes preparation/init/prefill; TTFT is separate. No inner timing or GPU telemetry.",
+    "Control drift is not a confidence interval; phase eligibility is not proof of simultaneous hardware execution.",
+    "Full source/log/capture evidence is archived. Model weights, executable and native module binaries are referenced by hashes.",
+    "Two failed offline-baker invocations and one missing Host getter at link precede validation; their logs are retained.",
+    "The getter addition is Host-only; its exact source delta and original device-compile source are archived."
+  ],
+  "archive_sha256": "eb0511afb9e30d027e275e5396a76970af7f732f9b845ab79eb5ec5e3f226513"
+}

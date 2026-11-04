@@ -1,0 +1,196 @@
+{
+  "schema": 1,
+  "scope": "Only ISA tail padding changes,4096->512. Fresh same-compiler control. Matched expert/router schedule,80 Host objects,V11 policy and native modules fixed.",
+  "hardware": {
+    "video_controllers": [
+      {
+        "Name": "GameViewer Virtual Display Adapter",
+        "DriverVersion": "15.6.5.199"
+      },
+      {
+        "Name": "Intel(R) Arc(TM) A770 Graphics",
+        "DriverVersion": "32.0.101.9034"
+      }
+    ],
+    "experiment_device": "Intel Arc A770 C0",
+    "clock_locked": false,
+    "query": "Win32_VideoController once before validation/performance; no polling"
+  },
+  "source_adopted": false,
+  "production_changed": false,
+  "policy": {
+    "step": 0.5,
+    "last": 0.5,
+    "cumulative": 0,
+    "max_mtp": 4,
+    "expert_slots": 5771,
+    "reserve_mib": 1536
+  },
+  "padding_bytes": {
+    "control": 4096,
+    "candidate": 512
+  },
+  "checks": {
+    "windows_per_variant": 15,
+    "full_buffer_comparisons": 1728,
+    "gpu_tail_epochs": 2064,
+    "exact_short_requests": 160,
+    "exact_diagnostic_requests": 2
+  },
+  "footprint": {
+    "result_sha256": "1d82d5eb53120e45144a76e55afd74fbeabbd44b6fc320c19962c18fa7ce4192",
+    "loaded_kernels": 109,
+    "captured_byte_reduction": 390656,
+    "retained_isa_byte_reduction": 0,
+    "control_retained_isa_bytes": 5242880,
+    "compact_retained_isa_bytes": 5242880,
+    "exact_diagnostic_requests": 2,
+    "variants": {
+      "control": {
+        "loaded_kernels": 109,
+        "text_bytes": 3514112,
+        "captured_bytes": 3960576,
+        "isa_allocations": 5,
+        "retained_isa_bytes": 5242880,
+        "retained_device_isa_bytes": 4194304,
+        "exact_output": true
+      },
+      "compact": {
+        "loaded_kernels": 109,
+        "text_bytes": 3514112,
+        "captured_bytes": 3569920,
+        "isa_allocations": 5,
+        "retained_isa_bytes": 5242880,
+        "retained_device_isa_bytes": 4194304,
+        "exact_output": true
+      }
+    }
+  },
+  "comparisons": {
+    "first": {
+      "decode_tok_s": {
+        "control": 48.580064146096504,
+        "compact": 49.195716082668994,
+        "l0": 49.53577782364956,
+        "compact_vs_control_pct": 1.2672933792780006,
+        "compact_vs_l0_pct": -0.6864972266938163,
+        "control_drift_pct": 1.0472528445274243,
+        "l0_drift_pct": 0.4767995054899776
+      },
+      "ttft_ms": {
+        "control": 899.0121996666718,
+        "compact": 890.0484000041615,
+        "l0": 886.7184205832477,
+        "compact_vs_control_pct": -0.9970720826518065,
+        "compact_vs_l0_pct": 0.37553966892032165,
+        "control_drift_pct": -2.1472836303788267,
+        "l0_drift_pct": -1.1117832444816678
+      },
+      "prompt_ms": {
+        "control": 853.9196244378039,
+        "compact": 842.05,
+        "l0": 844.5106393645967,
+        "compact_vs_control_pct": -1.3900165891630123,
+        "compact_vs_l0_pct": -0.29136866368529857,
+        "control_drift_pct": -2.251939330786157,
+        "l0_drift_pct": -1.1595738418977097
+      },
+      "request_ms": {
+        "control": 2418.283406001684,
+        "compact": 2392.2313499933807,
+        "l0": 2380.3320919769467,
+        "compact_vs_control_pct": -1.0772954048167915,
+        "compact_vs_l0_pct": 0.4998990710809226,
+        "control_drift_pct": -1.5181596190844027,
+        "l0_drift_pct": -0.7426501964287846
+      }
+    },
+    "reverse": {
+      "decode_tok_s": {
+        "control": 48.80868461956847,
+        "compact": 49.10512557698691,
+        "compact_vs_control_pct": 0.6073528916605841,
+        "compact_drift_pct": 0.05170296688949971
+      },
+      "ttft_ms": {
+        "control": 890.6003499869257,
+        "compact": 888.1728999217443,
+        "compact_vs_control_pct": -0.2725633405844863,
+        "compact_drift_pct": -0.1060885551588231
+      },
+      "prompt_ms": {
+        "control": 845.4,
+        "compact": 843.1496204707679,
+        "compact_vs_control_pct": -0.26619109643152283,
+        "compact_drift_pct": -0.18958469103621534
+      },
+      "request_ms": {
+        "control": 2402.25405000092,
+        "compact": 2390.910984353229,
+        "compact_vs_control_pct": -0.47218426576016714,
+        "compact_drift_pct": 0.07990313372059354
+      }
+    }
+  },
+  "retained_decode_dispersion": {
+    "l0-before": {
+      "median": 49.41810528157279,
+      "min": 48.75858086867261,
+      "max": 49.556598852373504,
+      "mad": 0.11266939213871296
+    },
+    "control-before": {
+      "median": 48.32766680196286,
+      "min": 47.88909892879647,
+      "max": 48.899755501222494,
+      "mad": 0.19746188368845097
+    },
+    "compact": {
+      "median": 49.195716082668994,
+      "min": 48.75232535762396,
+      "max": 49.485610105482486,
+      "mad": 0.10183184604404971
+    },
+    "control-after": {
+      "median": 48.83377966724016,
+      "min": 48.392231773320596,
+      "max": 49.07658530285419,
+      "mad": 0.15108102636567722
+    },
+    "l0-after": {
+      "median": 49.653730563177845,
+      "min": 49.3154240477581,
+      "max": 49.822997246623835,
+      "mad": 0.038898357568037056
+    },
+    "compact-reverse-before": {
+      "median": 49.09243609399529,
+      "min": 48.75858086867261,
+      "max": 49.318624269954576,
+      "mad": 0.05385047004381249
+    },
+    "control-reverse": {
+      "median": 48.80868461956847,
+      "min": 48.401477518787416,
+      "max": 49.10195115648017,
+      "mad": 0.08320766760931875
+    },
+    "compact-reverse-after": {
+      "median": 49.11781833997422,
+      "min": 48.64311315924219,
+      "max": 49.41161172875626,
+      "mad": 0.1256095431118176
+    }
+  },
+  "evidence_files": 243,
+  "caveats": [
+    "Pinned NEO DG2 source uses512-byte default padding;equivalence to the installed proprietary driver is not claimed.",
+    "The candidate changes one padding expression. Kernel bytes,required barriers,matched expert/router schedules,80Host objects and module pack are fixed. Allocation placement can change with padding.",
+    "Ten warmups and ten retained requests per arm. Decode excludes prep/init/prefill;TTFT is separate.No inner timers or GPU telemetry during model requests.",
+    "Clocks are unlocked;adjacent control drift and dispersion are observations,not confidence intervals or guarantees.",
+    "Separate first-use census loads109 kernels:390656 fewer captured ISA bytes,but retained allocations stay5MiB in both variants. The two diagnostic requests are excluded from performance samples.",
+    "No Linux GPU test,new copy/lock census or physical cache-traffic measurement. Placement changes do not establish a cache-miss cause.",
+    "The candidate stays isolated;production configuration/binaries,live V11 source,MTP work,root README and Linux handoffs are preserved."
+  ],
+  "archive_sha256": "fc3cb999636df21facb6270ce984d8345b7397940c570537021ba07fa94b8829"
+}

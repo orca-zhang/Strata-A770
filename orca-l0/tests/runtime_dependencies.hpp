@@ -15,12 +15,19 @@
 #include <tlhelp32.h>
 #endif
 
-inline void check_runtime_dependencies() {
-    const auto inspect = [](std::string name) {
+inline void check_runtime_dependencies(bool native = false) {
+    const auto inspect = [native](std::string name) {
         std::transform(name.begin(), name.end(), name.begin(), [](unsigned char c) { return char(std::tolower(c)); });
+#ifdef ORCA_L0_DIRECT_DRIVER
+        if (name.find("ze_loader") != std::string::npos)
+            throw std::runtime_error("direct driver unexpectedly loaded ze_loader: " + name);
+#endif
         for (const char* forbidden : {"sycl", "ur_loader", "ur_adapter", "mkl_sycl"})
             if (name.find(forbidden) != std::string::npos)
                 throw std::runtime_error("unexpected SYCL/UR/oneMKL runtime dependency: " + name);
+        if (native) for (const char* forbidden : {"ze_loader", "ze_intel", "igc", "igdfcl", "igdgmm"})
+            if (name.find(forbidden) != std::string::npos)
+                throw std::runtime_error("unexpected native GPU runtime/compiler dependency: " + name);
     };
 #ifdef _WIN32
     const HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, GetCurrentProcessId());

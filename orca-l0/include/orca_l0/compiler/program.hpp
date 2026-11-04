@@ -18,17 +18,31 @@ public:
         std::ifstream index(directory / "index.txt");
         if (!index) throw std::runtime_error("cannot read native kernel index");
         std::string line;
+        bool native_identity_checked = false;
         while (std::getline(index, line)) {
             if (!line.empty() && line.back() == '\r') line.pop_back();
             const auto tab = line.find('\t');
             if (!tab || tab == std::string::npos || tab == line.size() - 1)
                 throw std::runtime_error("invalid native kernel index row");
             const std::filesystem::path file(line.substr(0, tab));
-            if (file.has_parent_path() || file.is_absolute() || file.extension() != ".spv")
-                throw std::runtime_error("native kernel image must be a local SPIR-V filename");
+            const bool native = file.extension() == ".zebin";
+            if (file.has_parent_path() || file.is_absolute() || (!native && file.extension() != ".spv"))
+                throw std::runtime_error("kernel image must be a local SPIR-V or zebin filename");
             const auto flags_tab = line.find('\t', tab + 1);
             const auto name = line.substr(tab + 1, flags_tab == std::string::npos ? flags_tab : flags_tab - tab - 1);
             const auto flags = flags_tab == std::string::npos ? std::string{} : line.substr(flags_tab + 1);
+            if (native) {
+                if (!flags.empty()) throw std::runtime_error("native pack flags must already be baked");
+                if (!native_identity_checked) {
+                    std::ifstream identity_file(directory / "native-device.txt");
+                    std::string identity;
+                    if (!std::getline(identity_file, identity)) throw std::runtime_error("native pack requires device identity");
+                    if (!identity.empty() && identity.back() == '\r') identity.pop_back();
+                    if (identity != runtime_.binary_identity())
+                        throw std::runtime_error("native pack device/driver mismatch; rebuild from SPIR-V");
+                    native_identity_checked = true;
+                }
+            }
             if (name.empty() || name.find_first_of("\t\r\n ") != std::string::npos ||
                 !valid_flags(flags) ||
                 !kernels_.emplace(name, Kernel{directory / file, flags}).second)
@@ -44,7 +58,8 @@ public:
         auto& entry = it->second;
         if (!entry.handle) {
             auto& module = modules_[{entry.file, entry.flags}];
-            if (!module) module = runtime_.module(entry.file, ZE_MODULE_FORMAT_IL_SPIRV, entry.flags.c_str());
+            if (!module) module = runtime_.module(entry.file, entry.file.extension() == ".zebin"
+                ? ZE_MODULE_FORMAT_NATIVE : ZE_MODULE_FORMAT_IL_SPIRV, entry.flags.c_str());
             auto kernel = runtime_.kernel(module, name);
             check(zeKernelSetIndirectAccess(kernel, ZE_KERNEL_INDIRECT_ACCESS_FLAG_DEVICE |
                   ZE_KERNEL_INDIRECT_ACCESS_FLAG_HOST | ZE_KERNEL_INDIRECT_ACCESS_FLAG_SHARED),

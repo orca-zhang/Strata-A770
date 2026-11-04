@@ -7,6 +7,9 @@
 #include <iomanip>
 #include <limits>
 #include <sstream>
+#ifdef ORCA_L0_DIRECT_DRIVER
+#include <orca_l0/direct_driver.hpp>
+#endif
 
 namespace orca::l0 {
 namespace {
@@ -69,7 +72,13 @@ bool wait(ze_command_list_handle_t immediate, uint64_t timeout_ns) {
 
 Runtime::Runtime(uint32_t device_index) {
     try {
-        check(zeInit(ZE_INIT_FLAG_GPU_ONLY), "zeInit");
+        const auto initialized = zeInit(ZE_INIT_FLAG_GPU_ONLY);
+#ifdef ORCA_L0_DIRECT_DRIVER
+        if (initialized != ZE_RESULT_SUCCESS)
+            throw Error(initialized, std::string("zeInit(direct driver): ") + direct_driver_error());
+#else
+        check(initialized, "zeInit");
+#endif
         uint32_t count = 0;
         check(zeDriverGet(&count, nullptr), "zeDriverGet(count)");
         std::vector<ze_driver_handle_t> drivers(count);
@@ -254,6 +263,46 @@ void Runtime::deallocate(void* pointer) {
     allocations_.erase(it);
 }
 
+std::string Runtime::binary_identity() const {
+    std::ostringstream out;
+    out << "orca-native-v2 " << std::hex << std::setfill('0');
+    for (auto byte : properties_.uuid.id) out << std::setw(2) << unsigned(byte);
+    // Intel's Windows driver UUID includes process initialization time. It is
+    // unsuitable for persistent binaries; use the reported driver build instead.
+    out << ' ' << properties_.vendorId << ' ' << properties_.deviceId << ' '
+        << driver_properties_.driverVersion << ' ' << sizeof(void*);
+#ifdef _WIN32
+    out << " windows";
+#else
+    out << " linux";
+#endif
+    return out.str();
+}
+
+std::vector<uint8_t> Runtime::compile_native(const std::filesystem::path& file, const char* flags) {
+    auto compiled = module(file, ZE_MODULE_FORMAT_IL_SPIRV, flags);
+    const auto release_module = [&] {
+        auto result = zeModuleDestroy(compiled);
+        if (result == ZE_RESULT_SUCCESS) modules_.pop_back();
+        return result;
+    };
+    std::vector<uint8_t> binary;
+    try {
+        std::size_t size = 0;
+        check(zeModuleGetNativeBinary(compiled, &size, nullptr), "native binary size");
+        if (!size) throw std::runtime_error("driver returned an empty native binary");
+        binary.resize(size);
+        check(zeModuleGetNativeBinary(compiled, &size, binary.data()), "native binary bytes");
+        if (!size || size > binary.size()) throw std::runtime_error("invalid native binary size");
+        binary.resize(size);
+    } catch (...) {
+        (void)release_module();
+        throw;
+    }
+    check(release_module(), "destroy temporary native compiler module");
+    return binary;
+}
+
 ze_module_handle_t Runtime::module(const std::filesystem::path& file, ze_module_format_t format,
                                   const char* build_flags) {
     if (!build_flags) throw std::invalid_argument("null module build flags");
@@ -303,6 +352,13 @@ ze_module_handle_t Runtime::module(const std::filesystem::path& file, ze_module_
     }
     try { modules_.push_back(module); }
     catch (...) { zeModuleDestroy(module); throw; }
+    // Optional setup diagnostic, never part of replay or per-dispatch work.
+    static const char* trace = std::getenv("ORCA_L0_MODULE_TRACE");
+    if (trace && *trace) {
+        std::ofstream output(trace, std::ios::app);
+        if (!output || !(output << file.generic_string() << '\t' << build_flags << '\n').flush())
+            throw std::runtime_error("cannot write native module trace");
+    }
     return module;
 }
 

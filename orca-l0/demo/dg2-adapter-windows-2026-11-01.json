@@ -1,0 +1,176 @@
+{
+  "date": "2026-11-01",
+  "complete": true,
+  "hardware": {
+    "os": "Windows",
+    "gpu": "Intel Arc A770 16 GB",
+    "pci_device": "0x56a0",
+    "driver": "32.0.101.9034",
+    "wddm": 2700,
+    "compiler": "Intel oneAPI 2025.3.2"
+  },
+  "scope": {
+    "backend": "Orca::DG2",
+    "actual_strata_queue_integrated": true,
+    "full_model_integrated": false,
+    "production_changed": false,
+    "linux_gpu_validated": false,
+    "linux_adapter_compiled": false
+  },
+  "features": {
+    "existing_strata_queue_reused": true,
+    "exact_lazy_events": true,
+    "typed_deferred_work": true,
+    "compute_copy_dependencies": true,
+    "graph_capture_replay": true,
+    "spsc_callbacks": true,
+    "callback_failure_propagation_and_gate_release": true,
+    "producer_threads_serialized_by_adapter_mutex": true,
+    "device_kernel_batch_limit": 64,
+    "host_visible_copy_fill_submit_promptly": true,
+    "pooled_staging_for_ordinary_host_pointers": true,
+    "captured_h2d_sources_refreshed": true,
+    "one_queue_progress_snapshot_per_collection": true,
+    "timeout_collects_completed_prefix": true,
+    "no_wait_for_tail_or_batch_fill": true,
+    "no_background_polling_thread": true
+  },
+  "validation": {
+    "windows_ctest": "16/16",
+    "linux_cpu_ctest": "4/4",
+    "original_l0_queue_passed": true,
+    "cross_thread_handoffs": 128,
+    "staging_jobs": 2048,
+    "staging_slots": 8,
+    "uploads": 64,
+    "upload_bytes_each": 10485760,
+    "prefix_staged_readbacks_before_tail_release": 16,
+    "native_strata_gemv_xmx_scratch_private_atomic_regressions": true,
+    "no_level_zero_intel_umd_gmm_or_compiler_loaded_by_native_checks": true,
+    "unchanged_production_hashes_verified": true
+  },
+  "completion_mode_measurement": {
+    "scope": "Raw native same-queue microbenchmark; not an adapter A/B or full-model benchmark",
+    "workload": {
+      "lists": 16,
+      "kernels_per_list": 25,
+      "host_values": 262144,
+      "warmups_per_phase": 128,
+      "retained_per_phase": 512,
+      "phases": 9,
+      "total_includes_identical_independent_cpu_work": true,
+      "recording_and_initialization_excluded": true
+    },
+    "rounds": 3,
+    "retained_samples": 13824,
+    "submissions_with_warmup": 276480,
+    "comparison": "Adjacent poll/candidate/poll, geometric mean controls, <=3% drift, at least three stable pairs",
+    "summary": [
+      {
+        "mode": "serial",
+        "stable_pairs": 0,
+        "stable_cycle_pairs": 0,
+        "combined_latency_change_pct": null,
+        "calling_thread_cycles_change_pct": null
+      },
+      {
+        "mode": "tail",
+        "stable_pairs": 3,
+        "stable_cycle_pairs": 3,
+        "combined_latency_change_pct": 10.362976529860667,
+        "calling_thread_cycles_change_pct": -76.13340642406436
+      },
+      {
+        "mode": "batch",
+        "stable_pairs": 3,
+        "stable_cycle_pairs": 3,
+        "combined_latency_change_pct": 8.158319941149061,
+        "calling_thread_cycles_change_pct": -60.872401010257995
+      },
+      {
+        "mode": "overlap",
+        "stable_pairs": 3,
+        "stable_cycle_pairs": 3,
+        "combined_latency_change_pct": -6.889484888004748,
+        "calling_thread_cycles_change_pct": -61.82669303818897
+      }
+    ],
+    "raw_evidence_directory": "windows-dg2-adapter-completion-v1",
+    "caveats": [
+      "Preparation here is independent CPU work included in every mode total. Model loading/recording are excluded.",
+      "Calling-thread cycles are not CPU percentage, energy or total driver-thread work.",
+      "Mode order is fixed; GPU clocks are not locked. Bracketing controls constrain, but do not remove, drift.",
+      "Serial mode had no stable pairs. No numerical serial regression estimate is supported.",
+      "Batching completion queries does not fuse kernels or compatible GEMMs."
+    ]
+  },
+  "caveats": [
+    "Full-engine CMake/device/memory integration, allocation release, contiguous Windows allocations above 4 GiB and GPU timestamps remain unfinished.",
+    "The adapter uses one recursive mutex for raw recording/submission/collection. Device properties are a calibrated A770 subset.",
+    "Unregistered D2H staging copyback requires observation or a later submission; unattended polling of its destination is not a proven progress path.",
+    "Captured graphs belong to one stream; a replay must complete before reuse. Backing allocations remain pooled until Runtime teardown.",
+    "Linux GCC/CPU checks exercise the raw backend, not the oneAPI queue adapter. WSL has no GPU node or oneAPI frontend.",
+    "Native Linux GPU coherence/preemption, full-model correctness, throughput and TTFT are unvalidated.",
+    "The v1 attempt retained a host completion-word fill in the recorder. Its failed logs remain local; v2 fixed prompt submission and v3 adds prefix collection."
+  ],
+  "source_sha256": {
+    "orca-l0/CMakeLists.txt": "4a4b706a7d62f729f5ece0028db9a7017ae496258f4da663c95221786e61c6a8",
+    "orca-l0/compiler/build.py": "0ea57601e57093496268bb4228b5ae29f09e8eb6d5b4924ca3867228dee37fca",
+    "orca-l0/compiler/CMakeLists.txt": "70288e53671c0060f338726814afb9c52a01d764dc830e246481cd72624c5ff5",
+    "orca-l0/compiler/native_pack.cpp": "0fdedfc6e302178df52f31a0628344b2571db8ebe018dc0948a916ae5301e8fd",
+    "orca-l0/demo/CMakeLists.txt": "1e763314817d9cd9572a96f9ae6cdf86af13a24e60b43e231715216d67962c71",
+    "orca-l0/demo/dispatch.cpp": "bd184678e907165a6bb17998b0109e860195e1ba7c5eb8e7f70fc64ad1b924bb",
+    "orca-l0/include/orca_l0/dg2.hpp": "7da587c1b69ae745e7f0f7c3c7656c7dc7ae604c0f5c3880b861f918e45c1cbd",
+    "orca-l0/include/orca_l0/direct_driver.hpp": "cd87a73ef80e8b2052a192ddd2ff174d36be595d79c42e454e0bb1b3d86e61c0",
+    "orca-l0/include/orca_l0/drm.hpp": "44c49672eed6602435052b716c7180ec40ce0d15ae47e1c48ff3dd2485ebe0bb",
+    "orca-l0/include/orca_l0/ring.hpp": "c0bc88a290d32ba5ee6cf26f2fe82c38cced25a334a02c23591e11bb67f75112",
+    "orca-l0/include/orca_l0/runtime.hpp": "1b800beb8a4ec7b1777192afc599a4cf519870acd2438b1aea43e79ffafc0869",
+    "orca-l0/include/orca_l0/compiler/dg2.hpp": "05b85ca8fe77f00c333e7b86faf287c4564d8d0aee8510f0bb81f0cb0636a09b",
+    "orca-l0/include/orca_l0/compiler/local_accessor.hpp": "749634fcbcd2a094d87b8f3cac4610aa095317e840e8c807fdb1beb342d81fc2",
+    "orca-l0/include/orca_l0/compiler/program.hpp": "3aedf164c9bc4320e2be356acc93cd2dae03f75fc49058cdb6f29671fbf02a25",
+    "orca-l0/include/orca_l0/compiler/stream.hpp": "4a5255d2ee3820603df48a098b86d17ef07ebc009fb4038baf3db47260f1e97b",
+    "orca-l0/include/orca_l0/compiler/sycl.hpp": "78c74406a5b0f702fbcfe8b1bedf73cb377ead1c7b2e9f0dd7188f493879e7dc",
+    "orca-l0/src/direct_api.inc": "e1fe46e7376f8a44ad9d27e2850cd175258c6f2a19aa5ad21a327e74020af281",
+    "orca-l0/src/direct_driver.cpp": "7fe701e2c34dccd80868685b29b83fc846406bf531faa4579a220c7bc4107548",
+    "orca-l0/src/direct_tables.inc": "5aa57dd8a7b89110fe6621b6840e8c36ad53e72792cf3b88f20a4db909231275",
+    "orca-l0/src/runtime.cpp": "2065f4be1abade4be029573f02d58d73f1b7d6a23cfc5ee85140669880bcf531",
+    "orca-l0/src/drm/arguments.hpp": "a090cb63d398ab5027e900ba77567325968b603546ef11e597a8b4283cd86625",
+    "orca-l0/src/drm/encoding.hpp": "82828d6edd2e11cbf25ebe5b7d7e1054228e5b1104c5ad0da46c08d7eaba80c1",
+    "orca-l0/src/drm/memory.cl": "f92e9123f256e505b1e0c9d3bd3e0899f8b131f49cab3a227798deb485ec805d",
+    "orca-l0/src/drm/recording.inl": "a33e368a88b7d4a1872cb11c02ea2648ed2aefcb7c5784a77cc2996863df0fba",
+    "orca-l0/src/drm/runtime.cpp": "b496a2fbbe4cba72fcb4a6a12e18c530503e76c73f49e87bcd2d53b4c6bbc8cd",
+    "orca-l0/src/drm/zebin.hpp": "9721fa8a206a2a730a04289594e44568ef2c854bd896f4f3d693cea6ef60cb70",
+    "orca-l0/src/wddm/allocation.hpp": "5348b408fb0942796b7d37f80ed6f96df4aa3ff188193341f46917a652afe31c",
+    "orca-l0/src/wddm/runtime.cpp": "7f2d6ee2189660bb22b29265060242414e87d9f3eaa7d2479d1348539596def5",
+    "orca-l0/tests/compiler_check.cpp": "0cec3be040240834476916155bade46c0edbf76cf81aa528d92fc4a0707f2ab1",
+    "orca-l0/tests/compiler_flags_check.py": "8fa480a5df5dcdc1f08a4ba64a4d6bea290d55795c076828d299c20039e014fd",
+    "orca-l0/tests/dg2_compiler_check.cpp": "a9e04111ac9c9ad98366d2bd9a88c3cd31b0895a441552630df976ffa548fdf9",
+    "orca-l0/tests/dispatch3d.cl": "0d70ceb4fdc897b246e0e3590df708c2cb80d7242600b085243172dbd3697641",
+    "orca-l0/tests/drm_compute_check.cpp": "0a5ac616ac0ab1451292020334cf7aaf1412bb1b412f9c0a545816d9b1b9f1a0",
+    "orca-l0/tests/drm_submit_check.cpp": "a2fd00de705be46804d2913cc10af3a58623ea253bf4e16963921922e73540a8",
+    "orca-l0/tests/inference.cl": "03647efb665f6d2ef16b95ee47526bf42832a71355b6f1c5b78668beefbee1b2",
+    "orca-l0/tests/native_pack_check.cpp": "631ed0ecb003351464fb999113ff444721b5e8f70562bf1fdc0656989338dc51",
+    "orca-l0/tests/ring_check.cpp": "edf589faf8df29b1c4d190a0e7a2e83d698f1726aa2365f3112e3bec5b529798",
+    "orca-l0/tests/runtime_check.cpp": "3aecdf8facd2ad0426dd90ea89ce869c12cdc4d882385dab9f9935bc1b5909ec",
+    "orca-l0/tests/runtime_dependencies.hpp": "f7fad56243713663e4936a9af44011364fc59cea27be0494d84b216e65cc5709",
+    "orca-l0/tests/submit_check.cpp": "e8634fdb6547448a3bf54efc9773da5ef6325e826858cea02f2c63a93dd1901e",
+    "orca-l0/tests/wddm_memory_check.cpp": "3e8b17e4b72db0a7b4e53737d747cfc299cceb9207e7d520ba03c43cbbe7071e",
+    "orca-l0/third_party/intel-dg2/packets.hpp": "ffa6713e5586d753ea79ad837e608e802989b2f45f1f5fdff23a6aee7d95407c",
+    "sycl/orca_queue.hpp": "8552301250e7aa3063d9ecf5017b151842acdb62663f56504083a9725fe1e28c",
+    "sycl/orca_dg2_backend.hpp": "41e10bf4c0c8a10bb3cb03854eb889395de4aece96ae160dac3c1344776a5fbf",
+    "sycl/orca_device.hpp": "30956c65cde199252e33fbc4d570722bd7cd20d7d7dba7c049e8bb966d68e96d",
+    "sycl/orca_queue_check.cpp": "42ea69e494ce1b1cd14a7832ca79f62e41a232501967c8cf7cc02955b1de2852"
+  },
+  "native_check_sha256": "ceda07c66d7c61b5d5eaaf0594350a0545c4d40576e73180f14e1a7d644e3211",
+  "source_check_directory": "windows-dg2-adapter-batch-v3",
+  "production_sha256": {
+    "strata-iq2_xs.json": "9c45e51de69e66c3f1cd020359c8d70d639fbd1aba5d87ead84082fbe73fd531",
+    "build-orca-default-pair-20261031/strata.exe": "7be641375e905b0ceb64424ab4875afcdf9f7f6f1e2c60d6b0fcff4ece5ff4b5"
+  },
+  "local_evidence": [
+    "windows-dg2-adapter-batch-v3",
+    "linux-dg2-adapter-batch-cpu-v1",
+    "windows-l0-queue-control-v1",
+    "windows-dg2-adapter-completion-v1"
+  ]
+}

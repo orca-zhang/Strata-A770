@@ -1,0 +1,111 @@
+{
+  "date": "2026-10-31",
+  "complete": true,
+  "hardware": {
+    "os": "Windows",
+    "gpu": "Intel Arc A770 16 GB",
+    "pci_device": "0x56a0",
+    "driver": "32.0.101.9034",
+    "wddm": 2700,
+    "compiler": "Intel oneAPI 2025.3.2"
+  },
+  "scope": {
+    "backend": "Orca::DG2",
+    "full_model_integrated": false,
+    "performance_gain_claimed": false,
+    "device_local_memory": false,
+    "linux_gpu_validated": false,
+    "production_changed": false
+  },
+  "features": {
+    "owned_allocation_256_mib_prototype_cap_removed": true,
+    "imported_host_pages_copied": false,
+    "imported_storage": "borrowed write-back read/write host mapping",
+    "import_address_and_size_alignment": 65536,
+    "gpu_and_cpu_virtual_addresses_distinct": true,
+    "overlapping_imports_rejected": true,
+    "caller_keeps_host_pages_until_gpu_use_and_runtime_end": true,
+    "imported_host_pages_not_freed_by_runtime": true,
+    "windows_transport": "D3DKMT standard existing heap",
+    "linux_transport": "i915 GEM_USERPTR (GPU unvalidated)",
+    "no_new_submit_allocations_or_per_kernel_work": true
+  },
+  "validation": {
+    "windows_ctest": "5/5",
+    "linux_cpu_ctest": "4/4",
+    "memory_gpu_replays": 8,
+    "large_allocation_requested_bytes": 335548416,
+    "large_allocation_actual_windows_bytes": 335609856,
+    "imported_host_mapping_bytes": 131072,
+    "large_gpu_va_subranges": 4,
+    "elements_per_subrange": 1024,
+    "crosses_256_mib_boundary": true,
+    "exact_outputs_and_full_prefix_gap_tail_guards": true,
+    "changed_inputs": true,
+    "invalid_alignment_size_overflow_overlap_and_readonly_imports_rejected": true,
+    "imported_cpu_access_rejected_while_in_flight": true,
+    "host_mapping_survives_runtime_teardown": true,
+    "kernel_regressions": {
+      "xmx_replays": 144,
+      "gemv_replays": 48,
+      "scratch_replays": 12,
+      "private_replays": 16,
+      "atomic_replays": 24
+    },
+    "no_level_zero_umd_gmm_or_compiler_loaded_during_windows_checks": true
+  },
+  "source_sha256": {
+    "orca-l0\\CMakeLists.txt": "10c6d7a85b7d3f4ced004394572ce66efda67c11c3765939d2d81b2314b75c25",
+    "orca-l0\\compiler\\CMakeLists.txt": "495fd91dc356f203b3dea0a6ff5277a13a4e1db1eda6cff59208f8567bd1c24e",
+    "orca-l0\\compiler\\native_pack.cpp": "0fdedfc6e302178df52f31a0628344b2571db8ebe018dc0948a916ae5301e8fd",
+    "orca-l0\\demo\\CMakeLists.txt": "1e763314817d9cd9572a96f9ae6cdf86af13a24e60b43e231715216d67962c71",
+    "orca-l0\\demo\\dispatch.cpp": "bd184678e907165a6bb17998b0109e860195e1ba7c5eb8e7f70fc64ad1b924bb",
+    "orca-l0\\include\\orca_l0\\dg2.hpp": "61cb46ea6ee72cd344265bdafac08edb93009c39c2f0cc8f94d9c75ce95e07c7",
+    "orca-l0\\include\\orca_l0\\direct_driver.hpp": "cd87a73ef80e8b2052a192ddd2ff174d36be595d79c42e454e0bb1b3d86e61c0",
+    "orca-l0\\include\\orca_l0\\drm.hpp": "46808da289dbb63cbb9310f9b4ea806fbec4eeff76dcfbd3b53478f0bf46f245",
+    "orca-l0\\include\\orca_l0\\ring.hpp": "c0bc88a290d32ba5ee6cf26f2fe82c38cced25a334a02c23591e11bb67f75112",
+    "orca-l0\\include\\orca_l0\\runtime.hpp": "1b800beb8a4ec7b1777192afc599a4cf519870acd2438b1aea43e79ffafc0869",
+    "orca-l0\\include\\orca_l0\\compiler\\program.hpp": "3aedf164c9bc4320e2be356acc93cd2dae03f75fc49058cdb6f29671fbf02a25",
+    "orca-l0\\include\\orca_l0\\compiler\\stream.hpp": "5a0b8badff512b7dc8b737f00b1cb2ddfedb35c0cdbc6e89fc77ee89b390a136",
+    "orca-l0\\include\\orca_l0\\compiler\\sycl.hpp": "8b740f4a4a3e4ef5dd84212f47d7b71315b7f1a196701dbcfc9f3a7e4c47ab9a",
+    "orca-l0\\src\\direct_driver.cpp": "7fe701e2c34dccd80868685b29b83fc846406bf531faa4579a220c7bc4107548",
+    "orca-l0\\src\\runtime.cpp": "2065f4be1abade4be029573f02d58d73f1b7d6a23cfc5ee85140669880bcf531",
+    "orca-l0\\src\\drm\\arguments.hpp": "ed071191b03d33167dcd3d61e4bca96edd526a276d629458770e893f68d9d584",
+    "orca-l0\\src\\drm\\encoding.hpp": "ec9e31dc4c0a9ccacfa2a9bb00f9a8504cbafb8efb60df0fc335498d785c38ae",
+    "orca-l0\\src\\drm\\recording.inl": "c930d157180680a9b39576a3521da62d5084b69b20d989723c3da80e0a9dd2d7",
+    "orca-l0\\src\\drm\\runtime.cpp": "60aae85b8a0bd82121762dfbec1b105a5ceb108def64a7978de8e529e15752be",
+    "orca-l0\\src\\drm\\zebin.hpp": "c5390c43c409246e3566f4c0c8d4ebf1e5a1c05224d5cc0ffb70eebfa6ab9ae8",
+    "orca-l0\\src\\wddm\\runtime.cpp": "c9ff6bf2b29ee1e663d835ee0643a8e31bad6b9c1ebced4d3319ceaf00155224",
+    "orca-l0\\tests\\compiler_check.cpp": "0cec3be040240834476916155bade46c0edbf76cf81aa528d92fc4a0707f2ab1",
+    "orca-l0\\tests\\dispatch3d.cl": "0d70ceb4fdc897b246e0e3590df708c2cb80d7242600b085243172dbd3697641",
+    "orca-l0\\tests\\drm_compute_check.cpp": "111d65edcde5d339b7816d90d9bcbe4df179670f8edbfecf121adfa39fe81968",
+    "orca-l0\\tests\\drm_submit_check.cpp": "a2fd00de705be46804d2913cc10af3a58623ea253bf4e16963921922e73540a8",
+    "orca-l0\\tests\\inference.cl": "03647efb665f6d2ef16b95ee47526bf42832a71355b6f1c5b78668beefbee1b2",
+    "orca-l0\\tests\\native_pack_check.cpp": "631ed0ecb003351464fb999113ff444721b5e8f70562bf1fdc0656989338dc51",
+    "orca-l0\\tests\\ring_check.cpp": "edf589faf8df29b1c4d190a0e7a2e83d698f1726aa2365f3112e3bec5b529798",
+    "orca-l0\\tests\\runtime_check.cpp": "3aecdf8facd2ad0426dd90ea89ce869c12cdc4d882385dab9f9935bc1b5909ec",
+    "orca-l0\\tests\\runtime_dependencies.hpp": "6b082542cf1b130441a3de93ae1d6e04cb7680600b429fa636ed9bf48cfec451",
+    "orca-l0\\tests\\submit_check.cpp": "e8634fdb6547448a3bf54efc9773da5ef6325e826858cea02f2c63a93dd1901e",
+    "orca-l0\\tests\\wddm_memory_check.cpp": "3e8b17e4b72db0a7b4e53737d747cfc299cceb9207e7d520ba03c43cbbe7071e",
+    "orca-l0\\third_party\\intel-dg2\\packets.hpp": "579559e752d0e4d4d44b903dea0a8f2d172afdd6d0fad63afa445d183bc1165b"
+  },
+  "executable_sha256": "5a306d63ae98f36fe6698c0a93002f8012d7699b22c94028c0e3ab53d26e67f6",
+  "image_sha256": "94e4970f3f8f9820a25ece27e3ea6ea2a792d1f34a520326a47ce1a10e397800",
+  "production_sha256": {
+    "strata-iq2_xs.json": "9c45e51de69e66c3f1cd020359c8d70d639fbd1aba5d87ead84082fbe73fd531",
+    "build-orca-default-pair-20261031/strata.exe": "7be641375e905b0ceb64424ab4875afcdf9f7f6f1e2c60d6b0fcff4ece5ff4b5"
+  },
+  "caveats": [
+    "The largest executed owned allocation is just over 320 MiB, not every representable allocation size.",
+    "Host import provides GPU access to caller storage, not VRAM placement or automatic CPU/GPU concurrency.",
+    "Keep borrowed pages committed, mapped and unchanged in address/size until all GPU use and runtime destruction.",
+    "Current runtime still has one reusable list and one pending submission; automatic GEMM batching is not implemented.",
+    "The 256 MiB scratch/private pool limit remains separate from the removed general allocation cap.",
+    "Linux build/CPU checks do not establish native Linux GPU/userptr behavior.",
+    "No full-model throughput or bandwidth claim is made. Earlier performance reports retain their own sources."
+  ],
+  "local_evidence": [
+    "windows-dg2-host-memory-v2",
+    "linux-dg2-host-memory-cpu-v2"
+  ]
+}

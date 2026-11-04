@@ -1,0 +1,596 @@
+{
+  "date": "2026-11-03",
+  "complete": true,
+  "source_adopted": false,
+  "production_changed": false,
+  "full_model_speedup_claimed": false,
+  "performance_claimed": false,
+  "hardware": "Intel Arc A770 C0",
+  "os": "Windows",
+  "driver": "32.0.101.9034",
+  "scope": "Actual primary/secondary command bytes for exactly one warmed T1/local/one-slot/mixed GDN+advance16 replay,phase0,pass10. Both backends use unchanged v8 baseline kernels/runtime. Observer perturbs execution,not performance evidence.",
+  "source_sha256": {
+    "sycl/orca_dg2_backend.hpp": "0bdaf70c9dff491c7ca3da7a9defc1ed3ba16bbdedc5457cc6e69b8248da9602",
+    "sycl/orca_queue.hpp": "1b7cc25c2b31653595b85d3a577ec96d6cc3a0a7156a53d9b63f8a8948ed26bf",
+    "orca-l0/include/orca_l0/dg2.hpp": "4d3337560bdd5f01145acfbce90db2fba118625c927a967ae5bd87fdd4d41245",
+    "orca-l0/src/drm/recording.inl": "06b7b235a267938b333391da97831997a1519d9feaf757553f1f3f53e460a4f9",
+    "orca-l0/src/drm/memory.cl": "d2825a86f3551d4a08cefe745a45ce44bd5607f256d304470abe18ca43772943",
+    "orca-l0/src/drm/zebin.hpp": "a927dfee4f823ca74bf85a84b07a6790c9caa752d4504cbfc10227e39a789283",
+    "orca-l0/src/drm/runtime.cpp": "1a10b18843bbb694ba0ad7bbad3f86aa73617f76672075cc0feba09dadf1446b",
+    "orca-l0/src/wddm/runtime.cpp": "e005a697e557ea75330a96303a42fa140505a83496aae396ab4bfee9149f0113",
+    "orca-l0/tests/drm_compute_check.cpp": "1818c4d92d180c651a5ec4777d4ef9fea4182d5156b6e0839a139aa2d6e02f3b",
+    "sycl/orca/include/dpct/dpct.hpp": "9c6f2d8669692666389cb8b47e38a29dfb967b158a881e5c2bff1149b438ec38",
+    "orca-l0/src/drm/encoding.hpp": "3ab2f962cca336aa0dc7566b0802084ab7721d06d5e6c2f307e7b8ff24d81f9c",
+    "orca-l0/tests/denorm.cl": "ebcf7b88c788e1711ed027de8e0d6d1a0df4599addeb93ecf2958e4d5d00ed48"
+  },
+  "captures": [
+    {
+      "mode": "native",
+      "summary": {
+        "submissions": 1,
+        "files": 1,
+        "bytes": 13796,
+        "failures": 0
+      },
+      "counts": {
+        "CFE_STATE": 32,
+        "COMPUTE_WALKER": 32,
+        "MI_BATCH_BUFFER_END": 1,
+        "MI_LOAD_REGISTER_IMM": 32,
+        "PIPELINE_SELECT": 32,
+        "PIPE_CONTROL": 68,
+        "STATE_BASE_ADDRESS": 64,
+        "STATE_COMPUTE_MODE": 32
+      },
+      "fields": {
+        "CFE_STATE.ComputeOverdispatchDisable": {
+          "1": 32
+        },
+        "CFE_STATE.FusedEuDispatch": {
+          "0": 32
+        },
+        "CFE_STATE.LargeGRFThreadAdjustDisable": {
+          "0": 32
+        },
+        "CFE_STATE.MaximumNumberOfThreads": {
+          "4096": 32
+        },
+        "CFE_STATE.OverDispatchControl": {
+          "2": 32
+        },
+        "CFE_STATE.ScratchSpaceBuffer": {
+          "0": 32
+        },
+        "CFE_STATE.SingleSliceDispatchCcsMode": {
+          "0": 32
+        },
+        "COMPUTE_WALKER.DispatchWalkOrder": {
+          "0": 32
+        },
+        "COMPUTE_WALKER.EmitInlineParameter": {
+          "1": 32
+        },
+        "COMPUTE_WALKER.EmitLocalId": {
+          "7": 32
+        },
+        "COMPUTE_WALKER.GenerateLocalId": {
+          "1": 32
+        },
+        "COMPUTE_WALKER.IndirectDataLength": {
+          "64": 32
+        },
+        "COMPUTE_WALKER.L3PrefetchDisable": {
+          "0": 32
+        },
+        "COMPUTE_WALKER.LocalXMaximum": {
+          "63": 16,
+          "127": 16
+        },
+        "COMPUTE_WALKER.LocalYMaximum": {
+          "0": 16,
+          "3": 16
+        },
+        "COMPUTE_WALKER.LocalZMaximum": {
+          "0": 32
+        },
+        "COMPUTE_WALKER.MessageSimd": {
+          "1": 16,
+          "2": 16
+        },
+        "COMPUTE_WALKER.SimdSize": {
+          "1": 16,
+          "2": 16
+        },
+        "COMPUTE_WALKER.SystolicModeEnable": {
+          "0": 32
+        },
+        "COMPUTE_WALKER.TileLayout": {
+          "0": 32
+        },
+        "COMPUTE_WALKER.WalkOrder": {
+          "0": 32
+        },
+        "IDD.BtdMode": {
+          "0": 32
+        },
+        "IDD.DenormMode": {
+          "0": 32
+        },
+        "IDD.FloatingPointMode": {
+          "0": 32
+        },
+        "IDD.NumberOfBarriers": {
+          "0": 16,
+          "1": 16
+        },
+        "IDD.NumberOfThreadsInGpgpuThreadGroup": {
+          "2": 16,
+          "32": 16
+        },
+        "IDD.PreferredSlmAllocationSize": {
+          "0": 16,
+          "8": 16
+        },
+        "IDD.RoundingMode": {
+          "0": 32
+        },
+        "IDD.SharedLocalMemorySize": {
+          "0": 16,
+          "3": 16
+        },
+        "IDD.SingleProgramFlow": {
+          "0": 32
+        },
+        "IDD.ThreadGroupDispatchSize": {
+          "3": 32
+        },
+        "IDD.ThreadPreemptionDisable": {
+          "0": 32
+        },
+        "PIPE_CONTROL.constant_invalidate": {
+          "0": 36,
+          "1": 32
+        },
+        "PIPE_CONTROL.cs_stall": {
+          "1": 68
+        },
+        "PIPE_CONTROL.dc": {
+          "0": 65,
+          "1": 3
+        },
+        "PIPE_CONTROL.flags": {
+          "8791037484924403712": 33,
+          "8791037484924403744": 1,
+          "8791037484924406796": 32,
+          "8791037484924452896": 2
+        },
+        "PIPE_CONTROL.hdc": {
+          "1": 68
+        },
+        "PIPE_CONTROL.instruction_invalidate": {
+          "0": 36,
+          "1": 32
+        },
+        "PIPE_CONTROL.post_sync": {
+          "0": 66,
+          "3": 2
+        },
+        "PIPE_CONTROL.state_invalidate": {
+          "0": 36,
+          "1": 32
+        },
+        "PIPE_CONTROL.texture_invalidate": {
+          "0": 36,
+          "1": 32
+        },
+        "PIPE_CONTROL.tlb_invalidate": {
+          "0": 68
+        },
+        "PIPE_CONTROL.untyped": {
+          "1": 68
+        },
+        "STATE_BASE_ADDRESS.BindlessSurfaceStateMemoryObjectControlState": {
+          "6": 64
+        },
+        "STATE_BASE_ADDRESS.BindlessSurfaceStateSize": {
+          "0": 64
+        },
+        "STATE_BASE_ADDRESS.DynamicStateMemoryObjectControlState": {
+          "0": 64
+        },
+        "STATE_BASE_ADDRESS.EnableMemoryCompressionForAllStatelessAccesses": {
+          "0": 64
+        },
+        "STATE_BASE_ADDRESS.GeneralStateBaseAddressModifyEnable": {
+          "1": 64
+        },
+        "STATE_BASE_ADDRESS.GeneralStateBufferSize": {
+          "1048575": 64
+        },
+        "STATE_BASE_ADDRESS.GeneralStateMemoryObjectControlState": {
+          "6": 64
+        },
+        "STATE_BASE_ADDRESS.InstructionBufferSize": {
+          "1048575": 64
+        },
+        "STATE_BASE_ADDRESS.InstructionMemoryObjectControlState": {
+          "6": 64
+        },
+        "STATE_BASE_ADDRESS.L1CacheControlCachePolicy": {
+          "0": 64
+        },
+        "STATE_BASE_ADDRESS.StatelessDataPortAccessMemoryObjectControlState": {
+          "6": 64
+        },
+        "STATE_BASE_ADDRESS.SurfaceStateMemoryObjectControlState": {
+          "6": 64
+        },
+        "STATE_COMPUTE_MODE.DisableL1InvalidateForNonL1CacheableWrites": {
+          "0": 32
+        },
+        "STATE_COMPUTE_MODE.DisableSlmReadMergeOptimization": {
+          "0": 32
+        },
+        "STATE_COMPUTE_MODE.ForceNonCoherent": {
+          "2": 32
+        },
+        "STATE_COMPUTE_MODE.LargeGrfMode": {
+          "0": 16,
+          "1": 16
+        },
+        "STATE_COMPUTE_MODE.MaskBits": {
+          "32792": 32
+        },
+        "STATE_COMPUTE_MODE.PixelAsyncComputeThreadLimit": {
+          "0": 32
+        },
+        "STATE_COMPUTE_MODE.ZPassAsyncComputeThreadLimit": {
+          "0": 32
+        }
+      },
+      "kmt_calls": {
+        "D3DKMTSubmitCommand": 1,
+        "D3DKMTWaitForSynchronizationObjectFromCpu": 0,
+        "D3DKMTWaitForSynchronizationObjectFromGpu": 0,
+        "D3DKMTMakeResident": 0,
+        "D3DKMTCreateAllocation2": 0,
+        "D3DKMTDestroyAllocation2": 0,
+        "D3DKMTMapGpuVirtualAddress": 0,
+        "D3DKMTQueryAllocationResidency": 0,
+        "D3DKMTSignalSynchronizationObjectFromCpu": 0,
+        "D3DKMTFreeGpuVirtualAddress": 0,
+        "D3DKMTReserveGpuVirtualAddress": 0,
+        "_Mtx_lock": 0,
+        "_Mtx_unlock": 0,
+        "D3DKMTCreateDevice": 0,
+        "D3DKMTCreateContextVirtual": 0,
+        "D3DKMTDestroyContext": 0
+      },
+      "gdn_geometry": [
+        48,
+        1,
+        1,
+        127,
+        3,
+        0,
+        1,
+        65535,
+        3,
+        0,
+        32
+      ],
+      "advance_geometry": [
+        1,
+        1,
+        1,
+        63,
+        0,
+        0,
+        2,
+        4294967295,
+        0,
+        8,
+        2
+      ]
+    },
+    {
+      "mode": "l0",
+      "summary": {
+        "submissions": 1,
+        "files": 3,
+        "bytes": 7020,
+        "failures": 0
+      },
+      "counts": {
+        "COMPUTE_WALKER": 32,
+        "MI_BATCH_BUFFER_END": 1,
+        "MI_BATCH_BUFFER_START": 2,
+        "PIPE_CONTROL": 69,
+        "STATE_BASE_ADDRESS": 1,
+        "STATE_COMPUTE_MODE": 32
+      },
+      "fields": {
+        "COMPUTE_WALKER.DispatchWalkOrder": {
+          "0": 32
+        },
+        "COMPUTE_WALKER.EmitInlineParameter": {
+          "1": 32
+        },
+        "COMPUTE_WALKER.EmitLocalId": {
+          "7": 32
+        },
+        "COMPUTE_WALKER.GenerateLocalId": {
+          "1": 32
+        },
+        "COMPUTE_WALKER.IndirectDataLength": {
+          "32": 16,
+          "64": 16
+        },
+        "COMPUTE_WALKER.L3PrefetchDisable": {
+          "0": 32
+        },
+        "COMPUTE_WALKER.LocalXMaximum": {
+          "63": 16,
+          "127": 16
+        },
+        "COMPUTE_WALKER.LocalYMaximum": {
+          "0": 16,
+          "3": 16
+        },
+        "COMPUTE_WALKER.LocalZMaximum": {
+          "0": 32
+        },
+        "COMPUTE_WALKER.MessageSimd": {
+          "1": 16,
+          "2": 16
+        },
+        "COMPUTE_WALKER.SimdSize": {
+          "1": 16,
+          "2": 16
+        },
+        "COMPUTE_WALKER.SystolicModeEnable": {
+          "0": 32
+        },
+        "COMPUTE_WALKER.TileLayout": {
+          "0": 32
+        },
+        "COMPUTE_WALKER.WalkOrder": {
+          "0": 32
+        },
+        "IDD.BtdMode": {
+          "0": 32
+        },
+        "IDD.DenormMode": {
+          "0": 32
+        },
+        "IDD.FloatingPointMode": {
+          "0": 32
+        },
+        "IDD.NumberOfBarriers": {
+          "0": 16,
+          "1": 16
+        },
+        "IDD.NumberOfThreadsInGpgpuThreadGroup": {
+          "2": 16,
+          "32": 16
+        },
+        "IDD.PreferredSlmAllocationSize": {
+          "8": 16,
+          "9": 16
+        },
+        "IDD.RoundingMode": {
+          "0": 32
+        },
+        "IDD.SharedLocalMemorySize": {
+          "0": 16,
+          "3": 16
+        },
+        "IDD.SingleProgramFlow": {
+          "0": 32
+        },
+        "IDD.ThreadGroupDispatchSize": {
+          "3": 32
+        },
+        "IDD.ThreadPreemptionDisable": {
+          "0": 32
+        },
+        "PIPE_CONTROL.constant_invalidate": {
+          "0": 69
+        },
+        "PIPE_CONTROL.cs_stall": {
+          "1": 69
+        },
+        "PIPE_CONTROL.dc": {
+          "0": 67,
+          "1": 2
+        },
+        "PIPE_CONTROL.flags": {
+          "8791026489808175104": 2,
+          "8791037484924403712": 65,
+          "8791037484924404768": 1,
+          "8791037484924420128": 1
+        },
+        "PIPE_CONTROL.hdc": {
+          "0": 2,
+          "1": 67
+        },
+        "PIPE_CONTROL.instruction_invalidate": {
+          "0": 69
+        },
+        "PIPE_CONTROL.post_sync": {
+          "0": 66,
+          "1": 1,
+          "3": 2
+        },
+        "PIPE_CONTROL.state_invalidate": {
+          "0": 69
+        },
+        "PIPE_CONTROL.texture_invalidate": {
+          "0": 68,
+          "1": 1
+        },
+        "PIPE_CONTROL.tlb_invalidate": {
+          "0": 69
+        },
+        "PIPE_CONTROL.untyped": {
+          "0": 2,
+          "1": 67
+        },
+        "STATE_BASE_ADDRESS.BindlessSurfaceStateMemoryObjectControlState": {
+          "6": 1
+        },
+        "STATE_BASE_ADDRESS.BindlessSurfaceStateSize": {
+          "4294967295": 1
+        },
+        "STATE_BASE_ADDRESS.DynamicStateMemoryObjectControlState": {
+          "6": 1
+        },
+        "STATE_BASE_ADDRESS.EnableMemoryCompressionForAllStatelessAccesses": {
+          "0": 1
+        },
+        "STATE_BASE_ADDRESS.GeneralStateBaseAddressModifyEnable": {
+          "1": 1
+        },
+        "STATE_BASE_ADDRESS.GeneralStateBufferSize": {
+          "1048575": 1
+        },
+        "STATE_BASE_ADDRESS.GeneralStateMemoryObjectControlState": {
+          "6": 1
+        },
+        "STATE_BASE_ADDRESS.InstructionBufferSize": {
+          "1048575": 1
+        },
+        "STATE_BASE_ADDRESS.InstructionMemoryObjectControlState": {
+          "6": 1
+        },
+        "STATE_BASE_ADDRESS.L1CacheControlCachePolicy": {
+          "2": 1
+        },
+        "STATE_BASE_ADDRESS.StatelessDataPortAccessMemoryObjectControlState": {
+          "6": 1
+        },
+        "STATE_BASE_ADDRESS.SurfaceStateMemoryObjectControlState": {
+          "6": 1
+        },
+        "STATE_COMPUTE_MODE.DisableL1InvalidateForNonL1CacheableWrites": {
+          "0": 32
+        },
+        "STATE_COMPUTE_MODE.DisableSlmReadMergeOptimization": {
+          "0": 32
+        },
+        "STATE_COMPUTE_MODE.ForceNonCoherent": {
+          "2": 32
+        },
+        "STATE_COMPUTE_MODE.LargeGrfMode": {
+          "0": 16,
+          "1": 16
+        },
+        "STATE_COMPUTE_MODE.MaskBits": {
+          "32792": 32
+        },
+        "STATE_COMPUTE_MODE.PixelAsyncComputeThreadLimit": {
+          "0": 32
+        },
+        "STATE_COMPUTE_MODE.ZPassAsyncComputeThreadLimit": {
+          "0": 32
+        }
+      },
+      "kmt_calls": {
+        "D3DKMTSubmitCommand": 1,
+        "D3DKMTWaitForSynchronizationObjectFromCpu": 0,
+        "D3DKMTWaitForSynchronizationObjectFromGpu": 0,
+        "D3DKMTMakeResident": 0,
+        "D3DKMTEvict": 0,
+        "D3DKMTCreateAllocation2": 0,
+        "D3DKMTDestroyAllocation2": 0,
+        "D3DKMTMapGpuVirtualAddress": 0,
+        "D3DKMTSignalSynchronizationObjectFromCpu": 0,
+        "D3DKMTEscape": 0,
+        "D3DKMTWaitForSynchronizationObject": 0,
+        "D3DKMTSignalSynchronizationObjectFromGpu": 0,
+        "D3DKMTFreeGpuVirtualAddress": 0,
+        "D3DKMTReserveGpuVirtualAddress": 0,
+        "D3DKMTLock2": 0,
+        "D3DKMTUnlock2": 0,
+        "zeCommandQueueExecuteCommandLists": 1,
+        "zeCommandQueueSynchronize": 0,
+        "zeCommandListHostSynchronize": 0,
+        "zeFenceQueryStatus": 0,
+        "zeFenceHostSynchronize": 1,
+        "zeCommandListAppendLaunchKernel": 0,
+        "zeCommandListAppendMemoryCopy": 0,
+        "zeCommandListAppendMemoryFill": 0,
+        "zeCommandListAppendBarrier": 0,
+        "zeKernelSetArgumentValue": 0,
+        "zeKernelSetGroupSize": 0,
+        "zeCommandListClose": 0,
+        "zeMemAllocDevice": 0,
+        "zeMemAllocHost": 0,
+        "zeMemFree": 0,
+        "zeContextMakeMemoryResident": 0,
+        "D3DKMTCreateDevice": 0,
+        "D3DKMTCreateContextVirtual": 0,
+        "D3DKMTDestroyContext": 0
+      },
+      "gdn_geometry": [
+        48,
+        1,
+        1,
+        127,
+        3,
+        0,
+        1,
+        65535,
+        3,
+        9,
+        32
+      ],
+      "advance_geometry": [
+        1,
+        1,
+        1,
+        63,
+        0,
+        0,
+        2,
+        4294967295,
+        0,
+        8,
+        2
+      ]
+    }
+  ],
+  "guarded_cases": 64,
+  "max_abs_reference_error": 7.74860382e-07,
+  "linux_gpu_tested": false,
+  "geometry_value_order": [
+    "groups_x",
+    "groups_y",
+    "groups_z",
+    "local_x_minus1",
+    "local_y_minus1",
+    "local_z_minus1",
+    "simd_encoding",
+    "execution_mask",
+    "slm_encoding",
+    "preferred_slm_encoding",
+    "hardware_threads_per_group"
+  ],
+  "caveats": [
+    "All32probe cases still check scalar reference,fullguards and advance counters; only one replay captured.",
+    "Bounded observed CPU-backed GPU mappings; unknown/truncated packets fail instead of extrapolating.",
+    "No fresh model throughput,physical traffic,application-lock census or Linux GPU result.",
+    "Process-local observer adds timing and a diagnostic SRW lock; captured timings are excluded from performance claims.",
+    "No fresh D2D or application-lock census; counts in this tiny replay are not full-model counts.",
+    "Actual GRF modes, workgroups, SIMD masks, required SLM and hardware threads agree. Preferred SLM and heap payload padding differ.",
+    "Native V2 capture reused byte-for-byte after CRLF parser correction; no repeated native GPU run.",
+    "Initial V1 compile failure and V2 post-capture decoder-assert failure are preserved.",
+    "Same eight FP32/Q8 fixtures as frozen baseline; scalar FP32 oracle, Q8finite+parity not an independent CPU quantization oracle."
+  ],
+  "reproduction": {
+    "verify": "python build-orca-native-lower-20261031/publish_dg2_gdn_mixed_packets.py --verify"
+  },
+  "evidence_files": 209,
+  "unique_blobs": 85,
+  "archive_sha256": "46487c6d4b03a7f358db3abac40a0ce7ef6fc4230b56961167752acaf5126358"
+}

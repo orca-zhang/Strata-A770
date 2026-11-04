@@ -1,0 +1,228 @@
+{
+  "date": "2026-10-31",
+  "hardware": {
+    "os": "Windows",
+    "gpu": "Intel Arc A770 16 GB",
+    "pci_device": "0x56a0",
+    "driver": "32.0.101.9034",
+    "wddm": 2700,
+    "compiler": "Intel oneAPI 2025.3.2"
+  },
+  "scope": {
+    "candidate": "Orca L0 -> raw vendor DDI -> Intel UMD -> WDDM",
+    "baseline": "Existing Orca L0 -> ze_loader -> Intel UMD -> WDDM",
+    "original_sycl_comparison": false,
+    "windows_compute_umd_replaced": false,
+    "linux_gpu_validated": false
+  },
+  "binary_pack": {
+    "packs": 48,
+    "zebin": 1243,
+    "retained_spirv": 24,
+    "retained_fp64": 18,
+    "retained_sg16_matrix": 6,
+    "iq_native_images": 252,
+    "native_mmvq_images": 611,
+    "image_manifest_sha256": "be348980663e2547b3a97eaea14e107c2dc2f8cdb32217f4d7ec6024cf9d6a5d",
+    "strict_unsupported_bake_rejected": true
+  },
+  "sources_sha256": {
+    "orca-l0/compiler/native_pack.cpp": "0fdedfc6e302178df52f31a0628344b2571db8ebe018dc0948a916ae5301e8fd",
+    "orca-l0/tests/wddm_memory_check.cpp": "32a7446199cbb3ea4658179aeeb5ae3be378cba0128af27d8062974eda9004fc",
+    "orca-l0/CMakeLists.txt": "ec05057719a98e629e4467fe6344bde3cef47abcf2df7d560ce16ad8783f5db6",
+    "sycl/src/kernels/cuda/iq_kernels.dp.cpp": "6989897e6bbf609f680a897c5666072ace5690c2388bf8a4e6cc7ca24168a84a",
+    "sycl/src/kernels/cuda/qsa_prompt_attn_xmx.dp.cpp": "d9538ec06202543662344b000a24d259ca52b789673a674e6b45ba85ffc5f1cc"
+  },
+  "executables_sha256": {
+    "G:\\GitHub\\Strata\\build-orca-native-lower-20261031\\native-model-v1\\strata-loader.exe": "3aa90185e99aa3258da653a8cc05b1251c72e1fed56f62ac0437e86bd28304f5",
+    "G:\\GitHub\\Strata\\build-orca-native-lower-20261031\\windows-native-compatible-v4\\strata-direct.exe": "23e69636b28480a9265698b4b0abf3fcaa95dcfc7bf6cee80c8b35d8b155abd7"
+  },
+  "reproducibility": {
+    "fixture": "sycl/orca/short-anchor-v1.json",
+    "fixture_sha256": "0c7d7a1436a5f412d5c552ff8950fe7117dd3c15dafd6d72672782c0c8dc0a62",
+    "warmups_per_process": 10,
+    "retained_per_process": 5,
+    "request_keys": "temperature=0",
+    "args": [
+      "--pack",
+      "G:\\GitHub\\Strata-data\\packs\\iq2_xs",
+      "--native",
+      "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00001-of-00002.gguf",
+      "--ple-gguf",
+      "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00002-of-00002.gguf",
+      "--expert-profile",
+      "G:\\GitHub\\Strata\\data\\expert-profile.bin",
+      "--expert-cache",
+      "5500",
+      "--prefill",
+      "8192",
+      "--spec",
+      "4",
+      "--spec-min-p",
+      "0.5",
+      "--mtp",
+      "G:\\GitHub\\Strata-data\\mtp\\rt-full-vocab-current",
+      "--max-context",
+      "8192",
+      "--stream-experts",
+      "--vram-reserve-mib",
+      "1536",
+      "--pcie-frac",
+      "0.16",
+      "--prompt-cache",
+      "0",
+      "--short-read",
+      "256",
+      "--adapt-every",
+      "1",
+      "--adapt-swaps",
+      "32",
+      "--prefill-borrow",
+      "--mtp-window",
+      "1024",
+      "--mtp-hnorm",
+      "stream",
+      "--adapt-decay",
+      "0.95"
+    ],
+    "env": {
+      "ZES_ENABLE_SYSMAN": "1",
+      "STRATA_MIRROR_MIB": "49152",
+      "STRATA_VERIFY_DEVICE_PLAN": "1",
+      "STRATA_VERIFY_NO_HOST": "1",
+      "STRATA_STAGER_THREADS": "12",
+      "STRATA_VERIFY_ADAPT": "1",
+      "STRATA_ADAPT_COST_WEIGHTED": "1",
+      "STRATA_PREFILL_FIRST": "0",
+      "STRATA_GDN_SG16": "1",
+      "STRATA_IQ4_XS_SG16": "2",
+      "STRATA_VERIFY_FUSED_ACT": "1",
+      "STRATA_VERIFY_DESC_CACHE": "1",
+      "STRATA_SERVE_QUIET": "1",
+      "STRATA_GU_LANES": "16",
+      "STRATA_DOWN_LANES": "4",
+      "STRATA_MTP_LAST_DRAFT_MIN_P": "0.6",
+      "STRATA_GU_IQ2S_SG16": "1",
+      "STRATA_GU_IQ2S_SINGLE_GROUP": "1",
+      "STRATA_GDN_Q8_TAIL": "1",
+      "STRATA_QSA_Q8_TAIL": "1",
+      "STRATA_PREFILL_NATIVE_XMX": "1",
+      "STRATA_PREFILL_XMX_EXPERT_CHAIN": "1",
+      "STRATA_PREFILL_XMX_EXPERT_BATCH": "1",
+      "STRATA_PREFILL_XMX_HC_INJECT": "1",
+      "STRATA_VALUE_PACKED_BITS": "4",
+      "STRATA_VALUE_PACKED_RESIDUAL": "0",
+      "STRATA_NO_BATCH_KV_STEP": "1",
+      "STRATA_QSA_FUSED_KV_STORE": "0",
+      "STRATA_PROMPT_ATTN_XMX": "0",
+      "STRATA_KV_RING_OFF": "1",
+      "STRATA_PREFILL_CACHE_TAIL64": "1",
+      "STRATA_ORCA_L0": "1",
+      "STRATA_ORCA_READY_OPS": "1",
+      "STRATA_PREFILL_FP16_PAIR": "1"
+    },
+    "decode_excludes": [
+      "preparation",
+      "model_loading",
+      "prefill"
+    ],
+    "setup_tracing_enabled": true,
+    "ready_time_is_startup_benchmark": false,
+    "build_method": "Reuse verified frozen objects, rebuild IQ/prompt-XMX host wrappers and native pack reader; preserve numerical images except unreachable SG16 IQ export. Use isolated compatible packs and original flags including >4 GiB addressing."
+  },
+  "comparison": {
+    "before_tok_s": 51.53940051539401,
+    "candidate_tok_s": 51.52891721472642,
+    "after_tok_s": 51.59888655034286,
+    "change_pct": -0.07798800752635282,
+    "control_drift_pct": 0.11541856202050838
+  },
+  "runs": [
+    {
+      "label": "loader-spirv-before",
+      "decode_tok_s": 51.53940051539401,
+      "loaded_native": 0,
+      "loaded_spirv": 150,
+      "anchor_requests": 15,
+      "mixed_cases": [
+        "Short",
+        "Code2K",
+        "Prose2K",
+        "Long8K"
+      ]
+    },
+    {
+      "label": "direct-compatible-zebin",
+      "decode_tok_s": 51.52891721472642,
+      "loaded_native": 150,
+      "loaded_spirv": 0,
+      "anchor_requests": 15,
+      "mixed_cases": [
+        "Short",
+        "Code2K",
+        "Prose2K",
+        "Long8K"
+      ]
+    },
+    {
+      "label": "loader-spirv-after",
+      "decode_tok_s": 51.59888655034286,
+      "loaded_native": 0,
+      "loaded_spirv": 95,
+      "anchor_requests": 15,
+      "mixed_cases": []
+    }
+  ],
+  "numerical_checks": {
+    "anchor_requests": 45,
+    "anchor_output_tokens": 76,
+    "anchor_accepted_drafts": 57,
+    "anchor_offered_drafts": 57,
+    "complete_anchor_tokens_equal": true,
+    "complete_mixed_tokens_and_finish_equal": true,
+    "forced_xmx_2k_output_equal": true,
+    "active_native_modules": 150,
+    "active_spirv_fallbacks": 0
+  },
+  "wddm": {
+    "cycles": 3,
+    "allocation_bytes": 65536,
+    "gpu_va": "0x800000000000",
+    "allocation": true,
+    "mapping": true,
+    "residency": true,
+    "paging_fence": true,
+    "cleanup": true,
+    "compute_runtime_or_compiler_loaded": false,
+    "gpu_commands_submitted": 0,
+    "context_and_compute_implemented": false
+  },
+  "checks": [
+    {
+      "label": "wddm-build",
+      "exit_code": 0
+    },
+    {
+      "label": "wddm-ctest",
+      "exit_code": 0
+    },
+    {
+      "label": "native-pack-build",
+      "exit_code": 0
+    },
+    {
+      "label": "native-pack-ctest",
+      "exit_code": 0
+    },
+    {
+      "label": "compiler-flags",
+      "exit_code": 0
+    }
+  ],
+  "interpretation": "One bracketed round: -0.078% candidate, +0.115% control drift. Effectively unchanged; no established throughput improvement.",
+  "local_reports": [
+    "build-orca-native-lower-20261031/windows-native-compatible-v4/results.json",
+    "build-orca-native-lower-20261031/windows-native-model-v4/results.json",
+    "build-orca-native-lower-20261031/windows-final-checks-v2/results.json"
+  ]
+}

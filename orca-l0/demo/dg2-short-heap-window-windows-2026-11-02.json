@@ -1,0 +1,199 @@
+{
+  "date": "2026-11-02",
+  "complete": true,
+  "scope": "Short28/natural76 shared heap-window diagnostic",
+  "hardware": "Intel Arc A770 16 GB (0x56a0), Windows, driver 32.0.101.9034",
+  "configuration": {
+    "spec_min_p": 0.5,
+    "requested_vram_reserve_mib": 1536,
+    "matched_expert_slots": 5771,
+    "warmups_per_process": 10,
+    "retained_per_process": 5,
+    "retained_statistic": "median",
+    "bracket_reference": "geometric mean of control medians",
+    "prefix_reuse": false,
+    "decode_scope": "Internal engine decode_ms; excludes loading, initialization, preparation and prefill.",
+    "cpu_scope": "Host-observed REUSED-to-DONE interval, close to but distinct from engine decode_ms.",
+    "logical_cpus": 44
+  },
+  "runs": [
+    {
+      "label": "native-before",
+      "summary": {
+        "decode_tok_s": 38.69850807067569,
+        "prompt_ms": 985.6,
+        "ttft_ms": 1042.7696999977343,
+        "request_ms": 2947.2355999969295,
+        "decode_cpu_ms": 62.5,
+        "decode_cpu_cores": 0.031823050397732124,
+        "decode_system_busy_pct": 2.7922896775355754,
+        "decode_cpu_wall_gap_abs_pct": 0.004338306431073136
+      },
+      "info": "INFO context=8192 kv=fp16 kv_resident=0 expert_slots=5771 expert_cache_mib=7922 expert_slots_primary=5771 expert_cache_primary_mib=7922 spec=6 mtp_max=4 lookup=3 vram_free_mib=2342 cvec=0 arena_mib=33812 pool_workers=21 pcie_frac=0.16 spec_min_p=0.50 conversation_cache_mib=0 conversation_cache_slots=4 conversation_cache_min_free_mib=2560 tail_role_token=-1 vram_elastic=0 engine=0.1.39-orca",
+      "executable_sha256": "b5df8b350bb7882b1ed067d5e757a798805d7afa52007f660e51d5352db60229",
+      "exit_code": 0
+    },
+    {
+      "label": "heap-window",
+      "summary": {
+        "decode_tok_s": 40.46212000212959,
+        "prompt_ms": 945.7,
+        "ttft_ms": 1002.2677999950247,
+        "request_ms": 2827.0018999974127,
+        "decode_cpu_ms": 78.125,
+        "decode_cpu_cores": 0.04186856245731081,
+        "decode_system_busy_pct": 5.095057034220529,
+        "decode_cpu_wall_gap_abs_pct": 0.0031356868522181003
+      },
+      "info": "INFO context=8192 kv=fp16 kv_resident=0 expert_slots=5771 expert_cache_mib=7922 expert_slots_primary=5771 expert_cache_primary_mib=7922 spec=6 mtp_max=4 lookup=3 vram_free_mib=2339 cvec=0 arena_mib=33812 pool_workers=21 pcie_frac=0.16 spec_min_p=0.50 conversation_cache_mib=0 conversation_cache_slots=4 conversation_cache_min_free_mib=2560 tail_role_token=-1 vram_elastic=0 engine=0.1.39-orca",
+      "executable_sha256": "5b2767abf5aa2b15ad77b02354f401bda23743e92c83b7a4e1cec240bebd564b",
+      "exit_code": 0
+    },
+    {
+      "label": "native-after",
+      "summary": {
+        "decode_tok_s": 38.51026095768938,
+        "prompt_ms": 992.5,
+        "ttft_ms": 1051.2782000005245,
+        "request_ms": 2986.8400000050315,
+        "decode_cpu_ms": 46.875,
+        "decode_cpu_cores": 0.023875431521365925,
+        "decode_system_busy_pct": 7.774170274170277,
+        "decode_cpu_wall_gap_abs_pct": 0.010967347562540475
+      },
+      "info": "INFO context=8192 kv=fp16 kv_resident=0 expert_slots=5771 expert_cache_mib=7922 expert_slots_primary=5771 expert_cache_primary_mib=7922 spec=6 mtp_max=4 lookup=3 vram_free_mib=2339 cvec=0 arena_mib=33812 pool_workers=21 pcie_frac=0.16 spec_min_p=0.50 conversation_cache_mib=0 conversation_cache_slots=4 conversation_cache_min_free_mib=2560 tail_role_token=-1 vram_elastic=0 engine=0.1.39-orca",
+      "executable_sha256": "b5df8b350bb7882b1ed067d5e757a798805d7afa52007f660e51d5352db60229",
+      "exit_code": 0
+    }
+  ],
+  "comparisons": {
+    "heap_window_vs_native": {
+      "decode_tok_s": {
+        "control": 38.604269770000435,
+        "candidate": 40.46212000212959,
+        "change_pct": 4.812551158713796,
+        "control_drift_pct": -0.48644540157081195
+      },
+      "prompt_ms": {
+        "control": 989.0439828440392,
+        "candidate": 945.7,
+        "change_pct": -4.3824120661855375,
+        "control_drift_pct": 0.700081168831157
+      },
+      "ttft_ms": {
+        "control": 1047.015307065138,
+        "candidate": 1002.2677999950247,
+        "change_pct": -4.2738159383308165,
+        "control_drift_pct": 0.8159519789277203
+      },
+      "request_ms": {
+        "control": 2966.9717186905673,
+        "candidate": 2827.0018999974127,
+        "change_pct": -4.717598681895375,
+        "control_drift_pct": 1.343781271105149
+      },
+      "decode_cpu_ms": {
+        "control": 54.12658773652741,
+        "candidate": 78.125,
+        "change_pct": 44.33756729740645,
+        "control_drift_pct": -25.0
+      },
+      "decode_cpu_cores": {
+        "control": 0.02756427145004979,
+        "candidate": 0.04186856245731081,
+        "change_pct": 51.89431918482714,
+        "control_drift_pct": -24.974409357478144
+      },
+      "decode_system_busy_pct": {
+        "control": 4.659156083237562,
+        "candidate": 5.095057034220529,
+        "change_pct": 9.355791975959459,
+        "control_drift_pct": 178.4156076898017
+      },
+      "decode_cpu_wall_gap_abs_pct": {
+        "control": 0.006897805046707512,
+        "candidate": 0.0031356868522181003,
+        "change_pct": -54.540802023466306,
+        "control_drift_pct": 152.8025103064829
+      }
+    }
+  },
+  "decode_controls_within_3pct": {
+    "heap_window_vs_native": true
+  },
+  "validation": {
+    "matching_requests": 45,
+    "every_output_id_matches": true,
+    "accepted_drafts_per_request": 57,
+    "offered_drafts_per_request": 57,
+    "all_owned_processes_exited": true,
+    "native_runtime_module_audit_passed": true,
+    "defaults_changed": false,
+    "production_changed": false,
+    "candidate_adopted": false,
+    "desktop_fix_confirmed": false,
+    "linux_gpu_validated": false
+  },
+  "reproduction": {
+    "local_directory": "build-orca-native-lower-20261031/windows-dg2-short-heap-cpu-v2",
+    "raw_results_sha256": "e4f8c0747da5d7b806301b5d211880ae3051fe0839ea8ddab69bf52e398aed82",
+    "runner_sha256": "4d969a873ddd1b578cb825ecb4bfaf8bee9e3ede4548b1ba3a04c0f5b350ca18",
+    "candidate_preparation_sha256": "0fcabd49ad268a35f268e4a51558b8bfb425a692f56cddae053fe7ef5b76bbdc",
+    "fixture_sha256": "0c7d7a1436a5f412d5c552ff8950fe7117dd3c15dafd6d72672782c0c8dc0a62",
+    "args": [
+      "--pack",
+      "G:\\GitHub\\Strata-data\\packs\\iq2_xs",
+      "--native",
+      "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00001-of-00002.gguf",
+      "--ple-gguf",
+      "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00002-of-00002.gguf",
+      "--expert-profile",
+      "G:\\GitHub\\Strata\\data\\expert-profile.bin",
+      "--expert-cache",
+      "5500",
+      "--prefill",
+      "8192",
+      "--spec",
+      "4",
+      "--spec-min-p",
+      "0.5",
+      "--mtp",
+      "G:\\GitHub\\Strata-data\\mtp\\rt-full-vocab-current",
+      "--max-context",
+      "8192",
+      "--stream-experts",
+      "--vram-reserve-mib",
+      "1536",
+      "--pcie-frac",
+      "0.16",
+      "--prompt-cache",
+      "0",
+      "--short-read",
+      "1024",
+      "--adapt-every",
+      "1",
+      "--adapt-swaps",
+      "32",
+      "--prefill-borrow",
+      "--mtp-window",
+      "1024",
+      "--mtp-hnorm",
+      "stream",
+      "--adapt-decay",
+      "0.5"
+    ],
+    "production_sha256": {
+      "strata-iq2_xs.json": "9c45e51de69e66c3f1cd020359c8d70d639fbd1aba5d87ead84082fbe73fd531",
+      "build-orca-default-pair-20261031/strata.exe": "7be641375e905b0ceb64424ab4875afcdf9f7f6f1e2c60d6b0fcff4ece5ff4b5"
+    }
+  },
+  "caveats": [
+    "CPU accounting brackets host receipt of REUSED and DONE; it is close to but distinct from internal decode timestamps.",
+    "GetProcessTimes is visibly quantized in 15.625-ms steps here. Small native/native CPU ratios are imprecise.",
+    "System-wide CPU busy percentage includes unrelated work and drifts strongly; it is not a causal comparison.",
+    "Much lower native process CPU use does not distinguish GPU execution cost from fence notification/wakeup latency.",
+    "No desktop observation or display instrumentation confirms a cursor fix or the cause of flickering.",
+    "The L0 control, when present, is production Orca L0, not original production SYCL.",
+    "Only Short was run. No long-context, broad PPL or Linux GPU claim follows from this diagnostic."
+  ]
+}

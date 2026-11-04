@@ -1,0 +1,218 @@
+{
+  "date": "2026-11-01",
+  "complete": true,
+  "hardware": {
+    "os": "Windows",
+    "gpu": "Intel Arc A770 16 GB",
+    "pci_device": "0x56a0",
+    "driver": "32.0.101.9034",
+    "wddm": 2700,
+    "compiler": "Intel oneAPI 2025.3.2"
+  },
+  "scope": "Isolated native-control / private native candidate / native-control Short28 bracket; not original L0 or SYCL.",
+  "policy": "Keep all existing leading invalidations, dependency/tail flushes and double-SBA workaround. Only suppress unchanged preemption/pipeline/compute-mode/SBA/CFE groups.",
+  "comparisons": {
+    "decode_tok_s": {
+      "baseline_geomean": 38.694748789035394,
+      "candidate": 38.01330465662982,
+      "change_pct": -1.7610765122699767,
+      "control_drift_pct": -1.5408709710012958,
+      "stable_control": true
+    },
+    "prompt_ms": {
+      "baseline_geomean": 981.5578536184203,
+      "candidate": 1001.8,
+      "change_pct": 2.0622468973131802,
+      "control_drift_pct": 2.7783515802520142,
+      "stable_control": true
+    },
+    "ttft_ms": {
+      "baseline_geomean": 1038.9328115515918,
+      "candidate": 1061.9847000052687,
+      "change_pct": 2.2188045461043915,
+      "control_drift_pct": 2.769035495822214,
+      "stable_control": true
+    },
+    "request_ms": {
+      "baseline_geomean": 2946.129910200793,
+      "candidate": 3012.785700004315,
+      "change_pct": 2.262486442730527,
+      "control_drift_pct": 2.0427415495959833,
+      "stable_control": true
+    }
+  },
+  "runs": [
+    {
+      "label": "before",
+      "summary": {
+        "decode_tok_s": 38.9963569192878,
+        "prompt_ms": 968.2,
+        "ttft_ms": 1024.8406000027899,
+        "request_ms": 2916.49229999166
+      },
+      "ready_ms": 31074.47459999821,
+      "executable_sha256": "b5df8b350bb7882b1ed067d5e757a798805d7afa52007f660e51d5352db60229",
+      "retained_decode_tok_s": [
+        39.288668320926384,
+        39.503092676334525,
+        38.98235535494461,
+        38.84686158249846,
+        38.9963569192878
+      ]
+    },
+    {
+      "label": "candidate",
+      "summary": {
+        "decode_tok_s": 38.01330465662982,
+        "prompt_ms": 1001.8,
+        "ttft_ms": 1061.9847000052687,
+        "request_ms": 3012.785700004315
+      },
+      "ready_ms": 32704.624800011516,
+      "executable_sha256": "bbae86ed70bdd8400b3d626f64e1cf2fa350371cd901f507363b5db190ba6a3a",
+      "retained_decode_tok_s": [
+        38.1200782464764,
+        37.681590559769944,
+        38.068523342015624,
+        37.775237337839854,
+        38.01330465662982
+      ]
+    },
+    {
+      "label": "after",
+      "summary": {
+        "decode_tok_s": 38.395473375770436,
+        "prompt_ms": 995.1,
+        "ttft_ms": 1053.2187999924645,
+        "request_ms": 2976.0686999943573
+      },
+      "ready_ms": 31385.415099997772,
+      "executable_sha256": "b5df8b350bb7882b1ed067d5e757a798805d7afa52007f660e51d5352db60229",
+      "retained_decode_tok_s": [
+        38.4129390952742,
+        38.60219422998781,
+        38.395473375770436,
+        38.37221044128042,
+        38.298730094738964
+      ]
+    }
+  ],
+  "validation": {
+    "exact_requests": 45,
+    "output_tokens": 76,
+    "accepted_offered": [
+      57,
+      57
+    ],
+    "fixed_expert_slots": 5771,
+    "windows_ctests": 14,
+    "linux_cpu_ctests": 3,
+    "actual_device_gemv_xmx_scratch_private_atomics_local_isa_checks": true,
+    "no_intel_umd_l0_sycl_ur_compiler_gmm_loaded": true,
+    "main_product_sources_changed": false,
+    "production_changed": false,
+    "default_changed": false,
+    "linux_gpu_validated": false
+  },
+  "caveats": [
+    "One same-host bracket with unlocked clocks; stable_control tests the predeclared 3% drift bound, not statistical significance.",
+    "Ten discarded warmups and five retained requests per arm; balanced spec-min-p=0.5, requested reserve 1536 MiB, no prefix reuse.",
+    "Decode excludes initialization/loading/preparation/prefill; TTFT and request time are separate host observations, not GPU timestamps.",
+    "Candidate changes only the staged native encoder and its CPU regression check; images, numerical ABI and frozen engine objects/libraries stay pinned.",
+    "The candidate remains isolated. This report does not claim that production defaults changed, full PPL passed or Linux GPU execution ran."
+  ],
+  "reproduction": {
+    "command": "python build-orca-native-lower-20261031/check_dg2_dirty_state.py NEW_OUTPUT dg2-dirty-state-prepared-v2",
+    "runner_sha256": "a9117d8bee2b488003f9a3689262b8f15cddab94cb6ec97372304c25097834fa",
+    "args": [
+      "--pack",
+      "G:\\GitHub\\Strata-data\\packs\\iq2_xs",
+      "--native",
+      "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00001-of-00002.gguf",
+      "--ple-gguf",
+      "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00002-of-00002.gguf",
+      "--expert-profile",
+      "G:\\GitHub\\Strata\\data\\expert-profile.bin",
+      "--expert-cache",
+      "5500",
+      "--prefill",
+      "8192",
+      "--spec",
+      "4",
+      "--spec-min-p",
+      "0.5",
+      "--mtp",
+      "G:\\GitHub\\Strata-data\\mtp\\rt-full-vocab-current",
+      "--max-context",
+      "8192",
+      "--stream-experts",
+      "--vram-reserve-mib",
+      "1536",
+      "--pcie-frac",
+      "0.16",
+      "--prompt-cache",
+      "0",
+      "--short-read",
+      "1024",
+      "--adapt-every",
+      "1",
+      "--adapt-swaps",
+      "32",
+      "--prefill-borrow",
+      "--mtp-window",
+      "1024",
+      "--mtp-hnorm",
+      "stream",
+      "--adapt-decay",
+      "0.5"
+    ],
+    "fixture_sha256": "0c7d7a1436a5f412d5c552ff8950fe7117dd3c15dafd6d72672782c0c8dc0a62",
+    "staged_source_sha256": {
+      "CMakeLists.txt": "76b588691caf2997b903526ee6939939140d467a0bf5ad5a6ec715db67bb7082",
+      "LICENSE": "d287f56f89f7ca62ded62124d5741c4e858bce5ee30d45f39bb4469ea63f5188",
+      "include/orca_l0/dg2.hpp": "74b3e49209f256f2d693deb2a88bfaa6dd1a262e1cc9e72f675d8fa0a670ba24",
+      "include/orca_l0/direct_driver.hpp": "cd87a73ef80e8b2052a192ddd2ff174d36be595d79c42e454e0bb1b3d86e61c0",
+      "include/orca_l0/drm.hpp": "44c49672eed6602435052b716c7180ec40ce0d15ae47e1c48ff3dd2485ebe0bb",
+      "include/orca_l0/ring.hpp": "c0bc88a290d32ba5ee6cf26f2fe82c38cced25a334a02c23591e11bb67f75112",
+      "include/orca_l0/runtime.hpp": "1b800beb8a4ec7b1777192afc599a4cf519870acd2438b1aea43e79ffafc0869",
+      "include/orca_l0/compiler/dg2.hpp": "05b85ca8fe77f00c333e7b86faf287c4564d8d0aee8510f0bb81f0cb0636a09b",
+      "include/orca_l0/compiler/local_accessor.hpp": "749634fcbcd2a094d87b8f3cac4610aa095317e840e8c807fdb1beb342d81fc2",
+      "include/orca_l0/compiler/program.hpp": "3aedf164c9bc4320e2be356acc93cd2dae03f75fc49058cdb6f29671fbf02a25",
+      "include/orca_l0/compiler/stream.hpp": "4a5255d2ee3820603df48a098b86d17ef07ebc009fb4038baf3db47260f1e97b",
+      "include/orca_l0/compiler/sycl.hpp": "78c74406a5b0f702fbcfe8b1bedf73cb377ead1c7b2e9f0dd7188f493879e7dc",
+      "src/direct_api.inc": "e1fe46e7376f8a44ad9d27e2850cd175258c6f2a19aa5ad21a327e74020af281",
+      "src/direct_driver.cpp": "7fe701e2c34dccd80868685b29b83fc846406bf531faa4579a220c7bc4107548",
+      "src/direct_tables.inc": "5aa57dd8a7b89110fe6621b6840e8c36ad53e72792cf3b88f20a4db909231275",
+      "src/runtime.cpp": "2065f4be1abade4be029573f02d58d73f1b7d6a23cfc5ee85140669880bcf531",
+      "src/drm/arguments.hpp": "77fd18b3c0e5a2b2f749ba969754ec08d38c3c76197c360988ba3c6ba6d5229c",
+      "src/drm/encoding.hpp": "313c74e2cbf2ad3874ddf066e0641d90c1c4d4e3f4f8c87547ffa5a4325dfd8d",
+      "src/drm/memory.cl": "f92e9123f256e505b1e0c9d3bd3e0899f8b131f49cab3a227798deb485ec805d",
+      "src/drm/recording.inl": "13f8b94e5905490ddb4aabd3cfb690ee8c30014dab03525058335df0b399ea8f",
+      "src/drm/runtime.cpp": "d76e59e2149d418ce543cc9682a14e8fd30da079dbdd15d371a69958aeedad87",
+      "src/drm/zebin.hpp": "63e75bb83a7e3b62f2a04123eeba51b67f1c4cd08f911bc3309f9f0b8156ef2a",
+      "src/wddm/allocation.hpp": "5348b408fb0942796b7d37f80ed6f96df4aa3ff188193341f46917a652afe31c",
+      "src/wddm/runtime.cpp": "e4272e768e03d48444266ea7fd5f20670e6ba71e9add03875d6759665226059e",
+      "tests/compiler_check.cpp": "0cec3be040240834476916155bade46c0edbf76cf81aa528d92fc4a0707f2ab1",
+      "tests/compiler_flags_check.py": "8fa480a5df5dcdc1f08a4ba64a4d6bea290d55795c076828d299c20039e014fd",
+      "tests/dg2_compiler_check.cpp": "a9e04111ac9c9ad98366d2bd9a88c3cd31b0895a441552630df976ffa548fdf9",
+      "tests/dispatch3d.cl": "0d70ceb4fdc897b246e0e3590df708c2cb80d7242600b085243172dbd3697641",
+      "tests/drm_compute_check.cpp": "d06ed2f99db0b571d3fdd767dd2ca5aa982b467de0e91cc7581be07e0d0b4bd1",
+      "tests/drm_submit_check.cpp": "a2fd00de705be46804d2913cc10af3a58623ea253bf4e16963921922e73540a8",
+      "tests/inference.cl": "03647efb665f6d2ef16b95ee47526bf42832a71355b6f1c5b78668beefbee1b2",
+      "tests/module_data.cl": "b3aa1fcf6936ec35add71784c8359fac0fcfa74dd812407c471181bb0202d7d0",
+      "tests/native_pack_check.cpp": "631ed0ecb003351464fb999113ff444721b5e8f70562bf1fdc0656989338dc51",
+      "tests/ring_check.cpp": "edf589faf8df29b1c4d190a0e7a2e83d698f1726aa2365f3112e3bec5b529798",
+      "tests/runtime_check.cpp": "3aecdf8facd2ad0426dd90ea89ce869c12cdc4d882385dab9f9935bc1b5909ec",
+      "tests/runtime_dependencies.hpp": "f7fad56243713663e4936a9af44011364fc59cea27be0494d84b216e65cc5709",
+      "tests/submit_check.cpp": "e8634fdb6547448a3bf54efc9773da5ef6325e826858cea02f2c63a93dd1901e",
+      "tests/wddm_memory_check.cpp": "3e8b17e4b72db0a7b4e53737d747cfc299cceb9207e7d520ba03c43cbbe7071e",
+      "third_party/intel-dg2/LICENSE": "987a002c6c9eb75290d9937735641ef4f4b670591ee79e1ac8edebe16a81872e",
+      "third_party/intel-dg2/packets.hpp": "ffa6713e5586d753ea79ad837e608e802989b2f45f1f5fdff23a6aee7d95407c"
+    },
+    "executable_sha256": "bbae86ed70bdd8400b3d626f64e1cf2fa350371cd901f507363b5db190ba6a3a"
+  },
+  "base_archive": "dg2-dependency-flush-windows-2026-11-01.json.gz",
+  "base_archive_sha256": "fbdb382f89456ade5ff93703e5a61ecf94acb8a5eabeb15d6fd7e08494880d4a",
+  "diagnostic_archive": "dg2-state-trace-windows-2026-11-01.json.gz",
+  "diagnostic_archive_sha256": "0187c6451cc4f0c3695edc0a9ffe145fd8eadc5a282b99413b4409ce2b1e29d3"
+}

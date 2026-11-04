@@ -1,7 +1,8 @@
-"""Replay the published short anchor, or a same-parameter SYCL/Orca/SYCL comparison.
+"""Replay the published short anchor, optionally bracketed by another runtime.
 
 python tools/bench_orca_anchor.py --config strata-iq2_xs-anchor50.json --out build-anchor-repeat
 Add --baseline-config <old-sycl.json> for three independent A/B/A processes.
+Use --runtime direct --baseline-runtime l0 for Orca L0 / Direct / L0.
 """
 import argparse
 import json
@@ -33,9 +34,16 @@ def check_parameters(cfg, fixture):
     assert not any(key in cfg.get('env', {}) for key in ('STRATA_DECODE_TIMING', 'STRATA_VERIFY_PROFILE', 'STRATA_TRACE'))
 
 
-def modules(pid, native):
-    if native:
-        return audit(pid)
+def modules(pid, runtime):
+    if runtime != 'sycl':
+        loaded = audit(pid)
+        names = [Path(row['path']).name.lower() for row in loaded]
+        driver = ('ze_loader', 'ze_intel', 'libze_', 'igc64', 'igc32', 'igdfcl', 'igdgmm', 'opencl', 'igdrcl')
+        if runtime == 'direct':
+            assert not any(part in name for name in names for part in driver), 'Direct loaded a vendor user-mode runtime'
+        else:
+            assert any(part in name for name in names for part in ('ze_loader', 'ze_intel', 'libze_')), 'L0 runtime missing'
+        return loaded
     if os.name == 'nt':
         result = subprocess.run(['powershell', '-NoProfile', '-Command',
                                  f'@(Get-Process -Id {int(pid)} -ErrorAction Stop).Modules.FileName | ConvertTo-Json'],
@@ -55,6 +63,8 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument('--config', type=Path)
     ap.add_argument('--baseline-config', type=Path)
+    ap.add_argument('--runtime', choices=('l0', 'direct'), default='l0')
+    ap.add_argument('--baseline-runtime', choices=('sycl', 'l0', 'direct'), default='sycl')
     ap.add_argument('--fixture', type=Path, default=ROOT/'sycl/orca/short-anchor-v1.json')
     ap.add_argument('--out', type=Path)
     ap.add_argument('--monitor', type=Path, help='Optional Sysman monitor.exe; stdout MEM free_bytes samples are retained')
@@ -80,12 +90,14 @@ def main():
     assert a.config and a.out
     cfg = read(a.config)
     check_parameters(cfg, fixture)
-    arms = [('Orca', a.config, cfg, True)]
+    labels = dict(sycl='SYCL', l0='Orca L0', direct='Orca Direct')
+    arms = [(labels[a.runtime], a.config, cfg, a.runtime)]
     if a.baseline_config:
         baseline = read(a.baseline_config)
         check_parameters(baseline, fixture)
         assert baseline['args'] == cfg['args'], 'A/B/A model arguments must match exactly'
-        arms = [('SYCL-before', a.baseline_config, baseline, False), *arms, ('SYCL-after', a.baseline_config, baseline, False)]
+        arms = [(labels[a.baseline_runtime]+'-before', a.baseline_config, baseline, a.baseline_runtime),
+                *arms, (labels[a.baseline_runtime]+'-after', a.baseline_config, baseline, a.baseline_runtime)]
     out = a.out.resolve()
     out.mkdir()
     images = Path(cfg['env']['STRATA_ORCA_IMAGES'])
@@ -94,6 +106,8 @@ def main():
              *(Path(c['exe']) for _, _, c, _ in arms)}
     profile = Path(cfg['args'][cfg['args'].index('--expert-profile')+1])
     paths.add(profile)
+    paths.update(Path(c['env']['STRATA_ORCA_DG2_MEMORY']) for _, _, c, _ in arms
+                 if 'STRATA_ORCA_DG2_MEMORY' in c.get('env', {}))
     if a.monitor:
         paths.add(a.monitor)
     hashes = {str(p.resolve()): b.sha(p) for p in paths}
@@ -113,11 +127,11 @@ def main():
                     while 'MEM index=' not in (out/'memory.stdout').read_text(encoding='utf-8'):
                         assert monitor.poll() is None and time.monotonic() < deadline
                         time.sleep(.05)
-                for label, path, settings, native in arms:
-                    env = {k: v for k, v in os.environ.items() if not k.startswith(('STRATA_', 'SYCL_', 'UR_', 'ONEAPI_', 'ZES_'))}
+                for label, path, settings, runtime in arms:
+                    env = {k: v for k, v in os.environ.items() if not k.startswith(('STRATA_', 'ORCA_', 'SYCL_', 'UR_', 'ONEAPI_', 'ZES_'))}
                     env.update(settings['env'])
                     env['PATH'] = os.pathsep.join(settings['lib_dirs'])+os.pathsep+env.get('PATH', '')
-                    run = dict(label=label, config=settings, rows=[], exe_sha256=b.sha(settings['exe']))
+                    run = dict(label=label, runtime=runtime, config=settings, rows=[], exe_sha256=b.sha(settings['exe']))
                     d['runs'].append(run)
                     print('START', label, flush=True)
                     engine = b.Engine(Path(settings['exe']), settings['args'], env, out/label)
@@ -125,7 +139,7 @@ def main():
                         run['info'] = engine.info
                         info = dict(re.findall(r'(\w+)=([^ ]+)', engine.info))
                         assert all(info.get(k) == v for k, v in fixture['expected_runtime'].items()), engine.info
-                        run['modules_startup'] = modules(engine.p.pid, native)
+                        run['modules_startup'] = modules(engine.p.pid, runtime)
                         for index in range(fixture['warmup']+fixture['retained']):
                             assert monitor is None or monitor.poll() is None
                             row = engine.gen(fixture['input_ids'], fixture['max_new'], keys='temperature=0')
@@ -137,7 +151,7 @@ def main():
                             assert row['accepted'] == fixture['expected_accepted'] and row['offered'] == fixture['expected_offered']
                             assert row['reused'] == row['resume'] == 0
                             print(label, index, 'kept' if row['retained'] else 'warm', round(1000*row['generated']/row['decode_ms'], 3), flush=True)
-                        run['modules_workload'] = modules(engine.p.pid, native)
+                        run['modules_workload'] = modules(engine.p.pid, runtime)
                     finally:
                         engine.close()
                     run['exit_code'] = engine.p.returncode

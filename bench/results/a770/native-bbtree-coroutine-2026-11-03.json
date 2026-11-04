@@ -1,0 +1,813 @@
+{
+  "date": "2026-11-03",
+  "complete": true,
+  "adopted": false,
+  "production_changed": false,
+  "reference_repository": "https://github.com/XiangpengHao/bbtree",
+  "reference_commit": "3ab503d34c85a74af5eb86417774e8770940203b",
+  "hardware": "Xeon E5-2696 v4 / Windows / Intel oneAPI 2025.3 compiler / MSVC STL 14.44.35207",
+  "fixed_stack_arena": {
+    "complete": true,
+    "commands": [
+      {
+        "label": "compile",
+        "exit_code": 0
+      },
+      {
+        "label": "run",
+        "exit_code": 0
+      }
+    ],
+    "comparisons": [
+      {
+        "count": 32,
+        "pattern": 0,
+        "variant": "prefetch",
+        "baseline": 129.70126853658758,
+        "candidate": 115.369,
+        "throughput_change_pct": 12.422980641756087,
+        "baseline_drift_pct": -20.711931896196624
+      },
+      {
+        "count": 32,
+        "pattern": 0,
+        "variant": "coroutine",
+        "baseline": 129.70126853658758,
+        "candidate": 272.198,
+        "throughput_change_pct": -52.350396205487336,
+        "baseline_drift_pct": -20.711931896196624
+      },
+      {
+        "count": 32,
+        "pattern": 1,
+        "variant": "prefetch",
+        "baseline": 321.4034967700258,
+        "candidate": 300.403,
+        "throughput_change_pct": 6.990774649396236,
+        "baseline_drift_pct": -0.6098241870044596
+      },
+      {
+        "count": 32,
+        "pattern": 1,
+        "variant": "coroutine",
+        "baseline": 321.4034967700258,
+        "candidate": 455.536,
+        "throughput_change_pct": -29.44498420102345,
+        "baseline_drift_pct": -0.6098241870044596
+      },
+      {
+        "count": 512,
+        "pattern": 0,
+        "variant": "prefetch",
+        "baseline": 235.32495998724826,
+        "candidate": 222.705,
+        "throughput_change_pct": 5.666671151185754,
+        "baseline_drift_pct": 12.497464720172724
+      },
+      {
+        "count": 512,
+        "pattern": 0,
+        "variant": "coroutine",
+        "baseline": 235.32495998724826,
+        "candidate": 365.485,
+        "throughput_change_pct": -35.612963599806214,
+        "baseline_drift_pct": 12.497464720172724
+      },
+      {
+        "count": 512,
+        "pattern": 1,
+        "variant": "prefetch",
+        "baseline": 550.9803479907428,
+        "candidate": 542.017,
+        "throughput_change_pct": 1.653702372940824,
+        "baseline_drift_pct": -2.60946816570633
+      },
+      {
+        "count": 512,
+        "pattern": 1,
+        "variant": "coroutine",
+        "baseline": 550.9803479907428,
+        "candidate": 684.338,
+        "throughput_change_pct": -19.487103157980002,
+        "baseline_drift_pct": -2.60946816570633
+      },
+      {
+        "count": 2048,
+        "pattern": 0,
+        "variant": "prefetch",
+        "baseline": 301.7907974657279,
+        "candidate": 254.199,
+        "throughput_change_pct": 18.722259908861915,
+        "baseline_drift_pct": 5.151798304480049
+      },
+      {
+        "count": 2048,
+        "pattern": 0,
+        "variant": "coroutine",
+        "baseline": 301.7907974657279,
+        "candidate": 533.533,
+        "throughput_change_pct": -43.4354018466097,
+        "baseline_drift_pct": 5.151798304480049
+      },
+      {
+        "count": 2048,
+        "pattern": 1,
+        "variant": "prefetch",
+        "baseline": 732.7909681348426,
+        "candidate": 670.697,
+        "throughput_change_pct": 9.258125224183589,
+        "baseline_drift_pct": 21.352998478662187
+      },
+      {
+        "count": 2048,
+        "pattern": 1,
+        "variant": "coroutine",
+        "baseline": 732.7909681348426,
+        "candidate": 784.674,
+        "throughput_change_pct": -6.612049317953361,
+        "baseline_drift_pct": 21.352998478662187
+      },
+      {
+        "count": 32768,
+        "pattern": 0,
+        "variant": "prefetch",
+        "baseline": 561.5438140795427,
+        "candidate": 507.91,
+        "throughput_change_pct": 10.559708231683306,
+        "baseline_drift_pct": -22.3340327595109
+      },
+      {
+        "count": 32768,
+        "pattern": 0,
+        "variant": "coroutine",
+        "baseline": 561.5438140795427,
+        "candidate": 706.708,
+        "throughput_change_pct": -20.54090033230942,
+        "baseline_drift_pct": -22.3340327595109
+      },
+      {
+        "count": 32768,
+        "pattern": 1,
+        "variant": "prefetch",
+        "baseline": 1802.7246578565457,
+        "candidate": 1707.629,
+        "throughput_change_pct": 5.568871098847916,
+        "baseline_drift_pct": -0.19313171527564066
+      },
+      {
+        "count": 32768,
+        "pattern": 1,
+        "variant": "coroutine",
+        "baseline": 1802.7246578565457,
+        "candidate": 1857.159,
+        "throughput_change_pct": -2.931054483943185,
+        "baseline_drift_pct": -0.19313171527564066
+      }
+    ],
+    "scope": "Real native RecordingStorage/retain_storage; serial ordered-map registration, two-pass prefetch, and seven C++20 coroutine lanes with a bounded stack arena. Prefetch the resulting payload; std::map traversal remains synchronous.",
+    "reference": "https://github.com/XiangpengHao/bbtree/blob/3ab503d34c85a74af5eb86417774e8770940203b/design/12-batch-api.md",
+    "limits": [
+      "CPU synthetic registration only; no GPU or model speed claim.",
+      "Seven retained batches of 16384 registrations after one warmup; clocks unlocked.",
+      "pattern 0 repeatedly uses seven resources; pattern 1 varies them and clears registration every iteration."
+    ],
+    "rows": [
+      {
+        "count": 32,
+        "pattern": 0,
+        "arm": 0,
+        "ns": 145.66
+      },
+      {
+        "count": 32,
+        "pattern": 0,
+        "arm": 1,
+        "ns": 115.369
+      },
+      {
+        "count": 32,
+        "pattern": 0,
+        "arm": 2,
+        "ns": 272.198
+      },
+      {
+        "count": 32,
+        "pattern": 0,
+        "arm": 3,
+        "ns": 115.491
+      },
+      {
+        "count": 32,
+        "pattern": 1,
+        "arm": 0,
+        "ns": 322.388
+      },
+      {
+        "count": 32,
+        "pattern": 1,
+        "arm": 1,
+        "ns": 300.403
+      },
+      {
+        "count": 32,
+        "pattern": 1,
+        "arm": 2,
+        "ns": 455.536
+      },
+      {
+        "count": 32,
+        "pattern": 1,
+        "arm": 3,
+        "ns": 320.422
+      },
+      {
+        "count": 512,
+        "pattern": 0,
+        "arm": 0,
+        "ns": 221.869
+      },
+      {
+        "count": 512,
+        "pattern": 0,
+        "arm": 1,
+        "ns": 222.705
+      },
+      {
+        "count": 512,
+        "pattern": 0,
+        "arm": 2,
+        "ns": 365.485
+      },
+      {
+        "count": 512,
+        "pattern": 0,
+        "arm": 3,
+        "ns": 249.597
+      },
+      {
+        "count": 512,
+        "pattern": 1,
+        "arm": 0,
+        "ns": 558.313
+      },
+      {
+        "count": 512,
+        "pattern": 1,
+        "arm": 1,
+        "ns": 542.017
+      },
+      {
+        "count": 512,
+        "pattern": 1,
+        "arm": 2,
+        "ns": 684.338
+      },
+      {
+        "count": 512,
+        "pattern": 1,
+        "arm": 3,
+        "ns": 543.744
+      },
+      {
+        "count": 2048,
+        "pattern": 0,
+        "arm": 0,
+        "ns": 294.305
+      },
+      {
+        "count": 2048,
+        "pattern": 0,
+        "arm": 1,
+        "ns": 254.199
+      },
+      {
+        "count": 2048,
+        "pattern": 0,
+        "arm": 2,
+        "ns": 533.533
+      },
+      {
+        "count": 2048,
+        "pattern": 0,
+        "arm": 3,
+        "ns": 309.467
+      },
+      {
+        "count": 2048,
+        "pattern": 1,
+        "arm": 0,
+        "ns": 665.204
+      },
+      {
+        "count": 2048,
+        "pattern": 1,
+        "arm": 1,
+        "ns": 670.697
+      },
+      {
+        "count": 2048,
+        "pattern": 1,
+        "arm": 2,
+        "ns": 784.674
+      },
+      {
+        "count": 2048,
+        "pattern": 1,
+        "arm": 3,
+        "ns": 807.245
+      },
+      {
+        "count": 32768,
+        "pattern": 0,
+        "arm": 0,
+        "ns": 637.189
+      },
+      {
+        "count": 32768,
+        "pattern": 0,
+        "arm": 1,
+        "ns": 507.91
+      },
+      {
+        "count": 32768,
+        "pattern": 0,
+        "arm": 2,
+        "ns": 706.708
+      },
+      {
+        "count": 32768,
+        "pattern": 0,
+        "arm": 3,
+        "ns": 494.879
+      },
+      {
+        "count": 32768,
+        "pattern": 1,
+        "arm": 0,
+        "ns": 1804.468
+      },
+      {
+        "count": 32768,
+        "pattern": 1,
+        "arm": 1,
+        "ns": 1707.629
+      },
+      {
+        "count": 32768,
+        "pattern": 1,
+        "arm": 2,
+        "ns": 1857.159
+      },
+      {
+        "count": 32768,
+        "pattern": 1,
+        "arm": 3,
+        "ns": 1800.983
+      }
+    ],
+    "source_sha256": "f34de2b61ff5a23197ec13bba9611b6d7871eccb3478e0aeb7bc14ce8d479abf",
+    "executable_sha256": "2f4bc0e7d621db2884ce1285c473405f9b3dffcf82cdb44920a9311c6f0fd716"
+  },
+  "standard_pmr_arena": {
+    "complete": true,
+    "commands": [
+      {
+        "label": "compile",
+        "exit_code": 0
+      },
+      {
+        "label": "run",
+        "exit_code": 0
+      }
+    ],
+    "comparisons": [
+      {
+        "count": 32,
+        "pattern": 0,
+        "variant": "prefetch",
+        "baseline": 121.5585952534826,
+        "candidate": 112.274,
+        "throughput_change_pct": 8.269586238561555,
+        "baseline_drift_pct": 1.1259099933818684
+      },
+      {
+        "count": 32,
+        "pattern": 0,
+        "variant": "coroutine",
+        "baseline": 121.5585952534826,
+        "candidate": 274.286,
+        "throughput_change_pct": -55.68180831195082,
+        "baseline_drift_pct": 1.1259099933818684
+      },
+      {
+        "count": 32,
+        "pattern": 1,
+        "variant": "prefetch",
+        "baseline": 305.9915168987533,
+        "candidate": 292.804,
+        "throughput_change_pct": 4.503871838756757,
+        "baseline_drift_pct": -11.574877920609216
+      },
+      {
+        "count": 32,
+        "pattern": 1,
+        "variant": "coroutine",
+        "baseline": 305.9915168987533,
+        "candidate": 449.469,
+        "throughput_change_pct": -31.921552565637835,
+        "baseline_drift_pct": -11.574877920609216
+      },
+      {
+        "count": 512,
+        "pattern": 0,
+        "variant": "prefetch",
+        "baseline": 219.88759089134612,
+        "candidate": 200.806,
+        "throughput_change_pct": 9.50250036918523,
+        "baseline_drift_pct": 3.237805666968563
+      },
+      {
+        "count": 512,
+        "pattern": 0,
+        "variant": "coroutine",
+        "baseline": 219.88759089134612,
+        "candidate": 382.861,
+        "throughput_change_pct": -42.56725263441663,
+        "baseline_drift_pct": 3.237805666968563
+      },
+      {
+        "count": 512,
+        "pattern": 1,
+        "variant": "prefetch",
+        "baseline": 496.2510199042416,
+        "candidate": 470.062,
+        "throughput_change_pct": 5.571396944284279,
+        "baseline_drift_pct": 4.0753395088377165
+      },
+      {
+        "count": 512,
+        "pattern": 1,
+        "variant": "coroutine",
+        "baseline": 496.2510199042416,
+        "candidate": 643.75,
+        "throughput_change_pct": -22.912462927496446,
+        "baseline_drift_pct": 4.0753395088377165
+      },
+      {
+        "count": 2048,
+        "pattern": 0,
+        "variant": "prefetch",
+        "baseline": 322.64128425234117,
+        "candidate": 237.86,
+        "throughput_change_pct": 35.64335502074378,
+        "baseline_drift_pct": 32.68629327087855
+      },
+      {
+        "count": 2048,
+        "pattern": 0,
+        "variant": "coroutine",
+        "baseline": 322.64128425234117,
+        "candidate": 565.662,
+        "throughput_change_pct": -42.96217807589318,
+        "baseline_drift_pct": 32.68629327087855
+      },
+      {
+        "count": 2048,
+        "pattern": 1,
+        "variant": "prefetch",
+        "baseline": 695.9079668095487,
+        "candidate": 617.279,
+        "throughput_change_pct": 12.737994781865037,
+        "baseline_drift_pct": -1.7474065939387606
+      },
+      {
+        "count": 2048,
+        "pattern": 1,
+        "variant": "coroutine",
+        "baseline": 695.9079668095487,
+        "candidate": 804.871,
+        "throughput_change_pct": -13.53794995601174,
+        "baseline_drift_pct": -1.7474065939387606
+      },
+      {
+        "count": 32768,
+        "pattern": 0,
+        "variant": "prefetch",
+        "baseline": 515.8428661210698,
+        "candidate": 506.799,
+        "throughput_change_pct": 1.784507491346643,
+        "baseline_drift_pct": 6.49206196786376
+      },
+      {
+        "count": 32768,
+        "pattern": 0,
+        "variant": "coroutine",
+        "baseline": 515.8428661210698,
+        "candidate": 741.87,
+        "throughput_change_pct": -30.46721580316365,
+        "baseline_drift_pct": 6.49206196786376
+      },
+      {
+        "count": 32768,
+        "pattern": 1,
+        "variant": "prefetch",
+        "baseline": 1967.9936706580131,
+        "candidate": 1691.541,
+        "throughput_change_pct": 16.34324386213595,
+        "baseline_drift_pct": -5.7210168613471835
+      },
+      {
+        "count": 32768,
+        "pattern": 1,
+        "variant": "coroutine",
+        "baseline": 1967.9936706580131,
+        "candidate": 1955.048,
+        "throughput_change_pct": 0.6621663845600256,
+        "baseline_drift_pct": -5.7210168613471835
+      }
+    ],
+    "scope": "Real native RecordingStorage/retain_storage; serial ordered-map registration, two-pass prefetch, and seven C++20 coroutine lanes with a bounded stack arena. Prefetch the resulting payload; std::map traversal remains synchronous.",
+    "reference": "https://github.com/XiangpengHao/bbtree/blob/3ab503d34c85a74af5eb86417774e8770940203b/design/12-batch-api.md",
+    "limits": [
+      "CPU synthetic registration only; no GPU or model speed claim.",
+      "Seven retained batches of 16384 registrations after one warmup; clocks unlocked.",
+      "pattern 0 repeatedly uses seven resources; pattern 1 varies them and clears registration every iteration."
+    ],
+    "rows": [
+      {
+        "count": 32,
+        "pattern": 0,
+        "arm": 0,
+        "ns": 120.88
+      },
+      {
+        "count": 32,
+        "pattern": 0,
+        "arm": 1,
+        "ns": 112.274
+      },
+      {
+        "count": 32,
+        "pattern": 0,
+        "arm": 2,
+        "ns": 274.286
+      },
+      {
+        "count": 32,
+        "pattern": 0,
+        "arm": 3,
+        "ns": 122.241
+      },
+      {
+        "count": 32,
+        "pattern": 1,
+        "arm": 0,
+        "ns": 325.403
+      },
+      {
+        "count": 32,
+        "pattern": 1,
+        "arm": 1,
+        "ns": 292.804
+      },
+      {
+        "count": 32,
+        "pattern": 1,
+        "arm": 2,
+        "ns": 449.469
+      },
+      {
+        "count": 32,
+        "pattern": 1,
+        "arm": 3,
+        "ns": 287.738
+      },
+      {
+        "count": 512,
+        "pattern": 0,
+        "arm": 0,
+        "ns": 216.412
+      },
+      {
+        "count": 512,
+        "pattern": 0,
+        "arm": 1,
+        "ns": 200.806
+      },
+      {
+        "count": 512,
+        "pattern": 0,
+        "arm": 2,
+        "ns": 382.861
+      },
+      {
+        "count": 512,
+        "pattern": 0,
+        "arm": 3,
+        "ns": 223.419
+      },
+      {
+        "count": 512,
+        "pattern": 1,
+        "arm": 0,
+        "ns": 486.438
+      },
+      {
+        "count": 512,
+        "pattern": 1,
+        "arm": 1,
+        "ns": 470.062
+      },
+      {
+        "count": 512,
+        "pattern": 1,
+        "arm": 2,
+        "ns": 643.75
+      },
+      {
+        "count": 512,
+        "pattern": 1,
+        "arm": 3,
+        "ns": 506.262
+      },
+      {
+        "count": 2048,
+        "pattern": 0,
+        "arm": 0,
+        "ns": 280.096
+      },
+      {
+        "count": 2048,
+        "pattern": 0,
+        "arm": 1,
+        "ns": 237.86
+      },
+      {
+        "count": 2048,
+        "pattern": 0,
+        "arm": 2,
+        "ns": 565.662
+      },
+      {
+        "count": 2048,
+        "pattern": 0,
+        "arm": 3,
+        "ns": 371.649
+      },
+      {
+        "count": 2048,
+        "pattern": 1,
+        "arm": 0,
+        "ns": 702.069
+      },
+      {
+        "count": 2048,
+        "pattern": 1,
+        "arm": 1,
+        "ns": 617.279
+      },
+      {
+        "count": 2048,
+        "pattern": 1,
+        "arm": 2,
+        "ns": 804.871
+      },
+      {
+        "count": 2048,
+        "pattern": 1,
+        "arm": 3,
+        "ns": 689.801
+      },
+      {
+        "count": 32768,
+        "pattern": 0,
+        "arm": 0,
+        "ns": 499.872
+      },
+      {
+        "count": 32768,
+        "pattern": 0,
+        "arm": 1,
+        "ns": 506.799
+      },
+      {
+        "count": 32768,
+        "pattern": 0,
+        "arm": 2,
+        "ns": 741.87
+      },
+      {
+        "count": 32768,
+        "pattern": 0,
+        "arm": 3,
+        "ns": 532.324
+      },
+      {
+        "count": 32768,
+        "pattern": 1,
+        "arm": 0,
+        "ns": 2026.825
+      },
+      {
+        "count": 32768,
+        "pattern": 1,
+        "arm": 1,
+        "ns": 1691.541
+      },
+      {
+        "count": 32768,
+        "pattern": 1,
+        "arm": 2,
+        "ns": 1955.048
+      },
+      {
+        "count": 32768,
+        "pattern": 1,
+        "arm": 3,
+        "ns": 1910.87
+      }
+    ],
+    "source_sha256": "06b0bb0fc2817e0b2ded5ab4534b284aa43548632763b131c5c6cb749e738b0f",
+    "executable_sha256": "5b54522dc3e1f04a2c4c4c5b8e1ccfbdd7671f5ddee49c1ed570729e92d35011"
+  },
+  "prototype_failures": [
+    {
+      "complete": false,
+      "commands": [
+        {
+          "label": "compile",
+          "exit_code": 0
+        },
+        {
+          "label": "run",
+          "exit_code": 3221226505
+        }
+      ],
+      "comparisons": [],
+      "scope": "Real native RecordingStorage/retain_storage; serial ordered-map registration, two-pass prefetch, and seven C++20 coroutine lanes with a bounded stack arena. Prefetch the resulting payload; std::map traversal remains synchronous.",
+      "reference": "https://github.com/XiangpengHao/bbtree/blob/3ab503d34c85a74af5eb86417774e8770940203b/design/12-batch-api.md",
+      "limits": [
+        "CPU synthetic registration only; no GPU or model speed claim.",
+        "Seven retained batches of 16384 registrations after one warmup; clocks unlocked.",
+        "pattern 0 repeatedly uses seven resources; pattern 1 varies them and clears registration every iteration."
+      ],
+      "error": "CalledProcessError(3221226505, ['G:\\\\GitHub\\\\Strata\\\\build-orca-bbtree-20261103\\\\bench_coroutine.exe'], b'', b'')"
+    },
+    {
+      "complete": false,
+      "commands": [
+        {
+          "label": "compile",
+          "exit_code": 0
+        },
+        {
+          "label": "run",
+          "exit_code": 1
+        }
+      ],
+      "comparisons": [],
+      "scope": "Real native RecordingStorage/retain_storage; serial ordered-map registration, two-pass prefetch, and seven C++20 coroutine lanes with a bounded stack arena. Prefetch the resulting payload; std::map traversal remains synchronous.",
+      "reference": "https://github.com/XiangpengHao/bbtree/blob/3ab503d34c85a74af5eb86417774e8770940203b/design/12-batch-api.md",
+      "limits": [
+        "CPU synthetic registration only; no GPU or model speed claim.",
+        "Seven retained batches of 16384 registrations after one warmup; clocks unlocked.",
+        "pattern 0 repeatedly uses seven resources; pattern 1 varies them and clears registration every iteration."
+      ],
+      "error": "CalledProcessError(1, ['G:\\\\GitHub\\\\Strata\\\\build-orca-bbtree-20261103\\\\bench_coroutine.exe'], b'START coroutine exception check\\r\\nPASS coroutine exception check\\r\\nCORO_BENCH count=32 pattern=0 arm=0 ns=119.885\\r\\nCORO_BENCH count=32 pattern=0 arm=1 ns=111.938\\r\\n', b'FAIL coroutine check: bad allocation\\r\\n')"
+    }
+  ],
+  "failure_resolution": "v0 exited 0xC0000409; v1 exception reporting exposed std::bad_alloc. This installed MSVC monotonic_buffer_resource::release() retains the cursor in a caller-supplied initial buffer when no upstream chunks exist. Reconstructing the PMR resource per batch fixed it. A separate bounded bump arena then removed PMR dispatch from the coroutine comparison.",
+  "decision": "Do not enable coroutine registration: fixed-stack coroutine throughput is negative in all eight CPU conditions. Simple two-pass payload prefetch is positive in these constructed cases, but no full-model test or adoption of prefetch has been made.",
+  "caveats": [
+    "These are seven internal resource lookups, not expert slots, a GPU pipeline scheduler or a complete bbtree traversal port.",
+    "The C++20 lanes yield once after std::map lookup, prefetching RecordingStorage.recording_index. std::map node traversal is synchronous.",
+    "CPU-only measurements; no GPU speed/concurrency or full-model benefit claim.",
+    "Some CPU controls drift by more than 20%; all rows, negative cases and failed prototypes are retained.",
+    "No conclusion that coroutines are generally slower; bbtree uses different node layouts, per-node yields and a size cutoff.",
+    "Fixed arena checks cover bounds, alignment, repeated reuse, resource order/deduplication, ownership and exception propagation."
+  ],
+  "evidence_sha256": {
+    "build-orca-bbtree-20261103\\bench_coroutine.cpp": "f34de2b61ff5a23197ec13bba9611b6d7871eccb3478e0aeb7bc14ce8d479abf",
+    "build-orca-bbtree-20261103\\bench_coroutine.exe": "2f4bc0e7d621db2884ce1285c473405f9b3dffcf82cdb44920a9311c6f0fd716",
+    "build-orca-bbtree-20261103\\bench_coroutine_pmr.cpp": "06b0bb0fc2817e0b2ded5ab4534b284aa43548632763b131c5c6cb749e738b0f",
+    "build-orca-bbtree-20261103\\check_coroutine.py": "9f49963e5fad3607ca345c4845d764df01bfe77cdd9d5101c78efa74494da578",
+    "build-orca-bbtree-20261103\\coroutine-compile.command.txt": "ae8dadfdc3e11f866b6ecf05876bdf1b8856966a98f12af8f3d0a531d8e44cda",
+    "build-orca-bbtree-20261103\\coroutine-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-orca-bbtree-20261103\\coroutine-failed-v0.cpp": "175e288a00c75147260e1f46b2345d0c3aa5f458158cdf34412e6a9d9d10a05f",
+    "build-orca-bbtree-20261103\\coroutine-failed-v0.json": "e4b875f6064c5469fbbf596afffb8f0e5344e2e4220e4eb928f2b23dbdbeb4d6",
+    "build-orca-bbtree-20261103\\coroutine-failed-v1.cpp": "1ec7e17c529f2cb1e00cb1f14e54aee30cf9356549f309252b7d0f03b8875b8c",
+    "build-orca-bbtree-20261103\\coroutine-failed-v1.json": "9e1d5bcf450f7063671aa341fccee87f0d5109f129804c390b99fba3a035ef77",
+    "build-orca-bbtree-20261103\\coroutine-failed-v1.log": "9aa1b9c00ee783d3fb494ab2e018bd1bb1037bbec48ccf7db91223877600cae0",
+    "build-orca-bbtree-20261103\\coroutine-pmr-results.json": "35685cbd5ae906c39c8d36c088a4fad366d9a5692e1d65e2cb3aafa60f97c86f",
+    "build-orca-bbtree-20261103\\coroutine-results.json": "acb792016acb2167e47ee4b76fef7ce37b18b47936ec0e2ed3d661aa79d974eb",
+    "build-orca-bbtree-20261103\\coroutine-run.command.txt": "6de2694674570842feb315b60e55db8328656dce7065d60941b7ed450f912cc0",
+    "build-orca-bbtree-20261103\\coroutine-run.log": "671387e8b343efda7e6de0c32fa617815580f926862137c8f3ef649448198ad7",
+    "build-orca-bbtree-20261103\\publish.py": "5864908091fe9a3f2be9ff8234bea93da57a183977c53309d9bff09cb3af5694",
+    "build-orca-lease-pool-20261103\\source\\src\\drm\\arguments.hpp": "8e091aea0d6e05153eb870890a8f3111213f7d57bdb78051b53b2a9052312ca6",
+    "build-orca-storage-borrow-20261103\\references\\bbtree\\README.md": "15f526d48df79f46b3933dc7749b1469b6595cc9f8932256e4a5004cc0c4301d",
+    "build-orca-storage-borrow-20261103\\references\\bbtree\\design\\12-batch-api.md": "2a153c973e2bf669df4bfe6304d08fc66541655ade3b8cfbf90450ebfd5c6fb4",
+    "build-orca-storage-borrow-20261103\\references\\bbtree\\design\\14-blogpost.md": "cc602138cd5a9e205efc03f81e4fb9d4268c8715351d7c6cae1d2c2a4a7631bc",
+    "build-orca-storage-borrow-20261103\\references\\bbtree\\bbtree\\src\\tree\\batch.rs": "5a9fcd019274d2aee3197c81bba3cdf31d7664bed25f804c3b4799d158087c7c",
+    "build-orca-storage-borrow-20261103\\references\\bbtree\\bbtree\\src\\allocator.rs": "becc8e7636855743e75335f90a6e9085f98e2d4e0dc55206318fb430d99c72c2"
+  }
+}

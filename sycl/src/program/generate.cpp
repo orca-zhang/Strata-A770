@@ -3391,7 +3391,7 @@ int main(int argc, char **argv) try {
                 auto u = std::make_unique<strata::core::SessionState>();
                 void* buf = nullptr;
                 if (DPCT_CHECK_ERROR(buf = sycl::malloc_device(bytes, dpct::get_in_order_queue())) != 0 || !buf || strata::core::session_init(g, o.max_context, K, buf, *u, lo, hi) == 0) {
-
+                    
                     if (buf != nullptr) sycl::free(buf, dpct::get_in_order_queue());
                     size_t fb = 0, tb = 0;
                     dpct::get_current_device().get_memory_info(fb, tb);
@@ -3709,6 +3709,27 @@ int main(int argc, char **argv) try {
     strata::core::ExpertCache xcache;
     // THE HEAD BEFORE THE CACHE: the native head and the logits are allocated above, before the expert arena (#620)
     const bool auto_cache = o.expert_cache < 0;
+    int64_t native_prepare_mib = 0;
+#ifdef STRATA_ORCA_DG2
+    if (auto_cache) {
+        const char* placement = std::getenv("STRATA_ORCA_DG2_THREAD_MEMORY");
+        if (!placement || std::strcmp(placement, "host")) {
+            // ponytail: 512 MiB covers the measured 478-MiB later local-pool cost
+            // on A770's current decode queues. Preallocate/query the pools if
+            // kernel scratch requirements or the queue topology grow.
+            native_prepare_mib = 512;
+        }
+        const char* isa_placement = std::getenv("STRATA_ORCA_DG2_ISA_MEMORY");
+        if (!isa_placement || std::strcmp(isa_placement, "host")) {
+            // ponytail: the current pack has 81.4 MiB of padded ISA; retain
+            // slab-packing headroom. Preallocate/query if packs or queue first-use grow.
+            native_prepare_mib += 192;
+        }
+        if (native_prepare_mib)
+            std::fprintf(stderr, "strata generate: native DG2: retaining %lld MiB for later local pools/ISA before auto-cache sizing\n",
+                         (long long) native_prepare_mib);
+    }
+#endif
     bool reserve_adapted = false;   // #496: the auto sizing lowered the reserve so a small card's cache fits
     if (o.expert_cache < 0) {
         size_t free_b = 0, total_b = 0;
@@ -3728,7 +3749,7 @@ int main(int argc, char **argv) try {
         int64_t mtp_bind = (!o.mtp.empty() && native_head.loaded())
                                      ? (int64_t) mtp.bind_bytes(native_head.row_bytes(), n_vocab) : 0;
         for (const auto& d : slot_mtp) mtp_bind += (int64_t) d->bind_bytes(native_head.row_bytes(), n_vocab);
-        const int64_t reserve = (((int64_t) o.vram_reserve_mib + prefill_mib) << 20) + mtp_bind;
+        const int64_t reserve = (((int64_t) o.vram_reserve_mib + prefill_mib + native_prepare_mib) << 20) + mtp_bind;
         const int64_t blob = (int64_t) strata::kernels::cpu::expert_layout().max_blob;
         int64_t slots = ((int64_t) free_b - reserve) / blob;
         if (!profile.empty()) slots = std::min<int64_t>(slots, (int64_t) profile.size());
@@ -3751,10 +3772,10 @@ int main(int argc, char **argv) try {
             ? ((int64_t) strata::prefill::Prefill::bytes_needed(g, ss, 256) + blob - 1) / blob + 128 : 1;
         if (o.expert_cache < min_slots && !o.vram_reserve_given && o.vram_reserve_mib > kSmallReserveMib) {
             // the largest reserve (in MiB) that still leaves min_slots
-            const int64_t fit_mib = ((int64_t) free_b - mtp_bind - min_slots * blob) / (1 << 20) - prefill_mib;
+            const int64_t fit_mib = ((int64_t) free_b - mtp_bind - min_slots * blob) / (1 << 20) - prefill_mib - native_prepare_mib;
             if (fit_mib >= kSmallReserveMib) {
                 const int r = (int) std::min<int64_t>(fit_mib, o.vram_reserve_mib);
-                int64_t s2 = ((int64_t) free_b - ((((int64_t) r + prefill_mib) << 20) + mtp_bind)) / blob;
+                int64_t s2 = ((int64_t) free_b - ((((int64_t) r + prefill_mib + native_prepare_mib) << 20) + mtp_bind)) / blob;
                 if (!profile.empty()) s2 = std::min<int64_t>(s2, (int64_t) profile.size());
                 std::fprintf(stderr, "strata generate: expert cache auto: the %d MiB reserve leaves too few slots on "
                                      "this card (a working cache needs %lld): a %d MiB reserve instead -> %lld slots\n",
@@ -3768,7 +3789,7 @@ int main(int argc, char **argv) try {
             // what is short, and what makes room: the numbers a small card picks from
             const int64_t at_reserve = o.vram_reserve_given ? o.vram_reserve_mib
                                                             : std::min(o.vram_reserve_mib, kSmallReserveMib);
-            const int64_t need_b = (((int64_t) at_reserve + prefill_mib) << 20) + mtp_bind + min_slots * blob;
+            const int64_t need_b = (((int64_t) at_reserve + prefill_mib + native_prepare_mib) << 20) + mtp_bind + min_slots * blob;
             const int64_t short_mib = std::max<int64_t>(1, (need_b - (int64_t) free_b + (1 << 20) - 1) >> 20);
             const int64_t session_mib =
                 (int64_t) (strata::core::session_bytes(g, o.max_context, K, 0, g.n_layers) >> 20);
@@ -3933,7 +3954,7 @@ int main(int argc, char **argv) try {
             compilers or runtimes. You may need to adjust the code.
             */
             dpct::get_current_device().get_memory_info(free_b, total_b);
-            const int64_t want = (int64_t) o.vram_reserve_mib << 20;
+            const int64_t want = ((int64_t) o.vram_reserve_mib + native_prepare_mib) << 20;
             if ((int64_t) free_b >= want - (64ll << 20)) break;
             // short by (want - free); a figure of 0 only says "at least": the first two such reads give back 1 GiB
             // each (under WDDM the free figure read before the allocation runs ~0.7 GiB high), later ones a quarter
@@ -6190,6 +6211,7 @@ int main(int argc, char **argv) try {
                 heat.assign(drive.d.usage.size(), 0.0);
         }
         Clock::time_point profile_saved_at = Clock::now();
+        bool profile_saved = false;
         dpct::queue_ptr adapt_stream = &dpct::get_in_order_queue();
         /*
         DPCT1025: The SYCL queue is created ignoring the flag and priority
@@ -6268,6 +6290,17 @@ int main(int argc, char **argv) try {
         std::vector<AdaptSwap> adapt_swaps;
         std::vector<std::pair<float, int32_t>> adapt_cand, adapt_vict;
         std::vector<std::pair<uintptr_t, uintptr_t>> adapt_spans;
+        // ponytail: one cursor per blob size; skipped or consumed victims cannot become eligible later in a round.
+        // At most n_layers cursors; this bounds repeated scans without changing either sorted order or the picks.
+        std::vector<size_t> adapt_cursor((size_t) g.n_layers), adapt_size_class((size_t) g.n_layers);
+        for (int64_t l = 0; l < g.n_layers; ++l) {
+            adapt_size_class[(size_t) l] = (size_t) l;
+            for (int64_t j = 0; j < l; ++j)
+                if (strata::kernels::cpu::expert_layout().blob_bytes(j) == strata::kernels::cpu::expert_layout().blob_bytes(l)) {
+                    adapt_size_class[(size_t) l] = adapt_size_class[(size_t) j];
+                    break;
+                }
+        }
         // the VRAM tier follows the conversation (the same rule as the speculative loop below)
         auto adapt = [&]() -> bool {
             if (!pending.empty()) return true;   // the previous swaps are still in flight
@@ -6285,18 +6318,25 @@ int main(int argc, char **argv) try {
                 }
                 std::sort(adapt_cand.begin(), adapt_cand.end(), [](auto& a, auto& b) { return a.first > b.first; });
                 std::sort(adapt_vict.begin(), adapt_vict.end(), [](auto& a, auto& b) { return a.first < b.first; });
-                // ponytail: greedy size-compatible LFU, O(candidates * slots); bin by blob size if host timing warrants it.
+                std::fill(adapt_cursor.begin(), adapt_cursor.end(), 0);
                 for (const auto& c : adapt_cand) {
                     const int32_t layer = (int32_t) (c.second / g.n_expert);
                     const int64_t bytes = strata::kernels::cpu::expert_layout().blob_bytes(layer);
-                    for (auto& v : adapt_vict) {
+                    for (size_t& j = adapt_cursor[adapt_size_class[(size_t) layer]]; j < adapt_vict.size(); ++j) {
+                        auto& v = adapt_vict[j];
+                        // ponytail: fixed A770 heat margin; recalibrate when the GPU or pack changes.
+#if defined(STRATA_ORCA_NATIVE)
+                        if (c.first < v.first + 1.5f) break;
+#else
                         if (c.first < v.first + 0.5f) break;
+#endif
                         if (v.second < 0) continue;
                         const int32_t slot = host_res[(size_t) v.second];
                         if (xcache.bytes_of(slot + 1) - xcache.bytes_of(slot) < bytes) continue;
                         adapt_swaps.push_back({c.first - v.first, layer, (int32_t) (c.second % g.n_expert),
                                                (int32_t) (v.second % g.n_expert), (int32_t) (v.second / g.n_expert)});
                         v.second = -1;
+                        ++j;
                         break;
                     }
                     if ((int) adapt_swaps.size() >= o.adapt_swaps) break;
@@ -6410,20 +6450,45 @@ int main(int argc, char **argv) try {
         // #477: write the learned profile (between requests and at QUIT: a prompt's lent slots are back by then).
         // A swap still in flight counts as done - its expert is resident once the copy lands.  `why`: for the log.
         auto save_profile = [&](const char* why) {
-            if (heat.empty()) return;
+            if (heat.empty()) return false;
             std::vector<uint8_t> resident(host_res.size(), 0);
             for (size_t i = 0; i < host_res.size(); ++i) resident[i] = host_res[i] >= 0;
             for (const auto& p : pending) resident[(size_t) p.first] = 1;
             std::string e;
             const auto ranked = strata::core::rank_learned_profile(g.n_layers, g.n_expert, resident, heat,
                                                                    profile_loaded);
-            if (strata::core::write_expert_profile(o.expert_profile_save, g.n_layers, g.n_expert, ranked, e))
+            const bool saved = strata::core::write_expert_profile(o.expert_profile_save, g.n_layers, g.n_expert, ranked, e);
+            if (saved) {
                 std::fprintf(stderr, "strata serve: expert profile saved to %s (%s)\n", o.expert_profile_save.c_str(),
                              why);
-            else
+            } else
                 std::fprintf(stderr, "strata serve: the expert profile was not saved: %s\n", e.c_str());
             profile_saved_at = Clock::now();
+            return saved;
         };
+        const int S = o.spec;
+        const int S_mtp = o.mtp_max_t > 0 ? std::min(o.mtp_max_t, S) : S;
+        if (S_mtp < S) mtp.set_max_drafts(S_mtp - 1);
+        strata::spec::SuffixDrafter sfx(std::max(1, o.suffix_draft), 64, (size_t) o.max_context + 4096);
+        strata::spec::DraftPolicy policy(S);
+#ifdef STRATA_ORCA_NATIVE
+        // Capture immutable graphs before READY, rather than on a user's first
+        // prompt/window. This records commands; it does not execute a dummy prompt.
+        if (g_env_warm_graphs) {
+            const auto tw = Clock::now();
+            for (int st = 0; st < n_stages; ++st)
+                if (!stage_ver(st).warm(err)) {
+                    std::fprintf(stderr, "strata serve: preparing verify graphs: %s\n", err.c_str());
+                    return 1;
+                }
+            if (use_mtp && !mtp.warm(err)) {
+                std::fprintf(stderr, "strata serve: preparing draft graphs: %s\n", err.c_str());
+                return 1;
+            }
+            std::fprintf(stderr, "strata serve: window, commit and draft graphs prepared before READY in %.1f ms\n",
+                         std::chrono::duration<double, std::milli>(Clock::now() - tw).count());
+        }
+#endif
         // stdin is read on its own thread, so a STOP line reaches a request that is still running (the client went
         // away, or pressed Esc): the flag is checked between prompt chunks and between verify windows.
         std::atomic<bool> stop_req{false};
@@ -6594,11 +6659,6 @@ int main(int argc, char **argv) try {
         std::fflush(stdout);
         std::string line;
         int64_t rounds = 0;
-        const int S = o.spec;
-        const int S_mtp = o.mtp_max_t > 0 ? std::min(o.mtp_max_t, S) : S;   // the MTP's windows; suffixes go up to S
-        if (S_mtp < S) mtp.set_max_drafts(S_mtp - 1);
-        strata::spec::SuffixDrafter sfx(std::max(1, o.suffix_draft), 64, (size_t) o.max_context + 4096);
-        strata::spec::DraftPolicy policy(S);   // MTP or lookup window, learned over the whole process
         // The vision path (--vision): GENI <max_new> <embeddings file> <id,id,...> carries images.  The file is one
         // or more strata-vision records (int32 'SVE1', n, nx, ny, n_embd, then n x n_embd floats) in prompt order;
         // each image's rows go to its run of <|image_pad|> tokens, whose M-RoPE positions are mtmd's: t = p,
@@ -7549,6 +7609,7 @@ int main(int argc, char **argv) try {
                 }
             const auto parked = conversations.best(ids, req_imgs, want_cvec);
             std::optional<strata::core::SavedConversation> incoming;
+            bool restored_checkpoint = false;
             if (parked.tokens > std::max(resume, slot_tokens)) incoming.emplace(conversations.take(parked.index));
             if (incoming) slot_source = -1;
             // Reject the entire image before parking/overwriting the outgoing
@@ -7603,13 +7664,23 @@ int main(int argc, char **argv) try {
             }
             if (incoming) {
                 const auto t0 = Clock::now();
-                if (strata::core::conversation_snapshot_restore(*incoming, ss, g, mtp.kv_state(), err) !=
+                const ConvCheckpoint* running = parked.live ? &incoming->live : nullptr;
+                if (!parked.live)
+                    for (const auto& c : incoming->checkpoints)
+                        if (int64_t(c.ids.size()) == parked.tokens) running = &c;
+                if (!running) {
+                    std::printf("ERR parked conversation lost its target checkpoint\n");
+                    return 1;
+                }
+                // ponytail: upload the target running state once; avoid live-state upload followed by rewind.
+                if (strata::core::conversation_snapshot_restore(*incoming, ss, g, mtp.kv_state(), err, *running) !=
                     strata::core::ConversationRestore::restored) {
                     // Already prevalidated above: a failure here is fatal, never
                     // permission to decode from a partially restored session.
                     std::printf("ERR restoring parked conversation: %s\n", err.c_str());
                     return 1;
                 }
+                restored_checkpoint = !parked.live;
                 if (use_mtp && g_env_snapshot_verify) {
                     uint64_t draft_hash = 0;
                     if (!strata::core::conversation_kv_verify(incoming->kv.back(), mtp.kv_state(), g,
@@ -7678,7 +7749,8 @@ int main(int argc, char **argv) try {
                     reread_to = resume;
                     std::fprintf(stderr, "strata serve: STRATA_CKPT_REREAD: reading %lld tokens again instead of "
                                          "restoring\n", (long long) resume);
-                } else if (c == nullptr || !checkpoint_restore(*c, ss, g) || c->stage_parts.size() != stages.size() ||
+                } else if (c == nullptr || (!restored_checkpoint && !checkpoint_restore(*c, ss, g)) ||
+                           c->stage_parts.size() != stages.size() ||
                            [&] {
                                for (size_t i = 0; i < stages.size(); ++i) {
                                    const strata::core::OnDevice on(stages[i]->dev);
@@ -8681,6 +8753,10 @@ int main(int argc, char **argv) try {
                                  remote_experts[(size_t) r].ms_begin() - begin_before[(size_t) r],
                                  remote_experts[(size_t) r].ms_wait() - wait_before[(size_t) r]);
             }
+            // ponytail: keep the existing periodic saves, but a one-request session must leave its learned profile too.
+            // A zero interval still means save only at QUIT; failed writes are retried after the next response.
+            if (!profile_saved && o.expert_profile_save_min > 0 && produced_n > 0 && std::strcmp(finish, "cancel") != 0)
+                profile_saved = save_profile("first response");
         }
         save_profile("exit");   // #477: QUIT, or the server closed stdin
         // SYCL port: the requests are done and their output written; leave without unwinding the GPU objects (the OS

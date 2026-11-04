@@ -1,0 +1,166 @@
+{
+  "date": "2026-11-04",
+  "hardware": "Intel Arc A770 G10 C0 0x56a0 revision8",
+  "driver": "32.0.101.9034",
+  "os": "Windows",
+  "complete": true,
+  "source_adopted": false,
+  "production_changed": false,
+  "linux_gpu_tested": false,
+  "scope": "Independent native compact/E3/compact Short incremental ablation using the exact previous executables and their original math packs. No recompilation. Ten warmups and ten retained requests per process.",
+  "checks": {
+    "exact_short_requests": 60,
+    "warmups_per_process": 10,
+    "retained_per_process": 10
+  },
+  "args": [
+    "--pack",
+    "G:\\GitHub\\Strata-data\\packs\\iq2_xs",
+    "--native",
+    "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00001-of-00002.gguf",
+    "--ple-gguf",
+    "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00002-of-00002.gguf",
+    "--expert-profile",
+    "G:\\GitHub\\Strata\\data\\expert-profile.bin",
+    "--expert-cache",
+    "5500",
+    "--prefill",
+    "8192",
+    "--spec",
+    "4",
+    "--spec-min-p",
+    "0.5",
+    "--mtp",
+    "G:\\GitHub\\Strata-data\\mtp\\rt-full-vocab-current",
+    "--max-context",
+    "8192",
+    "--stream-experts",
+    "--vram-reserve-mib",
+    "1536",
+    "--pcie-frac",
+    "0.16",
+    "--prompt-cache",
+    "0",
+    "--short-read",
+    "1024",
+    "--adapt-every",
+    "1",
+    "--adapt-swaps",
+    "32",
+    "--prefill-borrow",
+    "--mtp-window",
+    "1024",
+    "--mtp-hnorm",
+    "stream",
+    "--adapt-decay",
+    "0.5"
+  ],
+  "policy": {
+    "step": 0.5,
+    "last": 0.5,
+    "cumulative": 0,
+    "max_mtp": 4,
+    "expert_slots": 5771,
+    "reserve_mib": 1536
+  },
+  "experiment_env": {
+    "ORCA_IQ_PAIR_FORMAT_SPLIT": "1",
+    "ORCA_IQ_PAIR_E3": "1",
+    "ORCA_IQ_PAIR_COMPACT": "1"
+  },
+  "comparisons": {
+    "decode_tok_s": {
+      "e3": 50.12697074501705,
+      "compact": 50.26704914678106,
+      "compact_vs_e3_pct": 0.2794471712175728,
+      "compact_drift_pct": 0.016546973825892763
+    },
+    "ttft_ms": {
+      "e3": 879.5030999899609,
+      "compact": 880.1294904954066,
+      "compact_vs_e3_pct": 0.07122095481559843,
+      "compact_drift_pct": 0.267391344953527
+    },
+    "prompt_ms": {
+      "e3": 835.4,
+      "compact": 836.2241744891139,
+      "compact_vs_e3_pct": 0.09865627114125086,
+      "compact_drift_pct": 0.281420274235078
+    },
+    "request_ms": {
+      "e3": 2352.45494999981,
+      "compact": 2348.955022503232,
+      "compact_vs_e3_pct": -0.14877766295071648,
+      "compact_drift_pct": 0.07777969835909282
+    }
+  },
+  "arms": [
+    {
+      "label": "compact-before",
+      "summary": {
+        "decode_tok_s": 50.262890825098566,
+        "ttft_ms": 878.9551499939989,
+        "prompt_ms": 835.05,
+        "request_ms": 2348.0420499836328
+      }
+    },
+    {
+      "label": "e3",
+      "summary": {
+        "decode_tok_s": 50.12697074501705,
+        "ttft_ms": 879.5030999899609,
+        "prompt_ms": 835.4,
+        "request_ms": 2352.45494999981
+      }
+    },
+    {
+      "label": "compact-after",
+      "summary": {
+        "decode_tok_s": 50.27120781248753,
+        "ttft_ms": 881.3053999911062,
+        "prompt_ms": 837.4,
+        "request_ms": 2349.868350007455
+      }
+    }
+  ],
+  "retained_decode_dispersion": {
+    "compact-before": {
+      "samples": 10,
+      "median_tok_s": 50.262890825098566,
+      "min_tok_s": 50.06257822277848,
+      "max_tok_s": 50.50840699142686,
+      "mad_tok_s": 0.11772833400365101
+    },
+    "e3": {
+      "samples": 10,
+      "median_tok_s": 50.12697074501705,
+      "min_tok_s": 49.64400026128421,
+      "max_tok_s": 50.52855528222858,
+      "mad_tok_s": 0.1775354418420818
+    },
+    "compact-after": {
+      "samples": 10,
+      "median_tok_s": 50.27120781248753,
+      "min_tok_s": 49.97041225590111,
+      "max_tok_s": 50.61267980820458,
+      "mad_tok_s": 0.1611379166226108
+    }
+  },
+  "parent_evidence": {
+    "orca-l0\\demo\\dg2-iq-pair-compact-windows-2026-11-04.json": "68214ee49f5b648da173765bc3386c460c9fd1235159ce9826761b861eeb5619",
+    "orca-l0\\demo\\dg2-iq-pair-compact-windows-2026-11-04.json.gz": "d1774bb4508536c725581ae62c76470b6a9b4072ba0171a8b78c39ae675ce57e"
+  },
+  "caveats": [
+    "Exact existing native binaries/packs from the previous E3/compact experiment; no compilation or runtime edits.",
+    "Compact/E3/compact reverses the preceding native E3/compact/E3 incremental ablation. It does not compare native and L0.",
+    "Fresh processes and requests;76 exact tokens,57/57 drafts,stop,no reuse/resume. Ten warmups discarded and ten retained per process.",
+    "Decode excludes preparation/init/prefill;TTFT is separate. No inner timers,GPU timestamps,histogram or telemetry. Clocks unlocked;drift is not a confidence interval.",
+    "All three switches are1;the older E3 executable does not implement COMPACT. Each arm uses its matching original module pack. Production defaults and Linux handoff remain unchanged."
+  ],
+  "reproduction": {
+    "verify": "python build-orca-native-lower-20261031/repeat_dg2_iq_pair_compact_increment.py --verify-published",
+    "rerun": "Use a fresh stage directory with the archived script,matching pinned inputs and shared GPU lease;preserve completed evidence."
+  },
+  "evidence_files": 19,
+  "archive_sha256": "18cc136c05026f33913a90e70d59729e19619e9f190c3a647f57de0d9e762aaf"
+}

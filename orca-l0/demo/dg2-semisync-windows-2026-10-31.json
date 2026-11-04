@@ -1,0 +1,128 @@
+{
+  "date": "2026-10-31",
+  "complete": true,
+  "hardware": {
+    "os": "Windows",
+    "gpu": "Intel Arc A770 16 GB",
+    "pci_device": "0x56a0",
+    "driver": "32.0.101.9034",
+    "wddm": 2700,
+    "compiler": "Intel oneAPI 2025.3.2"
+  },
+  "scope": {
+    "backend": "Orca::DG2",
+    "comparison": "Same binary and GPU list; submit/wait/CPU-prepare versus submit/CPU-prepare/query-or-wait.",
+    "pure_gpu_or_full_model_gain": false,
+    "production_changed": false,
+    "linux_gpu_validated": false
+  },
+  "workload": {
+    "dependent_gpu_kernels_per_replay": 400,
+    "tail_fences_per_replay": 1,
+    "explicit_completion_queries_per_replay": 1,
+    "host_dequantized_values": 262144,
+    "host_buffers_separate_from_gpu_allocations": true,
+    "cpu_work_included_in_total": true,
+    "no_artificial_sleep": true
+  },
+  "validation": {
+    "windows_ctest": "4/4",
+    "linux_cpu_ctest": "4/4",
+    "rounds": 3,
+    "total_gpu_replays": 720,
+    "total_retained_samples": 576,
+    "exact_gpu_and_cpu_outputs": true,
+    "full_padded_output_guards": true,
+    "no_level_zero_umd_gmm_or_compiler_loaded": true
+  },
+  "measurement": {
+    "order": [
+      "serial",
+      "overlap",
+      "serial"
+    ],
+    "warmups_per_phase": 16,
+    "retained_per_phase": 64,
+    "stable_pair_max_abs_drift_pct": 3,
+    "stable_pairs": 3,
+    "median_paired_latency_change_pct": -10.002749378482523,
+    "max_abs_control_drift_pct": 1.775956284153013,
+    "caveats": [
+      "Combined work includes CPU preparation; this is not pure GPU timing or decode tok/s.",
+      "One explicit caller query; Runtime.wait still performs its existing short probes/event wait.",
+      "Fallback invocation does not prove OS sleep.",
+      "GPU clocks are not fixed; this is one A770/driver configuration.",
+      "CPU preparation is independent of this GPU batch, not necessarily of the next autoregressive token.",
+      "No automatic compatible-operator/GEMM coalescing or concurrent multiqueue completion API is implemented.",
+      "All phases and retained samples are preserved."
+    ]
+  },
+  "pairs": [
+    {
+      "round": 0,
+      "phase_median_us": [
+        805.2,
+        722.45,
+        790.9
+      ],
+      "control_us": 798.0179697224869,
+      "overlap_us": 722.45,
+      "latency_change_pct": -9.46945715379891,
+      "control_drift_pct": -1.775956284153013
+    },
+    {
+      "round": 1,
+      "phase_median_us": [
+        789.4,
+        713.85,
+        797.0
+      ],
+      "control_us": 793.190897577626,
+      "overlap_us": 713.85,
+      "latency_change_pct": -10.002749378482523,
+      "control_drift_pct": 0.9627565239422431
+    },
+    {
+      "round": 2,
+      "phase_median_us": [
+        820.35,
+        703.9,
+        805.95
+      ],
+      "control_us": 813.1181233375628,
+      "overlap_us": 703.9,
+      "latency_change_pct": -13.43201193072182,
+      "control_drift_pct": -1.7553483269336256
+    }
+  ],
+  "source_sha256": {
+    "orca-l0/CMakeLists.txt": "b738d979177870626d76480fe360a81d45f8f839af194bef657638db708d8a01",
+    "orca-l0/include/orca_l0/dg2.hpp": "9a7354f0e903aecffa1b7637bebdbe4a7c0bf008114c2e00b2f2d19621940778",
+    "orca-l0/include/orca_l0/drm.hpp": "46808da289dbb63cbb9310f9b4ea806fbec4eeff76dcfbd3b53478f0bf46f245",
+    "orca-l0/include/orca_l0/runtime.hpp": "1b800beb8a4ec7b1777192afc599a4cf519870acd2438b1aea43e79ffafc0869",
+    "orca-l0/src/direct_driver.cpp": "7fe701e2c34dccd80868685b29b83fc846406bf531faa4579a220c7bc4107548",
+    "orca-l0/src/drm/arguments.hpp": "2345accd90193116524c32f300f28b895af9379f29c817649968cce5c9c72aeb",
+    "orca-l0/src/drm/encoding.hpp": "609935e6bd86480add0e9713c4f2a9e6b592c0481d4c7bd60c2df7d5b45d7553",
+    "orca-l0/src/drm/recording.inl": "1197cb33aee937d9e44b560e06ccdf678a46fe0dd8cf47c4b881e96b420aa27b",
+    "orca-l0/src/drm/runtime.cpp": "29b8901666e152dd1d6f9d8936712fac2c4f4d6872700a98c7978eb9033d2a4f",
+    "orca-l0/src/drm/zebin.hpp": "ec9e0239f5e71b29c35c8f0db86a68fb2237c16a0508b0bb541e918bc560bd26",
+    "orca-l0/src/runtime.cpp": "2065f4be1abade4be029573f02d58d73f1b7d6a23cfc5ee85140669880bcf531",
+    "orca-l0/src/wddm/runtime.cpp": "47f1696e40a54f419e8f5ef0376e2e3413305b66285c47ebaef9f08e15756026",
+    "orca-l0/tests/drm_compute_check.cpp": "bf7e0e2cd0d85dbcfeadcb70bb7180e01bd376b62ee2d82ed23572052380c5b5",
+    "orca-l0/tests/runtime_dependencies.hpp": "6b082542cf1b130441a3de93ae1d6e04cb7680600b429fa636ed9bf48cfec451",
+    "orca-l0/tests/wddm_memory_check.cpp": "3e8b17e4b72db0a7b4e53737d747cfc299cceb9207e7d520ba03c43cbbe7071e",
+    "orca-l0/third_party/intel-dg2/packets.hpp": "579559e752d0e4d4d44b903dea0a8f2d172afdd6d0fad63afa445d183bc1165b",
+    "tools/bench_orca_wddm.py": "a8758d84c6303b5f5f570d174a7c6a051b52aabc8da66a9288eab65725401bf6"
+  },
+  "executable_sha256": "77e0c1d3671f9f01b447e11f7403a08842d9616e8c848585f7953fe6ec1f923e",
+  "image_sha256": "94e4970f3f8f9820a25ece27e3ea6ea2a792d1f34a520326a47ce1a10e397800",
+  "production_sha256": {
+    "strata-iq2_xs.json": "9c45e51de69e66c3f1cd020359c8d70d639fbd1aba5d87ead84082fbe73fd531",
+    "build-orca-default-pair-20261031/strata.exe": "7be641375e905b0ceb64424ab4875afcdf9f7f6f1e2c60d6b0fcff4ece5ff4b5"
+  },
+  "previous_runtime_report_sha256": "3dd67e2b2bee06bb1459329125c18b273ee6440c075efcf2dcb48f0dab268a3a",
+  "local_evidence": [
+    "windows-dg2-semisync-v1",
+    "linux-dg2-semisync-cpu-v1"
+  ]
+}

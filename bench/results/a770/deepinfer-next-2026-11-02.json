@@ -1,0 +1,1932 @@
+{
+  "date": "2026-11-02",
+  "hardware": "Intel Arc A770 16GB / Xeon E5-2696 v4 / Windows",
+  "upstream_commit": "2a85f8f0091e54dab5c38758e29ebdef2594e7f9",
+  "chain_submission": {
+    "adopted": false,
+    "complete": true,
+    "scope": "Same-prompt cached decode; 2 warmups + 3 retained requests per case per arm; A/B/A; fixed 5771 expert slots; spec4/min-p0.5; production precision.",
+    "requests": 75,
+    "tokens": 7950,
+    "comparisons": [
+      {
+        "case": "Anchor",
+        "median_ms_per_token": [
+          29.80921052631579,
+          29.513157894736842,
+          29.588157894736838
+        ],
+        "baseline": 29.698478543017707,
+        "candidate": 29.513157894736842,
+        "throughput_change_pct": 0.6279255135686945,
+        "baseline_drift_pct": -0.7415581549327088,
+        "passes_1pct": false
+      },
+      {
+        "case": "Short",
+        "median_ms_per_token": [
+          28.787142857142857,
+          28.781428571428574,
+          28.902857142857144
+        ],
+        "baseline": 28.84494197517167,
+        "candidate": 28.781428571428574,
+        "throughput_change_pct": 0.22067495220214894,
+        "baseline_drift_pct": 0.40196516301920227,
+        "passes_1pct": false
+      },
+      {
+        "case": "Code2K",
+        "median_ms_per_token": [
+          29.95625,
+          30.603125,
+          30.559375
+        ],
+        "baseline": 30.256309711261054,
+        "candidate": 30.603125,
+        "throughput_change_pct": -1.1332675625085553,
+        "baseline_drift_pct": 2.0133528061756722,
+        "passes_1pct": false
+      },
+      {
+        "case": "Prose2K",
+        "median_ms_per_token": [
+          33.1109375,
+          34.290625,
+          33.79140625
+        ],
+        "baseline": 33.449441555590425,
+        "candidate": 34.290625,
+        "throughput_change_pct": -2.45310035734132,
+        "baseline_drift_pct": 2.0551177386626485,
+        "passes_1pct": false
+      },
+      {
+        "case": "Long8K",
+        "median_ms_per_token": [
+          37.5359375,
+          38.71328125,
+          37.96015625
+        ],
+        "baseline": 37.7474509402984,
+        "candidate": 38.71328125,
+        "throughput_change_pct": -2.49482936738048,
+        "baseline_drift_pct": 1.1301669233650946,
+        "passes_1pct": false
+      }
+    ],
+    "raw_results": "build-deepinfer-next-20261102\\cached-screen\\results.json",
+    "raw_results_sha256": "eb6d97059f9af85c4787550aa15e874bc3d849d37115bf3ca6453b65d2d360ca",
+    "rejected_patch": "bench\\results\\a770\\deepinfer-next-chain-rejected-2026-11-02.patch",
+    "reason": "No case met the 1% gain gate; three contexts regressed. Full-chain rejected work outweighed reduced host waits. Candidate code removed."
+  },
+  "accepted_prefix_only": {
+    "adopted": false,
+    "complete": true,
+    "requests": 75,
+    "tokens": 7950,
+    "scope": "Same-prompt cached decode; 2 warmups + 3 retained requests per case per arm; A/B/A; fixed 5771 expert slots; spec4/min-p0.5; production precision.",
+    "comparisons": [
+      {
+        "case": "Anchor",
+        "median_ms_per_token": [
+          29.864473684210523,
+          29.8,
+          29.72763157894737
+        ],
+        "baseline": 29.79597407341098,
+        "candidate": 29.8,
+        "throughput_change_pct": -0.013509820768520253,
+        "baseline_drift_pct": -0.45821033616775253,
+        "passes_1pct": false
+      },
+      {
+        "case": "Short",
+        "median_ms_per_token": [
+          28.872857142857143,
+          28.735714285714284,
+          28.61857142857143
+        ],
+        "baseline": 28.74543310666576,
+        "candidate": 28.735714285714284,
+        "throughput_change_pct": 0.033821400278566394,
+        "baseline_drift_pct": -0.8807085250606139,
+        "passes_1pct": false
+      },
+      {
+        "case": "Code2K",
+        "median_ms_per_token": [
+          30.05703125,
+          30.3234375,
+          30.0703125
+        ],
+        "baseline": 30.06367114159157,
+        "candidate": 30.3234375,
+        "throughput_change_pct": -0.8566520811119527,
+        "baseline_drift_pct": 0.04418683232396692,
+        "passes_1pct": false
+      },
+      {
+        "case": "Prose2K",
+        "median_ms_per_token": [
+          33.52421875,
+          33.50078125,
+          33.4640625
+        ],
+        "baseline": 33.494127119745514,
+        "candidate": 33.50078125,
+        "throughput_change_pct": -0.019862612172627525,
+        "baseline_drift_pct": -0.17944116893106044,
+        "passes_1pct": false
+      },
+      {
+        "case": "Long8K",
+        "median_ms_per_token": [
+          37.78359375,
+          37.63046875,
+          37.721875
+        ],
+        "baseline": 37.75272176265284,
+        "candidate": 37.63046875,
+        "throughput_change_pct": 0.32487772997205067,
+        "baseline_drift_pct": -0.16334801397763776,
+        "passes_1pct": false
+      }
+    ],
+    "raw_results": "build-deepinfer-next-20261102\\accepted-screen\\results.json",
+    "raw_results_sha256": "96153569228e3054ff6b0d321c2222fe26245a1f703fed2744469b15f6b9e379",
+    "reason": "Prefix narrowing alone did not meet the 1% throughput gate. The next candidate also removes the duplicate front pass for the current row."
+  },
+  "accepted_prefix_current_row": {
+    "adopted": false,
+    "complete": true,
+    "scope": "Orca L0 accepted-only prefix plus omission of the duplicate current-row front pass; same numerical images and production policy.",
+    "functional": {
+      "raw_results": "build-deepinfer-next-20261102\\orca-catchup-functional\\results.json",
+      "raw_results_sha256": "f60aeaac88687b8c2db9e726391c83c5e0796313fa01ac962bfe84275e2cbc5d",
+      "requests": 72,
+      "tokens": 5972,
+      "comparisons": []
+    },
+    "screen": {
+      "raw_results": "build-deepinfer-next-20261102\\orca-catchup-screen\\results.json",
+      "raw_results_sha256": "9b998df49722889d52ed50476e8e3f8081fef01a606c4304158c6067a183451f",
+      "requests": 60,
+      "tokens": 6810,
+      "comparisons": [
+        {
+          "case": "Short",
+          "median_ms_per_token": [
+            27.84285714285714,
+            27.714285714285715,
+            28.115714285714283
+          ],
+          "baseline": 27.978953095613328,
+          "candidate": 27.714285714285715,
+          "throughput_change_pct": 0.9549853965429289,
+          "baseline_drift_pct": 0.9799897383273359,
+          "passes_1pct": false
+        },
+        {
+          "case": "Code2K",
+          "median_ms_per_token": [
+            30.0640625,
+            29.9796875,
+            30.19609375
+          ],
+          "baseline": 30.130005804112606,
+          "candidate": 29.9796875,
+          "throughput_change_pct": 0.5014005036330316,
+          "baseline_drift_pct": 0.43916636349461413,
+          "passes_1pct": false
+        },
+        {
+          "case": "Prose2K",
+          "median_ms_per_token": [
+            33.88359375,
+            33.21640625,
+            33.49375
+          ],
+          "baseline": 33.68810796355388,
+          "candidate": 33.21640625,
+          "throughput_change_pct": 1.420086537970633,
+          "baseline_drift_pct": -1.150538378178978,
+          "passes_1pct": true
+        },
+        {
+          "case": "Long8K",
+          "median_ms_per_token": [
+            37.39765625,
+            37.63515625,
+            37.69453125
+          ],
+          "baseline": 37.54580032696576,
+          "candidate": 37.63515625,
+          "throughput_change_pct": -0.2374267358973392,
+          "baseline_drift_pct": 0.7938331696922818,
+          "passes_1pct": false
+        }
+      ]
+    },
+    "excluded_confirmation": {
+      "raw_results": "build-deepinfer-next-20261102\\orca-catchup-confirm\\results.json",
+      "raw_results_sha256": "e37d6c2f8940d6f1df9a2e20769b3262e3df9115b1bba3d404b5dcac592fe9dc",
+      "requests": 90,
+      "tokens": 8910,
+      "comparisons": [
+        {
+          "case": "Short",
+          "median_ms_per_token": [
+            27.652857142857144,
+            27.892857142857142,
+            29.409999999999997
+          ],
+          "baseline": 28.51789838980826,
+          "candidate": 27.892857142857142,
+          "throughput_change_pct": 2.2408649058426766,
+          "baseline_drift_pct": 6.354290437567789,
+          "passes_1pct": false
+        },
+        {
+          "case": "Prose2K",
+          "median_ms_per_token": [
+            33.30078125,
+            33.69921875,
+            35.19453125
+          ],
+          "baseline": 34.2345642056758,
+          "candidate": 33.69921875,
+          "throughput_change_pct": 1.5885990106990322,
+          "baseline_drift_pct": 5.686803519061567,
+          "passes_1pct": false
+        }
+      ],
+      "excluded": true,
+      "reason": "Baseline time drift 5.69% to 6.35% exceeded the fixed 3% limit."
+    },
+    "confirmation": {
+      "raw_results": "build-deepinfer-next-20261102\\orca-catchup-confirm-prose\\results.json",
+      "raw_results_sha256": "fa5cb24c478953b27cf7c09bfd959ffe85551aa973f7351e9b20dca22d68b783",
+      "requests": 45,
+      "tokens": 5760,
+      "comparisons": [
+        {
+          "case": "Prose2K",
+          "median_ms_per_token": [
+            33.20234375,
+            33.19140625,
+            33.43359375
+          ],
+          "baseline": 33.317768119808854,
+          "candidate": 33.19140625,
+          "throughput_change_pct": 0.38070658669020485,
+          "baseline_drift_pct": 0.6964869761641568,
+          "passes_1pct": false
+        }
+      ]
+    },
+    "reason": "Prose2K screened at +1.42%; valid independent 10-warmup/5-retained single-case confirmation was only +0.38%, below the 1% gate. Replaced by full front-intermediate reuse.",
+    "frozen_generated_source": "build-deepinfer-next-20261102\\orca-catchup-build\\mtp.cpp"
+  },
+  "accepted_prefix_front_reuse": {
+    "adopted": false,
+    "complete": true,
+    "scope": "Orca L0 accepted prefix plus reuse of current-row R/injection/mixed front intermediates; production numerical images unchanged.",
+    "frozen_adapter": "build-deepinfer-next-20261102\\orca-reuse-build\\prepare-rejected.py",
+    "frozen_adapter_sha256": "c3ac20eb3b479393b62c8dd6b51f84da8e3896ae8d67f9365a3088c36bfa6f2e",
+    "functional": {
+      "raw_results": "build-deepinfer-next-20261102\\orca-reuse-functional\\results.json",
+      "raw_results_sha256": "a2cbb9d0b925d501c3bb087723b1e9145d206ab8a431da330e09514223fec56c",
+      "requests": 72,
+      "tokens": 5972,
+      "comparisons": []
+    },
+    "prose": {
+      "raw_results": "build-deepinfer-next-20261102\\orca-reuse-screen\\results.json",
+      "raw_results_sha256": "4986b3e26cfb94c1cbdf3991970d99335edfd3c73f9f86964cc2f0974e61607a",
+      "requests": 45,
+      "tokens": 5760,
+      "comparisons": [
+        {
+          "case": "Prose2K",
+          "median_ms_per_token": [
+            33.4984375,
+            33.059375,
+            33.19453125
+          ],
+          "baseline": 33.34613816351035,
+          "candidate": 33.059375,
+          "throughput_change_pct": 0.8674185870433115,
+          "baseline_drift_pct": -0.9072251504268047,
+          "passes_1pct": false
+        }
+      ]
+    },
+    "anchor": {
+      "raw_results": "build-deepinfer-next-20261102\\orca-reuse-anchor\\results.json",
+      "raw_results_sha256": "c61020b52ae02f93aa63b6612a4c9f6e7aceb9e1aad721e61229aff0e2782a7c",
+      "requests": 45,
+      "tokens": 3420,
+      "comparisons": [
+        {
+          "case": "Anchor",
+          "median_ms_per_token": [
+            20.967105263157894,
+            20.973684210526315,
+            21.030263157894737
+          ],
+          "baseline": 20.998660465455654,
+          "candidate": 20.973684210526315,
+          "throughput_change_pct": 0.11908377507088286,
+          "baseline_drift_pct": 0.3012237213680713,
+          "passes_1pct": false
+        }
+      ]
+    },
+    "default_check": {
+      "path": "build-deepinfer-next-20261102\\orca-reuse-build\\default-check.json",
+      "sha256": "5aa5eed16b6376cd06133c47081664b6955bc02e833b3dc831ee54f812497bef",
+      "note": "DG2 preprocessed MTP computation identical after normalization of exception diagnostic line numbers."
+    },
+    "reason": "Prose2K +0.8674% and Anchor +0.1191% both below the 1% gain gate; candidate adapter transform removed."
+  },
+  "capacity8_cost_screen": {
+    "adopted": false,
+    "complete": true,
+    "raw_results": "build-deepinfer-next-20261102\\window8-screen\\results.json",
+    "raw_results_sha256": "3cf181ebeb396c6a3d337132a89eda972001c4eb0e6cc5bbfe84ed6bddc127bf",
+    "comparisons": [
+      {
+        "case": "Anchor",
+        "median_ms_per_token": [
+          29.652631578947368,
+          32.544736842105266,
+          29.611842105263158
+        ],
+        "baseline": 29.632229823645226,
+        "candidate": 32.544736842105266,
+        "throughput_change_pct": -8.949241263158525,
+        "baseline_drift_pct": -0.13755768548100455,
+        "passes_1pct": false
+      },
+      {
+        "case": "Short",
+        "median_ms_per_token": [
+          28.54,
+          33.75,
+          28.79
+        ],
+        "baseline": 28.664727453788913,
+        "candidate": 33.75,
+        "throughput_change_pct": -15.067474210995812,
+        "baseline_drift_pct": 0.8759635599159044,
+        "passes_1pct": false
+      },
+      {
+        "case": "Code2K",
+        "median_ms_per_token": [
+          29.8265625,
+          30.57265625,
+          30.05
+        ],
+        "baseline": 29.9380728024534,
+        "candidate": 30.57265625,
+        "throughput_change_pct": -2.0756568953559595,
+        "baseline_drift_pct": 0.7491225313007499,
+        "passes_1pct": false
+      },
+      {
+        "case": "Prose2K",
+        "median_ms_per_token": [
+          33.1296875,
+          36.13203125,
+          33.253125
+        ],
+        "baseline": 33.19134886756544,
+        "candidate": 36.13203125,
+        "throughput_change_pct": -8.138713160319655,
+        "baseline_drift_pct": 0.3725887846059317,
+        "passes_1pct": false
+      }
+    ],
+    "requests": 60,
+    "tokens": 6030,
+    "controls": "Same executable and images; 5771 slots / 7922 MiB; full vocabulary; suffix off; FP16 KV; production expert policy; output IDs/finish/reuse equal, draft counts may differ.",
+    "reason": "Screening only; no default/source/config change. Full-output correctness audited separately; no benefit inferred from wider capacity."
+  },
+  "cumulative_confidence_default": {
+    "adopted": true,
+    "complete": true,
+    "scope": "A770 Orca L0 / IQ2_XS / FP16 KV / spec4 / full draft vocabulary; cumulative confidence 0.5; no new numerical kernel or weights.",
+    "gate": "Fixed four-case geometric mean >=1%, each baseline time drift <=3%, no case slower by more than 2%; complete output equality. Per-case 1% flags remain independent.",
+    "screen": {
+      "raw_results": "build-deepinfer-next-20261102\\cumulative-screen\\results.json",
+      "raw_results_sha256": "62af8d9b8139dd155f580b121ad73b20389f726331e0f2d9ef83f7a075e7137f",
+      "requests": 180,
+      "tokens": 20430,
+      "comparisons": [
+        {
+          "case": "Short",
+          "median_ms_per_token": [
+            27.74,
+            26.731428571428573,
+            27.45
+          ],
+          "baseline": 27.5946190406753,
+          "candidate": 26.731428571428573,
+          "throughput_change_pct": 3.229122105989246,
+          "baseline_drift_pct": -1.0454217736121096,
+          "passes_1pct": true
+        },
+        {
+          "case": "Code2K",
+          "median_ms_per_token": [
+            30.0625,
+            30.51015625,
+            29.8859375
+          ],
+          "baseline": 29.97408874501025,
+          "candidate": 30.51015625,
+          "throughput_change_pct": -1.7570133059864323,
+          "baseline_drift_pct": -0.5873180873180894,
+          "passes_1pct": false
+        },
+        {
+          "case": "Prose2K",
+          "median_ms_per_token": [
+            33.2953125,
+            32.696875,
+            33.06796875
+          ],
+          "baseline": 33.18144591893916,
+          "candidate": 32.696875,
+          "throughput_change_pct": 1.482009883021429,
+          "baseline_drift_pct": -0.6828100802477866,
+          "passes_1pct": true
+        },
+        {
+          "case": "Long8K",
+          "median_ms_per_token": [
+            37.55859375,
+            36.02734375,
+            37.35859375
+          ],
+          "baseline": 37.45846026904388,
+          "candidate": 36.02734375,
+          "throughput_change_pct": 3.97230650412268,
+          "baseline_drift_pct": -0.5325013000520129,
+          "passes_1pct": true
+        }
+      ],
+      "four_case_geomean_throughput_change_pct": 1.707418732096877,
+      "overall_gate_passed": true
+    },
+    "default_confirmation": {
+      "raw_results": "build-deepinfer-next-20261102\\cumulative-default-confirm\\results.json",
+      "raw_results_sha256": "55fe2ae5468abdf2ba1c28e6da5c1410731ba7f295b14013db5edb03049d17bf",
+      "requests": 96,
+      "tokens": 10896,
+      "comparisons": [
+        {
+          "case": "Short",
+          "median_ms_per_token": [
+            27.614285714285714,
+            26.24857142857143,
+            27.18285714285714
+          ],
+          "baseline": 27.39772223513242,
+          "candidate": 26.24857142857143,
+          "throughput_change_pct": 4.37795561441543,
+          "baseline_drift_pct": -1.5623383341955566,
+          "passes_1pct": true
+        },
+        {
+          "case": "Code2K",
+          "median_ms_per_token": [
+            30.31640625,
+            29.95390625,
+            30.109375
+          ],
+          "baseline": 30.212713291486974,
+          "candidate": 29.95390625,
+          "throughput_change_pct": 0.8640176654321152,
+          "baseline_drift_pct": -0.6829016879268179,
+          "passes_1pct": false
+        },
+        {
+          "case": "Prose2K",
+          "median_ms_per_token": [
+            33.3171875,
+            32.0921875,
+            33.378125
+          ],
+          "baseline": 33.3476423308071,
+          "candidate": 32.0921875,
+          "throughput_change_pct": 3.9120263484908824,
+          "baseline_drift_pct": 0.18290109271676958,
+          "passes_1pct": true
+        },
+        {
+          "case": "Long8K",
+          "median_ms_per_token": [
+            36.653125,
+            35.565625,
+            36.7375
+          ],
+          "baseline": 36.69528824914038,
+          "candidate": 35.565625,
+          "throughput_change_pct": 3.1762783562509833,
+          "baseline_drift_pct": 0.23019865291156183,
+          "passes_1pct": true
+        }
+      ],
+      "four_case_geomean_throughput_change_pct": 3.07365596243645,
+      "overall_gate_passed": true
+    },
+    "production_lookup_confirmation": {
+      "raw_results": "build-deepinfer-next-20261102\\cumulative-suffix-confirm\\results.json",
+      "raw_results_sha256": "1753112fccd58ce3735717a2b9d94c8250056b6ca6021c99195ac64a03888497",
+      "requests": 96,
+      "tokens": 10896,
+      "comparisons": [
+        {
+          "case": "Short",
+          "median_ms_per_token": [
+            27.22714285714286,
+            26.220000000000002,
+            27.029999999999998
+          ],
+          "baseline": 27.128392348765736,
+          "candidate": 26.220000000000002,
+          "throughput_change_pct": 3.4645017115398025,
+          "baseline_drift_pct": -0.7240673697465949,
+          "passes_1pct": true
+        },
+        {
+          "case": "Code2K",
+          "median_ms_per_token": [
+            29.37578125,
+            29.79921875,
+            29.3578125
+          ],
+          "baseline": 29.366795500675856,
+          "candidate": 29.79921875,
+          "throughput_change_pct": -1.4511227725530373,
+          "baseline_drift_pct": -0.06116858594185093,
+          "passes_1pct": false
+        },
+        {
+          "case": "Prose2K",
+          "median_ms_per_token": [
+            32.56640625,
+            32.175,
+            32.5421875
+          ],
+          "baseline": 32.55429462280932,
+          "candidate": 32.175,
+          "throughput_change_pct": 1.1788488665402497,
+          "baseline_drift_pct": -0.07436727839751356,
+          "passes_1pct": true
+        },
+        {
+          "case": "Long8K",
+          "median_ms_per_token": [
+            36.94453125,
+            35.27578125,
+            36.4609375
+          ],
+          "baseline": 36.70193788988596,
+          "candidate": 35.27578125,
+          "throughput_change_pct": 4.042877547569446,
+          "baseline_drift_pct": -1.3089724883165177,
+          "passes_1pct": true
+        }
+      ],
+      "excluded_comparison": {
+        "case": "Long8K",
+        "median_ms_per_token": [
+          36.71640625,
+          35.03671875,
+          37.89296875
+        ],
+        "baseline": 37.30004872173165,
+        "candidate": 35.03671875,
+        "throughput_change_pct": 6.459879955886705,
+        "baseline_drift_pct": 3.204459859139952,
+        "passes_1pct": false,
+        "excluded": true,
+        "reason": "Original mixed-case baseline time drift exceeded 3%; timing excluded, output checks remain valid."
+      },
+      "standalone_long_confirmation": {
+        "raw_results": "build-deepinfer-next-20261102\\cumulative-suffix-long-confirm\\results.json",
+        "raw_results_sha256": "d3e98ba3d9d1b8bb96312eb536ee2aaa34eeaa50679f96b15e9668e76c1aee73",
+        "requests": 45,
+        "tokens": 5760,
+        "comparisons": [
+          {
+            "case": "Long8K",
+            "median_ms_per_token": [
+              36.94453125,
+              35.27578125,
+              36.4609375
+            ],
+            "baseline": 36.70193788988596,
+            "candidate": 35.27578125,
+            "throughput_change_pct": 4.042877547569446,
+            "baseline_drift_pct": -1.3089724883165177,
+            "passes_1pct": true
+          }
+        ]
+      },
+      "four_case_geomean_throughput_change_pct": 1.7855868883571047,
+      "overall_gate_passed": true,
+      "comparison_sources": {
+        "Short": "build-deepinfer-next-20261102\\cumulative-suffix-confirm\\results.json",
+        "Code2K": "build-deepinfer-next-20261102\\cumulative-suffix-confirm\\results.json",
+        "Prose2K": "build-deepinfer-next-20261102\\cumulative-suffix-confirm\\results.json",
+        "Long8K": "build-deepinfer-next-20261102\\cumulative-suffix-long-confirm\\results.json"
+      },
+      "total_requests_including_standalone": 141,
+      "total_tokens_including_standalone": 16656
+    },
+    "functional": {
+      "raw_results": "build-deepinfer-next-20261102\\cumulative-suffix-functional\\results.json",
+      "raw_results_sha256": "25a59b380053ed2cc01e3117c74f008059b8449dd1f39e06064f7fccc1ccc977",
+      "requests": 72,
+      "tokens": 5922,
+      "comparisons": []
+    },
+    "cpu_check": {
+      "path": "build-deepinfer-next-20261102\\orca-cumulative-check\\results.json",
+      "sha256": "a929645af7b79743408e6b421e58bf03758f5d2f75507e6bd867e65cf4dcefc0",
+      "cases": 33,
+      "diagnostic_line_numbers_normalized": true
+    },
+    "source_patch": {
+      "path": "bench\\results\\a770\\deepinfer-next-cumulative-2026-11-02.patch",
+      "sha256": "18ffa93dc635a37601f2bae1c4f8f1a42ae812a9f46ff01beec60ed1d7283e88"
+    },
+    "isolated_build": {
+      "path": "build-deepinfer-next-20261102\\orca-cumulative-build\\build.json",
+      "sha256": "f34f07197b6698e00e67d06ae6e20bba858ae9eed286f023fec94e91186c77c6",
+      "note": "Only the frozen production host entry was rebuilt; its initializer matches the current adapter output. This is not a full rebuild of the modified working tree."
+    },
+    "production_policy_info": [
+      "INFO context=8192 kv=fp16 kv_resident=0 expert_slots=5771 expert_cache_mib=7922 expert_slots_primary=5771 expert_cache_primary_mib=7922 spec=6 mtp_max=4 lookup=3 vram_free_mib=2396 cvec=0 arena_mib=33812 pool_workers=21 pcie_frac=0.16 spec_min_p=0.50 conversation_cache_mib=0 conversation_cache_slots=4 conversation_cache_min_free_mib=2560 tail_role_token=-1 vram_elastic=0 engine=0.1.39-orca",
+      "INFO context=8192 kv=fp16 kv_resident=0 expert_slots=5771 expert_cache_mib=7922 expert_slots_primary=5771 expert_cache_primary_mib=7922 spec=6 mtp_max=4 lookup=3 vram_free_mib=2565 cvec=0 arena_mib=33812 pool_workers=21 pcie_frac=0.16 spec_min_p=0.50 conversation_cache_mib=0 conversation_cache_slots=4 conversation_cache_min_free_mib=2560 tail_role_token=-1 vram_elastic=0 engine=0.1.39-orca",
+      "INFO context=8192 kv=fp16 kv_resident=0 expert_slots=5771 expert_cache_mib=7922 expert_slots_primary=5771 expert_cache_primary_mib=7922 spec=6 mtp_max=4 lookup=3 vram_free_mib=2544 cvec=0 arena_mib=33812 pool_workers=21 pcie_frac=0.16 spec_min_p=0.50 conversation_cache_mib=0 conversation_cache_slots=4 conversation_cache_min_free_mib=2560 tail_role_token=-1 vram_elastic=0 engine=0.1.39-orca"
+    ],
+    "production_activation": {
+      "file": "strata-iq2_xs.json",
+      "before_sha256": "9c45e51de69e66c3f1cd020359c8d70d639fbd1aba5d87ead84082fbe73fd531",
+      "after_sha256": "3f1fb8f77a049931428852987d970eca71b13610e2b15325725205d60d4737a1",
+      "backup": "build-deepinfer-next-20261102\\strata-iq2_xs-before-cumulative.json",
+      "change": {
+        "STRATA_MTP_CUM_MIN_P": "0.5"
+      },
+      "executable_changed": false,
+      "images_changed": false
+    },
+    "limits": "Repeated fixed prompts and warm expert cache; production-policy timing keeps lookup=3, PCIe split and adaptive swaps but requests a fixed cache and uses prompt-cache=128. No universal speedup or 4090 reproduction claim.",
+    "raw_protocol_auditor": {
+      "path": "build-deepinfer-next-20261102\\audit_window.py",
+      "sha256": "69b59585162ae3aaddb5bbdc6b53b1ef27acecc738166f11c8fe7da543ed4c0a",
+      "checks": "T/TB token IDs; DONE tokens/finish/draft counts/cache/timings; RESUME; process exits; medians and ratios."
+    }
+  },
+  "cumulative_confidence_refinement": {
+    "trials": [
+      {
+        "candidate_cumulative": 0.35,
+        "baseline_cumulative": 0.5,
+        "adopted": false,
+        "comparison": [
+          {
+            "case": "Short",
+            "median_ms_per_token": [
+              26.224285714285713,
+              26.584285714285716,
+              26.254285714285714
+            ],
+            "baseline": 26.23928142682109,
+            "candidate": 26.584285714285716,
+            "throughput_change_pct": -1.2977752766147432,
+            "baseline_drift_pct": 0.11439777741462098,
+            "passes_1pct": false
+          },
+          {
+            "case": "Code2K",
+            "median_ms_per_token": [
+              29.72890625,
+              29.28046875,
+              29.71796875
+            ],
+            "baseline": 29.723436996908344,
+            "candidate": 29.28046875,
+            "throughput_change_pct": 1.512845476247171,
+            "baseline_drift_pct": -0.03679079179039757,
+            "passes_1pct": true
+          },
+          {
+            "case": "Prose2K",
+            "median_ms_per_token": [
+              32.096875,
+              32.49375,
+              32.07734375
+            ],
+            "baseline": 32.08710788892918,
+            "candidate": 32.49375,
+            "throughput_change_pct": -1.2514471585176157,
+            "baseline_drift_pct": -0.060850939538503734,
+            "passes_1pct": false
+          },
+          {
+            "case": "Long8K",
+            "median_ms_per_token": [
+              35.34921875,
+              36.5296875,
+              35.3515625
+            ],
+            "baseline": 35.35039060557602,
+            "candidate": 36.5296875,
+            "throughput_change_pct": -3.228324617953504,
+            "baseline_drift_pct": 0.006630273830321443,
+            "passes_1pct": false
+          }
+        ],
+        "geometric_mean_throughput_change_pct": -1.0805402649763485,
+        "requests": 72,
+        "generated_tokens": 8172,
+        "evidence": "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\tune035-screen",
+        "files_sha256": {
+          "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\tune035-screen\\0-A0.protocol": "68c4347811b8827d02c7a162bfd69dff660b973f47570e01f83df8ee40b434a6",
+          "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\tune035-screen\\0-A0.stderr": "4d15efe96c177ec04c947548b0d89151b5dfd40d16afacd46dc3178996a15c95",
+          "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\tune035-screen\\0-A1.protocol": "a07a4d1ca0eda8fb5add8defc67e82b9d216a2c8cbd8d0cf192a08279259acc5",
+          "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\tune035-screen\\0-A1.stderr": "9b942cae0993051217c9b48b7e8913a6f2301de58f1926381c1acf38ce519726",
+          "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\tune035-screen\\0-B.protocol": "8352c3ef9f9d7dbe43e665b87c4558837356562d9f5197905e84fe82aa45f61f",
+          "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\tune035-screen\\0-B.stderr": "ea421d18a23292edb1023786ade2faff67157ea87456cfccbf2af011787ea04f",
+          "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\tune035-screen\\bench_tune.py": "f0a27c811668bbc06fb139dec2f2e9e505df9d0ca5905320bad77922d08f879e",
+          "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\tune035-screen\\results.json": "257b2f624fe663cfd939e344eb75c48eb58b279bb80227368c893679fe26e7b2"
+        }
+      },
+      {
+        "candidate_cumulative": 0.65,
+        "baseline_cumulative": 0.5,
+        "adopted": false,
+        "comparison": [
+          {
+            "case": "Short",
+            "median_ms_per_token": [
+              26.39857142857143,
+              27.08142857142857,
+              26.224285714285713
+            ],
+            "baseline": 26.311284263445536,
+            "candidate": 27.08142857142857,
+            "throughput_change_pct": -2.843809756755422,
+            "baseline_drift_pct": -0.6602088857622257,
+            "passes_1pct": false
+          },
+          {
+            "case": "Code2K",
+            "median_ms_per_token": [
+              29.778125,
+              30.215625,
+              29.7828125
+            ],
+            "baseline": 29.78046865777237,
+            "candidate": 30.215625,
+            "throughput_change_pct": -1.4401699194626194,
+            "baseline_drift_pct": 0.015741420925596827,
+            "passes_1pct": false
+          },
+          {
+            "case": "Prose2K",
+            "median_ms_per_token": [
+              32.0390625,
+              32.98203125,
+              32.0140625
+            ],
+            "baseline": 32.026560060618536,
+            "candidate": 32.98203125,
+            "throughput_change_pct": -2.8969446488577355,
+            "baseline_drift_pct": -0.07802974884174585,
+            "passes_1pct": false
+          },
+          {
+            "case": "Long8K",
+            "median_ms_per_token": [
+              36.046875,
+              35.69921875,
+              36.175
+            ],
+            "baseline": 36.110880675012616,
+            "candidate": 35.69921875,
+            "throughput_change_pct": 1.1531398709183627,
+            "baseline_drift_pct": 0.35543996532292343,
+            "passes_1pct": true
+          }
+        ],
+        "geometric_mean_throughput_change_pct": -1.5205370555556708,
+        "requests": 72,
+        "generated_tokens": 8172,
+        "evidence": "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\tune065-screen",
+        "files_sha256": {
+          "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\tune065-screen\\0-A0.protocol": "c1a78914f9bc275817c50f76eca9a443270270fecead5695b130abaaced7c9cd",
+          "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\tune065-screen\\0-A0.stderr": "fbcd5db64396943c3a51e07f003303dfeab3e4f704a303d547ca15899efc37f6",
+          "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\tune065-screen\\0-A1.protocol": "83db2985da72f89aa5251631a71975f0513df4ff6dd2696ca7e78b808791beca",
+          "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\tune065-screen\\0-A1.stderr": "24bf0a9e648800b8ee1f0c828143ee51749a4e20505d1b000ff7e3e92be941f7",
+          "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\tune065-screen\\0-B.protocol": "099102989b821b5adbf21bdee8d8fd3962c4cc054bb95b3e2aa130f357b1a36d",
+          "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\tune065-screen\\0-B.stderr": "4687fc97747ff8c3415b06ba0b0b38ecbb4ee6b51d5b552f8eeace3149a80857",
+          "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\tune065-screen\\bench_tune.py": "f0a27c811668bbc06fb139dec2f2e9e505df9d0ca5905320bad77922d08f879e",
+          "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\tune065-screen\\results.json": "3c745b1c35ffddc4f7ed8b5c3224e027b76707299600bc559917f8c4310d902c"
+        }
+      }
+    ],
+    "production_changed": false,
+    "validation": "Raw T/TB/DONE/RESUME reconciled independently; exact outputs, finishes, reuse and normal exits.",
+    "settings": "Current cumulative 0.5 baseline, spec4, production lookup3, FP16 KV, full draft vocabulary, fixed 5771 expert slots; 3 warmups plus 3 retained requests per arm and case, independent A/B/A processes."
+  },
+  "remaining_output_budget": {
+    "adopted": true,
+    "baseline_cumulative": 0.5,
+    "screen": {
+      "comparisons": [
+        {
+          "case": "Short",
+          "median_ms_per_token": [
+            25.366666666666664,
+            23.3,
+            24.900000000000002
+          ],
+          "baseline": 25.132250197704145,
+          "candidate": 23.3,
+          "throughput_change_pct": 7.863734754095031,
+          "baseline_drift_pct": -1.8396846254927546,
+          "passes_1pct": true
+        },
+        {
+          "case": "Code2K",
+          "median_ms_per_token": [
+            24.666666666666668,
+            24.066666666666666,
+            24.633333333333336
+          ],
+          "baseline": 24.649994365561675,
+          "candidate": 24.066666666666666,
+          "throughput_change_pct": 2.4237993028878524,
+          "baseline_drift_pct": -0.13513513513512265,
+          "passes_1pct": true
+        },
+        {
+          "case": "Prose2K",
+          "median_ms_per_token": [
+            24.599999999999998,
+            23.933333333333334,
+            24.666666666666668
+          ],
+          "baseline": 24.63331078032346,
+          "candidate": 23.933333333333334,
+          "throughput_change_pct": 2.9246968537191886,
+          "baseline_drift_pct": 0.27100271002711285,
+          "passes_1pct": true
+        },
+        {
+          "case": "Long8K",
+          "median_ms_per_token": [
+            37.699999999999996,
+            35.9,
+            37.666666666666664
+          ],
+          "baseline": 37.68332964764835,
+          "candidate": 35.9,
+          "throughput_change_pct": 4.967492054730793,
+          "baseline_drift_pct": -0.08841732979663064,
+          "passes_1pct": true
+        }
+      ],
+      "geometric_mean_throughput_change_pct": 4.523197796314116,
+      "stable_baselines": true,
+      "passes": true
+    },
+    "confirmation": {
+      "comparisons": [
+        {
+          "case": "Short",
+          "median_ms_per_token": [
+            24.833333333333332,
+            23.666666666666668,
+            24.933333333333334
+          ],
+          "baseline": 24.8832830988553,
+          "candidate": 23.666666666666668,
+          "throughput_change_pct": 5.140632812064649,
+          "baseline_drift_pct": 0.4026845637584042,
+          "passes_1pct": true
+        },
+        {
+          "case": "Chinese",
+          "median_ms_per_token": [
+            34.96666666666667,
+            33.5,
+            34.93333333333333
+          ],
+          "baseline": 34.94999602606876,
+          "candidate": 33.5,
+          "throughput_change_pct": 4.328346346473921,
+          "baseline_drift_pct": -0.09532888465206835,
+          "passes_1pct": true
+        }
+      ],
+      "geometric_mean_throughput_change_pct": 4.73370209777042,
+      "stable_baselines": true,
+      "passes": true
+    },
+    "scope": "Decode of max_new=3 requests; these numbers do not establish a sustained 128-token or end-to-end prompt speedup.",
+    "full_output_requests": 1266,
+    "full_output_tokens": 7602,
+    "functional_requests": 432,
+    "functional_tokens": 2448,
+    "compiled_unique_boundary_cases": 528,
+    "dg2_entry_preprocessed_identical": true,
+    "original_executable_unchanged": true,
+    "configuration_changed": [
+      "exe"
+    ],
+    "config_backup": "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\strata-iq2_xs-before-budget.json",
+    "deployed_executable": "G:\\GitHub\\Strata\\build-orca-mtp-budget-20261102\\strata.exe",
+    "deployed_executable_sha256": "ed9a7c7525464375b812b2ebc3542f707c326e411d27882b075a1fa2206d5d8b",
+    "config_sha256": "102adb6093592ebaf373970c096e23e14b92c18063f9c105d149ef483463a4df",
+    "isolated_frozen_host_patch": true,
+    "gpu_images_and_numerical_objects_unchanged": true,
+    "whole_working_tree_rebuild": false,
+    "source_files_sha256": {
+      "G:\\GitHub\\Strata\\sycl\\orca\\prepare.py": "8291c8abf5f17c7ad1476a243a5571f748581bdf16f98843f008c3fb9699c54d",
+      "G:\\GitHub\\Strata\\tools\\test_mtp_budget.py": "4add9134e20361c93ddb5930b5e7ca9ac02e008a8dd19140e3cf3ad86149f0a6",
+      "G:\\GitHub\\Strata\\tools\\bench_mtp_prefix.py": "51799daa5fb10ebd2159551045afbab0fdb6bae54a5e2149fa3fbeb96f2448be",
+      "G:\\GitHub\\Strata\\bench\\results\\a770\\deepinfer-next-budget-2026-11-02.patch": "7b2d910d203c5d2ebf9260316aafa2dd70f8cbd0caa6c30b825514eebe333296"
+    },
+    "evidence": {
+      "budget3-screen": {
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\budget3-screen\\0-A0.protocol": "93f0ddb91d5aa59bc6c117eb338afcf12fae9f17a33c96ee189ad526f742e55a",
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\budget3-screen\\0-A0.stderr": "5d582123d58786517330f57a7c39cafdbd73ff05e470ce6dff44cb097b2cd62c",
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\budget3-screen\\0-A1.protocol": "c74e76f31bcad8629f0924cc99bad740bb3645b867528787e38586d6c674cf51",
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\budget3-screen\\0-A1.stderr": "f0cdb3b601cf4ed82cf40258808c0be5b4df4d19b55bda8d4944adca8456290d",
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\budget3-screen\\0-B.protocol": "4bc8de970bdee776bcef1605fc5e9919d2db8bec797e50d8248e5f7212ddf056",
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\budget3-screen\\0-B.stderr": "a61325a2554ac1cb00d4112f842d5b7968e2fbbe777642e5a423867c227c16df",
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\budget3-screen\\bench_mtp_prefix.py": "51799daa5fb10ebd2159551045afbab0fdb6bae54a5e2149fa3fbeb96f2448be",
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\budget3-screen\\results.json": "e64541bfb034ee8c18d84c0de2ef169ce01556a0e53a5daaf18d640a0b13142e"
+      },
+      "budget3-confirm": {
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\budget3-confirm\\0-A0.protocol": "8b108f153e63b2da43f189c60e14cbb16c75a2498af07fa76da8155e34eba185",
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\budget3-confirm\\0-A0.stderr": "09262bedfd57ad370f549d4fba0bcf33289e66877a54affda2533b4ad3a38a80",
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\budget3-confirm\\0-A1.protocol": "32a7fc768052ec4f19bb76b20c31bc227b907c3d5b139d159e6571dff413464f",
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\budget3-confirm\\0-A1.stderr": "a102996a25a708a46ad3cadbb584b8d25e6d2b0f2402e2159b862c225df906cd",
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\budget3-confirm\\0-B.protocol": "0767dbf14e2f24a0d37d730123988cc04a51740274dab6784f1cd75a638667ef",
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\budget3-confirm\\0-B.stderr": "314a5a4b4b8a4780fbd7e7d93f054ff21dedae0fad7d41a79b10bb82f44e1aa3",
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\budget3-confirm\\bench_mtp_prefix.py": "51799daa5fb10ebd2159551045afbab0fdb6bae54a5e2149fa3fbeb96f2448be",
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\budget3-confirm\\results.json": "66bd63ce0ccfcdf029beb13fb0c1c3cd2a754fc799779dc8f8390d4aa537f7a8"
+      },
+      "budget-functional": {
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\budget-functional\\0-prefix.protocol": "2c1eca4c5b1827069e6601058f6760dfda6afa7a1be9281f1f260c5ff24e146c",
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\budget-functional\\0-prefix.stderr": "695c2d66fc642aedbeb4a4512d564facdb0ac1981ddaf56d802944ec3efc0d07",
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\budget-functional\\0-serial.protocol": "f96c44d45a411d2f8d706ff574584534b1ac1c2ecc4d5cb304175b22ce8b4b57",
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\budget-functional\\0-serial.stderr": "6ba1110fb6cad5e19e097eb77fc3a4aea2f9fe68b4ed40762658c78d8ec17db6",
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\budget-functional\\1-prefix.protocol": "63881107858b775da218d30bb06bc0338339530d3ae945f98dde208e5142a5bc",
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\budget-functional\\1-prefix.stderr": "578e261b0dbce1c3f4f5347f419f8c1a0098d1cc484b5e837ef27df1a8048242",
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\budget-functional\\1-serial.protocol": "0cc326c3578a4cc9feb9f3177b3d4a258b59170b84c49de05112be79d749209e",
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\budget-functional\\1-serial.stderr": "a8880dc5f5c327a944baa3ebaf98730ea68939d6951a02bc867bc78ec27d337c",
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\budget-functional\\bench_budget_functional.py": "b914353d27441ef7ab3940fea3e0ba47c7144a3093a27d5ae938bf14582858d2",
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\budget-functional\\results.json": "8bfbee1e27aa44984e691441f862d57d8615ee9b4c382bb3f3c2aac808bcf413"
+      },
+      "budget128-regression": {
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\budget128-regression\\0-budget.protocol": "2938f4f310a07404bf7575f798da0c1abdaf0db70090850564746be4e1dd4bad",
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\budget128-regression\\0-budget.stderr": "dac0ea0b304a5d9fa6df9565273c91514165123cff2379c9e0ad6f71eaa43731",
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\budget128-regression\\results.json": "d74602c518a3a2eeb3afd5151f89e194af12f18ae60a3bfa188052bac3959347"
+      },
+      "orca-budget-check": {
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\orca-budget-check\\results.json": "69345db53780f297ee74f52ac2a42ce043858c4f8beb943c48fff2f8ff7ed276",
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\orca-budget-check\\bounds\\budget.cpp": "4e3226ec98bb3311500503af4bc4b73c7aaffd7f0000ba9e49c09c326aede1bc",
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\orca-budget-check\\bounds\\dg2.stdout": "a8c9a53a5ac8ef6f0a207067acb9185a59b25e724701d9ec0dd5b16fff1aab31",
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\orca-budget-check\\bounds\\l0.stdout": "caf7898882741e41f9c8013c62d82dfb0031a627fca1c92ef30b90c28f16c3dd",
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\orca-budget-check\\bounds-cxx20\\budget.cpp": "4e3226ec98bb3311500503af4bc4b73c7aaffd7f0000ba9e49c09c326aede1bc",
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\orca-budget-check\\bounds-cxx20\\dg2.stdout": "a8c9a53a5ac8ef6f0a207067acb9185a59b25e724701d9ec0dd5b16fff1aab31",
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\orca-budget-check\\bounds-cxx20\\l0.stdout": "caf7898882741e41f9c8013c62d82dfb0031a627fca1c92ef30b90c28f16c3dd"
+      },
+      "orca-budget-build": {
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\orca-budget-build\\build.json": "68c893f55d1cebcb53de3dccc2ccc84d5d6d12107e0f693efe0e6b62097a8a80",
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\orca-budget-build\\build.py": "8e339ba58ac865311184a2aee9b5df52e59c31ec42fc0f5f20214abd309edeca",
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\orca-budget-build\\compile.log": "a03ee30c933b0cb41030211ad6a481fdcfcc2d9e9121317977c1ff640315c531",
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\orca-budget-build\\compile.rsp": "6a6d8d56b1bcbf023b6dde58984bace3ff93d86efc499b99de89830cd80abda4",
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\orca-budget-build\\entry-current.cpp": "803d2775e3d8066c4f8e1275c8cda908a9488ebe9b0ebc7a0bca757ec96ac501",
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\orca-budget-build\\entry-parent.cpp": "f824bdca65d5336eb722690504c934ed6c5ed1178a14a30d038eb883dcd1596a",
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\orca-budget-build\\entry-source.cpp": "f824bdca65d5336eb722690504c934ed6c5ed1178a14a30d038eb883dcd1596a",
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\orca-budget-build\\entry.cpp": "9284c13fdf0d9577c01b7c71bdce65e7bfc38a4a6574497270f5fb009d11d33e",
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\orca-budget-build\\link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\orca-budget-build\\link.rsp": "f8518fc223ac1f0afb484e594c7fadb42f5788fbc89b214a2d58b5e4f581a048"
+      },
+      "draft-cap-screen": {
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\draft-cap-screen\\0-A0.protocol": "012e4ed46758b2f62870d70cd57a581dcefa14d98a25b80c0d6d447577de3074",
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\draft-cap-screen\\0-A0.stderr": "24eabaf1c04c3b40de9894f0019075250e64305681f8b28423fba2e7318d460e",
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\draft-cap-screen\\0-A1.protocol": "e49a8126a4a058849736a00f05fb0ac62fe320ada0d9c8fb0bd05ace9a0c8fd5",
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\draft-cap-screen\\0-A1.stderr": "4234c32a6611ae9be04edad750494826169b56dcea37e105bd2e176d91c4beb0",
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\draft-cap-screen\\0-B.protocol": "cb178c967d8d994c8398a598786bfe989dd9ac9779bbf3997a6da76e758d59b0",
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\draft-cap-screen\\0-B.stderr": "6c208deb59d52ed55230a0f383b109ac6d2536a46723500fe982cfcd00483718",
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\draft-cap-screen\\bench_tune.py": "f0a27c811668bbc06fb139dec2f2e9e505df9d0ca5905320bad77922d08f879e",
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\draft-cap-screen\\results.json": "29c4f26cc813629c1bcc8d8b8d0413ae842bd390b3484c7a46a6172ce4fbc116"
+      },
+      "orca-draft-cap-build": {
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\orca-draft-cap-build\\build.json": "b6f869f4c6bb62b01ac6b743aad348980105891161b6f25c39e8c6e18874d9ac",
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\orca-draft-cap-build\\build.py": "9ecc35b859ab9dc3a83b34655b35313b6a1c501d1a98a4652ddf0bbd6043b9ac",
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\orca-draft-cap-build\\compile.log": "674afe48486eb992bc7c53251f2096a2f6225de255b08585a9e025dfdf21e7a1",
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\orca-draft-cap-build\\compile.rsp": "6a6d8d56b1bcbf023b6dde58984bace3ff93d86efc499b99de89830cd80abda4",
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\orca-draft-cap-build\\entry-parent.cpp": "f824bdca65d5336eb722690504c934ed6c5ed1178a14a30d038eb883dcd1596a",
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\orca-draft-cap-build\\entry-source.cpp": "f824bdca65d5336eb722690504c934ed6c5ed1178a14a30d038eb883dcd1596a",
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\orca-draft-cap-build\\entry.cpp": "bf5e41c2f2b9deb87f6e66577d7a8c3cf4362a92cbe0d5471ea7910659b5eb3f",
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\orca-draft-cap-build\\link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\orca-draft-cap-build\\link.rsp": "0c05f028bb42834463f9f4eb1f8c66847c22ffc50ff73bd14e6fb9485ec685f1"
+      }
+    }
+  },
+  "cost_window_draft_cap_screen": {
+    "adopted": false,
+    "comparisons": [
+      {
+        "case": "Short",
+        "median_ms_per_token": [
+          26.525714285714287,
+          26.11,
+          26.18
+        ],
+        "baseline": 26.352290223052723,
+        "candidate": 26.11,
+        "throughput_change_pct": 0.9279594908185418,
+        "baseline_drift_pct": -1.3033175355450233,
+        "passes_1pct": false
+      },
+      {
+        "case": "Code2K",
+        "median_ms_per_token": [
+          29.803125,
+          30.0703125,
+          29.8140625
+        ],
+        "baseline": 29.80859324834556,
+        "candidate": 30.0703125,
+        "throughput_change_pct": -0.870357604878369,
+        "baseline_drift_pct": 0.036699171647258666,
+        "passes_1pct": false
+      },
+      {
+        "case": "Prose2K",
+        "median_ms_per_token": [
+          32.040625,
+          32.496875,
+          32.090625
+        ],
+        "baseline": 32.06561525435969,
+        "candidate": 32.496875,
+        "throughput_change_pct": -1.3270806674189783,
+        "baseline_drift_pct": 0.1560518872525174,
+        "passes_1pct": false
+      },
+      {
+        "case": "Long8K",
+        "median_ms_per_token": [
+          35.54375,
+          36.04609375,
+          35.53203125
+        ],
+        "baseline": 35.53789014196239,
+        "candidate": 36.04609375,
+        "throughput_change_pct": -1.4098715149616026,
+        "baseline_drift_pct": -0.03296993142254401,
+        "passes_1pct": false
+      }
+    ],
+    "geometric_mean_throughput_change_pct": -0.6743054464129594,
+    "stable_baselines": true,
+    "passes": false,
+    "reason": "Did not meet the current cumulative-0.5 baseline adoption gate; no cost-policy code or default added to the runtime adapter.",
+    "source": "G:\\GitHub\\Strata\\build-deepinfer-next-20261102\\prepare_draft_cap.py",
+    "source_sha256": "b8d377369b4171bedd0dbe201e1e03bfd7ab68153541c589ba349e66132bd8b0"
+  },
+  "mtp_window_cap_current_budget_baseline": {
+    "adopted": false,
+    "production_changed": false,
+    "reason": "Four-case geometric mean below1%; Short and Prose exceed2% regression.",
+    "baseline_exe": "build-orca-mtp-budget-20261102\\strata.exe",
+    "baseline_exe_sha256": "ed9a7c7525464375b812b2ebc3542f707c326e411d27882b075a1fa2206d5d8b",
+    "config_sha256_unchanged": "102adb6093592ebaf373970c096e23e14b92c18063f9c105d149ef483463a4df",
+    "cumulative_confidence_floor": 0.5,
+    "remaining_budget_pruning": true,
+    "verifier_capacity": 6,
+    "mtp_max_baseline": 4,
+    "mtp_max_candidate": 3,
+    "expert_slots": 5771,
+    "lookup": 3,
+    "prompt_cache_mib": 128,
+    "full_draft_vocab": 248320,
+    "kv": "fp16",
+    "max_output_tokens": 128,
+    "warmup_per_arm_case": 3,
+    "retained_per_arm_case": 3,
+    "arms": [
+      "A0",
+      "B",
+      "A1"
+    ],
+    "gate": {
+      "four_case_geomean_min_pct": 1,
+      "max_abs_baseline_drift_pct": 3,
+      "max_scene_regression_pct": 2,
+      "exact_outputs_required": true,
+      "independent_confirmation_required": true
+    },
+    "comparisons": [
+      {
+        "case": "Short",
+        "median_ms_per_token": [
+          27.187142857142856,
+          27.994285714285713,
+          27.220000000000002
+        ],
+        "baseline": 27.203566467862785,
+        "candidate": 27.994285714285713,
+        "throughput_change_pct": -2.824573752276227,
+        "baseline_drift_pct": 0.12085544637696621,
+        "passes_1pct": false
+      },
+      {
+        "case": "Code2K",
+        "median_ms_per_token": [
+          31.178125,
+          30.62578125,
+          30.640625
+        ],
+        "baseline": 30.908206617792064,
+        "candidate": 30.62578125,
+        "throughput_change_pct": 0.922181757541507,
+        "baseline_drift_pct": -1.7239651197754835,
+        "passes_1pct": false
+      },
+      {
+        "case": "Prose2K",
+        "median_ms_per_token": [
+          33.15546875,
+          34.49765625,
+          33.25859375
+        ],
+        "baseline": 33.206991217920816,
+        "candidate": 34.49765625,
+        "throughput_change_pct": -3.741312229230598,
+        "baseline_drift_pct": 0.3110346615141868,
+        "passes_1pct": false
+      },
+      {
+        "case": "Long8K",
+        "median_ms_per_token": [
+          36.21328125,
+          36.8046875,
+          36.06875
+        ],
+        "baseline": 36.14094337570531,
+        "candidate": 36.8046875,
+        "throughput_change_pct": -1.803422795791132,
+        "baseline_drift_pct": -0.39911116864065344,
+        "passes_1pct": false
+      }
+    ],
+    "geometric_mean_throughput_change_pct": -1.8772202497342683,
+    "passes_adoption_gate": false,
+    "independent_confirmation_run": false,
+    "exact_requests": 72,
+    "exact_output_tokens": 8172,
+    "results": "build-deepinfer-next-20261102\\cap3-budget-screen\\results.json",
+    "results_sha256": "92a08cdfe9ad42442519debcc7fd2e373c7339b54820d042b605c4408eeec199",
+    "script": "build-deepinfer-next-20261102/bench_cap.py",
+    "script_sha256": "e39612d3042e402464c6e38b147acc9375cb0085d4272585a1e58fabca8d93da",
+    "raw_protocol_audit": "build-deepinfer-next-20261102/audit_window.py",
+    "raw_protocol_audit_passed": true,
+    "phase_diagnostic": {
+      "diagnostic_only": true,
+      "results": "build-deepinfer-next-20261102\\budget-current-phase\\results.json",
+      "results_sha256": "5789abd4d6f8a58bf2baf9df51ae4eadf484cd207c2cbd8748460a3761d01261",
+      "requests": 9,
+      "output_tokens": 1152,
+      "raw_protocol_and_unprofiled_reference_audit_passed": true,
+      "auditor": "build-deepinfer-next-20261102/audit_budget_phase.py",
+      "auditor_sha256": "61d407ebfcc311d7d5d1d9d24eec6c6556c5b9b0ca65751faa6aea449e194ca5",
+      "retained_per_case": 2,
+      "warmup_per_case": 1,
+      "shares_pct": {
+        "Code2K": {
+          "verify": 83.31748085020038,
+          "draft": 13.810683305432963
+        },
+        "Prose2K": {
+          "verify": 83.23195900744889,
+          "draft": 13.817194097831763
+        },
+        "Long8K": {
+          "verify": 84.52373204911275,
+          "draft": 12.73645277452384
+        }
+      },
+      "limitation": "Host verify duration includes submission and waits; legacy host CPU/cache counters are zero on the device-plan/no-host path and cannot separate CPU, PCIe or GPU work. Profiling enabled; not an A/B speed measurement."
+    }
+  },
+  "expert_cache_decay_current_budget_baseline": {
+    "adopted": false,
+    "production_changed": false,
+    "reason": "Independent confirmation four-case geometric mean below the predeclared 1% minimum; keep adapt-decay0.5.",
+    "baseline_exe": "build-orca-mtp-budget-20261102/strata.exe",
+    "baseline_exe_sha256": "ed9a7c7525464375b812b2ebc3542f707c326e411d27882b075a1fa2206d5d8b",
+    "config_sha256_unchanged": "102adb6093592ebaf373970c096e23e14b92c18063f9c105d149ef483463a4df",
+    "decay_baseline": 0.5,
+    "decay_candidate": 0.9,
+    "cumulative_confidence": 0.5,
+    "remaining_budget_pruning": true,
+    "verifier_capacity": 6,
+    "mtp_max": 4,
+    "lookup": 3,
+    "expert_slots": 5771,
+    "full_draft_vocab": 248320,
+    "kv": "fp16",
+    "max_output_tokens": 128,
+    "prompt_cache_mib": 128,
+    "production_adapt_and_pcie_enabled": true,
+    "gate": {
+      "four_case_geomean_min_pct": 1,
+      "max_abs_baseline_drift_pct": 3,
+      "max_scene_regression_pct": 2,
+      "exact_outputs_required": true,
+      "independent_confirmation_required": true
+    },
+    "raw_protocol_audit": "build-deepinfer-next-20261102/audit_window.py",
+    "raw_protocol_audit_sha256": "69b59585162ae3aaddb5bbdc6b53b1ef27acecc738166f11c8fe7da543ed4c0a",
+    "limitation": "Repeated cached prompts and decode timing only. No additional functional sampling for this rejected parameter candidate.",
+    "screen": {
+      "results": "build-deepinfer-next-20261102\\decay090-budget-screen\\results.json",
+      "warmup_per_arm_case": 3,
+      "retained_per_arm_case": 3,
+      "comparisons": [
+        {
+          "case": "Short",
+          "median_ms_per_token": [
+            27.16,
+            25.814285714285713,
+            27.14857142857143
+          ],
+          "baseline": 27.154285113035108,
+          "candidate": 25.814285714285713,
+          "throughput_change_pct": 5.190921854590913,
+          "baseline_drift_pct": -0.042078687144953,
+          "passes_1pct": true
+        },
+        {
+          "case": "Code2K",
+          "median_ms_per_token": [
+            30.71171875,
+            30.6296875,
+            30.6375
+          ],
+          "baseline": 30.674586927995055,
+          "candidate": 30.6296875,
+          "throughput_change_pct": 0.14658794019708488,
+          "baseline_drift_pct": -0.24166263895601947,
+          "passes_1pct": false
+        },
+        {
+          "case": "Prose2K",
+          "median_ms_per_token": [
+            33.08984375,
+            33.475,
+            32.896875
+          ],
+          "baseline": 32.99321829729985,
+          "candidate": 33.475,
+          "throughput_change_pct": -1.4392283874537837,
+          "baseline_drift_pct": -0.5831660960925467,
+          "passes_1pct": false
+        },
+        {
+          "case": "Long8K",
+          "median_ms_per_token": [
+            36.36171875,
+            36.2765625,
+            36.4078125
+          ],
+          "baseline": 36.384758325811845,
+          "candidate": 36.2765625,
+          "throughput_change_pct": 0.29825269638446006,
+          "baseline_drift_pct": 0.12676449734652095,
+          "passes_1pct": false
+        }
+      ],
+      "geometric_mean_throughput_change_pct": 1.0189779090086226,
+      "stable_baselines": true,
+      "passes_numeric_gate": true,
+      "exact_requests": 72,
+      "exact_output_tokens": 8172,
+      "raw_protocol_audit_passed": true,
+      "artifacts_sha256": {
+        "build-deepinfer-next-20261102\\decay090-budget-screen\\0-A0.protocol": "b4c21ad341abe0dd4a71c8ac37fd31f5465761f0c87f3f64763c06f46e7b6157",
+        "build-deepinfer-next-20261102\\decay090-budget-screen\\0-A0.stderr": "4a5d93d8b6cdcace93a33b5cce0aaf8c5b61e3bfa6509c97e2daf61294a071cb",
+        "build-deepinfer-next-20261102\\decay090-budget-screen\\0-A1.protocol": "a55f2fd51592cdabc8630a979eab690bbc6be1f45bd3b160f0187ed92b57e537",
+        "build-deepinfer-next-20261102\\decay090-budget-screen\\0-A1.stderr": "911925d668af36fcf9b8ed0a8ad00bee9692a8a2e9307cb3d689194ce42bf592",
+        "build-deepinfer-next-20261102\\decay090-budget-screen\\0-B.protocol": "c834b1d215ace7ec1bfb0ab213ba1fce5d861a7f0f9a69b6ec34d01247982c4c",
+        "build-deepinfer-next-20261102\\decay090-budget-screen\\0-B.stderr": "a089c0fe7e27630d70b5311b011cb839249f854bdc8575dd54da8879878a3ed8",
+        "build-deepinfer-next-20261102\\decay090-budget-screen\\bench_decay.py": "a6c9f018de08f9384febcfe2b07ec6d4906ff4bc73a6e70f0ba16eadd485b569",
+        "build-deepinfer-next-20261102\\decay090-budget-screen\\plan.json": "0ec568acaf6801f1c4e31f3001752d148df1332927a823584befa26e5e9e716f",
+        "build-deepinfer-next-20261102\\decay090-budget-screen\\results.json": "2f51b7083ca712bc70107a9daba1ac2847add128afba9f258184b543f855a812"
+      }
+    },
+    "independent_confirmation": {
+      "results": "build-deepinfer-next-20261102\\decay090-budget-confirm\\results.json",
+      "warmup_per_arm_case": 5,
+      "retained_per_arm_case": 5,
+      "comparisons": [
+        {
+          "case": "Short",
+          "median_ms_per_token": [
+            26.86857142857143,
+            25.694285714285712,
+            26.987142857142857
+          ],
+          "baseline": 26.927791879584262,
+          "candidate": 25.694285714285712,
+          "throughput_change_pct": 4.800702300172266,
+          "baseline_drift_pct": 0.44130157379838053,
+          "passes_1pct": true
+        },
+        {
+          "case": "Code2K",
+          "median_ms_per_token": [
+            30.56171875,
+            30.76953125,
+            30.56875
+          ],
+          "baseline": 30.56523417281573,
+          "candidate": 30.76953125,
+          "throughput_change_pct": -0.6639590168740939,
+          "baseline_drift_pct": 0.023006723075735813,
+          "passes_1pct": false
+        },
+        {
+          "case": "Prose2K",
+          "median_ms_per_token": [
+            32.92265625,
+            33.540625,
+            32.92890625
+          ],
+          "baseline": 32.925781101702455,
+          "candidate": 33.540625,
+          "throughput_change_pct": -1.8331319058531026,
+          "baseline_drift_pct": 0.018983887425538803,
+          "passes_1pct": false
+        },
+        {
+          "case": "Long8K",
+          "median_ms_per_token": [
+            35.9921875,
+            36.35390625,
+            35.95546875
+          ],
+          "baseline": 35.97382344011255,
+          "candidate": 36.35390625,
+          "throughput_change_pct": -1.0455074821222432,
+          "baseline_drift_pct": -0.10201866724549591,
+          "passes_1pct": false
+        }
+      ],
+      "geometric_mean_throughput_change_pct": 0.28081916453635003,
+      "stable_baselines": true,
+      "passes_numeric_gate": false,
+      "exact_requests": 120,
+      "exact_output_tokens": 13620,
+      "raw_protocol_audit_passed": true,
+      "artifacts_sha256": {
+        "build-deepinfer-next-20261102\\decay090-budget-confirm\\0-A0.protocol": "8d4e847059ec9760ad8bc837e92fec4a988fd13f0314a559c32f63ea77cb57c6",
+        "build-deepinfer-next-20261102\\decay090-budget-confirm\\0-A0.stderr": "e80793e5bc76fdf65c1cb16b8f9c048a3018f963322f454d4a5d5f62b3b577e2",
+        "build-deepinfer-next-20261102\\decay090-budget-confirm\\0-A1.protocol": "04840865f21f5a27b0b00ee081d84bdb07ea991463c0f1cdf9e0e9476219c5ac",
+        "build-deepinfer-next-20261102\\decay090-budget-confirm\\0-A1.stderr": "d36d7a2ec9a3e8a6a15cc368be43f2cfd61f255a6ce5c820c925f53cb01b5ba1",
+        "build-deepinfer-next-20261102\\decay090-budget-confirm\\0-B.protocol": "482890daeaf980afe55a3d49dd7ac77f363ae781e9b333485bd6b2960e036697",
+        "build-deepinfer-next-20261102\\decay090-budget-confirm\\0-B.stderr": "6de2c02ce9083d5c3695892f677332829b6ab328667e751b8a027c724d86119b",
+        "build-deepinfer-next-20261102\\decay090-budget-confirm\\bench_decay.py": "a6c9f018de08f9384febcfe2b07ec6d4906ff4bc73a6e70f0ba16eadd485b569",
+        "build-deepinfer-next-20261102\\decay090-budget-confirm\\results.json": "e8f99b6f9652cda463a18d29836b39cee10ce74d12354c9ce76d6ba4ce7ad18e"
+      }
+    }
+  },
+  "committed_prefix_cache_heat_current_budget_baseline": {
+    "adopted": false,
+    "production_changed": false,
+    "reason": "Two-case pilot geometric mean below predeclared 1% advance threshold; stop this candidate without four-case screen or confirmation.",
+    "hypothesis": "Score expert-cache heat only for committed input rows; discarded drafts still represent real expert work and may predict future demand.",
+    "baseline_exe": "build-orca-mtp-budget-20261102\\strata.exe",
+    "baseline_exe_sha256": "ed9a7c7525464375b812b2ebc3542f707c326e411d27882b075a1fa2206d5d8b",
+    "config_sha256_unchanged": "102adb6093592ebaf373970c096e23e14b92c18063f9c105d149ef483463a4df",
+    "candidate_exe": "build-deepinfer-next-20261102\\orca-routing-prefix-build\\strata.exe",
+    "candidate_exe_sha256": "594d3f958101d9eee316de8806acd338511d31882c00c414ee410045bf760ea2",
+    "cumulative_confidence": 0.5,
+    "remaining_budget_pruning": true,
+    "adapt_decay": 0.5,
+    "expert_slots": 5771,
+    "full_draft_vocab": 248320,
+    "kv": "fp16",
+    "verifier_capacity": 6,
+    "mtp_max": 4,
+    "lookup": 3,
+    "production_adapt_and_pcie_enabled": true,
+    "implementation": "Private host-only count_routing prefix uses existing h_commit_[0] with bounds checks; serve-loop routing/adapt launch after successful commit. No fields, GPU kernels, new readbacks or canonical runtime changes. DG2 keeps original policy and call order.",
+    "build_scope": "Only frozen production host entry and verifier objects rebuilt; original precise numerical libraries and GPU images reused.",
+    "compiled_actual_count_method_checks": {
+      "l0_prefix_and_boundary_cases": 23,
+      "dg2_prefix_and_boundary_cases": 23,
+      "disabled_collection_and_null_usage_passed": true
+    },
+    "predeclared_plan": {
+      "candidate": "Committed-prefix-only cache heat",
+      "baseline": "budget EXE + cumulative0.5",
+      "gate": {
+        "four_case_geomean_min_pct": 1,
+        "max_abs_baseline_drift_pct": 3,
+        "max_scene_regression_pct": 2,
+        "exact_outputs_required": true,
+        "independent_confirmation_required": true
+      },
+      "production_changed": false,
+      "pilot": {
+        "cases": [
+          "Code2K",
+          "Prose2K"
+        ],
+        "warmup": 3,
+        "retained": 3,
+        "max_new_tokens": 128,
+        "advance_geomean_min_pct": 1,
+        "max_scene_regression_pct": 2,
+        "max_abs_baseline_drift_pct": 3,
+        "full_four_case_screen_and_independent_confirmation_required_for_adoption": true
+      }
+    },
+    "build_evidence_sha256": {
+      "build-deepinfer-next-20261102\\orca-routing-prefix-build\\build.json": "a7f38672aa74f970473767164a3959ba3583cf6db9332399a503eaec31c8e821",
+      "build-deepinfer-next-20261102\\orca-routing-prefix-build\\build.py": "05e5c0ba072777369c1e4ea3b0cf46b251f4266ebc83ccccdb18b5954348b689",
+      "build-deepinfer-next-20261102\\orca-routing-prefix-build\\plan.json": "567a00019ca366031e025bca62f7ecff9cfe17a3ee1ac6c9ac7f937206c61b67",
+      "build-deepinfer-next-20261102\\orca-routing-prefix-build\\routing-check.cpp": "db09e52c18206a0056cfd7df5457b2c9f1eeb6893b57fd0b5965f560a72f87b4",
+      "build-deepinfer-next-20261102\\orca-routing-prefix-build\\entry.cpp": "82d77d561fdf6c769a271fa52c116c4079fc2d374f1367cd49e0978a81b28cd3",
+      "build-deepinfer-next-20261102\\orca-routing-prefix-build\\verify.cpp": "ff44854e8c0f0d2abd7c4a05aae24580e59bfa7cb37f362177f784ecd154803e"
+    },
+    "transform": "build-deepinfer-next-20261102/prepare_routing_prefix.py",
+    "transform_sha256": "d3336b4468b35db5565a3adee91f686d2fd664bcc31f7224480a6611db2cd289",
+    "raw_protocol_auditor": "build-deepinfer-next-20261102/audit_window.py",
+    "raw_protocol_auditor_sha256": "69b59585162ae3aaddb5bbdc6b53b1ef27acecc738166f11c8fe7da543ed4c0a",
+    "functional": {
+      "max_output_tokens": 32,
+      "exact_requests": 24,
+      "exact_output_tokens": 768,
+      "raw_protocol_audit_passed": true,
+      "actual_sampling_and_greedy_reset_verified": true,
+      "routing_audits": {
+        "serial": {
+          "windows": 210,
+          "expected_rows_per_layer": 428,
+          "actual_rows_per_layer": [
+            428,
+            428,
+            428,
+            428,
+            428,
+            428,
+            428,
+            428,
+            428,
+            428,
+            428,
+            428,
+            428,
+            428,
+            428,
+            428,
+            428,
+            428,
+            428,
+            428,
+            428,
+            428,
+            428,
+            428,
+            428,
+            428,
+            428,
+            428,
+            428,
+            428,
+            428,
+            428,
+            428,
+            428,
+            428,
+            428,
+            428,
+            428,
+            428,
+            428,
+            428,
+            428,
+            428,
+            428,
+            428,
+            428,
+            428,
+            428
+          ],
+          "passed": true
+        },
+        "prefix": {
+          "windows": 210,
+          "expected_rows_per_layer": 384,
+          "actual_rows_per_layer": [
+            384,
+            384,
+            384,
+            384,
+            384,
+            384,
+            384,
+            384,
+            384,
+            384,
+            384,
+            384,
+            384,
+            384,
+            384,
+            384,
+            384,
+            384,
+            384,
+            384,
+            384,
+            384,
+            384,
+            384,
+            384,
+            384,
+            384,
+            384,
+            384,
+            384,
+            384,
+            384,
+            384,
+            384,
+            384,
+            384,
+            384,
+            384,
+            384,
+            384,
+            384,
+            384,
+            384,
+            384,
+            384,
+            384,
+            384,
+            384
+          ],
+          "passed": true
+        }
+      },
+      "artifacts_sha256": {
+        "build-deepinfer-next-20261102\\routing-prefix-functional\\0-prefix.protocol": "bfc17faece26ab89ef5473586b254534673687455cf65ebdfaa77438232aab34",
+        "build-deepinfer-next-20261102\\routing-prefix-functional\\0-prefix.routing": "cbdb0a35296c97b14ccba49cf805c3dd436d6a87d667aa0162f10d197ba8152a",
+        "build-deepinfer-next-20261102\\routing-prefix-functional\\0-prefix.stderr": "cad7be4fd4de7ccf7580b3421b99d7f064c3de2663da59e896523060b5142b94",
+        "build-deepinfer-next-20261102\\routing-prefix-functional\\0-serial.protocol": "b709b5e520c835eedc05c686653b6a67abf2c7e387218ee2f04b199b12084f5f",
+        "build-deepinfer-next-20261102\\routing-prefix-functional\\0-serial.routing": "39934f9a24621a4790309ad511316744ca49d09cdb50471dc2e8be991fe1417b",
+        "build-deepinfer-next-20261102\\routing-prefix-functional\\0-serial.stderr": "798d37f8cc6127bd0d2dfc555f891e00a6c2cfbe4c5e0f782816c829e587fb7d",
+        "build-deepinfer-next-20261102\\routing-prefix-functional\\bench_routing_prefix.py": "4976b726c60a3b4d7625c63464e77e1e6cab716940d4ea05a7a538d7f56acb95",
+        "build-deepinfer-next-20261102\\routing-prefix-functional\\results.json": "67b83021792a29abe0a78528388e267191b0da0e294f0395abe8d0ec8987807e"
+      }
+    },
+    "pilot": {
+      "max_output_tokens": 128,
+      "warmup_per_arm_case": 3,
+      "retained_per_arm_case": 3,
+      "prompt_cache_mib": 128,
+      "routing_trace_disabled": true,
+      "comparisons": [
+        {
+          "case": "Code2K",
+          "median_ms_per_token": [
+            31.0015625,
+            31.278125,
+            30.74765625
+          ],
+          "baseline": 30.874348364992102,
+          "candidate": 31.278125,
+          "throughput_change_pct": -1.2909234009644055,
+          "baseline_drift_pct": -0.8190111385514842,
+          "passes_1pct": false
+        },
+        {
+          "case": "Prose2K",
+          "median_ms_per_token": [
+            32.97578125,
+            33.734375,
+            33.1734375
+          ],
+          "baseline": 33.074461723670524,
+          "candidate": 33.734375,
+          "throughput_change_pct": -1.956204246645965,
+          "baseline_drift_pct": 0.59939823260442,
+          "passes_1pct": false
+        }
+      ],
+      "geometric_mean_throughput_change_pct": -1.6241262042464788,
+      "stable_baselines": true,
+      "passes_advance_gate": false,
+      "exact_requests": 36,
+      "exact_output_tokens": 4608,
+      "raw_protocol_audit_passed": true,
+      "artifacts_sha256": {
+        "build-deepinfer-next-20261102\\routing-prefix-pilot\\0-A0.protocol": "5084bbb00705c67f65f6020f51e6f4d60d7e09bef74bba3a2435e8a34612b703",
+        "build-deepinfer-next-20261102\\routing-prefix-pilot\\0-A0.stderr": "00122b910d5ba12acc5cc6702994abce7cb457720b88c55a67f0c426f0a9e618",
+        "build-deepinfer-next-20261102\\routing-prefix-pilot\\0-A1.protocol": "be258d59b727fd2c2bc728b73c1ed1ffe25d4a923f1ebeadb1b5bfefb06734a6",
+        "build-deepinfer-next-20261102\\routing-prefix-pilot\\0-A1.stderr": "26b0398598a4f479b21a09a899b7d1f7ce14eef0ef1fb332919131155334981c",
+        "build-deepinfer-next-20261102\\routing-prefix-pilot\\0-B.protocol": "34a43dc088c4e3f940509c59cc725474849bafb24241167be87c4846da70bd42",
+        "build-deepinfer-next-20261102\\routing-prefix-pilot\\0-B.stderr": "47f6007a4cb7bfada806b494f00fbde7c97161f66cabad4bb4d96fe3b4a2ffe7",
+        "build-deepinfer-next-20261102\\routing-prefix-pilot\\bench_routing_prefix.py": "4976b726c60a3b4d7625c63464e77e1e6cab716940d4ea05a7a538d7f56acb95",
+        "build-deepinfer-next-20261102\\routing-prefix-pilot\\results.json": "e669b275f9c696f353b685c612629b5cc662933ff0324eaf5179baffa18b2785"
+      }
+    },
+    "full_four_case_screen_run": false,
+    "independent_confirmation_run": false,
+    "limitation": "Same repeated prompts and decode time only; reduction in routing-score rows does not establish reduced GPU work or faster generation."
+  },
+  "expert_cache_update_cadence_current_budget_baseline": {
+    "adopted": false,
+    "production_changed": false,
+    "reason": "Valid Short comparison exceeds2% regression; full screen Code2K and Long8K baseline drift exceeds3%. Do not infer stable four-case gain from invalid timings.",
+    "baseline_exe": "build-orca-mtp-budget-20261102/strata.exe",
+    "baseline_exe_sha256": "ed9a7c7525464375b812b2ebc3542f707c326e411d27882b075a1fa2206d5d8b",
+    "config_sha256_unchanged": "102adb6093592ebaf373970c096e23e14b92c18063f9c105d149ef483463a4df",
+    "adapt_every_baseline": 1,
+    "adapt_every_candidate": 2,
+    "adapt_swaps": 32,
+    "adapt_decay": 0.5,
+    "cumulative_confidence": 0.5,
+    "remaining_budget_pruning": true,
+    "expert_slots": 5771,
+    "full_draft_vocab": 248320,
+    "kv": "fp16",
+    "verifier_capacity": 6,
+    "mtp_max": 4,
+    "lookup": 3,
+    "production_pcie_and_adapt_enabled": true,
+    "prompt_cache_mib": 128,
+    "max_output_tokens": 128,
+    "interpretation": "Cadence changes both update overhead/traffic and heat-memory time scale; no isolated attribution.",
+    "gate": {
+      "geomean_min_pct": 1,
+      "max_abs_baseline_drift_pct": 3,
+      "max_scene_regression_pct": 2,
+      "exact_outputs_required": true,
+      "full_four_case_and_independent_confirmation_required": true
+    },
+    "independent_confirmation_run": false,
+    "functional_sampling_run": false,
+    "raw_protocol_auditor": "build-deepinfer-next-20261102/audit_window.py",
+    "raw_protocol_auditor_sha256": "69b59585162ae3aaddb5bbdc6b53b1ef27acecc738166f11c8fe7da543ed4c0a",
+    "plans_sha256": {
+      "build-deepinfer-next-20261102\\cadence2-budget-plan.json": "d7879be54c91f6843f35f9b3f7651d0e45dc0b7a20e8715ea8ceb00c7db98df1",
+      "build-deepinfer-next-20261102\\cadence2-budget-full-plan.json": "d31d02f65e680f18bac722449a41873fbf13c991da9586c272e1127ee7410ddc"
+    },
+    "two_case_pilot": {
+      "comparisons": [
+        {
+          "case": "Code2K",
+          "median_ms_per_token": [
+            30.53125,
+            28.5359375,
+            30.634375
+          ],
+          "baseline": 30.58276903288435,
+          "candidate": 28.5359375,
+          "throughput_change_pct": 7.172820352877318,
+          "baseline_drift_pct": 0.3377686796315116,
+          "passes_1pct": true
+        },
+        {
+          "case": "Prose2K",
+          "median_ms_per_token": [
+            33.11171875,
+            31.24375,
+            33.409375
+          ],
+          "baseline": 33.26021389909093,
+          "candidate": 31.24375,
+          "throughput_change_pct": 6.453975272145396,
+          "baseline_drift_pct": 0.8989453318547502,
+          "passes_1pct": true
+        }
+      ],
+      "warmup_per_arm_case": 3,
+      "retained_per_arm_case": 3,
+      "raw_geometric_mean_throughput_change_pct": 6.812793090019342,
+      "geometric_mean_valid": true,
+      "excluded_timing_cases": [],
+      "passes_numeric_gate": true,
+      "exact_requests": 36,
+      "exact_output_tokens": 4608,
+      "raw_protocol_audit_passed": true,
+      "only_cadence_differs_verified": true,
+      "artifacts_sha256": {
+        "build-deepinfer-next-20261102\\cadence2-budget-pilot\\0-A0.protocol": "61534c65f74f1ea0d8ce2271181689bacc0f4285ecca6e2c5244260fa6a6be32",
+        "build-deepinfer-next-20261102\\cadence2-budget-pilot\\0-A0.stderr": "f351a1b647a2cfe14e670fd6de56097686d5233df3d4b20e5b8e30e037850e3b",
+        "build-deepinfer-next-20261102\\cadence2-budget-pilot\\0-A1.protocol": "8721a2ea103d589346cf71f6c1c5feb70131870a94c95e4642090b871f7b0c60",
+        "build-deepinfer-next-20261102\\cadence2-budget-pilot\\0-A1.stderr": "7612582d472cd9bf3638a377099aab6d600198590fd8aedae9aad73c7569055c",
+        "build-deepinfer-next-20261102\\cadence2-budget-pilot\\0-B.protocol": "077649f4921ddbbdb6fee469773f500363e1b8d60a26c087b13be25c3f2dc143",
+        "build-deepinfer-next-20261102\\cadence2-budget-pilot\\0-B.stderr": "60ad5bbb7161ba74d951fd6345918cad95f2b5562f374185ad196fa94a5ed0a5",
+        "build-deepinfer-next-20261102\\cadence2-budget-pilot\\bench_cadence.py": "7e430c4f54e1788d85d04948babb6837b5e68f5ec1a425ddc3abcfeb23c78771",
+        "build-deepinfer-next-20261102\\cadence2-budget-pilot\\results.json": "2f23b97b26684a9590f3456c6a7690542160642bbbd60aee1a66e76f21ef7688"
+      }
+    },
+    "four_case_screen": {
+      "comparisons": [
+        {
+          "case": "Short",
+          "median_ms_per_token": [
+            27.102857142857143,
+            29.340000000000003,
+            26.964285714285715
+          ],
+          "baseline": 27.033482640486213,
+          "candidate": 29.340000000000003,
+          "throughput_change_pct": -7.861340693639363,
+          "baseline_drift_pct": -0.51127978072949,
+          "passes_1pct": false
+        },
+        {
+          "case": "Code2K",
+          "median_ms_per_token": [
+            30.2890625,
+            31.15078125,
+            32.3359375
+          ],
+          "baseline": 31.295770192369346,
+          "candidate": 31.15078125,
+          "throughput_change_pct": 0.46544239518662156,
+          "baseline_drift_pct": 6.757802424555059,
+          "passes_1pct": false
+        },
+        {
+          "case": "Prose2K",
+          "median_ms_per_token": [
+            32.6796875,
+            33.32265625,
+            32.7125
+          ],
+          "baseline": 32.69608963383465,
+          "candidate": 33.32265625,
+          "throughput_change_pct": -1.8803021327729486,
+          "baseline_drift_pct": 0.1004064068850008,
+          "passes_1pct": false
+        },
+        {
+          "case": "Long8K",
+          "median_ms_per_token": [
+            38.6125,
+            36.778125,
+            36.29140625
+          ],
+          "baseline": 37.433967513851975,
+          "candidate": 36.778125,
+          "throughput_change_pct": 1.7832407548018514,
+          "baseline_drift_pct": -6.0112495953382865,
+          "passes_1pct": false
+        }
+      ],
+      "warmup_per_arm_case": 3,
+      "retained_per_arm_case": 3,
+      "raw_geometric_mean_throughput_change_pct": -1.9443175577962823,
+      "geometric_mean_valid": false,
+      "excluded_timing_cases": [
+        "Code2K",
+        "Long8K"
+      ],
+      "passes_numeric_gate": false,
+      "exact_requests": 72,
+      "exact_output_tokens": 8172,
+      "raw_protocol_audit_passed": true,
+      "only_cadence_differs_verified": true,
+      "artifacts_sha256": {
+        "build-deepinfer-next-20261102\\cadence2-budget-screen\\0-A0.protocol": "b4aae7136da2ef2c5f34e090b8c9962ad5fa5d317adbf05b5ff74deb5991360c",
+        "build-deepinfer-next-20261102\\cadence2-budget-screen\\0-A0.stderr": "7c54247b7f82ba8474128ba39ff9015cc533862afde02738b53ebc2187808b6a",
+        "build-deepinfer-next-20261102\\cadence2-budget-screen\\0-A1.protocol": "58e7b77f9468ccd4b49b99923a4fbed6cc52fe2738ca4b5bce84c1f26c4372a1",
+        "build-deepinfer-next-20261102\\cadence2-budget-screen\\0-A1.stderr": "a81b6075f4577a9852438e463dbf37f6c60786acd622532f93273563194cbf6b",
+        "build-deepinfer-next-20261102\\cadence2-budget-screen\\0-B.protocol": "43679e0a7f98f52987f7f04b81e0ee228f57f7d3843346df16fe4ae9e47792de",
+        "build-deepinfer-next-20261102\\cadence2-budget-screen\\0-B.stderr": "3f6bdc75aca4471c3e3ce566f2a6113530892529b97e29feb1ee72504177ac2d",
+        "build-deepinfer-next-20261102\\cadence2-budget-screen\\bench_cadence.py": "7e430c4f54e1788d85d04948babb6837b5e68f5ec1a425ddc3abcfeb23c78771",
+        "build-deepinfer-next-20261102\\cadence2-budget-screen\\results.json": "fe7fe4080ef1d2301e67ce3ef59235169538395b37f893402b7132c5866492f1"
+      }
+    }
+  },
+  "expert_cache_swap_limit_current_budget_baseline": {
+    "adopted": false,
+    "production_changed": false,
+    "reason": "Both pilot scenes exceed predeclared3% baseline drift limit. Raw positive differences are not stable gain evidence; no valid pilot geomean.",
+    "baseline_exe": "build-orca-mtp-budget-20261102/strata.exe",
+    "baseline_exe_sha256": "ed9a7c7525464375b812b2ebc3542f707c326e411d27882b075a1fa2206d5d8b",
+    "config_sha256_unchanged": "102adb6093592ebaf373970c096e23e14b92c18063f9c105d149ef483463a4df",
+    "adapt_swaps_baseline": 32,
+    "adapt_swaps_candidate": 16,
+    "adapt_every": 1,
+    "adapt_decay": 0.5,
+    "cumulative_confidence": 0.5,
+    "remaining_budget_pruning": true,
+    "expert_slots": 5771,
+    "full_draft_vocab": 248320,
+    "kv": "fp16",
+    "verifier_capacity": 6,
+    "mtp_max": 4,
+    "lookup": 3,
+    "production_pcie_and_adapt_enabled": true,
+    "prompt_cache_mib": 128,
+    "max_output_tokens": 128,
+    "controls": "Same executable, environment, GPU images and arguments; only --adapt-swaps changes32 to16. This is an upper limit, not measured transfer count or bytes.",
+    "gate": {
+      "geomean_min_pct": 1,
+      "max_abs_baseline_drift_pct": 3,
+      "max_scene_regression_pct": 2,
+      "exact_outputs_required": true,
+      "full_four_case_and_independent_confirmation_required": true
+    },
+    "plans_sha256": {
+      "build-deepinfer-next-20261102\\swaps16-budget-plan.json": "07362783d541736f59f1933c35b66cf9c472f036757ac01d1017cb5d14a7ac61",
+      "build-deepinfer-next-20261102\\swaps16-budget-full-plan.json": "76720c23e60e72b625d9726c50f10dd8c87ce8497068ede74bcbe035587c6aac"
+    },
+    "pilot": {
+      "comparisons": [
+        {
+          "case": "Code2K",
+          "median_ms_per_token": [
+            31.42109375,
+            29.1875,
+            33.3890625
+          ],
+          "baseline": 32.39013527352286,
+          "candidate": 29.1875,
+          "throughput_change_pct": 10.972626204789226,
+          "baseline_drift_pct": 6.263208931102215,
+          "passes_1pct": false
+        },
+        {
+          "case": "Prose2K",
+          "median_ms_per_token": [
+            35.2734375,
+            31.62109375,
+            33.64296875
+          ],
+          "baseline": 34.448558105058304,
+          "candidate": 31.62109375,
+          "throughput_change_pct": 8.941703210561158,
+          "baseline_drift_pct": -4.62236987818383,
+          "passes_1pct": false
+        }
+      ],
+      "warmup_per_arm_case": 3,
+      "retained_per_arm_case": 3,
+      "raw_geometric_mean_throughput_change_pct": 9.952475681535656,
+      "geometric_mean_valid": false,
+      "excluded_timing_cases": [
+        "Code2K",
+        "Prose2K"
+      ],
+      "passes_advance_gate": false,
+      "exact_requests": 36,
+      "exact_output_tokens": 4608,
+      "raw_protocol_audit_passed": true,
+      "only_swap_limit_differs_verified": true,
+      "artifacts_sha256": {
+        "build-deepinfer-next-20261102\\swaps16-budget-pilot\\0-A0.protocol": "f6d1a15eab33a6a5b63cfce3b12bd052a711afc74d4e8cec30a11e862ec910a0",
+        "build-deepinfer-next-20261102\\swaps16-budget-pilot\\0-A0.stderr": "5e2274cfb2bbb6a7f5d5d05fac1b4db963bfdc359711668238384754faa4b305",
+        "build-deepinfer-next-20261102\\swaps16-budget-pilot\\0-A1.protocol": "091a3ba4a7e1f9db489b4802aca5407510acd87542655398c7598dc09a228355",
+        "build-deepinfer-next-20261102\\swaps16-budget-pilot\\0-A1.stderr": "3a1e803cce16e2c628e8d09ee0fa60147e89247d3f68580d526ce66217d71c1d",
+        "build-deepinfer-next-20261102\\swaps16-budget-pilot\\0-B.protocol": "d9526ad28b0a294378009a85b1040683130a6c8960cfd8b67dbc5ba449519701",
+        "build-deepinfer-next-20261102\\swaps16-budget-pilot\\0-B.stderr": "51040b10f9c4d552a998294d94c5ab0e161f9d6c9ebfa38f7edb089916b62b7e",
+        "build-deepinfer-next-20261102\\swaps16-budget-pilot\\bench_swaps.py": "1f5d0b3d9aa4419821635b2ab2a433549ae0562b28ff272834192be56cba3cd7",
+        "build-deepinfer-next-20261102\\swaps16-budget-pilot\\results.json": "a75e7a1f4e738597a93a1bf541b5507e245e0e9848b2e42d6204fe67766824cc"
+      }
+    },
+    "full_four_case_screen_run": false,
+    "independent_confirmation_run": false,
+    "functional_sampling_run": false,
+    "six_warmup_plan_executed": false,
+    "raw_protocol_auditor": "build-deepinfer-next-20261102/audit_window.py",
+    "raw_protocol_auditor_sha256": "69b59585162ae3aaddb5bbdc6b53b1ef27acecc738166f11c8fe7da543ed4c0a",
+    "limitation": "No frequency, power or PCIe traffic sampling; timing drift cause unknown. No production source, executable or config change."
+  }
+}

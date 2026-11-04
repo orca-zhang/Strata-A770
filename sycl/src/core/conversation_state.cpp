@@ -359,7 +359,13 @@ bool conversation_snapshot_validate(const SavedConversation& image, const Sessio
 }
 
 ConversationRestore conversation_snapshot_restore(const SavedConversation& image, SessionState& ss,
-                                                   const ModelGeometry& g, const QsaState& draft, std::string& error) {
+                                                   const ModelGeometry& g, const QsaState& draft, std::string& error,
+                                                   const ConversationCheckpoint& running) {
+    if (&running != &image.live && std::none_of(image.checkpoints.begin(), image.checkpoints.end(),
+            [&](const auto& c) { return &c == &running; })) {
+        fail(error, "running checkpoint does not belong to snapshot");
+        return ConversationRestore::invalid;
+    }
     if (!conversation_snapshot_validate(image, ss, g, draft, error)) return ConversationRestore::invalid;
     if (!sync(error)) return ConversationRestore::transfer_failed;
     const int64_t upto = (int64_t) image.live.ids.size();
@@ -367,7 +373,12 @@ ConversationRestore conversation_snapshot_restore(const SavedConversation& image
         if (!conversation_kv_restore(image.kv[j], owned(ss, j), g, upto, true, error))
             return ConversationRestore::transfer_failed;
     if (!conversation_kv_restore(image.kv.back(), draft, g, upto, false, error) ||
-        !conversation_checkpoint_restore(image.live, ss, g, error)) return ConversationRestore::transfer_failed;
+        !conversation_checkpoint_restore(running, ss, g, error)) return ConversationRestore::transfer_failed;
     return ConversationRestore::restored;
+}
+
+ConversationRestore conversation_snapshot_restore(const SavedConversation& image, SessionState& ss,
+                                                   const ModelGeometry& g, const QsaState& draft, std::string& error) {
+    return conversation_snapshot_restore(image, ss, g, draft, error, image.live);
 }
 } // namespace strata::core

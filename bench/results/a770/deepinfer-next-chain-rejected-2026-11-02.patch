@@ -1,0 +1,36 @@
+--- a/sycl/src/core/mtp.cpp
++++ b/sycl/src/core/mtp.cpp
+@@ -68,9 +68,9 @@
+     const char* v = std::getenv("STRATA_QSA_Q8_TAIL");
+     return v && v[0] == '1';
+ }();
+-const bool g_chain_submit = [] {
++const int g_chain_submit = [] {
+     const char* v = std::getenv("STRATA_MTP_CHAIN_SUBMIT");
+-    return v && v[0] == '1';
++    return v && v[0] == '2' ? 2 : int(v && v[0] == '1');
+ }();
+ 
+ struct Bump {
+@@ -1245,7 +1245,8 @@
+     }
+     put(2 * max_t_ - 1, coupled_draft_cell(p, a, 0));   // p + a: draft 0's cell
+     const int max_steps = std::min(max_t_ - 1, max_drafts_);
+-    const bool chain_submit = g_chain_submit && !top2_on && min_p <= 0.0f && cumulative_min_p <= 0.0f;
++    const bool chain_submit = g_chain_submit && !top2_on &&
++        (g_chain_submit == 2 || (min_p <= 0.0f && cumulative_min_p <= 0.0f));
+     if (chain_submit) {
+         // All mapped metadata is ready before the first graph can read it.
+         for (int j = 1; j < max_steps; ++j) {
+@@ -1283,7 +1284,10 @@
+             }
+         }
+         cs_->wait_and_throw();
+-        const int n = std::max(1, max_steps);
++        // ponytail: mode 2 computes the full chain, then returns exactly the serial early-stop prefix.
++        // Extra rejected drafts cost GPU time; keep it opt-in until device-side skipping pays for itself.
++        const int n = std::max(1, std::min(max_steps, strata::spec::mtp_confidence_window(
++            max_steps + 1, h_prob_, min_p, cumulative_min_p)));
+         for (int j = 0; j < n; ++j) {
+             drafts[j] = h_out_[j];
+             if (probs) probs[j] = h_prob_[j];
