@@ -1,0 +1,183 @@
+{
+  "date": "2026-11-05",
+  "hardware": "Arc A770 16 GB; Xeon E5-2696 v4; Windows; driver32.0.101.9034; oneAPI2025.3",
+  "plan": {
+    "date": "2026-11-05",
+    "hardware": "Arc A770 16 GB; Xeon E5-2696 v4; Windows; driver32.0.101.9034; oneAPI2025.3",
+    "baseline": "Adopted U4N16/unmask/load4/genericM16 L0; same EXE/images/assets/config args",
+    "change": "Existing STRATA_PREFILL_FUSED_DEQUANT=1; baseline explicitly0; no arithmetic or kernel changes",
+    "baseline_config_sha256": "bfd231a662ac864c14ee08575e1899189f64f76e78b90b5b3ec8292fe9df084c",
+    "quality": "Entire256-target raw TSV must byte-match frozen U4. All full generation outputs match U4; speculative accepted/offered equal between arms by cycle.",
+    "performance": "Short23/16 initializer then interleaved Code2K/128 and Prose2K/128, three cycles, discard cycle0; median1/2. Forward old/new/old, independent reverse new/old/new only if forward passes.",
+    "gates": {
+      "each_case_prefill_gain_pct": 1,
+      "each_case_request_gain_pct": 0.5,
+      "absolute_outer_control_drift_pct": 3
+    },
+    "failure_policy": "Preserve all attempts. Reject stable no-gain candidate; repeat only a drift-rejected cohort with explicit plan and unchanged gates.",
+    "production_changed": false,
+    "scope": "First evaluate existing fallback switch. No new GEMV improvement claimed."
+  },
+  "raw_quality_tsv_byte_equal": true,
+  "full_outputs_equal": true,
+  "cohorts": {
+    "performance-forward-r1": {
+      "order": "forward",
+      "passes": true,
+      "metrics": {
+        "Code2K": {
+          "prompt_ms": {
+            "baseline": 15361.845390853925,
+            "candidate": 15176.0,
+            "throughput_change_pct": 1.2246006250258734,
+            "baseline_drift_pct": -0.15480933409219855
+          },
+          "decode_ms": {
+            "baseline": 4200.499570289229,
+            "candidate": 4192.75,
+            "throughput_change_pct": 0.18483263464861288,
+            "baseline_drift_pct": 0.09050635926259876
+          },
+          "total_ms": {
+            "baseline": 19562.347444069692,
+            "candidate": 19368.75,
+            "throughput_change_pct": 0.9995350452129959,
+            "baseline_drift_pct": -0.10218497012368655
+          },
+          "ttft_ms": {
+            "baseline": 15406.544155254369,
+            "candidate": 15220.112100010738,
+            "throughput_change_pct": 1.224905927227038,
+            "baseline_drift_pct": -0.1555967261337332
+          },
+          "request_ms": {
+            "baseline": 19564.222525350477,
+            "candidate": 19370.360200002324,
+            "throughput_change_pct": 1.0008194135085358,
+            "baseline_drift_pct": -0.10205442093094153
+          }
+        },
+        "Prose2K": {
+          "prompt_ms": {
+            "baseline": 14969.047175338183,
+            "candidate": 14566.05,
+            "throughput_change_pct": 2.766688122985861,
+            "baseline_drift_pct": 1.7337165073664451
+          },
+          "decode_ms": {
+            "baseline": 4234.0977633965895,
+            "candidate": 4205.549999999999,
+            "throughput_change_pct": 0.6788116511892595,
+            "baseline_drift_pct": 1.5625743799685843
+          },
+          "total_ms": {
+            "baseline": 19203.146108255285,
+            "candidate": 18771.6,
+            "throughput_change_pct": 2.298930875659444,
+            "baseline_drift_pct": 1.6959566440066798
+          },
+          "ttft_ms": {
+            "baseline": 15015.869161687035,
+            "candidate": 14612.895099970046,
+            "throughput_change_pct": 2.7576606754524224,
+            "baseline_drift_pct": 1.7289162203185438
+          },
+          "request_ms": {
+            "baseline": 19205.059417216504,
+            "candidate": 18773.712349968264,
+            "throughput_change_pct": 2.2976119970697706,
+            "baseline_drift_pct": 1.6951357656745936
+          }
+        }
+      },
+      "ready_ms": [
+        26110.424200014677,
+        26658.09659997467,
+        26395.545199979097
+      ]
+    },
+    "performance-reverse-r1": {
+      "order": "reverse",
+      "passes": false,
+      "metrics": {
+        "Code2K": {
+          "prompt_ms": {
+            "baseline": 15274.25,
+            "candidate": 15155.679045740577,
+            "throughput_change_pct": 0.7823532941122036,
+            "baseline_drift_pct": 0.8022391149533847
+          },
+          "decode_ms": {
+            "baseline": 4202.3,
+            "candidate": 4255.379215769142,
+            "throughput_change_pct": -1.2473439634344885,
+            "baseline_drift_pct": 0.6270479243770888
+          },
+          "total_ms": {
+            "baseline": 19476.550000000003,
+            "candidate": 19411.059518158712,
+            "throughput_change_pct": 0.3373874660475229,
+            "baseline_drift_pct": 0.7638068297879608
+          },
+          "ttft_ms": {
+            "baseline": 15318.776799977059,
+            "candidate": 15200.722341583401,
+            "throughput_change_pct": 0.7766371606611422,
+            "baseline_drift_pct": 0.8018063259657371
+          },
+          "request_ms": {
+            "baseline": 19478.146149980603,
+            "candidate": 19413.164209474584,
+            "throughput_change_pct": 0.3347313184231204,
+            "baseline_drift_pct": 0.765356374414039
+          }
+        },
+        "Prose2K": {
+          "prompt_ms": {
+            "baseline": 14866.35,
+            "candidate": 14631.023633362089,
+            "throughput_change_pct": 1.6084067153122161,
+            "baseline_drift_pct": 1.66949222626529
+          },
+          "decode_ms": {
+            "baseline": 4210.55,
+            "candidate": 4244.549870127573,
+            "throughput_change_pct": -0.8010241643491622,
+            "baseline_drift_pct": 1.6963649322879526
+          },
+          "total_ms": {
+            "baseline": 19076.9,
+            "candidate": 18875.573532213533,
+            "throughput_change_pct": 1.0665978834649925,
+            "baseline_drift_pct": 1.6755344722587218
+          },
+          "ttft_ms": {
+            "baseline": 14912.562600016827,
+            "candidate": 14677.573042983799,
+            "throughput_change_pct": 1.6010109869312394,
+            "baseline_drift_pct": 1.6701535007189738
+          },
+          "request_ms": {
+            "baseline": 19078.88544999878,
+            "candidate": 18877.33244400613,
+            "throughput_change_pct": 1.0676985564061825,
+            "baseline_drift_pct": 1.6753108089064828
+          }
+        }
+      },
+      "ready_ms": [
+        26312.936000002082,
+        26477.938399999402,
+        25810.639400035143
+      ]
+    }
+  },
+  "qualification": false,
+  "adopted": false,
+  "production_changed": false,
+  "primary_check": null,
+  "baseline_config_unchanged": true,
+  "retained_exe_and_images": "engine/u4n16-orca-l0-m16",
+  "experts": 9402,
+  "payload_bytes": 25994649600
+}

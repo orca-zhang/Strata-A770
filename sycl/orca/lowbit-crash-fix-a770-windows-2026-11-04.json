@@ -1,0 +1,413 @@
+{
+  "date": "2026-11-04",
+  "complete": true,
+  "production_executable_changed": false,
+  "hardware": "Intel Arc A770 16 GB; driver 32.0.101.9034; Xeon E5-2696 v4; Windows; oneAPI 2025.3",
+  "scope": "Legacy U2 Down real-model experiment; original inference arithmetic retained.",
+  "root_cause": "Default-constructed Verifier aliases the shared default queue twice, destroys the first alias, then waits through the dangling second alias during exception unwinding.",
+  "original_crash": {
+    "exit_code": 3221225477,
+    "wait_return_rva": "0x10d13b",
+    "queue_offset": "0x4f8",
+    "private_dump_sha256": "17f3c5bad5cb49cb79a297ae51f6ac9e972c30e2ef820f12bdf02215e3b08c70"
+  },
+  "cleanup_regression": {
+    "check-cleanup-original": {
+      "label": "check-cleanup-original",
+      "command": "\"G:\\GitHub\\Strata\\build-lowbit-model-crashfix-20261104\\bin\\verify-cleanup-original.exe\"",
+      "exit_code": 3221226505,
+      "seconds": 3.109661817550659
+    },
+    "check-cleanup": {
+      "label": "check-cleanup",
+      "command": "\"G:\\GitHub\\Strata\\build-lowbit-model-crashfix-20261104\\bin\\verify-cleanup.exe\"",
+      "exit_code": 0,
+      "seconds": 3.2142159938812256
+    }
+  },
+  "current_checkout_cleanup": {
+    "complete": true,
+    "reuses": [
+      "current-check-r1",
+      "current-check-r2"
+    ],
+    "commands": [
+      {
+        "label": "compile_verify_command",
+        "exit_code": 0,
+        "seconds": 28.308059453964233,
+        "command": "\"C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin\\icx.exe\" -IG:\\GitHub\\Strata\\third_party\\ggml -IG:\\GitHub\\Strata\\src\\core -IG:\\GitHub\\Strata\\build-sycl\\_deps\\strata_llamacpp-src\\ggml\\include /Ob2 /DNDEBUG /nologo /Gy -DSTRATA_HAS_LEVEL_ZERO_EVENTS=1 -I\"C:\\Program Files\\LevelZeroSDK\\1.33.1\\include\" /EHsc /O2 /MD -Qstd:c++20 -fsycl -fsycl-default-sub-group-size=32 -fsycl-device-code-split=per_kernel /fp:precise -DSTRATA_NATIVE_EXPERTS=1 -DSTRATA_SYCL_SERIAL_Q8_1=0 -D_USE_STD_VECTOR_ALGORITHMS=0 -Wno-deprecated-declarations -IG:\\GitHub\\Strata\\sycl\\include -IG:\\GitHub\\Strata\\include /c G:\\GitHub\\Strata\\sycl\\src\\core\\verify.cpp /FoG:\\GitHub\\Strata\\build-lowbit-model-crashfix-20261104\\current-check-r1\\verify.obj"
+      },
+      {
+        "label": "compile_cleanup_command",
+        "exit_code": 0,
+        "seconds": 21.145912885665894,
+        "command": "\"C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin\\icx.exe\" -IG:\\GitHub\\Strata\\third_party\\ggml -IG:\\GitHub\\Strata\\src\\core -IG:\\GitHub\\Strata\\build-sycl\\_deps\\strata_llamacpp-src\\ggml\\include /Ob2 /DNDEBUG /nologo /Gy -DSTRATA_HAS_LEVEL_ZERO_EVENTS=1 -I\"C:\\Program Files\\LevelZeroSDK\\1.33.1\\include\" /EHsc /O2 /MD -Qstd:c++20 -fsycl -fsycl-default-sub-group-size=32 -fsycl-device-code-split=per_kernel /fp:precise -DSTRATA_NATIVE_EXPERTS=1 -DSTRATA_SYCL_SERIAL_Q8_1=0 -D_USE_STD_VECTOR_ALGORITHMS=0 -Wno-deprecated-declarations -IG:\\GitHub\\Strata\\sycl\\include -IG:\\GitHub\\Strata\\include /c G:\\GitHub\\Strata\\sycl\\src\\core\\verify_cleanup_test.cpp /FoG:\\GitHub\\Strata\\build-lowbit-model-crashfix-20261104\\current-check-r1\\verify_cleanup_test.obj"
+      },
+      {
+        "label": "link",
+        "command": "\"C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin\\icx.exe\" /nologo G:\\GitHub\\Strata\\build-lowbit-model-crashfix-20261104\\current-check-r1\\verify.obj G:\\GitHub\\Strata\\build-lowbit-model-crashfix-20261104\\current-check-r1\\verify_cleanup_test.obj G:\\GitHub\\Strata\\build-sycl-a770-deepopt\\strata_engine.lib G:\\GitHub\\Strata\\build-sycl-a770-deepopt\\strata_kernels.lib G:\\GitHub\\Strata\\build-sycl-a770-deepopt\\strata_core.lib G:\\GitHub\\Strata\\build-sycl-a770-deepopt\\strata_kernels_cpu.lib G:\\GitHub\\Strata\\build-sycl-a770-deepopt\\strata_spec.lib G:\\GitHub\\Strata\\build-sycl-a770-deepopt\\ggml\\src\\ggml-cpu.lib G:\\GitHub\\Strata\\build-sycl-a770-deepopt\\ggml\\src\\ggml-base.lib -fsycl -fsycl-device-code-split=per_kernel \"C:\\Program Files\\LevelZeroSDK\\1.33.1\\lib\\ze_loader.lib\" advapi32.lib /link /OPT:REF /INCREMENTAL:NO /OUT:G:\\GitHub\\Strata\\build-lowbit-model-crashfix-20261104\\current-check-r3\\verify-cleanup-current.exe",
+        "exit_code": 0,
+        "seconds": 64.72809958457947
+      },
+      {
+        "label": "check",
+        "command": "\"G:\\GitHub\\Strata\\build-lowbit-model-crashfix-20261104\\current-check-r3\\verify-cleanup-current.exe\"",
+        "exit_code": 0,
+        "seconds": 5.323755264282227
+      }
+    ],
+    "sha256": {
+      "sycl/include/strata/core/verify.hpp": "852fa36fb7d6e04fc38ad3edfff694339c327db79ae76989ca2a960d728a4384",
+      "sycl/src/core/verify.cpp": "18cec352a2dadb7839c5c41e2218ac8829ba16f73ea2e7acdc3596b4e39a71c8",
+      "sycl/src/core/verify_cleanup_test.cpp": "205ef815a97daa7fea78034de400c68cb0b0bfe2aef08ce6d300a3e69dfff00d"
+    },
+    "object_sha256": {
+      "verify.obj": "ec00dbc8c77b6d183bdb75024eb12275fe388809fd7653e43c0114314f4d350f",
+      "verify_cleanup_test.obj": "319f60cb13e5ddf872cc7553c9f69a3dd1aacc33f1a1ca30aa4562cadcb9e94a"
+    },
+    "library_sha256": {
+      "build-sycl-a770-deepopt\\strata_engine.lib": "236efcc329878b64be46b788ea3cd5f123f73f3df4642f2a44ebdba7c9f0b63b",
+      "build-sycl-a770-deepopt\\strata_kernels.lib": "c379755527005873f5bf79bd8e53a03aaf91497cbad35ba9125b0c950254a6cf",
+      "build-sycl-a770-deepopt\\strata_core.lib": "3335819abce4e396cccce90a53731ab877795af85feca5482f6694a58d2819d3",
+      "build-sycl-a770-deepopt\\strata_kernels_cpu.lib": "c7ad04edca2706683ce1b85fa6b6f66a1fdba6cf8d07e6b08df3a709a7ff26e7",
+      "build-sycl-a770-deepopt\\strata_spec.lib": "03475d79ee14cfe0691ac1998b0008d3dfc26b7663711135f281c2d69a940323",
+      "build-sycl-a770-deepopt\\ggml\\src\\ggml-cpu.lib": "ebcdb5d44457131a2f5acef1746bc91e9ad63d821d8966f1c3440401cb1cbf2f",
+      "build-sycl-a770-deepopt\\ggml\\src\\ggml-base.lib": "d9ce0f8565aa97a2d1d56cfe5c490dcb7841c032382522e8cad3c9794e24a98d"
+    },
+    "exe_sha256": "d97ebae2618612dc06d9e0fec4037b1d5a0b9ae860acc870f90873f67e14caf0"
+  },
+  "injected_nonfinite": {
+    "exit_code": 1,
+    "error": "RuntimeError('engine failed: ERR prefill U2 Down: nonfinite quantization input')",
+    "watchdog_fired": false,
+    "private_dump_created": false
+  },
+  "regression": {
+    "complete": true,
+    "production_exe_changed": false,
+    "comparison": {
+      "cases": {
+        "Code2K": {
+          "tokens": 128,
+          "baseline_ppl": 1.4320345944621713,
+          "candidate_ppl": 1.4394959902111735,
+          "ppl_change_pct": 0.5210346019471935,
+          "top1_agreement": 0.9765625
+        },
+        "Prose2K": {
+          "tokens": 128,
+          "baseline_ppl": 1.463910883668175,
+          "candidate_ppl": 1.469813888775171,
+          "ppl_change_pct": 0.40323527701390666,
+          "top1_agreement": 0.96875
+        }
+      },
+      "targets": 256,
+      "aggregate_ppl_change_pct": 0.46211767342036286
+    },
+    "quality_processes": 2,
+    "quality_long_requests": 4,
+    "generation_processes": 2,
+    "generation_long_requests": 4,
+    "scores_identical_to_healthy_original": true,
+    "raw_scores_identical_across_processes": true,
+    "generation_tokens_identical_across_processes": true,
+    "nonfinite_error_exit_code": 1,
+    "exe_sha256": "fab6a4a1a5666829a525bbb7171ba3b5743bf666514b91a55124f9194b57b16b"
+  },
+  "runs": {
+    "quality-r1": {
+      "exit_code": 0,
+      "coverage": {
+        "requests": 3,
+        "long_requests": 2,
+        "targets": 256,
+        "u2_calls": 4240,
+        "u2_rows": 1136186,
+        "identical_scores_within_process": true
+      },
+      "rows": [
+        {
+          "generated": 16,
+          "prompt_tokens": 23,
+          "prompt_ms": 1366.2,
+          "decode_ms": 1322.8,
+          "finish": "length",
+          "accepted": 8,
+          "offered": 15,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 1507.7049999963492,
+          "done": "DONE 16 23 1366.2 1322.8 length 8 15 0 0 0 0 0 0.0 23 0",
+          "request_ms": 2689.3290000152774,
+          "first_delivery_tokens": 1,
+          "last_delivery_ms": 2685.318800038658,
+          "delivery_span_ms": 1177.6138000423089,
+          "post_first_delivery_tok_s": 12.737622469659481,
+          "case": "Short"
+        },
+        {
+          "generated": 1,
+          "prompt_tokens": 2176,
+          "prompt_ms": 27928.7,
+          "decode_ms": 95.8,
+          "finish": "length",
+          "accepted": 0,
+          "offered": 0,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 28023.268699995242,
+          "done": "DONE 1 2176 27928.7 95.8 length 0 0 0 0 0 0 0 0.0 2176 0",
+          "request_ms": 28026.41140000196,
+          "first_delivery_tokens": 1,
+          "last_delivery_ms": 28023.268699995242,
+          "delivery_span_ms": 0.0,
+          "post_first_delivery_tok_s": null,
+          "case": "Code2K-0"
+        },
+        {
+          "generated": 1,
+          "prompt_tokens": 2176,
+          "prompt_ms": 27220.5,
+          "decode_ms": 62.7,
+          "finish": "length",
+          "accepted": 0,
+          "offered": 0,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 27281.833600020036,
+          "done": "DONE 1 2176 27220.5 62.7 length 0 0 0 0 0 0 0 0.0 2176 0",
+          "request_ms": 27285.066600015853,
+          "first_delivery_tokens": 1,
+          "last_delivery_ms": 27281.833600020036,
+          "delivery_span_ms": 0.0,
+          "post_first_delivery_tok_s": null,
+          "case": "Prose2K-0"
+        }
+      ],
+      "tokens_sha256": "ef087321cdc82924481169cf6a6911b88aed0f4ec6b36720d44ade1a86d9a79c"
+    },
+    "quality-r2": {
+      "exit_code": 0,
+      "coverage": {
+        "requests": 3,
+        "long_requests": 2,
+        "targets": 256,
+        "u2_calls": 4240,
+        "u2_rows": 1136186,
+        "identical_scores_within_process": true
+      },
+      "rows": [
+        {
+          "generated": 16,
+          "prompt_tokens": 23,
+          "prompt_ms": 1376.9,
+          "decode_ms": 1320.0,
+          "finish": "length",
+          "accepted": 8,
+          "offered": 15,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 1485.55760004092,
+          "done": "DONE 16 23 1376.9 1320.0 length 8 15 0 0 0 0 0 0.0 23 0",
+          "request_ms": 2697.38560001133,
+          "first_delivery_tokens": 1,
+          "last_delivery_ms": 2690.791100030765,
+          "delivery_span_ms": 1205.2334999898449,
+          "post_first_delivery_tok_s": 12.445721098962473,
+          "case": "Short"
+        },
+        {
+          "generated": 1,
+          "prompt_tokens": 2176,
+          "prompt_ms": 28048.9,
+          "decode_ms": 99.0,
+          "finish": "length",
+          "accepted": 0,
+          "offered": 0,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 28146.620200015604,
+          "done": "DONE 1 2176 28048.9 99.0 length 0 0 0 0 0 0 0 0.0 2176 0",
+          "request_ms": 28149.868200009223,
+          "first_delivery_tokens": 1,
+          "last_delivery_ms": 28146.620200015604,
+          "delivery_span_ms": 0.0,
+          "post_first_delivery_tok_s": null,
+          "case": "Code2K-0"
+        },
+        {
+          "generated": 1,
+          "prompt_tokens": 2176,
+          "prompt_ms": 27363.9,
+          "decode_ms": 63.3,
+          "finish": "length",
+          "accepted": 0,
+          "offered": 0,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 27425.801599980332,
+          "done": "DONE 1 2176 27363.9 63.3 length 0 0 0 0 0 0 0 0.0 2176 0",
+          "request_ms": 27428.959599987138,
+          "first_delivery_tokens": 1,
+          "last_delivery_ms": 27425.801599980332,
+          "delivery_span_ms": 0.0,
+          "post_first_delivery_tok_s": null,
+          "case": "Prose2K-0"
+        }
+      ],
+      "tokens_sha256": "ef087321cdc82924481169cf6a6911b88aed0f4ec6b36720d44ade1a86d9a79c"
+    },
+    "generation-r1": {
+      "exit_code": 0,
+      "coverage": {
+        "requests": 3,
+        "long_requests": 2,
+        "targets": 0,
+        "u2_calls": 4251,
+        "u2_rows": 1139170,
+        "identical_scores_within_process": false
+      },
+      "rows": [
+        {
+          "generated": 16,
+          "prompt_tokens": 23,
+          "prompt_ms": 1275.9,
+          "decode_ms": 1305.6,
+          "finish": "length",
+          "accepted": 8,
+          "offered": 15,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 1420.6490000360645,
+          "done": "DONE 16 23 1275.9 1305.6 length 8 15 0 0 0 0 0 0.0 23 0",
+          "request_ms": 2581.8325000000186,
+          "first_delivery_tokens": 1,
+          "last_delivery_ms": 2578.3369000419043,
+          "delivery_span_ms": 1157.6879000058398,
+          "post_first_delivery_tok_s": 12.956859961933034,
+          "case": "Short"
+        },
+        {
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 23526.4,
+          "decode_ms": 5669.3,
+          "finish": "length",
+          "accepted": 72,
+          "offered": 101,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 23584.101299988106,
+          "done": "DONE 128 2048 23526.4 5669.3 length 72 101 0 0 0 0 0 0.0 2048 0",
+          "request_ms": 29196.996900020167,
+          "first_delivery_tokens": 1,
+          "last_delivery_ms": 29193.535200029146,
+          "delivery_span_ms": 5609.43390004104,
+          "post_first_delivery_tok_s": 22.640430792681386,
+          "case": "Code2K-0"
+        },
+        {
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 22513.4,
+          "decode_ms": 5527.9,
+          "finish": "length",
+          "accepted": 65,
+          "offered": 99,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 22561.49940000614,
+          "done": "DONE 128 2048 22513.4 5527.9 length 65 99 0 0 0 0 0 0.0 2048 0",
+          "request_ms": 28042.538300040178,
+          "first_delivery_tokens": 1,
+          "last_delivery_ms": 28038.618399994448,
+          "delivery_span_ms": 5477.118999988306,
+          "post_first_delivery_tok_s": 23.187372777599162,
+          "case": "Prose2K-0"
+        }
+      ],
+      "tokens_sha256": "b50364abdd237b5bcf48dad8a9cc7249cd62a9b0c76dd064744be1c9d0c530c0"
+    },
+    "generation-r2": {
+      "exit_code": 0,
+      "coverage": {
+        "requests": 3,
+        "long_requests": 2,
+        "targets": 0,
+        "u2_calls": 4251,
+        "u2_rows": 1139170,
+        "identical_scores_within_process": false
+      },
+      "rows": [
+        {
+          "generated": 16,
+          "prompt_tokens": 23,
+          "prompt_ms": 1317.6,
+          "decode_ms": 1275.3,
+          "finish": "length",
+          "accepted": 8,
+          "offered": 15,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 1431.6957999835722,
+          "done": "DONE 16 23 1317.6 1275.3 length 8 15 0 0 0 0 0 0.0 23 0",
+          "request_ms": 2593.4481999720447,
+          "first_delivery_tokens": 1,
+          "last_delivery_ms": 2590.4679999803193,
+          "delivery_span_ms": 1158.772199996747,
+          "post_first_delivery_tok_s": 12.944735816100962,
+          "case": "Short"
+        },
+        {
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 23709.7,
+          "decode_ms": 5680.7,
+          "finish": "length",
+          "accepted": 72,
+          "offered": 101,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 23768.33200000692,
+          "done": "DONE 128 2048 23709.7 5680.7 length 72 101 0 0 0 0 0 0.0 2048 0",
+          "request_ms": 29392.147100006696,
+          "first_delivery_tokens": 1,
+          "last_delivery_ms": 29388.781199988443,
+          "delivery_span_ms": 5620.449199981522,
+          "post_first_delivery_tok_s": 22.596058692322586,
+          "case": "Code2K-0"
+        },
+        {
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 22523.0,
+          "decode_ms": 5575.0,
+          "finish": "length",
+          "accepted": 65,
+          "offered": 99,
+          "reused": 0,
+          "resume": 0,
+          "ttft_ms": 22571.958899963647,
+          "done": "DONE 128 2048 22523.0 5575.0 length 65 99 0 0 0 0 0 0.0 2048 0",
+          "request_ms": 28099.355399957858,
+          "first_delivery_tokens": 1,
+          "last_delivery_ms": 28095.735999988392,
+          "delivery_span_ms": 5523.777100024745,
+          "post_first_delivery_tok_s": 22.991514266466524,
+          "case": "Prose2K-0"
+        }
+      ],
+      "tokens_sha256": "b50364abdd237b5bcf48dad8a9cc7249cd62a9b0c76dd064744be1c9d0c530c0"
+    }
+  },
+  "exe_sha256": "fab6a4a1a5666829a525bbb7171ba3b5743bf666514b91a55124f9194b57b16b",
+  "limits": [
+    "FP16 upstream nonfinite/wrong-finite instability remains unresolved.",
+    "This fixes the secondary access violation; invalid input still returns ERR and exits 1.",
+    "256 distinct fixed targets and two short prompts do not establish broad model quality.",
+    "Two independent generation processes are stability observations, not a speedup benchmark.",
+    "Regression links the matched frozen legacy ABI, including its former inlined queue initializers."
+  ]
+}

@@ -1,0 +1,568 @@
+{
+  "date": "2026-11-04",
+  "complete": true,
+  "production_executable_changed": false,
+  "hardware": "Intel Arc A770 16 GB; driver 32.0.101.9034; Xeon E5-2696 v4; Windows; oneAPI 2025.3",
+  "scope": "A770-only FP16 paired-M4 numerical workaround, preserving M8 output tile/padding, BF16 M8 shapes and other GPU dispatch.",
+  "stress": [
+    {
+      "variant": "plain",
+      "stage": "stress-r1",
+      "run": "screen",
+      "control": {
+        "case": 0,
+        "rows": 703,
+        "m": 8,
+        "calls": 1304,
+        "bad_cells": 384,
+        "guards": 1
+      },
+      "candidate": {
+        "case": 0,
+        "rows": 703,
+        "m": 4,
+        "calls": 8192,
+        "bad_cells": 0,
+        "guards": 1
+      }
+    },
+    {
+      "variant": "plain",
+      "stage": "stress-r1",
+      "run": "confirm",
+      "control": {
+        "case": 0,
+        "rows": 703,
+        "m": 8,
+        "calls": 8176,
+        "bad_cells": 256,
+        "guards": 1
+      },
+      "candidate": {
+        "case": 0,
+        "rows": 703,
+        "m": 4,
+        "calls": 8192,
+        "bad_cells": 0,
+        "guards": 1
+      }
+    },
+    {
+      "variant": "plain",
+      "stage": "stress-long-r1",
+      "run": "screen",
+      "control": {
+        "case": 0,
+        "rows": 703,
+        "m": 8,
+        "calls": 2704,
+        "bad_cells": 384,
+        "guards": 1
+      },
+      "candidate": {
+        "case": 0,
+        "rows": 703,
+        "m": 4,
+        "calls": 65536,
+        "bad_cells": 0,
+        "guards": 1
+      }
+    },
+    {
+      "variant": "plain",
+      "stage": "stress-long-r1",
+      "run": "confirm",
+      "control": {
+        "case": 0,
+        "rows": 703,
+        "m": 8,
+        "calls": 7288,
+        "bad_cells": 320,
+        "guards": 1
+      },
+      "candidate": {
+        "case": 0,
+        "rows": 703,
+        "m": 4,
+        "calls": 65536,
+        "bad_cells": 0,
+        "guards": 1
+      }
+    },
+    {
+      "variant": "paired",
+      "stage": "stress-r1",
+      "run": "screen",
+      "control": {
+        "case": 0,
+        "rows": 703,
+        "m": 8,
+        "calls": 6480,
+        "bad_cells": 64,
+        "guards": 1
+      },
+      "candidate": {
+        "case": 0,
+        "rows": 703,
+        "m": 4,
+        "calls": 65536,
+        "bad_cells": 0,
+        "guards": 1
+      }
+    },
+    {
+      "variant": "paired",
+      "stage": "stress-r1",
+      "run": "confirm",
+      "control": {
+        "case": 0,
+        "rows": 703,
+        "m": 8,
+        "calls": 7696,
+        "bad_cells": 320,
+        "guards": 1
+      },
+      "candidate": {
+        "case": 0,
+        "rows": 703,
+        "m": 4,
+        "calls": 65536,
+        "bad_cells": 0,
+        "guards": 1
+      }
+    }
+  ],
+  "component_comparisons": [
+    {
+      "block": 0,
+      "throughput_change_pct": 38.784995883293824,
+      "control_drift_pct": 0.13866128828943225
+    },
+    {
+      "block": 1,
+      "throughput_change_pct": 38.64499984254706,
+      "control_drift_pct": 0.01259604484191712
+    },
+    {
+      "block": 2,
+      "throughput_change_pct": 38.841774257839326,
+      "control_drift_pct": 0.025192089683856445
+    },
+    {
+      "block": 3,
+      "throughput_change_pct": 38.95835429291308,
+      "control_drift_pct": -0.09436336185203453
+    }
+  ],
+  "component_retained_checks": 496,
+  "quality": {
+    "complete": true,
+    "comparison": {
+      "u4n16": {
+        "cases": {
+          "Code2K": {
+            "tokens": 128,
+            "baseline_ppl": 1.4320345944621713,
+            "candidate_ppl": 1.4409856494989128,
+            "ppl_change_pct": 0.6250585754950462,
+            "top1_agreement": 0.9765625
+          },
+          "Prose2K": {
+            "tokens": 128,
+            "baseline_ppl": 1.463910883668175,
+            "candidate_ppl": 1.4725351919329206,
+            "ppl_change_pct": 0.5891279558722494,
+            "top1_agreement": 0.9765625
+          }
+        },
+        "targets": 256,
+        "aggregate_ppl_change_pct": 0.6070916616597728
+      },
+      "u2down": {
+        "cases": {
+          "Code2K": {
+            "tokens": 128,
+            "baseline_ppl": 1.4320345944621713,
+            "candidate_ppl": 1.4394959902111735,
+            "ppl_change_pct": 0.5210346019471935,
+            "top1_agreement": 0.9765625
+          },
+          "Prose2K": {
+            "tokens": 128,
+            "baseline_ppl": 1.463910883668175,
+            "candidate_ppl": 1.469813888775171,
+            "ppl_change_pct": 0.40323527701390666,
+            "top1_agreement": 0.96875
+          }
+        },
+        "targets": 256,
+        "aggregate_ppl_change_pct": 0.46211767342036286
+      }
+    },
+    "raw_scores_identical_to_healthy_m8": {
+      "native": true,
+      "u4n16": true,
+      "u2down": true
+    }
+  },
+  "performance": {
+    "u4n16": {
+      "Code2K": {
+        "prompt_ms": {
+          "baseline": 23304.80089917097,
+          "candidate": 21899.6,
+          "throughput_change_pct": 6.416559659404597,
+          "baseline_drift_pct": -2.537257161254236
+        },
+        "decode_ms": {
+          "baseline": 4772.373056719267,
+          "candidate": 4752.4,
+          "throughput_change_pct": 0.4202730561246426,
+          "baseline_drift_pct": -1.1292725359668965
+        },
+        "total_ms": {
+          "baseline": 28077.27581960187,
+          "candidate": 26652.0,
+          "throughput_change_pct": 5.347725572571926,
+          "baseline_drift_pct": -2.2993584045483795
+        },
+        "ttft_ms": {
+          "baseline": 23356.915033494326,
+          "candidate": 21953.440250013955,
+          "throughput_change_pct": 6.392960590673158,
+          "baseline_drift_pct": -2.53372360356815
+        },
+        "request_ms": {
+          "baseline": 28079.334943857986,
+          "candidate": 26654.224099998828,
+          "throughput_change_pct": 5.346660396162961,
+          "baseline_drift_pct": -2.2969109182935377
+        }
+      },
+      "Prose2K": {
+        "prompt_ms": {
+          "baseline": 22390.256471677585,
+          "candidate": 20820.55,
+          "throughput_change_pct": 7.539217127681952,
+          "baseline_drift_pct": -0.39359110653479634
+        },
+        "decode_ms": {
+          "baseline": 5027.961986729812,
+          "candidate": 5329.6,
+          "throughput_change_pct": -5.6596745209807064,
+          "baseline_drift_pct": -1.1764008066748377
+        },
+        "total_ms": {
+          "baseline": 27418.250409398846,
+          "candidate": 26150.149999999998,
+          "throughput_change_pct": 4.849304533239196,
+          "baseline_drift_pct": -0.5376060526148252
+        },
+        "ttft_ms": {
+          "baseline": 22440.492267887716,
+          "candidate": 20871.780499990564,
+          "throughput_change_pct": 7.515946077996838,
+          "baseline_drift_pct": -0.391474436750483
+        },
+        "request_ms": {
+          "baseline": 27420.32051251808,
+          "candidate": 26152.511799999047,
+          "throughput_change_pct": 4.847751230224384,
+          "baseline_drift_pct": -0.5362972774524355
+        }
+      }
+    },
+    "u2down": {
+      "Code2K": {
+        "prompt_ms": {
+          "baseline": 23304.80089917097,
+          "candidate": 24139.65,
+          "throughput_change_pct": -3.4584142720753275,
+          "baseline_drift_pct": -2.537257161254236
+        },
+        "decode_ms": {
+          "baseline": 4772.373056719267,
+          "candidate": 5132.95,
+          "throughput_change_pct": -7.024750743349006,
+          "baseline_drift_pct": -1.1292725359668965
+        },
+        "total_ms": {
+          "baseline": 28077.27581960187,
+          "candidate": 29272.6,
+          "throughput_change_pct": -4.083423339225522,
+          "baseline_drift_pct": -2.2993584045483795
+        },
+        "ttft_ms": {
+          "baseline": 23356.915033494326,
+          "candidate": 24193.450349994237,
+          "throughput_change_pct": -3.457693319465327,
+          "baseline_drift_pct": -2.53372360356815
+        },
+        "request_ms": {
+          "baseline": 28079.334943857986,
+          "candidate": 29274.76959998603,
+          "throughput_change_pct": -4.083498085425119,
+          "baseline_drift_pct": -2.2969109182935377
+        }
+      },
+      "Prose2K": {
+        "prompt_ms": {
+          "baseline": 22390.256471677585,
+          "candidate": 23639.1,
+          "throughput_change_pct": -5.282957169784019,
+          "baseline_drift_pct": -0.39359110653479634
+        },
+        "decode_ms": {
+          "baseline": 5027.961986729812,
+          "candidate": 5279.45,
+          "throughput_change_pct": -4.763526755063263,
+          "baseline_drift_pct": -1.1764008066748377
+        },
+        "total_ms": {
+          "baseline": 27418.250409398846,
+          "candidate": 28918.55,
+          "throughput_change_pct": -5.188018038944387,
+          "baseline_drift_pct": -0.5376060526148252
+        },
+        "ttft_ms": {
+          "baseline": 22440.492267887716,
+          "candidate": 23691.11720001092,
+          "throughput_change_pct": -5.278876979776326,
+          "baseline_drift_pct": -0.391474436750483
+        },
+        "request_ms": {
+          "baseline": 27420.32051251808,
+          "candidate": 28920.619899989106,
+          "throughput_change_pct": -5.18764602093329,
+          "baseline_drift_pct": -0.5362972774524355
+        }
+      }
+    }
+  },
+  "performance_runs": [
+    {
+      "label": "0-native",
+      "summary": {
+        "Code2K": {
+          "prompt_ms": 23606.199999999997,
+          "decode_ms": 4799.549999999999,
+          "ttft_ms": 23658.55924997595,
+          "request_ms": 28407.4774000037,
+          "total_ms": 28405.75,
+          "prefill_tok_s": 86.75686895815507,
+          "decode_tok_s": 26.669166901063644
+        },
+        "Prose2K": {
+          "prompt_ms": 22434.449999999997,
+          "decode_ms": 5057.8,
+          "ttft_ms": 22484.546049992787,
+          "request_ms": 27494.144800002687,
+          "total_ms": 27492.25,
+          "prefill_tok_s": 91.28817510569684,
+          "decode_tok_s": 25.307445925105775
+        }
+      },
+      "coverage": {
+        "u4": [],
+        "u2": []
+      },
+      "exit_code": 0
+    },
+    {
+      "label": "1-u4n16",
+      "summary": {
+        "Code2K": {
+          "prompt_ms": 21899.6,
+          "decode_ms": 4752.4,
+          "ttft_ms": 21953.440250013955,
+          "request_ms": 26654.224099998828,
+          "total_ms": 26652.0,
+          "prefill_tok_s": 93.51768982081865,
+          "decode_tok_s": 26.933759784529922
+        },
+        "Prose2K": {
+          "prompt_ms": 20820.55,
+          "decode_ms": 5329.6,
+          "ttft_ms": 20871.780499990564,
+          "request_ms": 26152.511799999047,
+          "total_ms": 26150.149999999998,
+          "prefill_tok_s": 98.36435636906806,
+          "decode_tok_s": 24.016811768237766
+        }
+      },
+      "coverage": {
+        "u4": [
+          [
+            2009,
+            527683,
+            5554483200
+          ],
+          [
+            1996,
+            567796,
+            5518540800
+          ],
+          [
+            2009,
+            527683,
+            5554483200
+          ],
+          [
+            1996,
+            567796,
+            5518540800
+          ],
+          [
+            2009,
+            527683,
+            5554483200
+          ],
+          [
+            1996,
+            567796,
+            5518540800
+          ]
+        ],
+        "u2": []
+      },
+      "exit_code": 0
+    },
+    {
+      "label": "2-u2down",
+      "summary": {
+        "Code2K": {
+          "prompt_ms": 24139.65,
+          "decode_ms": 5132.95,
+          "ttft_ms": 24193.450349994237,
+          "request_ms": 29274.76959998603,
+          "total_ms": 29272.6,
+          "prefill_tok_s": 84.83967248903774,
+          "decode_tok_s": 24.936927108193146
+        },
+        "Prose2K": {
+          "prompt_ms": 23639.1,
+          "decode_ms": 5279.45,
+          "ttft_ms": 23691.11720001092,
+          "request_ms": 28920.619899989106,
+          "total_ms": 28918.55,
+          "prefill_tok_s": 86.6361240487159,
+          "decode_tok_s": 24.24494975802404
+        }
+      },
+      "coverage": {
+        "u4": [],
+        "u2": [
+          [
+            2133,
+            547942
+          ],
+          [
+            2118,
+            591228
+          ],
+          [
+            2133,
+            547942
+          ],
+          [
+            2118,
+            591228
+          ],
+          [
+            2133,
+            547942
+          ],
+          [
+            2118,
+            591228
+          ]
+        ]
+      },
+      "exit_code": 0
+    },
+    {
+      "label": "3-native",
+      "summary": {
+        "Code2K": {
+          "prompt_ms": 23007.25,
+          "decode_ms": 4745.35,
+          "ttft_ms": 23059.116749995155,
+          "request_ms": 27754.982949991245,
+          "total_ms": 27752.6,
+          "prefill_tok_s": 89.01541905268991,
+          "decode_tok_s": 26.973774326445888
+        },
+        "Prose2K": {
+          "prompt_ms": 22346.15,
+          "decode_ms": 4998.3,
+          "ttft_ms": 22396.524799987674,
+          "request_ms": 27346.69444998144,
+          "total_ms": 27344.45,
+          "prefill_tok_s": 91.64889701357951,
+          "decode_tok_s": 25.608706960366522
+        }
+      },
+      "coverage": {
+        "u4": [],
+        "u2": []
+      },
+      "exit_code": 0
+    }
+  ],
+  "exe_sha256": "25b913054f92e6d622187e09b2021bc810b5290655b71e3b90219b1438c480a8",
+  "current_checkout_check": {
+    "complete": true,
+    "commands": [
+      {
+        "label": "compile-gemm",
+        "command": "C:\\PROGRA~2\\Intel\\oneAPI\\compiler\\2025.3\\bin\\icx.exe  /nologo /TP -DSTRATA_NATIVE_EXPERTS=1 -DSTRATA_SYCL_SERIAL_Q8_1=0 -DSTRATA_VERSION=\\\"0.1.39-sycl\\\" -D_USE_STD_VECTOR_ALGORITHMS=0 -I\"C:\\Program Files (x86)\\Intel\\oneAPI\\mkl\\2025.3\\include\" -IG:\\GitHub\\Strata\\sycl\\include -IG:\\GitHub\\Strata\\sycl\\..\\include -IG:\\GitHub\\Strata\\build-sycl\\_deps\\strata_llamacpp-src\\ggml\\src\\..\\include /DWIN32 /D_WINDOWS /EHsc /O2 /Ob2 /DNDEBUG -Qstd:c++20 -MD -fsycl -fsycl-default-sub-group-size=32 -fsycl-device-code-split=per_kernel /fp:precise -Wno-unused-parameter -Wno-unused-variable -Wno-deprecated-declarations -Wall -Wextra -QMD -QMT G:\\GitHub\\Strata\\build-lowbit-model-m4pair-20261104\\current-check-r1\\gemm.obj -QMF G:\\GitHub\\Strata\\build-lowbit-model-m4pair-20261104\\current-check-r1\\gemm.obj.d /FoG:\\GitHub\\Strata\\build-lowbit-model-m4pair-20261104\\current-check-r1\\gemm.obj /FdG:\\GitHub\\Strata\\build-lowbit-model-m4pair-20261104\\current-check-r1\\gemm.pdb -c G:\\GitHub\\Strata\\sycl\\src\\prefill\\gemm.dp.cpp",
+        "exit_code": 0,
+        "seconds": 27.685142278671265
+      },
+      {
+        "label": "compile-check",
+        "command": "C:\\PROGRA~2\\Intel\\oneAPI\\compiler\\2025.3\\bin\\icx.exe  /nologo /TP -DSTRATA_NATIVE_EXPERTS=1 -DSTRATA_SYCL_SERIAL_Q8_1=0 -DSTRATA_VERSION=\\\"0.1.39-sycl\\\" -D_USE_STD_VECTOR_ALGORITHMS=0 -I\"C:\\Program Files (x86)\\Intel\\oneAPI\\mkl\\2025.3\\include\" -IG:\\GitHub\\Strata\\sycl\\include -IG:\\GitHub\\Strata\\sycl\\..\\include -IG:\\GitHub\\Strata\\build-sycl\\_deps\\strata_llamacpp-src\\ggml\\src\\..\\include /DWIN32 /D_WINDOWS /EHsc /O2 /Ob2 /DNDEBUG -Qstd:c++20 -MD -fsycl -fsycl-default-sub-group-size=32 -fsycl-device-code-split=per_kernel /fp:precise -Wno-unused-parameter -Wno-unused-variable -Wno-deprecated-declarations -Wall -Wextra -QMD -QMT G:\\GitHub\\Strata\\build-lowbit-model-m4pair-20261104\\current-check-r1\\tile-check.obj -QMF G:\\GitHub\\Strata\\build-lowbit-model-m4pair-20261104\\current-check-r1\\tile-check.obj.d /FoG:\\GitHub\\Strata\\build-lowbit-model-m4pair-20261104\\current-check-r1\\tile-check.obj /FdG:\\GitHub\\Strata\\build-lowbit-model-m4pair-20261104\\current-check-r1\\tile-check.pdb -c G:\\GitHub\\Strata\\sycl\\src\\prefill\\gemm_m4_check.cpp",
+        "exit_code": 0,
+        "seconds": 20.78863835334778
+      },
+      {
+        "label": "link",
+        "command": "\"C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin\\icx.exe\" /nologo G:\\GitHub\\Strata\\build-lowbit-model-m4pair-20261104\\current-check-r1\\gemm.obj G:\\GitHub\\Strata\\build-lowbit-model-m4pair-20261104\\current-check-r1\\tile-check.obj G:\\GitHub\\Strata\\build-sycl-a770-deepopt\\strata_prefill.lib G:\\GitHub\\Strata\\build-sycl-a770-deepopt\\strata_engine.lib G:\\GitHub\\Strata\\build-sycl-a770-deepopt\\strata_kernels.lib G:\\GitHub\\Strata\\build-sycl-a770-deepopt\\strata_core.lib G:\\GitHub\\Strata\\build-sycl-a770-deepopt\\strata_kernels_cpu.lib G:\\GitHub\\Strata\\build-sycl-a770-deepopt\\strata_spec.lib G:\\GitHub\\Strata\\build-sycl-a770-deepopt\\ggml\\src\\ggml-cpu.lib G:\\GitHub\\Strata\\build-sycl-a770-deepopt\\ggml\\src\\ggml-base.lib -fsycl -fsycl-device-code-split=per_kernel -Qmkl=sequential \"C:\\Program Files (x86)\\Intel\\oneAPI\\mkl\\2025.3\\lib\\mkl_sycl_blas_dll.lib\" \"C:\\Program Files\\LevelZeroSDK\\1.33.1\\lib\\ze_loader.lib\" kernel32.lib user32.lib advapi32.lib /link /INCREMENTAL:NO /out:G:\\GitHub\\Strata\\build-lowbit-model-m4pair-20261104\\current-check-r1\\tile-check.exe",
+        "exit_code": 0,
+        "seconds": 84.11081719398499
+      },
+      {
+        "label": "check",
+        "command": "\"G:\\GitHub\\Strata\\build-lowbit-model-m4pair-20261104\\current-check-r1\\tile-check.exe\"",
+        "exit_code": 0,
+        "seconds": 3.6906001567840576
+      }
+    ],
+    "sha256": {
+      "sycl/src/prefill/gemm.dp.cpp": "3d9f28545ed6d68ab59382c091c26ebf19802266cab97b4f300e2d4b41f0e506",
+      "sycl/src/prefill/gemm_m4_check.cpp": "da7eaca9851afe40f9873347ecdc2b3af1c63fc8035a23d86af3bc92262a3bc4",
+      "include/strata/prefill/gemm.hpp": "e84f7048e36dbec1b4f65f4b5eadd32602766e2e664f5c2d91d4b7e4a8902121",
+      "sycl/CMakeLists.txt": "11530c9c56052e822e88f67ea2ac316bb02c074cd5e500f8746c7c2680a5045b"
+    },
+    "exe_sha256": "67fd9672c0e1628831daf70ec2c51e998067684b1c25a5f76069eeb3fd1875bc"
+  },
+  "lock_cleanup": {
+    "benchmark_children_passed": true,
+    "wrapper_exit_code": 1,
+    "wrapper_error": "PermissionError [WinError 32] releasing gpu-experiment.lock in gpu_lock finally, tools/bench_deepinfer.py:88 path.unlink()",
+    "original_owner": "36400 deepinfer",
+    "recovery": "At continuation 2026-11-04 17:23 local, the workspace lock was already absent; no lock was deleted and no process was terminated by this continuation.",
+    "fix": "Retry transient PermissionError and recheck ownership on every attempt; tolerate an already removed lock.",
+    "cpu_regression": "python tools/test_gpu_experiment_lock.py: PASS lock cleanup retries and preserves foreign ownership",
+    "previous_helper_sha256": "edef8c0e8c439c028b0c4787c069abab6932b0333df00a0128b76a33083bc868"
+  },
+  "limits": [
+    "Numerical failure reproduced in M8 controls; physical driver/hardware cause is not established.",
+    "Joint-matrix API shapes were tested; no final ISA dump proves emitted instruction shapes.",
+    "Two prompts and 256 fixed distinct targets are a limited quality diagnostic.",
+    "Hot component improvement is relative to plain M4, not historical M8 or full model.",
+    "Model comparison uses corrected paired-M4 native in every arm; no deployment change.",
+    "Decode arithmetic is unchanged; generated-token and routing changes are not GEMV speedup evidence.",
+    "One small bracketed cohort with two retained cycles per prompt is not independent confirmation."
+  ]
+}

@@ -5,6 +5,13 @@ Status on 2026-11-04. Measurements below identify their frozen profiles.
 **Orca L0 is the recommended path. Orca Direct remains WIP and an alternative.**
 The matched Short brackets measure L0 at **59.38–59.57 tok/s**, ahead of Direct.
 
+The [Windows call-path diagram](../README.md#runtime-call-paths) is retained
+separately from performance plots: SYCL uses UR and Level Zero/Intel UMD;
+Orca L0 uses Level Zero/Intel UMD directly; Orca Direct encodes its own GPU
+commands. All three continue through D3DKMT and the Windows kernel driver.
+The default remains Orca L0; Direct is WIP. Offline kernel compilation is
+separate from these execution paths.
+
 The latest [current-frontend context comparison](../bench/results/a770/orca-direct-current-contexts-2026-11-04.md)
 keeps the same fixed anchor and mathematical pack in an L0/Direct/L0 bracket.
 Direct decode is **1.83%/1.51%/2.21% below L0** for Short/2K/8K; 2K/8K

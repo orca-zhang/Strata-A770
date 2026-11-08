@@ -1,0 +1,139 @@
+{
+  "complete": true,
+  "adopted": false,
+  "confirmed": false,
+  "production_changed": false,
+  "hardware": "A770 16GB, E5-2696v4, Windows driver32.0.101.9034, oneAPI2025.3",
+  "kernel": "_ZTS16dpct_kernel_nameIJZN6strata7kernels12_GLOBAL__N_114launch_gu_portILi16ELi16ELi32ELb0EEEvjPNS0_2l05QueueEPKyPKiSA_SA_PK10block_q8_1RKNS1_18NativeExpertLayoutEPfSH_E14native_gu_port18dpct_kernel_scalarILi16EESK_SJ_ILi32EESJ_ILi0EEEE",
+  "resources": {
+    "old_resources": {
+      "grf_count": 128,
+      "simd_size": 32,
+      "spill_size": 0
+    },
+    "new_resources": {
+      "grf_count": 256,
+      "simd_size": 32,
+      "spill_size": 0
+    }
+  },
+  "changed_images": [
+    "iq_kernels/image_245.zebin",
+    "iq_kernels/native-manifest.tsv",
+    "iq_kernels/source-index.txt"
+  ],
+  "component": [
+    {
+      "label": "vram-0-None-old",
+      "eager_chains": 48,
+      "graph_final_checks": 12
+    },
+    {
+      "label": "vram-0-None-new",
+      "eager_chains": 48,
+      "graph_final_checks": 12
+    },
+    {
+      "label": "mixed-4-None-old",
+      "eager_chains": 48,
+      "graph_final_checks": 12
+    },
+    {
+      "label": "mixed-4-None-new",
+      "eager_chains": 48,
+      "graph_final_checks": 12
+    },
+    {
+      "label": "mapped-8-None-old",
+      "eager_chains": 48,
+      "graph_final_checks": 12
+    },
+    {
+      "label": "mapped-8-None-new",
+      "eager_chains": 48,
+      "graph_final_checks": 12
+    },
+    {
+      "label": "mixed-4-random-old",
+      "eager_chains": 48,
+      "graph_final_checks": 0
+    },
+    {
+      "label": "mixed-4-random-new",
+      "eager_chains": 48,
+      "graph_final_checks": 0
+    },
+    {
+      "label": "mapped-8-outlier-old",
+      "eager_chains": 48,
+      "graph_final_checks": 0
+    },
+    {
+      "label": "mapped-8-outlier-new",
+      "eager_chains": 48,
+      "graph_final_checks": 0
+    }
+  ],
+  "runs": [
+    {
+      "stage": "performance-forward-r1",
+      "comparison": {
+        "Code2K": {
+          "decode_ms": {
+            "baseline": 4195.523519180891,
+            "candidate": 4205.3,
+            "throughput_change_pct": -0.23247998523552305,
+            "baseline_drift_pct": 0.168177480916043
+          },
+          "prompt_ms": {
+            "baseline": 14918.748836614952,
+            "candidate": 14898.849999999999,
+            "throughput_change_pct": 0.13355954731373298,
+            "baseline_drift_pct": 1.224352165629794
+          },
+          "ttft_ms": {
+            "baseline": 14965.078422044535,
+            "candidate": 14944.792850030353,
+            "throughput_change_pct": 0.13573672260127623,
+            "baseline_drift_pct": 1.222921632790075
+          },
+          "request_ms": {
+            "baseline": 19115.871377955376,
+            "candidate": 19105.278700008057,
+            "throughput_change_pct": 0.05544372376684592,
+            "baseline_drift_pct": 0.9937488617620893
+          }
+        },
+        "Prose2K": {
+          "decode_ms": {
+            "baseline": 4238.924187220148,
+            "candidate": 4250.299999999999,
+            "throughput_change_pct": -0.26764729030541723,
+            "baseline_drift_pct": -0.12377550659549152
+          },
+          "prompt_ms": {
+            "baseline": 14371.127948424926,
+            "candidate": 14369.35,
+            "throughput_change_pct": 0.012373200074633495,
+            "baseline_drift_pct": 1.9159981454683228
+          },
+          "ttft_ms": {
+            "baseline": 14416.297780818026,
+            "candidate": 14414.073499996448,
+            "throughput_change_pct": 0.015431313164726568,
+            "baseline_drift_pct": 1.9125814600276625
+          },
+          "request_ms": {
+            "baseline": 18611.510968893992,
+            "candidate": 18620.76915000216,
+            "throughput_change_pct": -0.0497196492453611,
+            "baseline_drift_pct": 1.4484765308215852
+          }
+        }
+      },
+      "passes": false
+    }
+  ],
+  "preserved_failure": "AssertionError(('vram-0-None-old', 'FAIL bulk size\\r\\n'))",
+  "note": "Same adopted U4/min16/M16 L0 EXE, weights, math, draft settings and complete outputs. Current native image has no reported spill in either mode; this is a register-budget test, not spill elimination."
+}

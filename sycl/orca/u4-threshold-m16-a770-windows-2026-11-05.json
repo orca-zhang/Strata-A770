@@ -1,0 +1,1193 @@
+{
+  "date": "2026-11-05",
+  "plan": {
+    "date": "2026-11-05",
+    "hardware": "Arc A77016GB; Xeon E5-2696v4; Windows; driver32.0.101.9034; oneAPI2025.3",
+    "change": "Only STRATA_U4_MIN_ROWS32 to16; same adopted U4N16/load4/genericM16 L0 EXE/images/9402 weights; fused-dequant remains off.",
+    "quality": "256 fixed native targets; aggregate PPL increase<=1%, each case<=3%. Quality may differ. Full output determinism within each arm and outer controls, finite timings, successful exits required.",
+    "performance": "Existing Short23/16 plus three interleaved Code/Prose2K/128 cycles; discard cycle0, median cycles1/2. Independent forward/reverse, each case prefill gain>=1%, request gain>=0.5%, absolute outer-control drift<=3%.",
+    "baseline_config_sha256": "bfd231a662ac864c14ee08575e1899189f64f76e78b90b5b3ec8292fe9df084c",
+    "production_changed": false,
+    "notes": [
+      "More low-row experts may use U4, including the Short initializer. Candidate generated content/draft counts may differ; request comparison measures that actual workload, not isolated kernels.",
+      "No new weights, dependencies, kernels or GEMV math. Preserve all failed attempts."
+    ]
+  },
+  "quality_passes": true,
+  "quality_vs_native": {
+    "cases": {
+      "Code2K": {
+        "tokens": 128,
+        "baseline_ppl": 1.4227056617304108,
+        "candidate_ppl": 1.4393136671216566,
+        "ppl_change_pct": 1.167353574107932,
+        "top1_agreement": 0.9921875
+      },
+      "Prose2K": {
+        "tokens": 128,
+        "baseline_ppl": 1.4794245406413546,
+        "candidate_ppl": 1.4714380134542042,
+        "ppl_change_pct": -0.539840118083221,
+        "top1_agreement": 0.9453125
+      }
+    },
+    "targets": 256,
+    "aggregate_ppl_change_pct": 0.31012491922826735
+  },
+  "quality_vs_current_u4": {
+    "cases": {
+      "Code2K": {
+        "tokens": 128,
+        "baseline_ppl": 1.4400246055211277,
+        "candidate_ppl": 1.4393136671216566,
+        "ppl_change_pct": -0.04936987859410088,
+        "top1_agreement": 1.0
+      },
+      "Prose2K": {
+        "tokens": 128,
+        "baseline_ppl": 1.4652638611711781,
+        "candidate_ppl": 1.4714380134542042,
+        "ppl_change_pct": 0.4213679492573447,
+        "top1_agreement": 0.9921875
+      }
+    },
+    "targets": 256,
+    "aggregate_ppl_change_pct": 0.1857225565690378
+  },
+  "qualification": true,
+  "cohorts": {
+    "performance-forward-r1": {
+      "order": "forward",
+      "passes": true,
+      "metrics": {
+        "Code2K": {
+          "prompt_ms": {
+            "baseline": 15154.10502553681,
+            "candidate": 14858.5,
+            "throughput_change_pct": 1.9894674801413936,
+            "baseline_drift_pct": 0.9517652909000418
+          },
+          "decode_ms": {
+            "baseline": 4187.149798192084,
+            "candidate": 4198.85,
+            "throughput_change_pct": -0.27865253123871003,
+            "baseline_drift_pct": 0.062114027019610774
+          },
+          "total_ms": {
+            "baseline": 19341.286954983116,
+            "candidate": 19057.35,
+            "throughput_change_pct": 1.489907856984929,
+            "baseline_drift_pct": 0.7584977437092411
+          },
+          "ttft_ms": {
+            "baseline": 15199.088780476453,
+            "candidate": 14904.978349979501,
+            "throughput_change_pct": 1.97323621404224,
+            "baseline_drift_pct": 0.953699979663325
+          },
+          "request_ms": {
+            "baseline": 19343.13143233793,
+            "candidate": 19059.292199963238,
+            "throughput_change_pct": 1.4892433013605766,
+            "baseline_drift_pct": 0.7592817613649938
+          }
+        },
+        "Prose2K": {
+          "prompt_ms": {
+            "baseline": 14736.430444564925,
+            "candidate": 14436.8,
+            "throughput_change_pct": 2.0754630151067044,
+            "baseline_drift_pct": 2.438882001655207
+          },
+          "decode_ms": {
+            "baseline": 4204.098543088638,
+            "candidate": 4233.700000000001,
+            "throughput_change_pct": -0.6991864541975867,
+            "baseline_drift_pct": -0.16636562410875522
+          },
+          "total_ms": {
+            "baseline": 18940.800330437465,
+            "candidate": 18670.5,
+            "throughput_change_pct": 1.4477401806993084,
+            "baseline_drift_pct": 1.8547972431137927
+          },
+          "ttft_ms": {
+            "baseline": 14783.187843096835,
+            "candidate": 14482.265900005586,
+            "throughput_change_pct": 2.0778650604055926,
+            "baseline_drift_pct": 2.4341129325162747
+          },
+          "request_ms": {
+            "baseline": 18942.79470183512,
+            "candidate": 18672.028850007337,
+            "throughput_change_pct": 1.4501147893613897,
+            "baseline_drift_pct": 1.854556616954195
+          }
+        }
+      },
+      "coverage": [
+        {
+          "mode": "old",
+          "cases": {
+            "Code2K": {
+              "calls": 6828.0,
+              "rows": 861351.0,
+              "dma_bytes": 18878054400.0
+            },
+            "Prose2K": {
+              "calls": 6305.0,
+              "rows": 871930.0,
+              "dma_bytes": 17432064000.0
+            }
+          }
+        },
+        {
+          "mode": "new",
+          "cases": {
+            "Code2K": {
+              "calls": 7902.0,
+              "rows": 887022.0,
+              "dma_bytes": 21847449600.0
+            },
+            "Prose2K": {
+              "calls": 7229.0,
+              "rows": 893024.0,
+              "dma_bytes": 19986739200.0
+            }
+          }
+        },
+        {
+          "mode": "old",
+          "cases": {
+            "Code2K": {
+              "calls": 6828.0,
+              "rows": 861351.0,
+              "dma_bytes": 18878054400.0
+            },
+            "Prose2K": {
+              "calls": 6305.0,
+              "rows": 871930.0,
+              "dma_bytes": 17432064000.0
+            }
+          }
+        }
+      ],
+      "outputs": {
+        "Code2K": {
+          "full_tokens_equal": true,
+          "drafts": {
+            "old": [
+              [
+                72,
+                93
+              ]
+            ],
+            "new": [
+              [
+                73,
+                90
+              ]
+            ]
+          }
+        },
+        "Prose2K": {
+          "full_tokens_equal": false,
+          "drafts": {
+            "old": [
+              [
+                67,
+                92
+              ]
+            ],
+            "new": [
+              [
+                62,
+                96
+              ]
+            ]
+          }
+        }
+      }
+    },
+    "performance-reverse-r1": {
+      "order": "reverse",
+      "passes": true,
+      "metrics": {
+        "Code2K": {
+          "prompt_ms": {
+            "baseline": 15389.9,
+            "candidate": 14935.777770842737,
+            "throughput_change_pct": 3.040499370871652,
+            "baseline_drift_pct": -0.6200650100451677
+          },
+          "decode_ms": {
+            "baseline": 4195.799999999999,
+            "candidate": 4201.198370703292,
+            "throughput_change_pct": -0.12849597250484956,
+            "baseline_drift_pct": -0.17598516017026666
+          },
+          "total_ms": {
+            "baseline": 19585.7,
+            "candidate": 19136.984289067073,
+            "throughput_change_pct": 2.3447566458487223,
+            "baseline_drift_pct": -0.5227443295530265
+          },
+          "ttft_ms": {
+            "baseline": 15434.50484998175,
+            "candidate": 14982.223076768461,
+            "throughput_change_pct": 3.0187894740040244,
+            "baseline_drift_pct": -0.611773958131423
+          },
+          "request_ms": {
+            "baseline": 19587.504149996676,
+            "candidate": 19138.527568035508,
+            "throughput_change_pct": 2.3459306384208567,
+            "baseline_drift_pct": -0.5200228196529988
+          }
+        },
+        "Prose2K": {
+          "prompt_ms": {
+            "baseline": 14809.05,
+            "candidate": 14443.283108421021,
+            "throughput_change_pct": 2.5324359346367897,
+            "baseline_drift_pct": -1.2634671216478544
+          },
+          "decode_ms": {
+            "baseline": 4204.05,
+            "candidate": 4243.691184275784,
+            "throughput_change_pct": -0.9341203813950094,
+            "baseline_drift_pct": -0.40683386833165747
+          },
+          "total_ms": {
+            "baseline": 19013.1,
+            "candidate": 18687.004888424468,
+            "throughput_change_pct": 1.7450367970820668,
+            "baseline_drift_pct": -1.0695799124429528
+          },
+          "ttft_ms": {
+            "baseline": 14855.551050015492,
+            "candidate": 14488.779698996956,
+            "throughput_change_pct": 2.5314164383624993,
+            "baseline_drift_pct": -1.2557036737356198
+          },
+          "request_ms": {
+            "baseline": 19014.947600022424,
+            "candidate": 18688.833645588355,
+            "throughput_change_pct": 1.7449668642700589,
+            "baseline_drift_pct": -1.0690705963268377
+          }
+        }
+      },
+      "coverage": [
+        {
+          "mode": "new",
+          "cases": {
+            "Code2K": {
+              "calls": 7902.0,
+              "rows": 887022.0,
+              "dma_bytes": 21847449600.0
+            },
+            "Prose2K": {
+              "calls": 7229.0,
+              "rows": 893024.0,
+              "dma_bytes": 19986739200.0
+            }
+          }
+        },
+        {
+          "mode": "old",
+          "cases": {
+            "Code2K": {
+              "calls": 6828.0,
+              "rows": 861351.0,
+              "dma_bytes": 18878054400.0
+            },
+            "Prose2K": {
+              "calls": 6305.0,
+              "rows": 871930.0,
+              "dma_bytes": 17432064000.0
+            }
+          }
+        },
+        {
+          "mode": "new",
+          "cases": {
+            "Code2K": {
+              "calls": 7902.0,
+              "rows": 887022.0,
+              "dma_bytes": 21847449600.0
+            },
+            "Prose2K": {
+              "calls": 7229.0,
+              "rows": 893024.0,
+              "dma_bytes": 19986739200.0
+            }
+          }
+        }
+      ],
+      "outputs": {
+        "Code2K": {
+          "full_tokens_equal": true,
+          "drafts": {
+            "old": [
+              [
+                72,
+                93
+              ]
+            ],
+            "new": [
+              [
+                73,
+                90
+              ]
+            ]
+          }
+        },
+        "Prose2K": {
+          "full_tokens_equal": false,
+          "drafts": {
+            "old": [
+              [
+                67,
+                92
+              ]
+            ],
+            "new": [
+              [
+                62,
+                96
+              ]
+            ]
+          }
+        }
+      }
+    }
+  },
+  "short_initializer_u4_reports": 0,
+  "short_initializer_full_tokens_equal": true,
+  "adopted": true,
+  "production_changed": true,
+  "primary_check": {
+    "complete": true,
+    "raw": [
+      {
+        "case": "Long8K",
+        "tokens": [
+          760,
+          3766,
+          1414,
+          17855,
+          264,
+          25450,
+          321,
+          13987,
+          62342,
+          3010,
+          314,
+          56127,
+          795,
+          9191,
+          11,
+          31838,
+          430,
+          264,
+          1248,
+          1105,
+          2785,
+          328,
+          79097,
+          220,
+          15,
+          1149,
+          2332,
+          1141,
+          6007,
+          11,
+          279,
+          3558,
+          16661,
+          314,
+          264,
+          3074,
+          11,
+          1064,
+          11316,
+          11173,
+          3408,
+          2586,
+          3808,
+          220,
+          18,
+          17,
+          18,
+          12103,
+          13753,
+          11,
+          23245,
+          494,
+          10790,
+          220,
+          15,
+          310,
+          10790,
+          220,
+          18,
+          17,
+          17,
+          13,
+          561,
+          11316,
+          303,
+          3296,
+          369,
+          25,
+          328,
+          49,
+          1878,
+          4415,
+          33002,
+          321,
+          4881,
+          13,
+          8586,
+          3150,
+          51080,
+          11,
+          9150,
+          15127,
+          11,
+          321,
+          3019,
+          2919,
+          958,
+          1149,
+          1061,
+          51623,
+          11121,
+          264,
+          4752,
+          60427,
+          17865,
+          421,
+          42934,
+          6157,
+          524,
+          1132,
+          383,
+          279,
+          40355,
+          2144,
+          314,
+          279,
+          11316,
+          4924,
+          694,
+          1048,
+          383,
+          279,
+          23016,
+          23398,
+          314,
+          1141,
+          10632,
+          64285,
+          13,
+          271,
+          1206,
+          3418,
+          279,
+          3558,
+          303,
+          7472,
+          11,
+          799
+        ],
+        "last": {
+          "generated": 128,
+          "prompt_tokens": 8000,
+          "prompt_ms": 44423.0,
+          "decode_ms": 4998.0,
+          "finish": "length",
+          "drafts_accepted": 76,
+          "drafts_offered": 94,
+          "reused": 0,
+          "hits": 0,
+          "lookups": 0,
+          "ram_blobs": 0,
+          "file_blobs": 0,
+          "file_mb": 0.0,
+          "prompt_read": 8000,
+          "offloaded": 0
+        }
+      },
+      {
+        "case": "Short",
+        "tokens": [
+          29108,
+          4009,
+          27891,
+          8964,
+          579,
+          16078,
+          321,
+          1100,
+          9872,
+          303,
+          660,
+          17425,
+          11,
+          694,
+          22602,
+          6105
+        ],
+        "last": {
+          "generated": 16,
+          "prompt_tokens": 23,
+          "prompt_ms": 834.2,
+          "decode_ms": 754.9,
+          "finish": "length",
+          "drafts_accepted": 9,
+          "drafts_offered": 12,
+          "reused": 0,
+          "hits": 0,
+          "lookups": 0,
+          "ram_blobs": 0,
+          "file_blobs": 0,
+          "file_mb": 0.0,
+          "prompt_read": 23,
+          "offloaded": 0
+        }
+      },
+      {
+        "case": "Code2K",
+        "tokens": [
+          760,
+          3766,
+          1970,
+          41643,
+          10551,
+          264,
+          4281,
+          314,
+          12654,
+          5568,
+          11,
+          28853,
+          1510,
+          7945,
+          62,
+          15,
+          63,
+          1472,
+          1510,
+          7945,
+          62,
+          22,
+          17,
+          7561,
+          864,
+          4072,
+          264,
+          3050,
+          34780,
+          17454,
+          383,
+          449,
+          1879,
+          3759,
+          1510,
+          87,
+          27653,
+          1061,
+          5759,
+          369,
+          27649,
+          314,
+          264,
+          15019,
+          8381,
+          11,
+          264,
+          86062,
+          5010,
+          18465,
+          11,
+          466,
+          264,
+          13094,
+          29184,
+          84,
+          2209,
+          13427,
+          318,
+          8294,
+          38,
+          8,
+          11096,
+          11,
+          1332,
+          1754,
+          709,
+          16298,
+          264,
+          4752,
+          13094,
+          17454,
+          57844,
+          264,
+          3349,
+          9944,
+          1324,
+          13,
+          1946,
+          3418,
+          279,
+          3558,
+          303,
+          7472,
+          11,
+          567,
+          1902,
+          22903,
+          279,
+          5215,
+          11,
+          279,
+          34780,
+          5706,
+          11,
+          279,
+          4499,
+          7193,
+          11,
+          321,
+          279,
+          60826,
+          2945,
+          303,
+          279,
+          1534,
+          709,
+          13,
+          271,
+          13962,
+          220,
+          16,
+          13,
+          561,
+          3146,
+          18264,
+          321,
+          87867,
+          27662,
+          271,
+          760,
+          6007,
+          11870,
+          314,
+          1754,
+          709,
+          10695,
+          264
+        ],
+        "last": {
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 14964.9,
+          "decode_ms": 4372.6,
+          "finish": "length",
+          "drafts_accepted": 73,
+          "drafts_offered": 90,
+          "reused": 0,
+          "hits": 0,
+          "lookups": 0,
+          "ram_blobs": 0,
+          "file_blobs": 0,
+          "file_mb": 0.0,
+          "prompt_read": 2048,
+          "offloaded": 0
+        }
+      },
+      {
+        "case": "Prose2K",
+        "tokens": [
+          760,
+          3766,
+          1414,
+          17855,
+          264,
+          25450,
+          321,
+          13987,
+          62342,
+          30333,
+          466,
+          42351,
+          35426,
+          11,
+          30825,
+          539,
+          13818,
+          51623,
+          321,
+          264,
+          10647,
+          11,
+          41557,
+          33265,
+          13,
+          1946,
+          3418,
+          411,
+          3558,
+          303,
+          7472,
+          11,
+          799,
+          1902,
+          1353,
+          7551,
+          279,
+          22419,
+          7063,
+          314,
+          279,
+          22157,
+          321,
+          22903,
+          279,
+          23016,
+          11,
+          91496,
+          11,
+          321,
+          22463,
+          23398,
+          314,
+          279,
+          1414,
+          430,
+          264,
+          4220,
+          13,
+          561,
+          6007,
+          2144,
+          16661,
+          314,
+          264,
+          3074,
+          11,
+          4145,
+          11316,
+          11173,
+          3408,
+          2586,
+          3808,
+          76837,
+          39663,
+          13753,
+          11,
+          7854,
+          539,
+          449,
+          31084,
+          1534,
+          3644,
+          13,
+          1061,
+          5759,
+          11121,
+          264,
+          4752,
+          5122,
+          3039,
+          421,
+          27700,
+          494,
+          18641,
+          59036,
+          310,
+          5215,
+          17310,
+          11,
+          321,
+          5326,
+          310,
+          264,
+          5357,
+          314,
+          801,
+          23532,
+          466,
+          51112,
+          675,
+          60967,
+          13,
+          271,
+          1597,
+          1141,
+          1379,
+          6557,
+          2119,
+          11,
+          279,
+          1414,
+          16067,
+          264,
+          15170,
+          4864,
+          1881,
+          5629
+        ],
+        "last": {
+          "generated": 128,
+          "prompt_tokens": 2048,
+          "prompt_ms": 14345.8,
+          "decode_ms": 4345.8,
+          "finish": "length",
+          "drafts_accepted": 62,
+          "drafts_offered": 96,
+          "reused": 0,
+          "hits": 0,
+          "lookups": 0,
+          "ram_blobs": 0,
+          "file_blobs": 0,
+          "file_mb": 0.0,
+          "prompt_read": 2048,
+          "offloaded": 0
+        }
+      },
+      {
+        "case": "Long8KRepeat",
+        "tokens": [
+          760,
+          3766,
+          1414,
+          17855,
+          264,
+          25450,
+          321,
+          13987,
+          62342,
+          3010,
+          314,
+          56127,
+          795,
+          9191,
+          11,
+          31838,
+          430,
+          264,
+          1248,
+          1105,
+          2785,
+          328,
+          79097,
+          220,
+          15,
+          1149,
+          2332,
+          1141,
+          6007,
+          11,
+          279,
+          3558,
+          16661,
+          314,
+          264,
+          3074,
+          11,
+          1064,
+          11316,
+          11173,
+          3408,
+          2586,
+          3808,
+          220,
+          18,
+          17,
+          18,
+          12103,
+          13753,
+          11,
+          23245,
+          494,
+          10790,
+          220,
+          15,
+          310,
+          10790,
+          220,
+          18,
+          17,
+          17,
+          13,
+          561,
+          11316,
+          303,
+          3296,
+          369,
+          25,
+          328,
+          49,
+          1878,
+          4415,
+          33002,
+          321,
+          4881,
+          13,
+          8586,
+          3150,
+          51080,
+          11,
+          9150,
+          15127,
+          11,
+          321,
+          3019,
+          2919,
+          958,
+          1149,
+          1061,
+          51623,
+          11121,
+          264,
+          4752,
+          60427,
+          17865,
+          421,
+          42934,
+          6157,
+          524,
+          1132,
+          383,
+          279,
+          40355,
+          2144,
+          314,
+          279,
+          11316,
+          4924,
+          694,
+          1048,
+          383,
+          279,
+          23016,
+          23398,
+          314,
+          1141,
+          10632,
+          64285,
+          13,
+          271,
+          1206,
+          3418,
+          279,
+          3558,
+          303,
+          7472,
+          11,
+          799
+        ],
+        "last": {
+          "generated": 128,
+          "prompt_tokens": 8000,
+          "prompt_ms": 33744.2,
+          "decode_ms": 4248.3,
+          "finish": "length",
+          "drafts_accepted": 76,
+          "drafts_offered": 94,
+          "reused": 0,
+          "hits": 0,
+          "lookups": 0,
+          "ram_blobs": 0,
+          "file_blobs": 0,
+          "file_mb": 0.0,
+          "prompt_read": 8000,
+          "offloaded": 0
+        }
+      }
+    ],
+    "http": [
+      {
+        "id": "chatcmpl-70f139433ee34e1d9e0b861e",
+        "object": "chat.completion",
+        "created": 1793834815,
+        "model": "qwen3.8-flash-next-iq2_xs",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "Sunlight enters Earth's atmosphere and scatters in all directions, but shorter blue"
+            },
+            "finish_reason": "length"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 23,
+          "completion_tokens": 16,
+          "total_tokens": 39,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "timings": {
+          "cache_n": 0,
+          "prompt_n": 23,
+          "prompt_ms": 825.8,
+          "prompt_per_token_ms": 35.904,
+          "prompt_per_second": 27.9,
+          "predicted_n": 16,
+          "predicted_ms": 699.7,
+          "predicted_per_token_ms": 43.731,
+          "predicted_per_second": 22.9,
+          "draft_n": 12,
+          "draft_n_accepted": 9
+        }
+      },
+      {
+        "id": "chatcmpl-6df5609a174b45aab9a56cc3",
+        "object": "chat.completion",
+        "created": 1793834817,
+        "model": "qwen3.8-flash-next-iq2_xs",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "Sunlight enters Earth's atmosphere and scatters in all directions, but shorter blue"
+            },
+            "finish_reason": "length"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 23,
+          "completion_tokens": 16,
+          "total_tokens": 39,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "timings": {
+          "cache_n": 0,
+          "prompt_n": 23,
+          "prompt_ms": 780.7,
+          "prompt_per_token_ms": 33.943,
+          "prompt_per_second": 29.5,
+          "predicted_n": 16,
+          "predicted_ms": 560.5,
+          "predicted_per_token_ms": 35.031,
+          "predicted_per_second": 28.5,
+          "draft_n": 12,
+          "draft_n_accepted": 9
+        }
+      }
+    ],
+    "adopted": true,
+    "launcher_before": "df624b6aae20bb3cb9a02dc80764b206f00f453c5d4bc2705ed534130a35ad38",
+    "fallback_before": "04f127e995014114fd229bc7c46057eb2f515164714ac6d86db6f28f9c35e59a",
+    "source_sha_before": {
+      "build-orca-u4-threshold-m16-20261105/check-primary.py": "40d640dd015c9ace0651f700449875067016334d9361a7fc57299f2f0d95894c",
+      "build-orca-u4-threshold-m16-20261105/candidate.json": "f3af1a53a25d73998eaa6235ce43c669f49e50a49f67b30d0584e7d146ad8d83",
+      "serve/server.py": "6d64d7d53f474270eabc9ab7137196060fe540ab18d39702458392ed3e3a4b67",
+      "sycl/serve/server_intel.py": "a2e1b80444d9fe886a32a0a8da817fa6ca08c769498135cbc26b60c253fac198",
+      "serve/telemetry.py": "611ce7043ad316793569de52c0f9f4f57c3dd1ffa77f9e41ef85b65189a2873b",
+      "tools/strata_tokenizer.py": "87eacd2cc297f704fd3b65a95b3eb8b83eb3c87aa40e15a1fbf727dd5d698912"
+    },
+    "learned_before": "855eb97ac3f0707e3ca0404e48ed975503c02bd1c75d1e035752f1262eeac230",
+    "engine_args": [
+      "--pack",
+      "G:\\GitHub\\Strata-data\\packs\\iq2_xs",
+      "--native",
+      "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00001-of-00002.gguf",
+      "--ple-gguf",
+      "G:\\GitHub\\Strata-data\\models\\IQ2_XS\\Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00002-of-00002.gguf",
+      "--expert-profile",
+      "G:\\GitHub\\Strata\\data\\expert-profile.bin",
+      "--expert-cache",
+      "5500",
+      "--prefill",
+      "8192",
+      "--spec",
+      "4",
+      "--spec-min-p",
+      "0.5",
+      "--mtp",
+      "G:\\GitHub\\Strata-data\\mtp\\rt-full-vocab-current",
+      "--max-context",
+      "8192",
+      "--stream-experts",
+      "--vram-reserve-mib",
+      "1536",
+      "--pcie-frac",
+      "0.16",
+      "--prompt-cache",
+      "0",
+      "--short-read",
+      "256",
+      "--adapt-every",
+      "1",
+      "--adapt-swaps",
+      "32",
+      "--prefill-borrow",
+      "--mtp-window",
+      "1024",
+      "--mtp-hnorm",
+      "stream",
+      "--adapt-decay",
+      "0.95",
+      "--suffix-draft",
+      "0"
+    ],
+    "long_tokens_equal_previous_u4": false,
+    "health": {
+      "status": "ok",
+      "max_context": 8192,
+      "model": "qwen3.8-flash-next-iq2_xs",
+      "images": false,
+      "api_key": false,
+      "loaded": true,
+      "service": "strata"
+    },
+    "models": {
+      "object": "list",
+      "data": [
+        {
+          "id": "qwen3.8-flash-next-iq2_xs",
+          "object": "model",
+          "status": {
+            "value": "loaded"
+          },
+          "meta": {
+            "n_ctx": 8192
+          },
+          "architecture": {
+            "input_modalities": [
+              "text"
+            ],
+            "output_modalities": [
+              "text"
+            ]
+          }
+        }
+      ]
+    },
+    "exit_code": 0,
+    "learned_after": "855eb97ac3f0707e3ca0404e48ed975503c02bd1c75d1e035752f1262eeac230",
+    "sha256": {
+      "build-orca-u4-threshold-m16-20261105/check-primary.py": "40d640dd015c9ace0651f700449875067016334d9361a7fc57299f2f0d95894c",
+      "build-orca-u4-threshold-m16-20261105/candidate.json": "f3af1a53a25d73998eaa6235ce43c669f49e50a49f67b30d0584e7d146ad8d83",
+      "serve/server.py": "6d64d7d53f474270eabc9ab7137196060fe540ab18d39702458392ed3e3a4b67",
+      "sycl/serve/server_intel.py": "a2e1b80444d9fe886a32a0a8da817fa6ca08c769498135cbc26b60c253fac198",
+      "serve/telemetry.py": "611ce7043ad316793569de52c0f9f4f57c3dd1ffa77f9e41ef85b65189a2873b",
+      "build-orca-u4-threshold-m16-20261105/primary-check-r1/engine.stderr": "bc259d3830ccf4d558456dc993cd3357ae639cc0d9c81d1a344a2a333571ec30",
+      "tools/strata_tokenizer.py": "87eacd2cc297f704fd3b65a95b3eb8b83eb3c87aa40e15a1fbf727dd5d698912",
+      "strata-iq2_xs-u4n16-orca-l0-m16-r16.json": "f3af1a53a25d73998eaa6235ce43c669f49e50a49f67b30d0584e7d146ad8d83",
+      "strata-iq2_xs.json": "f3af1a53a25d73998eaa6235ce43c669f49e50a49f67b30d0584e7d146ad8d83"
+    },
+    "optional_config": "strata-iq2_xs-u4n16-orca-l0-m16-r16.json"
+  },
+  "baseline_config_unchanged": false
+}

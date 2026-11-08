@@ -1,0 +1,70 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" aria-labelledby="title desc" width="2000" height="1390" viewBox="0 0 2000 1390" role="img">
+  <title id="title">Short decode：L0 59.38、Direct 58.48、SYCL 42.05 tok/s；另列 2K prefill</title>
+  <desc id="desc">Windows A770 16GB / Xeon E5-2696 v4 / 256 GiB DDR3, driver 32.0.101.9034, oneAPI 2025.3, 2026-11-05. Lead example: 2026-11-04 frozen Short28/natural76 decode, ten warmups and five retained per process. SYCL/Direct/SYCL bracket gives Direct +39.07%; independent L0 is +41.21% versus that SYCL cross-cohort baseline. These Short figures are not current-U4 measurements. Separate 2048-input/128-output Code and Prose prefill panels follow. SYCL native is the corrected FP16 paired-M4 engine measured 2026-11-04; current U4/min16/M16/HC256 L0 comes from the independent 2026-11-05 cohort summaries. Direct uses the independently measured U4/min32/M16 HC128 optional build. Each comparison shows SYCL, L0 and Direct in tok/s. Percentages compare each candidate rate with SYCL. Bars use forward summaries; labels include both orders. This is a cross-cohort throughput ratio, not a concurrent three-backend bracket; L0 reverse Code prefill drift exceeds 3%. Ranges are cohort summaries, not confidence intervals. Warm requests exclude process startup, lazy first loading and HTTP. Direct remains WIP, Linux GPU unvalidated, U4 model uploads deferred.</desc>
+  <metadata data-source="sycl/orca/lowbit-fp16-m4-a770-windows-2026-11-04.json" data-sha256="6f543022c40331a663544d60892309146562b8a47b5dd1f1114cef13838c0970" />
+  <metadata data-source="sycl/orca/hc1-q8-grf-u4-a770-windows-2026-11-05.json" data-sha256="7247d5dd02a7ae9951928b9518903947d165c5ef12c45f21ef0543d0801f6735" />
+  <metadata data-source="sycl/orca/hc1-q8-grf-u4-adoption-a770-windows-2026-11-05.json" data-sha256="31ebe873af3e53d2daff05e30cd57ae710615f79256c94eb9db5f323f2294358" />
+  <metadata data-source="bench/results/a770/refresh-2026-10-21.json" data-sha256="d67fc975e6bbff8ebfa2a2934683d14ad622caa5b12d9bcd09f3ee9739ff8930" />
+  <metadata data-source="sycl/orca/u4-m16-combined-a770-windows-2026-11-05.json" data-sha256="0921dc2e9f2e4da5cd7dea2390e692593e8846f7d56787b4ddac2bb97022cfc6" />
+  <metadata data-source="sycl/orca/direct-idle-audit-a770-windows-2026-11-04.json" data-sha256="93f70d411bb5e2f239e877290dfbabdf3bf7f8e8964f98d9de6743574e1fe1a8" />
+  <metadata data-source="sycl/orca/direct-vs-sycl-a770-windows-2026-11-04.json" data-sha256="4d865192028d409bac74b11e286b6e8af7ca48a94cd39d749d816283dc6acb7e" />
+  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="26" font-weight="700" text-anchor="start" x="76" y="76" fill="#64e8ef">STRATA-A770  /  SYCL COMPARISON</text>
+  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="24" font-weight="400" text-anchor="end" x="1924" y="76" fill="#a5b7cd">2026-11-05 · WINDOWS · A770 16 GB</text>
+  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="96" font-weight="700" text-anchor="start" x="76" y="194" fill="#eaf2ff">Direct / L0 vs SYCL</text>
+  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="34" font-weight="400" text-anchor="start" x="80" y="249" fill="#a5b7cd">DECODE / Short 固定短代码 · 28 输入 / 76 自然输出 · 11-04 冻结版本</text>
+  <rect x="72" y="300" width="596" height="300" rx="16" fill="#101d2e" />
+  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="36" font-weight="700" text-anchor="start" x="104" y="353" fill="#90a5bd">SYCL</text>
+  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="108" font-weight="700" text-anchor="start" x="98" y="495" fill="#90a5bd">42.05</text>
+  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="30" font-weight="400" text-anchor="end" x="636" y="492" fill="#90a5bd">tok/s</text>
+  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="32" font-weight="700" text-anchor="start" x="104" y="561" fill="#90a5bd">对照基线</text>
+  <rect x="702" y="300" width="596" height="300" rx="16" fill="#133033" />
+  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="36" font-weight="700" text-anchor="start" x="734" y="353" fill="#c1f787">L0</text>
+  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="108" font-weight="700" text-anchor="start" x="728" y="495" fill="#c1f787">59.38</text>
+  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="30" font-weight="400" text-anchor="end" x="1266" y="492" fill="#c1f787">tok/s</text>
+  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="32" font-weight="700" text-anchor="start" x="734" y="561" fill="#c1f787">相对 SYCL +41.21%</text>
+  <rect x="1332" y="300" width="596" height="300" rx="16" fill="#101d2e" />
+  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="36" font-weight="700" text-anchor="start" x="1364" y="353" fill="#64e8ef">Direct</text>
+  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="108" font-weight="700" text-anchor="start" x="1358" y="495" fill="#64e8ef">58.48</text>
+  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="30" font-weight="400" text-anchor="end" x="1896" y="492" fill="#64e8ef">tok/s</text>
+  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="32" font-weight="700" text-anchor="start" x="1364" y="561" fill="#64e8ef">相对 SYCL +39.07%</text>
+  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="28" font-weight="400" text-anchor="start" x="76" y="648" fill="#a5b7cd">Short：每进程 10 次预热 + 5 次保留，输出与 57/57 草稿一致；净 decode 排除预填充。</text>
+  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="28" font-weight="400" text-anchor="start" x="76" y="694" fill="#a5b7cd">Direct 对 SYCL 为同期夹测；L0 对 SYCL 为跨组参考。该 Short 成绩不代表当前 U4 配置。</text>
+  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="36" font-weight="700" text-anchor="start" x="76" y="758" fill="#64e8ef">PREFILL / 2K 输入预填充（11-04 / 11-05）</text>
+  <rect x="72" y="805" width="908" height="350" rx="16" fill="#101d2e" />
+  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="33" font-weight="700" text-anchor="start" x="104" y="859" fill="#eaf2ff">Code2K</text>
+  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="24" font-weight="400" text-anchor="end" x="780" y="903" fill="#a5b7cd">tok/s</text>
+  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="24" font-weight="400" text-anchor="end" x="948" y="903" fill="#a5b7cd">相对 SYCL</text>
+  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="28" font-weight="700" text-anchor="start" x="104" y="969" fill="#90a5bd">SYCL</text>
+  <rect x="252" y="938" width="178.0111900668223" height="40" rx="6" fill="#90a5bd" />
+  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="27" font-weight="700" text-anchor="end" x="780" y="969" fill="#90a5bd">87.88</text>
+  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="26" font-weight="700" text-anchor="end" x="948" y="969" fill="#90a5bd">基线</text>
+  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="28" font-weight="700" text-anchor="start" x="104" y="1049" fill="#c1f787">L0</text>
+  <rect x="252" y="1018" width="281.5845882358538" height="40" rx="6" fill="#c1f787" />
+  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="27" font-weight="700" text-anchor="end" x="780" y="1049" fill="#c1f787">134.76–139.01</text>
+  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="26" font-weight="700" text-anchor="end" x="948" y="1049" fill="#c1f787">+53–58%</text>
+  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="28" font-weight="700" text-anchor="start" x="104" y="1129" fill="#64e8ef">Direct</text>
+  <rect x="252" y="1098" width="304.8686458864215" height="40" rx="6" fill="#64e8ef" />
+  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="27" font-weight="700" text-anchor="end" x="780" y="1129" fill="#64e8ef">150.50–151.90</text>
+  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="26" font-weight="700" text-anchor="end" x="948" y="1129" fill="#64e8ef">+71–73%</text>
+  <rect x="1020" y="805" width="908" height="350" rx="16" fill="#101d2e" />
+  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="33" font-weight="700" text-anchor="start" x="1052" y="859" fill="#eaf2ff">Prose2K</text>
+  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="24" font-weight="400" text-anchor="end" x="1728" y="903" fill="#a5b7cd">tok/s</text>
+  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="24" font-weight="400" text-anchor="end" x="1896" y="903" fill="#a5b7cd">相对 SYCL</text>
+  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="28" font-weight="700" text-anchor="start" x="1052" y="969" fill="#90a5bd">SYCL</text>
+  <rect x="1200" y="938" width="179.38514039751445" height="40" rx="6" fill="#90a5bd" />
+  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="27" font-weight="700" text-anchor="end" x="1728" y="969" fill="#90a5bd">91.47</text>
+  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="26" font-weight="700" text-anchor="end" x="1896" y="969" fill="#90a5bd">基线</text>
+  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="28" font-weight="700" text-anchor="start" x="1052" y="1049" fill="#c1f787">L0</text>
+  <rect x="1200" y="1018" width="279.5229538980127" height="40" rx="6" fill="#c1f787" />
+  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="27" font-weight="700" text-anchor="end" x="1728" y="1049" fill="#c1f787">139.99–142.53</text>
+  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="26" font-weight="700" text-anchor="end" x="1896" y="1049" fill="#c1f787">+53–56%</text>
+  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="28" font-weight="700" text-anchor="start" x="1052" y="1129" fill="#64e8ef">Direct</text>
+  <rect x="1200" y="1098" width="305.09926702178126" height="40" rx="6" fill="#64e8ef" />
+  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="27" font-weight="700" text-anchor="end" x="1728" y="1129" fill="#64e8ef">155.57–156.89</text>
+  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="26" font-weight="700" text-anchor="end" x="1896" y="1129" fill="#64e8ef">+70–72%</text>
+  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="27" font-weight="400" text-anchor="start" x="76" y="1200" fill="#a5b7cd">2K prefill：SYCL FP16 M4 修复版 · L0 U4/min16/M16/HC256 · Direct U4/min32/M16/HC128</text>
+  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="27" font-weight="400" text-anchor="start" x="76" y="1246" fill="#a5b7cd">2K 为跨组实测，条形取正序；L0 反序 Code prefill 控制漂移 −3.56%，区间非置信区间。</text>
+  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="27" font-weight="400" text-anchor="start" x="76" y="1292" fill="#a5b7cd">A770 16 GB · Xeon E5-2696 v4 · 256 GiB DDR3 · Windows · oneAPI 2025.3 · 5771 槽 / MTP4</text>
+  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="25" font-weight="400" text-anchor="start" x="76" y="1344" fill="#64e8ef">推荐 L0 · Direct 为 WIP（8K 间歇问题未关闭）· 最早历史见文档 · HF / ModelScope 权重稍后发布</text>
+</svg>

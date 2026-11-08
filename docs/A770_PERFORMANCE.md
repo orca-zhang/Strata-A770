@@ -2,13 +2,555 @@
 
 **先看实测结果，再判断哪项优化适合你的机器。** 首页介绍[使用价值与最新速度](../README.md)，这里给出参数、验证与对照，把整模型表现和单项改动的收益连起来。
 
-## 仓库主图：同参数整版本锚点（2026-10-31）
+## 首页性能对照：当前默认对SYCL
 
-原生产 SYCL → 当前 Orca L0 → 原生产 SYCL，三个独立进程为 **41.46 → 50.54 → 41.39 tok/s**。固定 Fibonacci28／自然76 输出、5771 槽、MTP4／min-p0.5／decay0.95；每进程十次预热、五次保留，45 次完整输出及草稿计数一致。以两个 SYCL 中位数的几何平均 **41.42** 为基线，吞吐 **+22.01%**，前后基线耗时漂移 **0.17%**。
+首页长期保留顺序为：**调用链路图 → 当前默认对SYCL图 → SYCL对原主线历史数据 → 当前默认对HC256图**。SYCL对照沿用原三方表的11-04 native FP16 paired-M4修复版SYCL，两端native控制摘要取几何均值；当前端为11-08完整默认配置的独立正／反序摘要。均为2048输入／128输出，来自同机不同测量组。
 
-这是固定输入热态的整版本后端对照，包含录制／EAGER、调度和内核实现差异，不是纯 API 收益；decode 排除准备与预填充。日常继续平衡参数，50 锚定单独保留。1 Hz 采样最低空闲 **847.4805 MiB**，未过 1024 MiB 余量线；无新 PPL 或整版本质量等价结论，Linux 尚未验证。混合请求及旧实验保持原数据，不与此结果拼接算倍率。[主图与同等条件复现](../bench/results/a770/orca-anchor50-2026-10-31.md) · [完整样本和哈希](../sycl/orca/anchor50-a770-windows-2026-10-31.json)。
+[![当前默认对SYCL：Code decode速率增幅40.78%–41.01%，Prose49.12%–49.31%；跨测量组参考，分别保留11-04与11-08版本。](media/orca-current-vs-sycl.png)](media/orca-current-vs-sycl.svg)
 
-## 当前默认：1536 MiB 预留 Orca（2026-10-31）
+| 任务 | SYCL净decode（tok/s） | 当前净decode（tok/s） | decode速率增幅 | prefill速率增幅 | 整请求速率增幅 |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Code2K | 26.82 | 37.76–37.82 | +40.78%–41.01% | +54.35%–54.55% | +51.91%–52.02% |
+| Prose2K | 25.46 | 37.96–38.01 | +49.12%–49.31% | +52.72%–54.42% | +52.05%–53.46% |
+
+各增幅直接按SYCL耗时／当前耗时减1计算。SYCL实际5771槽／spec4，当前6509槽／spec6及不同MTP／缓存策略；这是跨组整版本速率参考，未新增同期SYCL／当前／SYCL夹测，不作单独API／内核归因或两版本完整输出／广泛质量等价结论。范围来自当前默认两方向摘要，非置信区间。完整请求含prefill，不含HTTP与进程启动。
+
+`python tools/render_orca_current.py --sycl --check-only`离线核对当前42请求／4704输出、SYCL控制摘要、跨组计算、原主线历史倍率及首页保留顺序；去掉 `--check-only` 重画SYCL对照PNG／SVG。[SYCL原始数据](../sycl/orca/lowbit-fp16-m4-a770-windows-2026-11-04.json) · [当前原始协议与参考](../sycl/orca/default-hc256-a770-windows-2026-11-08.json)。[原主线历史表](#sycl-original-mainline-history)另用10-21 SYCL版本，固定保留在首页SYCL对照图之后，不与11-04 SYCL混用或累乘。
+
+## 最新默认：对原HC256的双向实测（2026-11-08）
+
+**当前／HC256图保留当前默认的直接双向对照。** 同机A770／Windows，U4 N16／M16／HC SG16、层内profile、spec6／置信度0.6、cache6200／6509槽、adapt16及8K配置保持；固定2048输入／128输出，正序原HC256／当前／原HC256，反序当前／原HC256／当前。每进程Short16后交错三轮Code／Prose，首轮预热、后两轮中位数，两端控制取几何均值。
+
+[![2026-11-08 当前默认对原HC256：Code2K decode提升21.21%–21.64%，Prose2K提升22.89%–23.27%；整请求吞吐提升4.15%–5.19%，最大decode控制漂移0.150%。](media/orca-current-default.png)](media/orca-current-default.svg)
+
+| 任务 | 原HC256净decode（tok/s） | 当前净decode（tok/s） | decode吞吐提升（正／反） | 整请求吞吐提升（正／反） |
+| --- | ---: | ---: | ---: | ---: |
+| Code2K | 31.09–31.15 | 37.76–37.82 | +21.642%／+21.212% | +4.379%／+4.299% |
+| Prose2K | 30.84–30.89 | 37.96–38.01 | +23.267%／+22.889% | +5.191%／+4.154% |
+
+净decode为 `128000 / decode_ms`；整请求含prefill，不含HTTP或进程启动。范围为独立两方向摘要，不是置信区间。42请求／4704输出、全部8字段、来源及独立原始协议复核通过，六个引擎退出0；最大绝对decode控制漂移0.150334%，四项decode均通过20%／3%条件。当前Code／Prose prefill为15.08–15.10／14.50–14.66秒，完整请求18.47–18.48／17.87–18.03秒。本轮固定2K结果不外推到其他输入或硬件，旧耗时、旧分叉及8K低余量标记保持，未宣称根因或修复。
+
+公开[JSON、完整原始协议与冻结参考](../sycl/orca/default-hc256-a770-windows-2026-11-08.json)可独立离线检查；`python tools/render_orca_current.py --check-only`复核42请求、8字段及全部阶段配对计算，去掉该参数重画PNG／SVG，无需GPU或本机模型资源。[完整报告及未合并的旧轮次](../bench/results/a770/orca-mtp-confidence40x40-2026-11-07.md#11-08-再次复测当前默认对原hc256双向达到20)。
+
+## 历史对照：Direct、L0 vs SYCL（11-04／11-05）
+
+以下保留各冻结版本及采用步骤的独立基线；历史百分比不相加。本机主推仍为U4 N16/load4/M16、min_rows=16、HC SG16及上述spec6配置，U4模型权重稍后上传HF／ModelScope，安装程序默认和公开U4模型分发尚未随之切换。[HC SG16单项采用](#hc-sg16-default)。
+
+[![Direct、L0 对照 SYCL：Short decode 为 SYCL 42.05、L0 59.38（+41.21%）、Direct 58.48（+39.07%）tok/s；下方另列 2K prefill。Short 为 11-04 冻结版本，L0 对 SYCL 为跨组参考。](media/orca-u4-optimization.png)](media/orca-u4-optimization.svg)
+
+这张历史图先用 **Short decode** 展示生成速度差异，再单独列出 **2K prefill** 的输入处理速度；每项均对照SYCL，同时展示Orca L0和Orca Direct。速率单位均为tok/s，越高越好。
+
+**Short decode（11-04 冻结版本）：** 固定 28-token Fibonacci 输入、76-token 自然输出，每进程十次预热、五次保留。`76000 / decode_ms` 排除准备、预填充和 HTTP。
+
+| 任务 | SYCL | Orca L0 | L0 相对 SYCL | Orca Direct | Direct 相对 SYCL |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| **Short** | **42.05** | **59.38** | **+41.21%** | **58.48** | **+39.07%** |
+
+SYCL／Direct／SYCL 夹测三个进程为 **41.8502 → 58.4840 → 42.2598 tok/s**，SYCL 几何基线 42.0545；Direct 相对该基线 +39.0672%，控制耗时漂移 −0.9692%。L0 59.3843 来自独立同策略 L0／Direct／L0 组，相对该 SYCL +41.2079% 为**跨组参考**，不是 L0／SYCL 同期夹测。两组加上反序复核共 135 次请求，完整输出和 57／57 草稿计数一致。固定 5771 槽、1536 MiB 预留、read256、decay0.95、MTP4、FP16 KV、prompt-cache0；这是整版本对照，包含内核、调度和缓存策略差异，**不代表本机当前 U4 配置的 Short 测速**。[Direct／SYCL 原始对照](../bench/results/a770/orca-direct-vs-sycl-2026-11-04.md) · [L0／Direct 双向复核](../bench/results/a770/orca-direct-idle-audit-2026-11-04.md)。
+
+以下两张历史 **2K表**保留11-04／11-05各版本的decode和prefill。三组均为2048输入、128输出、5771实际槽、MTP4、FP16 KV、prompt-cache0，初始化后交错三轮，舍弃首轮。
+
+**2K decode：** `128000 / decode_ms`，排除准备、预填充和 HTTP。
+
+| 任务 | SYCL | Orca L0 | L0 相对 SYCL | Orca Direct | Direct 相对 SYCL |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Code2K | 26.82 | 30.58–30.90 | +14.01%–15.20% | 29.82–29.93 | +11.18%–11.60% |
+| Prose2K | 25.46 | 30.45–30.69 | +19.61%–20.57% | 29.60–29.82 | +16.26%–17.15% |
+
+**2K prefill：** `2048000 / prompt_ms`，不与 decode 或完整请求墙钟混算。
+
+| 任务 | SYCL | Orca L0 | L0 相对 SYCL | Orca Direct | Direct 相对 SYCL |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Code2K | 87.88 | 134.76–139.01 | +53.35%–58.18% | 150.50–151.90 | +71.26%–72.85% |
+| Prose2K | 91.47 | 139.99–142.53 | +53.05%–55.82% | 155.57–156.89 | +70.08%–71.53% |
+
+2K 版本与原始字段：SYCL 为 **11-04 FP16 paired-M4 修复版 native**，从 `performance_runs[0]`／`[3]` 的 native 耗时摘要取几何均值；L0 为 **11-05 U4/min16/M16/HC256**，取 `trials[*].comparison[case][metric].candidate`；Direct 为 **11-05 U4/min32/M16/HC128 可选版**，取 `model.direct.cohorts[*].warm[case][metric].candidate`。范围来自各自独立正反序摘要，图中条形取正序。百分比为 `100 × (后端速率 / SYCL速率 − 1)`。
+
+2K 对照是**同机独立测量组之间的速率参考，非同期三方夹测**；不同后端的数值路径、版本与配置均保留身份，不能把比值单独归因给 API，也不构成输出或广泛质量等价结论。L0 反序 Code prefill 控制漂移 −3.56%，区间不代表稳定性保证；Direct 8K 间歇问题仍未关闭。[SYCL 修复与 native 控制](../bench/results/a770/lowbit-fp16-m4-2026-11-04.md) · [L0 HC256 测量](../bench/results/a770/orca-hc1-q8-grf-u4-2026-11-05.md) · [Direct 双向测量](../bench/results/a770/orca-u4-m16-combined-2026-11-05.md)。
+
+<a id="sycl-original-mainline-history"></a>
+
+## 最早版本 → SYCL 优化版：历史阶段提升
+
+最早生成基线为最初开启 MTP 的阶段；8K 预填基线来自显存预算修正阶段。SYCL 端为 2026-10-21 完整源码优化测试构建，39 次请求、每场景五个保留样本，输出匹配历史哈希。
+
+| 指标 | 最早阶段（tok/s） | SYCL 10-21（tok/s） | 历史吞吐倍率 |
+| --- | ---: | ---: | ---: |
+| Short 生成 | 5.8 | 41.85 | 7.22× |
+| Code2K 生成 | 7.6 | 29.02 | 3.82× |
+| Prose2K 生成 | 7.0 | 27.87 | 3.98× |
+| Long8K 生成 | 6.8 | 24.39 | 3.59× |
+| Long8K 预填 | 239.2 | 596.92 | 2.50× |
+
+倍率由未四舍五入的10-21中位数除以归档中的最早阶段值。各阶段配置不同，Short输入36→28 tokens；它不是同条件软件消融，不能与上方Short或U4对照相加或相乘。10-21 SYCL、11-04 Short SYCL、11-04修复后的2K SYCL分别保留构建身份。[历史完整测量](#2026-10-21-整模型复测) · [原始值及 `throughput_ratios` 历史字段](../bench/results/a770/refresh-2026-10-21.json)。历史三方图由 `python tools/render_orca_u4.py` 生成，`--check-only`离线复核Short、2K和最早历史的来源与计算；历史图片不改写。
+
+## 本机采用与各步骤验证（2026-11-05）
+
+**此前 min16/M16/HC256 阶段的另轮观测：** Code／Prose prefill 为 **14.73–15.20／14.37–14.63 秒**，完整请求 **18.88–19.38／18.54–18.83 秒**，净 decode **30.58–30.90／30.45–30.69 tok/s**。范围为正反序候选摘要，非置信区间。反序 Code prefill／完整请求控制漂移 **−3.56%／−3.08%** 超出 3%，这些列仅作观测；HC256 仅有 decode 双向对照通过性能门槛，不能与较早数据拼接为完整配置的总提升。[该轮原始记录](../bench/results/a770/orca-hc1-q8-grf-u4-2026-11-05.md)。历史三方图由 `python tools/render_orca_u4.py` 生成，`--check-only` 可离线复核，历史图片与记录保留原样。
+
+本机主入口 `run-iq2_xs.bat`／`strata-iq2_xs.json` 采用 U4 N16、四路权重加载和通用 FP16 M16 投影的组合，保留原模型名与 8080 端口。原组合的 `min_rows=32` 测量：同一 A770／驱动 `32.0.101.9034`／oneAPI 2025.3，2K 输入、128 输出，相对当前 U4/load4 的独立正反序对照，L0 的 Code／Prose prefill 吞吐提升 **47.47%–49.34%／49.11%–49.68%**，整请求吞吐提升 **37.22%–39.04%／38.15%–38.94%**；组合版 prefill 约 **15.24–15.34／14.75–14.84 秒**。两种顺序的控制漂移均在 3% 内。初轮 L0 控制漂移超线的记录保留，不用于采用。
+
+Direct 组合版也通过正反序确认，Code／Prose prefill 吞吐提升 **55.94%–56.52%／57.87%–58.17%**，保留独立可选配置；既有 Direct 8K 间歇问题仍未关闭，主推 L0。两后端的完整 256-target 质量 TSV 与原 U4 版本逐字节一致，完整生成输出及同组草稿计数一致；L0 另通过一组首次 8K 请求的完整输出对照。这些结果不构成广泛质量或长期可靠性结论，decode/GEMV 本轮未改。
+
+复用已保留的 9,402 个 U4 专家，载荷约 24.21 GiB；当前行数门槛的后续实测见下文。主启动脚本检查可用物理内存：达到 **67,891,552,256 字节（63.23 GiB）** 的准备预算时使用 U4；不足或无法查询时自动选择 `strata-iq2_xs-native-before-u4-20261105.json`。预算不是实测最低内存要求。旧 EXE、配置及权重保留，无需重新转换或复制权重。主推配置使用已测的固定 cache5500（实际5771）、read256、decay0.95、cumulative0；上述百分比仅与相同设置的 U4/load4 对照比较，不表示相对旧日常配置的总收益，也不与其他实验百分比相加。[实测、主入口验证和原始证据](../bench/results/a770/orca-u4-m16-combined-2026-11-05.md)。
+
+主推配置固定读取本轮实测的专家列表，保留进程内缓存适配；原有跨进程专家列表学习设置保留在原生回退配置中。这样服务器启动时不会用后来学习到的列表替换测速列表。
+
+同日继续在当前 U4/M16 L0 上测试已有融合反量化开关。质量 TSV、完整输出和草稿计数一致；正反序 Code prefill 吞吐提升为 **1.22%／0.78%**，整请求为 **1.00%／0.33%**。反序未达到预设的 1%／0.5% 门槛，该开关保持关闭；Prose 的正反序结果和全部原始样本见[回退专家实测](../bench/results/a770/orca-u4-fallback-2026-11-05.md)。
+
+当前主配置进一步采用 **`STRATA_U4_MIN_ROWS=16`**，其余 EXE、内核、权重和参数相同。同机 2K 输入／128 输出，相对本轮 U4/M16／32 行基线，独立正反序的 Code／Prose prefill 吞吐提升分别为 **1.99%–3.04%／2.08%–2.53%**，整请求提升 **1.49%–2.35%／1.45%–1.74%**；两种顺序均通过预设性能及 3% 控制漂移门槛。256 个固定目标的合计 PPL 相对 native 增幅 **0.3101%**、相对原 32 行方案增幅 **0.1857%**，通过既有有限质量门槛；Prose 生成内容和两组草稿计数有变化，不能视为数学等价或 decode/GEMV 内核提速。
+
+实际服务器通过首次 8K、Short、Code／Prose 2K、重复同一 8K 的混合历史及真实 HTTP health／models／重复 chat 验证。两次 8K 的完整输出及草稿计数相同，但与旧 32 行方案的输出不同；这是兼容性和确定性检查，未扩展为 8K 质量或稳态性能结论。旧 32 行配置仍可用，新增可选配置 `strata-iq2_xs-u4n16-orca-l0-m16-r16.json`；RAM 保护、原生回退及其学习列表保留。[行数门槛实测、采用检查与原始证据](../bench/results/a770/orca-u4-threshold-m16-2026-11-05.md)。
+
+当前 U4/min16 基线的 IQ2_XXS GEMV 定向 256 GRF 筛选已完成：Code／Prose decode 吞吐变化 **−0.232%／−0.268%**，未过 1% 门槛，不采用。480 条完整链及 72 次图重放数据检查、21 次完整模型请求的输出和草稿计数均通过；当前原生两侧都没有报告 spill，不能沿用旧 SYCL 对象的溢出结论。[完整数据和复算](../bench/results/a770/orca-gemv-xxs-grf-2026-11-05.md)。
+
+同一基线的 IQ2_XXS GU16 物理子组 SG32→SG16 也完成了独立三进程筛选，保留 WG256／GRF128、点积与 XOR 归约邻居。Code／Prose decode 吞吐变化 **−0.222%／+0.103%**，控制耗时漂移 **+0.025%／+0.248%**，没有通过 1% 门槛，不采用。另有480条完整链、72次图重放数据及21次模型请求核对通过，Host ABI 和全部 scratch 字节一致；主配置、U4N16 权重、RAM 回退保持。[源码改动、全部实测与复算](../bench/results/a770/orca-gemv-xxs-sg16-2026-11-05.md)。
+
+当前 decode 专家链的细分诊断保留正常并行调度，249 个窗口校验通过；暖态 Code 的 GU／Down 插桩区间约 **23.961／11.095 ms/窗口**，包含对应共享专家工作。补测已有 IQ2_S 三条输入复用路径，21 次正式请求完整输出及草稿计数一致；Code decode **−2.849%**，Prose 控制耗时漂移 **+11.871%**，该 Prose 配对排除。未采用，未建立新的稳定提速。[阶段边界、漂移与原始证据](../bench/results/a770/orca-decode-expert-stages-2026-11-05.md)。
+
+按 GU／Down 分块工作量计算缓存热度的隔离候选也完成了当前 U4 的 21 次完整请求核对。Code 观察变化 **+0.894%**，控制耗时漂移 **−3.147%** 超限，该配对排除；Prose 观察变化 **+1.281%**，漂移 **−2.999%**。整体未过采用门槛，未运行反序、不采用；默认计分和 U4N16／原生回退保留。[计分规则、全部样本与复算](../bench/results/a770/orca-decode-cache-work-2026-11-05.md)。
+
+HC1 融合 Q8 的单映像 128→256 GRF 已完成当前 U4/min16 的正反序对照，42 次完整输出和 MTP／协议一致。Code／Prose decode 正序观察 **+1.349%／+1.730%**，反序 **+1.932%／+4.415%**；外侧同策略耗时漂移均在 3% 内。反序有明显轮间波动，保留全部样本，不将这些有限同日测量解释为跨日稳定性。数学参数、SPIR-V／payload ABI、生产 EXE 和其余 images 不变；报告的 spill_size 从 2208 降为 0，private 分配仍存在。[全部样本、元数据与复算](../bench/results/a770/orca-hc1-q8-grf-u4-2026-11-05.md)。
+
+**此前的服务验收通过后，HC256 曾设为默认。** 两个新进程的首次8K→Short→Code2K→Prose2K→重复8K，以及真实 HTTP chat／Anthropic messages／OpenAI responses，共18次生成请求的完整输出及草稿计数核对通过，进程正常退出。每侧166个1Hz显存样本，128／256 GRF最低空闲分别为 **1519.145／1390.508 MiB**，均超过1024MiB余量线；采样不能排除间隙中的瞬时低值。永久目录另通过Short23/16与Code2K/full128，随后只切换 `STRATA_ORCA_IMAGES`；原128-GRF映像、U4N16数据、RAM保护和原生回退／学习列表保留。L0／Direct生成的构建命令均检查了单内核large-GRF标志，本轮默认采用仅针对L0，不扩展为8K提速、PPL或Linux结论。[服务、采用记录与文本证据](../bench/results/a770/orca-hc1-q8-grf-u4-adoption-2026-11-05.md)。
+
+<a id="hc-sg16-default"></a>
+
+### HC SG16：已设为本机默认
+
+同一 Windows A770 16GB／Xeon E5-2696 v4／驱动 32.0.101.9034／oneAPI 2025.3.2 上，完整配套的窄捕获 Host EXE 与 SG16 融合 Q8 images 已通过 HC256→SG16→HC256、SG16→HC256→SG16 两组独立模型对照。固定 U4/min16/M16、5771 实际专家槽、MTP4、2048 输入／128 输出；每进程先做 Short23/16 初始化，再交错三轮 Code／Prose，首轮不计，共42次请求的完整输出、草稿计数及协议核对通过。
+
+| 场景 | 正序 decode 吞吐变化 | 反序 decode 吞吐变化 | 外侧同策略耗时漂移（正／反序） |
+| --- | ---: | ---: | ---: |
+| Code2K | +5.611% | +5.602% | −0.980%／+1.026% |
+| Prose2K | +5.968% | +6.154% | −0.651%／+1.066% |
+
+两种顺序均通过预设性能门槛。基线仍为本轮冻结的原 HC256，历史百分比不相加；上述数据只说明本次完整元组的净 decode 收益。本机记录为 `build-orca-decode20-20261105/hc-sg16/performance-{forward,reverse}-r1/results.json`，更早的组件失败记录继续保留。
+
+首阶段 HC256 控制进程的首次／重复8K、Short、Code／Prose及四次真实 HTTP 请求全部核对通过且正常退出，但170个1Hz样本的最低空闲显存为 **855.176 MiB**，未达1024MiB；失败记录 `build-orca-decode20-20261105/hc-default-r1/` 保留，该阶段未切换主配置。新阶段分别报告控制侧余量，候选 HC SG16 仍必须达到原定1024MiB余量线。最终两侧全部18次生成请求、完整草稿计数及真实 HTTP health／models／重复chat／messages／responses核对通过，进程正常退出；HC256／SG16 分别171／169个1Hz样本，最低空闲显存为 **1119.418／1336.047 MiB**，两侧实际均达标。采样不能排除间隙中的瞬时低值。
+
+**主配置已采用 HC SG16，下次启动生效。** 永久配套元组位于 `engine/u4n16-orca-l0-m16-hc-sg16/`，主配置只改 `exe` 与 `env.STRATA_ORCA_IMAGES`；原HC256主配置逐字节备份到 `strata-iq2_xs-before-hc-sg16-20261105.json`，另保留SG16可选配置。U4N16数据、RAM保护、固定及学习专家列表和原生回退均保留。采用记录为 `build-orca-decode20-20261105/hc-default-r2/results.json`，其中完整哈希、服务记录和首阶段失败记录可复核；本机检查入口：
+
+```powershell
+python -X utf8 build-orca-decode20-20261105/adopt_hc_r2.py check
+```
+
+此前以 SG16 为控制的增量 decode 筛选，按用户要求将 Code2K 吞吐门槛从 +0.5% 进一步降到 **+0.2%**，Prose2K 保持 **+1%**；正序、独立反序均须通过各自门槛，外侧同策略耗时漂移绝对值仍须不超过 3%，完整输出／MTP 计数／原始协议一致。当时的新实验使用 `gate_policy_r2.py`；已冻结的 `gate_policy.py`、原始测量和判定保留，不追加挽救重复。原 HC256 的新增 20% 目标基线和其他实验的整请求耗时门槛不变。本机旧门槛自检：`python -X utf8 build-orca-decode20-20261105/gate_policy_r2.py self-check`。规则及旧数据的离线复核记录为 `build-orca-decode20-20261105/checkpoint-gate-code02-r1.json`。
+
+**当前增量门槛**按用户后续明确要求改为 **Code2K ≥+0.2%、Prose2K ≥+0.5%**，正序及独立反序都须通过，绝对耗时漂移上限仍为 **3%**，完整输出／MTP计数／原始协议要求保留。这是筛选线，不表示已证明小幅变化超出测量噪声。新入口使用 `gate_policy_r3.py`，边界、非有限数和旧规则不变自检为 `python -X utf8 build-orca-decode20-20261105/gate_policy_r3.py self-check`。已冻结的旧门槛、测量和判定均保留，不能统一改写旧失败记录；用户明确接受的当前MTP accepted-only候选单独记录新规则判定并执行新反序。原HC256每场景20%的累计目标不变。
+
+同机 SG16 上的 IQ2_S GEMV exact-load／256-GRF 候选完成21次完整请求核对，但 Code／Prose decode 吞吐分别 **−3.256%／−4.190%**，外侧耗时漂移 **−0.270%／+0.450%**；新门槛下仍拒绝，未采用。记录为 `build-orca-decode20-20261105/gemv-loads256-sg16/performance-forward-r1/results.json`，新门槛复核保存在同目录下的 `gate-code05-forward-r1/results.json`，原 `passes=false` 保留。
+
+有效 alignment2 的 exact-load／128-GRF 版本也完成480项 eager＋72项图重放的链式数值／scratch／guards检查，但同样的21次完整模型请求中，Code／Prose decode 吞吐为 **−3.162%／−2.699%**，外侧耗时漂移 **+0.656%／−2.000%**。正序不通过，未进入反序，未采用；记录为 `build-orca-decode20-20261105/gemv-align2-sg16/performance-forward-r1/results.json`。两次 exact-load 候选的资源改善均未转化为本轮模型收益。
+
+HC 常量槽位选择保持原608字节捕获布局，编译器报告的 private_size 从9728降到0，SG16／256 GRF／零spill保留；旧／新各64项 eager/replay 的完整输出、CPU参考、输入及guards核对通过。相对冻结SG16的增量正序，Code／Prose decode 吞吐 **+0.569%／+1.183%**，外侧耗时漂移 **+0.202%／−0.048%**，通过新筛选门槛；独立反序为 **+0.498%／+0.713%**，漂移 **−0.076%／−0.274%**，两类请求均未过各自门槛。共42次完整请求的输出、MTP计数和协议一致，但双向收益门槛失败，未采用，不追加挽救重复。这不是新增20%或整模型显存减少的结论。资格记录为 `build-orca-decode20-20261105/hc-row-select/build-r3/results.json`，测速位于 `build-orca-decode20-20261105/hc-row-select-model/performance-forward-r1/` 与 `performance-reverse-r2/`。
+
+主配置随后叠加了校准 Q2 MTP 与 cumulative0.5，采用身份记录为 `build-mtp-quality-20261105/optional-combined-r1/results.json`；该组合早先未通过性能门槛的结果保留。上面的 SG16 采用检查严格要求原主配置身份，因此该变更会使旧入口拒绝。后续 HC 反序使用 `mtp_descendant.py` 核对新默认、运行时和保留的 SG16 祖先配置，模型对照仍使用与正序相同的冻结 SG16 请求历史，原 HC256 的20%目标基线不变。首次反序仅在身份检查处退出、未启动模型，其证据保存在 `hc-row-select-model/guard-reverse-r1/`；新阶段为 `performance-reverse-r2`。Q5 接受率改善但计入专家缓存缩减后未获得一致完整请求收益。[Q5 实测](../bench/results/a770/mtp-q5-2026-11-05.md) · [Q2 实测与配置](../bench/results/a770/mtp-q2-optimization-2026-11-05.md)。
+
+IQ2_S GU 的 canonical stride 候选只在已有 fixed2560 分支推导 `gu_row` 和 `up_off`，保持原加载、点积和归约顺序；480项 eager／72项图重放的完整链、scratch、guards及原生参数布局核对通过。原生静态指令只减少1条 `mul`、3条 `mach`，21次完整模型请求的 Code／Prose decode 吞吐变化为 **−0.893%／+0.049%**，外侧耗时漂移 **−0.096%／−0.136%**。未过增量门槛，不做反序、不采用；资格及测速记录为 `build-orca-decode20-20261105/qualified-stride/build-r1/results.json` 和 `gemv-stride-sg16/performance-forward-r1/results.json`。
+
+IQ2_S GU 的符号展开候选改用位移／掩码，保持原加载、点积、scale与归约；原生 `mul` 从358降到262、`mach` 从232降到136，加载及DP4A数量相同，SG16／128 GRF／零spill保留。480项 eager及72项图重放的完整链、scratch、guards通过；21次完整模型请求中，Code／Prose decode 吞吐变化为 **−0.116%／+0.114%**，外侧耗时漂移 **+0.562%／+0.131%**，完整输出及MTP计数一致。静态改善未转化为通过门槛的decode收益，未反序、未采用；记录为 `build-orca-decode20-20261105/qualified-signs/build-r1/results.json` 和 `gemv-signs-sg16/performance-forward-r1/results.json`。
+
+IQ2_S GU 的 scale 候选利用16个有符号字节乘积及4位scale的整数范围，在FP32中精确完成整数乘加，再保留原来的 `/2` 与 `/4` 截断。边界／随机CPU检查及480项 eager、72项图重放的完整链检查通过；原生 `mach` 从232降到176，`mul` 从358降到330，加载及DP4A数量相同。21次完整请求中，Code／Prose decode 吞吐仅 **+0.139%／+0.265%**，外侧耗时漂移 **+0.324%／+0.256%**；完整输出和MTP计数一致，未过门槛、不做反序、不采用。记录为 `build-orca-decode20-20261105/qualified-finish/build-r1/results.json` 和 `gemv-finish-sg16/performance-forward-r1/results.json`。
+
+新的XMX int8 GU候选保留原来的16组部分和、每组5项浮点累计及XOR归约树；HC继续使用SG16，候选GU改为SG8、128 GRF、零spill、16 KiB SLM。首次原生资格检查因完整载荷布局变化拒绝，失败保留在 `build-orca-decode20-20261105/qualified-xmx/build-r1/`。独立第二阶段仅允许已核对的 `const_base`／`local_size` 隐式字段变化，用户参数、线程载荷及绑定布局保持相同；用户偏移、隐式字段偏移及未知字段的负例均拒绝。复用相同烘焙映像后，IQ2_S与Q2_0各480项 eager、72项图重放的完整链、scratch及guards均通过，并核对实际DPAS、SLM和barrier。该链式oracle固定 `n_ff=640`，不据此声称覆盖任意行尾。资格记录为 `qualified-xmx-r2/build-r1/results.json`；完整模型正序21次完整请求的Code／Prose decode吞吐为 **−10.549%／−13.175%**，外侧耗时漂移 **−0.351%／+0.278%**；完整输出、MTP计数及原始协议核对通过。性能退化，未反序、未采用；测速记录为 `gemv-xmx-sg16/performance-forward-r1/results.json`。后续8 KiB存储复用版本是另一个候选，尚无性能结论。
+
+XMX的8 KiB版本在每个子组内复用输入、结果和部分和存储，浮点部分和以整数位模式保存，不改变点积或归约次序；原生SLM为8192字节，IQ2_S及Q2_0的完整双格式GPU检查再次通过。21次完整模型请求的Prose decode吞吐 **−12.903%**，外侧耗时漂移 **+0.067%**；Code外侧控制漂移 **−14.424%**，超出3%线，该配对排除，原始观察值和异常样本全部保留。未过正序门槛、未反序、不追加挽救重复、不采用。记录为 `build-orca-decode20-20261105/qualified-xmx-slm8/build-r1/results.json` 和 `gemv-xmx-slm8-sg16/performance-forward-r1/results.json`。降低SLM没有使本轮方案取得可采用的decode收益。
+
+IQ2_S GU 的提前读取候选使用现有 SDK 的 L2 prefetch 提示，不新增 staging、同步或数学操作。完整行的可变长度版本在128 GRF下产生160字节spill；改成每64字节区间及行尾各提示一个字节后仍有128字节spill。两次均在任何候选GPU执行前由零spill门槛拒绝，失败分别保留在 `build-orca-decode20-20261105/qualified-prefetch/build-r1/` 和 `qualified-prefetch-lines/build-r1/`，没有模型测速或提速结论。单字节版本的CPU检查覆盖820字节标准行的全部64种起始对齐。
+
+同一份单字节预取SPIR-V另以256 GRF烘焙，实际SG16／256 GRF／零spill，用户及隐式原生参数布局均相同；480项 eager、72项图重放的完整输出、scratch及guards检查通过。原生多出两条无返回值的 `load.ugm.d8u32.a64.ca.ca`，不据SDK提示名称声称只填充L2，也未测量缓存命中或读取重叠。资格记录为 `build-orca-decode20-20261105/qualified-prefetch256/build-r1/results.json`。完整模型正序21次请求的Code／Prose decode吞吐为 **−2.051%／−2.347%**，外侧耗时漂移 **+0.318%／+0.198%**；完整输出、MTP计数和原始协议均一致。该结果反映预取与256 GRF的组合，不能单独归因于预取。未过门槛、不反序、不追加挽救重复、不采用；测速记录为 `gemv-prefetch256-sg16/performance-forward-r1/results.json`。比较继续使用冻结的旧MTP SG16历史，当前校准Q2 MTP默认及原HC256目标锚点保留。
+
+两次旧XMX映像均有173条静态 `send.slm`，因此另准备了直接填写activation B片段的候选，去掉其SLM写入及载入，保留gate/up矩阵存储、同步、两半整数点积与原浮点归约。CPU检查覆盖1／2／4条输入、半段零填充及有符号边界值；C++／SPIR-V编译及原生烘焙成功，但实际SG8／128 GRF下有 **1120字节spill**，在任何候选GPU执行前由资源门槛拒绝。后续只读反汇编确认静态 `send.slm` 从173降到152，但 `send.ugm` 从159增到294、`send.dc0` 从4增到63，`dpas.8x8` 仍为7；这些数量不能单独证明溢出的具体原因。未做双格式GPU数值验证或模型测速，不能声称数值等价或提速。入口为 `build-orca-decode20-20261105/gu_xmx_direct_b.py`，失败记录保留在 `qualified-xmx-direct-b/build-r1/results.json`；未采用。
+
+2026-11-06，同机独立SYCL探针实际校准了DG2／oneAPI2025.3的SG8矩阵片段坐标。WG128中的16个子组均通过完整、唯一覆盖检查：lane `r` 的A片段第 `i` 个字节位于 `(i/4,4*r+i%4)`，B片段位于 `(i,r)`，int32累加器片段也位于 `(i,r)`；各lane分别有32／32／8个元素。原GPU探针正常退出，Python整理因CRLF匹配失败；随后源码一致性复核又因后补三个include而退出。两个失败均保留，最终从已保存输出及实际编译副本恢复，未重跑GPU；复核仅允许这三个include差异并校验全部坐标、CRLF／LF及默认身份。记录为 `build-orca-decode20-20261105/matrix-coords-review-r2/results.json`。该证据只校准本机SDK片段布局，不代替Orca专家链数值或模型速度验证。
+
+首个寄存器片段候选使用12次shuffle的8×8转置及固定长度循环填写A／B、提取C，保留原半点积和浮点归约。C++／SPIR-V及原生烘焙成功；旧整理器因符号表伪内核排在首位而误读SIMD32，原失败保留。按目标内核全名复核后，实际为SG8／128 GRF、零spill、4096字节SLM，但仍有 **392字节／lane私有内存**（SG8合计3136字节），新增 `private_base_stateless` 也不在本轮冻结的隐式参数许可内，拒绝进入GPU数值或模型测速。静态 `send.slm` 为108、`send.ugm` 为772、`dpas.8x8` 为9；源代码改用寄存器片段不能证明最终机器码没有私有内存往返。元数据按名称解析的自检拒绝错名、额外内核及重复内核；复核和辅助IR导出失败日志保存在 `build-orca-decode20-20261105/xmx-registers-review-r4/`，未采用。
+
+随后将转置的12次交换和32／8个片段访问全部写成常量索引，消除了上述私有内存：实际SG8／128 GRF、零spill、零private_size、4096字节SLM；仅保留最终跨子组部分和存储及原工作组同步，原半点积、scale截断、16组各5项浮点累计和XOR树不变。整个映像的静态 `send.slm` 从旧XMX的173降至108，`send.ugm` 为172，`dpas.8x8` 为7，不能据此直接换算性能。精确用户参数及已知隐式参数布局核对通过，IQ2_S／Q2_0各480项 eager与72项图重放的完整链输出、scratch及guards均通过。资格记录为 `build-orca-decode20-20261105/qualified-xmx-static/build-r1/results.json`，入口为 `gu_xmx_static.py`；数值oracle仍限定 `n_embd=2560,n_ff=640`，模型收益须另看完整请求测速。
+
+该常量索引版的完整模型正序现已完成：21次请求的完整输出、MTP计数和原始协议一致，Code／Prose decode吞吐 **−9.468%／−11.973%**，外侧耗时漂移 **−0.141%／+0.456%**。两类控制漂移均合格，但性能回退，未过Code0.5%／Prose1%门槛；不反序、不追加挽救重复、不采用。测速为 `build-orca-decode20-20261105/gemv-xmx-static-sg16/performance-forward-r1/results.json`，同级 `performance-forward-r1-provenance/results.json` 确认前后默认身份不变。SLM和私有内存改善没有转化为可采用的decode收益；保留HC SG16＋校准Q2 MTP／cumulative0.5当前默认、U4N16数据和原生回退，原HC256新增20%目标仍未达到。
+
+随后测试了两种 IQ2_S GU 需求解码流水线：完整版本先解码下一轮实际需要的 gate/up 权重，gate-only 版本只提前解码 gate，保持加载块序列、原整数点积／截断、浮点累计和 XOR 归约。两版的 CPU 空输入／尾部序列自检、C++／SPIR-V 编译及编译器 ABI 核对均通过，但目标原生内核在 SG16／128 GRF 下分别报告 **3296／1088 字节 spill**，均在候选 GPU 执行前被零 spill 门槛拒绝。没有完整链数值或模型测速，不据 spill 减少声称提速；未采用。失败记录为 `build-orca-decode20-20261105/qualified-pipeline/build-r1/results.json` 和 `qualified-pipeline-gate/build-r1/results.json`，CPU 复查入口分别为 `gu_pipeline.py self-check` 与 `gu_pipeline_gate.py self-check`。Code0.5%／Prose1% 门槛、HC SG16＋校准Q2 MTP 默认、U4N16数据和原HC256的20%目标锚点保留。
+
+需求流水线又尝试只暂存四个压缩 gate 字段（qs、signs、合并的qh/scale、d），到当前轮再执行原展开。全部65,536组qh/scale及空输入／尾部加载序列CPU自检通过，但 SG16／128 GRF 的完整条目版、仅E1/E2版、仅E1版仍分别有 **1216／512／224 字节 spill**；三版均在候选GPU执行前拒绝，未做数值链或模型测速，不采用。对应记录为 `build-orca-decode20-20261105/qualified-pipeline-packed/build-r1/results.json`、`qualified-pipeline-small/build-r1/results.json` 和 `qualified-pipeline-one/build-r1/results.json`，入口分别为 `gu_pipeline_packed.py`、`gu_pipeline_small.py`、`gu_pipeline_one.py` 的 `self-check`。字段减少及限制条目分支仍未使本轮流水线达到零spill要求。
+
+XMX 另测按已校准 A 片段坐标直接解码 IQ2_S 的四字节权重：去掉 gate/up 的两次8×8 A转置，保留B片段、C转置、原半点积、scale截断、16组各五项浮点累计和最终XOR树。CPU检查覆盖524,288组网格索引、256组随机有符号布局及0–8行有效尾部；实际SG8／128 GRF、零spill、零private_size、4096字节SLM，IQ2_S／Q2_0各480项 eager及72项图重放的完整链、scratch和guards均通过。整个映像的静态 `send.ugm` 为322、`send.slm` 为108、`dpas.8x8` 为9；A转置减少没有减少静态加载指令，须由完整模型测速判定收益。资格记录为 `build-orca-decode20-20261105/qualified-xmx-direct-a/build-r1/results.json`，入口为 `gu_xmx_direct_a.py`；数值GPU oracle仍固定 `n_embd=2560,n_ff=640`，行尾仅有CPU证据。
+
+该直接A解码版完成21次完整模型正序请求：Code／Prose decode吞吐为 **−16.604%／−19.627%**，外侧耗时漂移 **−1.634%／−1.881%**；完整输出、MTP计数及原始协议一致。控制漂移合格，但性能回退，未过Code0.5%／Prose1%门槛；不反序、不追加挽救重复、不采用。控制几何平均／候选decode耗时分别为Code **3923.442／4704.600 ms**、Prose **3937.198／4898.650 ms**。记录为 `build-orca-decode20-20261105/gemv-xmx-direct-a-sg16/performance-forward-r1/results.json`，同级provenance记录核对前后默认身份一致。Code预填／TTFT控制漂移超过3%，不从这组数据确认它们的收益；本项仅报告通过漂移检查的decode比较。HC SG16＋校准Q2 MTP／cumulative0.5默认、U4N16数据及原HC256新增20%目标锚点保留。
+
+XMX静态转置的十二次交换另改成常量mask的 `permute_group_by_xor`。SG8／128 GRF、零spill／private、4096字节SLM及双格式各480项 eager＋72项图重放均通过。原生代码段70784字节，数据、重定位、元数据、符号表和字符串段逐字节相同；代码段原始字节不同，逐行复核只有两条 `mov (16|M0) null<1>:ud` 的八位十六进制标识立即数变化，其他指令及全部指令计数相同。故不做模型测速、不采用；没有把源代码intrinsic替换算作提速。原始不相同判定保留在 `build-orca-decode20-20261105/qualified-xmx-xor/build-r1/results.json`，仅归一化这两条无结果写入的复核为 `xmx-xor-review-r1/results.json`。首次整理匹配还包含尾部未变的0／1标记，失败保存于 `xmx-xor-review-parser-r1/`；修正匹配后复用已保存输出，未重跑GPU。自检 `xmx_xor_review.py self-check` 拒绝寄存器目标、其他宽度及真实指令变化。
+
+另一版直接交换XMX操作数角色：A存activation的两个半段，B存权重输出列，使C的lane直接对应原输出行、元素索引对应activation半段，同时去掉原来的四次A／C转置。256组有符号矩阵、E1／2／4零填充、极值半点积及校准坐标CPU检查通过；原scale截断、16组各五项浮点累计和最终XOR树保留。实际SG8／128 GRF、零spill／private、4096字节SLM，IQ2_S／Q2_0各480项 eager及72项图重放的完整链、scratch及guards通过。整个映像静态 `mov` 为944（原静态XMX为1482）、`send.ugm` 为157（原172）、`send.slm` 为108、`dpas.8x8` 为9；这些数量不直接换算成吞吐。资格记录为 `build-orca-decode20-20261105/qualified-xmx-swap/build-r1/results.json`，入口为 `gu_xmx_swap.py`。
+
+该交换版完成正序21次请求、2352个输出token，完整输出、MTP计数和原始协议一致；Code／Prose decode吞吐为 **−7.215%／−8.894%**，外侧耗时漂移 **−0.257%／+0.066%**。控制几何平均／候选decode耗时分别为Code **3907.222／4211.050 ms**、Prose **3911.200／4293.000 ms**。漂移合格，但性能回退，未过Code0.5%／Prose1%门槛；不反序、不追加挽救重复、不采用。记录为 `build-orca-decode20-20261105/gemv-xmx-swap-sg16/performance-forward-r1/results.json`，同级provenance确认前后默认身份一致；HC SG16＋校准Q2 MTP／cumulative0.5、U4N16数据和原HC256新增20%目标锚点保留。去掉全部转置仍未获得可采用的decode收益。
+
+随后只修改最终部分和的SLM排列与归约：保留WG128／SG8、16组各五项浮点累计及原来的8／4／2／1求和顺序，由子组读取相隔8的两个部分和，再执行XOR4／2／1。CPU检查覆盖E1／2／4布局双射、输出唯一归属、地址模16分布和768组逐位浮点树；主机分派、Q2_0分支和其他内核逐字一致，C++／SPIR-V与显式参数ABI检查通过。首次原生资格在候选GPU执行前拒绝，原因是编译器删除不再使用的隐式 `local_size`；记录保留在 `build-orca-decode20-20261105/qualified-xmx-reduce/build-r1/results.json`。独立适配器 `xmx_reduce_r2.py` 仅允许已观察到的 `const_base128,global_base136,group_count144` 布局，用户偏移、隐式偏移和未知字段负例均拒绝；复用原生编译结果，不改变数值检查。适配器首次CPU自检重复安装反射链的失败保留在 `xmx-reduce-adapter-selfcheck-r1/`，改为独立CPU子进程后通过。第二阶段原生SG8／128 GRF、零spill／private、4096字节SLM，IQ2_S／Q2_0各480项 eager及72项图重放的完整链、scratch及guards均通过；记录为 `qualified-xmx-reduce-r2/build-r1/results.json`。整个映像的静态 `send.slm` 从交换版的108降到36，`mov` 为986、`send.ugm` 为159、`dpas.8x8` 为9；静态变化不直接换算吞吐，收益须由完整请求计时判定。
+
+归约版随后完成21次完整模型正序请求、2352个输出token，完整输出、MTP计数和原始协议一致；Code／Prose decode吞吐为 **−7.275%／−8.802%**，外侧耗时漂移 **+0.292%／+0.181%**。控制几何平均／候选decode耗时分别为Code **3893.421／4198.900 ms**、Prose **3899.973／4276.400 ms**。两类漂移合格，性能仍回退；未过Code0.5%／Prose1%门槛，不反序、不追加挽救重复、不采用。测速为 `build-orca-decode20-20261105/gemv-xmx-reduce-sg16/performance-forward-r1/results.json`，同级provenance确认前后默认身份一致。该结果说明此处SLM静态指令减少仍未建立整模型收益，不单独归因于任何硬件瓶颈；HC SG16＋校准Q2 MTP／cumulative0.5默认、U4N16数据、原生回退和原HC256新增20%目标锚点保留。
+
+另测Q2_0 down四lane、单组快路径、WG256的物理子组SG16→SG8，仅替换 `iq_kernels/image_152.zebin` 及其原生清单；主机几何、模板名、点积、五项浮点累计、XOR2／1、所有GU及其他Down变体保留。CPU检查覆盖256个工作项的归约邻居与2560行的覆盖，编译器ABI及原生用户／线程／绑定布局一致。两侧均128 GRF，候选SIMD8；元数据未声明spill／private／SLM分配，资格按零处理。复用已有ELF短节名审计，逐节确认运行指令及所有非字符串表载荷不变；只修改审计副本，运行映像保持原字节。静态 `mov` 为417→300，`send.ugm` 仍53、`dp4a` 仍64，不作为性能结论。GU22和GU16各480项 eager＋72项图重放的完整链、scratch及guards均通过；资格为 `build-orca-decode20-20261105/qualified-down-sg8/build-r1/results.json`，入口为 `down_sg8.py`，GPU数值oracle仍限定N2560／F640。完整模型结果见下段。
+
+Down SG8的完整模型正序已完成：18条Code／Prose请求加3条初始化，共21次请求、2352个输出token，完整输出、MTP计数和原始协议一致，三个引擎均退出0。Code／Prose decode吞吐变化为 **−0.170%／−0.204%**，外侧耗时漂移 **+0.127%／+0.160%**；控制几何平均／候选decode耗时分别为Code **3899.124／3905.750 ms**、Prose **3901.424／3909.400 ms**。没有显示达到Code0.5%／Prose1%的收益，不反序、不追加挽救重复、不采用；不把该幅度称为显著回退。记录为 `build-orca-decode20-20261105/down-sg8-model/performance-forward-r1/results.json`，同级provenance确认前后默认身份一致。HC SG16＋校准Q2 MTP／cumulative0.5默认、U4N16数据及原生回退保留；原HC256新增20%目标尚未达到。
+
+同机随后只对512专家的两个原生路由映像启用256 GRF，保留原SPIR-V、Host几何、softmax、低ID优先及按获胜lane累加的顺序；256专家映像不变。两个映像的元数据均从128 GRF／4512字节spill变为256 GRF／零spill，用户及线程载荷一致，原版重烘焙逐字节一致。旧／新各266组eager和798次replay的完整输出、输入及guards核对通过，覆盖256／512专家、T=1–8／64和512专家单行入口；六类分布另核对CPU参考，近似平局一类检查合法性及旧／新逐字节一致。缺失的private／SLM字段按0解释，不是独立运行时分配测量。
+
+该路由GRF候选完成21次完整模型正序请求、2352个输出token，三个引擎退出0，完整输出、MTP计数和原始协议一致。Code／Prose decode吞吐变化为 **+0.166%／+0.141%**，外侧耗时漂移 **+0.086%／+0.019%**；控制几何平均／候选decode耗时分别为Code **3907.775／3901.300 ms**、Prose **3913.375／3907.850 ms**。未达到本轮Code0.2%／Prose1%的门槛，不反序、不追加挽救重复、不采用。资格和测速记录为 `build-orca-decode20-20261105/router-grf256/build-r1/results.json`、`router-grf256/performance-forward-r1/results.json`，provenance确认当前默认身份不变；原HC256新增20%目标仍未达到。降低路由spill没有建立可采用的模型收益。后续静态资源清点单列于 `resource-census-r1.json`，它不证明各映像实际执行或构成瓶颈。
+
+同机HC norm／reduce的固定槽位候选只替换默认路径的image20／19，保留八槽捕获布局、Host ABI、全部运算与归约顺序。元数据中的private_size分别从12544／20096降到0，128 GRF、SG32／16、SLM64／0及零spill保留；原生元数据仅删除四类编译器private描述，另有reduce反射类型编号192→190，1256字节结构大小与全部用户参数描述不变。旧／新各64组eager＋replay完整输出、CPU参考、输入及guards检查通过；跨臂比较的是64组完整输出校验和，不称为跨臂逐字节对照。
+
+该候选21次完整模型正序请求、2352个输出token全部核对通过，三个引擎退出0。Code／Prose decode吞吐为 **+0.608%／+0.792%**，外侧耗时漂移 **+0.065%／+0.205%**；控制几何平均／候选decode耗时分别为Code **3897.925／3874.350 ms**、Prose **3899.348／3868.700 ms**。Code达到新0.2%门槛，但Prose未到1%，因此不反序、不追加挽救重复、不采用。资格与测速记录为 `build-orca-decode20-20261105/hc-norm-reduce-select/qualification-r1/results.json` 和 `hc-norm-reduce-select/performance-forward-r1/results.json`；当前默认、U4N16数据和原生回退保留，原HC256新增20%目标尚未达到。
+
+随后将已分别核对的HC up3、norm20、reduce19固定槽位组成一个新候选，直接与冻结SG16对照，不相加单项百分比。三个映像的private元数据均按零处理，GRF／SG／SLM、数学顺序、捕获布局、EXE和其余映像保留。旧／新各64组eager＋replay完整输出、CPU参考、输入及guards检查通过，跨臂64组完整输出校验和一致。
+
+| 场景 | 组合正序decode吞吐变化 | 独立反序decode吞吐变化 | 外侧同策略耗时漂移（正／反序） |
+| --- | ---: | ---: | ---: |
+| Code2K | +1.220% | +1.357% | −0.120%／+0.025% |
+| Prose2K | +1.403% | +1.572% | −0.094%／+0.173% |
+
+两种顺序均达到Code0.2%／Prose1%、漂移不超过3%的门槛；42次请求、4704个输出token完整一致，MTP计数和原始协议核对通过，六个引擎均退出0。这是旧MTP冻结配置上的纯内核增量，不是当前校准Q2 MTP组合的已测净收益，也不是新增20%的结论。Code完整请求吞吐观察为−0.174%／−0.182%，Prose为+0.054%／+0.215%，不能把decode收益称为完整请求同比例提速。记录为 `build-orca-decode20-20261105/hc-all-row-select/performance-{forward,reverse}-r1/results.json`。
+
+**三内核组合已设为本机默认，下次启动生效。** 当前校准Q2 MTP＋cumulative0.5配置另跑控制／候选的首次8000输入、Short、Code2K、Prose2K、重复8000输入及真实HTTP chat／messages／responses，共18次生成请求。两侧完整token、MTP计数和API输出一致，进程均退出0；163／162个1Hz样本的最低空闲显存为 **2217.531／2405.152 MiB**，均超过1024MiB。采样不能排除间隙中的瞬时低值。这轮以当前MTP控制组建立成对参考，未套用旧MTP的草稿计数；属于兼容与余量验收，不另作性能百分比。
+
+主配置仅将 `env.STRATA_ORCA_IMAGES` 切到 `engine/u4n16-orca-l0-m16-hc-select/images`，永久副本逐文件哈希与已测候选一致，EXE及其他参数不变。校准Q2 MTP、cumulative0.5、U4N16数据、RAM保护及原生回退保留；原配置逐字节备份为 `strata-iq2_xs-before-hc-select-20261106.json`，另有新可选配置。采用记录为 `build-orca-decode20-20261105/hc-select-default-r1/results.json`，服务证据为 `hc-all-row-select/service-review-r1/`。该阶段身份核对使用 `hc_select_default_r2.py` 的 `provenance`，它通过精确备份审计原MTP默认，只允许这次images路径变更；缓存扩容后的默认复核入口见下文，旧检查及实验原件保留。原HC256新增20%目标仍未达到。
+
+扩容前的默认（HC三内核＋校准Q2 MTP／cumulative0.5）另与原HC256锚点直接做了正序对照：原配置／该默认／原配置，沿用Short初始化、三轮交错2048输入／完整128输出、首轮预热及后两轮中位数。21次请求、2352个输出token完整核对通过，三个引擎均退出0，前后运行时与配置身份一致。Code／Prose decode吞吐分别 **+6.278%／+8.866%**，两端原配置decode耗时漂移为 **+0.079%／+0.103%**；控制几何平均／该默认decode耗时分别为Code **4115.125／3872.050 ms**、Prose **4148.174／3810.350 ms**。完整请求吞吐观察为 **+1.282%／+1.869%**，不等同于decode增益。
+
+这次直接累计比较包含已采用的HC内核及MTP策略变化；两侧完整贪心输出相同，各自全部协议字段严格匹配预先冻结的参考。Code的MTP接受／提议数为原配置73／90、该默认73／89，Prose为62／96、59／80，不能把总收益归于单项内核或连乘历史百分比。两场景均未达到原HC256新增20%目标，因此不启动反序、不追加挽救重复。记录为 `build-orca-decode20-20261105/total-current-vs-hc256-r2/performance-forward-r1/results.json` 和 `checkpoint-total-current-vs-hc256-r2.json`；r1仅因身份适配器缺少EXE字段而在启动模型前退出，原失败记录保留。该轮未改主配置。
+
+同机后续仅将现有 `--expert-cache` 请求从5500增至6250，保持HC三内核、校准Q2 MTP／cumulative0.5、U4N16、1536MiB预留及其他参数。实际专家槽位从 **5771增至6561**，按原生profile和256字节对齐计算，缓存从7922.021增至9001.782MiB，增加 **1079.761MiB**；实际容量已在六个测速进程中核对。以扩容前真实默认为控制，沿用上述21请求正序和独立21请求反序：
+
+| 场景 | 缓存扩容正序decode吞吐变化 | 独立反序decode吞吐变化 | 外侧同策略耗时漂移（正／反序） |
+| --- | ---: | ---: | ---: |
+| Code2K | +6.848% | +6.879% | +0.018%／−0.174% |
+| Prose2K | +6.050% | +5.944% | +0.022%／+0.127% |
+
+两种顺序均通过Code0.2%／Prose1%及3%漂移门槛；42次请求、4704个输出token、两侧全部八项协议字段及原始协议一致，没有草稿计数例外，六个引擎均退出0。完整请求吞吐观察值为Code **+1.754%／+1.295%**、Prose **+1.618%／+1.529%**。这是相对扩容前默认的增量结果，未计为原HC256新增20%。测速与身份记录为 `build-orca-decode20-20261105/cache6250/performance-{forward,reverse}-r1/`，检查点为 `checkpoint-cache6250-bidirectional-r1.json`。
+
+**缓存6250已设为本机默认，下次启动生效。** 原缓存／扩大缓存各完成首次8000输入、Short、Code2K、Prose2K、重复8000输入及真实HTTP重复chat／messages／responses，共18次请求、1184个输出token；两侧完整输出、全部MTP计数及API结果一致，进程均退出0。161／160个1Hz样本的最低空闲显存为 **2377.691／1299.691MiB**，均超过1024MiB；不能排除采样间隙中的瞬时低值。服务记录为 `cache6250/service-review-r1/`。
+
+主配置仅改一个CLI参数5500→6250，EXE、images、MTP、U4N16数据、1536MiB预留、RAM保护及原生回退保持，原配置逐字节备份为 `strata-iq2_xs-before-cache6250-20261106.json`。采用记录为 `build-orca-decode20-20261105/cache6250-default-r1/results.json`，新可选配置为 `strata-iq2_xs-mtp-combined-hc-select-cache6250.json`。复核入口通过原配置备份继承HC与MTP身份检查，不要求旧检查接受新的主配置：
+
+```powershell
+python -X utf8 build-orca-decode20-20261105/cache6250_default.py check
+```
+
+扩容后的当前默认另与原HC256直接完成正序对照，沿用原Short初始化、2048输入／完整128输出、三轮交错及首轮预热；21次请求、2352个输出token、各自预先冻结的完整协议参考及运行时身份核对通过，三个引擎均退出0。Code／Prose decode吞吐分别 **+13.518%／+15.465%**，外侧原配置decode耗时漂移为 **−0.236%／−0.012%**；控制几何平均／当前默认decode耗时分别为Code **4121.622／3630.800ms**、Prose **4153.400／3597.100ms**。完整请求吞吐观察为 **+2.880%／+3.089%**。
+
+这是当前完整默认相对原锚点的直接累计正序结果，包含HC、MTP策略与缓存容量变化；沿用上文明确的MTP计数差异，完整贪心输出相同，不连乘各次增量收益。两场景均未达到20%目标，因此不启动反序、不追加挽救重复，目标仍未完成。记录为 `build-orca-decode20-20261105/total-cache6250-vs-hc256-r1/performance-forward-r1/results.json`，检查点为 `checkpoint-total-cache6250-vs-hc256-r1.json`。
+
+同机当前缓存6250／校准Q2 MTP默认另测试现有 `--adapt-swaps` 上限32→64，实际缓存均为6561槽位，EXE、内核、权重、profile和其他参数不变。21次完整请求、2352个输出token、全部八项协议字段及原始协议核对通过，三个引擎均退出0。Code／Prose decode吞吐为 **−3.792%／−2.326%**，外侧控制耗时漂移为 **−0.012%／+0.083%**；控制几何平均／候选decode耗时分别为Code **3633.475／3776.700ms**、Prose **3600.250／3686.000ms**。完整请求吞吐观察为 **−0.752%／−0.265%**。配置上限不等于实际换入数或测得的PCIe流量，不从本组确认具体回退原因。正序性能失败，不反序、不追加挽救重复、不采用；默认保持上限32、缓存6250及原profile。记录为 `build-orca-decode20-20261105/adapt64-cache6250/performance-forward-r1/results.json`，检查点为 `checkpoint-adapt64-rejected-r1.json`。
+
+当前缓存6250／校准Q2 MTP默认还比较了generic专家排序与现成learned排序的冻结副本；不重新训练、不更新画像，主配置未切换。两侧请求相同缓存预算，实际为6561／6562槽，9001.782／9001.685MiB。21次请求、2352个输出token、全部八项字段及原始协议一致，三个引擎退出0，前后身份核对通过。Code／Prose decode吞吐分别 **+0.201%／+0.217%**，外侧控制耗时漂移为 **+0.025%／+0.103%**；控制几何平均／候选耗时分别为Code **3630.700／3623.400ms**、Prose **3600.650／3592.850ms**。完整请求吞吐观察为 **+0.067%／−0.026%**。
+
+Code刚达到放宽后的0.2%门槛，Prose未达到1%，因此拒绝，不反序、不追加挽救重复；首轮预热不计入保留样本。原generic与learned文件保留，冻结副本为 `data/expert-profile-native-frozen-20261106.bin`，默认仍用generic、adapt32及缓存6250。记录为 `build-orca-decode20-20261105/learned-profile-cache6250/performance-forward-r1/results.json` 和 `checkpoint-learned-profile-rejected-r1.json`。
+
+当前缓存6250／校准Q2 MTP／HC三内核默认另完成阶段诊断：复用当前HC Host链接组合，只重编Verifier插桩；保持 `prof_on_=false`、正常fork和independent调度。每窗口578个GPU时间戳，36位19.2MHz时钟；开启插桩五请求、同一EXE关闭插桩三请求，共8请求、800个输出token，完整参考输出与MTP计数一致，两个引擎均退出0，运行前后默认身份相同。离线重算255个窗口的时间戳、回绕、阶段之和及窗口数；下表只取暖态cycle1，Code55／Prose69窗口。
+
+| 当前默认诊断，ms／窗口 | Code2K | Prose2K |
+| --- | ---: | ---: |
+| attention区间（含HC0） | 16.012 | 15.173 |
+| HC1 | 3.833 | 3.594 |
+| GU＋shared | 20.507 | 12.735 |
+| act＋shared | 0.383 | 0.377 |
+| Down＋shared | 9.444 | 5.813 |
+| 全部标记跨度 | 55.823 | 43.103 |
+
+其中IQ2_S层的GU区间为15.340／9.303ms。按层类型拆分attention区间，36个GDN层合计11.158／10.538ms，12个QSA层合计4.854／4.634ms；两者均含各层HC0，不能称为纯GDN或QSA内核时间。这些区间含标记、共享工作及阶段拆分开销，只用于定位，不把插桩吞吐计为优化收益。原5771槽／旧MTP阶段数据保留，不能直接与本表计算优化倍率。记录为 `build-orca-decode20-20261105/current-fine-cache6250/results.json`；现有原始时间戳按层类型的复算为 `current-fine-attention-r1/results.json`，没有重跑GPU。独立原始协议、全部八项参考字段、时间戳和哈希复核通过，记录为 `current-fine-cache6250-review-r2/results.json`；r1离线复核器误把带附加计数的DONE限制为九列，失败记录保留，r2重读原始数据完成修复，没有重测或替换样本。
+
+以当前默认为控制，另仅将 `--adapt-swaps` 每轮换入上限从32降到16，保持缓存6250／实际6561槽、generic排序、HC三内核、校准Q2 MTP／cumulative0.5和其他参数。关闭阶段插桩，沿用同一21请求正序与独立21请求反序：
+
+| 场景 | 上限16正序decode吞吐变化 | 独立反序decode吞吐变化 | 外侧同策略耗时漂移（正／反序） |
+| --- | ---: | ---: | ---: |
+| Code2K | +6.321% | +6.672% | −0.254%／+1.663% |
+| Prose2K | +3.715% | +2.309% | −0.076%／+0.197% |
+
+两种顺序均通过Code0.2%／Prose1%及3%漂移门槛；42次请求、4704个输出token、全部八项字段和原始协议一致，六个引擎均退出0，前后身份核对通过。完整请求吞吐观察为Code **+1.030%／+0.434%**、Prose **+1.504%／−0.423%**；decode改善不代表完整请求同比例加速。上限不是实际换入数或物理PCIe流量，本轮未测出具体加速原因。记录为 `build-orca-decode20-20261105/adapt16-cache6250/performance-{forward,reverse}-r1/results.json`。
+
+反序两端均为候选上限16，Code的保留样本中位数为3484.100→3542.050ms，Prose为3600.150→3607.250ms；中间上限32的中位数为3747.350／3686.900ms。反序Code的1.663%漂移如实保留，仍按原定3%上限判定；漂移不是置信区间，也不能证明跨日稳定性。
+
+**双向性能通过，但本轮显存验收失败，未采用上限16。** 原上限32控制组完成首次8000输入／128输出、Short、Code2K、Prose2K、重复8000输入／128输出，以及真实重复chat／messages／responses，共9请求、592个输出token，退出0。165个1Hz样本的最低空闲显存只有 **67.219MiB**，未达到1024MiB要求；最低值在首个采样后103.953秒。验收在控制组结束后停止，候选16未启动，不能把该低值归因于16。
+
+离线复核确认这9次控制请求的完整输出、全部MTP计数、重复8K和HTTP结果均与此前同一6250默认的验收参考一致；原失败与全部样本保留，没有挽救重测。记录为 `adapt16-cache6250/service-review-r1/service-r1/failure.json`，离线复核为 `adapt16-memory-review-r1/results.json`。显存变化原因尚未确定，此前1299.691MiB的采样结果不能保证本次桌面负载下的余量。主配置保持上限32／缓存6250，EXE、images、MTP、U4N16数据、RAM保护及原生回退未改；原3%漂移上限保留，本项增量未计为原HC256累计20%目标。下一步先定位运行期显存增长并校准缓存预算，两个方向的性能结果独立保留。
+
+同机另做一次当前6250／adapt32的显存诊断，保留相同首次／重复8K及HTTP历史，共9请求、592个输出token，进程退出0；完整输出、MTP计数和HTTP结果与上述控制一致。166个系统显存样本最低空闲 **713.988MiB**，发生在首次8K请求中，仍低于1024MiB。READY前约82ms的系统采样为1095.906MiB，引擎INFO另报告1545MiB，两者不是同一时刻的查询，不据此确定查询误差或泄漏。
+
+同步Windows进程计数覆盖全部9次请求和最低显存时刻，共125次有效查询，最长查询1714.880ms；最低点附近查询中点相差约392ms。从READY后的首个完整查询到最低点附近查询，引擎专用显存记账增加208.891MiB，Code增加70.078MiB，嘉立创EDA减少2.121MiB；共享显存是系统内存记账，不能与专用显存相加解释物理显存变化。这些证据不支持把本轮下降单独归因于嘉立创EDA，也未定位全部增长来源。进程计数器在引擎退出阶段报 `CounterApiError`，退出前最后约872ms未覆盖；原采集失败保留，不重跑模型。诊断插入额外采集，不能作为16方案服务验收或性能收益。原始记录为 `build-orca-decode20-20261105/current-memory-trace-r2/`；r1在启动模型前被PowerShell脚本执行策略拦住，记录保留。
+
+上述运行期数据另经 `current-memory-trace-review-r1/results.json` 离线复核：9次请求、完整输出／MTP／HTTP、保存的全部进程计数及其时间覆盖、运行前后默认身份均通过；退出阶段872ms缺口仍如实保留，没有重跑模型或把原采集标为成功。
+
+按用户选择校准 **cache6200**，实际6509槽／8929.736MiB，比6250释放72.046MiB。原adapt32控制组完成9请求、592个输出token、退出0；161个系统样本最低空闲 **398.793MiB**，未过1024MiB，原校准因此停止，未运行其16侧。原失败保留在 `cache6200-memory-calibration-r1/service-r1/failure.json`，不能改记为两侧余量验收通过。
+
+**随后按用户明确要求，cache6200／上限16已设为本机默认，下次启动生效。** 用户选择基于已有双向decode结果采用16，并将8K显存余量问题留待后续上下文调整。这是本次采用的明确例外，不改写上述失败，也不更改3%漂移门槛；尚未证明8K是全部显存增长的原因。采用前另以实际6200／16完成首次8000输入、Short、Code2K、Prose2K、重复8000输入及真实重复chat／messages／responses，共9请求、592个输出token，退出0，完整输出、MTP计数和HTTP结果与原6250控制一致。164个系统样本最低空闲 **424.125MiB**，仍未过1024MiB；本次按用户要求采用，不称为通过原显存余量线。
+
+主配置只改 `--expert-cache 6250→6200` 和 `--adapt-swaps 32→16`，context／prefill仍为8192，EXE、images、MTP、U4N16数据、RAM保护、原生回退及两类profile保留。原配置逐字节备份为 `strata-iq2_xs-before-cache6200-adapt16-20261106.json`，另有可选配置 `strata-iq2_xs-mtp-combined-hc-select-cache6200-adapt16.json`。采用记录为 `adapt16-cache6200-default-r1/results.json`，功能与显存原始记录为 `adapt16-cache6200-user-service-r1/service-r1/`。该阶段默认的身份复核入口如下；后续NC1采用后的当前入口见文末相应记录：
+
+```powershell
+python -X utf8 build-orca-decode20-20261105/adapt16_6200_default.py check
+```
+
+前述双向增益测于cache6250，不能直接标为6200的已测提速；实际新默认对原HC256的20%目标另用 `total_adapt16_6200.py` 直接配对测量，仍须两场景各达到20%、漂移不超过3%及独立反序，不连乘历史百分比。
+
+6200／上限16的新默认已完成相对原HC256的直接累计正序：同机A770／E5-2696 v4，原HC256／新默认／原HC256三个独立进程，各用Short初始化及三轮交错2048输入／完整128输出，首轮预热、后两轮中位数。原HC256为5771槽／原MTP策略，新默认为6509槽／校准Q2 MTP／cumulative0.5／上限16，context均8192。
+
+| 场景 | 原HC256几何基线decode，ms | 新默认decode，ms | 累计decode吞吐变化 | 外侧原HC256耗时漂移 |
+| --- | ---: | ---: | ---: | ---: |
+| Code2K | 4156.062 | 3459.750 | +20.126% | +0.496% |
+| Prose2K | 4184.328 | 3528.900 | +18.573% | +0.652% |
+
+21次请求、2352个输出token、各自全部八项参考字段和原始协议核对通过，三个引擎退出0，运行前后默认身份一致。两侧完整贪心输出相同，Code接受／提议数为原73／90、新73／89，Prose为原62／96、新59／80；累计比较含HC、MTP策略、缓存与换入上限变化，不是纯内核归因。完整请求吞吐变化为Code **+5.735%**、Prose **+4.514%**。Code达到20%，Prose仍未达到，因此整体目标未完成，不反序、不追加挽救重复。原始与provenance记录为 `build-orca-decode20-20261105/total-adapt16-cache6200-vs-hc256-r1/performance-forward-r1/` 及同名 `-provenance/`。下一项独立筛选保持6200／6509槽，只将上限16降为8；入口 `adapt8_cache6200.py`，当前默认保持已采用的16。
+
+上限8的正序筛选已完成：控制16／候选8／控制16，仍为同机6200／6509槽、相同EXE／images／MTP及完整21请求历史。2352个输出token、全部八项参考字段和原始协议一致，三个引擎退出0，前后默认身份相同。Code／Prose decode吞吐变化为 **−0.546%／−3.106%**，外侧decode耗时漂移 **+0.820%／+0.883%**；控制几何基线／候选中位数分别为Code **3445.846／3464.750ms**、Prose **3513.766／3626.400ms**。未过Code0.2%／Prose1%的增量门槛，不反序、不追加挽救重复、不采用。
+
+候选8的两轮保留decode样本为Code3646.4／3283.1ms、Prose3810.3／3442.5ms；后轮较快仍按预定两轮中位数计算，不只选较快一轮。Code prefill控制耗时漂移 **−10.015%**，对应prefill／TTFT／完整请求配对不能作为收益证据；不把它们的表观正值称为提速。记录为 `build-orca-decode20-20261105/adapt8-cache6200/performance-forward-r1/` 及其 `-provenance/`。当前默认继续为6200／上限16／decay0.95。下一项独立候选只将已有 `--adapt-decay` 从0.95降到0.9，保留6200／6509槽、上限16和所有参考；入口为 `decay90_cache6200.py`。
+
+decay0.9的完整正序已完成：0.95／0.9／0.95三个独立进程，仍为6200／6509槽、上限16与同一21请求历史。2352个输出token、全部八项参考字段和原始协议一致，三个引擎退出0，运行前后默认身份相同。Code／Prose decode吞吐变化为 **−0.909%／+0.978%**，外侧耗时漂移 **+1.334%／+0.570%**；控制几何基线／候选中位数分别为Code **3482.949／3514.900ms**、Prose **3543.761／3509.450ms**。未过Code0.2%／Prose1%的门槛，不反序、不追加挽救重复、不采用。记录为 `build-orca-decode20-20261105/decay90-cache6200/performance-forward-r1/` 及其 `-provenance/`；默认保留decay0.95。
+
+下一项独立筛选只将已有 `--adapt-every 1→2`，减少适应调用频率，保留6200／6509槽、每次上限16和每次适应衰减0.95；间隔改变也会改变按解码轮数计算的热度历史，不把两者分配为独立贡献。入口 `every2_cache6200.py` 已通过CPU自检并冻结配置与完整参考，仍按相同正序、独立反序和功能门槛验收。当前默认未改。
+
+上述间隔2候选的正序已完成：Code／Prose decode吞吐变化为 **+2.600%／+0.247%**，外侧同策略耗时漂移 **−0.482%／−0.211%**；控制几何基线／候选中位数分别为Code **3443.015／3355.750ms**、Prose **3495.448／3486.850ms**。21次请求、2352个输出token、完整八项参考字段及原始协议通过，三个引擎退出0，前后默认身份相同。Prose未达1%门槛，不反序、不追加挽救重复、不采用。记录为 `build-orca-decode20-20261105/every2-cache6200/performance-forward-r1/` 及其 `-provenance/`。
+
+下一项独立组合候选同时设置 `--adapt-every 2` 和 `--adapt-decay 0.9025`，其中0.9025＝0.95²，匹配两轮的名义衰减比例；计数累积和换入时刻仍不同，不声称完整热度历史等价。保留6200／6509槽与上限16，复用相同完整参考及验收门槛，不相加前两项筛选的百分比。入口 `every2_decay9025_cache6200.py` 已完成CPU自检和冻结，默认继续为间隔1／decay0.95。
+
+该组合的正序也已完成：Code／Prose decode吞吐变化为 **−3.083%／−5.169%**，外侧同策略耗时漂移 **+0.116%／+0.391%**；控制几何基线／候选中位数分别为Code **3437.599／3546.950ms**、Prose **3495.468／3686.000ms**。21次请求、2352个输出token、完整八项参考字段及原始协议一致，三个引擎退出0，前后默认身份相同。未过增量门槛，不反序、不追加挽救重复、不采用。记录为 `build-orca-decode20-20261105/every2-decay9025-cache6200/performance-forward-r1/` 及其 `-provenance/`。上述三个新筛选合计63次请求、7056个输出token均通过功能核对，但没有建立新的可采用提速；主配置仍为6200／上限16／间隔1／decay0.95，双场景累计20%目标未完成。
+
+同机随后对实际6200／上限16默认做主机区间诊断，只重编冻结主程序Host TU，复用原HC／U4／GEMV对象、数学images和全部参数。开启诊断为Short16及两轮Code／Prose2K/full128，关闭诊断另跑Short16和一轮Code／Prose，共8次请求、800个输出token；两进程退出0，完整八字段和原始协议一致，运行前后默认及复用链接输入身份相同。以下为开启诊断的第二轮单请求主机经过时间，单位ms；Code／Prose分别为55／69个验证窗口：
+
+| 区间 | Code2K | Prose2K |
+| --- | ---: | ---: |
+| 收集候选／淘汰评分 | 30.606 | 39.108 |
+| 两组完整排序 | 56.949 | 71.516 |
+| RAM交换准备 | 0.011 | 0.013 |
+| 专家复制提交及驻留记账 | 32.378 | 40.850 |
+| 等待上轮复制完成 | 1.816 | 0.356 |
+| 主线程驻留表上传及等待 | 27.597 | 32.850 |
+| 主线程等待适应线程结束 | 4.606 | 3.199 |
+| 创建适应线程 | 2.687 | 2.966 |
+
+这些是含API／GPU等待的插桩主机区间，适应线程与draft重叠，不能相加为独占decode时间或作为优化收益；解码循环外最后一批pending未纳入。RAM交换在本配置几乎不工作，单独减少扫描／排序时间也未必转化为端到端收益。入口 `adapt_host_trace.py`，原始记录为 `build-orca-decode20-20261105/adapt-host-trace-cache6200-r1/`。
+
+依据上述驻留表上传区间，新增独立候选 `adapt_early_upload.py`：通过 `STRATA_ADAPT_EARLY_RES_UPLOAD=1`，把下一轮完整驻留表快照随专家复制提交到既有adapt队列，由原完成事件共同确认权重与表已就绪，再发布主机驻留状态。源码只增加一份98304字节主机快照，未显式新增设备缓冲区，运行期显存仍待验收；关闭开关、非device-adapt、层拆分或peer路径保留原上传逻辑。CPU源码还原与配置自检已过，候选只重编Host主程序，数学对象／images、6200／6509槽、上限16及完整参考保持。仍需原正序与独立反序性能、功能和显存门槛验收，默认尚未采用。
+
+提前上传候选的正序筛选已通过：原设置／候选／原设置三个独立进程，固定Short初始化和三轮交错Code／Prose2K/full128，首轮预热、后两轮中位数。Code／Prose decode吞吐变化为 **+1.624%／+2.012%**，外侧同策略耗时漂移 **+1.674%／+2.565%**；控制几何基线／候选中位数分别为Code **3480.880／3425.250ms**、Prose **3550.215／3480.200ms**。21次请求、2352个输出token、完整八项字段和原始协议一致，三个引擎退出0，前后默认身份相同。按既定3%漂移门槛进入独立反序，不能只凭此正序采用或把百分比与历史结果相乘。
+
+独立反序未通过：候选／原设置／候选三个新进程，Code／Prose decode吞吐观察值为 **−1.754%／−0.835%**，外侧同策略耗时漂移 **+3.669%／+2.556%**；Code漂移超出3%线，该配对排除，不能据此认定稳定退步。控制中位数／候选几何代表值分别为Code **3440.950／3502.382ms**、Prose **3502.650／3532.144ms**。反序21次请求、2352个输出token的完整八字段、原始协议均一致，三进程退出0，前后默认身份相同。正反序合计42次请求、4704个输出token功能通过，但没有确认可采用的性能收益；不追加挽救重复、不接入生产源码或默认配置。
+
+两方向记录为 `build-orca-decode20-20261105/early-res-upload-cache6200/performance-{forward,reverse}-r1/` 及各自 `-provenance/`。`total_early_upload.py` 的CPU自检已通过，但由于增量反序失败，不准备或启动累计GPU比较及后续服务／显存验收。主配置保持6200／上限16／间隔1／decay0.95；此前直接累计Code **+20.126%**、Prose **+18.573%** 的结果不变，双场景20%目标尚未完成。
+
+下一项独立候选 `adapt_verify_upload.py` 保留原专家复制完成事件，把原先在默认队列复制并单独等待的驻留表，改为在下一轮验证器的有序队列复制，再提交验证图。只对等待复制完成、单GPU／无peer、device-adapt且紧接验证器的调用启用；普通请求边界、NOWAIT、层拆分及其他调用仍走原同步上传。主机表在该轮同步验证返回前不变，不新增设备缓冲区。隔离构建同时重编引用验证器类声明的两个Host源文件，不改变类数据布局或数学对象／images；CPU源码还原、调用范围、配置检查及两个源文件编译／链接均通过。
+
+验证队列上传的完整正序也未通过：Code／Prose decode吞吐观察值为 **+2.329%／+1.927%**，但外侧同策略耗时漂移为 **+3.609%／+3.268%**，两者均超出3%线，配对排除，不认定为确认提速。控制几何基线／候选中位数分别为Code **3519.697／3439.600ms**、Prose **3557.140／3489.900ms**。21次请求、2352个输出token的完整八字段及原始协议一致，三进程退出0，前后默认身份相同；不追加挽救重复、不反序、不运行该候选的累计或服务／显存验收、不接入生产源码或默认。记录为 `build-orca-decode20-20261105/verify-res-upload-cache6200/performance-forward-r1/` 及其 `-provenance/`。两个上传候选合计63次完整请求、7056个输出token功能通过，均没有建立新的可采用收益；6200／上限16默认与原HC256累计结果保持。
+
+随后在同机对三个完全相同的6200／上限16默认进程做只读频率诊断，各保留相同Short16初始化和三轮交错Code／Prose2K/full128，使用既有10Hz Sysman采样器，未更改频率或功耗设置。21次请求、2352个输出token的完整八字段及原始协议一致，三个引擎及采样器均退出0，前后默认身份相同。首轮预热、后两轮decode中位数如下，单位ms：
+
+| 相同默认进程 | Code2K | Prose2K |
+|---|---:|---:|
+| 0 | 3576.650 | 3602.000 |
+| 1 | 3548.850 | 3608.300 |
+| 2 | 3552.050 | 3578.650 |
+
+外侧同配置decode耗时漂移为Code **−0.688%**、Prose **−0.648%**。每请求首末token的主机出队QPC区间内，GPU频率样本中位数均为2400MHz，显存频率样本均为16000MHz；保留轮次共388个GPU样本，其中5个低于2400MHz、1个throttle标记非零，尚不能据此归因此前漂移。采样可能扰动运行，100ms间隔可能漏掉瞬时变化，主机区间也不是GPU独占时间；未采集温度、功耗或利用率，不把本轮耗时当作无观察者提速。记录为 `build-orca-decode20-20261105/default-frequency-drift-cache6200-r1/`，不是失败候选的挽救重测。
+
+随后只测试已有 `STRATA_MTP_CUM_MIN_P` 从0.5升到0.6，尝试减少低置信尾部的草稿及验证工作；其余6200／6509槽、上限16、context8192和EXE／images／MTP权重不变。入口 `confidence60_cache6200.py` 先完成7次资格请求、784个输出token，完整贪心输出及全部非MTP字段与默认一致，退出0，前后默认身份相同。三轮Code接受／提议数均为69／75，Prose均为55／63，默认分别为73／89和59／80；减少提议同时也减少了接受，不能仅凭草稿数认定提速。资格记录为 `confidence60-reference-r1/`，正式计时前已冻结两侧各自全部八字段参考。
+
+该候选完整正序未通过：默认0.5／候选0.6／默认0.5三个新进程，Code／Prose decode吞吐变化为 **−0.594%／+0.366%**，外侧同策略耗时漂移 **−0.417%／−0.173%**；控制几何基线／候选中位数分别为Code **3542.242／3563.400ms**、Prose **3608.874／3595.700ms**。21次请求、2352个输出token的各自严格八字段参考和原始协议均通过，三个引擎退出0，前后默认身份相同。未达到Code≥0.2%／Prose≥1%的既定门槛，不反序、不追加挽救重复、不运行累计或服务／显存验收、不采用。正式记录为 `build-orca-decode20-20261105/confidence60-cache6200/performance-forward-r1/` 及其 `-provenance/`；默认继续为6200／上限16／cumulative0.5，双场景累计20%目标仍未完成。
+
+同机基于主机排序诊断测试 `adapt_partial_vict.py`：仅将device-adapt淘汰表全排序改为按需排序16、32、64等长度的前缀，保留候选表全排序、每种专家尺寸的扫描游标、热度门槛、槽位容量检查和换入上限16。最坏仍会访问并排序全部淘汰项；同热度项的ID次序可能变化，不宣称缓存轨迹逐项等价，也不能将模型收益单独归因于CPU排序。开关关闭、层拆分、peer及其他路径仍用原逻辑，不新增设备缓冲区或主机向量，只重编隔离主程序。实际旧／新选择代码提取为C++检查，245项编译及运行通过，覆盖无候选／无淘汰项、容量不匹配、前缀多次扩展、同热度及上限；独立oracle核对最冷可容纳项、热度增益和不重复淘汰，关闭开关及无热度平局时另核对精确ID。
+
+按需排序的完整正序未通过：默认／候选／默认三个新进程，Code／Prose decode吞吐变化为 **−0.604%／+0.018%**，外侧同策略耗时漂移 **−0.041%／+0.724%**；控制几何基线／候选中位数分别为Code **3445.400／3466.350ms**、Prose **3506.477／3505.850ms**。21次请求、2352个输出token的完整八字段和原始协议均一致，三个引擎退出0，前后默认身份相同。漂移在3%以内，但未达到Code0.2%／Prose1%的增量门槛，不反序、不追加挽救重复、不运行累计或服务／显存验收、不接入生产源码或默认。记录为 `build-orca-decode20-20261105/partial-victim-sort-cache6200/performance-forward-r1/` 及其 `-provenance/`；该候选未建立模型收益，不能据此证明所有排序优化都无用，原主机插桩区间也不能当作可直接节省的时间。
+
+当前6200／6509槽、上限16的验证器细分诊断也已完成：`attention6200.py` 仅重编隔离的Verifier Host TU，数学对象与images不变，保留正常GDN／QSA／共享专家并行调度。插桩开启的5请求与关闭的3请求共800个输出token，完整八字段及原始协议一致，两个引擎退出0；前后默认身份与23项复用链接输入哈希相同。255个验证窗口各830个GPU时间戳，解析器核对分区总和、36位回绕、19.2MHz时基、窗口归属及T1–4计数。
+
+第二轮暖态Code／Prose每窗口中，36层GDN的输入投影为 **4.143／3.961ms**、输出投影 **2.288／2.128ms**、递推及AB/Z回退区间 **1.255／1.216ms**；12层QSA的输入投影 **1.292／1.262ms**、注意力 **1.105／1.030ms**。这些是含marker、队列及对应共享工作的插桩区间，不能当作独占内核耗时或新提速数据；HC0入口区间还可能含前层写回及PLE。原始记录为 `build-orca-decode20-20261105/attention-cache6200-r1/`，用于选择下一项投影候选，默认仍为6200／上限16／间隔1／decay0.95／context8192。
+
+下一项隔离候选为 `iq4_fixed.py`：仅对IQ4_XS一至四列、2560／6144输入宽度展开原GEMV循环，保留权重读取、逐逻辑lane的块顺序、FP32表达式与XOR32归约，其他形状用原循环。160项CPU块顺序及FP32检查通过，候选源码、当前6200／上限16配置及完整八字段参考已冻结到 `build-orca-decode20-20261105/iq4-fixed-width-cache6200-r1/`。截至准备记录，编译仍在等待另一个正常运行的Direct构建释放共享GPU锁；真实权重／完整输出／图重放资格和模型测速均尚未开始，没有新的提速结论，也未改变默认。后续先验证640项eager及1280项重放检查，再按原Code0.2%／Prose1%与漂移3%增量门槛筛选，双向通过后仍须直接对原HC256验证双场景20%。
+
+该固定宽度候选随后已完成隔离编译、烘焙及真实权重资格，构建会话81926正常退出0：当前SG16选择2及全SG16选择1、两侧共 **640项eager输出和1280项图重放检查** 通过，覆盖一至八列、两种激活、完整／7行尾部、512／768输入回退、完整输出、Q8缓冲区、未用列、输入与边界。四份权重哈希匹配原GGUF提取记录，前后默认身份相同；只替换八份IQ4_XS映像及其native manifest，Host EXE与其余映像保留。
+
+原构建记录的资源汇总使用全文件正则，将辅助 `Intel_Symbol_Table_Void_Program` 的SIMD32混入部分SG16字典；原记录保留。独立 `iq4_fixed_audit.py review` 按目标内核重新核对全部八项native payload与资源，实际仍为GRF128及原SG16／32。SG32三／四列报告的spill分别 **416→1568／608→1984字节**；SG16未报告spill。未报告字段不能证明实际流量或动态SLM使用为零，也不能只凭spill变化归因速度。修正报告为 `iq4-fixed-width-cache6200-r1/native-resource-review-r1/results.json`。正序模型会话48638已排队，另一个仍在运行的L0全量构建先取得共享锁；此时没有完整模型性能样本，不计算新收益。关闭SG16时的SG32两列选择若进入采用阶段，还需补做该选择的资格，现有两种选择均不触发它。
+
+固定宽度完整方案的正序已完成且未通过：同机A770／E5-2696 v4、6200／6509槽、上限16，默认／候选／默认三个新进程，Code／Prose decode吞吐变化为 **−1.110%／−0.602%**，两端耗时漂移 **−0.174%／−0.184%**；控制几何基线／候选中位数分别为Code **3446.649／3485.350ms**、Prose **3503.224／3524.450ms**。21次完整请求、2352个输出token的严格八字段及原始协议均通过，三个引擎和驱动均退出0，前后默认身份相同。漂移达标而收益未达Code0.2%／Prose1%门槛，不反序、不追加挽救重复、不运行累计或服务采用，不改生产源码或默认。记录为 `iq4-fixed-width-cache6200-r1/performance-forward-r1/` 及其 `-provenance/`；spill增加与回退同时出现，尚不能证明唯一原因。
+
+下一项为独立的两列SG16组件对照 `iq4_fixed_two.py`：只复用已通过完整输出／边界／Q8／图重放检查的 `native_mmvq/image_8.zebin`，其余映像恢复当前默认，仅对应manifest行随之更新，没有新数学或编译。该映像的GRF128／SG16／报告资源与原版相同；当前暖态诊断的T2窗口为Code9／55、Prose27／69，仅作选择组件的线索，不预测收益。新目录 `iq4-fixed-two-cache6200-r1/` 已冻结完整参考，正序会话51177正在等待另一个存活的完整模型验证进程释放共享GPU锁；必须重新完成独立21请求及原门槛，不复用完整方案的计时。默认仍为6200／上限16，累计双场景20%目标未完成。
+
+两列SG16组件正序随后完成且未通过：Code／Prose decode吞吐 **−0.066%／−0.174%**，两端控制耗时漂移 **−0.020%／−0.216%**；控制几何基线／候选中位数为Code **3422.350／3424.600ms**、Prose **3483.573／3489.650ms**。21次完整请求、2352个输出token的严格八字段和原始协议核对通过，三个引擎及会话51177退出0，外层provenance完整且默认前后一致。收益未过Code0.2%／Prose1%门槛，不反序、不挽救重复、不累计或服务采用；完整方案和本组件的两份失败记录均保留，默认不变。结果为 `iq4-fixed-two-cache6200-r1/performance-forward-r1/` 及其 `-provenance/`。
+
+下一项 `gdn_ab_grf256.py` 只对当前默认的 `verify_kernels/image_37.zebin` 增加large-GRF烘焙选项，使用原SPIR-V，保持SG32、计算体和Host调度。当前该GDN alpha/beta GEMV报告GRF128／spill1440；历史SYCL局部诊断不能推算当前整模型收益，旧的scoped整模型目录也仍仅有准备脚本和排队记录。新目录 `gdn-ab-grf256-cache6200-r1/` 已冻结当前参考，CPU自检通过，会话19246正在共享锁下独立烘焙及核对资格：原128GRF重烘焙必须逐字节一致；256GRF仅变目标映像及清单；复用现有完整GDN检查，覆盖T1–8、tail开关、三种激活、串行／并行图与eager、全输出／Q8 scratch／guards及state/history不变。此时没有整模型性能结果；仍按原增量、反序、直接累计及服务显存门槛验收，不改6200／上限16默认。
+
+GDN alpha/beta的256GRF方案随后完成资格及正序，未通过性能门槛。原128GRF重烘焙逐字节一致，目标kernel的native参数布局与SG32不变，报告spill **1440→0字节**；全T1–8的两臂共192项完整比较、288次GPU完成检查通过，两份 **29,930,496字节** 的GDN全输出／scratch二进制一致。资源字段未报告按0汇总，不是运行时内存流量测量。同机当前6200／6509槽、上限16的默认／候选／默认完整正序中，Code／Prose decode吞吐 **−2.501%／−2.481%**，两端耗时漂移 **+0.285%／−0.525%**；控制几何基线／候选中位数为Code **3446.447／3534.850ms**、Prose **3494.238／3583.150ms**。21次完整请求、2352个输出token的严格八字段和原始协议通过，三个引擎及会话19246退出0，前后默认身份一致。降低spill没有转化为本轮整模型收益，不以此单独推断回退原因；不反序、不挽救重复、不累计或服务采用。完整记录为 `gdn-ab-grf256-cache6200-r1/build-r1/`、`performance-forward-r1/` 及其 `-provenance/`。默认仍为6200／上限16／间隔1／decay0.95／context8192，原HC256双场景20%目标未完成。
+
+在256GRF整模型回退后，独立候选 `gdn_ab_tile4.py` 保留GRF128／SG32，仅把GDN alpha/beta GEMV的活跃输出列分为每组4列。每个逻辑lane、每个输出的八项FP32 FMA顺序、XOR16→1归约及非线性表达式不变；T5–8第二组重新读取权重，仍支持全部T1–8。256项CPU列／lane操作数顺序及可逆源码检查通过；原版SPIR-V重烘焙逐字节一致，全部编译器ABI和目标native参数布局核对通过，最终只改 `verify_kernels/image_37.zebin` 及native manifest。新旧两臂192项完整GDN比较、288次GPU完成检查通过，各29,930,496字节的完整输出／Q8 scratch二进制一致；覆盖T1–8、tail开关、三种激活、串行／并行图及eager、guards和state/history不变。报告spill **1440→736字节**，GRF128／SG32保留；这不是运行时流量或提速结论。冻结目录为 `gdn-ab-tile4-cache6200-r1/`，资格结果为 `build-r1/results.json`。会话9898已取得共享锁，按当前6200／6509槽、上限16的同一严格八字段参考运行独立21请求正序；结果未出，不改默认，仍须原增量／反序／直接累计20%及服务显存验收。
+
+补查复用的GDN检查器发现，初始化使用 `q.fill(a,0.f,HV)`，因此alpha投影的gate结果被乘0；现有完整输出比较不能单独证明非零alpha缩放下的数值正确性。beta路径、调度、输出边界与状态检查仍有效；本候选的变换也保持原FP32表达式及逐lane操作数顺序。若四列方案通过性能筛选，进入采用前必须用非零alpha系数及覆盖softplus两个分支的输入补做独立完整输出检查，不能把原检查扩展解释为这部分已覆盖。已有失败候选的原始结果不改写，也不以该补验挽救性能失败。
+
+四列分块方案随后完成正序且未通过：同机当前6200／6509槽、上限16的默认／候选／默认三进程中，Code／Prose decode吞吐 **−0.124%／−0.228%**，两端控制耗时漂移 **+0.864%／+0.176%**；控制几何基线／候选中位数分别为Code **3451.568／3455.850ms**、Prose **3506.424／3514.450ms**。21次完整请求、2352个输出token的严格八字段与原始协议通过，三个引擎及会话9898退出0，前后默认身份相同。性能失败，不反序、不挽救重复、不累计或服务采用；非零alpha补验也不为这项已拒绝候选追加运行。原始资格及其alpha覆盖限制均保留，不能把spill减半写成整模型加速。
+
+下一项独立候选 `iq3_four_grf256.py` 只对 `iq_kernels/image_47.zebin` 的IQ3_S四列MMVQ增加GRF256选项，使用原SPIR-V及SG32，其他映像与配置不变。该当前映像报告GRF128／spill1504；历史匹配eager局部诊断有+36.315%，并非正常graph或当前整模型结果。已测旧Q6_K／IQ4_XS组合不包含这项type21，不能用其结果替代本项；也不重复已拒绝的AB或IQ4方案。脚本复用冻结的单映像驱动与完整GDN检查器，新检查器使用非零负alpha、dt=-2／25并明确拒绝零gate，准备覆盖softplus两个分支及T1–8／tail开关／三种激活／串行与并行图及eager。CPU自检及冻结准备通过，目录为 `iq3-four-grf256-cache6200-r1/`。会话62635正在等待存活的 `build-orca-full-current-20261106/model_r2.py run` 释放共享GPU锁；尚未烘焙或执行新GPU检查，没有新收益结论。后续仍先资格、独立21请求正序，过门槛才反序，再直接累计及服务显存验收；默认6200／上限16保持。
+
+IQ3_S四列候选随后取得共享锁并完成资格：原128GRF重烘焙逐字节一致，目标native参数布局与SG32保持，报告spill **1504→0字节**、GRF128→256；只变 `iq_kernels/image_47.zebin`、native manifest和source-index对应选项。增强检查器的两臂192项完整GDN比较、288次GPU完成检查及29,930,496字节全输出／scratch逐字节核对通过，前后默认身份一致。独立 `iq3_four_gate_review.py` 又对保存输出做局部读取，确认两臂共20,736个alpha gate均非零：dt=-2的两种激活范围分别为 **−0.1290453至−0.0426015／−0.1146316至−0.0409934**，dt=25为 **−12.8740120至−12.2703743**；系数固定−0.5，这些数值带明确余量地覆盖softplus的v<20和v>20分支，所有T1–8／tail组合均通过，两侧范围一致。该离线审计不重放GPU、不重哈希大文件，其完整输出身份由持锁资格结果负责；报告为 `iq3-four-grf256-cache6200-r1/gate-coverage-review-r1/results.json`。会话62635正在继续当前默认／候选／默认21请求正序，尚无整模型收益结论。
+
+等待期间的只读资源核对另确认：当前IQ3_S的旧kernel／NC8／NC4／NC2／NC1依次报告spill **704／3872／1504／1344／2112字节**，均为GRF128／SG32；默认 `STRATA_OLD_IQ_MMVQ` 未启用，源码将1／2／3–4列分派到各自multi kernel。已完成的6200／上限16暖态诊断中，Code的T1／2／3／4窗口数为 **15／9／13／18**，Prose为 **21／27／10／11**；这是整个验证窗口的计数，不是IQ3_S某一形状的动态调用数或关键路径份额。单／两列可以作为四列结果之后的独立候选线索，尚未准备或执行新GRF候选，不从spill或窗口频率预测速度。
+
+IQ3_S四列GRF256随后完成正序且未通过：当前6200／6509槽、上限16的默认／候选／默认三个新进程中，Code／Prose decode吞吐 **−0.519%／−0.191%**，两端耗时漂移 **+0.444%／+0.243%**；控制几何基线／候选中位数分别为Code **3434.742／3452.650ms**、Prose **3495.747／3502.450ms**。21次完整请求、2352个输出token的严格八字段和原始协议通过，三个引擎及会话62635退出0，外层provenance完整且默认前后一致。收益未达Code0.2%／Prose1%，不反序、不挽救重复、不累计或服务采用；spill消除并未转化为本次整模型提速，不据此认定回退原因。记录为 `iq3-four-grf256-cache6200-r1/performance-forward-r1/` 及其 `-provenance/`。
+
+独立两列候选 `iq3_two_grf256.py` 复用冻结单映像驱动及非零alpha检查器，只选择 `iq_kernels/image_48.zebin`，原SPIR-V、SG32和其他映像／配置保持。当前NC2报告GRF128／spill1344；T2窗口频率仅用于选择测试对象，没有两列的历史整模型收益可迁移。CPU自检和准备完成，目录为 `iq3-two-grf256-cache6200-r1/`，会话38677已启动，先在共享锁内烘焙及完整资格检查，再按原标准独立正序。此时尚无该候选性能结论；6200／上限16默认和直接原HC256双场景20%目标保持。
+
+两列候选随后完成资格：原128GRF重烘焙逐字节一致，native参数布局和SG32保持，报告spill **1344→0字节**，GRF128→256。仅变目标image48、native manifest及source-index选项，两臂192项完整比较、288次GPU完成检查及各29,930,496字节完整输出／scratch逐字节一致，默认前后一致。会话38677正在独立21请求正序，资源变化仍不作为提速结论。
+
+等待期间准备了另一个源代码候选 `iq3_swar.py`：当前 `Split<21>` 仍有四项逐字节向量比较／减法，而同文件已有packed整型helper。新源码只将这四处换为现有 `swar_ne4`／`swar_sub4`，保留点积、缩放、浮点表达式、SG32及GRF128，拟仅选择NC1／2／4／8的image49／48／47／46。CPU检查覆盖全部256种packed符号字节与4096组逐字节减法组合，共4608项，并检查改动范围；这不是GPU或模型质量／性能验证。`iq3-swar-cache6200-r1/` 已冻结候选源码和当前严格参考，尚未编译或执行GPU，等待两列GRF筛选结束。若两列正序通过，先做它的独立反序；不交叉复用计时或修改默认。
+
+两列GRF256正序随后完成且未通过：Code／Prose decode吞吐 **+0.179%／+0.005%**，两端耗时漂移 **+0.352%／+0.495%**；控制几何基线／候选中位数分别为Code **3458.520／3452.350ms**、Prose **3517.014／3516.850ms**。21次完整请求、2352个输出token的严格八字段和原始协议通过，三个引擎及会话38677均退出0，外层provenance完整且默认前后一致。Code未达0.2%、Prose未达1%，不反序、不挽救重复、不累计或服务采用；四列与两列的各自失败均保留。会话16730随后启动独立packed符号方案，先烘焙、ABI／完整输出资格，只有资格通过才运行新21请求正序。此时没有该源码方案的GPU或性能结论，6200／上限16默认保持。
+
+Packed符号方案随后完成原生资格：原SPIR-V四项重烘焙逐字节一致，完整编译器ABI及四个目标native参数布局保持，GRF128／SG32不变；实际仅变image46–49及native manifest，其余文件逐项哈希一致。报告spill按NC8／4／2／1为 **3872→3008／1504→1664／1344→832／2112→1280字节**，四列反而增加，不能概括为全面下降或据此推断速度。复用的非零alpha检查器SHA为 `2b0ccd1aa779f2145366fad756fa6512f22f95301b7c154e1b7c9845649280bb`，两臂192项完整比较、288次GPU完成检查及各29,930,496字节完整输出／scratch逐字节一致，默认前后一致。编译器仅输出版本信息，无编译错误。`iq3-swar-cache6200-r1/build-r1/results.json` 已完整且qualified；会话16730继续独立正序，尚无整模型收益结论。
+
+Packed符号方案正序随后完成且未通过：Code／Prose decode吞吐 **−0.021%／+0.656%**，两端耗时漂移 **+0.103%／+0.497%**；控制几何基线／候选中位数分别为Code **3437.275／3438.000ms**、Prose **3501.114／3478.300ms**。21次完整请求、2352个输出token的严格八字段与原始协议通过，三个引擎及会话16730均退出0，外层provenance完整且默认前后一致。两个场景均未达到各自门槛，不反序、不追加挽救重复、不累计或服务采用，不修改生产源码或默认；记录为 `iq3-swar-cache6200-r1/performance-forward-r1/` 及其 `-provenance/`。四列／两列GRF和packed方案的三对完整资格输出在各自持锁结果中均有相同SHA256 `14176c4781b5986a752d43a49f1c9e7afe0a3da0f82d964e1fa1b8571f12ea5d`；本轮仅比较这些已记录哈希，未在测速外重读或重哈希大文件。当前默认仍为6200／上限16，直接原HC256的Code +20.126%／Prose +18.573%正序结论未变，双场景20%目标仍未完成。
+
+下一项独立组件筛选为 `iq3_swar_one_two.py`，仅复用已验证的NC1／NC2 packed符号映像49／48，其余映像恢复当前默认。此前全包中这两项报告spill减少，而NC4增加；这些资源变化不证明其动态关键路径份额或预期提速。CPU范围／严格参考自检、冻结准备通过，目录为 `iq3-swar-one-two-cache6200-r1/`，会话61864已取得共享锁。新包重新运行非零alpha的T1–8完整GDN两臂输出／scratch／guards／调度资格，再独立21请求正序，仍按Code0.2%／Prose1%／漂移3%验收；不复用全包计时，不更改默认，只有正序通过才反序，随后仍须直接累计及服务／显存验收。
+
+NC1／NC2组件随后完成新两臂192项完整比较、288次GPU完成检查及完整二进制一致检查，只改变image48／49及native manifest。独立正序21次完整请求、2352个输出token的严格八字段和原始协议通过，三个引擎与会话61864均退出0，外层provenance完整且默认前后一致。Code／Prose decode吞吐 **+0.225%／+0.214%**，两端耗时漂移 **+0.644%／−0.506%**；控制几何基线／候选中位数为Code **3545.657／3537.700ms**、Prose **3595.913／3588.250ms**。Code达到0.2%，Prose未达1%，整体拒绝，不反序、不挽救重复、不累计或服务采用。两项正值不是双向确认收益，未叠加到6200／上限16默认。
+
+新的源码候选 `iq3_stream_pairs.py` 在 `row_dot_multi` 中仅对type21逐对解码并立即消费两个packed权重字，保持原逐字节符号操作、GRF128／SG32、外层lane／块顺序、各列dp4a的j0–7顺序、整数scale、FP32表达式和XOR归约。四次循环明确不展开，减少源码中同时存活的解码字，但增加索引和循环工作；不能据源码预测原生寄存器或速度。3680项packed字节／符号提取及NC1／2／4／8各尾列、lane／块／整数点积顺序CPU检查通过，真实格式常量qk256／ipb8／step2已绑定。目录 `iq3-stream-pairs-cache6200-r1/` 已冻结原始及候选源码、当前完整参考和同一非零alpha检查器；会话99908正在等待仍存活的 `build-orca-global-memory-20261106/finish.py run`（PID27632、子进程engine.exe）释放共享GPU锁。此时未编译或运行新GPU资格，没有新性能结论，不改默认。
+
+等待期间只读复核了 `attention-cache6200-r1/` 的真实6200／上限16诊断身份及T计数，未重跑插桩或将区间当作独占耗时。另查到旧IQ4_XS compact输出头的算子收益，但其后续完整模型确认Code **+0.041%**、Prose **+0.158%**均处于当时噪声范围，见[后续完整确认](../bench/results/a770/compact-device-counter-2026-10-29.md)；未原样准备或重测该旧方案，也不借旧算子数字推算当前L0收益。
+
+逐对消费方案随后取得共享锁，device编译及原始／新映像烘焙均退出0，但会话99908在第一项NC8的完整native ABI断言处退出1，**未执行新GPU输出资格或模型测速**；原 `build-r1/results.json` 保持 `complete=false/qualified=false`。独立 `iq3_stream_review.py run` 在共享锁内对保存产物另做审计，会话25341退出0，默认前后一致：全编译器ABI一致，四项原始SPIR-V重烘焙均逐字节一致；NC8／NC4新增 `const_base@48` 并将 `global_base` 从48移到56，完整native载荷不同，不作豁免。NC2／NC1的完整native ABI、GRF128／SG32则保持一致。
+
+审计按NC8／4／2／1记录的报告spill为 **3872→4128／1504→1760／1344→800／2112→0字节**。这是元数据及已有编译产物的检查，不是GPU数值或性能通过；未修改原失败记录、源码或默认。审计文件为 `iq3-stream-pairs-cache6200-r1/native-review-r1/results.json`，明确保存每项完整ABI及来源哈希。下一步可优先独立选择ABI相同且零报告spill的单列image49（来自 `baked-new/image_3.zebin`），保持其他映像默认，重新完成非零alpha完整GPU检查及新21请求对照；此时尚未准备或执行该单列候选，不从spill消除预报收益。
+
+单列组件随后独立冻结为 `iq3-stream-one-cache6200-r1/`，只从上述raw bake取image49并重命名对应manifest行，其他文件逐项与当前默认一致；完整编译器／NC1原生ABI和原重烘焙身份再次核对通过。两侧非零alpha检查各退出0，各自96项完整调度比较和144次完成检查通过，但两份各29,930,496字节的输出**跨侧不一致**，会话61770在该断言退出1，未运行模型测速、不采用。原资格记录保持 `complete=false/qualified=false`；各侧调度一致不等于与原内核数值一致。
+
+`iq3_stream_one_review.py run` 对保存输出离线解析全部48组／336个缓冲区，会话18292退出0，无GPU重放。23,162个32位字不同，仅出现在T1的IQ3 gate及其后续GDN输出；gate最大绝对差为1.192093e-7，GDN输出最大为5.960464e-8，Q8 scratch与全部guards相同。该审计没有放宽逐位一致门槛。随后保存的SPIR-V经 `llvm-spirv --to-text` 检查：原image49为2条FMul、2条FAdd；新image49为1条FMul、1条FAdd及1条OpenCL.std `mad`。这是舍入路径变化的定位线索；未据小误差豁免原失败。记录为 `output-review-r1/results.json` 和 `fp-review-r1/results.json`。
+
+独立修正候选 `iq3_stream_one_rounding.py` 仅在TY21／NC1分支保留逐对消费并添加 `#pragma clang fp contract(off)`，已恢复2条FMul／2条FAdd／零mad；其余列回到原源码，实际仅选择image49及对应manifest。候选目录 `iq3-stream-one-rounding-cache6200-r1/` 已冻结源码、完整参考和原失败证据。重新编译／烘焙均退出0，原重烘焙逐字节一致，完整编译器／原生ABI、GRF128／SG32保留，报告spill2112→0；新两臂192项完整比较、288次GPU完成检查及跨侧29,930,496字节输出一致，`build-r1/results.json` 已完整且qualified。会话22741继续独立21请求正序，尚无整模型性能结论。复用编译驱动的stdout仍带旧“packed-sign”标签，本候选身份以冻结源码、映像哈希、原生ABI和上述记录为准。当前6200／上限16默认完整身份已再次复核，8K余量例外及原3%漂移门槛保留，context仍8192。
+
+修正单列候选随后完成21次完整请求、2352个输出token，严格八字段／原始协议一致，三个引擎与会话22741均退出0；外层provenance完整，默认前后一致。Code／Prose decode吞吐变化为 **+0.202317%／+0.973114%**，两端耗时漂移 **−0.068229%／+1.294648%**；控制几何基线／候选中位数分别为Code **3516.349795／3509.250ms**、Prose **3595.450634／3560.800ms**。Code刚达到0.2%，Prose未达到1%，不四舍五入为通过；整体拒绝，不反序、不挽救重复、不累计或服务采用。完整请求吞吐观察为 **+0.022%／+0.825%**。零spill和已修正数值路径没有建立符合本轮门槛的整模型收益；记录为 `iq3-stream-one-rounding-cache6200-r1/performance-forward-r1/results.json` 及同名 `-provenance/`。
+
+本轮复核保留用户已采用的cache6200／6509槽／上限16／every1／decay0.95、context及prefill8192、HC SG16、U4N16和全部回退身份；未叠加新内核。原HC256直接累计的既有正序仍为Code **+20.126%**、Prose **+18.573%**，本轮未重测，双场景各20%的目标仍未完成。下一条独立线索是把相同的独立乘加舍入修正扩展到NC2，与NC1组成新候选：此前NC2未修正逐对消费映像的完整原生ABI相同、报告spill1344→800，仅是线索，必须重编、重新数值资格和新模型对照；本轮尚未准备或执行该组合，不能从失败单列的正值累加或预报收益。
+
+随后独立组合 `iq3_stream_one_two_rounding.py` 将已修正舍入的逐对消费范围从NC1扩到NC1／NC2，只选择image48／49及对应manifest；保留原GRF128／SG32和其余映像。目录 `iq3-stream-one-two-rounding-cache6200-r1/` 已冻结，重新编译／烘焙、完整编译器及原生ABI、原重烘焙身份、新两臂非零alpha完整检查及跨侧输出一致均通过。会话29363正在完成新21请求正序，本段不预报或累计收益。
+
+用户另明确接受上述单列的Code **+0.202%**／Prose **+0.973%**，要求采用。原 `passes=false` 与全部失败记录保留，全局Code0.2%／Prose1%／漂移3%的筛选策略不改。`iq3_stream_one_user_reverse.py` 仅对这一份精确冻结正序记录登记用户例外，复用完整21请求做独立候选／控制／候选反序，并照常保存原策略的计算结果；会话69770在共享锁排队，未与组合实验混算。采用计划为 `iq3_stream_one_user_default.py`：反序仍须两场景正增益、漂移绝对值不超过3%，然后在永久映像目录做完整18项首次／重复8K及真实HTTP核对；保留用户选择的6200／16／8192上下文与已知8K余量问题，两侧1024MiB原始判定单独报告，不改记为通过。只在这些检查完成后备份并原子切换默认images路径，EXE、参数、U4N16及回退保留。此时仅准备好流程，尚未切默认。
+
+NC1／NC2修正组合的正序已完成：21次完整请求、2352个输出token、全部八字段及原始协议一致，三引擎与会话29363退出0，外层provenance完整且默认前后一致。Code／Prose decode吞吐 **+0.633489%／+0.722185%**，两端耗时漂移 **+0.282904%／−0.457612%**；控制几何基线／候选中位数为Code **3522.071486／3499.900ms**、Prose **3586.515569／3560.800ms**。Prose未达1%，按原策略拒绝，不反序、不挽救重复、不默认采用；这不是与单列候选的同期直接对照，不能用两组百分比相减评价NC2的独立贡献。该组合结果不替代用户另行授权的单列采用。记录为 `iq3-stream-one-two-rounding-cache6200-r1/performance-forward-r1/results.json` 及同名 `-provenance/`。
+
+**上述单列NC1方案随后按用户明确授权采用为本机默认，下次启动生效。** 新独立反序21次请求、2352个输出token，完整八字段及原始协议一致，三引擎与会话69770退出0，默认前后一致。与该方案原正序合并列示如下，均为同机A770／E5-2696 v4、cache6200／实际6509槽／上限16／校准Q2 MTP、context8192，不能把两种顺序的百分比相乘：
+
+| 场景 | NC1正序decode吞吐变化 | 独立反序decode吞吐变化 | 两端decode耗时漂移（正／反序） |
+| --- | ---: | ---: | ---: |
+| Code2K | +0.202317% | +0.326809% | −0.068229%／−0.103443% |
+| Prose2K | +0.973114% | +0.480885% | +1.294648%／−0.332966% |
+
+反序控制中位数／两侧候选几何中位数为Code **3538.200／3526.674528ms**、Prose **3600.200／3582.970018ms**。两种顺序均为正增益且漂移低于3%，但Prose均未达到原1%筛选门槛；原两份 `passes=false` 保留。用户在看到正序+0.202%／+0.973%后明确选择采用，本次按该候选的明确授权、反序正增益和3%漂移复核采用，不称为通过原双向门槛，不改变其他实验的全局标准。反序及用户例外记录为 `iq3-stream-one-rounding-cache6200-r1/performance-reverse-user-r1/` 与 `iq3-stream-one-user-review-r1/results.json`。
+
+采用前在永久images路径另完成两侧首次8000输入、Short、Code2K、Prose2K、重复8000输入，以及真实重复chat／messages／responses，共18次完整请求、1184个输出token；完整输出、全部MTP字段和API结果两侧及既有6200／16参考均一致，两个引擎退出0。原默认／NC1侧的169／167个1Hz样本最低空闲显存为 **462.664／597.066MiB**，均未达原1024MiB余量线；保留用户选择的8192上下文及已知8K余量问题，未标为通过该余量线。复用服务检查器stdout仍带旧的 `sampled VRAM>=1024MiB` 固定标签，此标签不适用于本轮；以 `iq3-stream-one-user-service-r1/results.json` 及采用记录的两侧实际数值／`original1024MiB_floor_passed=false` 为准，原输出不覆盖。1Hz采样不保证间隙中的瞬时余量。
+
+主配置只改 `env.STRATA_ORCA_IMAGES` 到 `engine/u4n16-orca-l0-m16-hc-select-iq3-stream1/images`，永久副本逐项哈希与已验证单列候选相同；相对前默认只变image49和对应native manifest。EXE、cache6200／上限16／every1／decay0.95、context及prefill8192、HC SG16、校准Q2 MTP、U4N16数据、RAM保护、原生回退、全部profile和原HC256锚点保留。原默认逐字节备份为 `strata-iq2_xs-before-iq3-stream1-20261106.json`，可选副本为 `strata-iq2_xs-mtp-combined-hc-select-cache6200-adapt16-iq3-stream1.json`；采用及完整身份记录为 `iq3-stream-one-user-default-r1/results.json`，会话39152已退出0。当前身份入口为：
+
+```powershell
+python -X utf8 build-orca-decode20-20261105/iq3_stream_one_user_default.py check
+```
+
+原HC256双场景各20%的目标仍须对这个新默认直接复核，不能连乘增量。入口 `total_iq3_stream_one_user.py` 已完成CPU自检和共享锁内完整默认身份检查，原5771槽／原MTP对照、新6509槽／校准Q2 MTP的参数及各自八字段参考已冻结在 `total-iq3-stream-one-user-vs-hc256-r1/`。保持完整贪心输出、各场景20%及3%漂移、正序通过才独立反序的规则；上述用户增量采用例外不降低20%目标。会话75715已启动正序并等待共享锁，尚无本次新默认的累计性能结论。
+
+等待期间只读复核了已采用NC1的保存产物：源码及SPIR-V的哈希与原资格记录一致，永久image49与采用记录一致；SPIR-V的两项LoopMerge掩码为2／1，其中2为DontUnroll。源码的四次逐对消费循环明确 `#pragma unroll 1`，报告spill仍为0；这不是原生ISA或动态耗时证据。记录为 `iq3-stream-one-loop-review-r1/results.json`。
+
+条件候选 `iq3_stream_one_unroll2.py` 已冻结到 `iq3-stream-one-unroll2-cache6200-r1/`，仅把该循环提示1改为2，独立FP乘加、整数点积／外层累加顺序和分派保持，CPU自检通过。其原SPIR-V基线使用**当前已采用的unroll1／零spill**产物，254行索引与当前包完整一致，不再使用采用前spill2112的旧基线；必须重新逐字节重烘焙、完整ABI、非零alpha两臂GPU资格及新21请求对照。此时尚未编译或测速，只有正在排队的新默认直接20%正序失败后才执行；若当前新默认已完成目标，两方向确认优先，不测试此候选。不根据循环提示预报原生寄存器或速度，原用户单列采用例外也不自动传给新候选。
+
+新NC1默认相对原HC256的直接累计正序已完成：同机A770／E5-2696 v4，原5771槽／新6509槽，均为8192 context，原／新／原三个独立进程，各用Short初始化和三轮交错Code／Prose2048输入、完整128输出，首轮预热、后两轮中位数。21次请求、2352个输出token、各自完整八字段和原始协议均通过，三个引擎退出0，外层provenance完整且默认前后一致。Code／Prose decode吞吐 **+20.512522%／+19.890160%**，两端耗时漂移 **−0.054631%／+0.358005%**；控制几何基线／候选中位数分别为Code **4208.899843／3492.500ms**、Prose **4253.343210／3547.700ms**。完整请求吞吐观察为 **+4.004%／+4.179%**。比较包含HC、MTP策略、缓存、换入上限和NC1变化，不是纯内核收益，也不连乘历史百分比。Prose仍低于20%，因此 `passes=false`，不反序、不挽救重复；用户此前对NC1增量采用的授权不降低累计20%目标。记录为 `total-iq3-stream-one-user-vs-hc256-r1/performance-forward-r1/` 及同名 `-provenance/`。当前默认保持已采用的NC1；上述独立unroll2候选随后启动新资格与正序流程，尚无该候选的GPU或性能结论。
+
+NC1部分展开候选随后完成新资格与正序。只把四次逐对消费循环的展开提示1改为2，完整编译器／原生ABI、当前零spill基线的逐字节重烘焙、独立乘加舍入、新两臂192项非零alpha完整比较和288次GPU完成检查，以及跨侧29,930,496字节输出一致均通过；仍为GRF128／SG32，但原生报告spill **0→480字节**。21次完整请求、2352个输出token、严格八字段和原始协议通过，三个引擎与会话98012退出0，外层provenance完整且默认前后一致。Code decode表观变化 **+0.269309%**，但两端耗时漂移 **+3.004468%**，严格超出3%线，该配对排除，不四舍五入记为通过；Prose decode变化 **−0.457481%**、漂移 **−0.190885%**。控制几何基线／候选中位数为Code **3577.308148／3567.700ms**、Prose **3585.123364／3601.600ms**。整体未过筛选，不反序、不挽救重复、不采用，不能将Code表观正值计入收益。记录为 `iq3-stream-one-unroll2-cache6200-r1/build-r1/results.json`、`performance-forward-r1/` 及同名 `-provenance/`。
+
+下一项独立候选 `iq3_stream_two_swar.py` 只为NC2映像48组合已修正舍入的逐对消费与现有 `swar_ne4`／`swar_sub4` packed符号操作，保留当前已采用NC1映像49及全部其他映像。源码只将对应分支选择为NC2并替换四项整数操作，unroll1、整数点积／归约顺序、独立FP32乘加和GRF128／SG32约束保留；选出的NC2旧基线报告spill1344字节，先前逐对消费的800字节仅是线索，不能据此预测新资源或速度。4608项既有packed符号／逐字节减法等价检查、源码可逆范围和严格模型参考检查通过，准备冻结在 `iq3-stream-two-swar-cache6200-r1/`。会话57119已启动，等待共享GPU锁；此时尚无新编译、GPU资格或模型性能结论。仍须完整ABI／原重烘焙、新非零alpha两臂输出资格和独立21请求，再按Code0.2%／Prose1%／漂移3%决定是否反序；此前用户对NC1的采用授权不改变本项门槛。当前默认保持NC1，原HC256累计正序仍为Code **+20.512522%**／Prose **+19.890160%**，双场景20%目标未完成。
+
+上述NC2会话57119随后在旧映像重烘焙逐字节检查处退出1，device／bake-old／bake-new均退出0，但**未运行GPU输出资格或模型测速**，原 `complete=false/qualified=false` 与失败产物保留。原因是准备流程给NC2选择了NC1修正构建中的完整SPIR-V目录；当前默认仅采用该构建的映像49，映像48仍保留原包，不能将同名SPIR-V当作其生产基线。CPU核对确认生产NC2与此前合格NC1／NC2实验中从原始SPIR-V重烘焙的旧映像逐字节一致，而NC1重编目录中的NC2 SPIR-V不同。`iq3_stream_two_swar_baseline.py` 将旧基线恢复为原 `build-orca-current-frontend-20261104/l0/build/images/iq_kernels/`，候选源码与原失败项逐字节一致，原ABI／重烘焙门槛不变。修正版冻结到 `iq3-stream-two-swar-baseline-cache6200-r2/`，4608项整数检查、基线来源及源码范围自检通过，会话98098正在等待共享锁以重新执行完整资格和21请求对照；此时尚无修正版GPU或性能结论。
+
+对应的直接累计入口 `total_iq3_stream_two_swar.py` 也通过CPU自检：相对原HC256的5771槽锚点、候选6509槽、每场景20%及3%漂移、完整八字段和两套MTP参考保留，三个无关参数变化被拒绝；增量和累计runner互相隔离。只有修正版NC2的资格及独立正反序增量对照均通过后，才允许冻结并运行直接累计对照，期间保留当前默认；该入口尚未准备或运行新GPU请求，不构成累计收益证据。
+
+修正NC2基线来源后的会话98098随后完整结束，退出0。原始SPIR-V重烘焙与生产映像逐字节一致、完整编译器／原生ABI、独立FP乘加、新两臂192项非零alpha完整比较、288次GPU完成检查及跨侧输出字节一致均通过，资格记录为 `complete=true/qualified=true`。仅变更映像48及对应manifest，GRF128／SG32保留，报告spill **1344→896字节**。新21次完整请求、2352个输出token、完整八字段和原始协议一致，三个引擎退出0，外层provenance完整且默认前后一致。Code／Prose decode吞吐变化 **+0.131166%／+0.029513%**，两端耗时漂移 **−0.150847%／+0.030916%**；控制几何基线／候选中位数为Code **3510.849000／3506.250ms**、Prose **3558.599957／3557.550ms**。两场景均未过原增量门槛，不反序、不直接累计、不采用或追加挽救重复；spill减少没有建立足够的模型收益。记录为 `iq3-stream-two-swar-baseline-cache6200-r2/build-r1/results.json`、`performance-forward-r1/` 及同名 `-provenance/`。当前默认累计数据仍为原HC256对照Code **+20.512522%**／Prose **+19.890160%**，双场景20%目标未完成。
+
+下一项独立候选 `iq3_stream_two_fixed.py` 为TY21／NC2且实际 `ncols==2` 增加受保护路径：在原尾行检查后，以常量2和偏移0／xb调用同一 `row_dot_multi`，保留原点积／归约与两列输出位置，其他列数继续原通用循环。仅组装映像48及manifest，保留已采用NC1映像49、正确的原NC2 SPIR-V基线、全部接口和数学约束。1152项两列偏移／输出位置／尾行检查与既有4608项整数等价检查通过，源码范围和原模型门槛自检通过，冻结在 `iq3-stream-two-fixed-cache6200-r1/`。会话46368已启动并等待共享GPU锁，尚无新编译、GPU或模型性能结论，仍需完整ABI、原重烘焙、新非零alpha两臂资格和21请求正序，再决定独立反序。其 `total_iq3_stream_two_fixed.py` 复用已冻结的完整累计检查器，CPU自检通过；只有本候选两方向增量均通过，才允许直接验证每场景20%与3%漂移，当前未准备或执行累计GPU请求。
+
+该双列候选随后完成新资格与正序：完整编译器／原生ABI、原NC2逐字节重烘焙、192项非零alpha比较／288次GPU尾部检查及两侧完整输出一致均通过；保持GRF128／SG32，报告spill **1344→1312字节**，仅映像48和manifest改变。21次完整请求、2352个输出token的严格八字段／原始协议检查通过，三个引擎及会话46368退出0，外层provenance完整且默认前后一致。Code／Prose decode吞吐变化为 **−0.004565%／−0.801543%**，两端耗时漂移 **+1.929525%／+0.527704%**；控制几何基线／候选中位数分别为Code **3552.787793／3552.950ms**、Prose **3571.987632／3600.850ms**。两场景未达到增量门槛，因此 `passes=false`，不反序、不挽救重复、不累计、不采用；较少spill没有建立整模型收益。资格和测速记录为 `iq3-stream-two-fixed-cache6200-r1/build-r1/results.json`、`performance-forward-r1/` 及同名 `-provenance/`。用户接受的NC1默认继续保留，直接原HC256累计正序仍为Code **+20.512522%**／Prose **+19.890160%**，双场景20%目标未完成。后续先更新当前默认的正常调度阶段诊断，再选择独立候选；旧阶段数据只作线索。
+
+为避免继续只按spill挑选候选，已为当前6200／6509槽／上限16／NC1默认准备两项新诊断。`current_decode_timing.py` 使用生产EXE现成的 `STRATA_DECODE_TIMING`，计划完成Short16及两轮交错Code／Prose2K完整128输出，核对全部八字段、原始协议和窗口数。`current_fine_6200.py` 复用此前与相同HC Host匹配的578时间戳诊断EXE，仅更新已采用的缓存、上限和images，计划完成五次插桩请求及三次关闭插桩的完整输出对照；保留正常独立调度、旧profiler的 `prof_on_=false`，不重编内核。两入口CPU自检通过，包括计时解析负例、精确三处配置差异和旧诊断源码范围；共享锁内仍须核对完整旧产物身份与当前默认前后身份。会话55419／16698已启动，均等待已确认存活的 `build-orca-shared-compute-20261106/pipeline.py` 释放共享GPU锁，尚无本轮GPU诊断或新提速结论。时间戳区间含标记、共享工作和阶段拆分开销，不将插桩吞吐作为优化收益，默认及原20%目标不变。
+
+当前6200／上限16／NC1的578时间戳阶段诊断随后完整结束，会话16698退出0。五次插桩及三次关闭插桩请求共800个输出token，完整八字段、原始协议和正常独立调度均核对通过；两个引擎退出0，255个窗口的时间戳数量及区间求和通过，默认前后身份一致，未重编内核。第二轮Code／Prose的每窗口区间分别为：attention（含HC0）**16.166／15.320ms**、HC1 **3.852／3.627ms**、GU＋shared **19.506／13.284ms**、Down＋shared **8.976／6.104ms**，完整标记跨度 **54.565／44.225ms**。这些数值包含标记、共享工作和阶段拆分，属于当前阶段定位，不是纯内核时间或提速证据，也不能用不同请求历史的ON／OFF耗时估计插桩开销。记录为 `current-fine-6200-nc1-r1/results.json`；生产EXE的独立host计时会话55419仍在等待其他实验释放共享锁。
+
+下一项 `mtp_accepted_only.py` 已完成CPU自检并冻结到 `mtp-accepted-only-cache6200-r1/`：只设置已有运行时开关 `STRATA_MTP_ACCEPTED_ONLY=1`，把MTP catch-up行数限制为已提交的 `a+1` 行。无需新EXE或内核；Q2、置信度0.5、cache6200／6509槽、上限16、NC1及U4N16保持。当前源码确有该开关，现有Code／Prose参考也保留全部接受／提议数；历史前缀复用实验修改了另一段代码，不能作为本开关的速度证据。必须等两项当前诊断完整通过后，才运行全21请求、严格八字段／原始协议的新对照，沿用Code0.2%／Prose1%／漂移3%和先正序后反序的门槛，不继承用户对NC1的采用例外。此时仅准备，尚无本候选GPU或性能结果，默认不变。
+
+生产EXE计时会话55419随后退出0：Short16及两轮交错Code／Prose2K完整128输出共五次请求、528个输出token，严格八字段、原始协议、18项计时字段及每请求窗口数核对通过，引擎退出0，完整默认身份前后一致。第二轮Code／Prose每窗口分别为 **63.30／51.69ms**，其中verify **54.56／43.71ms**、draft **8.00／7.31ms**、commit／emit **0.13／0.11ms**，draft约占 **12.64%／14.14%**。正常device-plan下部分host和PCIe计数为0，不代表没有传输；这些是开启计时后的阶段诊断，不是新速度收益。对应 `current-decode-timing-r1/results.json`。已有578时间戳记录中两轮Code／Prose均为55／69窗口、总验证行144／149、输出128行，这只说明有拒绝行，不能按行数直接换算提速。两项诊断均完成后，accepted-only候选会话67154已进入共享锁内的正序对照，尚无候选结论。
+
+accepted-only候选会话67154随后完整结束，退出0。沿用同一生产EXE和内核，只开启现有MTP拒绝行裁剪开关；原／新／原三个独立引擎的21次请求、2352个输出token、全部八字段（含接受／提议数）和原始协议通过，三个引擎均退出0，外层provenance完整，当前默认前后身份一致。Code／Prose decode吞吐变化 **+0.963714%／+0.766691%**，两端耗时漂移 **+1.166724%／+1.344526%**；控制几何基线／候选中位数分别为Code **3508.690987／3475.200ms**、Prose **3567.745451／3540.600ms**。完整请求吞吐观察为 **+0.175560%／−0.776203%**，不能把decode变化泛化为完整请求收益。Prose低于现有1%增量门槛，因此 `passes=false`，不反序、不追加挽救重复、不直接累计、不采用；用户对NC1的0.973%采用例外不传给本候选。记录为 `mtp-accepted-only-cache6200-r1/performance-forward-r1/` 及同名 `-provenance/`。NC1默认保持，最新原HC256直接累计仍为Code **+20.512522%**／Prose **+19.890160%**，双场景20%目标未完成。
+
+用户随后明确要求“可以采用啊，门槛改成0.2%和0.5%吧”。`gate_policy_r3.py` 保留漂移3%、完整协议及独立反序要求；已冻结正序在新规则下通过，原判定不变。独立反序随后完成21次完整请求，Code／Prose净decode观察为 **+0.498766%／+0.101509%**，控制耗时漂移 **−0.092188%／+0.608136%**，完整输出及八字段一致。Prose未达0.5%，新规则的反序 `passes=false` 也完整保留。
+
+用户再次允许采用幅度较小的改善后，本候选通过18次mixed8K／HTTP验收，主配置已单独采用 `STRATA_MTP_ACCEPTED_ONLY=1`，下次启动生效。采用入口为 `mtp_accepted_only_small_default.py`，保留原NC1配置、U4N16、6200／16、原生回退及实际显存余量记录；不改写失败规则，不追加同向性能重复。这些有限同日观察不证明稳定收益，也不改变原HC256每场景20%的累计目标；本轮未运行新累计请求。[完整观察、采用与回退](../bench/results/a770/orca-mtp-accepted-only-adoption-2026-11-06.md)。
+
+新门槛下的独立反序会话15304随后完成并退出0。候选／控制／候选三个独立引擎的21次完整请求、2352个输出token、全部八字段及原始协议均通过，三个引擎退出0，外层provenance完整且默认前后身份一致。Code／Prose decode吞吐变化 **+0.498766%／+0.101509%**，外侧候选耗时漂移 **−0.092188%／+0.608136%**；控制／候选几何中位数分别为Code **3541.350／3523.774625ms**、Prose **3591.000／3587.358516ms**。完整请求吞吐观察为 **+0.444269%／−0.537190%**。Prose仍低于用户新设0.5%门槛，所以新反序 `passes=false`；原正序在新规则下通过、在旧规则下失败的两项判定同时保留，不用聚合两方向掩盖反序不足。不追加挽救重复、不运行尚未满足前置条件的服务／采用／累计流程，主配置继续NC1，新的0.2%／0.5%门槛保持有效。记录为 `mtp-accepted-only-cache6200-r1/performance-reverse-r3/` 和 `mtp-accepted-only-policy3-review-r1/results.json`。
+
+共享工作区随后完成了该候选的单项小幅收益采用流程，授权记录为 `mtp_accepted_only_small_default.py` 中的 `AUTHORIZATION`，没有改写通用policy3门槛或反序失败。`mtp-accepted-only-small-service-r1/` 的两臂18次完整mixed8K／Short／2K／HTTP请求通过，两个引擎退出0；两臂采样空闲显存最低 **322.359375／303.089844MiB**（168／167个样本），原1024MiB标记均为false，按此前保留8192上下文的既有问题记录。采用记录 `mtp-accepted-only-small-default-r1/results.json` 为 `complete=true/adopted=true`，只新增 `env.STRATA_MTP_ACCEPTED_ONLY=1`，备份及保留文件身份一致，下次启动生效；当前配置SHA256为 `e3e6827d3cc78ba9ae9d3dcede21a547708a239e3f3b918326af766569027041`。本轮随后在共享锁内执行 `mtp_accepted_only_small_default.py check`，完整身份核验退出0。采用例外不等于反序达到0.5%，不将两轮变化当作稳定收益承诺。
+
+新默认的直接累计入口 `total_mtp_accepted_only_small.py` 已通过CPU自检，冻结到 `total-mtp-accepted-only-small-vs-hc256-r1/`，使用本次实际采用及18请求服务记录、原HC256的5771槽锚点和当前6509槽，不拼接历史计时。完整八字段／每策略MTP参考、每场景20%／漂移3%／独立反序均保留。会话27341已启动新正序，尚无累计结果。另有 `mtp_prefix_source.py` 通过288项T1–8／所有选中行的字节选择、对齐／守卫及FP载荷自检，仅改变MTP Host TU，使用现有byte gather和未使用的T1 MoE尾部scratch，计划逐位审计R／inject／Q8／K／V后才测速；未编译或执行GPU，不构成新正确性／资源／速度结论。先验证当前新默认累计目标，只有目标未满足时才继续该独立前缀候选。
+
+该直接累计正序随后完成，21次请求、2352个输出token的完整八字段、各策略参考及原始协议核对通过，三个引擎均退出0，外层provenance完整且默认前后身份一致。Code／Prose净decode吞吐为 **+17.009625%／+14.491918%**，外侧耗时漂移 **−0.255009%／−0.308476%**；原HC256几何基线／当前候选中位数分别为Code **4249.322／3631.600ms**、Prose **4272.495／3731.700ms**。两场景均未达到20%，`passes=false`，不追加挽救重复或反序；此前NC1的20.513%／19.890%仅是采用accepted-only之前的历史结果。
+
+同轮出现明显prefill回退：Code **15352.454→38272.400ms**、Prose **14897.712→36767.950ms**，整请求吞吐观察为 **−53.220816%／−52.662374%**，不能只报告decode改善。U4调用／行数／传输字节相同，READY空闲显存为控制2061／1980MiB、候选1237MiB；这些信息尚不足以证明分页或accepted-only开关是原因。先用实际已采用EXE／配置进行正常调度下的主机阶段与Windows／Sysman显存诊断，不编译新候选。
+
+首次资源诊断 `current-mtp-accepted-resources-r1/` 因Windows全进程计数器的无效实例而中断，尚无请求开始，引擎退出0，失败记录保留。独立修订入口 `current_mtp_resources_r2.py` 仅过滤并记录无效实例，仍要求引擎在全部有效运行采样中存在、没有被过滤的引擎实例，并保留原严格计数器／完整输出检查；真实PowerShell过滤及负例解析的CPU自检已通过。新阶段 `current-mtp-accepted-resources-r2/` 正在执行五次请求诊断，不作为性能验收重复或新提速证据。
+
+修订诊断随后完成并退出0：5次请求、528个输出token、255个decode窗口的完整八字段及原始协议均匹配，172个Windows采样和241个Sysman采样有效；11个无效的其他进程实例记录后过滤，引擎采样没有被过滤。源码／记录哈希和默认前后身份复核通过，结果及只读复核分别为 `current-mtp-accepted-resources-r2/results.json`、`current-mtp-accepted-resources-review-r2/results.json`。暖态Code／Prose的prefill仍为 **38603.2／37295.7ms**，decode为 **3655.7／3793.0ms**；按主机窗口计时，verify为 **57.51／46.78ms**、draft为 **8.15／7.45ms**，verify约占 **86.52%／85.10%**。这些是有监控开销的诊断区间，不替代正式性能比较。
+
+同轮Sysman的请求内最低采样空闲显存为 **369.902MiB**。Windows在READY附近报告引擎专用／共享占用 **13306.949／34563.254MiB**，另有嘉立创EDA进程专用占用约1545MiB、远程桌面进程约825MiB；引擎共享占用在U4首次使用后最高59435.195MiB，包含已有固定页专家镜像与U4主机数据，不能单凭该值认定分页。Windows记账与Sysman物理余量口径不同，不相加推导驻留量，也不能据这些采样将回退归因于其他应用。prefill回退原因仍待隔离；本轮未改频率、未关闭其他应用、未编译前缀复用候选，6200／上限16／context8192与已采用默认保持。
+
+随后使用同一EXE／images、6200／6509槽、上限16和context8192，仅在诊断环境中覆盖 `STRATA_MTP_ACCEPTED_ONLY=0`。5次请求、528个输出token、255个decode窗口的完整八字段、原始协议和前后默认身份全部通过，引擎退出0；178个Windows采样、242个Sysman采样有效，6个其他进程无效实例记录后过滤。暖态Code／Prose prefill仍为 **38568.0／37200.3ms**，最低采样空闲显存 **368.988MiB**；原开关开启诊断为38603.2／37295.7ms。关闭该开关没有恢复此前约15秒的prefill，因此不据本项撤销已采用默认。记录为 `current-mtp-flag0-resources-r1/`，入口 `current_mtp_flag0_resources.py`；这些带监控的顺序诊断不构成双向性能验收或因果分页证明。
+
+独立前缀复用候选随后由 `mtp_prefix.py` 完成单个MTP Host源文件的编译／链接，复用原23项数学／主程序／运行时链接输入，EXE／images默认未改。首个归属检查误将头文件内联warm／idle及其展开信息也要求来自新对象，失败保留于 `mtp-prefix-cache6200-r1/build-r1/results.json`。`mtp_prefix_r2.py` 根据原头文件仅允许已观察的10行main.obj内联记录，其余309行MTP记录来自mtp-prefix.obj，八个相关函数各有唯一归属；错误对象、未知内联函数和重复目标的负例均拒绝。只读复核通过，未重编，结果为 `build-review-r2/results.json`。下一阶段依次核对重编关闭路径、R／inject／Q8／K／V逐字节审计及开启路径；任何中间差异都阻止开启和测速，尚无前缀候选性能结论。
+
+前缀资格检查随后通过：重编关闭／审计／开启三个独立引擎，分别执行Short16、Code2K128、Prose2K128，共9次请求、816个输出token，完整八字段与原始协议一致，三个引擎退出0。128次审计覆盖实际模型的 `(T,a)=(1,0),(2,1),(3,2),(4,3)`，R／inject／Q8／K／V全部逐字节相同，非有限数检查通过；这不宣称GPU覆盖模型未使用的T5–8或所有格式。前后默认和复用链接输入保持，记录为 `mtp-prefix-cache6200-r1/qualification-r1/results.json`。正式入口 `mtp_prefix_model.py` 使用独立模块全局空间，CPU自检确认祖先核对不会重置候选路径、完整协议检查或Code0.2%／Prose0.5%门槛；正序使用当前已采用accepted-only默认，仍为三独立进程、21次请求、2352个输出token，尚无正式提速结论。
+
+首版前缀复用正序现已完成：21次请求、2352个输出token的完整八字段和原始协议均一致，三引擎退出0，外层provenance完整、前后默认身份一致。Code／Prose decode吞吐为 **+0.198361%／+0.315916%**，外侧耗时漂移 **+0.569846%／+0.442205%**；控制几何基线／候选中位数分别为Code **3440.511／3433.700ms**、Prose **3490.242／3479.250ms**。两类均低于Code0.2%／Prose0.5%门槛，Code不能四舍五入后判通过；不反序、不追加挽救重复、不采用。记录为 `mtp-prefix-model-cache6200-r1/performance-forward-r1/` 及其 `-provenance/`。该轮未启用资源／阶段监控，第一控制臂暖态prefill为Code约14.9秒、Prose约14.5秒，此前37–38秒的回退没有持续出现，原因尚未确认，不能把该变化计入前缀收益。
+
+独立下一版 `mtp_prefix_alias_source.py` 去掉三次设备内恢复拷贝，首个完整草稿直接读写已有MoE尾部的R／inject快照，仅将query投影输入指向已保存Q8；后续注意力／输出头继续使用原较大Q8工作区，首个草稿结束的R选择相应改读该尾部，未改变成员布局或新增缓冲区。可逆改动、尾部与T1 MoE互不覆盖、R写入不覆盖inject／Q8的CPU检查通过。入口 `mtp_prefix_alias.py` 完成同一Host TU编译／链接、23项复用输入与精确函数归属核对；关闭／审计／开启的9次请求、816个输出token、原始协议及128次T1–4中间审计全部通过，三个引擎退出0，默认前后保持。构建和资格记录位于 `mtp-prefix-alias-cache6200-r1/`；正式入口为 `mtp_prefix_alias_model.py`，资格通过时尚无性能结论。
+
+该版独立正序现已完成，21次请求、2352个输出token、完整八字段及原始协议通过，三个引擎退出0，外层provenance完整且默认前后相同。Code／Prose decode吞吐为 **+0.208065%／−0.183734%**，两端耗时漂移 **−0.342067%／−0.017255%**；基线／候选分别为Code **3429.120／3422.000ms**、Prose **3476.900／3483.300ms**。Code达到0.2%门槛，Prose未达到0.5%，整体失败，不反序、不挽救重复、不采用。记录为 `mtp-prefix-alias-model-cache6200-r1/performance-forward-r1/` 及其 `-provenance/`。本轮控制和候选暖态prefill约14–15秒，仍不据此归因此前受监控时的回退。下一独立候选仅将现有累计置信度0.5改为0.4，先另行冻结完整输出及每策略计数；主配置、spec-min-p0.5和全局门槛保持，尚无该参数候选的性能结论。
+
+`confidence40_cache6200.py` 的CPU自检确认单参数变化、独立命名空间不会被祖先核对重置、仅资格阶段允许草稿计数变化、计时仍逐项核对全部八字段。累计0.4资格检查随后完成7次请求／784个输出token，全部六个非MTP字段和完整输出与当前默认一致，三轮Code的接受／提议均为73／90，Prose均为60／83；当前默认分别为73／89和59／80。原始协议、引擎退出0、前后默认身份均通过，记录位于 `confidence40-reference-r1/`。每策略计数已单独冻结到 `confidence40-cache6200-r1/`，随后开始独立正序；资格计数不作为性能收益。
+
+累计0.4的正式正序完成21次请求／2352个输出token，八字段和原始协议匹配各自策略参考，三个引擎退出0，前后默认和外层provenance一致。Code／Prose decode吞吐观察值为 **+1.850348%／+0.524552%**，但两端耗时漂移分别为 **+3.205409%／+3.192468%**，均超过3%，本轮排除、不能作为提速确认；不反序、不挽救重复、不采用。几何基线／候选耗时分别为Code **3478.342／3415.150ms**、Prose **3533.589／3515.150ms**。完整请求吞吐为Code **+2.330373%**、Prose **−0.826989%**，亦不据此概括为普遍改善。记录为 `confidence40-cache6200-r1/performance-forward-r1/` 及其 `-provenance/`。主配置累计0.5保持；下一独立方向是现有MTP成本窗口开关，需重新验证完整输出和每策略计数，不沿用本轮收益。
+
+独立 `cost_window_cache6200.py` 只开启现有 `STRATA_MTP_COST_WINDOW`，复用冻结资格／计时流程，累计0.5及其余生产设置不变。CPU检查通过，7次资格请求／784个输出token的全部非MTP字段和完整输出一致、引擎退出0、默认前后保持；Code三轮接受／提议为68／80、66／75、66／74，Prose为55／71、55／71、56／72。策略由测得成本选择前缀，各轮计数按请求单独冻结于 `cost-window-reference-r1/` 和 `cost-window-cache6200-r1/`，正式正序仍严格核对全部八字段，不因该策略动态选择而豁免计数差异；尚无该候选性能结论。
+
+成本窗口正式正序随后完成21次请求／2352个输出token，全部八字段及原始协议匹配独立参考，三个引擎退出0，默认前后和外层provenance一致。Code／Prose decode为 **−2.600064%／+0.442298%**，两端耗时漂移 **−1.777246%／−2.963353%**；基线／候选分别为Code **3479.710／3572.600ms**、Prose **3553.548／3537.900ms**。两类均未达到0.2%／0.5%门槛，不反序、不挽救重复、不采用，成本窗口继续关闭。记录为 `cost-window-cache6200-r1/performance-forward-r1/` 及其 `-provenance/`。下一独立候选使用现有CLI将最大MTP窗口4改为5，累计0.5和其他策略保持；尚未验证其完整输出、资源或速度。
+
+`spec5_cache6200.py` 随后通过CPU检查和独立资格测试：仅将CLI `--spec 4` 改为5，其他配置保持，7次请求／784个输出token的全部非MTP字段和完整输出一致，原始协议、引擎退出0、前后默认身份通过。三轮Code接受／提议均为75／93，Prose均为62／85；资格参考冻结到 `spec5-reference-r1/` 和 `spec5-cache6200-r1/`。进入21请求独立正序前仍未宣称提速或8K显存通过；完整八字段、0.2%／0.5%／漂移3%及独立反序要求保持。
+
+窗口5的独立正序现已完成21次请求／2352个输出token，完整八字段及原始协议通过，三个引擎退出0，前后默认和外层provenance一致。Code／Prose decode为 **+0.312266%／−0.998564%**，两端耗时漂移 **+0.410831%／+0.480908%**；几何基线／候选分别为Code **3426.918／3416.250ms**、Prose **3480.940／3516.050ms**。Prose退步，整体不通过，不反序、不挽救重复、不采用。该轮prefill观察值为Code **+3.523857%**、Prose **+2.042433%**，完整请求吞吐 **+2.916413%／+1.436839%**，不替代decode验收或证明窗口5加快prefill。记录为 `spec5-cache6200-r1/performance-forward-r1/` 及其 `-provenance/`。后续窗口6仍直接对照当前窗口4，不叠加窗口5数据。
+
+`spec6_cache6200.py` 在相同冻结流程下仅将现有最大窗口4改为6，CPU检查和独立7请求／784输出token资格测试通过；完整非MTP字段和输出一致、原始协议通过、引擎退出0，默认前后保持。三轮Code接受／提议均为75／95，Prose均为63／86，分别冻结到 `spec6-reference-r1/` 和 `spec6-cache6200-r1/`。之后启动直接对照当前窗口4的21请求正式正序；尚无窗口6性能或8K显存验收结论，不更改主配置。
+
+窗口6独立正序随后完成21次请求／2352个输出token，八字段与各策略参考、原始协议均通过，三个引擎退出0，外层provenance完整、默认前后相同。Code／Prose decode吞吐为 **+1.205094%／+1.231253%**，两端耗时漂移 **+1.095538%／+1.945983%**，达到0.2%／0.5%／漂移3%门槛；几何基线／候选分别为Code **3482.973／3441.500ms**、Prose **3517.837／3475.050ms**。完整请求吞吐为 **−0.014592%／−0.254442%**，正序通过仅针对decode，不概括为整体请求提速。记录为 `spec6-cache6200-r1/performance-forward-r1/` 及其 `-provenance/`。独立反序已启动；反序、完整8K服务／HTTP／显存及原HC256直接20%目标均未由该正序证明，主配置仍为窗口4。
+
+窗口6独立反序现也通过：21次完整请求／2352个输出token、各策略八字段／原始协议通过，三个引擎退出0，外层provenance完整且默认前后相同。Code／Prose decode为 **+0.287057%／+1.012872%**，两端耗时漂移 **+0.335657%／−0.057047%**；基线／候选分别为Code **3486.600／3476.620ms**、Prose **3540.400／3504.900ms**。完整请求吞吐为 **+1.204973%／+1.301830%**。正反序均达到当前增量门槛，记录为 `spec6-cache6200-r1/performance-reverse-r1/` 及其 `-provenance/`；仍需完成8K／HTTP／显存和新原HC256直接总对照，不以约1%的增量证明20%目标，主配置尚未改变。
+
+`total_spec6_cache6200.py` 使用独立命名空间、原HC256配置及原策略参考、窗口6资格参考做新直接总对照，20%／漂移3%／独立反序要求保持。正式正序21次请求／2352输出token、各策略八字段和原始协议通过，三个引擎退出0，外层provenance完整且默认前后相同。Code／Prose decode为 **+19.218481%／+16.705253%**，两端耗时漂移 **−0.226013%／+0.675652%**；几何基线／候选分别为Code **4242.747／3558.800ms**、Prose **4262.076／3652.000ms**。完整请求吞吐为 **+3.433980%／+2.551678%**。两场景均未达20%，整体失败，不反序、不挽救重复、不累乘增量；总目标仍未完成。记录为 `total-spec6-cache6200-vs-hc256-r1/performance-forward-r1/` 及其 `-provenance/`。
+
+窗口6的 `spec6_service.py` 已通过CPU检查，保留既有真实服务和pump错误处理，仅在测试进程保存原始T／TB／RESUME／DONE行，并对完整八字段做单独检查。先运行9次候选8K混合／实际HTTP资格请求匹配当前默认完整输出及非MTP字段，冻结新策略计数，再进行18次全字段正式验证；当前启动的是9请求资格阶段。显存实测最低值和原1024MiB标志分别报告，不将既有低余量例外自动当作窗口6资源通过，默认仍为窗口4。
+
+9请求资格现已完成，共592个输出token。首个／重复8000输入tokens且各128输出、Short／Code／Prose混合历史，以及两次Chat Completions、Messages、Responses真实HTTP全部保持完整输出；八字段原始协议与真实服务解析记录逐项一致，计数变化仅在资格阶段与旧策略对比时允许，窗口6参考已冻结。引擎退出0，前后默认／资源身份保持；227个显存样本最低 **352.738281MiB**，原1024MiB标志为false，不改写为通过。记录为 `spec6-service-r1/qualification-r1/`，随后启动两配置共18次严格全字段服务验证；尚未采用窗口6。
+
+窗口6正式服务验证现已完成，两配置共18请求／1184个输出token，全部八字段分别匹配各策略参考，首次／重复8K、混合历史及四次真实HTTP均通过，两个引擎退出0，原始协议／前后身份检查完整。窗口4／6分别有230／214个显存样本，最低 **604.035156／468.949219MiB**，原1024MiB标志均为false。正式候选比控制少135.085938MiB，资格阶段另有352.738281MiB的更低观察值，全部保留。记录为 `spec6-service-r1/validation-r1/`。
+
+`spec6_default.py` 复用原原子替换及回退流程，仅将本机主配置 `--spec 4` 改为6；原窗口4配置和可选窗口6配置分别保留，EXE／images／U4N16／RAM检查／native回退／profiles／6200／6509槽／cap16／8192上下文不变。旧基线证明使用独立函数全局空间，避免采用后主配置变化导致历史八字段核对误读新默认。切换及切换后完整证明通过，采用记录为 `spec6-default-r1/results.json`；新主配置SHA256为 `b2f7e25a62a5c3c4a0e32f28b8aba5f1b58a1b02e53970ef140cc07c52e2f623`，旧窗口4备份SHA256仍为 `e3e6827d3cc78ba9ae9d3dcede21a547708a239e3f3b918326af766569027041`。以后核对当前默认使用 `spec6_default.py check`，不直接用旧accepted-only采用入口核对新主配置。原1024MiB失败及20%总目标失败不改写，目标继续保留。[采用摘要](../bench/results/a770/orca-mtp-spec6-adoption-2026-11-06.md)。
+
+新进程的 `spec6_default.py check` 随后完成，确认实际窗口6默认、旧窗口4祖先及27请求完整服务证据；仅CLI窗口发生变化。下一独立候选 `confidence40x40_spec6.py` 同时将现有 `--spec-min-p` 和累计置信度从0.5降为0.4，保持窗口6。仅降低单步门槛仍会被累计0.5挡住低于0.5的首个草稿，因此两项一起测试；完整输出及计数必须先资格验证，不能据此预断收益或精度。CPU检查通过，确认真实新默认基线、独立模型／校验命名空间、仅两参数变化和全部八字段要求；7请求资格阶段已提交，尚无该候选性能结论，默认仍为0.5／0.5。
+
+## 历史整版本锚点（2026-10-31）
+
+原生产 SYCL → 当时 Orca L0 → 原生产 SYCL，三个独立进程为 **41.46 → 50.54 → 41.39 tok/s**。固定 Fibonacci28／自然76 输出、5771 槽、MTP4／min-p0.5／decay0.95；每进程十次预热、五次保留，45 次完整输出及草稿计数一致。以两个 SYCL 中位数的几何平均 **41.42** 为基线，吞吐 **+22.01%**，前后基线耗时漂移 **0.17%**。
+
+这是固定输入热态的整版本后端对照，包含录制／EAGER、调度和内核实现差异，不是纯 API 收益；decode 排除准备与预填充。50 锚定单独保留。1 Hz 采样最低空闲 **847.4805 MiB**，未过 1024 MiB 余量线；无新 PPL 或整版本质量等价结论，Linux GPU 尚未验证。混合请求及旧实验保持原数据，不与此结果拼接算倍率。[历史图与同等条件复现](../bench/results/a770/orca-anchor50-2026-10-31.md) · [完整样本和哈希](../sycl/orca/anchor50-a770-windows-2026-10-31.json)。
+
+## 此前默认：1536 MiB 预留 Orca（2026-10-31）
 
 恢复 **1536 MiB 显存预留**后，实际为 **5896 专家槽／8093 MiB 缓存**。FP16 双专家、MTP4／`spec-min-p=0.5`、自动缓存、8192 context／prefill、adapt32／PCIe fraction 0.16 保留。单进程交错执行四场景，每场景一次预热、三个保留样本，共 16 请求、1024 个输出 tokens、12 个保留样本。 自动定容最初估算 6590 槽，写入后的引擎空闲查询为 201 MiB，随后自动收缩到实际 5896 槽；不是固定槽数上限。
 
@@ -19,6 +561,39 @@
 ## SYCL 恢复入口（2026-10-31）
 
 本机新增 `run-iq2_xs-sycl.bat`／`strata-iq2_xs-sycl.json`，固定到冻结 M4／256-GRF 构建，prefill2048、请求缓存3000槽、预留3072 MiB。两轮各502个目标的评分 TSV 均与冻结 Orca 参考一致，原始及条件 PPL 变化均为0%；四项 HTTP 和六次混合2K／8K历史请求通过，重复输入输出一致。580次物理显存采样最低空闲3762.17969 MiB。旧 `.sycl-backup` 仅作为已拒绝的历史档案，默认 Orca 配置未由本次恢复修改。此处没有新的配对测速，也不改变上述旧版本质量或速度结论。[恢复配置、被拒候选与复跑工具](../bench/results/a770/sycl-recovery-2026-10-31.md)。
+
+## 历史接入：内存充足时的可选 U4 N16（2026-11-04）
+
+以下保留 11-04 的独立可选配置与测量；11-05 的本机主入口采用见上文，旧准备工具不会自动生成当前 min16/M16/HC SG16 配置。U4 N16 最初作为 **A770／oneAPI 2025.3 的独立选项**。2K 输入、128 输出，相对同一修复后 SYCL native，Code／Prose prefill 吞吐分别 +6.42%／+7.54%，整请求 +5.35%／+4.85%；前后控制漂移在 3% 内。256 个固定目标的合计 PPL 增幅为 +0.6071%，属于有限质量检查。上述 SYCL 数字不能作为 Orca 提速数据。[SYCL 完整结果与原始证据](../bench/results/a770/lowbit-fp16-m4-2026-11-04.md)。
+
+Orca L0 和 Direct 也提供默认关闭的 U4 N16 入口，保留当前 FP16 配对、专家 batch 和 MTP 设置。两条后端各 330 万个 GU／Down 输出与 SYCL 参考逐字节一致；整模型各 256 个固定目标的合计 PPL 增幅同为 +0.4520%。首次接入中 U4 跳过专家破坏 FP16 配对下标的问题已修正，失败记录保留。[Orca 整模型测速、范围与原始证据](../bench/results/a770/orca-u4n16-2026-11-04.md)。
+
+保留 3,234 个原始 BF16 转换的 U4 专家：权重载荷 8,941,363,200 字节（约 8.33 GiB），加载后额外常驻 RAM；设备权重缓冲 44,236,800 字节（约 42.2 MiB），另需激活工作区。权重在本机 `C:/Strata-data/qwen-u4-prefill-20261027`，位于构建目录之外。完整 U4 源码及 6,469 项资源清单在[原始归档](../sycl/orca/lowbit-model-a770-windows-2026-11-04.json.gz)，后续修复及模型结果在[新归档](../sycl/orca/lowbit-fp16-m4-a770-windows-2026-11-04.json.gz)。
+
+后续优化复用已有资源扩至 9,402 个专家，移除 GU 激活读取的冗余掩码，采用 `min_rows=32`。同一 A770／oneAPI 2025.3，预热后 2K 输入、128 输出，相对各自当前 native 控制，L0 的 Code／Prose prefill 吞吐 +21.19%／+19.64%，整请求 +17.45%／+18.86%；Direct 分别为 +15.99%／+14.71% 和 +12.78%／+14.68%。这是内核与覆盖扩展的合计收益，不与旧百分比相加；尚无独立反序确认。256 个固定目标的合计 PPL 变化为 +0.1242%。[优化结果、首次加载成本和原始证据](../bench/results/a770/orca-u4-optimization-2026-11-04.md)。
+
+新可选配置为 `strata-iq2_xs-u4n16-orca-l0-opt.json`／`strata-iq2_xs-u4n16-orca-direct-opt.json`，已保留并实跑验证，旧配置和权重不覆盖。U4 主存载荷约 24.21 GiB，设备权重缓冲仍为 42.2 MiB；准备时检查的 RAM 预算约 63.23 GiB，非实测最低要求。首次长请求包含惰性加载，明显较慢；decode/GEMV 未改，Direct 8K 间歇问题仍未关闭。
+
+以下命令生成原 3,234 专家、`min_rows=128` 的独立配置：
+
+```powershell
+python tools/prepare_u4n16.py --out strata-iq2_xs-u4n16-sycl.json
+python tools/prepare_u4n16.py --backend orca-l0 --out strata-iq2_xs-u4n16-orca-l0.json
+python tools/prepare_u4n16.py --backend orca-direct --out strata-iq2_xs-u4n16-orca-direct.json
+```
+
+工具校验全部权重和已验证 EXE 的 SHA256，将程序保留到对应的 `engine/u4n16-*` 目录，并生成配置。Orca 另行保留并校验 images 和 Direct memory 内核；已有文件不会被覆盖。无需重新编译或重复转换权重。默认配置保持原样。
+
+启动前运行不带参数的内存与资源检查，再使用现有服务器：
+
+```powershell
+python tools/prepare_u4n16.py
+if ($LASTEXITCODE -eq 0) {
+    python sycl/serve/server_intel.py --engine strata --config strata-iq2_xs-u4n16-sycl.json --port 8080
+}
+```
+
+预检查要求可用 RAM 覆盖已测原生 arena 33,812 MiB、额外 U4 载荷及 6 GiB 余量，合计约 47.35 GiB；这是启动前预算，不是实测最低内存门槛，也不保证其他程序随后占用内存时仍足够。检查失败时不生成配置，可继续用原入口。Orca 启动前检查使用对应的 `--backend`，服务器的 `--config` 选择生成的对应文件。N16 和 `min_rows=128` 固定为已测设置；SYCL 关闭专家 batch，Orca 保留 FP16 配对和专家 batch；较小专家批次及 decode 使用原路径。CPU 回归检查：`python tools/prepare_u4n16.py --self-check`。
 
 
 **连续重复同一 Short 的补测为 38.54 tok/s。** 同一当前 EXE／images、23-token 输入、完整 64-token 输出与 37／50 草稿接受计数；当前完整配置连续重复十次预热后取五次中位数，实际自动缓存 5949 槽。上面的四场景交错结果是另一种请求分布；排除准备和首轮图预热不等于专家缓存已达到连续重复的热状态。两种结果分别保留，具体缓存适配、PCIe 访存与预热的贡献尚未单独量化。 [完整核对](../bench/results/a770/orca-short-workloads-2026-10-31.md)。
