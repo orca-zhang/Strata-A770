@@ -44,4 +44,4 @@ python -X utf8 build-orca-decode20-20261105/mtp_accepted_only_small_default.py c
 同条件复测须保持同一设备、驱动、编译器、EXE／images、权重／初始profile、参数、输入和进程顺序，使用新输出目录。
 归档保留采用决定、原失败判定、原始协议、配置、检查脚本及依赖摘要；不包含权重或二进制，仍需本机已保留资源。
 
-[JSON](../../../sycl/orca/mtp-accepted-only-adoption-a770-windows-2026-11-06.json) · [文本归档](../../../sycl/orca/mtp-accepted-only-adoption-a770-windows-2026-11-06.json.gz)
+[JSON](../../../sycl/orca/mtp-accepted-only-adoption-a770-windows-2026-11-06.json) · 文本归档 (`mtp-accepted-only-adoption-a770-windows-2026-11-06.json.gz`, raw capture retained locally)

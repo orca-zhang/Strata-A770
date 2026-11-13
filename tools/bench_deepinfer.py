@@ -84,8 +84,16 @@ def gpu_lock(allow_compiler=False):
                 time.sleep(1)
         yield
     finally:
-        if path.exists() and path.read_text() == owner:
-            path.unlink()
+        while True:
+            try:
+                if path.read_text() != owner:
+                    break
+                path.unlink()
+                break
+            except FileNotFoundError:
+                break
+            except PermissionError:
+                time.sleep(0.05)
 
 
 def environment(cfg, mode="baseline", reproducible=False):

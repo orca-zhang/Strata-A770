@@ -32,6 +32,21 @@ td.log
 /build/
 /third_party/llama.cpp
 /models/
+# ponytail: local calibrated model weights are distributed separately from source.
+/data/mtp-*/
+/data/expert-profile-*native*.bin
+# Local credentials and system traces may contain private data.
+.env
+.env.*
+!.env.example
+!.env.sample
+*.pem
+*.key
+*.p12
+*.pfx
+*.etl
+/secrets/
+/credentials/
 /packs/
 /mtp/
 /run-*.bat
@@ -91,3 +106,8 @@ bench/results/20??-??-??*
 /bench/results/a770/**/*.asm
 /bench/results/a770/**/*.ze_info
 /bench/results/a770/**/*.log.gz
+
+
+# Raw captures stay local; explicitly tracked benchmark summaries remain public.
+/sycl/orca/*-a770-windows-*.json
+/sycl/orca/*.json.gz

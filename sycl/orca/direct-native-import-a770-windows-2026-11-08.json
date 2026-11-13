@@ -1,0 +1,444 @@
+{
+  "hardware": "Intel Arc A770 16GB",
+  "driver": "32.0.101.9034",
+  "production_changed": true,
+  "deployed_exe_changed": false,
+  "linux_gpu_tested": false,
+  "performance_measured": false,
+  "small_import_calibration": {
+    "complete": true,
+    "scope": "Calibrate caller-owned Host import through the installed driver; no GPU command submissions.",
+    "commands": [
+      {
+        "label": "compile",
+        "args": [
+          "C:/Program Files (x86)/Intel/oneAPI/compiler/2025.3/bin/icx.exe",
+          "/std:c++17",
+          "/EHsc",
+          "/O2",
+          "-IC:/Program Files/LevelZeroSDK/1.33.1/include",
+          "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\calibration-r1\\probe.cpp",
+          "-o",
+          "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\calibration-r1\\probe.exe"
+        ],
+        "exit_code": 0
+      },
+      {
+        "label": "probe",
+        "args": [
+          "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\calibration-r1\\probe.exe",
+          "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\calibration-r1"
+        ],
+        "exit_code": 0
+      }
+    ],
+    "production_changed": false,
+    "kernel_submissions": 0,
+    "vendor_driver_used_for_calibration": true,
+    "private_raw_blobs_stay_local": true,
+    "records": [
+      {
+        "phase": 1,
+        "call": 15,
+        "count": 1,
+        "flags": "00000000",
+        "resource_private_bytes": 0,
+        "runtime_private_bytes": 0,
+        "blobs": [
+          {
+            "index": 0,
+            "path": "1-15-0-before.bin",
+            "bytes": 2376
+          }
+        ]
+      },
+      {
+        "phase": 2,
+        "call": 16,
+        "count": 1,
+        "flags": "00000000",
+        "resource_private_bytes": 0,
+        "runtime_private_bytes": 0,
+        "blobs": [
+          {
+            "index": 0,
+            "path": "2-16-0-before.bin",
+            "bytes": 2376
+          }
+        ]
+      },
+      {
+        "phase": 3,
+        "call": 17,
+        "count": 1,
+        "flags": "00000000",
+        "resource_private_bytes": 0,
+        "runtime_private_bytes": 0,
+        "blobs": [
+          {
+            "index": 0,
+            "path": "3-17-0-before.bin",
+            "bytes": 2376
+          }
+        ]
+      },
+      {
+        "phase": 4,
+        "call": 18,
+        "count": 1,
+        "flags": "00000000",
+        "resource_private_bytes": 0,
+        "runtime_private_bytes": 0,
+        "blobs": [
+          {
+            "index": 0,
+            "path": "4-18-0-before.bin",
+            "bytes": 2376
+          }
+        ]
+      }
+    ],
+    "executable_sha256": "01dc35f96d14f7989c8641757b412922d5d561b8868d344d60f2c37e334d76b2"
+  },
+  "large_calibration": [
+    {
+      "phase": 1,
+      "call": 15,
+      "index": 0,
+      "offset": 0,
+      "bytes": 2147418112
+    },
+    {
+      "phase": 2,
+      "call": 16,
+      "index": 0,
+      "offset": 0,
+      "bytes": 2147483648
+    },
+    {
+      "phase": 3,
+      "call": 17,
+      "index": 0,
+      "offset": 0,
+      "bytes": 2147549184
+    },
+    {
+      "phase": 4,
+      "call": 18,
+      "index": 0,
+      "offset": 0,
+      "bytes": 4294901760
+    },
+    {
+      "phase": 4,
+      "call": 19,
+      "index": 0,
+      "offset": 4294901760,
+      "bytes": 131072
+    }
+  ],
+  "exact_serialization": {
+    "eligible_matches": 7,
+    "normalized_driver_identity_padding_bytes": 60,
+    "larger_vendor_descriptors_outside_codec_scope": 2,
+    "caller_pointers_preserved": true
+  },
+  "no_restriction": {
+    "complete": true,
+    "gpu_calls": 0,
+    "scope": "Reuse the prior installed-driver offline NoRestriction field probe for actual import captures; no compilation or hardware rerun.",
+    "args": [
+      "wsl.exe",
+      "-d",
+      "OrcaL0-Check-20261031",
+      "--exec",
+      "/tmp/orca-host-fields",
+      "/mnt/g/GitHub/Strata/build-orca-native-import-20261108/calibration-r1/1-15-0-before.bin",
+      "/mnt/g/GitHub/Strata/build-orca-native-import-20261108/calibration-r1/2-16-0-before.bin",
+      "/mnt/g/GitHub/Strata/build-orca-native-import-20261108/calibration-r1/3-17-0-before.bin",
+      "/mnt/g/GitHub/Strata/build-orca-native-import-20261108/calibration-r1/4-18-0-before.bin",
+      "/mnt/g/GitHub/Strata/build-orca-native-import-20261108/large-r2/1-15-0-before.bin",
+      "/mnt/g/GitHub/Strata/build-orca-native-import-20261108/large-r2/2-16-0-before.bin",
+      "/mnt/g/GitHub/Strata/build-orca-native-import-20261108/large-r2/3-17-0-before.bin",
+      "/mnt/g/GitHub/Strata/build-orca-native-import-20261108/large-r2/4-18-0-before.bin",
+      "/mnt/g/GitHub/Strata/build-orca-native-import-20261108/large-r2/4-19-0-before.bin"
+    ],
+    "source_sha256": "125a2eba3427d09f0b327de3ec64f555ac0c353473f434d0da12e93159065b2b",
+    "capture_sha256": {
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\calibration-r1\\1-15-0-before.bin": "d2649c284b2fcf17e8ad8a8d2f16fe7ac18faf710ffa3cda98ba8a6a55b2ead7",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\calibration-r1\\2-16-0-before.bin": "dfaaecc2b268622f7517a50bde9cb4fe66dec62cd95099e4f43b81b07ea0af6f",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\calibration-r1\\3-17-0-before.bin": "7561d6a15434a5359ae06b3e581239497a95abfcf932a76427ea77fd7b06632a",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\calibration-r1\\4-18-0-before.bin": "df4a3320dce115504cb80a0164d9dcacc14fb4770eba42f29d2c14ec75c5800a",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\large-r2\\1-15-0-before.bin": "39056b3aac139f0af9fdce34d9cbeaa91cd71b22c0782f979e11af5e0cab9bf9",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\large-r2\\2-16-0-before.bin": "29c8973b518661f9e9f09fb1817703194371c05a587bcb87f55b08bb2526203b",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\large-r2\\3-17-0-before.bin": "6e2740863b9b635b366401881cca29eea8aa0f6a0f932255ddb929ee9cbc76b5",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\large-r2\\4-18-0-before.bin": "14a8c4479b2557d25bd83fb1d123dd2598444620ee4870d12ac2175899d95193",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\large-r2\\4-19-0-before.bin": "fff676c0427a07739389ee2cd81bc0ac91dc963abd1fd2ba2bd54fef193bc266"
+    },
+    "exit_code": 0
+  },
+  "log_decoding_failure": {
+    "launcher_exit_code": 1,
+    "child_exit_code": 0,
+    "child_semantic_check_passed": true,
+    "error": "UnicodeDecodeError reading WSL UTF-16-LE stderr as UTF-8 after results had been saved",
+    "stderr_encoding": "utf-16-le",
+    "hardware_rerun": false
+  },
+  "original_qualification_failure": {
+    "complete": false,
+    "production_changed": false,
+    "linux_gpu_tested": false,
+    "performance_measured": false,
+    "commands": [
+      {
+        "label": "compile-calibration",
+        "exit_code": 0
+      },
+      {
+        "label": "large-calibration",
+        "exit_code": 0
+      },
+      {
+        "label": "compile-abi",
+        "exit_code": 0
+      },
+      {
+        "label": "abi",
+        "exit_code": 0
+      },
+      {
+        "label": "compile-fields",
+        "exit_code": 0
+      },
+      {
+        "label": "fields",
+        "exit_code": 1
+      }
+    ],
+    "calibration_fragments": [
+      {
+        "phase": 1,
+        "call": 15,
+        "index": 0,
+        "offset": 0,
+        "bytes": 2147418112
+      },
+      {
+        "phase": 2,
+        "call": 16,
+        "index": 0,
+        "offset": 0,
+        "bytes": 2147483648
+      },
+      {
+        "phase": 3,
+        "call": 17,
+        "index": 0,
+        "offset": 0,
+        "bytes": 2147549184
+      },
+      {
+        "phase": 4,
+        "call": 18,
+        "index": 0,
+        "offset": 0,
+        "bytes": 4294901760
+      },
+      {
+        "phase": 4,
+        "call": 19,
+        "index": 0,
+        "offset": 4294901760,
+        "bytes": 131072
+      }
+    ],
+    "error": "AssertionError('fields')"
+  },
+  "checks": {
+    "complete": true,
+    "production_changed": false,
+    "linux_gpu_tested": false,
+    "performance_measured": false,
+    "hardware_calibration_rerun": false,
+    "original_failure_retained": "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\qualification-r2\\results.json",
+    "source_sha256": {
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\advance.py": "a12aeda7c70e01afa52480e3a5e5f8b7c371c0a326fa8ac41a974ab62d1ccae7",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\check.cpp": "52acb2bbeb267d10c63982eaea6d44b0e6966c8b5cbfc7831d16c706eb409737",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\abi.cpp": "d0b361bdfebc26d4e156293783117a7ac8649b94462d1cd7a8a394f09e3fc191",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\fields.cpp": "05ea498f979e39c6d1b98d7394589ba25ceab1a5f894ef644282ae9f2bee7b5b",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\large-r2\\probe.cpp": "dde89c4a1df5e64d4ccc88d2fc513c982d60b15f2a9fd6f73a629546fc16f275",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\qualification-r2\\source\\CMakeLists.txt": "ed1e9ca34a183f5a78953e856a01a11452255d0ef2744bb27c1c755ecfe4f2a8",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\qualification-r2\\source\\include\\orca_l0\\dg2.hpp": "518153f5e439f44a6e0e269cc57c3b8e21ac860b1de6c64be9db86d76c5f6e7c",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\qualification-r2\\source\\include\\orca_l0\\direct_driver.hpp": "cd87a73ef80e8b2052a192ddd2ff174d36be595d79c42e454e0bb1b3d86e61c0",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\qualification-r2\\source\\include\\orca_l0\\drm.hpp": "44c49672eed6602435052b716c7180ec40ce0d15ae47e1c48ff3dd2485ebe0bb",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\qualification-r2\\source\\include\\orca_l0\\ring.hpp": "c0bc88a290d32ba5ee6cf26f2fe82c38cced25a334a02c23591e11bb67f75112",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\qualification-r2\\source\\include\\orca_l0\\runtime.hpp": "1b800beb8a4ec7b1777192afc599a4cf519870acd2438b1aea43e79ffafc0869",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\qualification-r2\\source\\include\\orca_l0\\compiler\\dg2.hpp": "5ebed74bc9b2ae8672b1a30c56282c357318bad2638d1b26cfbcaebd2bacbe20",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\qualification-r2\\source\\include\\orca_l0\\compiler\\local_accessor.hpp": "749634fcbcd2a094d87b8f3cac4610aa095317e840e8c807fdb1beb342d81fc2",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\qualification-r2\\source\\include\\orca_l0\\compiler\\program.hpp": "3aedf164c9bc4320e2be356acc93cd2dae03f75fc49058cdb6f29671fbf02a25",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\qualification-r2\\source\\include\\orca_l0\\compiler\\stream.hpp": "4a5255d2ee3820603df48a098b86d17ef07ebc009fb4038baf3db47260f1e97b",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\qualification-r2\\source\\include\\orca_l0\\compiler\\sycl.hpp": "78c74406a5b0f702fbcfe8b1bedf73cb377ead1c7b2e9f0dd7188f493879e7dc",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\qualification-r2\\source\\src\\direct_api.inc": "e1fe46e7376f8a44ad9d27e2850cd175258c6f2a19aa5ad21a327e74020af281",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\qualification-r2\\source\\src\\direct_driver.cpp": "7fe701e2c34dccd80868685b29b83fc846406bf531faa4579a220c7bc4107548",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\qualification-r2\\source\\src\\direct_tables.inc": "5aa57dd8a7b89110fe6621b6840e8c36ad53e72792cf3b88f20a4db909231275",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\qualification-r2\\source\\src\\runtime.cpp": "6b60e902f8f92d924b21704c2e87d453f44705b993685b6f3d5f2105ad033e95",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\qualification-r2\\source\\src\\drm\\arguments.hpp": "60edbdf3f285c0f59b722e4ec0d5c128134445cb4e968b003e0bb6864a91983c",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\qualification-r2\\source\\src\\drm\\blitter.hpp": "c584140a730d1e9ca4d049a6431846c9a993767803011b3e24f59da10097f9b7",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\qualification-r2\\source\\src\\drm\\blitter_operations.inl": "cdaab7bb00f701a01a4752670a17a966830158a1455d200b4ef8064a90d4a927",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\qualification-r2\\source\\src\\drm\\blitter_packets.hpp": "349da852da789160e8075073d6d29e45e9fbcfa378af5c7ba4abaf99a740415b",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\qualification-r2\\source\\src\\drm\\encoding.hpp": "81866bd5dd06a9e6e19f56f44b1127660b74a6ef0482c8ec99d4040655533ad4",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\qualification-r2\\source\\src\\drm\\memory.cl": "85d783197963e676419aba04b172481695d54a0f09dafa4cf6dcb3f9b06a16d5",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\qualification-r2\\source\\src\\drm\\recording.inl": "2a495505848c60fdb78f38a59ab6924c1d8027451de967f5bfeea041d4a5a726",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\qualification-r2\\source\\src\\drm\\runtime.cpp": "fd6a0255cbce15fca035b92ea05aad36ca3d25cdb47f77a80d1c0eb877842d87",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\qualification-r2\\source\\src\\drm\\zebin.hpp": "a927dfee4f823ca74bf85a84b07a6790c9caa752d4504cbfc10227e39a789283",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\qualification-r2\\source\\src\\wddm\\allocation.hpp": "2cef2e4b8175b4f91b34605a4c92999bf1e7c9362b5b76d7565da2318e18227d",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\qualification-r2\\source\\src\\wddm\\runtime.cpp": "92636fd8a81dc52f59fe5fa9a4f750f050f85446254d5dd65757dcbf3290f043",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\qualification-r2\\source\\tests\\blitter_check.cpp": "c217519a90e482c42bfab960d6a958aa6db508545c02d146c406ecc01c3ad15e",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\qualification-r2\\source\\tests\\compiler_check.cpp": "0cec3be040240834476916155bade46c0edbf76cf81aa528d92fc4a0707f2ab1",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\qualification-r2\\source\\tests\\compiler_flags_check.py": "8fa480a5df5dcdc1f08a4ba64a4d6bea290d55795c076828d299c20039e014fd",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\qualification-r2\\source\\tests\\denorm.cl": "ebcf7b88c788e1711ed027de8e0d6d1a0df4599addeb93ecf2958e4d5d00ed48",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\qualification-r2\\source\\tests\\dg2_compiler_check.cpp": "a9e04111ac9c9ad98366d2bd9a88c3cd31b0895a441552630df976ffa548fdf9",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\qualification-r2\\source\\tests\\dispatch3d.cl": "0d70ceb4fdc897b246e0e3590df708c2cb80d7242600b085243172dbd3697641",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\qualification-r2\\source\\tests\\drm_compute_check.cpp": "480f4fb390a4a4337549af966a44021391919850462305ce512fe8377a8e4b03",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\qualification-r2\\source\\tests\\drm_submit_check.cpp": "a2fd00de705be46804d2913cc10af3a58623ea253bf4e16963921922e73540a8",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\qualification-r2\\source\\tests\\inference.cl": "03647efb665f6d2ef16b95ee47526bf42832a71355b6f1c5b78668beefbee1b2",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\qualification-r2\\source\\tests\\module_data.cl": "b3aa1fcf6936ec35add71784c8359fac0fcfa74dd812407c471181bb0202d7d0",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\qualification-r2\\source\\tests\\native_pack_check.cpp": "631ed0ecb003351464fb999113ff444721b5e8f70562bf1fdc0656989338dc51",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\qualification-r2\\source\\tests\\ring_check.cpp": "edf589faf8df29b1c4d190a0e7a2e83d698f1726aa2365f3112e3bec5b529798",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\qualification-r2\\source\\tests\\runtime_check.cpp": "2740d46200db9b62e39102396bf7c5768aa02315a456752ffe3d408091a386d0",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\qualification-r2\\source\\tests\\runtime_dependencies.hpp": "f7fad56243713663e4936a9af44011364fc59cea27be0494d84b216e65cc5709",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\qualification-r2\\source\\tests\\submit_check.cpp": "e8634fdb6547448a3bf54efc9773da5ef6325e826858cea02f2c63a93dd1901e",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\qualification-r2\\source\\tests\\wddm_allocation_check.cpp": "62b56ff0d9abb84ee3f682327f6ca69ed788caf560f7d25ae795b08509cf2205",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\qualification-r2\\source\\tests\\wddm_host_check.cpp": "70c2085fcd29c14244b91e4d69f28bf3af7db5feb30f8903dd7144937cbbcace",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\qualification-r2\\source\\tests\\wddm_import_check.cpp": "52acb2bbeb267d10c63982eaea6d44b0e6966c8b5cbfc7831d16c706eb409737",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\qualification-r2\\source\\tests\\wddm_memory_check.cpp": "edd939546d352641af67be08dc402f9b93d9d25664bbbba00a92809b92864b3f",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\qualification-r2\\source\\third_party\\intel-dg2\\LICENSE": "987a002c6c9eb75290d9937735641ef4f4b670591ee79e1ac8edebe16a81872e",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\qualification-r2\\source\\third_party\\intel-dg2\\packets.hpp": "ffa6713e5586d753ea79ad837e608e802989b2f45f1f5fdff23a6aee7d95407c"
+    },
+    "inputs_sha256": {
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\qualify.py": "4a846a02af549a4031a1a66c631ed71b6e2b86d331ea6323420cf4058e845d5a",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\fields_r3.cpp": "7c5285de64d2855c11174bdbb2f2027678e7ef8d4945c265d5e30584cbb0133b",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\qualification-r2\\prepared.json": "8d1e4624bf9b6bc543900ee51867dc02afb3c25b9a922646d34d1f83351589e8",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\qualification-r2\\results.json": "ec3047f19655d49e1a4c0111f2d96788b3e45f222ced16ab91a879356babf254",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\calibration-r1\\1-15-0-before.bin": "d2649c284b2fcf17e8ad8a8d2f16fe7ac18faf710ffa3cda98ba8a6a55b2ead7",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\calibration-r1\\2-16-0-before.bin": "dfaaecc2b268622f7517a50bde9cb4fe66dec62cd95099e4f43b81b07ea0af6f",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\calibration-r1\\3-17-0-before.bin": "7561d6a15434a5359ae06b3e581239497a95abfcf932a76427ea77fd7b06632a",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\calibration-r1\\4-18-0-before.bin": "df4a3320dce115504cb80a0164d9dcacc14fb4770eba42f29d2c14ec75c5800a",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\large-r2\\1-15-0-before.bin": "39056b3aac139f0af9fdce34d9cbeaa91cd71b22c0782f979e11af5e0cab9bf9",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\large-r2\\2-16-0-before.bin": "29c8973b518661f9e9f09fb1817703194371c05a587bcb87f55b08bb2526203b",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\large-r2\\3-17-0-before.bin": "6e2740863b9b635b366401881cca29eea8aa0f6a0f932255ddb929ee9cbc76b5",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\large-r2\\4-18-0-before.bin": "14a8c4479b2557d25bd83fb1d123dd2598444620ee4870d12ac2175899d95193",
+      "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\large-r2\\4-19-0-before.bin": "fff676c0427a07739389ee2cd81bc0ac91dc963abd1fd2ba2bd54fef193bc266"
+    },
+    "commands": [
+      {
+        "label": "compile-fields",
+        "exit_code": 0
+      },
+      {
+        "label": "fields",
+        "exit_code": 0
+      },
+      {
+        "label": "configure",
+        "exit_code": 0
+      },
+      {
+        "label": "build",
+        "exit_code": 0
+      },
+      {
+        "label": "ctest",
+        "exit_code": 0
+      }
+    ],
+    "executable_sha256": "75b888cb2741f0eb517309b05987a336835601e44490f9d90560e9b91d3410f3"
+  },
+  "adoption": {
+    "complete": true,
+    "source_adopted": true,
+    "deployed_exe_changed": false,
+    "configuration_changed": false,
+    "linux_gpu_tested": false,
+    "performance_measured": false,
+    "qualification": "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\checks-r3\\results.json",
+    "qualification_sha256": "9b0c235028a5c034885e245f7c0fcca342c96f90f60fc402e3c773895e628ce4",
+    "kernel_sha256": {
+      "G:\\GitHub\\Strata\\build-orca-native-lower-20261031\\first-check\\loader-native-pack\\image_0.zebin": "94e4970f3f8f9820a25ece27e3ea6ea2a792d1f34a520326a47ce1a10e397800",
+      "G:\\GitHub\\Strata\\engine\\u4n16-orca-direct-m16\\memory.zebin": "39e8a1a406575069a7324e7468ca1d9b55e2cc3e3b741ff8d49ecd3e5c36709c"
+    },
+    "qualification_scope": "All19 CTests on this exact current-source snapshot;adoption copies identical bytes,without repeating unchanged tests.",
+    "before_sha256": {
+      "G:\\GitHub\\Strata\\orca-l0\\src\\wddm\\runtime.cpp": "df02570d4f33ad27490fb31289986f0ccfbc528744250676557d87badb3979f4",
+      "G:\\GitHub\\Strata\\orca-l0\\src\\wddm\\allocation.hpp": "6e9fcbf22695c403e921027374fd462e8c7f61f701506c8da8ddda2c137f3530",
+      "G:\\GitHub\\Strata\\orca-l0\\tests\\wddm_host_check.cpp": "7ba14700ebde2ac38cb3b6c87ed681f615348ac78ccbb060c75a8b2f26d4e009",
+      "G:\\GitHub\\Strata\\orca-l0\\CMakeLists.txt": "9966602535290f30047a0b1b36f3bcc8a418acf410872ac4d7b96733ff943914"
+    },
+    "unchanged_source_sha256": {
+      "G:\\GitHub\\Strata\\orca-l0\\include\\orca_l0\\dg2.hpp": "518153f5e439f44a6e0e269cc57c3b8e21ac860b1de6c64be9db86d76c5f6e7c",
+      "G:\\GitHub\\Strata\\orca-l0\\include\\orca_l0\\direct_driver.hpp": "cd87a73ef80e8b2052a192ddd2ff174d36be595d79c42e454e0bb1b3d86e61c0",
+      "G:\\GitHub\\Strata\\orca-l0\\include\\orca_l0\\drm.hpp": "44c49672eed6602435052b716c7180ec40ce0d15ae47e1c48ff3dd2485ebe0bb",
+      "G:\\GitHub\\Strata\\orca-l0\\include\\orca_l0\\ring.hpp": "c0bc88a290d32ba5ee6cf26f2fe82c38cced25a334a02c23591e11bb67f75112",
+      "G:\\GitHub\\Strata\\orca-l0\\include\\orca_l0\\runtime.hpp": "1b800beb8a4ec7b1777192afc599a4cf519870acd2438b1aea43e79ffafc0869",
+      "G:\\GitHub\\Strata\\orca-l0\\include\\orca_l0\\compiler\\dg2.hpp": "5ebed74bc9b2ae8672b1a30c56282c357318bad2638d1b26cfbcaebd2bacbe20",
+      "G:\\GitHub\\Strata\\orca-l0\\include\\orca_l0\\compiler\\local_accessor.hpp": "749634fcbcd2a094d87b8f3cac4610aa095317e840e8c807fdb1beb342d81fc2",
+      "G:\\GitHub\\Strata\\orca-l0\\include\\orca_l0\\compiler\\program.hpp": "3aedf164c9bc4320e2be356acc93cd2dae03f75fc49058cdb6f29671fbf02a25",
+      "G:\\GitHub\\Strata\\orca-l0\\include\\orca_l0\\compiler\\stream.hpp": "4a5255d2ee3820603df48a098b86d17ef07ebc009fb4038baf3db47260f1e97b",
+      "G:\\GitHub\\Strata\\orca-l0\\include\\orca_l0\\compiler\\sycl.hpp": "78c74406a5b0f702fbcfe8b1bedf73cb377ead1c7b2e9f0dd7188f493879e7dc",
+      "G:\\GitHub\\Strata\\orca-l0\\src\\direct_api.inc": "e1fe46e7376f8a44ad9d27e2850cd175258c6f2a19aa5ad21a327e74020af281",
+      "G:\\GitHub\\Strata\\orca-l0\\src\\direct_driver.cpp": "7fe701e2c34dccd80868685b29b83fc846406bf531faa4579a220c7bc4107548",
+      "G:\\GitHub\\Strata\\orca-l0\\src\\direct_tables.inc": "5aa57dd8a7b89110fe6621b6840e8c36ad53e72792cf3b88f20a4db909231275",
+      "G:\\GitHub\\Strata\\orca-l0\\src\\runtime.cpp": "6b60e902f8f92d924b21704c2e87d453f44705b993685b6f3d5f2105ad033e95",
+      "G:\\GitHub\\Strata\\orca-l0\\src\\drm\\arguments.hpp": "60edbdf3f285c0f59b722e4ec0d5c128134445cb4e968b003e0bb6864a91983c",
+      "G:\\GitHub\\Strata\\orca-l0\\src\\drm\\blitter.hpp": "c584140a730d1e9ca4d049a6431846c9a993767803011b3e24f59da10097f9b7",
+      "G:\\GitHub\\Strata\\orca-l0\\src\\drm\\blitter_operations.inl": "cdaab7bb00f701a01a4752670a17a966830158a1455d200b4ef8064a90d4a927",
+      "G:\\GitHub\\Strata\\orca-l0\\src\\drm\\blitter_packets.hpp": "349da852da789160e8075073d6d29e45e9fbcfa378af5c7ba4abaf99a740415b",
+      "G:\\GitHub\\Strata\\orca-l0\\src\\drm\\encoding.hpp": "81866bd5dd06a9e6e19f56f44b1127660b74a6ef0482c8ec99d4040655533ad4",
+      "G:\\GitHub\\Strata\\orca-l0\\src\\drm\\memory.cl": "85d783197963e676419aba04b172481695d54a0f09dafa4cf6dcb3f9b06a16d5",
+      "G:\\GitHub\\Strata\\orca-l0\\src\\drm\\recording.inl": "2a495505848c60fdb78f38a59ab6924c1d8027451de967f5bfeea041d4a5a726",
+      "G:\\GitHub\\Strata\\orca-l0\\src\\drm\\runtime.cpp": "fd6a0255cbce15fca035b92ea05aad36ca3d25cdb47f77a80d1c0eb877842d87",
+      "G:\\GitHub\\Strata\\orca-l0\\src\\drm\\zebin.hpp": "a927dfee4f823ca74bf85a84b07a6790c9caa752d4504cbfc10227e39a789283",
+      "G:\\GitHub\\Strata\\orca-l0\\tests\\blitter_check.cpp": "c217519a90e482c42bfab960d6a958aa6db508545c02d146c406ecc01c3ad15e",
+      "G:\\GitHub\\Strata\\orca-l0\\tests\\compiler_check.cpp": "0cec3be040240834476916155bade46c0edbf76cf81aa528d92fc4a0707f2ab1",
+      "G:\\GitHub\\Strata\\orca-l0\\tests\\compiler_flags_check.py": "8fa480a5df5dcdc1f08a4ba64a4d6bea290d55795c076828d299c20039e014fd",
+      "G:\\GitHub\\Strata\\orca-l0\\tests\\denorm.cl": "ebcf7b88c788e1711ed027de8e0d6d1a0df4599addeb93ecf2958e4d5d00ed48",
+      "G:\\GitHub\\Strata\\orca-l0\\tests\\dg2_compiler_check.cpp": "a9e04111ac9c9ad98366d2bd9a88c3cd31b0895a441552630df976ffa548fdf9",
+      "G:\\GitHub\\Strata\\orca-l0\\tests\\dispatch3d.cl": "0d70ceb4fdc897b246e0e3590df708c2cb80d7242600b085243172dbd3697641",
+      "G:\\GitHub\\Strata\\orca-l0\\tests\\drm_compute_check.cpp": "480f4fb390a4a4337549af966a44021391919850462305ce512fe8377a8e4b03",
+      "G:\\GitHub\\Strata\\orca-l0\\tests\\drm_submit_check.cpp": "a2fd00de705be46804d2913cc10af3a58623ea253bf4e16963921922e73540a8",
+      "G:\\GitHub\\Strata\\orca-l0\\tests\\inference.cl": "03647efb665f6d2ef16b95ee47526bf42832a71355b6f1c5b78668beefbee1b2",
+      "G:\\GitHub\\Strata\\orca-l0\\tests\\module_data.cl": "b3aa1fcf6936ec35add71784c8359fac0fcfa74dd812407c471181bb0202d7d0",
+      "G:\\GitHub\\Strata\\orca-l0\\tests\\native_pack_check.cpp": "631ed0ecb003351464fb999113ff444721b5e8f70562bf1fdc0656989338dc51",
+      "G:\\GitHub\\Strata\\orca-l0\\tests\\ring_check.cpp": "edf589faf8df29b1c4d190a0e7a2e83d698f1726aa2365f3112e3bec5b529798",
+      "G:\\GitHub\\Strata\\orca-l0\\tests\\runtime_check.cpp": "2740d46200db9b62e39102396bf7c5768aa02315a456752ffe3d408091a386d0",
+      "G:\\GitHub\\Strata\\orca-l0\\tests\\runtime_dependencies.hpp": "f7fad56243713663e4936a9af44011364fc59cea27be0494d84b216e65cc5709",
+      "G:\\GitHub\\Strata\\orca-l0\\tests\\submit_check.cpp": "e8634fdb6547448a3bf54efc9773da5ef6325e826858cea02f2c63a93dd1901e",
+      "G:\\GitHub\\Strata\\orca-l0\\tests\\wddm_allocation_check.cpp": "62b56ff0d9abb84ee3f682327f6ca69ed788caf560f7d25ae795b08509cf2205",
+      "G:\\GitHub\\Strata\\orca-l0\\tests\\wddm_memory_check.cpp": "edd939546d352641af67be08dc402f9b93d9d25664bbbba00a92809b92864b3f",
+      "G:\\GitHub\\Strata\\orca-l0\\third_party\\intel-dg2\\LICENSE": "987a002c6c9eb75290d9937735641ef4f4b670591ee79e1ac8edebe16a81872e",
+      "G:\\GitHub\\Strata\\orca-l0\\third_party\\intel-dg2\\packets.hpp": "ffa6713e5586d753ea79ad837e608e802989b2f45f1f5fdff23a6aee7d95407c"
+    },
+    "source_archive": {
+      "G:\\GitHub\\Strata\\orca-l0\\src\\wddm\\runtime.cpp": "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\adoption-r1\\source\\src\\wddm\\runtime.cpp",
+      "G:\\GitHub\\Strata\\orca-l0\\src\\wddm\\allocation.hpp": "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\adoption-r1\\source\\src\\wddm\\allocation.hpp",
+      "G:\\GitHub\\Strata\\orca-l0\\tests\\wddm_host_check.cpp": "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\adoption-r1\\source\\tests\\wddm_host_check.cpp",
+      "G:\\GitHub\\Strata\\orca-l0\\CMakeLists.txt": "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\adoption-r1\\source\\CMakeLists.txt",
+      "G:\\GitHub\\Strata\\orca-l0\\tests\\wddm_import_check.cpp": "G:\\GitHub\\Strata\\build-orca-native-import-20261108\\adoption-r1\\source\\tests\\wddm_import_check.cpp"
+    },
+    "scope": "Adopt exactly the native-import source that passed all19 checks; no GPU rerun or deployed EXE change.",
+    "source_sha256": {
+      "G:\\GitHub\\Strata\\orca-l0\\src\\wddm\\runtime.cpp": "92636fd8a81dc52f59fe5fa9a4f750f050f85446254d5dd65757dcbf3290f043",
+      "G:\\GitHub\\Strata\\orca-l0\\src\\wddm\\allocation.hpp": "2cef2e4b8175b4f91b34605a4c92999bf1e7c9362b5b76d7565da2318e18227d",
+      "G:\\GitHub\\Strata\\orca-l0\\tests\\wddm_host_check.cpp": "70c2085fcd29c14244b91e4d69f28bf3af7db5feb30f8903dd7144937cbbcace",
+      "G:\\GitHub\\Strata\\orca-l0\\CMakeLists.txt": "ed1e9ca34a183f5a78953e856a01a11452255d0ef2744bb27c1c755ecfe4f2a8",
+      "G:\\GitHub\\Strata\\orca-l0\\tests\\wddm_import_check.cpp": "52acb2bbeb267d10c63982eaea6d44b0e6966c8b5cbfc7831d16c706eb409737"
+    }
+  },
+  "source_adopted_qualified": true,
+  "qualification_pending": false,
+  "qualified": true,
+  "archive_path": "sycl/orca/direct-native-import-a770-windows-2026-11-08.json.gz",
+  "archive_sha256": "62a81fab15a3fda8148e846aefd04f85ca60255623fbd570c4835dd2b01a16eb",
+  "scope": "Runtime-path replacement qualification, not throughput or PPL. Frozen model comparisons use --stream-experts with no external PinnedArena."
+}

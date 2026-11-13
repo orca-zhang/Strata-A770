@@ -182,8 +182,8 @@ public:
     void prefetch_rows(const uint32_t* rows16);
     void wait_prefetches();
     /// Plan v0.3 P5: the rows of `n_tokens` tokens (16 each, `rows` token-major) into `out` (2560 floats per token),
-    /// as ONE reader request - page dedupe and sort across the whole batch, the reader's full queue depth.  Not
-    /// while a single-token `issue` is pending.  The mapped mode gathers row by row.
+    /// as ONE reader request (or reuse an ordered prefetched prefix and submit only the suffix), with page dedupe,
+    /// sort and the reader's full queue depth. Not while a single-token `issue` is pending. Mapped mode reads row by row.
     bool gather_batch(const uint32_t* rows, size_t n_tokens, float* out, std::string& err);
 
     /// Fault injection (Direct mode): every row read completes no earlier than `us` after issue.

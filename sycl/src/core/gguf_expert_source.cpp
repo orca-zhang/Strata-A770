@@ -3,14 +3,16 @@
 #include "strata/kernels/cpu/expert_layout.hpp"
 
 #include <algorithm>
+#include <chrono>
+#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <cstdint>
+#include <future>
 #include <limits>
 #include <fcntl.h>
 #ifdef _WIN32
-// No unistd.h / pread on Windows: CRT open/close plus positional reads through the Win32
-// OVERLAPPED offset (thread-safe, no serialization of the stager threads).
+// No unistd.h / pread on Windows: overlapped file handles permit independent positional reads.
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 #include <windows.h>
@@ -20,28 +22,37 @@
 #endif
 #include <dpct/dpct.hpp>
 #include <sycl/sycl.hpp>
-#include <thread>
 #include <atomic>
 
 namespace strata::core {
 
 #ifdef _WIN32
 namespace {
-// threadsafe pread for a CRT fd from _open: OVERLAPPED carries the offset, so concurrent
-// readers of one GGUF need no lock. Returns bytes read or -1.
+// A synchronous file handle serializes ReadFile calls even with explicit OVERLAPPED offsets.
+// Each outstanding read needs its own event; finish it before the stack OVERLAPPED goes away.
 int64_t portable_pread(int fd, void* buf, size_t count, uint64_t offset) {
     HANDLE h = (HANDLE) _get_osfhandle(fd);
     if (h == INVALID_HANDLE_VALUE) return -1;
     OVERLAPPED ov{};
     ov.Offset = (DWORD) (offset & 0xFFFFFFFFull);
     ov.OffsetHigh = (DWORD) (offset >> 32);
+    ov.hEvent = CreateEventW(nullptr, TRUE, FALSE, nullptr);
+    if (ov.hEvent == nullptr) return -1;
     DWORD done = 0;
-    if (!ReadFile(h, buf, (DWORD) count, &done, &ov)) {
-        if (GetLastError() != ERROR_HANDLE_EOF) return -1;
-    }
-    return (int64_t) done;
+    bool ok = ReadFile(h, buf, (DWORD) std::min<size_t>(count, MAXDWORD), &done, &ov) != FALSE;
+    if (ok || GetLastError() == ERROR_IO_PENDING) ok = GetOverlappedResult(h, &ov, &done, TRUE) != FALSE;
+    const DWORD error = ok ? ERROR_SUCCESS : GetLastError();
+    CloseHandle(ov.hEvent);
+    return ok || error == ERROR_HANDLE_EOF ? (int64_t) done : -1;
 }
-int portable_open(const char* name) { return _open(name, _O_RDONLY); }
+int portable_open(const char* name) {
+    HANDLE h = CreateFileA(name, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
+                           OPEN_EXISTING, FILE_FLAG_OVERLAPPED, nullptr);
+    if (h == INVALID_HANDLE_VALUE) return -1;
+    const int fd = _open_osfhandle((intptr_t) h, _O_RDONLY | _O_BINARY);
+    if (fd < 0) CloseHandle(h);
+    return fd;
+}
 int portable_close(int fd) { return _close(fd); }
 }  // namespace
 #else
@@ -212,39 +223,63 @@ int64_t GgufExpertSource::mirror(const std::vector<std::pair<int64_t, int64_t>>&
         total += b;
     }
     if (take.empty()) return 0;
+    const auto started = std::chrono::steady_clock::now();
     std::vector<uint8_t*> chunks;
-    for (uint64_t bytes : chunk_bytes) {
-        uint8_t* chunk = nullptr;
-        try {
-            chunk = (uint8_t*) sycl::malloc_host(bytes, dpct::get_in_order_queue());
-        } catch (const sycl::exception& ex) {
-            err = std::string("mirror: ") + ex.what();
-        }
-        if (chunk == nullptr) {
-            for (uint8_t* p : chunks) sycl::free(p, dpct::get_in_order_queue());
-            if (err.empty()) err = "mirror: no pinned host memory for " + std::to_string(bytes >> 20) +
-                                   " MiB chunk (" + std::to_string(total >> 20) + " MiB total)";
-            return -1;
-        }
-        chunks.push_back(chunk);
-    }
-    std::atomic<size_t> next{0};
+    chunks.reserve(chunk_bytes.size());
     std::atomic<bool> bad{false};
-    std::vector<std::thread> ts;
-    for (int i = 0; i < std::max(1, threads); ++i)
-        ts.emplace_back([&] {
-            for (size_t j; (j = next.fetch_add(1)) < take.size() && !bad.load();) {
-                const auto [l, e] = take[j];
-                if (!read_into(l, e, chunks[loc[j].first] + loc[j].second, (size_t) lay.bytes[(size_t) l]))
-                    bad.store(true);
+    bool failed = false;
+    double allocate_ms = 0, read_ms = 0;
+    std::future<void> reading;
+    try {
+        size_t begin = 0;
+        for (size_t c = 0; c < chunk_bytes.size() && !bad.load(); ++c) {
+            const auto tm = std::chrono::steady_clock::now();
+            uint8_t* chunk = (uint8_t*) sycl::malloc_host(chunk_bytes[c], dpct::get_in_order_queue());
+            allocate_ms += std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - tm).count();
+            if (chunk == nullptr) {
+                err = "mirror: no pinned host memory for " + std::to_string(chunk_bytes[c] >> 20) +
+                      " MiB chunk (" + std::to_string(total >> 20) + " MiB total)";
+                failed = true;
+                break;
             }
-        });
-    for (auto& th : ts) th.join();
-    if (bad.load()) {
+            chunks.push_back(chunk);
+            // ponytail: one chunk reads while the main thread allocates the next; no staging copy or memory pool.
+            if (reading.valid()) reading.get();
+            if (bad.load()) break;
+            size_t end = begin;
+            while (end < loc.size() && loc[end].first == c) ++end;
+            reading = std::async(std::launch::async, [&, chunk, begin, end] {
+                const auto tr = std::chrono::steady_clock::now();
+                std::atomic<size_t> next{begin};
+                std::vector<std::future<void>> readers;
+                for (int i = 0; i < std::max(1, threads); ++i)
+                    readers.emplace_back(std::async(std::launch::async, [&] {
+                        for (size_t j; (j = next.fetch_add(1)) < end && !bad.load();) {
+                            const auto [l, e] = take[j];
+                            if (!read_into(l, e, chunk + loc[j].second, (size_t) lay.bytes[(size_t) l]))
+                                bad.store(true);
+                        }
+                    }));
+                for (auto& reader : readers) reader.get();
+                read_ms += std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - tr).count();
+            });
+            begin = end;
+        }
+        if (reading.valid()) reading.get();
+    } catch (const std::exception& ex) {
+        err = std::string("mirror: ") + ex.what();
+        failed = true;
+    }
+    // Even an allocation failure must finish the previous chunk's readers before freeing their destinations.
+    if (reading.valid()) reading.wait();
+    if (failed || bad.load()) {
         for (uint8_t* chunk : chunks) sycl::free(chunk, dpct::get_in_order_queue());
-        err = "mirror: reading an expert from the GGUF failed";
+        if (!failed) err = "mirror: reading an expert from the GGUF failed";
         return -1;
     }
+    std::fprintf(stderr, "strata mirror: allocated %.1f ms, read %.1f ms, total %.1f ms (overlapped)\n",
+                 allocate_ms, read_ms,
+                 std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - started).count());
     for (uint8_t* chunk : mirror_chunks_) sycl::free(chunk, dpct::get_in_order_queue());
     mirror_chunks_ = std::move(chunks);
     mirror_bytes_ = total;

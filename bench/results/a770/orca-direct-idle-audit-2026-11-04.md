@@ -66,7 +66,7 @@ Direct 已对跨队列前驱提交 GPU fence 依赖，同队列依赖由顺序�
 固定 Short 28 输入／自然 76 输出；实际 5,771 专家槽／7,922 MiB，预留 1,536 MiB；read256、decay0.95、MTP4、step／last 门槛 0.5、累计门槛 0，缓存热度差 1.5。
 **这是固定锚点，不能当成日常平衡参数或自动缓存容量的成绩。** 共 225 次干净请求、75 次保留测量及另外 44 次诊断请求，均逐 token 匹配，57/57 草稿、自然 stop、无前缀复用。生产配置、已部署 EXE 和候选默认等待策略均未修改；未新增 PPL、长上下文或 Linux GPU 结论。
 
-[完整结果与哈希](../../../sycl/orca/direct-idle-audit-a770-windows-2026-11-04.json)及[证据归档](../../../sycl/orca/direct-idle-audit-a770-windows-2026-11-04.json.gz)包含精确配置、源代码、构建命令、日志、协议和原始命令缓冲；完整前端构建依赖[前一份源快照](orca-direct-current-frontend-2026-11-04.md)。EXE／数值包有哈希，GGUF 与权重 pack 内容未在本轮完整重算哈希。
+[完整结果与哈希](../../../sycl/orca/direct-idle-audit-a770-windows-2026-11-04.json)及证据归档 (`direct-idle-audit-a770-windows-2026-11-04.json.gz`, raw capture retained locally)包含精确配置、源代码、构建命令、日志、协议和原始命令缓冲；完整前端构建依赖[前一份源快照](orca-direct-current-frontend-2026-11-04.md)。EXE／数值包有哈希，GGUF 与权重 pack 内容未在本轮完整重算哈希。
 同等条件复现需要相同硬件、驱动、编译器、外部资产、初始专家 profile、预热历史和参数；空闲条件下仍允许时钟与系统波动。
 
 本机复测使用尚不存在的输出目录：

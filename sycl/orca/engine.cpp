@@ -8,6 +8,8 @@
 #if defined(_WIN32) && !defined(STRATA_ORCA_DG2)
 #include <windows.h>
 #include <dxgi1_4.h>
+#include <winternl.h>
+#include <d3dkmthk.h>
 #endif
 
 namespace strata::l0 {
@@ -174,6 +176,42 @@ void memory_info(size_t& free_bytes, size_t& total_bytes) {
         // Some L0 allocations are absent from DXGI's process usage.
         // The global device query also accounts for those allocations.
         if (have_sysman) free_bytes = std::min(free_bytes, device_free);
+        // Sysman discovery can fail even while DXGI succeeds. Always constrain
+        // the process budget by live global residency, as Direct already does.
+        static const auto segments = [&] {
+            std::pair<LUID, std::vector<UINT>> cached;
+            DXGI_ADAPTER_DESC1 desc{};
+            if (FAILED(source.first->GetDesc1(&desc))) throw std::runtime_error("Orca cannot identify the memory adapter");
+            cached.first = desc.AdapterLuid;
+            D3DKMT_QUERYSTATISTICS query{};
+            query.Type = D3DKMT_QUERYSTATISTICS_ADAPTER; query.AdapterLuid = cached.first;
+            if (D3DKMTQueryStatistics(&query) < 0) throw std::runtime_error("Orca cannot query global memory topology");
+            const auto count = query.QueryResult.AdapterInformation.NbSegments;
+            if (!count || count > 32) throw std::runtime_error("Orca invalid global memory segment count");
+            for (UINT index = 0; index < count; ++index) {
+                query = {}; query.Type = D3DKMT_QUERYSTATISTICS_SEGMENT; query.AdapterLuid = cached.first;
+                query.QuerySegment.SegmentId = index;
+                if (D3DKMTQueryStatistics(&query) < 0) throw std::runtime_error("Orca cannot query global memory segment");
+                const auto& memory = query.QueryResult.SegmentInformation;
+                if (!memory.Aperture && !memory.SegmentProperties.SystemMemory) cached.second.push_back(index);
+            }
+            if (cached.second.empty()) throw std::runtime_error("Orca has no local memory segments");
+            return cached;
+        }();
+        // ponytail: one engine/device per process; cache topology, refresh residency at capacity checks.
+        uint64_t global_free = 0;
+        for (const auto index : segments.second) {
+            D3DKMT_QUERYSTATISTICS query{};
+            query.Type = D3DKMT_QUERYSTATISTICS_SEGMENT; query.AdapterLuid = segments.first;
+            query.QuerySegment.SegmentId = index;
+            if (D3DKMTQueryStatistics(&query) < 0) throw std::runtime_error("Orca cannot query global memory residency");
+            const auto& memory = query.QueryResult.SegmentInformation;
+            if (memory.Aperture || memory.SegmentProperties.SystemMemory || !memory.CommitLimit ||
+                memory.BytesResident > memory.CommitLimit || memory.CommitLimit - memory.BytesResident > UINT64_MAX - global_free)
+                throw std::runtime_error("Orca invalid global memory counters");
+            global_free += memory.CommitLimit - memory.BytesResident;
+        }
+        free_bytes = std::min<uint64_t>(free_bytes, global_free);
         return;
     }
 #endif

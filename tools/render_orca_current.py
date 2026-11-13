@@ -1,4 +1,4 @@
-"""Render the current hero, --sycl comparison or --paths-only Windows call paths; --check-only needs no GPU."""
+"""Render English current/SYCL charts or --paths-only Windows call paths; --check-only needs no GPU."""
 import argparse
 import hashlib
 import json
@@ -132,11 +132,11 @@ def render_paths(check_only):
     ns = 'http://www.w3.org/2000/svg'
     original = ET.parse(source.with_suffix('.svg')).getroot()
     nodes = [e for e in original if e.tag in (f'{{{ns}}}rect', f'{{{ns}}}text') and 693 <= float(e.get('y')) <= 1066]
-    common = ['D3DKMT', 'Windows 内核驱动', 'Intel GPU']
+    common = ['D3DKMT', 'Windows KMD', 'Intel GPU']
     rows = (
         (810, ['SYCL', 'Strata', 'SYCL', 'UR', 'Level Zero / Intel UMD', *common]),
-        (900, ['L0 · 推荐', 'Strata', 'Orca L0', 'Level Zero / Intel UMD', *common]),
-        (990, ['Direct WIP', 'Strata', 'Orca Direct · WIP 备选 · GPU 命令编码', *common]),
+        (900, ['L0 · Default', 'Strata', 'Orca L0', 'Level Zero / Intel UMD', *common]),
+        (990, ['Direct WIP', 'Strata', 'Orca Direct · WIP · GPU command encoding', *common]),
     )
     for y, expected in rows:
         assert [e.text for e in nodes if e.tag == f'{{{ns}}}text' and float(e.get('y')) == y and e.text != '→'] == expected
@@ -150,7 +150,7 @@ def render_paths(check_only):
     ET.register_namespace('', ns)
     svg = ET.Element(f'{{{ns}}}svg', width='1920', height='425', viewBox='40 665 1920 425',
                      role='img', attrib={'aria-labelledby': 'title desc'})
-    ET.SubElement(svg, f'{{{ns}}}title', id='title').text = 'SYCL、Orca L0 与 Orca Direct 的 Windows 调用链路'
+    ET.SubElement(svg, f'{{{ns}}}title', id='title').text = 'Windows call paths for SYCL, Orca L0 and Orca Direct'
     ET.SubElement(svg, f'{{{ns}}}desc', id='desc').text = (
         'SYCL: Strata to SYCL to Unified Runtime to Level Zero/Intel UMD. '
         'Current default Orca L0: Strata to Orca L0 to Level Zero/Intel UMD. '
@@ -195,8 +195,8 @@ def main():
     svg = ET.Element(f'{{{ns}}}svg', width=str(width), height=str(height), viewBox=f'0 0 {width} {height}',
                      role='img', attrib={'aria-labelledby': 'title desc'})
     ET.SubElement(svg, f'{{{ns}}}title', id='title').text = (
-        '当前默认对SYCL：Code decode +40.78–41.01%，Prose +49.12–49.31%；同机跨测量组速率参考'
-        if args.sycl else '当前默认对原HC256：Code decode +21.21–21.64%，Prose +22.89–23.27%；整请求 +4.15–5.19%')
+        'Current default vs SYCL: Code decode +40.78–41.01%, Prose +49.12–49.31%; same-machine cross-cohort rates'
+        if args.sycl else 'Current default vs original HC256: Code decode +21.21–21.64%, Prose +22.89–23.27%; full request +4.15–5.19%')
     ET.SubElement(svg, f'{{{ns}}}desc', id='desc').text = (
         '2026-11-08, Intel Arc A770 16GB, Xeon E5-2696 v4, 256 GiB DDR3, Windows 10 22H2. '
         'Current Orca L0 U4/min16/M16/HC SG16/spec6/confidence0.6/layer-profile default versus original HC256. '
@@ -232,52 +232,52 @@ def main():
     def text(x, y, label, size=28, color='#eaf2ff', bold=False, right=False, limit=1850):
         key = size, bold
         if key not in fonts:
-            fonts[key] = ImageFont.truetype('C:/Windows/Fonts/msyhbd.ttc' if bold else 'C:/Windows/Fonts/msyh.ttc', size)
+            fonts[key] = ImageFont.truetype('C:/Windows/Fonts/segoeuib.ttf' if bold else 'C:/Windows/Fonts/segoeui.ttf', size)
         box = draw.textbbox((x, y), label, font=fonts[key], anchor='rs' if right else 'ls')
         assert 0 <= box[0] <= box[2] <= width and 0 <= box[1] <= box[3] <= height, (label, box)
         assert box[2]-box[0] <= limit, (label, box, limit)
         draw.text((x, y), label, font=fonts[key], fill=color, anchor='rs' if right else 'ls')
         ET.SubElement(svg, f'{{{ns}}}text', x=str(x), y=str(y), fill=color, attrib={
-            'font-family': 'Microsoft YaHei, Noto Sans CJK SC, sans-serif', 'font-size': str(size),
+            'font-family': 'Segoe UI, Arial, sans-serif', 'font-size': str(size),
             'font-weight': '700' if bold else '400', 'text-anchor': 'end' if right else 'start'}).text = label
 
     text(76, 76, 'STRATA-A770  /  U4 N16 + M16 · ORCA L0', 26, cyan, True)
     text(1924, 76, '2026-11-08 · WINDOWS · A770 16 GB', 24, muted, right=True)
-    text(76, 190, '当前默认 vs SYCL' if args.sycl else 'Decode 双场景超过 20%', 88, bold=True)
-    text(80, 249, 'SYCL 11-04 → 当前 11-08 · 2048 输入 / 128 输出 · 跨测量组速率参考'
-         if args.sycl else '当前默认 vs 原 HC256 · 2048 输入 / 128 输出 · 独立正反序夹测', 34, muted)
+    text(76, 190, 'Current default vs SYCL' if args.sycl else 'Decode gains above 20%', 88, bold=True)
+    text(80, 249, 'SYCL Nov 4 → Current Nov 8 · 2048 input / 128 output · Cross-cohort rates'
+         if args.sycl else 'Current vs original HC256 · 2048 input / 128 output · Forward and reverse brackets', 34, muted)
     for column, case in enumerate(CASES):
         x = 72+column*948
         color = green if column == 0 else cyan
         rect(x, 302, 908, 475, '#101d2e')
         text(x+32, 361, case, 36, bold=True)
         text(x+32, 456, '+'+span(values[case]['decode_ms']['throughput_change_pct'])+'%', 66, color, True, limit=844)
-        text(x+32, 502, 'decode 吞吐提升 · 排除 prefill', 28, muted)
-        for index, (field, label, bar_color) in enumerate((('baseline', 'SYCL' if args.sycl else '原 HC256', '#90a5bd'), ('candidate', '当前默认', color))):
+        text(x+32, 502, 'Decode throughput gain · Excludes prefill', 28, muted)
+        for index, (field, label, bar_color) in enumerate((('baseline', 'SYCL' if args.sycl else 'HC256', '#90a5bd'), ('candidate', 'Current', color))):
             rates = [128000/v for v in values[case]['decode_ms'][field]]
             y = 550+index*80
             text(x+32, y+31, label, 28, bar_color, True)
             rect(x+190, y, 350*rates[0]/42, 40, bar_color, 6)
             text(x+876, y+31, span(rates)+' tok/s', 28, bar_color, True, True, limit=310)
-        text(x+32, 744, '跨组实测；范围为当前两方向摘要，非置信区间。' if args.sycl
-             else '条形取正序；范围为两方向摘要，非置信区间。', 25, muted, limit=844)
+        text(x+32, 744, 'Cross-cohort; current ranges span both orders, not CIs.' if args.sycl
+             else 'Forward bars; ranges span both orders, not confidence intervals.', 25, muted, limit=844)
         rect(x, 812, 908, 320, '#101d2e')
-        text(x+32, 868, '完整请求吞吐（含 prefill）', 32, bold=True)
+        text(x+32, 868, 'Full-request throughput (includes prefill)', 32, bold=True)
         text(x+32, 944, '+'+span(values[case]['request_ms']['throughput_change_pct'])+'%', 58, color, True, limit=844)
         seconds = lambda k, field: span([v/1000 for v in values[case][k][field]])
-        text(x+32, 1001, ('SYCL ' if args.sycl else '原对照 ')+seconds('request_ms', 'baseline')+' s → 当前 '+seconds('request_ms', 'candidate')+' s', 27, muted, limit=844)
-        text(x+32, 1051, '当前 prefill：'+seconds('prompt_ms', 'candidate')+' s', 29, color, limit=844)
-        text(x+32, 1100, '完整请求不含 HTTP 与进程启动。', 25, muted, limit=844)
+        text(x+32, 1001, ('SYCL ' if args.sycl else 'HC256 ')+seconds('request_ms', 'baseline')+' s → Current '+seconds('request_ms', 'candidate')+' s', 27, muted, limit=844)
+        text(x+32, 1051, 'Current prefill: '+seconds('prompt_ms', 'candidate')+' s', 29, color, limit=844)
+        text(x+32, 1100, 'Full request excludes HTTP and process startup.', 25, muted, limit=844)
     if args.sycl:
-        text(76, 1194, '当前默认：42 请求 / 4704 输出及 8 字段通过 · SYCL 基线沿用独立冻结实测', 29, green)
+        text(76, 1194, 'Current: 42 requests / 4704 output tokens / 8 fields pass · SYCL: separate frozen measurements', 29, green)
     else:
         drift = max(abs(v) for c in CASES for v in values[c]['decode_ms']['baseline_drift_pct'])
-        text(76, 1194, f'42 请求 / 4704 输出全部匹配 · 8 字段复核通过 · 6 进程退出 0 · 最大 decode 漂移 {drift:.3f}%', 29, green)
+        text(76, 1194, f'42 requests / 4704 tokens match · 8 fields pass · 6 clean exits · Max decode control drift {drift:.3f}%', 29, green)
     text(76, 1244, 'Intel Arc A770 16 GB · Xeon E5-2696 v4 · 256 GiB DDR3 · Windows 10 · oneAPI 2025.3', 27, muted)
-    text(76, 1293, 'SYCL：native FP16 M4 / 5771 槽 / spec4 · 当前：U4 / HC SG16 / 6509 槽 / spec6'
-         if args.sycl else '当前：HC SG16 · spec6 / 置信度 0.6 · 层内专家排序 · cache6200 / 6509 槽 · adapt16 · 8K', 27, muted)
-    text(76, 1352, '跨组整版本比较 · 非同期 SYCL 夹测 · 不作单独 API 归因 · 不与原主线历史倍率累乘'
-         if args.sycl else '本机固定 2K 实测 · 历史收益不累乘 · 旧输出分叉未宣称修复 · 原 8K 低显存余量标记保留', 26, cyan)
+    text(76, 1293, 'SYCL: native FP16 M4 / 5771 slots / spec4 · Current: U4 / HC SG16 / 6509 slots / spec6'
+         if args.sycl else 'Current: HC SG16 · spec6 / confidence 0.6 · Layer expert ordering · cache6200 / 6509 slots · adapt16 · 8K', 27, muted)
+    text(76, 1352, 'Cross-cohort whole versions · No concurrent SYCL bracket or API-only attribution · Historical ratios not compounded'
+         if args.sycl else 'Fixed 2K on this PC · Gains not compounded · Earlier output forks not claimed fixed · 8K low-VRAM flag retained', 26, cyan)
     ET.indent(svg, space='  ')
     ET.ElementTree(svg).write(out.with_suffix('.svg'), encoding='utf-8', xml_declaration=True)
     canvas.save(out.with_suffix('.png'), optimize=True)

@@ -22,17 +22,24 @@ Allocation Runtime::allocate_staging(size_t bytes) { return allocate_storage(byt
 void Runtime::barrier() {
     require(!state_->recording.closed && !state_->failed, "barrier requires an open healthy recording");
     // Match dispatch dependencies; completion tags and queue tails still flush to the host.
+
+    if(state_->queue(state_->recording.queue).blitter) {detail::emit(state_->recording.commands,blitter_flush());return;}
     detail::emit(state_->recording.commands, detail::barrier(false, state_->host_visibility));
 }
 void Runtime::signal_value(uint64_t address, uint64_t value) {
     require(!state_->recording.closed && !state_->failed, "signal requires an open healthy recording");
     const auto signal = detail::signal_value(address, value);
     detail::validate_gpu_range(address, 8, state_->allocations);
-    use_address(address); detail::emit(state_->recording.commands, signal);
+
+    use_address(address);
+    if(state_->queue(state_->recording.queue).blitter) {detail::emit(state_->recording.commands,blitter_flush(address,value));return;}
+    detail::emit(state_->recording.commands, signal);
 }
 void Runtime::write_global_timestamp(uint64_t address) {
     require(!state_->recording.closed && !state_->failed, "timestamp requires an open healthy recording");
-    const auto timestamp = detail::timestamp_value(address);
+
+    require(!state_->queue(state_->recording.queue).blitter,"CS timestamps are unsupported on the copy-only queue");
+    const auto timestamp = detail::timestamp_value(address, state_->host_visibility);
     detail::validate_gpu_range(address, 8, state_->allocations);
     use_address(address); detail::emit(state_->recording.commands, timestamp);
 }
@@ -184,6 +191,8 @@ void Runtime::copy(uint64_t destination, uint64_t source, size_t bytes) {
     if (destination == source) return;
     require(destination > source ? destination - source >= bytes : source - destination >= bytes,
             "partially overlapping GPU copy");
+
+    if(s.queue(s.recording.queue).blitter) {s.record_blit(destination,source,bytes);return;}
     require(!s.memory_module.empty(), "copy requires set_memory_module");
     const uint64_t count = bytes;
     const auto groups = uint32_t(std::min<size_t>(256, (bytes - 1) / 4096 + 1));
@@ -209,6 +218,11 @@ void Runtime::copy_2d(uint64_t destination, size_t destination_pitch, uint64_t s
     require(destination > source ? destination - source >= source_span : source - destination >= destination_span,
             "overlapping pitched GPU copy spans");
     if (width == destination_pitch && width == source_pitch) { copy(destination, source, width * height); return; }
+
+    if(s.queue(s.recording.queue).blitter) {
+        for(size_t row=0;row<height;++row)copy(destination+row*destination_pitch,source+row*source_pitch,width);
+        return;
+    }
     require(!s.memory_module.empty(), "2D copy requires set_memory_module");
     // Cache the optional entry point once at binding. Existing three-entry
     // memory modules keep their previous row semantics without repeated queries.
@@ -230,6 +244,7 @@ void Runtime::fill(uint64_t destination, const void* pattern, size_t pattern_byt
     detail::validate_gpu_range(destination, bytes, s.allocations);
     use_address(destination);
     require(pattern && pattern_bytes && pattern_bytes <= 128 && !(pattern_bytes & (pattern_bytes - 1)), "fill needs a power-of-two pattern of 1..128 bytes");
+    if(s.queue(s.recording.queue).blitter){s.record_color_fill(destination,pattern,pattern_bytes,bytes);return;}
     require(!s.memory_module.empty(), "fill requires set_memory_module");
     const uint64_t count = bytes;
     const auto groups = uint32_t(std::min<size_t>(256, (bytes - 1) / 4096 + 1));
@@ -256,11 +271,16 @@ void Runtime::append(const std::string& path, const std::string& name, uint32_t 
 }
 void Runtime::append(const std::string& path, const std::string& name, std::array<uint32_t, 3> local,
                      std::array<uint32_t, 3> groups, const std::vector<Argument>& args) {
+    append(path, name, local, groups, args.data(), args.size());
+}
+void Runtime::append(const std::string& path, const std::string& name, std::array<uint32_t, 3> local,
+                     std::array<uint32_t, 3> groups, const Argument* args, size_t argument_count) {
     auto& s = *state_;
     require(!s.recording.closed && !s.failed, "recording closed/failed");
+    require(!s.queue(s.recording.queue).blitter,"kernels are unsupported on the copy-only queue");
     auto& entry = detail::recorded_image(s.images, path, name);
     // Validate user arguments before changing the recording or allocating resources.
-    auto cross = detail::pack_arguments(entry.kernel, local, groups, args, s.allocations, 0, 0, 0, &entry.resident_hints, &s.cpu_bounds);
+    auto cross = detail::pack_arguments(entry.kernel, local, groups, args, argument_count, s.allocations, 0, 0, 0, &entry.resident_hints, &s.cpu_bounds);
     try {
         auto write_storage = [&](const Allocation& memory, size_t offset, const void* source, size_t bytes, size_t padded) {
             require(source && bytes && bytes <= padded && offset <= memory.bytes && padded <= memory.bytes - offset,
@@ -361,10 +381,13 @@ void Runtime::append(const std::string& path, const std::string& name, std::arra
         const auto& data = s.module_data.at(path);
         const auto private_va = private_memory.allocation.handle ? private_memory.allocation.gpu + detail::thread_memory_guard : 0;
         detail::bind_base_arguments(k, cross, data.globals.gpu, data.constants.gpu, private_va);
+        const bool local_parameters = s.local_parameters && s.recording.device_parameters &&
+            s.storage_queue != SIZE_MAX && path != s.memory_module;
         auto payload = detail::indirect_payload(entry, cross, local);
         auto indirect = entry.indirect.lock();
         bool captured_payload = false;
         if (!payload.empty() && (entry.last_indirect != payload || !indirect ||
+                entry.last_local_parameters != local_parameters ||
                 ((indirect->gpu ^ s.indirect_heap.allocation->gpu) >> 32))) {
             // Keep identical cached arguments near this recording's current heap.
             // Copy once during capture when an older list lives in another SBA window.
@@ -377,13 +400,16 @@ void Runtime::append(const std::string& path, const std::string& name, std::arra
         }
         entry.last_indirect = std::move(payload);
         entry.last_local = local;
+        // A host-only capture may never have reached its old device mirror.
+        // Recapture on placement changes so cached bytes are uploaded before graph use.
+        entry.last_local_parameters = local_parameters;
         if (entry.last_indirect.empty()) indirect = s.indirect_heap.allocation;
         retain_capture(s.recording.captures, indirect);
         // ponytail: borrow owned allocations here; use_storage never changes their containers.
         for (const auto* memory : std::array<const Allocation*, 7>{&entry.isa, indirect.get(), &data.globals, &data.constants,
                                   &scratch0.allocation, &scratch1.allocation, &private_memory.allocation}) use_storage(*memory);
         auto parameter_gpu = indirect->gpu;
-        if (s.local_parameters && s.storage_queue != SIZE_MAX && path != s.memory_module) {
+        if (local_parameters) {
             auto [mirror, created] = s.parameter_mirrors.try_emplace(indirect->handle);
             if (created) mirror->second = {*indirect, allocate_storage(indirect->bytes, true)};
             parameter_gpu = mirror->second[1].gpu;
@@ -404,13 +430,64 @@ void Runtime::append(const std::string& path, const std::string& name, std::arra
         }
         detail::record_dispatch(s.recording.commands, k, cross, local, groups, entry.isa.gpu, entry.isa.bytes,
                                 parameter_gpu, s.max_threads, &s.recording.encoder_state, s.mocs, s.host_visibility,
-                                detail::local_memory_bytes(k, args) - k.slm, scratch_heap, entry.isa_offset, entry.indirect_offset, s.disable_overdispatch);
+                                detail::local_memory_bytes(k, args, argument_count) - k.slm, scratch_heap, entry.isa_offset, entry.indirect_offset, s.disable_overdispatch);
     } catch (...) { s.failed = true; throw; }
 }
+uint64_t Runtime::trim_thread_memory() {
+    auto& s = *state_;
+    require(!s.failed && !s.recording.closed && s.recording.commands.empty() && s.idle(),
+            "thread-memory trim requires idle healthy queues and an empty open recording");
+    const auto retained = [&](const Allocation& memory) {
+        const auto* storage = &s.storage.at(memory.handle);
+        const auto uses = [&](const auto& list) {
+            return std::find(list.storage.begin(), list.storage.end(), storage) != list.storage.end();
+        };
+        return uses(s.recording) || std::any_of(s.recordings.begin(), s.recordings.end(), uses);
+    };
+    std::vector<size_t> unused;
+    for (size_t index = 0; index < s.thread_memory.size(); ++index) {
+        const auto& memory = s.thread_memory[index].allocation;
+        if (!memory.handle || retained(memory)) continue;
+        bool bound = false;
+        for (size_t qi = 0; qi <= s.queues.size(); ++qi) {
+            const auto& queue = s.queue(qi);
+            bound |= queue.current_private == index || queue.current_scratch[0] == index || queue.current_scratch[1] == index;
+        }
+        for (const auto& descriptor : s.scratch_descriptors)
+            if (descriptor.first[0] == index || descriptor.first[1] == index) bound |= retained(descriptor.second);
+        if (!bound) unused.push_back(index);
+    }
+    const auto retired = [&](size_t index) { return std::find(unused.begin(), unused.end(), index) != unused.end(); };
+    uint64_t bytes = 0;
+    const auto reclaim = [&](Allocation& memory) {
+        const auto size = memory.bytes;
+        require(!retained(memory) && storage_idle(memory), "thread storage is still retained or busy");
+        require(s.storage_by_gpu.erase(memory.gpu) == 1, "thread storage GPU range is missing");
+        require(s.storage.erase(memory.handle) == 1, "thread storage ledger is missing");
+        release(memory);
+        bytes += size;
+    };
+    try {
+        for (auto it = s.scratch_descriptors.begin(); it != s.scratch_descriptors.end();) {
+            if (retired(it->first[0]) || retired(it->first[1])) {
+                reclaim(it->second); it = s.scratch_descriptors.erase(it);
+            } else ++it;
+        }
+        for (auto index : unused) {
+            reclaim(s.thread_memory[index].allocation);
+            // ponytail: leave holes so retained command/descriptor indices never move;
+            // startup-only trimming scans the small pool/list sets, never timed replay.
+            s.thread_memory[index] = {};
+        }
+    } catch (...) { s.failed = true; throw; }
+    return bytes;
+}
+
 void Runtime::check_scratch_guards() {
     auto& s = *state_;
     require(s.idle() && !s.failed, "scratch guard check requires idle healthy queues");
     for (const auto& memory : s.thread_memory) {
+        if (!memory.allocation.handle) continue;
         const auto guard_end = detail::thread_memory_guard + memory.payload_bytes;
         if (memory.allocation.device_local) {
             const auto tail = memory.allocation.bytes - guard_end;
@@ -494,13 +571,14 @@ size_t Runtime::completion_index(const Completion& completion) const {
             "invalid, foreign or destroyed-runtime completion");
     return completion.queue_;
 }
-void Runtime::begin(const Queue& queue, bool in_order) {
+void Runtime::begin(const Queue& queue, bool in_order, bool device_parameters) {
     const auto index = queue_index(queue);
     auto& s = *state_;
     require(!s.recording.closed && s.recording.commands.empty() && s.recording.gates.empty() && !s.failed,
             "queue selection requires an empty open healthy recording");
     s.recording.queue = index;
     s.recording.encoder_state.in_order = in_order;
+    s.recording.device_parameters = device_parameters;
 }
 uint64_t Runtime::submit() { return submit_recording(SIZE_MAX, 0); }
 uint64_t Runtime::submit(const Commands& commands) { return submit_recording(command_index(commands), 0); }

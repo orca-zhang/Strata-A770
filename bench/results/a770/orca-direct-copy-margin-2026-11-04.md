@@ -127,7 +127,7 @@ GPU 时钟未锁定，夹测漂移不是置信区间。单组固定输入的热�
 ## 复现和离线核对
 
 [公开数据](../../../sycl/orca/direct-copy-margin-a770-windows-2026-11-04.json)及
-[原始证据归档](../../../sycl/orca/direct-copy-margin-a770-windows-2026-11-04.json.gz)
+原始证据归档 (`direct-copy-margin-a770-windows-2026-11-04.json.gz`, raw capture retained locally)
 保存所有请求、配置、EXE／内核哈希、构建命令、冻结运行时源码、适配头和原始日志。
 本机原始阶段位于 `build-orca-direct-gap-20261104/`，测试与编译使用共享 GPU 锁串行执行。
 生产配置、已部署 EXE、数值内核包、初始专家 profile 和 Linux 交接包没有修改。

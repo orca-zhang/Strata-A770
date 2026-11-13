@@ -69,6 +69,7 @@ endforeach()
 add_custom_target(strata-orca-headers DEPENDS ${_native_headers} "${_generated}/include/dpct/util.hpp")
 set(_kernel_names elementwise dequant_bf16 iq_kernels xmx native_gemm prefill_helpers)
 if(STRATA_ORCA_ALL_KERNELS)
+  list(APPEND _kernel_names u4n16)
   list(APPEND _kernel_names dequant_s2 s2_gemv s_gemv s2_gemv_quads s2_gemv_fast router_top10 quantize_act
     rope sampler s2_gemv_q8 s2_expert_grouped shared_expert gr gdn qsa bf16_gemv native_mmvq native_bf16
     native_gr_norm native_moe native_gdn native_gr_postops native_router native_gdn_preprocess native_qsa
@@ -91,11 +92,15 @@ foreach(_kernel IN LISTS _kernel_names)
   if(_kernel STREQUAL "xmx")
     set(_input "${STRATA_ROOT}/sycl/src/prefill/gemm.dp.cpp")
     set(_prepare_flags --xmx-kernel)
-    # The FP16 M4 candidate passed the clean 68-request A770 regression; BF16 stays unchanged.
+    # M4 tails retain their checked flag; the M16 kernel carries its own 256-GRF property.
     set(_register_flags "--large-grf-kernel=*native_xmx_launch_m4*")
   elseif(_kernel STREQUAL "native_gemm")
     set(_input "${CMAKE_CURRENT_SOURCE_DIR}/gemm.cpp")
     set(_register_flags "--large-grf-kernel=*OrcaFp16ExpertPair*")
+  elseif(_kernel STREQUAL "fused_gr" AND NOT STRATA_ORCA_DG2)
+    set(_register_flags "--large-grf-kernel=*gr_up_multi_q8_kernel*")
+  elseif(_kernel STREQUAL "u4n16")
+    set(_input "${CMAKE_CURRENT_SOURCE_DIR}/u4n16.cpp")
   elseif(_kernel STREQUAL "prefill_helpers")
     set(_input "${STRATA_ROOT}/sycl/src/prefill/kernels.dp.cpp")
   endif()
@@ -106,15 +111,23 @@ foreach(_kernel IN LISTS _kernel_names)
     "${STRATA_ROOT}/include/strata/kernels/*.hpp" "${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp"
     "${STRATA_ROOT}/include/strata/prefill/*.hpp"
     "${STRATA_ROOT}/orca-l0/include/*.hpp")
+  if(_kernel STREQUAL "u4n16")
+    list(APPEND _headers "${CMAKE_CURRENT_SOURCE_DIR}/u4n16.hpp")
+  endif()
   # This bootstrap is included only by the host executable. Its API changes
   # must not invalidate every numerical SPIR-V image.
   list(REMOVE_ITEM _headers "${CMAKE_CURRENT_SOURCE_DIR}/include/strata/orca_engine.hpp")
   list(APPEND _headers "${STRATA_ROOT}/include/strata/core/emulate.hpp"
     "${STRATA_ROOT}/include/strata/core/coupled_draft.hpp")
   list(APPEND _headers "${STRATA_ROOT}/orca-l0/tests/runtime_dependencies.hpp")
-  add_custom_command(OUTPUT "${_source}"
-    COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/prepare.py" "${_input}" "${_source}" ${_prepare_flags}
-    DEPENDS "${_input}" prepare.py VERBATIM)
+  if(_kernel STREQUAL "u4n16")
+    # Already native; retain its source directory for the adjacent U4 header.
+    set(_source "${_input}")
+  else()
+    add_custom_command(OUTPUT "${_source}"
+      COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/prepare.py" "${_input}" "${_source}" ${_prepare_flags}
+      DEPENDS "${_input}" prepare.py VERBATIM)
+  endif()
   add_custom_command(OUTPUT "${_pack}/index.txt" "${_pack}/abi.hpp"
     COMMAND "${Python3_EXECUTABLE}" "${STRATA_ROOT}/orca-l0/compiler/build.py"
       --compiler "${CMAKE_CXX_COMPILER}" --source "${_source}" --out "${_pack}"
@@ -141,6 +154,17 @@ add_executable(strata-orca-gemm-replay-check EXCLUDE_FROM_ALL gemm_replay_check.
 target_compile_options(strata-orca-gemm-replay-check PRIVATE ${_flags} -fsycl -fsycl-host-only)
 target_link_libraries(strata-orca-gemm-replay-check PRIVATE strata_orca_kernels)
 enable_testing()
+# The PLE scheduling check needs no model, device images or GPU runtime.
+find_package(Threads REQUIRED)
+add_executable(strata-orca-ple-reader-check "${STRATA_ROOT}/src/ngram/ple_reader_test.cpp"
+  "${STRATA_ROOT}/src/kernels/ngram.cpp" "${STRATA_ROOT}/sycl/src/ngram/ple_reader.cpp"
+  "${STRATA_ROOT}/src/platform/direct_file.cpp")
+target_include_directories(strata-orca-ple-reader-check PRIVATE "${STRATA_ROOT}/include")
+target_compile_options(strata-orca-ple-reader-check PRIVATE -fp-model=precise)
+target_link_libraries(strata-orca-ple-reader-check PRIVATE Threads::Threads)
+target_compile_features(strata-orca-ple-reader-check PRIVATE cxx_std_20)
+add_test(NAME strata-orca-ple-reader COMMAND strata-orca-ple-reader-check --selftest --dir "${CMAKE_CURRENT_BINARY_DIR}")
+set_tests_properties(strata-orca-ple-reader PROPERTIES LABELS cpu TIMEOUT 180 RUN_SERIAL TRUE)
 set(STRATA_ORCA_TEST_IMAGES "${CMAKE_CURRENT_BINARY_DIR}/images" CACHE PATH "Kernel packs used by the runtime checks")
 add_test(NAME strata-orca-kernels COMMAND strata-orca-kernel-check "${STRATA_ORCA_TEST_IMAGES}")
 set_tests_properties(strata-orca-kernels PROPERTIES LABELS gpu TIMEOUT 120 RUN_SERIAL TRUE)
@@ -170,6 +194,14 @@ add_test(NAME strata-orca-queues COMMAND strata-orca-queue-check "${STRATA_ORCA_
 set_tests_properties(strata-orca-queues PROPERTIES LABELS gpu TIMEOUT 120 RUN_SERIAL TRUE)
 
 if(STRATA_ORCA_ALL_KERNELS)
+  # Manual portable HC correctness check: CPU oracle, Q8 reference and replay guards; no timers.
+  add_executable(strata-orca-hc-check EXCLUDE_FROM_ALL hc_check.cpp)
+  target_compile_options(strata-orca-hc-check PRIVATE ${_flags} -fsycl -fsycl-host-only)
+  target_link_libraries(strata-orca-hc-check PRIVATE strata_orca_kernels)
+  # Manual real-weight check; create references with the SYCL build of the same source.
+  add_executable(strata-orca-u4n16-check EXCLUDE_FROM_ALL u4n16_check.cpp)
+  target_compile_options(strata-orca-u4n16-check PRIVATE ${_flags} -fsycl -fsycl-host-only)
+  target_link_libraries(strata-orca-u4n16-check PRIVATE strata_orca_kernels)
   # Manual GEMV/router fork-join check and timings; reuse existing model images.
   add_executable(strata-orca-mixed-check EXCLUDE_FROM_ALL mixed_schedule_check.cpp)
   target_compile_options(strata-orca-mixed-check PRIVATE ${_flags} -fsycl -fsycl-host-only)

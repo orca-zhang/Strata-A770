@@ -254,6 +254,34 @@ struct GrMulti {
     float* part2 = nullptr;    ///< SYCL port: [GRS_SLICES][kFusedGrMaxT][GRS_PITCH] padded private slice partials
 };
 
+// ponytail: up needs no down/inject weights or norm-only fields; keep all token slots.
+struct GrUpRow {
+    const float *R, *bo_prev, *inj_prev, *rs;
+    float *R_out, *lo, *mixed;
+    uint8_t* q8_mixed;
+    bool apply;
+};
+struct GrUpMulti {
+    GrUpRow a[kFusedGrMaxT];
+    float* part;
+    const uint16_t* w_up;
+    const float* w_norm;
+    int T, nsplit;
+};
+GrUpMulti gr_up_args(const GrMulti& m) {
+    GrUpMulti result{};
+    result.part = m.part;
+    result.w_up = m.a[0].w_up;
+    result.w_norm = m.a[0].w_norm;
+    result.T = m.T;
+    result.nsplit = m.nsplit;
+    for (int i = 0; i < m.T; ++i) {
+        const auto& a = m.a[i];
+        result.a[i] = {a.R, a.bo_prev, a.inj_prev, a.rs, a.R_out, a.lo, a.mixed, a.q8_mixed, a.apply};
+    }
+    return result;
+}
+
 // ponytail: copy only norm inputs; retain all eight token slots and the exact math.
 struct GrNormRow {
     const float *R, *bo_prev, *inj_prev, *w_norm;
@@ -654,15 +682,15 @@ Consult with your hardware vendor to find the total register size available and
 adjust the code, or use smaller sub-group size to avoid high register pressure.
 */
 template <int COLS = UPM_COLS, bool Q8 = false>
-__dpct_inline__ void gr_up_multi_kernel(GrMulti m, float* local) {
+__dpct_inline__ void gr_up_multi_kernel(GrUpMulti m, float* local) {
     static_assert(!Q8 || COLS == 32);
     auto item_ct1 = sycl::ext::oneapi::this_work_item::get_nd_item<3>();
     auto lo = reinterpret_cast<float (*)[LR]>(local);
     auto g = reinterpret_cast<float (*)[HC][COLS]>(local + (size_t) m.T * LR);
     const int t = item_ct1.get_local_id(2);
-    const int lane = Q8 ? (t & 31) : (t & 15);
-    const int warp = Q8 ? (t >> 5) : (t >> 4);
-    const int warps = Q8 ? 8 : 16;
+    const int lane = t & 15;
+    const int warp = t >> 4;
+    const int warps = 16;
     const int T = m.T;
     const int d0 = item_ct1.get_group(2) * COLS;
 #pragma unroll
@@ -684,19 +712,21 @@ __dpct_inline__ void gr_up_multi_kernel(GrMulti m, float* local) {
     }
     item_ct1.barrier(sycl::access::fence_space::local_space);
     if constexpr (Q8) {
+        // ponytail: pair SG32 lanes before the same XOR8..1 tree; retain one fused launch.
         for (int r = warp; r < HC * COLS; r += warps) {
             const int c = r / COLS, dd = r - c * COLS, i = c * N + d0 + dd;
             const sycl::uint4 *w4 =
-                reinterpret_cast<const sycl::uint4 *>(m.a[0].w_up + (size_t)i * LR);
+                reinterpret_cast<const sycl::uint4 *>(m.w_up + (size_t)i * LR);
             const sycl::uint4 wa = *(w4 + lane);
+            const sycl::uint4 wh = *(w4 + 16 + lane);
             const sycl::uint4 wb =
                 lane < LR / 8 - 32 ? *(w4 + 32 + lane) : sycl::uint4(0, 0, 0, 0);
             float rv = 0.0f, wn = 0.0f, rsc = 0.0f, bo = 0.0f, ip = 0.0f;
             bool apply = false;
             if (lane < T) {
-                const FusedGrArgs& a = m.a[lane];
+                const GrUpRow& a = m.a[lane];
                 rv = a.R[i];
-                wn = a.w_norm[i];
+                wn = m.w_norm[i];
                 rsc = a.rs[c];
                 apply = a.apply;
                 if (apply) { bo = a.bo_prev[d0 + dd]; ip = a.inj_prev[c]; }
@@ -707,7 +737,10 @@ __dpct_inline__ void gr_up_multi_kernel(GrMulti m, float* local) {
                 if (k >= T) break;
                 float acc = dot8(wa, lo[k] + lane * 8);
                 if (lane < LR / 8 - 32) acc += dot8(wb, lo[k] + (32 + lane) * 8);
-                acc = warp_sum(acc);
+                acc += dot8(wh, lo[k] + (16 + lane) * 8);
+#pragma unroll
+                for (int o = 8; o > 0; o >>= 1)
+                    acc += sycl::permute_group_by_xor(item_ct1.get_sub_group(), acc, o);
                 if (lane == k) mine = acc;
             }
             if (lane < T) {
@@ -724,7 +757,7 @@ __dpct_inline__ void gr_up_multi_kernel(GrMulti m, float* local) {
         for (int c = 0; c < HC; ++c) {
             const int dd = warp, i = c * N + d0 + dd;
             const sycl::uint4 *w4 =
-                reinterpret_cast<const sycl::uint4 *>(m.a[0].w_up + (size_t)i * LR);
+                reinterpret_cast<const sycl::uint4 *>(m.w_up + (size_t)i * LR);
             const sycl::uint4 wa = *(w4 + lane);
             const sycl::uint4 wh = *(w4 + 16 + lane);
             const sycl::uint4 wb =
@@ -732,9 +765,9 @@ __dpct_inline__ void gr_up_multi_kernel(GrMulti m, float* local) {
             float rv = 0.0f, wn = 0.0f, rsc = 0.0f, bo = 0.0f, ip = 0.0f;
             bool apply = false;
             if (lane < T) {
-                const FusedGrArgs& a = m.a[lane];
+                const GrUpRow& a = m.a[lane];
                 rv = a.R[i];
-                wn = a.w_norm[i];
+                wn = m.w_norm[i];
                 rsc = a.rs[c];
                 apply = a.apply;
                 if (apply) { bo = a.bo_prev[d0 + dd]; ip = a.inj_prev[c]; }
@@ -762,6 +795,33 @@ __dpct_inline__ void gr_up_multi_kernel(GrMulti m, float* local) {
         }
     }
     item_ct1.barrier(sycl::access::fence_space::local_space);
+    if constexpr (Q8) {
+        for (int i = t; i < T * 16; i += THREADS) {
+            const int k = i / 16, col = i % 16;
+            float s0 = 0.0f, s1 = 0.0f;
+#pragma unroll
+            for (int c = 0; c < HC; ++c) {
+                s0 += g[k][c][col];
+                s1 += g[k][c][col + 16];
+            }
+            const float x0 = s0 / (float)HC, x1 = s1 / (float)HC;
+            m.a[k].mixed[d0 + col] = x0;
+            m.a[k].mixed[d0 + col + 16] = x1;
+            float amax = sycl::fmax(sycl::fabs(x0), sycl::fabs(x1));
+            float sum = x0 + x1;
+#pragma unroll
+            for (int o = 8; o > 0; o >>= 1)
+                amax = sycl::fmax(amax, sycl::permute_group_by_xor(item_ct1.get_sub_group(), amax, o));
+#pragma unroll
+            for (int o = 8; o > 0; o >>= 1)
+                sum += sycl::permute_group_by_xor(item_ct1.get_sub_group(), sum, o);
+            const float d = q8_1_finite(amax / 127.0f);
+            GrQ81* y = reinterpret_cast<GrQ81*>(m.a[k].q8_mixed) + d0 / 32;
+            y->qs[col] = q8_1_quant(x0, d, amax);
+            y->qs[col + 16] = q8_1_quant(x1, d, amax);
+            if (col == 0) y->ds = q8_1_ds(d, sum);
+        }
+    } else {
     for (int i = t; i < T * COLS; i += THREADS) {
         const int k = i / COLS, col = i - k * COLS;
         float s = 0.0f;
@@ -769,19 +829,7 @@ __dpct_inline__ void gr_up_multi_kernel(GrMulti m, float* local) {
         for (int c = 0; c < HC; ++c) s += g[k][c][col];
         const float xi = s / (float) HC;
         m.a[k].mixed[d0 + col] = xi;
-        if constexpr (Q8) {
-            float amax = sycl::fabs(xi), sum = xi;
-#pragma unroll
-            for (int o = 16; o > 0; o >>= 1)
-                amax = sycl::fmax(amax, sycl::permute_group_by_xor(item_ct1.get_sub_group(), amax, o));
-#pragma unroll
-            for (int o = 16; o > 0; o >>= 1)
-                sum += sycl::permute_group_by_xor(item_ct1.get_sub_group(), sum, o);
-            const float d = q8_1_finite(amax / 127.0f);
-            GrQ81* y = reinterpret_cast<GrQ81*>(m.a[k].q8_mixed) + d0 / 32;
-            y->qs[col] = q8_1_quant(xi, d, amax);
-            if (col == 0) y->ds = q8_1_ds(d, sum);
-        }
+    }
     }
 }
 
@@ -1656,13 +1704,14 @@ void launch_multi(const GrMulti &m, int variant, dpct::queue_ptr st,
         st->submit([&](sycl::handler& cgh) {
             sycl::local_accessor<float, 1> local(
                 sycl::range<1>((size_t) m.T * (LR + HC * UPM_COLS)), cgh);
+            const auto up = gr_up_args(m);
             cgh.parallel_for<dpct_kernel_name<class gr_up_multi_kernel_1a7280>>(
                 sycl::nd_range<3>(sycl::range(1, 1, UPM_BLOCKS) *
                                       sycl::range(1, 1, THREADS),
                                   sycl::range(1, 1, THREADS)),
                 exp_props,
                 [=](sycl::nd_item<3> item_ct1) [[sycl::reqd_sub_group_size(16)]] {
-                    gr_up_multi_kernel(m, local.get_multi_ptr<sycl::access::decorated::no>().get());
+                    gr_up_multi_kernel(up, local.get_multi_ptr<sycl::access::decorated::no>().get());
                 });
         });
     }
@@ -1999,13 +2048,14 @@ bool fused_gr_read_multi(const FusedGrArgs* a, int n_tok, float* xn_scratch, voi
 #endif
             sycl::local_accessor<float, 1> local(
                 sycl::range<1>((size_t) m.T * (LR + HC * QUPM_COLS)), cgh);
+            const auto up = gr_up_args(m);
             cgh.parallel_for<dpct_kernel_name<class gr_up_multi_q8_kernel>>(
                 sycl::nd_range<3>(sycl::range(1, 1, QUPM_BLOCKS) *
                                       sycl::range(1, 1, THREADS),
                                   sycl::range(1, 1, THREADS)),
                 exp_props,
-                [=](sycl::nd_item<3> item_ct1) [[sycl::reqd_sub_group_size(32)]] {
-                    gr_up_multi_kernel<QUPM_COLS, true>(m, local.get_multi_ptr<sycl::access::decorated::no>().get());
+                [=](sycl::nd_item<3> item_ct1) [[sycl::reqd_sub_group_size(16)]] {
+                    gr_up_multi_kernel<QUPM_COLS, true>(up, local.get_multi_ptr<sycl::access::decorated::no>().get());
                 });
         });
         return true;
@@ -2021,13 +2071,14 @@ bool fused_gr_read_multi(const FusedGrArgs* a, int n_tok, float* xn_scratch, voi
 #endif
             sycl::local_accessor<float, 1> local(
                 sycl::range<1>((size_t) m.T * (LR + HC * UPM_COLS)), cgh);
+            const auto up = gr_up_args(m);
             cgh.parallel_for<dpct_kernel_name<class gr_up_multi_kernel_1a727f>>(
                 sycl::nd_range<3>(sycl::range(1, 1, UPM_BLOCKS) *
                                       sycl::range(1, 1, THREADS),
                                   sycl::range(1, 1, THREADS)),
                 exp_props,
                 [=](sycl::nd_item<3> item_ct1) [[sycl::reqd_sub_group_size(16)]] {
-                    gr_up_multi_kernel(m, local.get_multi_ptr<sycl::access::decorated::no>().get());
+                    gr_up_multi_kernel(up, local.get_multi_ptr<sycl::access::decorated::no>().get());
                 });
         });
     }

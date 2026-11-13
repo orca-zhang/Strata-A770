@@ -6,6 +6,8 @@
 #include "strata/kernels/iq_kernels.hpp"
 #include "strata/kernels/native_mmvq.hpp"
 
+#include <algorithm>
+#include <memory>
 #include <climits>
 #include <cstdio>
 #include <cstring>
@@ -55,11 +57,19 @@ bool NativeHead::load(const std::vector<std::string> &shards, int64_t n_in,
                 scratch = (void *)sycl::malloc_device(
                     strata::kernels::native_q8_1_bytes((int)n_in, 1),
                     dpct::get_in_order_queue()));
+        // ponytail: the same bounded staging copy as the dense projections.
+        constexpr size_t upload_bytes = 64u << 20;
+        auto release = [](void* p) { if (p) sycl::free(p, dpct::get_in_order_queue()); };
+        std::unique_ptr<void, decltype(release)> upload(nullptr, release);
         if (status == 0)
-            status = DPCT_CHECK_ERROR(
-                dpct::get_in_order_queue()
-                    .memcpy(weights, gguf.tensor_data(*tensor), bytes)
-                    .wait());
+            status = DPCT_CHECK_ERROR(upload.reset(sycl::malloc_host(upload_bytes, dpct::get_in_order_queue())));
+        if (status == 0 && !upload) status = 1;
+        for (uint64_t at = 0; status == 0 && at < bytes; at += upload_bytes) {
+            const size_t count = (size_t) std::min<uint64_t>(upload_bytes, bytes - at);
+            std::memcpy(upload.get(), gguf.tensor_data(*tensor) + at, count);
+            status = DPCT_CHECK_ERROR(dpct::get_in_order_queue().memcpy(
+                (uint8_t*) weights + at, upload.get(), count).wait());
+        }
         /*
         DPCT1000: Error handling if-stmt was detected but could not be
         rewritten.

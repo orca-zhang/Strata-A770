@@ -6,6 +6,7 @@
 #include <fstream>
 #include <iomanip>
 #include <limits>
+#include <mutex>
 #include <sstream>
 #ifdef ORCA_L0_DIRECT_DRIVER
 #include <orca_l0/direct_driver.hpp>
@@ -13,6 +14,8 @@
 
 namespace orca::l0 {
 namespace {
+// ponytail: one bookkeeping lock; use per-runtime locks if concurrent setup makes it contended.
+std::mutex allocation_mutex;
 std::string message(ze_result_t result, const std::string& operation) {
     std::ostringstream out;
     out << operation << " failed: Level Zero 0x" << std::hex << static_cast<uint32_t>(result);
@@ -231,6 +234,7 @@ void* Runtime::allocate(std::size_t bytes, Memory kind, std::size_t alignment) {
         if (kind == Memory::device)
             check(zeContextMakeMemoryResident(context_, device_, ptr, bytes),
                   "zeContextMakeMemoryResident(device)");
+        std::lock_guard guard(allocation_mutex);
         allocations_.push_back(ptr);
     }
     catch (...) { zeMemFree(context_, ptr); throw; }
@@ -256,6 +260,7 @@ void* Runtime::allocate(std::size_t bytes, Memory kind, std::size_t alignment) {
 
 void Runtime::deallocate(void* pointer) {
     if (!pointer) return;
+    std::lock_guard guard(allocation_mutex);
     // ponytail: allocation bookkeeping is linear outside submission; use a map if model setup makes it costly.
     const auto it = std::find(allocations_.begin(), allocations_.end(), pointer);
     if (it == allocations_.end()) throw std::invalid_argument("allocation is not owned by this runtime");

@@ -26,4 +26,4 @@ python -X utf8 build-orca-gemv-xxs-grf-20261105/run.py self-check
 python -X utf8 build-orca-gemv-xxs-grf-20261105/publish.py --check
 ```
 
-[数字](../../../sycl/orca/gemv-xxs-grf-a770-windows-2026-11-05.json) · [文本证据](../../../sycl/orca/gemv-xxs-grf-a770-windows-2026-11-05.json.gz)
+[数字](../../../sycl/orca/gemv-xxs-grf-a770-windows-2026-11-05.json) · 文本证据 (`gemv-xxs-grf-a770-windows-2026-11-05.json.gz`, raw capture retained locally)

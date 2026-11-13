@@ -1,5 +1,6 @@
 #include <orca_l0/drm.hpp>
 #include "arguments.hpp"
+#include "blitter.hpp"
 #include <i915_drm.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
@@ -31,7 +32,11 @@ int parameter(int fd, int name) {
     call(fd, DRM_IOCTL_I915_GETPARAM, &get, "I915_GETPARAM");
     return value;
 }
-i915_engine_class_instance engine(int fd) {
+struct Engines {
+    i915_engine_class_instance compute{}, copy{};
+    bool has_copy = false;
+};
+Engines engines(int fd) {
     drm_i915_query_item item{}; item.query_id = DRM_I915_QUERY_ENGINE_INFO;
     drm_i915_query query{}; query.num_items = 1; query.items_ptr = ptr(&item);
     call(fd, DRM_IOCTL_I915_QUERY, &query, "query compute engine size");
@@ -42,9 +47,19 @@ i915_engine_class_instance engine(int fd) {
     require(item.length >= int(sizeof(drm_i915_query_engine_info)) && size_t(item.length) <= storage.size() * 8, "invalid engine query response");
     const auto* info = reinterpret_cast<const drm_i915_query_engine_info*>(storage.data());
     require(info->num_engines <= (item.length - sizeof(*info)) / sizeof(info->engines[0]), "invalid engine count");
-    for (uint32_t i = 0; i < info->num_engines; ++i)
-        if (info->engines[i].engine.engine_class == I915_ENGINE_CLASS_COMPUTE) return info->engines[i].engine;
-    throw std::runtime_error("DG2/i915 compute engine unavailable");
+    Engines result{};
+    bool has_compute = false;
+    for (uint32_t i = 0; i < info->num_engines; ++i) {
+        const auto candidate = info->engines[i].engine;
+        if (!has_compute && candidate.engine_class == I915_ENGINE_CLASS_COMPUTE) {
+            result.compute = candidate; has_compute = true;
+        }
+        if (!result.has_copy && candidate.engine_class == I915_ENGINE_CLASS_COPY) {
+            result.copy = candidate; result.has_copy = true;
+        }
+    }
+    require(has_compute, "DG2/i915 compute engine unavailable");
+    return result;
 }
 drm_i915_memory_region_info local_region(int fd, std::vector<uint64_t>& storage) {
     drm_i915_query_item item{}; item.query_id = DRM_I915_QUERY_MEMORY_REGIONS;
@@ -154,6 +169,7 @@ void HostGate::signal() const {
     require(bool(state_), "invalid host gate"); state_->signal();
 }
 struct NativeQueue {
+    bool blitter = false;
     std::shared_ptr<NativeCompletion> observer;
     uint32_t context = 0, timeline = 0;
     uint64_t sequence = 0, done = 0;
@@ -163,7 +179,7 @@ struct NativeQueue {
 struct Runtime::State : NativeQueue {
     int fd = -1;
     uint32_t max_threads = 0, vm = 0;
-    i915_engine_class_instance compute_engine{};
+    Engines engines; // Cached once at initialization; logical queues reuse the selected instances.
     std::deque<NativeQueue> queues;
     // ponytail: one reusable page per live gate; pack cache-line slots if callbacks make this measurable.
     std::vector<std::pair<Allocation, std::weak_ptr<HostGate::State>>> host_gates;
@@ -199,6 +215,7 @@ struct Runtime::State : NativeQueue {
         uint64_t generation = 1;
         size_t queue = 0;
         bool closed = false;
+        bool device_parameters = true;
     } recording;
     std::deque<List> recordings;
     std::vector<size_t> free_recordings;
@@ -221,7 +238,10 @@ struct Runtime::State : NativeQueue {
     std::vector<uint64_t> memory_regions;
     bool device_region_known = false;
     bool failed = false;
-    void create_queue(NativeQueue& q) {
+#include "blitter_operations.inl"
+    void create_queue(NativeQueue& q, bool copy_only = false) {
+        require(!copy_only || engines.has_copy, "DG2/i915 copy engine unavailable");
+        q.blitter = copy_only;
         q.observer = std::make_shared<NativeCompletion>();
         drm_i915_gem_context_create create{};
         call(fd, DRM_IOCTL_I915_GEM_CONTEXT_CREATE, &create, "GEM_CONTEXT_CREATE"); q.context = create.ctx_id;
@@ -229,9 +249,9 @@ struct Runtime::State : NativeQueue {
         parameter.ctx_id = q.context; parameter.param = I915_CONTEXT_PARAM_VM; parameter.value = vm;
         call(fd, DRM_IOCTL_I915_GEM_CONTEXT_SETPARAM, &parameter, "context shared VM");
         struct { uint64_t extensions; i915_engine_class_instance engines[1]; } map{};
-        map.engines[0] = compute_engine;
+        map.engines[0] = copy_only ? engines.copy : engines.compute;
         parameter.param = I915_CONTEXT_PARAM_ENGINES; parameter.size = 8 + sizeof(i915_engine_class_instance); parameter.value = ptr(&map);
-        call(fd, DRM_IOCTL_I915_GEM_CONTEXT_SETPARAM, &parameter, "context compute engine map");
+        call(fd, DRM_IOCTL_I915_GEM_CONTEXT_SETPARAM, &parameter, "context engine map");
         drm_syncobj_create timeline{};
         call(fd, DRM_IOCTL_SYNCOBJ_CREATE, &timeline, "create completion timeline"); q.timeline = timeline.handle;
         // dup retains this DRM open-file description and its syncobj namespace.
@@ -282,7 +302,7 @@ Runtime::Runtime(const char* render_node) : state_(std::make_unique<State>()) {
     const auto eus = parameter(s.fd, I915_PARAM_EU_TOTAL);
     require(eus > 0 && eus <= 512, "unexpected DG2 EU count");
     s.max_threads = uint32_t(eus) * 8;
-    s.compute_engine = engine(s.fd);
+    s.engines = engines(s.fd);
     drm_i915_gem_vm_control vm{};
     call(s.fd, DRM_IOCTL_I915_GEM_VM_CREATE, &vm, "GEM_VM_CREATE"); s.vm = vm.vm_id;
     require(s.vm, "shared VM returned no handle");
@@ -445,6 +465,7 @@ void Runtime::close() {
     auto& s = *state_;
     require(!s.recording.closed && !s.failed && !s.recording.commands.empty(), "empty, closed or failed recording");
     try {
+        if (s.queue(s.recording.queue).blitter) detail::emit(s.recording.commands, blitter_flush());
         s.recording.commands.push_back(0x05000000); // MI_BATCH_BUFFER_END
         if (s.recording.commands.size() & 1) s.recording.commands.push_back(0);
         require(s.recording.commands.size() <= 1024 * 1024, "command list too large");
@@ -585,5 +606,16 @@ void Runtime::reset() {
     s.recording.gates.clear();
     s.recording.storage.clear();
     if (s.indirect_heap.allocation.use_count() == 1) s.indirect_heap = {};
+}
+Queue Runtime::create_copy_queue() {
+    auto& s = *state_;
+    require(!s.recording.closed && s.idle() && !s.failed, "copy queue creation requires idle healthy queues");
+    require(s.engines.has_copy, "DG2/i915 copy engine unavailable");
+    s.queues.emplace_back();
+    try {
+        s.create_queue(s.queues.back(), true);
+        for (auto& storage : s.storage) storage.second.last_use.push_back(0);
+    } catch (...) { s.failed = true; throw; }
+    Queue queue; queue.owner_ = s.identity; queue.index_ = s.queues.size(); return queue;
 }
 } // namespace orca::l0::dg2

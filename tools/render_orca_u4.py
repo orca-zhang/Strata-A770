@@ -1,4 +1,4 @@
-"""Lead with Short decode, then compare 2K prefill; --check-only also checks historical ratios."""
+"""Render English Short decode and 2K prefill charts; --check-only also checks historical ratios."""
 import argparse
 import hashlib
 import json
@@ -127,7 +127,7 @@ def main():
     ET.register_namespace('', ns)
     svg = ET.Element(f'{{{ns}}}svg', width=str(width), height=str(height), viewBox=f'0 0 {width} {height}',
                      role='img', attrib={'aria-labelledby': 'title desc'})
-    ET.SubElement(svg, f'{{{ns}}}title', id='title').text = 'Short decode：L0 59.38、Direct 58.48、SYCL 42.05 tok/s；另列 2K prefill'
+    ET.SubElement(svg, f'{{{ns}}}title', id='title').text = 'Short decode: L0 59.38, Direct 58.48, SYCL 42.05 tok/s; separate 2K prefill comparison'
     ET.SubElement(svg, f'{{{ns}}}desc', id='desc').text = (
         'Windows A770 16GB / Xeon E5-2696 v4 / 256 GiB DDR3, driver 32.0.101.9034, oneAPI 2025.3, 2026-11-05. '
         'Lead example: 2026-11-04 frozen Short28/natural76 decode, ten warmups and five retained per process. '
@@ -158,20 +158,20 @@ def main():
     def text(x, y, label, size=28, color='#eaf2ff', bold=False, right=False, limit=None):
         key = size, bold
         if key not in fonts:
-            fonts[key] = ImageFont.truetype('C:/Windows/Fonts/msyhbd.ttc' if bold else 'C:/Windows/Fonts/msyh.ttc', size)
+            fonts[key] = ImageFont.truetype('C:/Windows/Fonts/segoeuib.ttf' if bold else 'C:/Windows/Fonts/segoeui.ttf', size)
         anchor = 'rs' if right else 'ls'
         box = draw.textbbox((x, y), label, font=fonts[key], anchor=anchor)
         assert 0 <= box[0] <= box[2] <= width and 0 <= box[1] <= box[3] <= height, (label, box)
         assert limit is None or box[2]-box[0] <= limit, (label, box, limit)
         draw.text((x, y), label, font=fonts[key], fill=color, anchor=anchor)
         ET.SubElement(svg, f'{{{ns}}}text', x=str(x), y=str(y), fill=color, attrib={
-            'font-family': 'Microsoft YaHei, Noto Sans CJK SC, sans-serif', 'font-size': str(size),
+            'font-family': 'Segoe UI, Arial, sans-serif', 'font-size': str(size),
             'font-weight': '700' if bold else '400', 'text-anchor': 'end' if right else 'start'}).text = label
 
     text(76, 76, 'STRATA-A770  /  SYCL COMPARISON', 26, cyan, True)
     text(1924, 76, '2026-11-05 · WINDOWS · A770 16 GB', 24, muted, right=True)
     text(76, 194, 'Direct / L0 vs SYCL', 96, bold=True)
-    text(80, 249, 'DECODE / Short 固定短代码 · 28 输入 / 76 自然输出 · 11-04 冻结版本', 34, muted)
+    text(80, 249, 'DECODE / Fixed short code · 28 input / 76 natural output · Frozen Nov 4 builds', 34, muted)
     short = rates['Short28']['decode_ms']
     for index, (backend, color) in enumerate((('SYCL', '#90a5bd'), ('L0', green), ('Direct', cyan))):
         x = 72+index*630
@@ -180,17 +180,17 @@ def main():
         text(x+32, 353, backend, 36, color, True)
         text(x+26, 495, f'{value:.2f}', 108, color, True, limit=410)
         text(x+564, 492, 'tok/s', 30, color, right=True)
-        gain = '对照基线' if backend == 'SYCL' else f'相对 SYCL +{100*(value/short["SYCL"][0]-1):.2f}%'
+        gain = 'Reference baseline' if backend == 'SYCL' else f'vs SYCL +{100*(value/short["SYCL"][0]-1):.2f}%'
         text(x+32, 561, gain, 32, color, True, limit=532)
-    text(76, 648, 'Short：每进程 10 次预热 + 5 次保留，输出与 57/57 草稿一致；净 decode 排除预填充。', 28, muted)
-    text(76, 694, 'Direct 对 SYCL 为同期夹测；L0 对 SYCL 为跨组参考。该 Short 成绩不代表当前 U4 配置。', 28, muted)
-    text(76, 758, 'PREFILL / 2K 输入预填充（11-04 / 11-05）', 36, cyan, True)
+    text(76, 648, 'Short: 10 warmups + 5 retained per process; outputs and 57/57 draft counts match. Decode excludes prefill.', 28, muted)
+    text(76, 694, 'Direct/SYCL: concurrent bracket. L0/SYCL: cross-cohort reference. Short does not measure the current U4 setup.', 28, muted)
+    text(76, 758, 'PREFILL / 2K input (November 4–5)', 36, cyan, True)
     for column, case in enumerate(CASES):
         x, y = 72+column*948, 805
         rect(x, y, 908, 350, '#101d2e')
         text(x+32, y+54, case, 33, bold=True)
         text(x+708, y+98, 'tok/s', 24, muted, right=True)
-        text(x+876, y+98, '相对 SYCL', 24, muted, right=True)
+        text(x+876, y+98, 'vs SYCL', 24, muted, right=True)
         series = rates[case]['prompt_ms']
         maximum = max(max(values) for values in series.values())*1.04
         for index, (backend, color) in enumerate((('SYCL', '#90a5bd'), ('L0', green), ('Direct', cyan))):
@@ -200,12 +200,12 @@ def main():
             rect(x+180, bar_y, 320*values[0]/maximum, 40, color, 6)
             text(x+708, bar_y+31, span(values), 27, color, True, True)
             gains = [100*(value/series['SYCL'][0]-1) for value in values]
-            gain = '基线' if backend == 'SYCL' else f'+{min(gains):.0f}–{max(gains):.0f}%'
+            gain = 'Baseline' if backend == 'SYCL' else f'+{min(gains):.0f}–{max(gains):.0f}%'
             text(x+876, bar_y+31, gain, 26, color, True, True)
-    text(76, 1200, '2K prefill：SYCL FP16 M4 修复版 · L0 U4/min16/M16/HC256 · Direct U4/min32/M16/HC128', 27, muted)
-    text(76, 1246, '2K 为跨组实测，条形取正序；L0 反序 Code prefill 控制漂移 −3.56%，区间非置信区间。', 27, muted)
-    text(76, 1292, 'A770 16 GB · Xeon E5-2696 v4 · 256 GiB DDR3 · Windows · oneAPI 2025.3 · 5771 槽 / MTP4', 27, muted)
-    text(76, 1344, '推荐 L0 · Direct 为 WIP（8K 间歇问题未关闭）· 最早历史见文档 · HF / ModelScope 权重稍后发布', 25, cyan)
+    text(76, 1200, '2K prefill: corrected SYCL FP16 M4 · L0 U4/min16/M16/HC256 · Direct U4/min32/M16/HC128', 27, muted)
+    text(76, 1246, '2K: cross-cohort, forward bars. L0 reverse Code prefill drift −3.56%. Ranges are not confidence intervals.', 27, muted)
+    text(76, 1292, 'A770 16 GB · Xeon E5-2696 v4 · 256 GiB DDR3 · Windows · oneAPI 2025.3 · 5771 slots / MTP4', 27, muted)
+    text(76, 1344, 'L0 recommended · Direct WIP (intermittent 8K issue open) · Earlier history in docs · HF / ModelScope weights later', 25, cyan)
     out = ROOT / 'docs/media/orca-u4-optimization'
     ET.indent(svg, space='  ')
     ET.ElementTree(svg).write(out.with_suffix('.svg'), encoding='utf-8', xml_declaration=True)

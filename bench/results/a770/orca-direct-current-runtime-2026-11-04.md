@@ -81,7 +81,7 @@ Linux GPU、PPL 和一般输入质量等价不由本轮证明。生产默认和�
 各路径的专家替换热度差统一为 1.5。它不是日常 `1024/0.5/累计0.5` 或自动缓存配置的成绩。
 
 [完整数据与哈希清单](../../../sycl/orca/direct-current-runtime-a770-windows-2026-11-04.json)和
-[原始证据归档](../../../sycl/orca/direct-current-runtime-a770-windows-2026-11-04.json.gz)
+原始证据归档 (`direct-current-runtime-a770-windows-2026-11-04.json.gz`, raw capture retained locally)
 包含冻结源码、编译／链接命令、配置、逐请求记录和 GPU 命令缓冲。
 还保留离线解析器的两次失败及修正，以及第一次包装脚本在启动引擎前遇到的路径错误。
 内核包、EXE 和专家 profile 有哈希；模型 GGUF／权重 pack 记录路径，本轮未重算全量哈希。

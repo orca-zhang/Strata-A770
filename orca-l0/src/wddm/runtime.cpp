@@ -7,6 +7,7 @@
 #include <orca_l0/dg2.hpp>
 #include "../drm/arguments.hpp"
 #include "allocation.hpp"
+#include "../drm/blitter.hpp"
 #include <chrono>
 #include <cstdio>
 #include <immintrin.h>
@@ -159,6 +160,7 @@ void HostGate::signal() const {
     require(bool(state_), "invalid host gate"); state_->signal();
 }
 struct NativeQueue {
+    bool blitter = false;
     std::shared_ptr<NativeCompletion> observer;
     D3DKMT_HANDLE context = 0, monitor = 0;
     unsigned long hw_context = 0;
@@ -173,6 +175,8 @@ struct Runtime::State : NativeQueue {
     D3DKMT_HANDLE& device = completion_device->device;
     D3DKMT_HANDLE paging = 0, paging_fence = 0;
     uint64_t local_bytes = 0;
+    LUID adapter_luid{};
+    std::vector<UINT> local_segments;
     std::deque<NativeQueue> queues;
     std::vector<std::weak_ptr<HostGate::State>> host_gates;
     NativeQueue& queue(size_t index) { return index ? queues.at(index - 1) : *this; }
@@ -190,6 +194,7 @@ struct Runtime::State : NativeQueue {
     std::map<uint64_t, detail::RecordingStorage*> storage_by_gpu;
     struct Backing {
         D3DKMT_HANDLE resource = 0;
+        bool driver_host = false, cpu_locked = false;
         std::vector<D3DKMT_HANDLE> parts; // Large device buffers share one contiguous GPU VA.
     };
     std::vector<Backing> resources;
@@ -208,6 +213,7 @@ struct Runtime::State : NativeQueue {
         uint64_t generation = 1;
         size_t queue = 0;
         bool closed = false;
+        bool device_parameters = true;
     } recording;
     std::deque<List> recordings;
     std::vector<size_t> free_recordings;
@@ -232,8 +238,29 @@ struct Runtime::State : NativeQueue {
     std::map<std::array<size_t, 2>, Allocation> scratch_descriptors;
     bool failed = false;
 
+    uint64_t global_available() const {
+        require(!local_segments.empty(), "no native local-memory segments");
+        uint64_t available = 0;
+        for (const auto index : local_segments) {
+            D3DKMT_QUERYSTATISTICS query{};
+            query.Type = D3DKMT_QUERYSTATISTICS_SEGMENT; query.AdapterLuid = adapter_luid;
+            query.QuerySegment.SegmentId = index;
+            check(D3DKMTQueryStatistics(&query), "query global local-memory residency");
+            const auto& memory = query.QueryResult.SegmentInformation;
+            require(!memory.Aperture && !memory.SegmentProperties.SystemMemory && memory.CommitLimit &&
+                    memory.BytesResident <= memory.CommitLimit, "invalid global local-memory counters");
+            const auto free = memory.CommitLimit - memory.BytesResident;
+            require(free <= UINT64_MAX - available, "global local-memory counter overflow");
+            available += free;
+        }
+        return std::min(local_bytes, available);
+    }
+
     Allocation create_allocation(size_t bytes, void* host = nullptr, bool device_local = false);
-    void create_queue(NativeQueue& q) {
+
+#include "../drm/blitter_operations.inl"
+    void create_queue(NativeQueue& q, uint32_t node=5) {
+        q.blitter = node==2;
         q.observer = std::make_shared<NativeCompletion>(completion_device);
         alignas(8) std::array<uint8_t, 144> data{};
         const auto pointer = reinterpret_cast<uintptr_t>(&q.hw_context);
@@ -241,7 +268,7 @@ struct Runtime::State : NativeQueue {
         std::memcpy(data.data(), &pointer, sizeof(pointer)); std::memcpy(data.data() + 12, &pid, sizeof(pid));
         data[36] = 1; data[68] = 1; std::memcpy(data.data() + 80, &kind, sizeof(kind));
         D3DKMT_CREATECONTEXTVIRTUAL context{};
-        context.hDevice = device; context.NodeOrdinal = 5; context.ClientHint = D3DKMT_CLIENTHINT_ONEAPI_LEVEL0;
+        context.hDevice = device; context.NodeOrdinal = node; context.ClientHint = D3DKMT_CLIENTHINT_ONEAPI_LEVEL0;
         context.pPrivateDriverData = data.data(); context.PrivateDriverDataSize = sizeof(data);
         check(D3DKMTCreateContextVirtual(&context), "create compute context"); q.context = context.hContext;
         require(q.context != 0, "context returned no handle");
@@ -292,6 +319,10 @@ struct Runtime::State : NativeQueue {
                     d.hAdapter = adapter; d.BaseAddress = a.gpu & address_mask; d.Size = a.bytes;
                     D3DKMTFreeGpuVirtualAddress(&d);
                 }
+                if (resources[i].cpu_locked) {
+                    D3DKMT_UNLOCK2 unlock{}; unlock.hDevice = device; unlock.hAllocation = a.handle;
+                    D3DKMTUnlock2(&unlock); // DestroyDevice owns final cleanup if unlock/destroy fails.
+                }
                 if (a.handle || resources[i].resource) {
                     D3DKMT_DESTROYALLOCATION2 d{}; d.hDevice = device;
                     d.Flags.SynchronousDestroy = 1;
@@ -304,8 +335,15 @@ struct Runtime::State : NativeQueue {
             if (paging) { D3DDDI_DESTROYPAGINGQUEUE d{}; d.hPagingQueue = paging; D3DKMTDestroyPagingQueue(&d); }
         }
         if (allocations_released) {
-            for (const auto& a : allocations) if (a.data && !a.imported) VirtualFree(a.data, 0, MEM_RELEASE);
-        } else completion_device->retained = std::move(allocations);
+            for (size_t i = 0; i < allocations.size(); ++i) {
+                const auto& a = allocations[i];
+                if (a.data && !a.imported && !resources[i].driver_host) VirtualFree(a.data, 0, MEM_RELEASE);
+            }
+        } else {
+            // Device destruction releases driver mappings; retain only caller-owned backing without allocating in teardown.
+            for (size_t i = 0; i < allocations.size(); ++i) if (resources[i].driver_host) allocations[i].data = nullptr;
+            completion_device->retained = std::move(allocations);
+        }
         if (event) CloseHandle(event);
     }
 };
@@ -343,9 +381,25 @@ Runtime::Runtime(const char* render_node) : state_(std::make_unique<State>()) {
     }
     require(selected != UINT32_MAX, "no calibrated Intel GPU");
     s.adapter = adapters.value.Adapters[selected].hAdapter;
+    s.adapter_luid = adapters.value.Adapters[selected].AdapterLuid;
     adapters.value.Adapters[selected].hAdapter = 0;
     s.local_bytes = query<D3DKMT_SEGMENTSIZEINFO>(s.adapter, KMTQAITYPE_GETSEGMENTSIZE).DedicatedVideoMemorySize;
     require(s.local_bytes, "adapter reported no dedicated video memory");
+    D3DKMT_QUERYSTATISTICS topology{};
+    topology.Type = D3DKMT_QUERYSTATISTICS_ADAPTER; topology.AdapterLuid = s.adapter_luid;
+    check(D3DKMTQueryStatistics(&topology), "query native memory segments");
+    const auto segments = topology.QueryResult.AdapterInformation.NbSegments;
+    require(segments && segments <= 32, "invalid native memory segment count");
+    // ponytail: cache fixed adapter/segment identity; query live residency only at memory checks.
+    for (UINT index = 0; index < segments; ++index) {
+        D3DKMT_QUERYSTATISTICS segment{};
+        segment.Type = D3DKMT_QUERYSTATISTICS_SEGMENT; segment.AdapterLuid = s.adapter_luid;
+        segment.QuerySegment.SegmentId = index;
+        check(D3DKMTQueryStatistics(&segment), "query native memory segment");
+        const auto& memory = segment.QueryResult.SegmentInformation;
+        if (!memory.Aperture && !memory.SegmentProperties.SystemMemory) s.local_segments.push_back(index);
+    }
+    require(!s.local_segments.empty(), "adapter reported no local-memory segments");
     D3DKMT_CREATEDEVICE device{}; device.hAdapter = s.adapter;
     check(D3DKMTCreateDevice(&device), "create device"); s.device = device.hDevice;
     D3DKMT_NODEMETADATA node{}; node.NodeOrdinalAndAdapterIndex = 5;
@@ -394,6 +448,9 @@ Allocation Runtime::import_host(void* data, size_t bytes) {
 }
 Allocation Runtime::State::create_allocation(size_t bytes, void* host, bool device_local) {
     auto& s = *this;
+    // ponytail: larger owned Host spans use caller-page descriptors over one VirtualAlloc mapping.
+    const bool driver_host = !host && !device_local && bytes <= (size_t{2} << 30);
+    if (driver_host && bytes >= (size_t{2} << 20)) bytes = detail::align(bytes, size_t{2} << 20);
     s.allocations.reserve(s.allocations.size() + 1); s.resources.reserve(s.resources.size() + 1);
     s.allocations.emplace_back(); s.resources.emplace_back();
     auto& a = s.allocations.back(); a.bytes = bytes; a.data = host; a.imported = host != nullptr;
@@ -401,15 +458,15 @@ Allocation Runtime::State::create_allocation(size_t bytes, void* host, bool devi
     bool residency_rolled_back = false;
     try {
         a.identity = std::make_shared<const int>(0);
-        if (!host && !device_local) a.data = VirtualAlloc(nullptr, bytes, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
-        require(device_local || a.data != nullptr, "allocate backing pages");
-        const auto count = device_local ? UINT(1 + (bytes - 1) / detail::native_device_allocation_limit) : 1u;
-        auto& backing = s.resources.back();
+        if (!host && !device_local && !driver_host) a.data = VirtualAlloc(nullptr, bytes, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
+        require(device_local || driver_host || a.data != nullptr, "allocate backing pages");
+        const auto part_limit = device_local ? detail::native_device_allocation_limit : detail::native_import_allocation_limit;
+        const auto count = driver_host ? 1u : UINT(1 + (bytes - 1) / part_limit);
+        auto& backing = s.resources.back(); backing.driver_host = driver_host;
         if (count > 1) backing.parts.resize(count);
         std::vector<std::array<uint8_t, 2376>> native;
         std::vector<D3DDDI_ALLOCATIONINFO2> info(count);
-        D3DKMT_CREATESTANDARDALLOCATION standard{};
-        standard.Type = D3DKMT_STANDARDALLOCATIONTYPE_EXISTINGHEAP; standard.ExistingHeapData.Size = bytes;
+        // Native descriptors cover both owned and imported system pages.
         info[0].pSystemMem = a.data;
         D3DKMT_CREATEALLOCATION create{}; create.hDevice = s.device; create.NumAllocations = count;
         create.pAllocationInfo2 = info.data();
@@ -420,16 +477,30 @@ Allocation Runtime::State::create_allocation(size_t bytes, void* host, bool devi
                 native[i] = detail::native_device_allocation(part_bytes);
                 info[i].pPrivateDriverData = native[i].data(); info[i].PrivateDriverDataSize = unsigned(native[i].size());
             }
+        } else if (driver_host) {
+            native.resize(1); native[0] = detail::native_host_allocation(bytes);
+            info[0].pPrivateDriverData = native[0].data(); info[0].PrivateDriverDataSize = unsigned(native[0].size());
         } else {
-            create.pStandardAllocation = &standard;
-            create.Flags.StandardAllocation = 1; create.Flags.ExistingSysMem = 1; create.Flags.CreateResource = 1;
-            create.Flags.CreateShared = 1; create.Flags.CrossAdapter = 1; create.Flags.NtSecuritySharing = 1;
+            native.resize(count);
+            for (UINT i = 0; i < count; ++i) {
+                const auto offset = size_t(i) * part_limit;
+                native[i] = detail::native_import_allocation(reinterpret_cast<uintptr_t>(a.data) + offset,
+                    std::min(part_limit, bytes - offset));
+                info[i].pSystemMem = static_cast<uint8_t*>(a.data) + offset;
+                info[i].pPrivateDriverData = native[i].data(); info[i].PrivateDriverDataSize = unsigned(native[i].size());
+            }
         }
         const auto created = D3DKMTCreateAllocation2(&create);
         a.handle = info[0].hAllocation; backing.resource = create.hResource;
         for (UINT i = 0; i < backing.parts.size(); ++i) backing.parts[i] = info[i].hAllocation;
         check(created, "create GPU allocation");
         require(a.handle != 0, "allocation returned no handle");
+        if (driver_host) {
+            D3DKMT_LOCK2 lock{}; lock.hDevice = s.device; lock.hAllocation = a.handle;
+            check(D3DKMTLock2(&lock), "map native Host allocation to CPU");
+            a.data = lock.pData; backing.cpu_locked = true;
+            require(a.data && !(reinterpret_cast<uintptr_t>(a.data) & 65535), "invalid native Host CPU mapping");
+        }
         D3DDDI_MAKERESIDENT resident{}; resident.hPagingQueue = s.paging;
         resident.NumAllocations = count; resident.AllocationList = count == 1 ? &a.handle : backing.parts.data();
         check(D3DKMTMakeResident(&resident), "make allocation resident");
@@ -442,6 +513,24 @@ Allocation Runtime::State::create_allocation(size_t bytes, void* host, bool devi
             if (!std::all_of(status.begin(), status.end(), [](auto value) {
                 return value == D3DKMT_ALLOCATIONRESIDENCYSTATUS_RESIDENTINGPUMEMORY;
             })) {
+                // Capture pressure before rollback; a failed diagnostic query must not hide the residency error.
+                D3DKMT_QUERYVIDEOMEMORYINFO budget{};
+                budget.hAdapter = s.adapter; budget.MemorySegmentGroup = D3DKMT_MEMORY_SEGMENT_GROUP_LOCAL;
+                const auto budget_status = D3DKMTQueryVideoMemoryInfo(&budget);
+                uint64_t global_free = UINT64_MAX;
+                try { global_free = s.global_available(); } catch (...) {} // Keep the residency error and rollback if diagnostics fail.
+                uint64_t tracked = 0;
+                for (const auto& own : s.allocations) if (own.device_local) tracked += own.bytes;
+                char message[512];
+                std::snprintf(message, sizeof(message),
+                    "device allocation is not resident in local GPU memory: bytes=%zu parts=%u local=%zu shared=%zu not_resident=%zu "
+                    "tracked_device_bytes=%llu local_capacity_bytes=%llu budget_bytes=%llu usage_bytes=%llu budget_status=0x%08lx global_free_bytes=%llu",
+                    bytes, count, size_t(std::count(status.begin(), status.end(), D3DKMT_ALLOCATIONRESIDENCYSTATUS_RESIDENTINGPUMEMORY)),
+                    size_t(std::count(status.begin(), status.end(), D3DKMT_ALLOCATIONRESIDENCYSTATUS_RESIDENTINSHAREDMEMORY)),
+                    size_t(std::count(status.begin(), status.end(), D3DKMT_ALLOCATIONRESIDENCYSTATUS_NOTRESIDENT)),
+                    static_cast<unsigned long long>(tracked), static_cast<unsigned long long>(s.local_bytes),
+                    static_cast<unsigned long long>(budget.Budget), static_cast<unsigned long long>(budget.CurrentUsage),
+                    static_cast<unsigned long>(budget_status), static_cast<unsigned long long>(global_free));
                 // Paging completed and no GPU VA exists yet; return all backing before a smaller retry.
                 // ponytail: uncertain driver/paging/teardown failures remain terminal.
                 D3DKMT_DESTROYALLOCATION2 destroy{}; destroy.hDevice = s.device;
@@ -451,7 +540,7 @@ Allocation Runtime::State::create_allocation(size_t bytes, void* host, bool devi
                 check(D3DKMTDestroyAllocation2(&destroy), "rollback nonlocal device allocation");
                 s.allocations.pop_back(); s.resources.pop_back();
                 residency_rolled_back = true;
-                throw std::runtime_error("device allocation is not resident in local GPU memory");
+                throw std::runtime_error(message);
             }
         }
         uint64_t reserved = 0;
@@ -464,9 +553,9 @@ Allocation Runtime::State::create_allocation(size_t bytes, void* host, bool devi
                     "invalid contiguous GPU VA reservation");
         }
         for (UINT i = 0; i < count; ++i) {
-            const auto offset = size_t(i) * detail::native_device_allocation_limit;
+            const auto offset = size_t(i) * part_limit;
             D3DDDI_MAPGPUVIRTUALADDRESS map{}; map.hPagingQueue = s.paging; map.hAllocation = info[i].hAllocation;
-            map.SizeInPages = (count == 1 ? bytes : std::min(detail::native_device_allocation_limit, bytes - offset)) / 4096;
+            map.SizeInPages = (count == 1 ? bytes : std::min(part_limit, bytes - offset)) / 4096;
             map.MinimumAddress = 65536; map.Protection.Write = 1;
             if (reserved) map.BaseAddress = reserved + offset;
             check(D3DKMTMapGpuVirtualAddress(&map), "map GPU virtual address");
@@ -505,8 +594,13 @@ void Runtime::release(Allocation& memory) {
         if (backing.resource) destroy.hResource = backing.resource;
         else if (backing.parts.empty()) { destroy.phAllocationList = &own.handle; destroy.AllocationCount = 1; }
         else { destroy.phAllocationList = backing.parts.data(); destroy.AllocationCount = UINT(backing.parts.size()); }
-        check(D3DKMTDestroyAllocation2(&destroy), "release GPU allocation"); own.handle = 0; backing = {};
-        if (own.data && !own.imported && !VirtualFree(own.data, 0, MEM_RELEASE))
+        if (backing.cpu_locked) {
+            D3DKMT_UNLOCK2 unlock{}; unlock.hDevice = s.device; unlock.hAllocation = own.handle;
+            check(D3DKMTUnlock2(&unlock), "unmap native Host CPU allocation"); backing.cpu_locked = false;
+        }
+        check(D3DKMTDestroyAllocation2(&destroy), "release GPU allocation"); own.handle = 0;
+        const bool driver_host = backing.driver_host; backing = {};
+        if (own.data && !own.imported && !driver_host && !VirtualFree(own.data, 0, MEM_RELEASE))
             throw std::system_error(GetLastError(), std::system_category(), "release backing pages");
         own.data = nullptr;
         s.allocations.erase(s.allocations.begin() + index); s.resources.erase(s.resources.begin() + index);
@@ -524,7 +618,7 @@ MemoryInfo Runtime::memory_info() {
     uint64_t own = 0;
     for (const auto& a : s.allocations) if (a.device_local) own += a.bytes;
     const auto available = info.CurrentUsage < ceiling ? ceiling - info.CurrentUsage : 0;
-    return {s.local_bytes, std::min(available, own < s.local_bytes ? s.local_bytes - own : 0), true, false};
+    return {s.local_bytes, std::min({available, own < s.local_bytes ? s.local_bytes - own : 0, s.global_available()}), true, true};
 }
 void Runtime::storage_access(const Allocation& a) {
     require(!state_->failed && storage_idle(a), "internal storage is still in GPU use");
@@ -568,7 +662,8 @@ void Runtime::close() {
     require(!s.recording.closed && !s.failed &&
             (!s.recording.commands.empty() || !s.recording.gates.empty()), "empty, closed or failed recording");
     try {
-        detail::emit(s.recording.commands, detail::barrier());
+        if(s.queue(s.recording.queue).blitter) detail::emit(s.recording.commands,blitter_flush());
+        else detail::emit(s.recording.commands, detail::barrier());
         detail::emit(s.recording.commands, detail::P::MI_BATCH_BUFFER_END::sInit());
         if (s.recording.commands.size() & 1) s.recording.commands.push_back(0);
         require(s.recording.commands.size() <= 1024 * 1024, "command list too large");
@@ -683,5 +778,16 @@ void Runtime::reset() {
     s.recording.gates.clear();
     s.recording.storage.clear();
     if (s.indirect_heap.allocation.use_count() == 1) s.indirect_heap = {};
+}
+
+Queue Runtime::create_copy_queue() {
+    auto& s=*state_;
+    require(!s.recording.closed && s.idle() && !s.failed,"Copy queue creation requires idle healthy queues");
+    s.queues.emplace_back();
+    try {
+        s.create_queue(s.queues.back(),2);
+        for(auto& storage:s.storage)storage.second.last_use.push_back(0);
+    } catch(...) {s.failed=true;throw;}
+    Queue queue;queue.owner_=s.identity;queue.index_=s.queues.size();return queue;
 }
 } // namespace orca::l0::dg2

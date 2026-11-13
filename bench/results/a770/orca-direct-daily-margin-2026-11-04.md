@@ -84,7 +84,7 @@ READY 时报告 1867 MiB 空闲；三次 Short 均为相同的 76 tokens、58/59
 ## 复现与独立核对
 
 [公开数据](../../../sycl/orca/direct-daily-margin-a770-windows-2026-11-04.json)及
-[161 个原始证据文件](../../../sycl/orca/direct-daily-margin-a770-windows-2026-11-04.json.gz)
+161 个原始证据文件 (`direct-daily-margin-a770-windows-2026-11-04.json.gz`, raw capture retained locally)
 包括完整输出、配置、模块与内核哈希、冻结源码、构建命令、失败阶段和续跑记录。
 归档 SHA256 为 `5b09439b612a7373d37654f99499715f68ff8d88884d16168a893c5f905e85f6`。
 模型、内核二进制和引擎 EXE 以哈希识别，需准备相同构建和本机路径。

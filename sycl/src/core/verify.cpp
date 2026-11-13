@@ -445,6 +445,13 @@ Verifier::~Verifier() try {
         Verifier* me = this;
         slot.compare_exchange_strong(me, nullptr);
     }
+    // Older callers may have inlined the former shared-default-queue initializers.
+    // A Verifier only owns the streams created by init().
+    if (cs_ || copy_) {
+        auto* borrowed = &dpct::get_in_order_queue();
+        if (cs_ == borrowed) cs_ = nullptr;
+        if (copy_ == borrowed) copy_ = nullptr;
+    }
     signal_all_l0_events();
     if (cs_) { cs_->wait(); (void) wait_verify_queue(cs_, l0_sync_, UINT64_MAX); }
     if (copy_) copy_->wait();
@@ -961,7 +968,11 @@ bool Verifier::record_window(int T, dpct::queue_ptr cs, std::string &err) {
         auto primitive = [](int t) { return t == 8 || t == 14 || t == 21 || t == 23; };
         const int d = w.shared_down->native_type;
         return primitive(w.shared_gate->native_type) && primitive(w.shared_up->native_type) &&
-               (d == 8 || d == 20 || d == 23);
+               (d == 8 || d == 20 || d == 23
+#ifdef STRATA_ORCA_DG2
+                || d == 42
+#endif
+               );
     };
 #endif
     // ---------------------------------------------------------------- pre(l, group): up to the ring

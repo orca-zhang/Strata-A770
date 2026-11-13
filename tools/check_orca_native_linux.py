@@ -36,6 +36,7 @@ def main():
     inputs = [p for prefix in prefixes for p in (root / prefix).rglob('*')
               if p.is_file() and p.suffix in ('.cpp', '.hpp', '.h', '.inl', '.inc', '.cl', '.cmake', '.txt', '.py')
               and '__pycache__' not in p.parts]
+    inputs.append(Path(__file__))
     hashes = {p.relative_to(root).as_posix(): bench.sha(p) for p in inputs}
     result = dict(complete=False, gpu_executed=False, linux_gpu_validated=False,
         frontend_requested=args.frontend, frontend_built=False, commands=[],
@@ -71,18 +72,22 @@ def main():
                     '-DSTRATA_GGML_DIR=' + str(ggml)])
             run('configure', ['cmake', '-S', root / ('sycl/orca' if args.frontend else 'orca-l0'),
                               '-B', build, *options])
-            targets = ['orca-l0-ring-check', 'orca-l0-drm-submit-check', 'orca-l0-drm-compute-check']
+            targets = ['orca-l0-ring-check', 'orca-l0-drm-submit-check', 'orca-l0-drm-compute-check',
+                       'orca-l0-blitter-check']
             run('build', ['cmake', '--build', build, '--target', *targets,
-                          *(['strata'] if args.frontend else []), '-j', '2'])
+                          *(['strata', 'strata-orca-ple-reader-check', 'strata-orca-hc-check'] if args.frontend else []), '-j', '2'])
             binary_dir = build / 'runtime' if args.frontend else build
             # Explicit CPU entry points: frontend CMake registers GPU tests even
             # when kernel compilation/GPU-check options are disabled.
             run('ring-cpu', [binary_dir / 'orca-l0-ring-check'])
             run('packets-cpu', [binary_dir / 'orca-l0-drm-submit-check', '--self-check'])
             run('encoder-cpu', [binary_dir / 'orca-l0-drm-compute-check', '--self-check'])
+            run('blitter-cpu', [binary_dir / 'orca-l0-blitter-check'])
             binaries = [binary_dir / name for name in targets]
             if args.frontend:
-                binaries.append(build / 'strata')
+                ple_check = build / 'strata-orca-ple-reader-check'
+                run('ple-reader-cpu', [ple_check, '--selftest', '--dir', out])
+                binaries.extend([build / 'strata', ple_check, build / 'strata-orca-hc-check'])
             for index, binary in enumerate(binaries):
                 label = 'dependencies-' + str(index)
                 run(label, ['ldd', binary])
@@ -91,10 +96,10 @@ def main():
                 if any(name in libraries for name in removed):
                     raise RuntimeError('Native executable links a removed runtime: ' + str(binary))
             assert all(bench.sha(root / p) == h for p, h in hashes.items()), 'Source changed during check'
-            result.update(complete=True, cpu_checks=3, frontend_built=args.frontend,
+            result.update(complete=True, cpu_checks=5 if args.frontend else 4, frontend_built=args.frontend,
                 executable_sha256={str(p.relative_to(out)): bench.sha(p) for p in binaries})
             save()
-            print('PASS Linux native build, 3 CPU checks and dependency audit; no GPU execution', flush=True)
+            print(f'PASS Linux native build, {result["cpu_checks"]} CPU checks and dependency audit; no GPU execution', flush=True)
     except BaseException as error:
         result['error'] = repr(error)
         save()

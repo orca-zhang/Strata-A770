@@ -1,0 +1,147 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="2160" viewBox="0 0 1800 2160" role="img" aria-labelledby="title desc">
+  <title id="title">Orca 并行推理流水线：请求、单层依赖与搬运计算时序</title>
+  <desc id="desc">展示 CPU 准备、BCS 搬运、EU/XMX 计算、共享与路由专家、MTP 验证和状态提交。BCS 与 M16 已接入源码，Direct 仍实验性，Linux GPU 待验证；逻辑队列不代表多个物理引擎，时间块不是实测耗时。</desc>
+  <defs>
+    <marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0 0L9 4.5L0 9Z" fill="#617287"/></marker>
+    <marker id="blueArrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0 0L9 4.5L0 9Z" fill="#1876bd"/></marker>
+    <marker id="amberArrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0 0L9 4.5L0 9Z" fill="#a76212"/></marker>
+    <style>
+      text{font-family:'Segoe UI','Microsoft YaHei',sans-serif;fill:#172b45;font-size:19px}
+      .title{font-size:36px;font-weight:700}.section{font-size:25px;font-weight:700}.heading{font-size:21px;font-weight:600}
+      .small{font-size:17px}.muted{fill:#53667c}.label{font-size:18px;font-weight:600}
+      .card{fill:#fff;stroke:#d7e0ea;stroke-width:2}.box{fill:#f3f7fb;stroke:#91a7be;stroke-width:2}
+      .cpu{fill:#ecf8f2;stroke:#459273;stroke-width:2}.copy{fill:#eaf5fe;stroke:#1876bd;stroke-width:2}
+      .compute{fill:#f2eeff;stroke:#8060bc;stroke-width:2}.conditional{fill:#fff8eb;stroke:#bc812b;stroke-width:2;stroke-dasharray:7 5}
+      .edge{fill:none;stroke:#617287;stroke-width:2.3;marker-end:url(#arrow)}
+      .copyEdge{fill:none;stroke:#1876bd;stroke-width:2.4;marker-end:url(#blueArrow)}
+      .conditionalEdge{fill:none;stroke:#a76212;stroke-width:2.2;stroke-dasharray:7 5;marker-end:url(#amberArrow)}
+      .divider{stroke:#dbe4ee;stroke-width:1}.center{text-anchor:middle}
+    </style>
+  </defs>
+  <rect width="1800" height="2160" fill="#f7f9fc"/>
+  <text x="58" y="65" class="title">Orca 并行推理流水线</text>
+  <text x="60" y="100" class="muted">Strata Intel 路径 · 2026-11-05 · BCS／M16 已接入源码；Direct 仍实验性，Linux GPU 待验证</text>
+  <rect x="60" y="122" width="24" height="18" rx="4" class="box"/><text x="96" y="138" class="small">现有依赖结构</text>
+  <rect x="270" y="122" width="24" height="18" rx="4" class="copy"/><text x="306" y="138" class="small">BCS 显式启用</text>
+  <rect x="485" y="122" width="24" height="18" rx="4" class="conditional"/><text x="522" y="138" class="small">条件性重叠／分支</text>
+  <text x="1738" y="138" class="small muted" text-anchor="end">定性示意：图形长度不代表耗时</text>
+
+  <rect x="48" y="164" width="1704" height="302" rx="20" class="card"/>
+  <text x="76" y="208" class="section">01　整次请求：准备 → Prefill → MTP 验证 → 提交</text>
+  <rect x="78" y="238" width="300" height="88" rx="12" class="box"/>
+  <text x="228" y="272" class="heading center">初始化与准备</text><text x="228" y="301" class="small center">设备／ISA／arena／录图 · 计时外</text>
+  <path d="M378 282H432" class="edge"/>
+  <rect x="438" y="238" width="330" height="88" rx="12" class="box"/>
+  <text x="603" y="272" class="heading center">分块／批量 Prefill</text><text x="603" y="301" class="small center">逐层更新 KV／SSM → head</text>
+  <path d="M768 282H837" class="edge"/>
+  <text x="802" y="227" class="small center muted">首 token</text>
+  <rect x="843" y="238" width="370" height="88" rx="12" class="compute"/>
+  <text x="1028" y="272" class="heading center">MTP 草稿 → 主模型批量验证</text><text x="1028" y="301" class="small center">草稿按依赖生成，验证候选窗口</text>
+  <path d="M1213 282H1281" class="edge"/>
+  <rect x="1287" y="238" width="432" height="88" rx="12" class="box"/>
+  <text x="1503" y="272" class="heading center">接受／回退 → 提交 → 输出</text><text x="1503" y="301" class="small center">只保留已接受的 KV／SSM／token 状态</text>
+  <path d="M1503 326V365H1028V332" class="edge"/>
+  <rect x="78" y="349" width="752" height="47" rx="9" class="cpu"/>
+  <text x="454" y="379" class="small center">CPU 自适应缓存规划／换入与 commit／MTP 重叠；使用前等待</text>
+  <text x="1266" y="391" class="small center muted">提交完成后进入下一个窗口</text>
+  <text x="78" y="422" class="small">MTP 草稿与主模型验证有真实数据依赖，不能假定完全并发；跨层、自回归 token 也不能任意并行。</text>
+  <text x="78" y="449" class="small muted">净 decode 排除初始化／准备／Prefill；TTFT 单独统计。准备工作能否提前，取决于输入与资源何时可知。</text>
+
+  <rect x="48" y="488" width="1704" height="752" rx="20" class="card"/>
+  <text x="76" y="533" class="section">02　单层依赖：可重叠的分支，与必须保留的汇合点</text>
+  <rect x="78" y="564" width="315" height="82" rx="12" class="box"/>
+  <text x="235" y="598" class="heading center">当前层输入／归一化</text><text x="235" y="626" class="small center">残差与必要的 HC 状态</text>
+  <path d="M393 605H449" class="edge"/>
+  <rect x="455" y="564" width="570" height="82" rx="12" class="compute"/>
+  <text x="740" y="597" class="heading center">GDN 或 QSA：按当前层类型选择</text><text x="740" y="626" class="small center">独立投影可放宽顺序；随后更新对应递归／KV 状态</text>
+  <path d="M1025 605H1085" class="edge"/>
+  <rect x="1091" y="564" width="628" height="82" rx="12" class="box"/>
+  <text x="1405" y="598" class="heading center">输出投影／残差 → FFN 输入归一化</text><text x="1405" y="626" class="small center">下面的共享分支和路由分支读取相同 FFN 输入</text>
+  <path d="M1405 646V676H290V712" class="edge"/>
+  <path d="M820 676V712" class="edge"/>
+
+  <rect x="78" y="718" width="424" height="82" rx="12" class="conditional"/>
+  <text x="290" y="751" class="heading center">共享专家：Gate／Up／标量 gate</text><text x="290" y="780" class="small center">数学上独立；实现重叠受格式与窗口限制</text>
+  <path d="M290 800V842" class="edge"/>
+  <rect x="78" y="848" width="424" height="66" rx="12" class="compute"/>
+  <text x="290" y="888" class="heading center">SwiGLU／量化</text>
+  <path d="M290 914V951" class="edge"/>
+  <rect x="78" y="957" width="424" height="66" rx="12" class="compute"/>
+  <text x="290" y="997" class="heading center">Down → gate 缩放</text>
+
+  <rect x="566" y="718" width="560" height="82" rx="12" class="compute"/>
+  <text x="846" y="751" class="heading center">Router／Top-K → 路由与设备计划</text><text x="846" y="780" class="small center">实际路由专家必须等待该计划</text>
+  <path d="M705 800V842" class="edge"/><path d="M990 800V842" class="edge"/>
+  <rect x="566" y="848" width="270" height="66" rx="12" class="box"/>
+  <text x="701" y="876" class="heading center">VRAM 命中</text><text x="701" y="901" class="small center">已有可用权重</text>
+  <rect x="856" y="848" width="270" height="66" rx="12" class="conditional"/>
+  <text x="991" y="876" class="heading center">GPU 可见主机镜像</text><text x="991" y="901" class="small center">可直接读；不必显式 H2D</text>
+  <path d="M701 914V951" class="edge"/><path d="M991 914V951" class="edge"/>
+  <rect x="566" y="957" width="560" height="86" rx="12" class="compute"/>
+  <text x="846" y="989" class="heading center">分组专家：GU → 激活／量化 → Down</text><text x="846" y="1017" class="small center">按可就绪行聚合；Prefill 可选择 FP16 双专家链</text>
+
+  <rect x="1214" y="718" width="505" height="82" rx="12" class="cpu"/>
+  <text x="1466" y="751" class="heading center">磁盘／主机权重 → CPU 准备</text><text x="1466" y="780" class="small center">页锁定 staging、就绪标记；仅预取已知工作</text>
+  <path d="M1126 759H1208" class="conditionalEdge"/><text x="1170" y="706" class="small center muted">按需计划</text>
+  <path d="M1466 800V842" class="copyEdge"/>
+  <rect x="1214" y="848" width="505" height="66" rx="12" class="copy"/>
+  <text x="1466" y="876" class="heading center">BCS 搬运／填充 · 显式开启</text><text x="1466" y="901" class="small center">Prefill／验证／专家补槽三种 copy role</text>
+  <path d="M1466 914V951" class="copyEdge"/>
+  <rect x="1214" y="957" width="505" height="86" rx="12" class="copy"/>
+  <text x="1466" y="989" class="heading center">传输完成事件 → 权重可读</text><text x="1466" y="1017" class="small center">仅需要显式搬运的分支；也可为未来补槽</text>
+  <path d="M1214 1000H1132" class="copyEdge"/>
+
+  <path d="M290 1023V1115H560" class="edge"/><path d="M846 1043V1078" class="edge"/>
+  <rect x="566" y="1084" width="560" height="80" rx="12" class="box"/>
+  <text x="846" y="1116" class="heading center">汇合：路由加权合并＋残差／HC</text><text x="846" y="1145" class="small center">两支完成，且输出与 scratch 生命周期正确</text>
+  <path d="M1126 1124H1208" class="edge"/>
+  <rect x="1214" y="1084" width="505" height="80" rx="12" class="box"/>
+  <text x="1466" y="1116" class="heading center">下一层 → 最终 RMSNorm／head</text><text x="1466" y="1145" class="small center">48 层按真实依赖推进，随后采样／验证结果</text>
+  <text x="78" y="1198" class="small">并发边界：共享／路由只在已审计条件下交错；VRAM 与流式专家共用 scratch 时，也不能仅靠多开队列并发。</text>
+  <text x="78" y="1224" class="small muted">XMX 分块、寄存器复用、SLM 暂存位于计算内核内部；SLM 本身不是另一条独立复制引擎。</text>
+
+  <rect x="48" y="1262" width="1704" height="428" rx="20" class="card"/>
+  <text x="76" y="1307" class="section">03　稳态流水的安排方式：准备 N+2 ／搬运 N+1 ／计算 N</text>
+  <text x="78" y="1338" class="small muted">主线程等 GPU 时，工作线程继续准备已知批次；N 不表示未来 token 或未知路由。</text>
+  <text x="420" y="1372" class="small center muted">槽 0</text><text x="700" y="1372" class="small center muted">槽 1</text><text x="980" y="1372" class="small center muted">槽 2</text><text x="1260" y="1372" class="small center muted">槽 3</text><text x="1540" y="1372" class="small center muted">槽 4 →</text>
+  <path d="M550 1384V1612M830 1384V1612M1110 1384V1612M1390 1384V1612M1670 1384V1612" class="divider"/>
+  <text x="78" y="1425" class="heading">CPU／I/O 工作线程</text>
+  <rect x="300" y="1396" width="240" height="52" rx="9" class="cpu"/><text x="420" y="1428" class="center">准备 N</text>
+  <rect x="580" y="1396" width="240" height="52" rx="9" class="cpu"/><text x="700" y="1428" class="center">准备 N+1</text>
+  <rect x="860" y="1396" width="240" height="52" rx="9" class="cpu"/><text x="980" y="1428" class="center">准备 N+2</text>
+  <rect x="1140" y="1396" width="240" height="52" rx="9" class="cpu"/><text x="1260" y="1428" class="center">准备 N+3</text>
+  <text x="78" y="1498" class="heading">BCS 复制队列</text><text x="78" y="1523" class="small muted">多个逻辑角色共享节点</text>
+  <rect x="580" y="1474" width="240" height="52" rx="9" class="copy"/><text x="700" y="1506" class="center">搬运 N</text>
+  <rect x="860" y="1474" width="240" height="52" rx="9" class="copy"/><text x="980" y="1506" class="center">搬运 N+1</text>
+  <rect x="1140" y="1474" width="240" height="52" rx="9" class="copy"/><text x="1260" y="1506" class="center">搬运 N+2</text>
+  <rect x="1420" y="1474" width="240" height="52" rx="9" class="copy"/><text x="1540" y="1506" class="center">搬运 N+3</text>
+  <text x="78" y="1580" class="heading">EU／XMX 计算队列</text>
+  <rect x="860" y="1552" width="240" height="52" rx="9" class="compute"/><text x="980" y="1584" class="center">计算 N</text>
+  <rect x="1140" y="1552" width="240" height="52" rx="9" class="compute"/><text x="1260" y="1584" class="center">计算 N+1</text>
+  <rect x="1420" y="1552" width="240" height="52" rx="9" class="compute"/><text x="1540" y="1584" class="center">计算 N+2</text>
+  <path d="M540 1440L575 1475M820 1518L855 1553" class="copyEdge"/>
+  <path d="M1100 1592H1120V1538H1140V1532" class="conditionalEdge"/>
+  <text x="78" y="1640" class="small">先启动准备，在消费点等对应事件；槽位等最后读者释放；尾部就绪即派发，不为凑批等待未知数据。</text>
+  <text x="78" y="1668" class="small muted">均匀块仅用于说明依赖，不是实测时间轴，也不证明 GPU 引擎持续同时活跃。</text>
+
+  <rect x="48" y="1712" width="1704" height="350" rx="20" class="card"/>
+  <text x="76" y="1757" class="section">04　并行的边界：依赖、硬件与内存所有权</text>
+  <rect x="78" y="1781" width="515" height="242" rx="12" class="box"/>
+  <text x="100" y="1818" class="heading">必须等待的关系</text>
+  <text x="100" y="1855">Router → 对应的路由专家</text><text x="100" y="1888">GU → SwiGLU／量化 → Down</text>
+  <text x="100" y="1921">分支汇合 → 下一层</text><text x="100" y="1954">验证／提交 → 后续自回归状态</text>
+  <text x="100" y="1992" class="small muted">无依赖的投影可交错；整条专家链不能忽略依赖。</text>
+  <rect x="613" y="1781" width="560" height="242" rx="12" class="copy"/>
+  <text x="635" y="1818" class="heading">当前验证到哪一步</text>
+  <text x="635" y="1855">两条计算＋两条 BCS 逻辑队列校验通过</text><text x="635" y="1888">16 个双路输出；51 次整模型请求匹配</text>
+  <text x="635" y="1921">Windows：compute node5 ＋ Copy node2</text><text x="635" y="1954">多队列共享节点、显存和 PCIe 带宽</text>
+  <text x="635" y="1992" class="small muted">GuC 是调度固件，不是第三个计算／复制引擎。</text>
+  <rect x="1193" y="1781" width="526" height="242" rx="12" class="conditional"/>
+  <text x="1215" y="1818" class="heading">正确的缓冲区复用</text>
+  <text x="1215" y="1855">Host staging：等 DMA 读完再覆盖</text><text x="1215" y="1888">Device 槽：等最后计算读完再搬新数据</text>
+  <text x="1215" y="1921">并发分支：scratch 与输出必须不冲突</text><text x="1215" y="1954">图重放：正确重置事件／gate 后再提交</text>
+  <text x="1215" y="1992" class="small muted">仅增加队列数量不能替代这些生命周期约束。</text>
+  <text x="78" y="2047" class="small muted">源码重建已通过双专家 GPU 检查；119 次请求与性能来自冻结的隔离组合版，见各自报告。</text>
+  <text x="60" y="2100" class="small muted">依据：sycl/src/core/verify.cpp · sycl/src/prefill/prefill.cpp · sycl/src/program/generate.cpp · sycl/orca_queue.hpp · 对应报告</text>
+  <text x="60" y="2131" class="small muted">这是一张工程依赖与调度示意图；没有用示意位置或旧执行包络交集代替本轮硬件并行度测量。</text>
+</svg>

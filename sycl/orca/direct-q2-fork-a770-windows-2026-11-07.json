@@ -1,0 +1,207 @@
+{
+  "complete": true,
+  "date": "2026-11-07",
+  "hardware": "Windows10,Arc A77016GB,driver32.0.101.9034,XeonE5-2696v4,oneAPI2025.3.2",
+  "model_requests": 120,
+  "retained_requests": 40,
+  "output_tokens_per_request": 70,
+  "prompt_tokens": 23,
+  "full_model_protocol_exact": true,
+  "safety_full_buffer_checks": 2304,
+  "safety_tail_epochs": 2752,
+  "safety_T": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "safety_changing_plans_per_case": 6,
+  "scope": "Extend only Q2_0 shared-down fork eligibility;frozen native math,exact checks,opposed Short orders.",
+  "order": [
+    "l0",
+    "base",
+    "q2fork",
+    "base",
+    "q2fork",
+    "base",
+    "q2fork",
+    "l0"
+  ],
+  "selection": "15Short/fresh process,discard10/retain5;fixed eight arms;no rescue repeats.",
+  "math": "Common frozen HC128 ZEBIN/Host kernel pack;only two Host eligibility predicates admit Q2_0 shared-down into the existing <=4row full fork.Baseline recompiles the same two Host TUs with unchanged predicates. All stage dependencies and scratch addresses remain unchanged.",
+  "arms": [
+    {
+      "index": 0,
+      "mode": "l0",
+      "summary": {
+        "decode_tok_s": 50.240436374075934,
+        "ttft_ms": 773.5628000000361,
+        "request_ms": 2124.400300000161
+      },
+      "ready_ms": 10550.457999999708
+    },
+    {
+      "index": 1,
+      "mode": "base",
+      "summary": {
+        "decode_tok_s": 48.831531217300316,
+        "ttft_ms": 776.6848000001119,
+        "request_ms": 2168.4746000000814
+      },
+      "ready_ms": 15440.935000000536
+    },
+    {
+      "index": 2,
+      "mode": "q2fork",
+      "summary": {
+        "decode_tok_s": 49.50845179998585,
+        "ttft_ms": 772.615500000029,
+        "request_ms": 2144.0904999999475
+      },
+      "ready_ms": 15504.036199999973
+    },
+    {
+      "index": 3,
+      "mode": "base",
+      "summary": {
+        "decode_tok_s": 48.48988639512331,
+        "ttft_ms": 772.9185999996844,
+        "request_ms": 2175.431700000445
+      },
+      "ready_ms": 14578.780699999697
+    },
+    {
+      "index": 4,
+      "mode": "q2fork",
+      "summary": {
+        "decode_tok_s": 49.29230335891839,
+        "ttft_ms": 771.7218999996476,
+        "request_ms": 2158.728599999449
+      },
+      "ready_ms": 14309.166600000026
+    },
+    {
+      "index": 5,
+      "mode": "base",
+      "summary": {
+        "decode_tok_s": 48.81790919868889,
+        "ttft_ms": 778.3982999999353,
+        "request_ms": 2162.0137999998406
+      },
+      "ready_ms": 14883.788299999651
+    },
+    {
+      "index": 6,
+      "mode": "q2fork",
+      "summary": {
+        "decode_tok_s": 49.17456972251493,
+        "ttft_ms": 778.3054999999877,
+        "request_ms": 2158.595100000639
+      },
+      "ready_ms": 14708.425899999384
+    },
+    {
+      "index": 7,
+      "mode": "l0",
+      "summary": {
+        "decode_tok_s": 50.139674808394815,
+        "ttft_ms": 774.6681999997236,
+        "request_ms": 2128.942000000279
+      },
+      "ready_ms": 10406.438100000742
+    }
+  ],
+  "comparison": [
+    {
+      "order": [
+        "base",
+        "q2fork",
+        "base"
+      ],
+      "metrics": {
+        "decode_tok_s": {
+          "candidate": 49.50845179998585,
+          "base": 48.660408971018825,
+          "candidate_change_pct": 1.7427778493849022,
+          "control_drift_pct": -0.6996397894153517
+        },
+        "ttft_ms": {
+          "candidate": 772.615500000029,
+          "base": 774.7994116267263,
+          "candidate_change_pct": -0.28186800272758106,
+          "control_drift_pct": -0.4849071335536581
+        },
+        "request_ms": {
+          "candidate": 2144.0904999999475,
+          "base": 2171.950364415808,
+          "candidate_change_pct": -1.2827118368956891,
+          "control_drift_pct": 0.32082921332641234
+        }
+      }
+    },
+    {
+      "order": [
+        "q2fork",
+        "base",
+        "q2fork"
+      ],
+      "metrics": {
+        "decode_tok_s": {
+          "candidate": 49.23340134813447,
+          "base": 48.81790919868889,
+          "candidate_change_pct": 0.8511059901286089,
+          "control_drift_pct": -0.2388479100807861
+        },
+        "ttft_ms": {
+          "candidate": 775.0067091581635,
+          "base": 778.3982999999353,
+          "candidate_change_pct": -0.43571406075424424,
+          "control_drift_pct": 0.8531052443040865
+        },
+        "request_ms": {
+          "candidate": 2158.6618489680245,
+          "base": 2162.0137999998406,
+          "candidate_change_pct": -0.1550383735671068,
+          "control_drift_pct": -0.006184195586711461
+        }
+      }
+    }
+  ],
+  "l0_reference": {
+    "decode_tok_s": 50.19003030511157,
+    "ttft_ms": 774.1153026925473,
+    "request_ms": 2126.669937598107
+  },
+  "l0_drift_pct": {
+    "decode_tok_s": -0.20055869923357728,
+    "ttft_ms": 0.14289725406746445,
+    "request_ms": 0.21378739214628073
+  },
+  "gates": {
+    "workload_exact": true,
+    "decode_positive_both_orders": true,
+    "controls_within_3pct": true,
+    "ttft_request_regression_within_3pct": true,
+    "outer_l0_within_3pct": true,
+    "decode_gain_exceeds_control_drift_both_orders": true
+  },
+  "adoption_evidence_passes": true,
+  "production_changed": false,
+  "linux_gpu_tested": false,
+  "static_audit": "Q2_0 native_mmvq uses exactly one launch for every accepted T1..4 and caller-provided input/weight/output pointers;no extra global scratch/allocation. Existing matching-stage joins protect shared Q8 reuse before SwiGLU and down;shared and routed down write disjoint outputs. Two eligibility predicates are the only Host source deltas;no numerical kernels or scratch layout changed.",
+  "safety_scope": "Real layer6 IQ4_XS gate/up and Q2_0 down plus BF16 scalar weights;two routed formats22/42,T1..8,ready/not-ready,six changing plans including no active group,three schedule alternatives and two replays.Full output/scratch/guard/input bits match the existing serial kernel chain.Unsupported phases still reject before enqueueing.This is schedule equivalence,not an independent accuracy/PPL oracle.",
+  "limitations": "Only Short matched real-model requests;no new long-context,TTFT initialization claim,PPL or Linux GPU result.L0 safety probe is tested,but its Q2_0 Verifier fork performance is not measured.One frozen same-HC128 policy,5771 actualslots,MTP4/spec-min-p0.5;not current spec6/calibrated production defaults.Control drift is not a confidence interval.Historical Direct nonfinite/residency issues remain open.",
+  "setup_correction": "Initial waiting build process was stopped before creating any build/GPU output: frozen artifact manifest does not include generated cpp hashes. The corrected builder verifies generated text by re-running the pinned frozen prepare transform over pinned original sources,then records actual compile bytes. Initial script retained;no failed/slow model sample removed or repeated.",
+  "source_sha256": {
+    "build-orca-q2-fork-20261107\\report.py": "9ce2a86125d238660510104863b10e5c49c73dc194b3de4498ac1627530ba742",
+    "build-orca-q2-fork-20261107\\experiment.py": "5fd52a92e5243d9eafea6f6e99123e2816ba97a0cc31d3bec9daada49b8a9c68",
+    "build-orca-router-serial-20261107\\report.py": "ddceb81b7c4103bdb48b6b3de7627e110fc5c394de56a4ccfc6b2dfc05f0724a",
+    "build-orca-q2-fork-20261107\\prepared-r1.json": "c83c788e3d625e6618f7dd1df7bd297025ee9a55b57e8f488ba07414ff52bc89",
+    "build-orca-q2-fork-20261107\\run-r1\\results.json": "de50c01407c6c2f897e2298aa130bbee7208f0fbf2994fadcbbe4bcee6cfb7f5",
+    "build-orca-q2-fork-20261107\\checks-r1\\results.json": "d1a2f45efc4b318631ba73d737c3b7fd2fbe3dabfc6006ab6db3a542707690dd"
+  }
+}

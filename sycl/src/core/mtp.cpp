@@ -48,12 +48,18 @@ namespace {
 constexpr float EPS = 1e-6f;
 constexpr int GGML_Q8_0 = 8;
 // ponytail: one expert format per engine process; every session uses the same runtime directory.
-const bool g_mtp_q8_experts = [] {
+const int g_mtp_expert_type = [] {
+    if (const char* v = std::getenv("STRATA_MTP_EXPERTS")) {
+        if (std::strcmp(v, "q2_0") == 0) return 0;
+        if (std::strcmp(v, "q5_0") == 0) return 6;
+        if (std::strcmp(v, "q8_0") == 0) return 8;
+        return -1;
+    }
     const char* v = std::getenv("STRATA_MTP_Q8_EXPERTS");
-    return v && v[0] == '1';
+    return v && v[0] == '1' ? 8 : 0;
 }();
 uint64_t mtp_expert_bytes(const ModelGeometry& g) {
-    return g_mtp_q8_experts ? strata::kernels::native_expert_layout(8, 8, g.n_embd, g.n_ff).bytes
+    return g_mtp_expert_type ? strata::kernels::native_expert_layout(g_mtp_expert_type, g_mtp_expert_type, g.n_embd, g.n_ff).bytes
                             : strata::kernels::cpu::BLOB;
 }
 using Clock = std::chrono::steady_clock;
@@ -67,6 +73,18 @@ const bool g_accepted_only = [] {
 const bool g_qsa_q8_tail = [] {
     const char* v = std::getenv("STRATA_QSA_Q8_TAIL");
     return v && v[0] == '1';
+}();
+const bool g_mtp_prestage = [] {
+    if (const char* v = std::getenv("STRATA_MTP_PRESTAGE")) {
+        if (!std::strcmp(v, "1")) return true;
+        if (!std::strcmp(v, "0")) return false;
+        throw std::invalid_argument("STRATA_MTP_PRESTAGE must be 0 or 1");
+    }
+#if defined(STRATA_ORCA_NATIVE) && !defined(STRATA_ORCA_DG2)
+    return true;
+#else
+    return false;
+#endif
 }();
 const bool g_chain_submit = [] {
     const char* v = std::getenv("STRATA_MTP_CHAIN_SUBMIT");
@@ -190,6 +208,7 @@ bool MtpDrafter::load(const std::string &rt_dir, const ModelGeometry &g,
     ss_ = &ss;
     max_t_ = max_t;
     rt_dir_ = rt_dir;
+    if (g_mtp_expert_type < 0) { err = "mtp: STRATA_MTP_EXPERTS must be q2_0, q5_0 or q8_0"; return false; }
     if (max_t < 1 || max_t > strata::kernels::kVerifyMaxT) { err = "mtp: max_t out of range"; return false; }
     if (shared) {
         if (shared == this || shared->device_ != device_ || shared->g_ != &g ||
@@ -269,11 +288,13 @@ bool MtpDrafter::load(const std::string &rt_dir, const ModelGeometry &g,
         const uint64_t bytes = (uint64_t) g.n_expert * mtp_expert_bytes(g);
         // Loader fix (0.1.15+loaderfix.2): each 64 MiB read below reached the disk as ~16k 4095-byte reads under
         // MSVC's `basic_filebuf::xsgetn`, which is what made 675 MiB of drafter experts take minutes.
-        if (g_mtp_q8_experts && !strata::kernels::native_expert_supported(8, 8, g.n_embd, g.n_ff)) {
-            err = "mtp: native Q8_0 experts unsupported for this geometry"; return false;
+        if (g_mtp_expert_type && !strata::kernels::native_expert_supported(g_mtp_expert_type, g_mtp_expert_type, g.n_embd, g.n_ff)) {
+            err = "mtp: selected native experts unsupported for this geometry"; return false;
         }
-        FILE* f = std::fopen((rt_dir + (g_mtp_q8_experts ? "/experts.q8_0.bin" : "/experts.bin")).c_str(), "rb");
-        if (f == nullptr) { err = "mtp: cannot open experts.bin"; return false; }
+        const std::string expert_path = rt_dir + (g_mtp_expert_type == 6 ? "/experts.q5_0.bin" :
+                                                 g_mtp_expert_type == 8 ? "/experts.q8_0.bin" : "/experts.bin");
+        FILE* f = std::fopen(expert_path.c_str(), "rb");
+        if (f == nullptr) { err = "mtp: cannot open " + expert_path; return false; }
         struct Closer {
             FILE* f;
             ~Closer() { if (f != nullptr) std::fclose(f); }
@@ -378,7 +399,7 @@ bool MtpDrafter::load(const std::string &rt_dir, const ModelGeometry &g,
         grp_ptr_ = b.take<unsigned long long>(T * K); grp_start_ = b.take<int32_t>(T * K + 1);
         grp_counts_ = b.take<int32_t>(4);
         hit_xq_ = b.take<uint8_t>(T * (N / 32) * 34); hit_xs_ = b.take<float>(T * (N / 32));
-        hit_scratch_ = b.take<uint8_t>(g_mtp_q8_experts
+        hit_scratch_ = b.take<uint8_t>(g_mtp_expert_type
             ? strata::kernels::native_expert_scratch_bytes((int64_t) (T * K), g.n_ff)
             : strata::kernels::moe_hit_grouped_scratch_bytes((int64_t) (T * K), g.n_embd, g.n_ff));
         sh_scratch_ = (float*) b.take<uint8_t>(strata::kernels::shared_expert_scratch_bytes(g.n_ff));
@@ -778,9 +799,9 @@ bool MtpDrafter::record_forward(int T, int step_row0, dpct::queue_ptr cs,
         }
         moe_group_resident(ids_, (int) (T * K), (int) K, experts_, (int64_t) mtp_expert_bytes(g), grp_ptr_,
                            grp_start_, grp_counts_, hit_dst_, hit_slot_, cs);
-        if (g_mtp_q8_experts) {
+        if (g_mtp_expert_type) {
             native_quantize_q8_1(mixed_, xq_, (int) N, T, cs);
-            native_expert_grouped(native_expert_layout(8, 8, N, g.n_ff), grp_ptr_, grp_start_, grp_counts_,
+            native_expert_grouped(native_expert_layout(g_mtp_expert_type, g_mtp_expert_type, N, g.n_ff), grp_ptr_, grp_start_, grp_counts_,
                                   hit_dst_, hit_slot_, (int64_t) T * K, (int64_t) T * K, xq_, hit_scratch_, parts_, cs);
         } else {
             quantize_q8_0_scaled(mixed_, hit_xq_, hit_xs_, (int64_t) T * N, cs);
@@ -1245,12 +1266,16 @@ bool MtpDrafter::draft(int T, const int32_t* tokens, int64_t p, int a, int32_t* 
     }
     put(2 * max_t_ - 1, coupled_draft_cell(p, a, 0));   // p + a: draft 0's cell
     const int max_steps = std::min(max_t_ - 1, max_drafts_);
+    // Positions depend on p/a, not future tokens. round reads 2*T mapped rows:
+    // publish every slot before submission, never while that graph is reading.
+    if (g_mtp_prestage)
+        for (int j = 1; j < max_steps; ++j) put(max_t_ + j - 1, coupled_draft_cell(p, a, j));
     const bool chain_submit = g_chain_submit && !top2_on && min_p <= 0.0f && cumulative_min_p <= 0.0f;
     if (chain_submit) {
         // All mapped metadata is ready before the first graph can read it.
         for (int j = 1; j < max_steps; ++j) {
             if (!capture_step(j, cp, err)) return false;
-            put(max_t_ + j - 1, coupled_draft_cell(p, a, j));
+            if (!g_mtp_prestage) put(max_t_ + j - 1, coupled_draft_cell(p, a, j));
         }
     }
     h_row_[0] = a;
@@ -1305,8 +1330,10 @@ bool MtpDrafter::draft(int T, const int32_t* tokens, int64_t p, int a, int32_t* 
         if (cumulative_min_p > 0.0f &&
             strata::spec::mtp_confidence_window(j + 1, h_prob_, 0.0f, cumulative_min_p) != j + 1) break;
         if (!capture_step(j, cp, err)) return false;
-        put(max_t_ + j - 1, coupled_draft_cell(p, a, j));   // p + a + j; coupled: drawn at counter cell + 1
-        std::atomic_thread_fence(std::memory_order_seq_cst);
+        if (!g_mtp_prestage) {
+            put(max_t_ + j - 1, coupled_draft_cell(p, a, j));   // p + a + j; coupled: drawn at counter cell + 1
+            std::atomic_thread_fence(std::memory_order_seq_cst);
+        }
         if ((g_verify_eager
                  ? !record_step(j, cp, err)   // SYCL port: no graph backend, replay the body
                  : DPCT_CHECK_ERROR((cs_)->ext_oneapi_graph(*(cp ? step_exec_c_[j] : step_exec_[j]))) != 0) ||

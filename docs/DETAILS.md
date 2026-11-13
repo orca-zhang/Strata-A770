@@ -225,6 +225,12 @@ RTX 5070, against ~3 tokens/s before these changes.
 - Draft layer: `--lookup-chain-min M` (the shortest context match `--lookup-chain` extends, default 3),
   `--mtp-hnorm stream` (one norm per stream, as llama.cpp's MTP graph) and `--mtp-draft-vocab FILE` (a token subset
   of your own instead of `<mtp>/draft_vocab.bin`).
+  SYCL/Orca builds also accept `STRATA_MTP_EXPERTS=q5_0` or `q8_0` with the matching runtime files from
+  `tools/mtp_pack.py --experts q5_0|q8_0` and `tools/mtp_rt.py`. Q5 experts use 1,650 MiB, Q8 2,550 MiB,
+  versus 675 MiB for the default Q2 experts. Explicit `q2_0` selects the default; the older
+  `STRATA_MTP_Q8_EXPERTS=1` still works when `STRATA_MTP_EXPERTS` is unset. These settings affect the draft
+  predictions, not the target weights or verification rule; measure acceptance and speed with the same cache size.
+  [A770 Q5 measurements and checks](../bench/results/a770/mtp-q5-2026-11-05.md).
 - Elsewhere: HIP `STRATA_DENSE_MMQ=1` and `STRATA_HIP_ADAPT_KERNEL_COPY=1` in [AMD_HIP.md](AMD_HIP.md#model-and-serving-configuration);
   `STRATA_KEEP_EMPTY_TURNS=1` and `STRATA_TOPK_STREAM=0` in [TROUBLESHOOTING.md](TROUBLESHOOTING.md).
 
@@ -975,7 +981,7 @@ also paste as it is (key `"mcpServers"`):
 
 ```json
 "mcp_servers": {
-  "files": {"command": "npx", "args": ["-y", "@modelcontextprotocol/server-filesystem", "C:\\Users\\me\\Documents\\notes"]},
+  "files": {"command": "npx", "args": ["-y", "@modelcontextprotocol/server-filesystem", "C:\\Users\\<USER>\\Documents\\notes"]},
   "search": {"url": "http://127.0.0.1:3000/mcp", "headers": {"Authorization": "Bearer ..."}}
 },
 "mcp": {"timeout_s": 60, "max_result_chars": 20000, "max_rounds": 8}
@@ -1052,7 +1058,7 @@ Once it is added, you can ask your assistant "install Strata for this PC", "star
 In Claude Code, add it with:
 
 ```bash
-claude mcp add strata -- python C:\Users\you\Strata\tools\strata_mcp.py
+claude mcp add strata -- python C:\Users\<USER>\Strata\tools\strata_mcp.py
 ```
 
 It has eight tools: status (the running model, what is installed, the hardware, a recommended size), the model
@@ -1116,7 +1122,7 @@ encoder's card needs code in the ready-made encoder (RTX 20/30/40/50).
 **Terminal chat:** type `/image <path to a picture>`, press Enter, then type your question.
 
 ```
-you> /image C:\Users\me\Pictures\receipt.jpg
+you> /image C:\Users\<USER>\Pictures\receipt.jpg
 (picture attached: receipt.jpg - now type your question)
 you> What is the total on this receipt?
 ```

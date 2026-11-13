@@ -1,0 +1,1375 @@
+{
+  "scope": "Post-hoc Host-only decomposition of the existing 90 current-pack diagnostic requests; no GPU.",
+  "parent_json_sha256": "cf710aee038a59cb7267a63ef8504b1e2f5bde362fded2f2367626300098d496",
+  "parent_archive_sha256": "b4b4aea29bd9689aff97b3d5a1d02bb819eaf77b3cf364bc337d30f213c633aa",
+  "source": "\"\"\"Post-hoc Host-only decomposition of the existing 90 current-pack diagnostic requests; no GPU.\"\"\"\nfrom pathlib import Path\nimport hashlib\nimport json\nimport math\nimport re\nimport statistics\nimport sys\n\nROOT = Path(__file__).resolve().parent.parent\nSTAGE = Path(__file__).resolve().parent / 'stage-r2'\nPARENT = ROOT / 'sycl/orca/direct-current-window-a770-windows-2026-11-06.json'\nTARGET = ROOT / 'sycl/orca/direct-current-host-split-a770-windows-2026-11-06.json'\nREPORT = ROOT / 'bench/results/a770/orca-direct-current-host-split-2026-11-06.md'\nPATTERN = (r'strata decode timing: (\\d+) windows, avg T ([\\d.]+), ([\\d.]+) tokens/window, '\n           r'([\\d.]+) ms/window = verify ([\\d.]+).*?\\+ commit/emit ([\\d.]+) \\+ draft ([\\d.]+);')\n\n\ndef digest(data):\n    return hashlib.sha256(data).hexdigest()\n\n\ndef parse(body, row):\n    found = re.findall(PATTERN,body)\n    assert len(found)==1\n    n,avg_t,tokens,total,verify,commit,draft = map(float,found[0])\n    assert n==int(n)==len(row['timeline']['windows'])\n    assert abs(total*n-row['decode_ms']) <= .005*n+.051\n    assert abs(avg_t*n-sum(v['T'] for v in row['timeline']['windows'])) <= .005*n+1e-8\n    assert abs(tokens*n-row['generated']) <= .005*n+1e-8\n    out=dict(decode_ms=row['decode_ms'],verify_call_ms=n*verify,commit_emit_ms=n*commit,\n             draft_region_ms=n*draft,host_window_ms=row['timeline']['stage_ms']+row['timeline']['wall_ms'])\n    out['host_outside_window_ms']=out['decode_ms']-out['host_window_ms']\n    out['unassigned_host_ms']=out['decode_ms']-out['verify_call_ms']-out['commit_emit_ms']-out['draft_region_ms']\n    assert out['verify_call_ms']+.005*n+.05 >= out['host_window_ms']\n    assert out['host_outside_window_ms']>=0 and out['unassigned_host_ms'] >= -.015*n-.051\n    return out\n\n\ndef selfcheck():\n    row=dict(decode_ms=20,generated=4,timeline=dict(windows=[dict(T=2),dict(T=2)],stage_ms=1,wall_ms=9))\n    text='strata decode timing: 2 windows, avg T 2.00, 2.00 tokens/window, 10.00 ms/window = verify 5.00 (...) + commit/emit 1.00 + draft 3.00;'\n    assert parse(text,row)['unassigned_host_ms']==2 and parse(text,row)['host_outside_window_ms']==10\n    for before,after in (('2 windows','3 windows'),('10.00 ms/window','11.00 ms/window'),('avg T 2.00','avg T 3.00')):\n        try: parse(text.replace(before,after),row)\n        except AssertionError: pass\n        else: raise AssertionError('accepted inconsistent timing summary')\n\n\ndef calculate():\n    selfcheck()\n    raw=PARENT.read_bytes();parent=json.loads(raw)\n    data=parent['result'];plan=parent['plan']\n    assert data['complete'] and data['control_drift_passed'] and len(data['runs'])==6\n    result=dict(scope=__doc__,parent_json_sha256=digest(raw),parent_archive_sha256=parent['archive_sha256'],\n                source=Path(__file__).read_text('utf8'),method='Arithmetic means of five retained requests per arm; arithmetic outer controls preserve additive Host decomposition. No new sampling or GPU.',\n                rounded_phase_error_per_request_ms=.005*29,engine_decode_rounding_ms=.05,runs=[],comparison=[])\n    for arm in data['runs']:\n        log=(STAGE/(arm['label']+'.stderr')).read_bytes()\n        protocol=(STAGE/(arm['label']+'.protocol')).read_bytes()\n        assert digest(log)==data['sha256'][str(STAGE/(arm['label']+'.stderr'))]\n        assert digest(protocol)==data['sha256'][str(STAGE/(arm['label']+'.protocol'))]\n        tokens,packets=[],[]\n        for line in protocol.decode('utf8').splitlines():\n            if line.startswith(('T ','TB ')): tokens.extend(map(int,line.split()[1:] if line.startswith('T ') else line.split()[2:]))\n            elif line.startswith('DONE '): packets.append((tokens,line));tokens=[]\n        assert len(packets)==len(arm['rows'])==15 and not tokens\n        rows=[]\n        for index,(row,(tokens,done)) in enumerate(zip(arm['rows'],packets)):\n            assert row['index']==index and row['retained']==(index>=10)\n            assert row['tokens']==tokens==plan['reference']['tokens'] and row['done']==done\n            assert float(done.split()[4])==row['decode_ms']\n            metrics=parse(log[row['log_begin']:row['log_end']].decode('utf8'),row)\n            rows.append(dict(index=index,retained=row['retained'],metrics=metrics))\n        keep=[v['metrics'] for v in rows if v['retained']]\n        result['runs'].append(dict(label=arm['label'],backend=arm['backend'],rows=rows,\n            summary={k:statistics.mean(v[k] for v in keep) for k in keep[0]}))\n    for start in (0,3):\n        arms=result['runs'][start:start+3]\n        assert [v['backend'] for v in arms]==plan['orders'][start//3]\n        metrics={}\n        for k in arms[0]['summary']:\n            a,b,c=[v['summary'][k] for v in arms]\n            outer=(a+c)/2\n            direct,l0=(outer,b) if start==0 else(b,outer)\n            metrics[k]=dict(direct=direct,l0=l0,direct_minus_l0_ms=direct-l0,\n                            outer_control_drift_ms=c-a)\n        assert math.isclose(metrics['decode_ms']['direct_minus_l0_ms'],sum(metrics[k]['direct_minus_l0_ms'] for k in\n            ('verify_call_ms','commit_emit_ms','draft_region_ms','unassigned_host_ms')),abs_tol=1e-9)\n        result['comparison'].append(dict(order=plan['orders'][start//3],metrics=metrics))\n    return result\n\n\ndef document(data):\n    labels=dict(decode_ms='引擎净decode',verify_call_ms='Verifier调用及紧随的路由统计／采纳检查',\n                commit_emit_ms='commit提交／输出（含自适应线程启动）',draft_region_ms='MTP草稿区域（含PLE预读／等待）',\n                unassigned_host_ms='其余Host区间',host_window_ms='窗口准备＋提交至最终等待返回',host_outside_window_ms='上述窗口之外')\n    lines=['# 当前 U4／HC：用已有日志拆分 Host decode','',\n        '2026-11-06，Windows10／A77016GB／32.0.101.9034／oneAPI2025.3.2。',\n        '离线重解上一组90次请求的原始协议和日志，未重新运行GPU、添加探针或改变参数。',\n        '父组本身是带GPU时间戳的诊断，因此下表也不是无探针吞吐成绩。','',\n        '各进程丢弃前十次、保留后五次。为让Host分段差值可相加，本表先取五次算术均值，',\n        '外侧同后端也取算术均值；与父报告的中位数／几何控制方法不同，不能直接拼接两张表。',\n        'verify／commit／draft来自已有日志的每窗口两位小数，乘以29窗口：每分项每请求舍入界为±0.145ms。',\n        'DONE的decode精度为0.1ms，舍入界±0.05ms。其余Host由这些数值相减得到，也含舍入误差。',\n        '只在同一进程的std::chrono::steady_clock Host时段之间做包含关系拆分；没有把CPU和GPU时钟相减。','',\n        '| 顺序 | Host区间 | Direct ms／请求 | L0 ms／请求 | Direct多用时 ms |',\n        '| --- | --- | ---: | ---: | ---: |']\n    for c in data['comparison']:\n        for k,label in labels.items():\n            v=c['metrics'][k]\n            lines.append(f\"| {'→'.join(c['order'])} | {label} | {v['direct']:.3f} | {v['l0']:.3f} | {v['direct_minus_l0_ms']:+.3f} |\")\n    lines+=['',\n        '两种顺序都显示差距同时存在于Verifier调用和MTP草稿区域；commit／输出也有较小差异。',\n        '这些区间包含GPU提交／执行／等待，不能全部称作CPU开销；MTP区域还包含PLE预读和历史准备。',\n        'commit可与draft在GPU上重叠，因此表内Host阶段占比不等于互斥的GPU引擎时间占比。',\n        '窗口之外包含诊断格式化／日志等开销，不能全部归到MTP。两种顺序均保留，不选择更有利的一组。',\n        '本分析为事后定位，不增加性能采用门槛、不建立新的加速或因果结论；源码和部署未改变。','',\n        '[父诊断、硬件与精确配置](orca-direct-current-window-2026-11-06.md)保留所有90条协议、2610个窗口、初始失败和原始归档。',\n        '本JSON包含完整分析脚本，并固定父JSON／归档摘要；可用原证据离线复算。','',\n        '```powershell','python -X utf8 build-orca-current-window-20261106/host_split.py --check','```','',\n        '[精确数据及脚本](../../../sycl/orca/direct-current-host-split-a770-windows-2026-11-06.json)','']\n    return '\\n'.join(lines)\n\n\nif __name__=='__main__':\n    assert sys.argv[1:] in ([],['--check'])\n    data=calculate();raw=json.dumps(data,ensure_ascii=False,indent=2)+'\\n';doc=document(data)\n    if sys.argv[1:]:\n        assert TARGET.read_text('utf8')==raw and REPORT.read_text('utf8')==doc\n    else:\n        assert not TARGET.exists() and not REPORT.exists(), 'preserve existing analysis'\n        TARGET.write_text(raw,encoding='utf8');REPORT.write_text(doc,encoding='utf8')\n    print('PASS90 raw protocols/logs,Host-only decomposition,rounding bounds and additive opposed-order controls;no GPU')\n",
+  "method": "Arithmetic means of five retained requests per arm; arithmetic outer controls preserve additive Host decomposition. No new sampling or GPU.",
+  "rounded_phase_error_per_request_ms": 0.145,
+  "engine_decode_rounding_ms": 0.05,
+  "runs": [
+    {
+      "label": "0-direct",
+      "backend": "direct",
+      "rows": [
+        {
+          "index": 0,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 3094.9,
+            "verify_call_ms": 2775.88,
+            "commit_emit_ms": 5.800000000000001,
+            "draft_region_ms": 302.46999999999997,
+            "host_window_ms": 2773.0564,
+            "host_outside_window_ms": 321.84360000000015,
+            "unassigned_host_ms": 10.75
+          }
+        },
+        {
+          "index": 1,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 2217.4,
+            "verify_call_ms": 1895.44,
+            "commit_emit_ms": 5.800000000000001,
+            "draft_region_ms": 305.95000000000005,
+            "host_window_ms": 1893.1272000000001,
+            "host_outside_window_ms": 324.27279999999996,
+            "unassigned_host_ms": 10.20999999999998
+          }
+        },
+        {
+          "index": 2,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 1809.0,
+            "verify_call_ms": 1491.47,
+            "commit_emit_ms": 6.09,
+            "draft_region_ms": 300.44,
+            "host_window_ms": 1488.9481,
+            "host_outside_window_ms": 320.05189999999993,
+            "unassigned_host_ms": 11.0
+          }
+        },
+        {
+          "index": 3,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 1505.7,
+            "verify_call_ms": 1260.0500000000002,
+            "commit_emit_ms": 5.800000000000001,
+            "draft_region_ms": 232.0,
+            "host_window_ms": 1257.6218000000001,
+            "host_outside_window_ms": 248.07819999999992,
+            "unassigned_host_ms": 7.849999999999852
+          }
+        },
+        {
+          "index": 4,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 1427.5,
+            "verify_call_ms": 1222.93,
+            "commit_emit_ms": 6.38,
+            "draft_region_ms": 195.75,
+            "host_window_ms": 1220.0316,
+            "host_outside_window_ms": 207.46839999999997,
+            "unassigned_host_ms": 2.439999999999941
+          }
+        },
+        {
+          "index": 5,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 1413.4,
+            "verify_call_ms": 1214.81,
+            "commit_emit_ms": 6.09,
+            "draft_region_ms": 190.82,
+            "host_window_ms": 1212.2752,
+            "host_outside_window_ms": 201.12480000000005,
+            "unassigned_host_ms": 1.680000000000149
+          }
+        },
+        {
+          "index": 6,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 1417.4,
+            "verify_call_ms": 1219.4499999999998,
+            "commit_emit_ms": 5.51,
+            "draft_region_ms": 190.53,
+            "host_window_ms": 1217.1192999999998,
+            "host_outside_window_ms": 200.28070000000025,
+            "unassigned_host_ms": 1.9100000000002808
+          }
+        },
+        {
+          "index": 7,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 1413.2,
+            "verify_call_ms": 1213.65,
+            "commit_emit_ms": 6.09,
+            "draft_region_ms": 191.39999999999998,
+            "host_window_ms": 1211.2767,
+            "host_outside_window_ms": 201.92330000000015,
+            "unassigned_host_ms": 2.059999999999974
+          }
+        },
+        {
+          "index": 8,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 1414.3,
+            "verify_call_ms": 1215.97,
+            "commit_emit_ms": 6.09,
+            "draft_region_ms": 189.37,
+            "host_window_ms": 1213.5718,
+            "host_outside_window_ms": 200.72820000000002,
+            "unassigned_host_ms": 2.8699999999999193
+          }
+        },
+        {
+          "index": 9,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 1405.2,
+            "verify_call_ms": 1208.72,
+            "commit_emit_ms": 5.800000000000001,
+            "draft_region_ms": 188.79,
+            "host_window_ms": 1206.2087,
+            "host_outside_window_ms": 198.99130000000014,
+            "unassigned_host_ms": 1.8900000000000148
+          }
+        },
+        {
+          "index": 10,
+          "retained": true,
+          "metrics": {
+            "decode_ms": 1411.1,
+            "verify_call_ms": 1214.81,
+            "commit_emit_ms": 5.800000000000001,
+            "draft_region_ms": 188.5,
+            "host_window_ms": 1212.4165,
+            "host_outside_window_ms": 198.68349999999987,
+            "unassigned_host_ms": 1.9899999999999523
+          }
+        },
+        {
+          "index": 11,
+          "retained": true,
+          "metrics": {
+            "decode_ms": 1416.8,
+            "verify_call_ms": 1218.5800000000002,
+            "commit_emit_ms": 5.51,
+            "draft_region_ms": 190.82,
+            "host_window_ms": 1216.1828,
+            "host_outside_window_ms": 200.6171999999999,
+            "unassigned_host_ms": 1.8899999999998158
+          }
+        },
+        {
+          "index": 12,
+          "retained": true,
+          "metrics": {
+            "decode_ms": 1408.8,
+            "verify_call_ms": 1212.1999999999998,
+            "commit_emit_ms": 5.800000000000001,
+            "draft_region_ms": 189.07999999999998,
+            "host_window_ms": 1209.5849,
+            "host_outside_window_ms": 199.2150999999999,
+            "unassigned_host_ms": 1.720000000000141
+          }
+        },
+        {
+          "index": 13,
+          "retained": true,
+          "metrics": {
+            "decode_ms": 1414.0,
+            "verify_call_ms": 1215.68,
+            "commit_emit_ms": 5.51,
+            "draft_region_ms": 190.82,
+            "host_window_ms": 1213.3192999999999,
+            "host_outside_window_ms": 200.68070000000012,
+            "unassigned_host_ms": 1.9899999999999523
+          }
+        },
+        {
+          "index": 14,
+          "retained": true,
+          "metrics": {
+            "decode_ms": 1406.2,
+            "verify_call_ms": 1211.6200000000001,
+            "commit_emit_ms": 5.22,
+            "draft_region_ms": 187.34,
+            "host_window_ms": 1209.3111000000001,
+            "host_outside_window_ms": 196.88889999999992,
+            "unassigned_host_ms": 2.019999999999925
+          }
+        }
+      ],
+      "summary": {
+        "decode_ms": 1411.3799999999999,
+        "verify_call_ms": 1214.578,
+        "commit_emit_ms": 5.5680000000000005,
+        "draft_region_ms": 189.31199999999998,
+        "host_window_ms": 1212.16292,
+        "host_outside_window_ms": 199.21707999999995,
+        "unassigned_host_ms": 1.9219999999999573
+      }
+    },
+    {
+      "label": "1-l0",
+      "backend": "l0",
+      "rows": [
+        {
+          "index": 0,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 3052.9,
+            "verify_call_ms": 2744.8500000000004,
+            "commit_emit_ms": 3.19,
+            "draft_region_ms": 288.84000000000003,
+            "host_window_ms": 2742.7156,
+            "host_outside_window_ms": 310.1844000000001,
+            "unassigned_host_ms": 16.019999999999698
+          }
+        },
+        {
+          "index": 1,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 2170.3,
+            "verify_call_ms": 1859.77,
+            "commit_emit_ms": 2.9000000000000004,
+            "draft_region_ms": 292.03000000000003,
+            "host_window_ms": 1858.2621,
+            "host_outside_window_ms": 312.03790000000026,
+            "unassigned_host_ms": 15.600000000000193
+          }
+        },
+        {
+          "index": 2,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 1760.2,
+            "verify_call_ms": 1451.74,
+            "commit_emit_ms": 3.19,
+            "draft_region_ms": 289.42,
+            "host_window_ms": 1450.5543,
+            "host_outside_window_ms": 309.64570000000003,
+            "unassigned_host_ms": 15.850000000000023
+          }
+        },
+        {
+          "index": 3,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 1464.3,
+            "verify_call_ms": 1229.6,
+            "commit_emit_ms": 2.9000000000000004,
+            "draft_region_ms": 219.53,
+            "host_window_ms": 1228.2673,
+            "host_outside_window_ms": 236.03269999999998,
+            "unassigned_host_ms": 12.270000000000039
+          }
+        },
+        {
+          "index": 4,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 1370.1,
+            "verify_call_ms": 1180.01,
+            "commit_emit_ms": 2.61,
+            "draft_region_ms": 184.14999999999998,
+            "host_window_ms": 1178.7458,
+            "host_outside_window_ms": 191.3542,
+            "unassigned_host_ms": 3.3299999999999272
+          }
+        },
+        {
+          "index": 5,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 1370.4,
+            "verify_call_ms": 1185.23,
+            "commit_emit_ms": 2.61,
+            "draft_region_ms": 180.09,
+            "host_window_ms": 1184.1941,
+            "host_outside_window_ms": 186.20590000000016,
+            "unassigned_host_ms": 2.4700000000000557
+          }
+        },
+        {
+          "index": 6,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 1365.1,
+            "verify_call_ms": 1182.91,
+            "commit_emit_ms": 2.9000000000000004,
+            "draft_region_ms": 177.19,
+            "host_window_ms": 1181.7051000000001,
+            "host_outside_window_ms": 183.39489999999978,
+            "unassigned_host_ms": 2.099999999999824
+          }
+        },
+        {
+          "index": 7,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 1364.6,
+            "verify_call_ms": 1181.1699999999998,
+            "commit_emit_ms": 2.61,
+            "draft_region_ms": 178.93,
+            "host_window_ms": 1180.0550999999998,
+            "host_outside_window_ms": 184.5449000000001,
+            "unassigned_host_ms": 1.8900000000000432
+          }
+        },
+        {
+          "index": 8,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 1357.8,
+            "verify_call_ms": 1175.0800000000002,
+            "commit_emit_ms": 2.61,
+            "draft_region_ms": 178.35000000000002,
+            "host_window_ms": 1173.8494999999998,
+            "host_outside_window_ms": 183.95050000000015,
+            "unassigned_host_ms": 1.7599999999997635
+          }
+        },
+        {
+          "index": 9,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 1368.7,
+            "verify_call_ms": 1185.52,
+            "commit_emit_ms": 2.61,
+            "draft_region_ms": 178.64000000000001,
+            "host_window_ms": 1184.4223,
+            "host_outside_window_ms": 184.2777000000001,
+            "unassigned_host_ms": 1.9300000000000352
+          }
+        },
+        {
+          "index": 10,
+          "retained": true,
+          "metrics": {
+            "decode_ms": 1361.0,
+            "verify_call_ms": 1178.85,
+            "commit_emit_ms": 2.61,
+            "draft_region_ms": 177.48,
+            "host_window_ms": 1177.74,
+            "host_outside_window_ms": 183.26,
+            "unassigned_host_ms": 2.0600000000000875
+          }
+        },
+        {
+          "index": 11,
+          "retained": true,
+          "metrics": {
+            "decode_ms": 1373.8,
+            "verify_call_ms": 1190.16,
+            "commit_emit_ms": 2.61,
+            "draft_region_ms": 178.93,
+            "host_window_ms": 1188.9979,
+            "host_outside_window_ms": 184.80209999999988,
+            "unassigned_host_ms": 2.099999999999852
+          }
+        },
+        {
+          "index": 12,
+          "retained": true,
+          "metrics": {
+            "decode_ms": 1361.2,
+            "verify_call_ms": 1179.72,
+            "commit_emit_ms": 2.61,
+            "draft_region_ms": 176.89999999999998,
+            "host_window_ms": 1178.5888,
+            "host_outside_window_ms": 182.61120000000005,
+            "unassigned_host_ms": 1.9700000000000273
+          }
+        },
+        {
+          "index": 13,
+          "retained": true,
+          "metrics": {
+            "decode_ms": 1363.0,
+            "verify_call_ms": 1181.1699999999998,
+            "commit_emit_ms": 2.61,
+            "draft_region_ms": 178.35000000000002,
+            "host_window_ms": 1180.1893,
+            "host_outside_window_ms": 182.8107,
+            "unassigned_host_ms": 0.8700000000001182
+          }
+        },
+        {
+          "index": 14,
+          "retained": true,
+          "metrics": {
+            "decode_ms": 1361.3,
+            "verify_call_ms": 1179.72,
+            "commit_emit_ms": 2.61,
+            "draft_region_ms": 177.19,
+            "host_window_ms": 1178.3115,
+            "host_outside_window_ms": 182.98849999999993,
+            "unassigned_host_ms": 1.7799999999999159
+          }
+        }
+      ],
+      "summary": {
+        "decode_ms": 1364.06,
+        "verify_call_ms": 1181.924,
+        "commit_emit_ms": 2.61,
+        "draft_region_ms": 177.77,
+        "host_window_ms": 1180.7655,
+        "host_outside_window_ms": 183.29449999999997,
+        "unassigned_host_ms": 1.7560000000000002
+      }
+    },
+    {
+      "label": "2-direct",
+      "backend": "direct",
+      "rows": [
+        {
+          "index": 0,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 3096.5,
+            "verify_call_ms": 2774.43,
+            "commit_emit_ms": 5.800000000000001,
+            "draft_region_ms": 305.37,
+            "host_window_ms": 2771.613,
+            "host_outside_window_ms": 324.88700000000017,
+            "unassigned_host_ms": 10.900000000000148
+          }
+        },
+        {
+          "index": 1,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 2223.8,
+            "verify_call_ms": 1900.08,
+            "commit_emit_ms": 5.800000000000001,
+            "draft_region_ms": 307.4,
+            "host_window_ms": 1897.5424,
+            "host_outside_window_ms": 326.25760000000014,
+            "unassigned_host_ms": 10.520000000000266
+          }
+        },
+        {
+          "index": 2,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 1802.5,
+            "verify_call_ms": 1485.09,
+            "commit_emit_ms": 5.800000000000001,
+            "draft_region_ms": 300.72999999999996,
+            "host_window_ms": 1482.5715,
+            "host_outside_window_ms": 319.9285,
+            "unassigned_host_ms": 10.88000000000011
+          }
+        },
+        {
+          "index": 3,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 1512.9,
+            "verify_call_ms": 1267.59,
+            "commit_emit_ms": 5.51,
+            "draft_region_ms": 231.42000000000002,
+            "host_window_ms": 1264.7987,
+            "host_outside_window_ms": 248.10130000000004,
+            "unassigned_host_ms": 8.380000000000166
+          }
+        },
+        {
+          "index": 4,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 1426.8,
+            "verify_call_ms": 1223.22,
+            "commit_emit_ms": 6.09,
+            "draft_region_ms": 194.59,
+            "host_window_ms": 1220.3033,
+            "host_outside_window_ms": 206.49669999999992,
+            "unassigned_host_ms": 2.8999999999999204
+          }
+        },
+        {
+          "index": 5,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 1414.2,
+            "verify_call_ms": 1215.3899999999999,
+            "commit_emit_ms": 5.800000000000001,
+            "draft_region_ms": 191.39999999999998,
+            "host_window_ms": 1212.9753,
+            "host_outside_window_ms": 201.22469999999998,
+            "unassigned_host_ms": 1.6100000000001842
+          }
+        },
+        {
+          "index": 6,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 1414.3,
+            "verify_call_ms": 1217.71,
+            "commit_emit_ms": 5.22,
+            "draft_region_ms": 189.37,
+            "host_window_ms": 1215.3572,
+            "host_outside_window_ms": 198.94280000000003,
+            "unassigned_host_ms": 1.9999999999999147
+          }
+        },
+        {
+          "index": 7,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 1413.1,
+            "verify_call_ms": 1215.1,
+            "commit_emit_ms": 5.800000000000001,
+            "draft_region_ms": 190.82,
+            "host_window_ms": 1212.728,
+            "host_outside_window_ms": 200.37199999999984,
+            "unassigned_host_ms": 1.3799999999999955
+          }
+        },
+        {
+          "index": 8,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 1415.3,
+            "verify_call_ms": 1219.4499999999998,
+            "commit_emit_ms": 5.51,
+            "draft_region_ms": 188.5,
+            "host_window_ms": 1217.0693999999999,
+            "host_outside_window_ms": 198.2306000000001,
+            "unassigned_host_ms": 1.8400000000001455
+          }
+        },
+        {
+          "index": 9,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 1409.2,
+            "verify_call_ms": 1213.07,
+            "commit_emit_ms": 5.800000000000001,
+            "draft_region_ms": 188.5,
+            "host_window_ms": 1210.5592000000001,
+            "host_outside_window_ms": 198.6407999999999,
+            "unassigned_host_ms": 1.8300000000000978
+          }
+        },
+        {
+          "index": 10,
+          "retained": true,
+          "metrics": {
+            "decode_ms": 1415.0,
+            "verify_call_ms": 1217.4199999999998,
+            "commit_emit_ms": 5.800000000000001,
+            "draft_region_ms": 190.82,
+            "host_window_ms": 1214.8592,
+            "host_outside_window_ms": 200.1407999999999,
+            "unassigned_host_ms": 0.9600000000001501
+          }
+        },
+        {
+          "index": 11,
+          "retained": true,
+          "metrics": {
+            "decode_ms": 1411.6,
+            "verify_call_ms": 1215.1,
+            "commit_emit_ms": 5.800000000000001,
+            "draft_region_ms": 188.79,
+            "host_window_ms": 1212.5919,
+            "host_outside_window_ms": 199.0081,
+            "unassigned_host_ms": 1.9099999999999966
+          }
+        },
+        {
+          "index": 12,
+          "retained": true,
+          "metrics": {
+            "decode_ms": 1416.0,
+            "verify_call_ms": 1218.0,
+            "commit_emit_ms": 5.22,
+            "draft_region_ms": 190.53,
+            "host_window_ms": 1215.5561,
+            "host_outside_window_ms": 200.44389999999999,
+            "unassigned_host_ms": 2.25
+          }
+        },
+        {
+          "index": 13,
+          "retained": true,
+          "metrics": {
+            "decode_ms": 1412.4,
+            "verify_call_ms": 1216.26,
+            "commit_emit_ms": 5.51,
+            "draft_region_ms": 188.79,
+            "host_window_ms": 1213.6591999999998,
+            "host_outside_window_ms": 198.74080000000026,
+            "unassigned_host_ms": 1.840000000000117
+          }
+        },
+        {
+          "index": 14,
+          "retained": true,
+          "metrics": {
+            "decode_ms": 1412.7,
+            "verify_call_ms": 1215.97,
+            "commit_emit_ms": 5.800000000000001,
+            "draft_region_ms": 189.07999999999998,
+            "host_window_ms": 1213.524,
+            "host_outside_window_ms": 199.17600000000016,
+            "unassigned_host_ms": 1.8500000000000227
+          }
+        }
+      ],
+      "summary": {
+        "decode_ms": 1413.54,
+        "verify_call_ms": 1216.55,
+        "commit_emit_ms": 5.626,
+        "draft_region_ms": 189.602,
+        "host_window_ms": 1214.03808,
+        "host_outside_window_ms": 199.50192000000007,
+        "unassigned_host_ms": 1.7620000000000573
+      }
+    },
+    {
+      "label": "3-l0",
+      "backend": "l0",
+      "rows": [
+        {
+          "index": 0,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 3045.7,
+            "verify_call_ms": 2739.3399999999997,
+            "commit_emit_ms": 3.19,
+            "draft_region_ms": 288.26,
+            "host_window_ms": 2737.4615,
+            "host_outside_window_ms": 308.23849999999993,
+            "unassigned_host_ms": 14.910000000000139
+          }
+        },
+        {
+          "index": 1,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 2176.5,
+            "verify_call_ms": 1864.41,
+            "commit_emit_ms": 3.19,
+            "draft_region_ms": 291.74,
+            "host_window_ms": 1862.7292,
+            "host_outside_window_ms": 313.7708,
+            "unassigned_host_ms": 17.15999999999991
+          }
+        },
+        {
+          "index": 2,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 1764.8,
+            "verify_call_ms": 1456.96,
+            "commit_emit_ms": 2.9000000000000004,
+            "draft_region_ms": 288.84000000000003,
+            "host_window_ms": 1455.5440999999998,
+            "host_outside_window_ms": 309.2559000000001,
+            "unassigned_host_ms": 16.09999999999991
+          }
+        },
+        {
+          "index": 3,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 1459.7,
+            "verify_call_ms": 1226.1200000000001,
+            "commit_emit_ms": 2.9000000000000004,
+            "draft_region_ms": 219.82,
+            "host_window_ms": 1225.0443,
+            "host_outside_window_ms": 234.65570000000002,
+            "unassigned_host_ms": 10.859999999999928
+          }
+        },
+        {
+          "index": 4,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 1376.3,
+            "verify_call_ms": 1184.65,
+            "commit_emit_ms": 2.61,
+            "draft_region_ms": 185.31,
+            "host_window_ms": 1183.4669,
+            "host_outside_window_ms": 192.83310000000006,
+            "unassigned_host_ms": 3.7299999999998477
+          }
+        },
+        {
+          "index": 5,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 1364.4,
+            "verify_call_ms": 1178.27,
+            "commit_emit_ms": 2.61,
+            "draft_region_ms": 180.96,
+            "host_window_ms": 1177.1064,
+            "host_outside_window_ms": 187.2936000000002,
+            "unassigned_host_ms": 2.5600000000000875
+          }
+        },
+        {
+          "index": 6,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 1369.6,
+            "verify_call_ms": 1186.1,
+            "commit_emit_ms": 2.61,
+            "draft_region_ms": 178.93,
+            "host_window_ms": 1184.6286,
+            "host_outside_window_ms": 184.9713999999999,
+            "unassigned_host_ms": 1.9599999999999795
+          }
+        },
+        {
+          "index": 7,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 1363.4,
+            "verify_call_ms": 1180.59,
+            "commit_emit_ms": 2.61,
+            "draft_region_ms": 178.35000000000002,
+            "host_window_ms": 1179.3537999999999,
+            "host_outside_window_ms": 184.04620000000023,
+            "unassigned_host_ms": 1.8500000000001364
+          }
+        },
+        {
+          "index": 8,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 1364.0,
+            "verify_call_ms": 1182.04,
+            "commit_emit_ms": 2.61,
+            "draft_region_ms": 177.48,
+            "host_window_ms": 1180.7866000000001,
+            "host_outside_window_ms": 183.21339999999987,
+            "unassigned_host_ms": 1.870000000000033
+          }
+        },
+        {
+          "index": 9,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 1364.7,
+            "verify_call_ms": 1181.1699999999998,
+            "commit_emit_ms": 2.9000000000000004,
+            "draft_region_ms": 178.64000000000001,
+            "host_window_ms": 1180.1271,
+            "host_outside_window_ms": 184.57290000000012,
+            "unassigned_host_ms": 1.9900000000001796
+          }
+        },
+        {
+          "index": 10,
+          "retained": true,
+          "metrics": {
+            "decode_ms": 1359.6,
+            "verify_call_ms": 1176.82,
+            "commit_emit_ms": 2.61,
+            "draft_region_ms": 178.06,
+            "host_window_ms": 1175.7405999999999,
+            "host_outside_window_ms": 183.85940000000005,
+            "unassigned_host_ms": 2.109999999999957
+          }
+        },
+        {
+          "index": 11,
+          "retained": true,
+          "metrics": {
+            "decode_ms": 1370.6,
+            "verify_call_ms": 1187.26,
+            "commit_emit_ms": 2.9000000000000004,
+            "draft_region_ms": 178.64000000000001,
+            "host_window_ms": 1186.1798999999999,
+            "host_outside_window_ms": 184.42010000000005,
+            "unassigned_host_ms": 1.7999999999998977
+          }
+        },
+        {
+          "index": 12,
+          "retained": true,
+          "metrics": {
+            "decode_ms": 1360.0,
+            "verify_call_ms": 1177.69,
+            "commit_emit_ms": 2.61,
+            "draft_region_ms": 177.48,
+            "host_window_ms": 1176.6199,
+            "host_outside_window_ms": 183.38010000000008,
+            "unassigned_host_ms": 2.219999999999942
+          }
+        },
+        {
+          "index": 13,
+          "retained": true,
+          "metrics": {
+            "decode_ms": 1373.1,
+            "verify_call_ms": 1189.5800000000002,
+            "commit_emit_ms": 2.9000000000000004,
+            "draft_region_ms": 179.8,
+            "host_window_ms": 1188.2029,
+            "host_outside_window_ms": 184.8970999999999,
+            "unassigned_host_ms": 0.8199999999997374
+          }
+        },
+        {
+          "index": 14,
+          "retained": true,
+          "metrics": {
+            "decode_ms": 1360.2,
+            "verify_call_ms": 1178.85,
+            "commit_emit_ms": 2.61,
+            "draft_region_ms": 176.89999999999998,
+            "host_window_ms": 1177.4649,
+            "host_outside_window_ms": 182.7351000000001,
+            "unassigned_host_ms": 1.8400000000001455
+          }
+        }
+      ],
+      "summary": {
+        "decode_ms": 1364.7,
+        "verify_call_ms": 1182.04,
+        "commit_emit_ms": 2.726,
+        "draft_region_ms": 178.176,
+        "host_window_ms": 1180.8416399999999,
+        "host_outside_window_ms": 183.85836000000003,
+        "unassigned_host_ms": 1.7579999999999358
+      }
+    },
+    {
+      "label": "4-direct",
+      "backend": "direct",
+      "rows": [
+        {
+          "index": 0,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 3106.3,
+            "verify_call_ms": 2786.32,
+            "commit_emit_ms": 5.800000000000001,
+            "draft_region_ms": 303.63,
+            "host_window_ms": 2783.3703,
+            "host_outside_window_ms": 322.92970000000014,
+            "unassigned_host_ms": 10.550000000000011
+          }
+        },
+        {
+          "index": 1,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 2219.9,
+            "verify_call_ms": 1897.4700000000003,
+            "commit_emit_ms": 5.22,
+            "draft_region_ms": 306.24,
+            "host_window_ms": 1895.0354,
+            "host_outside_window_ms": 324.8646000000001,
+            "unassigned_host_ms": 10.9699999999998
+          }
+        },
+        {
+          "index": 2,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 1800.0,
+            "verify_call_ms": 1483.93,
+            "commit_emit_ms": 5.51,
+            "draft_region_ms": 300.44,
+            "host_window_ms": 1481.2667999999999,
+            "host_outside_window_ms": 318.7332000000001,
+            "unassigned_host_ms": 10.119999999999948
+          }
+        },
+        {
+          "index": 3,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 1512.7,
+            "verify_call_ms": 1266.43,
+            "commit_emit_ms": 5.51,
+            "draft_region_ms": 232.86999999999998,
+            "host_window_ms": 1264.047,
+            "host_outside_window_ms": 248.65300000000002,
+            "unassigned_host_ms": 7.890000000000015
+          }
+        },
+        {
+          "index": 4,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 1417.6,
+            "verify_call_ms": 1213.94,
+            "commit_emit_ms": 5.800000000000001,
+            "draft_region_ms": 194.88,
+            "host_window_ms": 1211.3568,
+            "host_outside_window_ms": 206.2431999999999,
+            "unassigned_host_ms": 2.9799999999998477
+          }
+        },
+        {
+          "index": 5,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 1413.9,
+            "verify_call_ms": 1215.1,
+            "commit_emit_ms": 5.800000000000001,
+            "draft_region_ms": 191.10999999999999,
+            "host_window_ms": 1212.3568,
+            "host_outside_window_ms": 201.54320000000007,
+            "unassigned_host_ms": 1.8900000000001853
+          }
+        },
+        {
+          "index": 6,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 1416.9,
+            "verify_call_ms": 1218.8700000000001,
+            "commit_emit_ms": 5.800000000000001,
+            "draft_region_ms": 190.23999999999998,
+            "host_window_ms": 1216.1952,
+            "host_outside_window_ms": 200.70479999999998,
+            "unassigned_host_ms": 1.9899999999999807
+          }
+        },
+        {
+          "index": 7,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 1409.2,
+            "verify_call_ms": 1212.78,
+            "commit_emit_ms": 5.51,
+            "draft_region_ms": 189.37,
+            "host_window_ms": 1210.1941,
+            "host_outside_window_ms": 199.0059000000001,
+            "unassigned_host_ms": 1.5400000000000773
+          }
+        },
+        {
+          "index": 8,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 1420.1,
+            "verify_call_ms": 1221.77,
+            "commit_emit_ms": 5.51,
+            "draft_region_ms": 191.10999999999999,
+            "host_window_ms": 1219.0613,
+            "host_outside_window_ms": 201.03869999999984,
+            "unassigned_host_ms": 1.7099999999999511
+          }
+        },
+        {
+          "index": 9,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 1412.3,
+            "verify_call_ms": 1215.1,
+            "commit_emit_ms": 6.09,
+            "draft_region_ms": 189.07999999999998,
+            "host_window_ms": 1212.5584000000001,
+            "host_outside_window_ms": 199.74159999999983,
+            "unassigned_host_ms": 2.030000000000058
+          }
+        },
+        {
+          "index": 10,
+          "retained": true,
+          "metrics": {
+            "decode_ms": 1410.5,
+            "verify_call_ms": 1213.94,
+            "commit_emit_ms": 5.51,
+            "draft_region_ms": 189.95,
+            "host_window_ms": 1211.4136,
+            "host_outside_window_ms": 199.0863999999999,
+            "unassigned_host_ms": 1.099999999999966
+          }
+        },
+        {
+          "index": 11,
+          "retained": true,
+          "metrics": {
+            "decode_ms": 1409.8,
+            "verify_call_ms": 1213.3600000000001,
+            "commit_emit_ms": 5.800000000000001,
+            "draft_region_ms": 188.5,
+            "host_window_ms": 1210.803,
+            "host_outside_window_ms": 198.99699999999984,
+            "unassigned_host_ms": 2.139999999999816
+          }
+        },
+        {
+          "index": 12,
+          "retained": true,
+          "metrics": {
+            "decode_ms": 1412.9,
+            "verify_call_ms": 1215.1,
+            "commit_emit_ms": 5.800000000000001,
+            "draft_region_ms": 189.95,
+            "host_window_ms": 1212.6288,
+            "host_outside_window_ms": 200.27120000000014,
+            "unassigned_host_ms": 2.050000000000182
+          }
+        },
+        {
+          "index": 13,
+          "retained": true,
+          "metrics": {
+            "decode_ms": 1411.9,
+            "verify_call_ms": 1215.1,
+            "commit_emit_ms": 5.22,
+            "draft_region_ms": 189.37,
+            "host_window_ms": 1212.8093,
+            "host_outside_window_ms": 199.0907000000002,
+            "unassigned_host_ms": 2.2100000000001785
+          }
+        },
+        {
+          "index": 14,
+          "retained": true,
+          "metrics": {
+            "decode_ms": 1410.8,
+            "verify_call_ms": 1213.07,
+            "commit_emit_ms": 6.09,
+            "draft_region_ms": 189.66,
+            "host_window_ms": 1210.4497,
+            "host_outside_window_ms": 200.35030000000006,
+            "unassigned_host_ms": 1.9800000000000182
+          }
+        }
+      ],
+      "summary": {
+        "decode_ms": 1411.18,
+        "verify_call_ms": 1214.114,
+        "commit_emit_ms": 5.684,
+        "draft_region_ms": 189.486,
+        "host_window_ms": 1211.62088,
+        "host_outside_window_ms": 199.55912000000004,
+        "unassigned_host_ms": 1.896000000000032
+      }
+    },
+    {
+      "label": "5-l0",
+      "backend": "l0",
+      "rows": [
+        {
+          "index": 0,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 3044.4,
+            "verify_call_ms": 2736.1499999999996,
+            "commit_emit_ms": 3.48,
+            "draft_region_ms": 289.71,
+            "host_window_ms": 2734.5218999999997,
+            "host_outside_window_ms": 309.87810000000036,
+            "unassigned_host_ms": 15.060000000000457
+          }
+        },
+        {
+          "index": 1,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 2172.9,
+            "verify_call_ms": 1861.2200000000003,
+            "commit_emit_ms": 3.19,
+            "draft_region_ms": 291.45000000000005,
+            "host_window_ms": 1859.7855000000002,
+            "host_outside_window_ms": 313.1144999999999,
+            "unassigned_host_ms": 17.039999999999793
+          }
+        },
+        {
+          "index": 2,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 1762.7,
+            "verify_call_ms": 1454.06,
+            "commit_emit_ms": 2.9000000000000004,
+            "draft_region_ms": 290.29,
+            "host_window_ms": 1452.6638,
+            "host_outside_window_ms": 310.0362,
+            "unassigned_host_ms": 15.450000000000102
+          }
+        },
+        {
+          "index": 3,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 1462.5,
+            "verify_call_ms": 1228.44,
+            "commit_emit_ms": 2.9000000000000004,
+            "draft_region_ms": 219.23999999999998,
+            "host_window_ms": 1226.8153,
+            "host_outside_window_ms": 235.68470000000002,
+            "unassigned_host_ms": 11.919999999999959
+          }
+        },
+        {
+          "index": 4,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 1372.2,
+            "verify_call_ms": 1182.04,
+            "commit_emit_ms": 2.61,
+            "draft_region_ms": 183.85999999999999,
+            "host_window_ms": 1180.7163,
+            "host_outside_window_ms": 191.4837,
+            "unassigned_host_ms": 3.690000000000083
+          }
+        },
+        {
+          "index": 5,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 1367.6,
+            "verify_call_ms": 1182.3300000000002,
+            "commit_emit_ms": 2.9000000000000004,
+            "draft_region_ms": 180.09,
+            "host_window_ms": 1181.0552,
+            "host_outside_window_ms": 186.5447999999999,
+            "unassigned_host_ms": 2.2799999999997453
+          }
+        },
+        {
+          "index": 6,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 1364.7,
+            "verify_call_ms": 1181.75,
+            "commit_emit_ms": 2.61,
+            "draft_region_ms": 178.35000000000002,
+            "host_window_ms": 1180.5037,
+            "host_outside_window_ms": 184.19630000000006,
+            "unassigned_host_ms": 1.990000000000009
+          }
+        },
+        {
+          "index": 7,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 1366.3,
+            "verify_call_ms": 1182.04,
+            "commit_emit_ms": 2.61,
+            "draft_region_ms": 179.8,
+            "host_window_ms": 1180.8167,
+            "host_outside_window_ms": 185.48329999999987,
+            "unassigned_host_ms": 1.849999999999966
+          }
+        },
+        {
+          "index": 8,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 1366.1,
+            "verify_call_ms": 1182.6200000000001,
+            "commit_emit_ms": 2.61,
+            "draft_region_ms": 178.93,
+            "host_window_ms": 1181.2899,
+            "host_outside_window_ms": 184.81009999999992,
+            "unassigned_host_ms": 1.9399999999997704
+          }
+        },
+        {
+          "index": 9,
+          "retained": false,
+          "metrics": {
+            "decode_ms": 1367.9,
+            "verify_call_ms": 1184.07,
+            "commit_emit_ms": 2.61,
+            "draft_region_ms": 179.22,
+            "host_window_ms": 1182.7627,
+            "host_outside_window_ms": 185.1373000000001,
+            "unassigned_host_ms": 2.000000000000142
+          }
+        },
+        {
+          "index": 10,
+          "retained": true,
+          "metrics": {
+            "decode_ms": 1359.3,
+            "verify_call_ms": 1176.82,
+            "commit_emit_ms": 2.61,
+            "draft_region_ms": 178.06,
+            "host_window_ms": 1175.52,
+            "host_outside_window_ms": 183.77999999999997,
+            "unassigned_host_ms": 1.8100000000000023
+          }
+        },
+        {
+          "index": 11,
+          "retained": true,
+          "metrics": {
+            "decode_ms": 1367.9,
+            "verify_call_ms": 1184.94,
+            "commit_emit_ms": 2.61,
+            "draft_region_ms": 178.35000000000002,
+            "host_window_ms": 1183.4378000000002,
+            "host_outside_window_ms": 184.46219999999994,
+            "unassigned_host_ms": 2.0
+          }
+        },
+        {
+          "index": 12,
+          "retained": true,
+          "metrics": {
+            "decode_ms": 1359.7,
+            "verify_call_ms": 1177.69,
+            "commit_emit_ms": 2.61,
+            "draft_region_ms": 177.48,
+            "host_window_ms": 1176.529,
+            "host_outside_window_ms": 183.17100000000005,
+            "unassigned_host_ms": 1.9199999999999875
+          }
+        },
+        {
+          "index": 13,
+          "retained": true,
+          "metrics": {
+            "decode_ms": 1369.8,
+            "verify_call_ms": 1186.97,
+            "commit_emit_ms": 2.9000000000000004,
+            "draft_region_ms": 178.93,
+            "host_window_ms": 1185.6605000000002,
+            "host_outside_window_ms": 184.13949999999977,
+            "unassigned_host_ms": 0.9999999999999147
+          }
+        },
+        {
+          "index": 14,
+          "retained": true,
+          "metrics": {
+            "decode_ms": 1359.8,
+            "verify_call_ms": 1177.98,
+            "commit_emit_ms": 2.61,
+            "draft_region_ms": 177.19,
+            "host_window_ms": 1176.9184,
+            "host_outside_window_ms": 182.88159999999993,
+            "unassigned_host_ms": 2.019999999999925
+          }
+        }
+      ],
+      "summary": {
+        "decode_ms": 1363.3,
+        "verify_call_ms": 1180.88,
+        "commit_emit_ms": 2.668,
+        "draft_region_ms": 178.002,
+        "host_window_ms": 1179.6131400000002,
+        "host_outside_window_ms": 183.68685999999994,
+        "unassigned_host_ms": 1.7499999999999658
+      }
+    }
+  ],
+  "comparison": [
+    {
+      "order": [
+        "direct",
+        "l0",
+        "direct"
+      ],
+      "metrics": {
+        "decode_ms": {
+          "direct": 1412.46,
+          "l0": 1364.06,
+          "direct_minus_l0_ms": 48.40000000000009,
+          "outer_control_drift_ms": 2.160000000000082
+        },
+        "verify_call_ms": {
+          "direct": 1215.5639999999999,
+          "l0": 1181.924,
+          "direct_minus_l0_ms": 33.63999999999987,
+          "outer_control_drift_ms": 1.97199999999998
+        },
+        "commit_emit_ms": {
+          "direct": 5.597,
+          "l0": 2.61,
+          "direct_minus_l0_ms": 2.9870000000000005,
+          "outer_control_drift_ms": 0.05799999999999983
+        },
+        "draft_region_ms": {
+          "direct": 189.457,
+          "l0": 177.77,
+          "direct_minus_l0_ms": 11.686999999999983,
+          "outer_control_drift_ms": 0.29000000000002046
+        },
+        "host_window_ms": {
+          "direct": 1213.1005,
+          "l0": 1180.7655,
+          "direct_minus_l0_ms": 32.335000000000036,
+          "outer_control_drift_ms": 1.8751600000000508
+        },
+        "host_outside_window_ms": {
+          "direct": 199.35950000000003,
+          "l0": 183.29449999999997,
+          "direct_minus_l0_ms": 16.065000000000055,
+          "outer_control_drift_ms": 0.28484000000011633
+        },
+        "unassigned_host_ms": {
+          "direct": 1.8420000000000072,
+          "l0": 1.7560000000000002,
+          "direct_minus_l0_ms": 0.08600000000000696,
+          "outer_control_drift_ms": -0.1599999999999
+        }
+      }
+    },
+    {
+      "order": [
+        "l0",
+        "direct",
+        "l0"
+      ],
+      "metrics": {
+        "decode_ms": {
+          "direct": 1411.18,
+          "l0": 1364.0,
+          "direct_minus_l0_ms": 47.180000000000064,
+          "outer_control_drift_ms": -1.400000000000091
+        },
+        "verify_call_ms": {
+          "direct": 1214.114,
+          "l0": 1181.46,
+          "direct_minus_l0_ms": 32.653999999999996,
+          "outer_control_drift_ms": -1.1599999999998545
+        },
+        "commit_emit_ms": {
+          "direct": 5.684,
+          "l0": 2.697,
+          "direct_minus_l0_ms": 2.987,
+          "outer_control_drift_ms": -0.05799999999999983
+        },
+        "draft_region_ms": {
+          "direct": 189.486,
+          "l0": 178.089,
+          "direct_minus_l0_ms": 11.396999999999991,
+          "outer_control_drift_ms": -0.17399999999997817
+        },
+        "host_window_ms": {
+          "direct": 1211.62088,
+          "l0": 1180.22739,
+          "direct_minus_l0_ms": 31.39348999999993,
+          "outer_control_drift_ms": -1.2284999999997126
+        },
+        "host_outside_window_ms": {
+          "direct": 199.55912000000004,
+          "l0": 183.77261,
+          "direct_minus_l0_ms": 15.78651000000005,
+          "outer_control_drift_ms": -0.17150000000009413
+        },
+        "unassigned_host_ms": {
+          "direct": 1.896000000000032,
+          "l0": 1.7539999999999507,
+          "direct_minus_l0_ms": 0.1420000000000814,
+          "outer_control_drift_ms": -0.007999999999970031
+        }
+      }
+    }
+  ]
+}

@@ -525,7 +525,7 @@ bool onemkl_usable(void* stream) {
 }
 
 // Dense 16-bit input -> FP32 output, without an FP32 weight copy.
-template <class Input, int NSG = 8>
+template <class Input, int NSG = 8, int ROWS = 8>
 void native_xmx_launch(const uint16_t* X, const uint16_t* W, float* Y,
                        int64_t T, int64_t N, int64_t K, int64_t ldx, sycl::queue* q,
                        const uint16_t* input_tail = nullptr) {
@@ -550,21 +550,29 @@ void native_xmx_launch(const uint16_t* X, const uint16_t* W, float* Y,
                 const size_t stride = size_t(partial ? K : ldx);
                 auto gptr = [](auto* p) { return sycl::address_space_cast<sycl::access::address_space::global_space,
                     sycl::access::decorated::no>(p); };
-                jm::joint_matrix<sycl::sub_group, float, jm::use::accumulator, TILE, TILE> c;
-                jm::joint_matrix_fill(sg, c, 0.f);
+                jm::joint_matrix<sycl::sub_group, float, jm::use::accumulator, ROWS, TILE> c[TILE / ROWS];
+                #pragma unroll
+                for (int r = 0; r < TILE / ROWS; ++r) jm::joint_matrix_fill(sg, c[r], 0.f);
                 for (int64_t k = 0; k < K; k += 16) {
-                    jm::joint_matrix<sycl::sub_group, Input, jm::use::a, TILE, 16, jm::layout::row_major> a;
                     jm::joint_matrix<sycl::sub_group, Input, jm::use::b, 16, TILE, jm::layout::col_major> b;
-                    jm::joint_matrix_load(sg, a, gptr(source + k), stride);
                     jm::joint_matrix_load(sg, b, gptr(w + col * K + k), size_t(K));
-                    jm::joint_matrix_mad(sg, c, a, b, c);
+                    #pragma unroll
+                    for (int r = 0; r < TILE / ROWS; ++r) {
+                        jm::joint_matrix<sycl::sub_group, Input, jm::use::a, ROWS, 16, jm::layout::row_major> a;
+                        jm::joint_matrix_load(sg, a, gptr(source + r * ROWS * stride + k), stride);
+                        jm::joint_matrix_mad(sg, c[r], a, b, c[r]);
+                    }
                 }
                 if (row + TILE <= T) {
-                    jm::joint_matrix_store(sg, c, gptr(Y + row * N + col), size_t(N), jm::layout::row_major);
+                    #pragma unroll
+                    for (int r = 0; r < TILE / ROWS; ++r)
+                        jm::joint_matrix_store(sg, c[r], gptr(Y + (row + r * ROWS) * N + col), size_t(N), jm::layout::row_major);
                 } else {
                     auto* tmp = tail.get_multi_ptr<sycl::access::decorated::no>().get() + subgroup * TILE * TILE;
-                    jm::joint_matrix_store(sg, c, sycl::address_space_cast<sycl::access::address_space::local_space,
-                        sycl::access::decorated::no>(tmp), TILE, jm::layout::row_major);
+                    #pragma unroll
+                    for (int r = 0; r < TILE / ROWS; ++r)
+                        jm::joint_matrix_store(sg, c[r], sycl::address_space_cast<sycl::access::address_space::local_space,
+                            sycl::access::decorated::no>(tmp + r * ROWS * TILE), TILE, jm::layout::row_major);
                     sycl::group_barrier(sg);
                     for (int i = lane; i < TILE * TILE; i += SG)
                         if (row + i / TILE < T) Y[(row + i / TILE) * N + col + i % TILE] = tmp[i];
@@ -624,6 +632,12 @@ bool native_xmx_gemm(const uint16_t* X, const uint16_t* W, float* Y,
     if (a770 && bf16 && N == 8 && K == 10240 && (T == 1024 || T == 2069))
         native_xmx_launch<sycl::ext::oneapi::bfloat16, 1>(X, W, Y, T, N, K, ldx, q, input_tail);
     else if (bf16) native_xmx_launch<sycl::ext::oneapi::bfloat16>(X, W, Y, T, N, K, ldx, q, input_tail);
+    else if (a770) {
+        // ponytail: A770-only M4 avoids observed M8 corruption; wider dispatch needs stress validation.
+        static const bool noted = [] { std::fprintf(stderr, "PREFILL_FP16_M4 enabled=1 tile_rows=8 reuse_b=2\n"); return true; }();
+        (void) noted;
+        native_xmx_launch<sycl::half, 8, 4>(X, W, Y, T, N, K, ldx, q, input_tail);
+    }
     else native_xmx_launch<sycl::half>(X, W, Y, T, N, K, ldx, q, input_tail);
     if (finish) q->wait_and_throw();
     static const bool profile = [] {

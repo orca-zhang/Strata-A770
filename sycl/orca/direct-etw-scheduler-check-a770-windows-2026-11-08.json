@@ -1,0 +1,27 @@
+{
+  "complete": true,
+  "stage": "offline checker correction;zero additional GPU requests",
+  "preserved_failure": "Original post-export check compared integer packet-type keys against JSON string keys and raised AssertionError. Original report,JSON,archive,source and all measurements remain unchanged.",
+  "correction": "Normalize the independently recalculated analyses through JSON before equality comparison;all exact source/protocol/archive checks retained.",
+  "parent": {
+    "sycl/orca/direct-etw-scheduler-a770-windows-2026-11-08.json": "3db636bb63e61ce84297e5ca97216bac4179f2be247cb86f112e48da6ee1094a",
+    "sycl/orca/direct-etw-scheduler-a770-windows-2026-11-08.json.gz": "388cac144598e890768f5d35dd83f170212414502f008b9a9730b269af837049",
+    "bench/results/a770/orca-direct-etw-scheduler-2026-11-08.md": "f2cf454c9fe92c72073a31edddbdab05f2d901d85de57e4a4ae47edecede2b40"
+  },
+  "sources": [
+    {
+      "path": "build-orca-etw-scheduler-20261108/check.py",
+      "sha256": "8c2810e495c1eae76718b833bc365ec4bae3c5079419027c0cddc704c3171e57",
+      "text": "\"\"\"Publication-check erratum: compare counters in their JSON representation.\"\"\"\nimport base64\nimport gzip\nimport hashlib\nimport importlib.util\nimport json\nfrom pathlib import Path\n\nHERE=Path(__file__).resolve().parent\nspec=importlib.util.spec_from_file_location('etw_publication_r1',HERE/'publish.py')\np=importlib.util.module_from_spec(spec);spec.loader.exec_module(p)\n\n\ndef check():\n    data,analyses,proof=p.validate();public=p.load(p.PUBLIC)\n    # JSON object keys are always strings, including the packet-type counters.\n    canonical=json.loads(json.dumps(analyses,ensure_ascii=False))\n    assert public['experiment']==data and public['analyses']==canonical and public['validation']==proof\n    assert public['raw_audit']==p.load(HERE/'raw-audit-r1.json') and public['archive_sha256']==p.b.sha(p.ARCHIVE)\n    for item in json.loads(gzip.decompress(p.ARCHIVE.read_bytes()))['files']:\n        contents=base64.b64decode(item['content_base64'])\n        assert hashlib.sha256(contents).hexdigest()==item['sha256'] and (p.ROOT/item['path']).read_bytes()==contents\n    assert json.loads(json.dumps({0:240}))=={'0':240}\n    p.a.selfcheck()\n    print('PASS JSON-normalized counters,exact archived events,protocols and independent interval/pairing analysis',flush=True)\n\n\nif __name__=='__main__':\n    with p.b.gpu_lock():check()\n"
+    },
+    {
+      "path": "build-orca-etw-scheduler-20261108/qualify_check.py",
+      "sha256": "f8b43b71e1c4f028005a93542fbd5fe3660b57e329eb2f964b399c8aa21a2fce",
+      "text": "\"\"\"Add an immutable correction; never rewrite the original ETW publication.\"\"\"\nimport importlib.util\nfrom pathlib import Path\n\nHERE=Path(__file__).resolve().parent\nspec=importlib.util.spec_from_file_location('etw_corrected_check',HERE/'check.py')\nc=importlib.util.module_from_spec(spec);spec.loader.exec_module(c)\np=c.p\nOUT=p.ROOT/'sycl/orca/direct-etw-scheduler-check-a770-windows-2026-11-08.json'\nREPORT=p.ROOT/'bench/results/a770/orca-direct-etw-scheduler-check-2026-11-08.md'\n\nwith p.b.gpu_lock():\n    assert not OUT.exists() and not REPORT.exists()\n    c.check()\n    manifest=dict(complete=True,stage='offline checker correction;zero additional GPU requests',\n        preserved_failure='Original post-export check compared integer packet-type keys against JSON string keys and raised AssertionError. Original report,JSON,archive,source and all measurements remain unchanged.',\n        correction='Normalize the independently recalculated analyses through JSON before equality comparison;all exact source/protocol/archive checks retained.',\n        parent={x.relative_to(p.ROOT).as_posix():p.b.sha(x) for x in (p.PUBLIC,p.ARCHIVE,p.REPORT)},\n        sources=[dict(path=x.relative_to(p.ROOT).as_posix(),sha256=p.b.sha(x),text=x.read_text('utf8')) for x in (HERE/'check.py',Path(__file__))],\n        check_passed=True,performance_claim=False,production_changed=False,linux_gpu_tested=False)\n    p.b.save(OUT,manifest)\n    REPORT.write_text('# GPU调度追踪：离线复核命令勘误\\n\\n'\n        '原报告归档已经完整生成，但末尾复核把Python的整数packet-type键与JSON读取后的字符串键直接比较，触发AssertionError。修正复核器先统一JSON表示；完整原始协议、独立区间／配对复算、源码和归档逐字节检查全部通过。原报告、JSON、归档、源码及所有GPU样本保留，没有新增GPU请求。\\n\\n'\n        '正确离线命令：`python -X utf8 build-orca-etw-scheduler-20261108/check.py`。原报告所列`publish.py check`保留为失败记录。\\n\\n'\n        '[原调度报告](orca-direct-etw-scheduler-2026-11-08.md) · '\n        '[勘误、原文件摘要与精确复核源码](../../../sycl/orca/'+OUT.name+')\\n',encoding='utf8')\n    print('PASS immutable checker correction;original publication preserved',flush=True)\n"
+    }
+  ],
+  "check_passed": true,
+  "performance_claim": false,
+  "production_changed": false,
+  "linux_gpu_tested": false
+}

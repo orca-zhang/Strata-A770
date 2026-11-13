@@ -126,4 +126,4 @@ python -X utf8 build-orca-direct-gap-20261104/publish_current_contexts.py --chec
 
 代码、ABI 与数学模块的冻结来源见[完整前端重建](orca-direct-current-frontend-2026-11-04.md)；此前独立 Short 协议及拷贝／锁计数见[空闲机审计](orca-direct-idle-audit-2026-11-04.md)。本轮没有重新统计拷贝／锁次数，没有采用新性能候选，也没有更改生产配置或部署 EXE。
 
-[精确 JSON](../../../sycl/orca/direct-current-contexts-a770-windows-2026-11-04.json) · [原始证据档案](../../../sycl/orca/direct-current-contexts-a770-windows-2026-11-04.json.gz)
+[精确 JSON](../../../sycl/orca/direct-current-contexts-a770-windows-2026-11-04.json) · 原始证据档案 (`direct-current-contexts-a770-windows-2026-11-04.json.gz`, raw capture retained locally)

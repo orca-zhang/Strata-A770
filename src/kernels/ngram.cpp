@@ -483,27 +483,35 @@ bool PleTable::gather_batch(const uint32_t* rows, size_t n_tokens, float* out, s
     if (impl_->pending) { err = "PleTable::gather_batch while a token is in flight"; return false; }
     const size_t n = n_tokens * (size_t) PLE_N_HEADS;
     if (impl_->mode == PleIo::Direct) {
-        // Fast path: if all requested tokens match our in-flight/completed prefetch slots, collect them directly
-        // without issuing a second PleReader ticket or copying through RowCache.
-        if (impl_->n_prefetch >= n_tokens && n_tokens <= Impl::kMaxPrefetch) {
+        // ponytail: reuse an ordered prefetched prefix; arbitrary reordering still uses the batched fallback.
+        const size_t prefetched = std::min(impl_->n_prefetch, n_tokens);
+        if (prefetched > 0) {
             bool exact_match = true;
-            for (size_t t = 0; t < n_tokens; ++t) {
+            for (size_t t = 0; t < prefetched; ++t) {
                 if (std::memcmp(impl_->prefetch_keys[t], rows + t * PLE_N_HEADS, sizeof(uint32_t) * PLE_N_HEADS) != 0) {
                     exact_match = false;
                     break;
                 }
             }
             if (exact_match) {
+                // Submit the newly known suffix before waiting; its storage stays live until collect completes.
+                const size_t remaining = (n_tokens - prefetched) * PLE_N_HEADS;
+                std::vector<uint8_t> raw(remaining * impl_->rb);
+                strata::ngram::PleReader::Ticket ticket;
+                if (remaining) ticket = impl_->reader.issue(rows + prefetched * PLE_N_HEADS, remaining, raw.data());
+                bool ok = true;
                 for (size_t i = 0; i < impl_->n_prefetch; ++i) {
-                    if (!impl_->reader.collect(impl_->prefetch_tickets[i], err)) {
-                        impl_->n_prefetch = 0;
-                        return false;
-                    }
+                    // Drain every writer even after an error, before any destination can be reused or released.
+                    ok = impl_->reader.collect(impl_->prefetch_tickets[i], err) && ok;
                 }
                 impl_->n_prefetch = 0;
+                if (remaining) ok = impl_->reader.collect(ticket, err) && ok;
+                if (!ok) return false;
                 for (size_t t = 0; t < n_tokens; ++t) {
+                    const uint8_t* token = t < prefetched ? impl_->prefetch_raw[t]
+                                                        : raw.data() + (t - prefetched) * PLE_N_HEADS * impl_->rb;
                     for (int h = 0; h < PLE_N_HEADS; ++h) {
-                        impl_->decode(impl_->prefetch_raw[t] + (size_t) h * impl_->rb,
+                        impl_->decode(token + (size_t) h * impl_->rb,
                                       out + (t * PLE_N_HEADS + (size_t) h) * PLE_HEAD_DIM);
                     }
                 }

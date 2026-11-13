@@ -7,6 +7,7 @@
 #include "strata/kernels/native_mmvq.hpp"
 
 #include <algorithm>
+#include <cstring>
 #include <climits>
 #include <cstdlib>
 #include <exception>
@@ -46,7 +47,9 @@ struct Pending {
     WeightRef* ref;
     int type;
     uint64_t bytes;
-    DevicePtr data;
+    const uint8_t* source;
+    void* data;
+    uint64_t offset;
 };
 }
 
@@ -96,6 +99,13 @@ bool NativeDense::load(const std::vector<std::string> &shards,
     if (shards.empty()) { err = "native dense: at least one GGUF shard is required"; return false; }
     try {
         std::vector<Pending> pending;
+        std::vector<std::unique_ptr<strata::GgufFile>> mapped;
+        uint64_t required = 0;
+        // ponytail: one bounded pinned buffer avoids per-matrix pageable transfers.
+        constexpr size_t upload_bytes = 64u << 20;
+        DevicePtr upload(sycl::malloc_host(upload_bytes, dpct::get_in_order_queue()));
+        if (!upload) { err = "native dense: no pinned upload buffer"; return false; }
+
         std::set<std::string> seen;
         int max_in = 0;
         uint64_t total = 0;
@@ -103,7 +113,8 @@ bool NativeDense::load(const std::vector<std::string> &shards,
         std::set<uint64_t> split_numbers;
         bool have_architecture = false;
         for (const auto& path : shards) {
-            strata::GgufFile gguf(path);
+            mapped.push_back(std::make_unique<strata::GgufFile>(path));
+            const auto& gguf = *mapped.back();
             const auto* count = gguf.get("split.count");
             const auto* number = gguf.get("split.no");
             const auto* tensors = gguf.get("split.tensors.count");
@@ -181,40 +192,54 @@ bool NativeDense::load(const std::vector<std::string> &shards,
                 }
                 const auto bytes = strata::kernels::native_mmvq_weight_bytes(
                     tensor.type, (int) ref.ne0, (int) ref.ne1);
-                void* allocation = nullptr;
-                auto status =
-                    DPCT_CHECK_ERROR(allocation = (void *)sycl::malloc_device(
-                                         bytes, dpct::get_in_order_queue()));
-                DevicePtr data(allocation);
-                if (status == 0)
-                    status = DPCT_CHECK_ERROR(
-                        dpct::get_in_order_queue()
-                            .memcpy(data.get(), gguf.tensor_data(tensor), bytes)
-                            .wait());
-                /*
-                DPCT1000: Error handling if-stmt was detected but could not
-                be rewritten.
-                */
-                if (status != 0) {
-                    /*
-                    DPCT1009: SYCL reports errors using exceptions and does
-                    not use error codes. Please replace the
-                    "get_error_string_dummy(...)" with a real error-handling
-                    function.
-                    */
-                    /*
-                    DPCT1001: The statement could not be removed.
-                    */
-                    err = "native dense upload " + tensor.name + ": " +
-                          dpct::get_error_string_dummy(status);
-                        return false;
-                }
                 max_in = (std::max)(max_in, (int) ref.ne0);
                 total += bytes;
-                pending.push_back(Pending{&ref, (int) tensor.type, bytes, std::move(data)});
+                if (bytes > SIZE_MAX - 255 || required > SIZE_MAX - ((bytes + 255) / 256 * 256)) {
+                    err = "native dense: allocation size overflow"; return false;
+                }
+                pending.push_back(Pending{&ref, (int) tensor.type, bytes, gguf.tensor_data(tensor), nullptr, required});
+                required += (bytes + 255) / 256 * 256;
             }
         }
         if (pending.empty()) { err = "native dense: no supported GDN/QSA matrices in supplied shards"; return false; }
+        // ponytail: one arena below Arc's per-allocation ceiling; larger packs keep individual allocations.
+        const bool pooled = required <= (2ull << 30);
+        std::vector<DevicePtr> allocations;
+        allocations.reserve(pooled ? 1 : pending.size());
+        if (pooled) allocations.emplace_back(sycl::malloc_device((size_t) required, dpct::get_in_order_queue()));
+        if (pooled && !allocations.back()) { err = "native dense: arena allocation failed"; return false; }
+        for (auto& item : pending) {
+            if (pooled) item.data = (uint8_t*) allocations.front().get() + item.offset;
+            else {
+                allocations.emplace_back(sycl::malloc_device((size_t) item.bytes, dpct::get_in_order_queue()));
+                item.data = allocations.back().get();
+            }
+            if (!item.data) { err = "native dense: allocation failed"; return false; }
+            if (!pooled) for (uint64_t at = 0; at < item.bytes; at += upload_bytes) {
+                const size_t count = (size_t) std::min<uint64_t>(upload_bytes, item.bytes - at);
+                std::memcpy(upload.get(), item.source + at, count);
+                if (DPCT_CHECK_ERROR(dpct::get_in_order_queue().memcpy(
+                        (uint8_t*) item.data + at, upload.get(), count).wait()) != 0) {
+                    err = "native dense: upload failed"; return false;
+                }
+            }
+        }
+
+        if (pooled) for (uint64_t at = 0; at < required; at += upload_bytes) {
+            const size_t count = (size_t) std::min<uint64_t>(upload_bytes, required - at);
+            std::memset(upload.get(), 0, count);
+            // ponytail: scan a few hundred matrices per chunk; use a cursor if larger plans make this costly.
+            for (const auto& item : pending) {
+                const uint64_t begin = std::max(at, item.offset);
+                const uint64_t end = std::min(at + count, item.offset + item.bytes);
+                if (begin < end) std::memcpy((uint8_t*) upload.get() + begin - at,
+                                           item.source + begin - item.offset, (size_t) (end - begin));
+            }
+            if (DPCT_CHECK_ERROR(dpct::get_in_order_queue().memcpy(
+                    (uint8_t*) allocations.front().get() + at, upload.get(), count).wait()) != 0) {
+                err = "native dense: arena upload failed"; return false;
+            }
+        }
         void* allocation = nullptr;
         const auto status =
             DPCT_CHECK_ERROR(allocation = (void *)sycl::malloc_device(
@@ -239,13 +264,14 @@ bool NativeDense::load(const std::vector<std::string> &shards,
             return false;
         }
         // All checks and allocations finish before publishing any reference.
-        weights_.reserve(pending.size());
+        // Preserve tensor_count(): one entry per matrix; only allocation bases own storage.
+        weights_.resize(pending.size(), nullptr);
         for (auto& item : pending) {
-            item.ref->native_data = item.data.get();
+            item.ref->native_data = item.data;
             item.ref->native_type = item.type;
             item.ref->native_q8_1 = scratch.get();
-            weights_.push_back(item.data.release());
         }
+        for (size_t i = 0; i < allocations.size(); ++i) weights_[i] = allocations[i].release();
         scratch_ = scratch.release();
         bytes_ = total;
         return true;

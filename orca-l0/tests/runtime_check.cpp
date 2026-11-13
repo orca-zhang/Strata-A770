@@ -5,6 +5,7 @@
 #include <cmath>
 #include <cstdlib>
 #include <exception>
+#include <future>
 #include <iostream>
 #include <limits>
 #include <string>
@@ -25,6 +26,22 @@ static double micros(Clock::time_point begin, Clock::time_point end) {
 }
 
 int main(int argc, char** argv) try {
+    if (argc == 2 && std::string(argv[1]) == "--allocations") {
+        if (const char* poison = std::getenv("ORCA_L0_POISON_ALLOCATIONS"); poison && std::string(poison) == "1")
+            throw std::invalid_argument("concurrent allocation check requires poisoning disabled");
+        Runtime rt;
+        auto allocations = [&](Memory kind) {
+            for (size_t i = 0; i < 128; ++i) {
+                auto* p = rt.allocate(16384 + (i % 8) * 4096, kind);
+                rt.deallocate(p);
+            }
+        };
+        auto host = std::async(std::launch::async, allocations, Memory::host);
+        auto device = std::async(std::launch::async, allocations, Memory::device);
+        host.get(); device.get();
+        std::cout << "PASS concurrent host/device allocation ownership\n";
+        return 0;
+    }
     if (argc < 2 || argc > 3 || (argc == 3 && std::string(argv[2]) != "native"))
         throw std::invalid_argument("usage: orca-l0-check module_file [native]");
     Runtime rt;

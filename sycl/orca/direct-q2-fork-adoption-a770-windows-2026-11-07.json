@@ -1,0 +1,87 @@
+{
+  "complete": true,
+  "direct_default_extended": true,
+  "l0_verifier_default_changed": false,
+  "shared_phase5_accepts_Q2_0": true,
+  "extra_runtime_flags": 0,
+  "added_allocation_api_calls": 0,
+  "qualification": "sycl\\orca\\direct-q2-fork-a770-windows-2026-11-07.json",
+  "qualification_sha256": "dfd1a90929dfa91faa1d303708ccf7ba0365044ec0419bd8fe216a9fb6e5b550",
+  "comparison": [
+    {
+      "order": [
+        "base",
+        "q2fork",
+        "base"
+      ],
+      "metrics": {
+        "decode_tok_s": {
+          "candidate": 49.50845179998585,
+          "base": 48.660408971018825,
+          "candidate_change_pct": 1.7427778493849022,
+          "control_drift_pct": -0.6996397894153517
+        },
+        "ttft_ms": {
+          "candidate": 772.615500000029,
+          "base": 774.7994116267263,
+          "candidate_change_pct": -0.28186800272758106,
+          "control_drift_pct": -0.4849071335536581
+        },
+        "request_ms": {
+          "candidate": 2144.0904999999475,
+          "base": 2171.950364415808,
+          "candidate_change_pct": -1.2827118368956891,
+          "control_drift_pct": 0.32082921332641234
+        }
+      }
+    },
+    {
+      "order": [
+        "q2fork",
+        "base",
+        "q2fork"
+      ],
+      "metrics": {
+        "decode_tok_s": {
+          "candidate": 49.23340134813447,
+          "base": 48.81790919868889,
+          "candidate_change_pct": 0.8511059901286089,
+          "control_drift_pct": -0.2388479100807861
+        },
+        "ttft_ms": {
+          "candidate": 775.0067091581635,
+          "base": 778.3982999999353,
+          "candidate_change_pct": -0.43571406075424424,
+          "control_drift_pct": 0.8531052443040865
+        },
+        "request_ms": {
+          "candidate": 2158.6618489680245,
+          "base": 2162.0137999998406,
+          "candidate_change_pct": -0.1550383735671068,
+          "control_drift_pct": -0.006184195586711461
+        }
+      }
+    }
+  ],
+  "proof": "Current raw sources and prepare script match frozen qualification inputs before patch. Resolving only the literal existing STRATA_ORCA_DG2 compile macro makes the entire generated Direct Verifier equal to the compiled/tested candidate TU and the L0 Verifier equal to the frozen baseline TU. Generated shared wrapper equals both native safety-check TUs. No numerical kernels,math order,scratch layout or public ABI changed.",
+  "limitation": "Source adoption only;no deployed EXE/config/README headline change.No new benchmark beyond the frozen MTP4/HC128 profile.No Linux GPU validation;historical Direct issues remain open.",
+  "source_sha256": {
+    "G:\\GitHub\\Strata\\sycl\\src\\core\\verify.cpp": "8818cc405ffcbc65b20a9727e9c2609bab6ea9ccd64b5bf4cc129af319b4a0e5",
+    "G:\\GitHub\\Strata\\sycl\\src\\kernels\\cuda\\shared_expert.dp.cpp": "29a9e4bb5157bf0ec96277fbc7f446df9d85d9d347d50b22468db8370ce52eb5",
+    "G:\\GitHub\\Strata\\sycl\\orca\\prepare.py": "cd2881932a7eaeb1769244c83671d75a5c3f8d3a26d1a4cd84fb0c9bde3aa091",
+    "G:\\GitHub\\Strata\\build-orca-q2-fork-adoption-20261107\\adopt.py": "e7f2cc6312cfbd3f6e90edfbd67386171b95a60f4d88a03f32a8ec5fd44cf097",
+    "G:\\GitHub\\Strata\\build-orca-q2-fork-adoption-20261107\\finish.py": "d98a3d92bf1de98c5d56247858f07c44273a9cbc5e31507a1f6c850d8c4f9407",
+    "G:\\GitHub\\Strata\\build-orca-q2-fork-adoption-20261107\\source-r1\\shared-before.cpp": "73d883804aab249423c28e3aeed20f9ef4fdaa29dc25dd3130a8efc51c8857b5",
+    "G:\\GitHub\\Strata\\build-orca-q2-fork-adoption-20261107\\source-r1\\shared.cpp": "1e603d72060338bb9f2686391c09b90db17421f4604e4cb4d13bea122cfd57d5",
+    "G:\\GitHub\\Strata\\build-orca-q2-fork-adoption-20261107\\source-r1\\shared.diff": "51a4085eec692f9faf2f3dddb6fb6112a0a1491ffd3b6dc8a8b6adabdd10dce7",
+    "G:\\GitHub\\Strata\\build-orca-q2-fork-adoption-20261107\\source-r1\\verify-before.cpp": "18cec352a2dadb7839c5c41e2218ac8829ba16f73ea2e7acdc3596b4e39a71c8",
+    "G:\\GitHub\\Strata\\build-orca-q2-fork-adoption-20261107\\source-r1\\verify.cpp": "1de67fa4372ac3a6fb1946353cf17b74ba59fbaeb2f333f690691f76cf8ec873",
+    "G:\\GitHub\\Strata\\build-orca-q2-fork-adoption-20261107\\source-r1\\verify.diff": "4d255caa700832b8aacc0bbeb543535c9c473c0b4b74ee1f5f5587ffee58437c",
+    "G:\\GitHub\\Strata\\build-orca-q2-fork-20261107\\build-r1\\direct-q2fork-verify.cpp": "dec1f540025facdb27806feada583255c9c6f6796a8e5892d4b8e68355107eb9",
+    "G:\\GitHub\\Strata\\build-orca-q2-fork-20261107\\build-r1\\direct-q2fork-shared.cpp": "1e603d72060338bb9f2686391c09b90db17421f4604e4cb4d13bea122cfd57d5",
+    "G:\\GitHub\\Strata\\build-orca-q2-fork-20261107\\build-r1\\l0-q2fork-shared.cpp": "1e603d72060338bb9f2686391c09b90db17421f4604e4cb4d13bea122cfd57d5",
+    "G:\\GitHub\\Strata\\build-orca-full-current-20261106\\l0-r1\\build\\generated\\engine\\core\\verify.cpp": "b8757e84401b2b4d6ebea2e745cd074b40dbf7f6990988b5bafd0a647f1ecc69",
+    "G:\\GitHub\\Strata\\build-orca-q2-fork-20261107\\build-r1\\compile-direct-q2fork-verify.command.json": "8076878d49cb51980963fcf18da5f03f6ef3d627343f3e763d96883c18f60cf8",
+    "G:\\GitHub\\Strata\\build-orca-q2-fork-20261107\\build-r1\\compile-l0-q2fork-shared.command.json": "cb546d6c6b3c2b26d7e63931e75cc6ac20a96348f8c9ecfa44ebbb3aba64d87c"
+  }
+}

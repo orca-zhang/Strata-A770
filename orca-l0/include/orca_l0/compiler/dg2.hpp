@@ -56,8 +56,8 @@ void append(dg2::Program& program, dg2::Runtime& runtime, sycl::nd_range<Dimensi
     const char* name = d::getKernelName<Name>();
     const auto& file = program.kernel_file(name);
     const auto* closure = reinterpret_cast<const std::byte*>(&function);
-    std::vector<dg2::Argument> arguments;
-    arguments.reserve(d::getKernelNumParams<Name>());
+    // ponytail: the compiler fixes the count; append consumes these stack views synchronously.
+    std::array<dg2::Argument, d::getKernelNumParams<Name>()> arguments;
     for (unsigned i = 0; i < d::getKernelNumParams<Name>(); ++i) {
         const auto descriptor = d::getKernelParamDesc<Name>(i);
         if (descriptor.offset < 0 || size_t(descriptor.offset) >= sizeof(F)) throw std::runtime_error("invalid DG2 capture offset");
@@ -69,11 +69,11 @@ void append(dg2::Program& program, dg2::Runtime& runtime, sycl::nd_range<Dimensi
                 throw std::runtime_error("unsupported DG2 accessor capture");
             std::memcpy(&bytes, closure + descriptor.offset, sizeof(bytes));
             if (!bytes) throw std::runtime_error("empty DG2 local-memory capture");
-            arguments.push_back(dg2::Argument::local(bytes));
+            arguments[i] = dg2::Argument::local(bytes);
             continue;
         } else throw std::runtime_error("unsupported DG2 compiler capture kind");
         if (bytes > sizeof(F) - size_t(descriptor.offset)) throw std::runtime_error("DG2 capture exceeds closure");
-        arguments.push_back(dg2::Argument::capture(closure + descriptor.offset, bytes));
+        arguments[i] = dg2::Argument::capture(closure + descriptor.offset, bytes);
     }
     std::array<uint32_t, 3> local{1,1,1}, groups{1,1,1};
     for (int i = 0; i < Dimensions; ++i) {
@@ -82,7 +82,7 @@ void append(dg2::Program& program, dg2::Runtime& runtime, sycl::nd_range<Dimensi
             throw std::invalid_argument("invalid DG2 compiler launch range");
         local[i] = uint32_t(block); groups[i] = uint32_t(total / block);
     }
-    runtime.append(file, name, local, groups, arguments);
+    runtime.append(file, name, local, groups, arguments.data(), arguments.size());
 #endif
 }
 

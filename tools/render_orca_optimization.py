@@ -1,4 +1,4 @@
-"""Render recommended L0, WIP Direct, SYCL comparisons and submission paths; --check-only uses no GPU."""
+"""Render English L0, WIP Direct and SYCL comparisons and call paths; --check-only uses no GPU."""
 import argparse
 import hashlib
 import json
@@ -73,7 +73,7 @@ def main():
     direct, baseline = comparison['orca_tok_s'], comparison['baseline_tok_s']
     gain = comparison['throughput_change_pct']
     l0_gain = 100 * (pairs[0][1] / baseline - 1)
-    ET.SubElement(svg, f'{{{ns}}}title', id='title').text = 'Orca L0 推荐路径；Orca Direct 为 WIP 备选：性能对照与三种调用链路'
+    ET.SubElement(svg, f'{{{ns}}}title', id='title').text = 'Recommended Orca L0 and WIP Orca Direct: performance comparisons and Windows call paths'
     ET.SubElement(svg, f'{{{ns}}}desc', id='desc').text = (
         f'Windows A770 16GB, 2026-11-04. Orca L0 is recommended; Orca Direct is a WIP alternative. '
         f'L0 {pairs[0][1]:.4f} versus independently measured SYCL {baseline:.4f} tok/s: '
@@ -101,46 +101,46 @@ def main():
     def text(x, y, label, size=28, color='#eaf2ff', bold=False, right=False, limit=None):
         key = size, bold
         if key not in fonts:
-            fonts[key] = ImageFont.truetype('C:/Windows/Fonts/msyhbd.ttc' if bold else 'C:/Windows/Fonts/msyh.ttc', size)
+            fonts[key] = ImageFont.truetype('C:/Windows/Fonts/segoeuib.ttf' if bold else 'C:/Windows/Fonts/segoeui.ttf', size)
         anchor = 'rs' if right else 'ls'
         box = draw.textbbox((x, y), label, font=fonts[key], anchor=anchor)
         assert 0 <= box[0] <= box[2] <= width and 0 <= box[1] <= box[3] <= height, (label, box)
         assert limit is None or box[2] - box[0] <= limit, (label, box, limit)
         draw.text((x, y), label, font=fonts[key], fill=color, anchor=anchor)
         ET.SubElement(svg, f'{{{ns}}}text', x=str(x), y=str(y), fill=color, attrib={
-            'font-family': 'Microsoft YaHei, Noto Sans CJK SC, sans-serif', 'font-size': str(size),
+            'font-family': 'Segoe UI, Arial, sans-serif', 'font-size': str(size),
             'font-weight': '700' if bold else '400', 'text-anchor': 'end' if right else 'start'}).text = label
 
     text(76, 76, 'STRATA-A770  /  NATIVE INFERENCE', 26, cyan, True)
     text(1924, 76, '2026-11-04 · WINDOWS · A770 16 GB', 24, muted, right=True)
     text(76, 194, 'Orca L0', 108, bold=True)
-    text(80, 249, '推荐路径 · 原生 Level Zero 推理 · Orca Direct 为 WIP 备选', 34, muted)
+    text(80, 249, 'Recommended · Native Level Zero inference · Orca Direct is a WIP alternative', 34, muted)
     rect(72, 294, 890, 308, '#133033')
     rect(984, 294, 944, 308, '#111f32')
     paired_direct, l0 = pairs[0]
-    text(104, 347, '推荐 L0 · 固定短代码热态', 30, '#b5d5cc')
+    text(104, 347, 'Recommended L0 · Warm fixed-code input', 30, '#b5d5cc')
     text(100, 508, f'{l0:.2f}', 154, green, True)
     text(920, 505, 'tok/s', 46, green, True, True)
-    text(104, 564, f'相对独立实测 SYCL 基线  {l0_gain:+.2f}%', 34, green, True)
-    text(1018, 347, '同策略夹测：L0 → Direct → L0', 30, muted)
+    text(104, 564, f'vs independently measured SYCL  {l0_gain:+.2f}%', 34, green, True)
+    text(1018, 347, 'Matched-policy bracket: L0 → Direct → L0', 30, muted)
     maximum = math.ceil(max(l0, paired_direct) / 10) * 10
     for y, label, rate, color in ((376, 'Orca L0', l0, green), (465, 'Direct · WIP', paired_direct, '#90a5bd')):
         text(1018, y+36, label, 26, color, True)
         rect(1220, y, 480, 48, '#1d3048', 7)
         rect(1220, y, 480*rate/maximum, 48, color, 7)
         text(1894, y+38, f'{rate:.2f}', 38, color, True, True)
-    text(1018, 559, f'同轮 Direct 低 {100*(1-paired_direct/l0):.2f}% · L0 反向复测 {pairs[1][1]:.2f}', 27, muted)
-    text(76, 653, f'WIP 备选 Direct：相对 SYCL {gain:+.2f}%'
-         f'（{baseline:.2f} → {direct:.2f} tok/s，独立整版本夹测）', 29, muted)
+    text(1018, 559, f'Direct is {100*(1-paired_direct/l0):.2f}% slower here · Reverse L0: {pairs[1][1]:.2f}', 27, muted)
+    text(76, 653, f'Direct WIP: {gain:+.2f}% vs SYCL'
+         f' ({baseline:.2f} → {direct:.2f} tok/s, separate whole-version bracket)', 29, muted)
     rect(72, 693, 1856, 373, '#101d2e')
-    text(104, 744, '三种 Windows 调用链路', 34, cyan, True)
-    common = [(1205, 180, 'D3DKMT'), (1415, 255, 'Windows 内核驱动'), (1700, 190, 'Intel GPU')]
+    text(104, 744, 'Three Windows call paths', 34, cyan, True)
+    common = [(1205, 180, 'D3DKMT'), (1415, 255, 'Windows KMD'), (1700, 190, 'Intel GPU')]
     paths = [
         ('SYCL', 775, '#20314a', '#c5d2e4', [(295, 180, 'Strata'), (505, 170, 'SYCL'),
             (705, 120, 'UR'), (855, 320, 'Level Zero / Intel UMD')]),
-        ('L0 · 推荐', 865, '#17414b', green, [(295, 180, 'Strata'), (505, 320, 'Orca L0'),
+        ('L0 · Default', 865, '#17414b', green, [(295, 180, 'Strata'), (505, 320, 'Orca L0'),
             (855, 320, 'Level Zero / Intel UMD')]),
-        ('Direct WIP', 955, '#20314a', '#90a5bd', [(295, 180, 'Strata'), (505, 670, 'Orca Direct · WIP 备选 · GPU 命令编码')]),
+        ('Direct WIP', 955, '#20314a', '#90a5bd', [(295, 180, 'Strata'), (505, 670, 'Orca Direct · WIP · GPU command encoding')]),
     ]
     for label, y, fill, color, nodes in paths:
         text(104, y+35, label, 26, color, True)
@@ -150,13 +150,13 @@ def main():
             text(x+15, y+35, name, 24, color, True, limit=w-25)
             if index+1 < len(nodes):
                 text(x+w+5, y+35, '→', 24, color)
-    text(104, 1045, '执行提交路径示意 · UR = Unified Runtime · 离线内核构建仍使用 Intel 编译器', 25, muted)
+    text(104, 1045, 'UR = Unified Runtime · UMD / KMD = user-mode / kernel-mode driver · Offline kernels use the Intel compiler', 25, muted)
     rect(72, 1096, 1856, 238, '#101d2e')
-    text(104, 1145, 'L0 双向对照 90 次、独立 SYCL 对照 45 次：输出一致 · 每进程 10 次预热 + 5 次保留', 29, green, True)
-    text(104, 1194, '28 输入 / 76 自然输出 · 5771 槽 · read256 / decay0.95 · MTP4 · 累计门槛 0', 27, muted)
-    text(104, 1240, '同参数整版本对比，包含数值内核、调度与缓存策略差异；提升不能全部归于 API。', 27, muted)
-    text(104, 1286, 'L0 对 SYCL 增幅为跨组速率参考；decode 排除准备和预填充，固定输入非通用速度。', 27, muted)
-    text(76, 1396, '推荐使用 Orca L0 · Orca Direct 为 WIP 备选 · GPU 时钟未锁定 · 无新增 PPL / Linux GPU 结论', 25, muted)
+    text(104, 1145, '90 L0 comparison requests + 45 separate SYCL requests match · 10 warmups + 5 retained per process', 29, green, True)
+    text(104, 1194, '28 input / 76 natural output · 5771 slots · read256 / decay0.95 · MTP4 · Cumulative threshold 0', 27, muted)
+    text(104, 1240, 'Matched parameters; whole versions differ in numerical kernels, scheduling and cache policies. No API-only attribution.', 27, muted)
+    text(104, 1286, 'L0/SYCL is a cross-cohort reference. Decode excludes preparation/prefill. Fixed-input speed is workload-specific.', 27, muted)
+    text(76, 1396, 'Orca L0 recommended · Direct is WIP · GPU clocks unlocked · No new PPL or Linux GPU conclusions', 25, muted)
     out = ROOT / 'docs/media/orca-direct-optimization'
     ET.indent(svg, space='  ')
     ET.ElementTree(svg).write(out.with_suffix('.svg'), encoding='utf-8', xml_declaration=True)

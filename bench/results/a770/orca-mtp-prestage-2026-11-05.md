@@ -39,4 +39,4 @@ python -X utf8 build-orca-slm-async-20261104/publish_mtp_prestage.py --check
 
 重测先prepare新目录，再run；不覆盖原始记录。
 [精确JSON](../../../sycl/orca/mtp-prestage-a770-windows-2026-11-05.json) ·
-[原始证据](../../../sycl/orca/mtp-prestage-a770-windows-2026-11-05.json.gz)
+原始证据 (`mtp-prestage-a770-windows-2026-11-05.json.gz`, raw capture retained locally)

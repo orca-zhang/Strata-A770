@@ -298,8 +298,11 @@ public:
     }
     void write_global_timestamp(uint64_t* destination) {
         before();
-        // A command-stream timestamp alone can overtake an earlier pipeline's work.
+        // DG2's ordered PIPE_CONTROL timestamp already stalls and flushes prior work.
+        // Level Zero's raw timestamp still needs the explicit preceding barrier.
+#ifndef STRATA_ORCA_DG2
         stream_.barrier();
+#endif
         stream_.write_global_timestamp(destination);
         record_node(sycl::ext::oneapi::experimental::node_type::ext_oneapi_barrier);
         needs_barrier_ = true; // Timestamp writes preserve ordering on relaxed recorded lists too.
@@ -359,8 +362,25 @@ public:
         state->completed_through = sequence_;
         return Event(std::move(state));
     }
-    void depends_on(const Event& event) { ext_oneapi_submit_barrier({event}); }
-    void depends_on(std::initializer_list<Event> events) { ext_oneapi_submit_barrier(events); }
+    void depends_on(const Event& event) { depends_on({event}); }
+    void depends_on(std::initializer_list<Event> events) {
+#ifdef STRATA_ORCA_DG2
+        if (runtime_.dependency_only && !recording_ && events.size()) {
+            // ponytail: eager callers export no completion here. Keep the wait
+            // with subsequent work; queue switches and explicit markers flush it.
+            before();
+            bool waited = false;
+            for (const auto& event : events) if (auto handle = event.native()) {
+                retain(event.state_);
+                stream_.barrier(nullptr, {handle});
+                waited = true;
+            }
+            if (!waited) stream_.barrier();
+            return;
+        }
+#endif
+        ext_oneapi_submit_barrier(events);
+    }
     void depends_on(const std::vector<Event>& events) { for (const auto& e : events) depends_on(e); }
     bool wait(uint64_t timeout_ns = 30000000000ULL) {
         // The watchdog may observe completion from another thread. Only the

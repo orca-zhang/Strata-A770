@@ -1,0 +1,19 @@
+# 完整 Verifier 窗口：恢复 PLE 输入后检查重复回放
+
+2026-11-08，Windows10／Arc A770 16GB／驱动32.0.101.9034／oneAPI2025.3.2。
+
+复用上一轮合格纯原生运行时和修正驻留统计的L0；固定HC128／MTP4／min-p0.5／reserve1536及5771槽条件，数学包、其他Host对象和profile保留。每个新进程2次Code2K后接10次Short，固定L0→Direct→L0，不重试或放宽容量。只在第10次Short的pos23／T4首窗口做隔离诊断，没有重测8K。
+
+图内会推进PLE历史，所以仅跳过commit后盲目重复图不等价。本诊断保存原窗口之前的PLE历史，每次额外回放前恢复它并重置原有flag／事件。以第一次正常图完成后的状态为参考，每次逐字节核对完整GDN状态、连续QSA状态arena（包含全部驻留FP16 KV和索引）、PLE历史、T行历史快照、全部logits及采样ID；不支持流式／压缩／弹性KV或其他执行策略时拒绝。没有猜测其他状态的恢复规则，任何非幂等写入均保留为失败。
+
+每进程10次额外回放，前2次预热、后8次取中位数；两端L0取几何均值，控制耗时漂移上限3%。Host计时仅覆盖原图提交及原等待路径；恢复、全状态回读／比较和打印均在计时外。全状态回读会改变缓存，属于诊断环境；不是纯kernel时间或无探针模型吞吐，也不能把重复窗口的结果外推为自回归收益。
+
+完成普通模型请求0条／输出0个，独立原始协议复核通过；76个实际编译头与冻结父对照摘要一致。
+
+本次保留失败：`AssertionError('capacity failure; no retry')`。没有完整合格回放对照，不报告窗口提速；已完成请求、错误协议和源码全部保留。
+
+生产源码、部署EXE、默认推荐Orca L0和Linux GPU待测状态保持。没有新增模型吞吐、TTFT或PPL成绩。
+
+[父同条件对照](orca-direct-qualified-contexts-r2-2026-11-08.md) · [JSON](../../../sycl/orca/direct-whole-window-replay-reset-a770-windows-2026-11-08.json) · 精确诊断源码、实际编译头和原协议 (`direct-whole-window-replay-reset-a770-windows-2026-11-08.json.gz`, raw capture retained locally)
+
+离线复核：`python -X utf8 build-orca-window-replay-reset-20261108/publish.py check`。新测量使用新目录和计划，保留原同条件资产身份缓存与全部历史，不覆盖本次采样。

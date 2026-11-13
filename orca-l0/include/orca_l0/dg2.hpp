@@ -93,7 +93,7 @@ private:
 };
 struct MemoryInfo {
     uint64_t total = 0, available = 0;
-    // Windows reports a process budget; Linux reports region availability,
+    // Windows clamps its process budget to global local-memory availability; Linux reports region availability,
     // which the kernel may restrict for unprivileged callers.
     bool process_budget = false;
     bool global_availability = false;
@@ -108,6 +108,8 @@ public:
     Runtime& operator=(const Runtime&) = delete;
     Queue default_queue() const;
     Queue create_queue();
+    // Experimental DG2 BCS: copy/fill and synchronization only; no compute kernels.
+    Queue create_copy_queue();
     // Gates start unsignaled. Reusable gates record a GPU memory wait and keep
     // the same address across reset/replay; ordinary gates remain one-shot.
     HostGate create_gate(bool reusable = false);
@@ -120,7 +122,9 @@ public:
     // Requires an empty open recording; other frozen lists may be in flight.
     // With in_order=false, the caller records barriers between dependent work.
     // Explicit barriers, completion writes and required state workarounds remain.
-    void begin(const Queue&, bool in_order = true);
+    // device_parameters=false keeps indirect arguments host-backed for eager work.
+    // true preserves the calibrated mirror policy for reusable recordings.
+    void begin(const Queue&, bool in_order = true, bool device_parameters = true);
     Allocation allocate(size_t bytes);
     // Device-local GPU storage, without a CPU mapping. Transfer through GPU kernels.
     Allocation allocate_device(size_t bytes);
@@ -176,6 +180,18 @@ public:
     void append(const std::string& zebin, const std::string& kernel,
                 std::array<uint32_t, 3> local, std::array<uint32_t, 3> groups,
                 const std::vector<Argument>& arguments);
+    void append(const std::string& zebin, const std::string& kernel,
+                std::array<uint32_t, 3> local, std::array<uint32_t, 3> groups,
+                const Argument* arguments, size_t argument_count);
+    void append(const std::string& zebin, const std::string& kernel,
+                uint32_t local_x, uint32_t groups_x, std::initializer_list<Argument> arguments) {
+        append(zebin, kernel, {local_x, 1, 1}, {groups_x, 1, 1}, arguments.begin(), arguments.size());
+    }
+    void append(const std::string& zebin, const std::string& kernel,
+                std::array<uint32_t, 3> local, std::array<uint32_t, 3> groups,
+                std::initializer_list<Argument> arguments) {
+        append(zebin, kernel, local, groups, arguments.begin(), arguments.size());
+    }
     void close();
     // Close and freeze the current list, then start an empty recording. Handles
     // are borrowed from this Runtime; copies refer to the same immutable list.
@@ -212,6 +228,9 @@ public:
     void cpu_access(const Allocation&, bool write);
     // Explicit diagnostic outside timed replay; requires an idle completed list.
     void check_scratch_guards();
+    // Initialization-only: free obsolete unbound/unretained pools and descriptors.
+    // Requires idle healthy queues and an empty open recording; preserves pool indices.
+    uint64_t trim_thread_memory();
 private:
     Allocation allocate_storage(size_t, bool device_local = false);
     void transfer_storage(uint64_t destination, uint64_t source, size_t bytes, uint8_t pattern = 0);

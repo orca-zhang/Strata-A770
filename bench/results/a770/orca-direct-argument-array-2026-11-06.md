@@ -70,4 +70,4 @@ python -X utf8 -c "import sys; sys.path.insert(0,'build-orca-argument-array-2026
 ```
 
 归档保留精确输入／相关env、完整原始协议、源代码与编译／链接命令及摘要；不分发权重或二进制。
-[JSON](../../../sycl/orca/direct-argument-array-a770-windows-2026-11-06.json) · [原始文本归档](../../../sycl/orca/direct-argument-array-a770-windows-2026-11-06.json.gz)
+[JSON](../../../sycl/orca/direct-argument-array-a770-windows-2026-11-06.json) · 原始文本归档 (`direct-argument-array-a770-windows-2026-11-06.json.gz`, raw capture retained locally)

@@ -29,4 +29,4 @@ Performance: Short16 initialization; three interleaved Code/Prose2048→128 cycl
 
 These are small diagnostic cohorts. Native pair tiles, expert batching, MTP4/read256, cache5500(actual5771), reserve1536 and warm graphs stay fixed. GPU work holds the shared lock. Lower thresholds keep the same host payload but copy more expert weights. Decode math is unchanged; output and speculative acceptance can differ.
 
-Evidence: [JSON](../../../sycl/orca/u4-threshold-a770-windows-2026-11-04.json), [text archive](../../../sycl/orca/u4-threshold-a770-windows-2026-11-04.json.gz). Recompute: `python -X utf8 build-orca-u4-tune-20261104/publish.py --check`. No weights, input tensors or dumps are archived.
+Evidence: [JSON](../../../sycl/orca/u4-threshold-a770-windows-2026-11-04.json), text archive (`u4-threshold-a770-windows-2026-11-04.json.gz`, raw capture retained locally). Recompute: `python -X utf8 build-orca-u4-tune-20261104/publish.py --check`. No weights, input tensors or dumps are archived.

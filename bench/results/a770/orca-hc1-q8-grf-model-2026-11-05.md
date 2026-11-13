@@ -41,4 +41,4 @@ python -X utf8 build-orca-slm-async-20261104/publish_hc1_grf_model.py --check
 运行库、精确argv/env与请求历史。归档保留输入、参考、源码、协议、配置、每次样本及依赖哈希，
 单映像编译证据见组件报告，不分发模型或EXE。准备在锁前完成，GPU／重型哈希／发布持共享实验锁。
 [精确JSON](../../../sycl/orca/hc1-q8-grf-model-a770-windows-2026-11-05.json) ·
-[原始证据](../../../sycl/orca/hc1-q8-grf-model-a770-windows-2026-11-05.json.gz)
+原始证据 (`hc1-q8-grf-model-a770-windows-2026-11-05.json.gz`, raw capture retained locally)

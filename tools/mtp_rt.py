@@ -11,8 +11,9 @@ Writes
                 RMSNorm weights as F32 with the Gemma "+1" applied (vLLM GemmaRMSNorm scales by 1 + w).
   dense.txt     one line per tensor: name kind rows cols offset bytes   (kind = q8_0 | bf16 | f32)
 
-Q8_0 expert GGUFs instead write experts.q8_0.bin in the existing native grouped-expert layout
-(gate, up, down rows). The SYCL MTP path selects it with STRATA_MTP_Q8_EXPERTS=1.
+Q5_0/Q8_0 expert GGUFs instead write experts.q5_0.bin / experts.q8_0.bin in the existing
+native grouped-expert layout (gate, up, down rows). The SYCL MTP path selects them with
+STRATA_MTP_EXPERTS=q5_0 / q8_0; Q2_0 remains the default.
 """
 from __future__ import annotations
 
@@ -48,11 +49,14 @@ def q8_0(x: np.ndarray) -> bytes:
     return out.tobytes()
 
 
-def blob_of(gu: np.ndarray, dn: np.ndarray, *, q8: bool = False) -> bytes:
-    """Pack gate/up then down byte rows into the Q2_0 split planes or native Q8_0 layout."""
-    if q8:
-        if gu.shape != (2 * FF, H // 32 * 34) or dn.shape != (H, FF // 32 * 34):
-            raise ValueError("MTP Q8_0 expert dimensions do not match the native layout")
+def blob_of(gu: np.ndarray, dn: np.ndarray, *, kind: str = "q2_0") -> bytes:
+    """Pack byte rows into Q2_0 split planes or the native gate/up/down layout."""
+    if kind not in ("q2_0", "q5_0", "q8_0"):
+        raise ValueError(f"unsupported MTP expert format: {kind}")
+    block, size = (64, 18) if kind == "q2_0" else (32, 22 if kind == "q5_0" else 34)
+    if gu.dtype != np.uint8 or dn.dtype != np.uint8 or gu.shape != (2 * FF, H // block * size) or dn.shape != (H, FF // block * size):
+        raise ValueError(f"MTP {kind} expert dimensions or byte dtype do not match the runtime layout")
+    if kind != "q2_0":
         return gu.tobytes() + dn.tobytes()
     gub = gu.reshape(2 * FF, H // 64, 18)
     inter = np.empty_like(gub)
@@ -76,17 +80,18 @@ def main() -> int:
     tens = {t.name: t for t in r.tensors}
     gut = tens["mtp.layers.0.mlp.experts.gate_up_proj"]
     dnt = tens["mtp.layers.0.mlp.experts.down_proj"]
-    if gut.tensor_type != dnt.tensor_type or int(gut.tensor_type) not in (42, 8):
-        raise ValueError("MTP runtime experts must both be Q2_0 or both be Q8_0")
-    q8 = int(gut.tensor_type) == 8
+    if gut.tensor_type != dnt.tensor_type or int(gut.tensor_type) not in (42, 6, 8):
+        raise ValueError("MTP runtime experts must both be Q2_0, Q5_0 or Q8_0")
+    kind = {42: "q2_0", 6: "q5_0", 8: "q8_0"}[int(gut.tensor_type)]
     gu, dn = np.asarray(gut.data), np.asarray(dnt.data)
-    gu_row, dn_row = (H // 32 * 34, FF // 32 * 34) if q8 else (H // 64 * 18, FF // 64 * 18)
+    block, size = gguf.GGML_QUANT_SIZES[gut.tensor_type]
+    gu_row, dn_row = H // block * size, FF // block * size
     if gu.shape != (NE, 2 * FF, gu_row) or dn.shape != (NE, H, dn_row):
         raise ValueError(f"MTP expert dimensions do not match: {gu.shape}, {dn.shape}")
-    expert_name = "experts.q8_0.bin" if q8 else "experts.bin"
+    expert_name = "experts.bin" if kind == "q2_0" else f"experts.{kind}.bin"
     with open(out / expert_name, "wb") as f:
         for e in range(NE):
-            f.write(blob_of(gu[e], dn[e], q8=q8))
+            f.write(blob_of(gu[e], dn[e], kind=kind))
     lines = []
     off = 0
     with open(out / "dense.bin", "wb") as f:

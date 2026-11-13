@@ -4,6 +4,7 @@ Generated files live only in the build tree. The SYCL baseline and its source
 files remain available for same-source comparisons.
 """
 import argparse
+import hashlib
 from pathlib import Path
 import re
 
@@ -56,6 +57,11 @@ def engine_source(text):
                 indent + f'if ({condition})\n' +
                 indent + f'    mtp.set_max_drafts((int) std::min<int64_t>(S_mtp - 1, {remaining} - 1));\n' +
                 '#endif\n' + marker)
+    if "void mark_event(dpct::event_ptr ev, dpct::queue_ptr q)" in text:
+        # ponytail: these prefill sites discard the returned event; retain exported markers.
+        text, count = re.subn(r"ext_oneapi_submit_barrier\((\s*\{)", r"depends_on(\1", text)
+        if count != 16:
+            raise ValueError("prefill dependency sites changed; review discarded completion events")
     # Native waits use signed nanoseconds; normalize the legacy teardown sentinel.
     text = text.replace("wait_verify_queue(cs_, l0_sync_, UINT64_MAX)",
                         "wait_verify_queue(cs_, l0_sync_, uint64_t(INT64_MAX))")
@@ -63,7 +69,7 @@ def engine_source(text):
         lambda match: match[1] + re.sub(r"\breturn (?!nullptr;)([^;\n]+);",
             r"return strata::l0::device_pointer(\1, dpct::get_in_order_queue());", match[2]) + match[3],
         text, flags=re.S | re.M)
-    for target in ("m.copy", "copy_"):
+    for target in ("m.copy", "copy_", "adapt_stream"):
         text = text.replace(target + " = dpct::get_current_device().create_queue(true)",
                             target + " = strata::l0::create_copy_queue()")
     if "strata::l0::create_copy_queue()" in text:
@@ -214,13 +220,37 @@ def device_util(text):
 
 def xmx_kernel(text):
     begin = "template <class Input, int NSG = 8>"
+    paired = "template <class Input, int NSG = 8, int ROWS = 8>"
+    if paired in text:
+        # SYCL now shares B across two M4 accumulators. Preserve Orca's separately
+        # measured M4 tile and BF16 kernel, including the generated source order.
+        start = text.index("                jm::joint_matrix<sycl::sub_group, float, jm::use::accumulator, ROWS, TILE>")
+        stop = text.index("                    sycl::group_barrier(sg);", start)
+        if hashlib.sha256(text[start:stop].encode()).hexdigest() != "85651206517423fb4fe6c3ddf2e9c5672921a9cb2ff9c1d9c39ec642f7a86967":
+            raise ValueError("SYCL paired XMX body changed; review the Orca adapter")
+        text = text[:start] + '''                jm::joint_matrix<sycl::sub_group, float, jm::use::accumulator, TILE, TILE> c;
+                jm::joint_matrix_fill(sg, c, 0.f);
+                for (int64_t k = 0; k < K; k += 16) {
+                    jm::joint_matrix<sycl::sub_group, Input, jm::use::a, TILE, 16, jm::layout::row_major> a;
+                    jm::joint_matrix<sycl::sub_group, Input, jm::use::b, 16, TILE, jm::layout::col_major> b;
+                    jm::joint_matrix_load(sg, a, gptr(source + k), stride);
+                    jm::joint_matrix_load(sg, b, gptr(w + col * K + k), size_t(K));
+                    jm::joint_matrix_mad(sg, c, a, b, c);
+                }
+                if (row + TILE <= T) {
+                    jm::joint_matrix_store(sg, c, gptr(Y + row * N + col), size_t(N), jm::layout::row_major);
+                } else {
+                    auto* tmp = tail.get_multi_ptr<sycl::access::decorated::no>().get() + subgroup * TILE * TILE;
+                    jm::joint_matrix_store(sg, c, sycl::address_space_cast<sycl::access::address_space::local_space,
+                        sycl::access::decorated::no>(tmp), TILE, jm::layout::row_major);
+''' + text[stop:]
+        text = text.replace(paired, begin)
     end = "bool native_xmx_gemm("
     if text.count(begin) != 1 or text.count(end) != 1:
         raise ValueError("Strata native XMX section changed; review the compiler adapter")
     kernel = text[text.index(begin):text.index(end)]
     kernel = transform(kernel)
-    # ponytail: duplicate only the generated FP16 tile, retaining the checked
-    # BF16 exports and original SYCL source. Wider tile selection needs measurements.
+    # Retain the checked M4 tails and BF16 exports alongside the FP16 register tile.
     small = kernel
     for original, native in {
         "native_xmx_launch(": "native_xmx_launch_m4(",
@@ -240,11 +270,65 @@ def xmx_kernel(text):
         small = small.replace(original, native)
     # Preserve the tested candidate's generated source, including this comment.
     small = "// Diagnostic only: use repeat-count 4 DPAS, retaining K accumulation order.\n" + small
-    return '''#include <dpct/dpct.hpp>
+    return '''#include <cstdlib>
+#include <cstring>
+#include <sycl/ext/intel/experimental/grf_size_properties.hpp>
+#include <dpct/dpct.hpp>
 #include <climits>
 namespace strata::prefill {
 ''' + kernel + '''
 ''' + small + '''
+
+class OrcaFp16ProjectionWide;
+void native_xmx_launch_m16(const uint16_t* input, const uint16_t* weight, float* y,
+                           int64_t t, int64_t n, int64_t k, int64_t stride, strata::l0::Queue* queue) {
+    auto& q = *queue;
+    if (!t) return;
+    namespace jm = sycl::ext::oneapi::experimental::matrix;
+    constexpr int SG = 8, NSG = 8;
+    q.parallel_for<OrcaFp16ProjectionWide>(sycl::nd_range<3>(
+        sycl::range<3>(size_t(t / 16), size_t(n / 64), SG * NSG),
+        sycl::range<3>(1, 1, SG * NSG)),
+        sycl::ext::oneapi::experimental::properties{sycl::ext::intel::experimental::grf_size<256>},
+        [=](sycl::nd_item<3> it) [[sycl::reqd_sub_group_size(SG)]] {
+        const auto sg = it.get_sub_group();
+        const int sid = int(sg.get_group_id()[0]);
+        const int row = int(it.get_group(0)) * 16 + sid / 4 * 8;
+        const int col = int(it.get_group(1)) * 64 + sid % 4 * 16;
+        const auto* x = reinterpret_cast<const sycl::half*>(input);
+        const auto* w = reinterpret_cast<const sycl::half*>(weight);
+        auto gp = [](auto* p) { return sycl::address_space_cast<sycl::access::address_space::global_space,
+            sycl::access::decorated::no>(p); };
+        using A = jm::joint_matrix<sycl::sub_group, sycl::half, jm::use::a, 4, 16, jm::layout::row_major>;
+        using B = jm::joint_matrix<sycl::sub_group, sycl::half, jm::use::b, 16, 8, jm::layout::col_major>;
+        jm::joint_matrix<sycl::sub_group, float, jm::use::accumulator, 4, 8> acc[2][2];
+        #pragma unroll
+        for (int r = 0; r < 2; ++r)
+            #pragma unroll
+            for (int c = 0; c < 2; ++c) jm::joint_matrix_fill(sg, acc[r][c], 0.f);
+        for (int z = 0; z < k; z += 64) {
+            #pragma unroll
+            for (int j = 0; j < 64; j += 16) {
+                A aa[2]; B bb[2];
+                #pragma unroll
+                for (int r = 0; r < 2; ++r) {
+                    jm::joint_matrix_load(sg, aa[r], gp(x + size_t(row + r * 4) * stride + z + j), size_t(stride));
+                    jm::joint_matrix_load(sg, bb[r], gp(w + size_t(col + r * 8) * k + z + j), size_t(k));
+                }
+                #pragma unroll
+                for (int r = 0; r < 2; ++r)
+                    #pragma unroll
+                    for (int c = 0; c < 2; ++c) jm::joint_matrix_mad(sg, acc[r][c], aa[r], bb[c], acc[r][c]);
+            }
+        }
+        #pragma unroll
+        for (int r = 0; r < 2; ++r)
+            #pragma unroll
+            for (int c = 0; c < 2; ++c)
+                jm::joint_matrix_store(sg, acc[r][c], gp(y + size_t(row + r * 4) * n + col + c * 8), size_t(n), jm::layout::row_major);
+    });
+}
+
 void orca_xmx_gemm(const uint16_t* x, const uint16_t* w, float* y,
                    int64_t t, int64_t n, int64_t k, int64_t stride,
                    const uint16_t* tail, bool bf16, void* stream) {
@@ -253,6 +337,19 @@ void orca_xmx_gemm(const uint16_t* x, const uint16_t* w, float* y,
         n % 8 || k % 16 || (t % 8 && !tail))
         throw std::invalid_argument("invalid native XMX dimensions/pointers/tail");
     auto* queue = &strata::l0::stream_of(stream);
+    // ponytail: calibrated full tiles only; retain the checked M4 tails and BF16.
+    static const bool wide = [] {
+        const char* value = std::getenv("STRATA_ORCA_XMX_WIDE");
+        if (!value || !std::strcmp(value, "1")) return true;
+        if (!std::strcmp(value, "0")) return false;
+        throw std::invalid_argument("STRATA_ORCA_XMX_WIDE must be 0 or 1");
+    }();
+    const int64_t full = wide && !bf16 && t >= 128 && n % 64 == 0 && k % 64 == 0 ? t / 16 * 16 : 0;
+    if (full) {
+        native_xmx_launch_m16(x, w, y, full, n, k, stride, queue);
+        x += full * stride; y += full * n; t -= full;
+        if (!t) return;
+    }
     // Keep the same measured A770 small-projection choice as native_xmx_gemm.
     if (bf16 && n == 8 && k == 10240 && (t == 1024 || t == 2069) &&
         queue->get_device().get_info<sycl::info::device::name>().find("A770") != std::string::npos)

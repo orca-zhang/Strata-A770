@@ -1,0 +1,7179 @@
+{
+  "date": "2026-11-04",
+  "machine": "Windows10 22H2;Arc A77016GB;32.0.101.9034;oneAPI2025.3",
+  "production_changed": false,
+  "results": {
+    "initial": {
+      "complete": true,
+      "production_changed": false,
+      "scope": "Isolated A770 XMX SLM screen; kernel timing is not model/runtime speedup.",
+      "commands": [
+        {
+          "label": "build",
+          "exit_code": 0
+        },
+        {
+          "label": "smoke",
+          "exit_code": 0
+        },
+        {
+          "label": "screen",
+          "exit_code": 0
+        }
+      ],
+      "sha256": {
+        "G:\\GitHub\\Strata\\build-orca-slm-async-20261104\\xmx_slm_probe.cpp": "3e8d359938b6eb8684bb9f3eb6d26c33841c3ac7cbbf95f0674627cbf558fdfc",
+        "G:\\GitHub\\Strata\\build-orca-slm-async-20261104\\run.py": "197beb98fc17b6383fdd74f1d9ad287596368ef00193341c32556ff504ea823e",
+        "G:\\GitHub\\Strata\\build-orca-slm-async-20261104\\r3\\smoke.command.txt": "584d5016cd4c8ff35c5d9f9ac609cdf09fe30cac78690fc89d3854d9e0fa13f3",
+        "G:\\GitHub\\Strata\\build-orca-slm-async-20261104\\r3\\screen.stdout": "5ae154b2c9da478bca01961e038bee66dcbcd893d13a89a3e91db3ccdecf8392",
+        "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\include\\sycl\\ext\\intel\\experimental\\esimd\\memory.hpp": "089103ea698fb291109a16d0e775ee95ef9cc0bbcda72a0624fbd4d91fc13104",
+        "G:\\GitHub\\Strata\\build-orca-slm-async-20261104\\r3\\runner.py": "197beb98fc17b6383fdd74f1d9ad287596368ef00193341c32556ff504ea823e",
+        "G:\\GitHub\\Strata\\build-orca-slm-async-20261104\\r3\\smoke.stdout": "739582979d76861c34abed5958188d3efba57a345b43d238c40ad707fdb11cfa",
+        "G:\\GitHub\\Strata\\build-orca-slm-async-20261104\\r3\\smoke.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\include\\sycl\\ext\\oneapi\\matrix\\matrix.hpp": "dcbe275f786933355100c8404b6de32be0fb2f9bfca129f483807c2bf07980e5",
+        "G:\\GitHub\\Strata\\build-orca-slm-async-20261104\\r3\\build.command.txt": "ff20fbdcba253922738fbfbf7b6f4c735259f106048eaac0856f34a101dc132e",
+        "G:\\GitHub\\Strata\\build-orca-slm-async-20261104\\r3\\build.stderr": "aeb5c67bd854ded47f9143f69bba2624c6f27f7df7c29e1253a1e3aabe886d26",
+        "G:\\GitHub\\Strata\\build-orca-slm-async-20261104\\r3\\screen.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\include\\sycl\\ext\\intel\\experimental\\grf_size_properties.hpp": "8f5b302db7ed8a2c17314e8a4019de1971c5489cef904bd5bf0db63116eb9a18",
+        "G:\\GitHub\\Strata\\build-orca-slm-async-20261104\\r3\\build.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\include\\sycl\\ext\\intel\\esimd\\memory.hpp": "2b375a54481eb35f42c2c9bc03f169c6ed5c09a002770f41912dd0faa042d639",
+        "G:\\GitHub\\Strata\\tools\\bench_deepinfer.py": "edef8c0e8c439c028b0c4787c069abab6932b0333df00a0128b76a33083bc868",
+        "G:\\GitHub\\Strata\\build-orca-slm-async-20261104\\r3\\probe.cpp": "3e8d359938b6eb8684bb9f3eb6d26c33841c3ac7cbbf95f0674627cbf558fdfc",
+        "G:\\GitHub\\Strata\\build-orca-slm-async-20261104\\r3\\probe.exe": "451c484fd8d0ede65730ca433cbd88f82a5d3c87f4c186caec5de571cf1f1d74",
+        "G:\\GitHub\\Strata\\build-orca-slm-async-20261104\\r3\\screen.command.txt": "60d462e1e282ba4196e55945a7356d12d70dd23340d6e4ee00da475ba54fa3c8",
+        "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin\\icx.exe": "05dde96e473c7362cf4a89a0dc3daa1fb723ec6014c849f773fddfb69ba9f79b"
+      },
+      "modes": {
+        "0": "M4N64 global load",
+        "1": "M4N64 register lookahead",
+        "2": "M8N32 BK64 padded SLM",
+        "3": "M8N32 BK64 double SLM with register lookahead"
+      },
+      "notes": [
+        "All variants request256 GRFs;actual occupancy/spills/overlap are unmeasured.",
+        "SLM variants also change workgroup tile;this is a combined kernel screen.",
+        "3 warmups and9 individual kernel timestamps per phase;no JIT/copy/CPU/model timing.",
+        "Same buffers and queue,A/B/A/C/A/D/A per shape;unlocked clocks."
+      ],
+      "smoke": {
+        "rows": [
+          {
+            "M": 13,
+            "N": 64,
+            "K": 64,
+            "phase": 0,
+            "mode": 0,
+            "median_us": 85.8,
+            "samples_us": [
+              44.096,
+              85.8,
+              85.904
+            ]
+          },
+          {
+            "M": 13,
+            "N": 64,
+            "K": 64,
+            "phase": 1,
+            "mode": 1,
+            "median_us": 75.816,
+            "samples_us": [
+              44.096,
+              86.84,
+              75.816
+            ]
+          },
+          {
+            "M": 13,
+            "N": 64,
+            "K": 64,
+            "phase": 2,
+            "mode": 0,
+            "median_us": 64.688,
+            "samples_us": [
+              44.512,
+              64.688,
+              82.472
+            ]
+          },
+          {
+            "M": 13,
+            "N": 64,
+            "K": 64,
+            "phase": 3,
+            "mode": 2,
+            "median_us": 84.24,
+            "samples_us": [
+              75.088,
+              84.24,
+              90.168
+            ]
+          },
+          {
+            "M": 13,
+            "N": 64,
+            "K": 64,
+            "phase": 4,
+            "mode": 0,
+            "median_us": 80.08,
+            "samples_us": [
+              44.616,
+              80.08,
+              100.152
+            ]
+          },
+          {
+            "M": 13,
+            "N": 64,
+            "K": 64,
+            "phase": 5,
+            "mode": 3,
+            "median_us": 66.352,
+            "samples_us": [
+              65.208,
+              66.352,
+              84.76
+            ]
+          },
+          {
+            "M": 13,
+            "N": 64,
+            "K": 64,
+            "phase": 6,
+            "mode": 0,
+            "median_us": 47.632,
+            "samples_us": [
+              44.512,
+              47.632,
+              86.216
+            ]
+          }
+        ],
+        "comparisons": [
+          {
+            "M": 13,
+            "N": 64,
+            "K": 64,
+            "mode": 1,
+            "control_us": 74.4998684562597,
+            "candidate_us": 75.816,
+            "throughput_pct": -1.7359548693419602,
+            "control_duration_drift_pct": -24.6060606060606
+          },
+          {
+            "M": 13,
+            "N": 64,
+            "K": 64,
+            "mode": 2,
+            "control_us": 71.97371075608093,
+            "candidate_us": 84.24,
+            "throughput_pct": -14.561122084424339,
+            "control_duration_drift_pct": 23.794212218649502
+          },
+          {
+            "M": 13,
+            "N": 64,
+            "K": 64,
+            "mode": 3,
+            "control_us": 61.76059067075055,
+            "candidate_us": 66.352,
+            "throughput_pct": -6.919775333448053,
+            "control_duration_drift_pct": -40.519480519480524
+          }
+        ]
+      },
+      "screen": {
+        "rows": [
+          {
+            "M": 4,
+            "N": 1280,
+            "K": 2560,
+            "phase": 0,
+            "mode": 0,
+            "median_us": 194.272,
+            "samples_us": [
+              174.616,
+              192.088,
+              221.312,
+              226.408,
+              194.272,
+              231.4,
+              193.648,
+              227.032,
+              182.104
+            ]
+          },
+          {
+            "M": 4,
+            "N": 1280,
+            "K": 2560,
+            "phase": 1,
+            "mode": 1,
+            "median_us": 211.12,
+            "samples_us": [
+              180.232,
+              211.12,
+              221,
+              173.056,
+              239.928,
+              204.152,
+              233.376,
+              196.768,
+              243.776
+            ]
+          },
+          {
+            "M": 4,
+            "N": 1280,
+            "K": 2560,
+            "phase": 2,
+            "mode": 0,
+            "median_us": 212.68,
+            "samples_us": [
+              204.568,
+              212.68,
+              225.368,
+              180.856,
+              218.504,
+              311.688,
+              171.288,
+              319.176,
+              173.992
+            ]
+          },
+          {
+            "M": 4,
+            "N": 1280,
+            "K": 2560,
+            "phase": 3,
+            "mode": 2,
+            "median_us": 807.144,
+            "samples_us": [
+              791.232,
+              829.608,
+              810.68,
+              807.04,
+              791.752,
+              810.992,
+              807.144,
+              819.312,
+              805.688
+            ]
+          },
+          {
+            "M": 4,
+            "N": 1280,
+            "K": 2560,
+            "phase": 4,
+            "mode": 0,
+            "median_us": 216.424,
+            "samples_us": [
+              177.84,
+              201.76,
+              216.424,
+              222.768,
+              227.968,
+              176.28,
+              231.088,
+              202.176,
+              241.904
+            ]
+          },
+          {
+            "M": 4,
+            "N": 1280,
+            "K": 2560,
+            "phase": 5,
+            "mode": 3,
+            "median_us": 462.488,
+            "samples_us": [
+              442.312,
+              464.048,
+              472.992,
+              458.328,
+              464.464,
+              473.2,
+              462.384,
+              461.344,
+              462.488
+            ]
+          },
+          {
+            "M": 4,
+            "N": 1280,
+            "K": 2560,
+            "phase": 6,
+            "mode": 0,
+            "median_us": 212.264,
+            "samples_us": [
+              175.344,
+              205.4,
+              222.664,
+              177.632,
+              232.024,
+              195.52,
+              236.6,
+              213.928,
+              212.264
+            ]
+          },
+          {
+            "M": 16,
+            "N": 1280,
+            "K": 2560,
+            "phase": 0,
+            "mode": 0,
+            "median_us": 208.416,
+            "samples_us": [
+              175.968,
+              208.416,
+              180.44,
+              225.68,
+              195.208,
+              210.6,
+              221.416,
+              342.472,
+              176.28
+            ]
+          },
+          {
+            "M": 16,
+            "N": 1280,
+            "K": 2560,
+            "phase": 1,
+            "mode": 1,
+            "median_us": 214.552,
+            "samples_us": [
+              169.416,
+              165.256,
+              240.968,
+              214.552,
+              224.952,
+              172.952,
+              228.904,
+              188.448,
+              231.4
+            ]
+          },
+          {
+            "M": 16,
+            "N": 1280,
+            "K": 2560,
+            "phase": 2,
+            "mode": 0,
+            "median_us": 196.976,
+            "samples_us": [
+              185.432,
+              228.072,
+              169.936,
+              237.432,
+              196.976,
+              236.808,
+              193.128,
+              229.112,
+              194.064
+            ]
+          },
+          {
+            "M": 16,
+            "N": 1280,
+            "K": 2560,
+            "phase": 3,
+            "mode": 2,
+            "median_us": 866.944,
+            "samples_us": [
+              838.552,
+              875.368,
+              866.944,
+              964.704,
+              959.504,
+              840.736,
+              863.2,
+              867.048,
+              861.744
+            ]
+          },
+          {
+            "M": 16,
+            "N": 1280,
+            "K": 2560,
+            "phase": 4,
+            "mode": 0,
+            "median_us": 200.824,
+            "samples_us": [
+              174.096,
+              230.36,
+              171.184,
+              248.352,
+              200.824,
+              225.992,
+              178.464,
+              229.528,
+              175.136
+            ]
+          },
+          {
+            "M": 16,
+            "N": 1280,
+            "K": 2560,
+            "phase": 5,
+            "mode": 3,
+            "median_us": 506.48,
+            "samples_us": [
+              484.224,
+              515.632,
+              510.12,
+              487.552,
+              511.056,
+              506.48,
+              506.064,
+              513.656,
+              488.696
+            ]
+          },
+          {
+            "M": 16,
+            "N": 1280,
+            "K": 2560,
+            "phase": 6,
+            "mode": 0,
+            "median_us": 215.592,
+            "samples_us": [
+              177.32,
+              216.632,
+              215.592,
+              228.072,
+              176.8,
+              228.072,
+              174.408,
+              232.232,
+              174.616
+            ]
+          },
+          {
+            "M": 40,
+            "N": 1280,
+            "K": 2560,
+            "phase": 0,
+            "mode": 0,
+            "median_us": 214.552,
+            "samples_us": [
+              188.552,
+              214.552,
+              240.24,
+              196.768,
+              219.232,
+              226.2,
+              202.28,
+              218.192,
+              214.552
+            ]
+          },
+          {
+            "M": 40,
+            "N": 1280,
+            "K": 2560,
+            "phase": 1,
+            "mode": 1,
+            "median_us": 180.648,
+            "samples_us": [
+              176.072,
+              174.304,
+              180.648,
+              298.064,
+              176.488,
+              203.944,
+              204.568,
+              194.896,
+              175.136
+            ]
+          },
+          {
+            "M": 40,
+            "N": 1280,
+            "K": 2560,
+            "phase": 2,
+            "mode": 0,
+            "median_us": 209.04,
+            "samples_us": [
+              184.08,
+              230.568,
+              188.552,
+              249.288,
+              185.224,
+              243.464,
+              209.04,
+              238.056,
+              185.328
+            ]
+          },
+          {
+            "M": 40,
+            "N": 1280,
+            "K": 2560,
+            "phase": 3,
+            "mode": 2,
+            "median_us": 853.008,
+            "samples_us": [
+              835.536,
+              851.448,
+              861.952,
+              855.816,
+              861.224,
+              852.904,
+              851.136,
+              853.008,
+              877.552
+            ]
+          },
+          {
+            "M": 40,
+            "N": 1280,
+            "K": 2560,
+            "phase": 4,
+            "mode": 0,
+            "median_us": 215.176,
+            "samples_us": [
+              183.768,
+              186.264,
+              213.304,
+              227.24,
+              186.992,
+              253.032,
+              216.008,
+              249.288,
+              215.176
+            ]
+          },
+          {
+            "M": 40,
+            "N": 1280,
+            "K": 2560,
+            "phase": 5,
+            "mode": 3,
+            "median_us": 503.152,
+            "samples_us": [
+              482.352,
+              503.36,
+              507.208,
+              504.816,
+              484.64,
+              503.152,
+              496.08,
+              611.208,
+              486.928
+            ]
+          },
+          {
+            "M": 40,
+            "N": 1280,
+            "K": 2560,
+            "phase": 6,
+            "mode": 0,
+            "median_us": 220.688,
+            "samples_us": [
+              177.112,
+              230.464,
+              185.12,
+              249.496,
+              237.12,
+              217.152,
+              250.536,
+              213.824,
+              220.688
+            ]
+          },
+          {
+            "M": 160,
+            "N": 1280,
+            "K": 2560,
+            "phase": 0,
+            "mode": 0,
+            "median_us": 542.048,
+            "samples_us": [
+              540.384,
+              529.568,
+              551.928,
+              542.048,
+              555.672,
+              566.696,
+              532.896,
+              538.616,
+              542.776
+            ]
+          },
+          {
+            "M": 160,
+            "N": 1280,
+            "K": 2560,
+            "phase": 1,
+            "mode": 1,
+            "median_us": 538.408,
+            "samples_us": [
+              540.384,
+              561.808,
+              533.728,
+              538.408,
+              532.792,
+              536.64,
+              560.144,
+              514.904,
+              546.728
+            ]
+          },
+          {
+            "M": 160,
+            "N": 1280,
+            "K": 2560,
+            "phase": 2,
+            "mode": 0,
+            "median_us": 542.152,
+            "samples_us": [
+              544.232,
+              533.208,
+              541.216,
+              548.496,
+              549.224,
+              539.344,
+              527.904,
+              542.152,
+              554.112
+            ]
+          },
+          {
+            "M": 160,
+            "N": 1280,
+            "K": 2560,
+            "phase": 3,
+            "mode": 2,
+            "median_us": 1959.152,
+            "samples_us": [
+              1880.216,
+              1978.808,
+              1976.624,
+              1930.136,
+              1962.48,
+              1950.936,
+              1879.592,
+              3267.264,
+              1959.152
+            ]
+          },
+          {
+            "M": 160,
+            "N": 1280,
+            "K": 2560,
+            "phase": 4,
+            "mode": 0,
+            "median_us": 543.4,
+            "samples_us": [
+              544.44,
+              539.344,
+              531.44,
+              556.816,
+              529.776,
+              543.4,
+              542.36,
+              551.928,
+              779.376
+            ]
+          },
+          {
+            "M": 160,
+            "N": 1280,
+            "K": 2560,
+            "phase": 5,
+            "mode": 3,
+            "median_us": 1202.032,
+            "samples_us": [
+              1199.328,
+              1206.816,
+              1200.992,
+              1193.504,
+              1238.224,
+              1191.528,
+              1239.16,
+              1209.104,
+              1202.032
+            ]
+          },
+          {
+            "M": 160,
+            "N": 1280,
+            "K": 2560,
+            "phase": 6,
+            "mode": 0,
+            "median_us": 546.208,
+            "samples_us": [
+              541.736,
+              552.76,
+              538.512,
+              546.208,
+              537.992,
+              561.288,
+              574.6,
+              874.64,
+              541.32
+            ]
+          },
+          {
+            "M": 40,
+            "N": 2560,
+            "K": 640,
+            "phase": 0,
+            "mode": 0,
+            "median_us": 122.928,
+            "samples_us": [
+              117.728,
+              122.72,
+              111.904,
+              334.464,
+              137.072,
+              148.304,
+              122.928,
+              115.232,
+              156.832
+            ]
+          },
+          {
+            "M": 40,
+            "N": 2560,
+            "K": 640,
+            "phase": 1,
+            "mode": 1,
+            "median_us": 142.168,
+            "samples_us": [
+              112.216,
+              156,
+              142.168,
+              139.36,
+              141.752,
+              156.312,
+              154.856,
+              131.04,
+              143.832
+            ]
+          },
+          {
+            "M": 40,
+            "N": 2560,
+            "K": 640,
+            "phase": 2,
+            "mode": 0,
+            "median_us": 165.568,
+            "samples_us": [
+              110.24,
+              165.568,
+              150.28,
+              166.712,
+              163.8,
+              152.36,
+              185.848,
+              166.816,
+              170.248
+            ]
+          },
+          {
+            "M": 40,
+            "N": 2560,
+            "K": 640,
+            "phase": 3,
+            "mode": 2,
+            "median_us": 369.096,
+            "samples_us": [
+              335.816,
+              370.24,
+              357.136,
+              382.616,
+              369.096,
+              645.944,
+              658.528,
+              334.776,
+              355.472
+            ]
+          },
+          {
+            "M": 40,
+            "N": 2560,
+            "K": 640,
+            "phase": 4,
+            "mode": 0,
+            "median_us": 163.176,
+            "samples_us": [
+              110.136,
+              161.304,
+              153.816,
+              163.176,
+              170.04,
+              164.008,
+              171.912,
+              165.36,
+              162.864
+            ]
+          },
+          {
+            "M": 40,
+            "N": 2560,
+            "K": 640,
+            "phase": 5,
+            "mode": 3,
+            "median_us": 259.48,
+            "samples_us": [
+              235.144,
+              262.184,
+              253.76,
+              263.12,
+              252.824,
+              264.784,
+              254.696,
+              455.936,
+              259.48
+            ]
+          },
+          {
+            "M": 40,
+            "N": 2560,
+            "K": 640,
+            "phase": 6,
+            "mode": 0,
+            "median_us": 163.696,
+            "samples_us": [
+              125.216,
+              178.776,
+              163.696,
+              157.976,
+              173.888,
+              173.472,
+              150.176,
+              157.56,
+              164.84
+            ]
+          },
+          {
+            "M": 160,
+            "N": 2560,
+            "K": 640,
+            "phase": 0,
+            "mode": 0,
+            "median_us": 261.56,
+            "samples_us": [
+              263.12,
+              276.952,
+              260.208,
+              256.048,
+              261.56,
+              261.248,
+              268.944,
+              267.28,
+              258.544
+            ]
+          },
+          {
+            "M": 160,
+            "N": 2560,
+            "K": 640,
+            "phase": 1,
+            "mode": 1,
+            "median_us": 260.104,
+            "samples_us": [
+              255.944,
+              255.736,
+              260.104,
+              252.928,
+              265.928,
+              281.008,
+              279.76,
+              255.944,
+              260.936
+            ]
+          },
+          {
+            "M": 160,
+            "N": 2560,
+            "K": 640,
+            "phase": 2,
+            "mode": 0,
+            "median_us": 259.896,
+            "samples_us": [
+              259.896,
+              262.392,
+              257.088,
+              257.088,
+              271.024,
+              272.272,
+              259.168,
+              258.44,
+              260.312
+            ]
+          },
+          {
+            "M": 160,
+            "N": 2560,
+            "K": 640,
+            "phase": 3,
+            "mode": 2,
+            "median_us": 792.792,
+            "samples_us": [
+              789.464,
+              812.552,
+              802.152,
+              790.4,
+              792.792,
+              790.296,
+              811.928,
+              789.88,
+              801.632
+            ]
+          },
+          {
+            "M": 160,
+            "N": 2560,
+            "K": 640,
+            "phase": 4,
+            "mode": 0,
+            "median_us": 262.496,
+            "samples_us": [
+              267.176,
+              262.496,
+              278.512,
+              274.56,
+              272.688,
+              259.792,
+              261.768,
+              259.48,
+              257.92
+            ]
+          },
+          {
+            "M": 160,
+            "N": 2560,
+            "K": 640,
+            "phase": 5,
+            "mode": 3,
+            "median_us": 545.376,
+            "samples_us": [
+              547.56,
+              546.728,
+              545.376,
+              541.008,
+              557.752,
+              557.44,
+              541.216,
+              536.328,
+              544.128
+            ]
+          },
+          {
+            "M": 160,
+            "N": 2560,
+            "K": 640,
+            "phase": 6,
+            "mode": 0,
+            "median_us": 260.832,
+            "samples_us": [
+              259.376,
+              283.712,
+              260.832,
+              261.144,
+              257.712,
+              257.608,
+              278.616,
+              258.544,
+              277.264
+            ]
+          },
+          {
+            "M": 2048,
+            "N": 6144,
+            "K": 2560,
+            "phase": 0,
+            "mode": 0,
+            "median_us": 32778.408,
+            "samples_us": [
+              32351.072,
+              32778.408,
+              32607.224,
+              32757.92,
+              32783.92,
+              32173.024,
+              32803.368,
+              32852.352,
+              32849.648
+            ]
+          },
+          {
+            "M": 2048,
+            "N": 6144,
+            "K": 2560,
+            "phase": 1,
+            "mode": 1,
+            "median_us": 31614.856,
+            "samples_us": [
+              31747.248,
+              31514.704,
+              31455.112,
+              31296.824,
+              31912.504,
+              31521.568,
+              31614.856,
+              31813.912,
+              31788.952
+            ]
+          },
+          {
+            "M": 2048,
+            "N": 6144,
+            "K": 2560,
+            "phase": 2,
+            "mode": 0,
+            "median_us": 32970.496,
+            "samples_us": [
+              32889.688,
+              33236.112,
+              32436.456,
+              33787.52,
+              33308.496,
+              32970.496,
+              33933.744,
+              32444.776,
+              32768.112
+            ]
+          },
+          {
+            "M": 2048,
+            "N": 6144,
+            "K": 2560,
+            "phase": 3,
+            "mode": 2,
+            "median_us": 145282.488,
+            "samples_us": [
+              144377.376,
+              145399.072,
+              145889.328,
+              145282.488,
+              145586.584,
+              145267.096,
+              145407.912,
+              144277.432,
+              144888.64
+            ]
+          },
+          {
+            "M": 2048,
+            "N": 6144,
+            "K": 2560,
+            "phase": 4,
+            "mode": 0,
+            "median_us": 33680.4,
+            "samples_us": [
+              37728.08,
+              32440.616,
+              36370.776,
+              33654.296,
+              33293.936,
+              33680.4,
+              32151.288,
+              33776.496,
+              33792.096
+            ]
+          },
+          {
+            "M": 2048,
+            "N": 6144,
+            "K": 2560,
+            "phase": 5,
+            "mode": 3,
+            "median_us": 82217.72,
+            "samples_us": [
+              82248.92,
+              82217.72,
+              82642.144,
+              82207.528,
+              82215.12,
+              82408.144,
+              82209.192,
+              82339.816,
+              82193.696
+            ]
+          },
+          {
+            "M": 2048,
+            "N": 6144,
+            "K": 2560,
+            "phase": 6,
+            "mode": 0,
+            "median_us": 33721.272,
+            "samples_us": [
+              38202.84,
+              32442.8,
+              36642.32,
+              34209.968,
+              33028.216,
+              33164.04,
+              32320.704,
+              34384.272,
+              33721.272
+            ]
+          }
+        ],
+        "comparisons": [
+          {
+            "M": 4,
+            "N": 1280,
+            "K": 2560,
+            "mode": 1,
+            "control_us": 203.2677272958007,
+            "candidate_us": 211.12,
+            "throughput_pct": -3.719340992894704,
+            "control_duration_drift_pct": 9.475374732334064
+          },
+          {
+            "M": 4,
+            "N": 1280,
+            "K": 2560,
+            "mode": 2,
+            "control_us": 214.54383309710863,
+            "candidate_us": 807.144,
+            "throughput_pct": -73.41938574813062,
+            "control_duration_drift_pct": 1.760391198044009
+          },
+          {
+            "M": 4,
+            "N": 1280,
+            "K": 2560,
+            "mode": 3,
+            "control_us": 214.33390757414003,
+            "candidate_us": 462.488,
+            "throughput_pct": -53.65633106715417,
+            "control_duration_drift_pct": -1.922152811148481
+          },
+          {
+            "M": 16,
+            "N": 1280,
+            "K": 2560,
+            "mode": 1,
+            "control_us": 202.6152758703055,
+            "candidate_us": 214.552,
+            "throughput_pct": -5.563557612930426,
+            "control_duration_drift_pct": -5.489021956087825
+          },
+          {
+            "M": 16,
+            "N": 1280,
+            "K": 2560,
+            "mode": 2,
+            "control_us": 198.89069416139108,
+            "candidate_us": 866.944,
+            "throughput_pct": -77.05841505779023,
+            "control_duration_drift_pct": 1.9535374868004274
+          },
+          {
+            "M": 16,
+            "N": 1280,
+            "K": 2560,
+            "mode": 3,
+            "control_us": 208.07702373880687,
+            "candidate_us": 506.48,
+            "throughput_pct": -58.91703053648577,
+            "control_duration_drift_pct": 7.35370274469187
+          },
+          {
+            "M": 40,
+            "N": 1280,
+            "K": 2560,
+            "mode": 1,
+            "control_us": 211.7780679862766,
+            "candidate_us": 180.648,
+            "throughput_pct": 17.23244541111808,
+            "control_duration_drift_pct": -2.569074163839069
+          },
+          {
+            "M": 40,
+            "N": 1280,
+            "K": 2560,
+            "mode": 2,
+            "control_us": 212.08581055789656,
+            "candidate_us": 853.008,
+            "throughput_pct": -75.13671494782035,
+            "control_duration_drift_pct": 2.935323383084576
+          },
+          {
+            "M": 40,
+            "N": 1280,
+            "K": 2560,
+            "mode": 3,
+            "control_us": 217.91457291333225,
+            "candidate_us": 503.152,
+            "throughput_pct": -56.69011095785523,
+            "control_duration_drift_pct": 2.5616239729337797
+          },
+          {
+            "M": 40,
+            "N": 2560,
+            "K": 640,
+            "mode": 1,
+            "control_us": 142.6637413781091,
+            "candidate_us": 142.168,
+            "throughput_pct": 0.3487010987768713,
+            "control_duration_drift_pct": 34.6869712351946
+          },
+          {
+            "M": 40,
+            "N": 2560,
+            "K": 640,
+            "mode": 2,
+            "control_us": 164.36764878771004,
+            "candidate_us": 369.096,
+            "throughput_pct": -55.46750742687267,
+            "control_duration_drift_pct": -1.444723618090471
+          },
+          {
+            "M": 40,
+            "N": 2560,
+            "K": 640,
+            "mode": 3,
+            "control_us": 163.43579319108773,
+            "candidate_us": 259.48,
+            "throughput_pct": -37.01410775740415,
+            "control_duration_drift_pct": 0.31867431485022024
+          },
+          {
+            "M": 160,
+            "N": 1280,
+            "K": 2560,
+            "mode": 1,
+            "control_us": 542.0999975059952,
+            "candidate_us": 538.408,
+            "throughput_pct": 0.6857248603280741,
+            "control_duration_drift_pct": 0.019186492709133418
+          },
+          {
+            "M": 160,
+            "N": 1280,
+            "K": 2560,
+            "mode": 2,
+            "control_us": 542.7756413104773,
+            "candidate_us": 1959.152,
+            "throughput_pct": -72.29537875006751,
+            "control_duration_drift_pct": 0.23019374640320667
+          },
+          {
+            "M": 160,
+            "N": 1280,
+            "K": 2560,
+            "mode": 3,
+            "control_us": 544.8021908913363,
+            "candidate_us": 1202.032,
+            "throughput_pct": -54.6765651088044,
+            "control_duration_drift_pct": 0.5167464114832487
+          },
+          {
+            "M": 160,
+            "N": 2560,
+            "K": 640,
+            "mode": 1,
+            "control_us": 260.72667251357313,
+            "candidate_us": 260.104,
+            "throughput_pct": 0.23939367082903562,
+            "control_duration_drift_pct": -0.6361829025844923
+          },
+          {
+            "M": 160,
+            "N": 2560,
+            "K": 640,
+            "mode": 2,
+            "control_us": 261.1927648615099,
+            "candidate_us": 792.792,
+            "throughput_pct": -67.05406148630286,
+            "control_duration_drift_pct": 1.0004001600640189
+          },
+          {
+            "M": 160,
+            "N": 2560,
+            "K": 640,
+            "mode": 3,
+            "control_us": 261.6626772621575,
+            "candidate_us": 545.376,
+            "throughput_pct": -52.021600279044634,
+            "control_duration_drift_pct": -0.6339144215530834
+          },
+          {
+            "M": 2048,
+            "N": 6144,
+            "K": 2560,
+            "mode": 1,
+            "control_us": 32874.31170154545,
+            "candidate_us": 31614.856,
+            "throughput_pct": 3.9837464435879433,
+            "control_duration_drift_pct": 0.586019918966163
+          },
+          {
+            "M": 2048,
+            "N": 6144,
+            "K": 2560,
+            "mode": 2,
+            "control_us": 33323.55763537861,
+            "candidate_us": 145282.488,
+            "throughput_pct": -77.0629219707618,
+            "control_duration_drift_pct": 2.1531492883819503
+          },
+          {
+            "M": 2048,
+            "N": 6144,
+            "K": 2560,
+            "mode": 3,
+            "control_us": 33700.829803860914,
+            "candidate_us": 82217.72,
+            "throughput_pct": -59.01025982736944,
+            "control_duration_drift_pct": 0.12135247799907045
+          }
+        ]
+      }
+    },
+    "tiled": {
+      "complete": true,
+      "production_changed": false,
+      "scope": "Isolated A770 XMX SLM screen; kernel timing is not model/runtime speedup.",
+      "commands": [
+        {
+          "label": "build",
+          "exit_code": 0
+        },
+        {
+          "label": "smoke",
+          "exit_code": 0
+        },
+        {
+          "label": "screen",
+          "exit_code": 0
+        }
+      ],
+      "sha256": {
+        "G:\\GitHub\\Strata\\build-orca-slm-async-20261104\\tile-r1\\build.stderr": "74eb9e845447b129ba82377ceb5daec84717e1f2a4e46ffd5258887ab4b4a31b",
+        "G:\\GitHub\\Strata\\build-orca-slm-async-20261104\\tile-r1\\smoke.stdout": "6e7b0b5fc207ae805433e648dbf054277ee9848d78d65e4ed0ab530febbcc922",
+        "G:\\GitHub\\Strata\\build-orca-slm-async-20261104\\tile-r1\\screen.stdout": "788d51f734172e0054224fcb4384eff5d1904509f82bb719274fd2d075e12e50",
+        "G:\\GitHub\\Strata\\build-orca-slm-async-20261104\\tile-r1\\build.command.txt": "13351fdaed1d2b0caa75825d69ef1cc720c5b87254ad643c7ea482500cee121f",
+        "G:\\GitHub\\Strata\\build-orca-slm-async-20261104\\tile-r1\\probe.exe": "7b449d6f8392a93df0ade05803c7b33a1c1a184641213326b73165b9f5a08e78",
+        "G:\\GitHub\\Strata\\build-orca-slm-async-20261104\\tile-r1\\build.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\include\\sycl\\ext\\intel\\experimental\\grf_size_properties.hpp": "8f5b302db7ed8a2c17314e8a4019de1971c5489cef904bd5bf0db63116eb9a18",
+        "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\include\\sycl\\ext\\oneapi\\experimental\\prefetch.hpp": "4d8069d85b934cb75bb53daabbc377a8d5267a1a7f65130062ad54b80b76b4bb",
+        "G:\\GitHub\\Strata\\build-orca-slm-async-20261104\\tile-r1\\screen.command.txt": "a45d6237d630ddd081a1aefcf89b43376481bc5889cb77c6a3c92ea916598527",
+        "G:\\GitHub\\Strata\\build-orca-slm-async-20261104\\xmx_slm_probe_v2.cpp": "f122238a6ba7c1d98bd124bd189845b40e8e2904218959d5f11f742ef7035416",
+        "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\include\\sycl\\ext\\intel\\esimd\\memory.hpp": "2b375a54481eb35f42c2c9bc03f169c6ed5c09a002770f41912dd0faa042d639",
+        "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin\\icx.exe": "05dde96e473c7362cf4a89a0dc3daa1fb723ec6014c849f773fddfb69ba9f79b",
+        "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\include\\sycl\\ext\\intel\\experimental\\esimd\\memory.hpp": "089103ea698fb291109a16d0e775ee95ef9cc0bbcda72a0624fbd4d91fc13104",
+        "G:\\GitHub\\Strata\\tools\\bench_deepinfer.py": "edef8c0e8c439c028b0c4787c069abab6932b0333df00a0128b76a33083bc868",
+        "G:\\GitHub\\Strata\\build-orca-slm-async-20261104\\tile-r1\\runner.py": "7cb25559ee7eefb9a429ddbcece8c4bfd9de49a728c7d2df2e06798b372de4ce",
+        "G:\\GitHub\\Strata\\build-orca-slm-async-20261104\\run_v2.py": "7cb25559ee7eefb9a429ddbcece8c4bfd9de49a728c7d2df2e06798b372de4ce",
+        "G:\\GitHub\\Strata\\build-orca-slm-async-20261104\\tile-r1\\screen.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "G:\\GitHub\\Strata\\build-orca-slm-async-20261104\\tile-r1\\smoke.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "G:\\GitHub\\Strata\\build-orca-slm-async-20261104\\tile-r1\\smoke.command.txt": "fdbe665282ad0bceda5aca62c0d6b4254ab3a5d6aef49e1381a07e3801ceb0ee",
+        "G:\\GitHub\\Strata\\build-orca-slm-async-20261104\\tile-r1\\probe.cpp": "f122238a6ba7c1d98bd124bd189845b40e8e2904218959d5f11f742ef7035416",
+        "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\include\\sycl\\ext\\oneapi\\matrix\\matrix.hpp": "dcbe275f786933355100c8404b6de32be0fb2f9bfca129f483807c2bf07980e5"
+      },
+      "modes": {
+        "0": "M4N64 global load",
+        "1": "M4N64 register lookahead",
+        "2": "M16N64 BK64 padded SLM",
+        "3": "M16N64 BK64 double SLM with register lookahead",
+        "4": "M16N64 register reuse/global load",
+        "5": "M4N64 explicit L2 prefetch64 ahead"
+      },
+      "notes": [
+        "All variants request256 GRFs;actual occupancy/spills/overlap are unmeasured.",
+        "SLM variants also change workgroup tile;this is a combined kernel screen.",
+        "3 warmups and9 individual kernel timestamps per phase;no JIT/copy/CPU/model timing.",
+        "Same buffers and queue,A/B/A/C/A/D/A per shape;unlocked clocks."
+      ],
+      "smoke": {
+        "rows": [
+          {
+            "M": 13,
+            "N": 64,
+            "K": 64,
+            "phase": 0,
+            "mode": 0,
+            "median_us": 67.288,
+            "samples_us": [
+              46.488,
+              67.288,
+              81.016
+            ]
+          },
+          {
+            "M": 13,
+            "N": 64,
+            "K": 64,
+            "phase": 1,
+            "mode": 1,
+            "median_us": 82.056,
+            "samples_us": [
+              43.472,
+              89.544,
+              82.056
+            ]
+          },
+          {
+            "M": 13,
+            "N": 64,
+            "K": 64,
+            "phase": 2,
+            "mode": 0,
+            "median_us": 87.152,
+            "samples_us": [
+              42.848,
+              87.152,
+              104.416
+            ]
+          },
+          {
+            "M": 13,
+            "N": 64,
+            "K": 64,
+            "phase": 3,
+            "mode": 4,
+            "median_us": 65.728,
+            "samples_us": [
+              52,
+              65.728,
+              77.064
+            ]
+          },
+          {
+            "M": 13,
+            "N": 64,
+            "K": 64,
+            "phase": 4,
+            "mode": 0,
+            "median_us": 44.512,
+            "samples_us": [
+              44.512,
+              91.312,
+              43.576
+            ]
+          },
+          {
+            "M": 13,
+            "N": 64,
+            "K": 64,
+            "phase": 5,
+            "mode": 2,
+            "median_us": 109.72,
+            "samples_us": [
+              184.704,
+              104.936,
+              109.72
+            ]
+          },
+          {
+            "M": 13,
+            "N": 64,
+            "K": 64,
+            "phase": 6,
+            "mode": 0,
+            "median_us": 65.936,
+            "samples_us": [
+              47.84,
+              65.936,
+              78.52
+            ]
+          },
+          {
+            "M": 13,
+            "N": 64,
+            "K": 64,
+            "phase": 7,
+            "mode": 3,
+            "median_us": 102.544,
+            "samples_us": [
+              102.544,
+              107.848,
+              101.4
+            ]
+          },
+          {
+            "M": 13,
+            "N": 64,
+            "K": 64,
+            "phase": 8,
+            "mode": 0,
+            "median_us": 81.12,
+            "samples_us": [
+              44.512,
+              100.36,
+              81.12
+            ]
+          },
+          {
+            "M": 13,
+            "N": 64,
+            "K": 64,
+            "phase": 9,
+            "mode": 5,
+            "median_us": 47.424,
+            "samples_us": [
+              46.696,
+              47.424,
+              90.272
+            ]
+          },
+          {
+            "M": 13,
+            "N": 64,
+            "K": 64,
+            "phase": 10,
+            "mode": 0,
+            "median_us": 76.544,
+            "samples_us": [
+              48.048,
+              76.544,
+              80.288
+            ]
+          }
+        ],
+        "comparisons": [
+          {
+            "M": 13,
+            "N": 64,
+            "K": 64,
+            "mode": 1,
+            "control_us": 76.57861173983243,
+            "candidate_us": 82.056,
+            "throughput_pct": -6.675183119049888,
+            "control_duration_drift_pct": 29.5208655332303
+          },
+          {
+            "M": 13,
+            "N": 64,
+            "K": 64,
+            "mode": 4,
+            "control_us": 62.28410570924174,
+            "candidate_us": 65.728,
+            "throughput_pct": -5.23961521841263,
+            "control_duration_drift_pct": -48.92601431980908
+          },
+          {
+            "M": 13,
+            "N": 64,
+            "K": 64,
+            "mode": 2,
+            "control_us": 54.17511635428207,
+            "candidate_us": 109.72,
+            "throughput_pct": -50.624210395295236,
+            "control_duration_drift_pct": 48.13084112149535
+          },
+          {
+            "M": 13,
+            "N": 64,
+            "K": 64,
+            "mode": 3,
+            "control_us": 73.13500064948384,
+            "candidate_us": 102.544,
+            "throughput_pct": -28.679395528276796,
+            "control_duration_drift_pct": 23.028391167192417
+          },
+          {
+            "M": 13,
+            "N": 64,
+            "K": 64,
+            "mode": 5,
+            "control_us": 78.79878983842328,
+            "candidate_us": 47.424,
+            "throughput_pct": 66.15804200072384,
+            "control_duration_drift_pct": -5.641025641025655
+          }
+        ]
+      },
+      "screen": {
+        "rows": [
+          {
+            "M": 4,
+            "N": 1280,
+            "K": 2560,
+            "phase": 0,
+            "mode": 0,
+            "median_us": 186.68,
+            "samples_us": [
+              179.088,
+              172.224,
+              173.784,
+              190.528,
+              186.68,
+              180.648,
+              224.016,
+              201.76,
+              224.744
+            ]
+          },
+          {
+            "M": 4,
+            "N": 1280,
+            "K": 2560,
+            "phase": 1,
+            "mode": 1,
+            "median_us": 211.12,
+            "samples_us": [
+              178.776,
+              230.568,
+              207.584,
+              220.272,
+              201.032,
+              232.336,
+              211.12,
+              204.048,
+              214.656
+            ]
+          },
+          {
+            "M": 4,
+            "N": 1280,
+            "K": 2560,
+            "phase": 2,
+            "mode": 0,
+            "median_us": 217.048,
+            "samples_us": [
+              179.192,
+              368.576,
+              197.6,
+              220.896,
+              317.2,
+              181.064,
+              240.864,
+              203.32,
+              217.048
+            ]
+          },
+          {
+            "M": 4,
+            "N": 1280,
+            "K": 2560,
+            "phase": 3,
+            "mode": 4,
+            "median_us": 294.424,
+            "samples_us": [
+              260.728,
+              294.632,
+              288.288,
+              302.536,
+              294.32,
+              310.024,
+              294.424,
+              293.176,
+              295.36
+            ]
+          },
+          {
+            "M": 4,
+            "N": 1280,
+            "K": 2560,
+            "phase": 4,
+            "mode": 0,
+            "median_us": 222.352,
+            "samples_us": [
+              180.752,
+              213.824,
+              222.664,
+              197.496,
+              222.352,
+              222.456,
+              225.368,
+              216.216,
+              224.224
+            ]
+          },
+          {
+            "M": 4,
+            "N": 1280,
+            "K": 2560,
+            "phase": 5,
+            "mode": 2,
+            "median_us": 1476.592,
+            "samples_us": [
+              1459.12,
+              1477.84,
+              1476.592,
+              1488.24,
+              1476.592,
+              1459.64,
+              1476.696,
+              1475.552,
+              1479.504
+            ]
+          },
+          {
+            "M": 4,
+            "N": 1280,
+            "K": 2560,
+            "phase": 6,
+            "mode": 0,
+            "median_us": 215.592,
+            "samples_us": [
+              176.384,
+              216.632,
+              307.32,
+              175.344,
+              202.072,
+              231.712,
+              213.096,
+              215.592,
+              217.88
+            ]
+          },
+          {
+            "M": 4,
+            "N": 1280,
+            "K": 2560,
+            "phase": 7,
+            "mode": 3,
+            "median_us": 1307.28,
+            "samples_us": [
+              1295.944,
+              1319.864,
+              1334.632,
+              1304.992,
+              1307.28,
+              1475.24,
+              1290.848,
+              1312.064,
+              1307.072
+            ]
+          },
+          {
+            "M": 4,
+            "N": 1280,
+            "K": 2560,
+            "phase": 8,
+            "mode": 0,
+            "median_us": 214.136,
+            "samples_us": [
+              179.4,
+              209.352,
+              214.136,
+              232.648,
+              218.504,
+              222.248,
+              202.592,
+              219.96,
+              212.992
+            ]
+          },
+          {
+            "M": 4,
+            "N": 1280,
+            "K": 2560,
+            "phase": 9,
+            "mode": 5,
+            "median_us": 225.056,
+            "samples_us": [
+              198.848,
+              230.88,
+              227.24,
+              233.376,
+              225.056,
+              213.2,
+              242.216,
+              224.744,
+              220.376
+            ]
+          },
+          {
+            "M": 4,
+            "N": 1280,
+            "K": 2560,
+            "phase": 10,
+            "mode": 0,
+            "median_us": 217.568,
+            "samples_us": [
+              176.904,
+              224.952,
+              201.448,
+              232.128,
+              297.024,
+              176.488,
+              328.952,
+              183.456,
+              217.568
+            ]
+          },
+          {
+            "M": 16,
+            "N": 1280,
+            "K": 2560,
+            "phase": 0,
+            "mode": 0,
+            "median_us": 178.568,
+            "samples_us": [
+              175.864,
+              179.296,
+              195.104,
+              175.344,
+              178.152,
+              178.568,
+              180.96,
+              177.84,
+              195.416
+            ]
+          },
+          {
+            "M": 16,
+            "N": 1280,
+            "K": 2560,
+            "phase": 1,
+            "mode": 1,
+            "median_us": 190.528,
+            "samples_us": [
+              175.032,
+              175.968,
+              200.304,
+              173.368,
+              192.504,
+              190.528,
+              191.152,
+              176.8,
+              193.44
+            ]
+          },
+          {
+            "M": 16,
+            "N": 1280,
+            "K": 2560,
+            "phase": 2,
+            "mode": 0,
+            "median_us": 183.144,
+            "samples_us": [
+              178.464,
+              183.144,
+              200.616,
+              178.776,
+              188.552,
+              175.24,
+              195.208,
+              198.328,
+              177.84
+            ]
+          },
+          {
+            "M": 16,
+            "N": 1280,
+            "K": 2560,
+            "phase": 3,
+            "mode": 4,
+            "median_us": 261.768,
+            "samples_us": [
+              259.168,
+              282.776,
+              249.496,
+              263.432,
+              261.456,
+              264.472,
+              264.16,
+              261.768,
+              254.696
+            ]
+          },
+          {
+            "M": 16,
+            "N": 1280,
+            "K": 2560,
+            "phase": 4,
+            "mode": 0,
+            "median_us": 209.456,
+            "samples_us": [
+              170.872,
+              209.456,
+              226.304,
+              180.336,
+              221.416,
+              227.032,
+              203.632,
+              224.328,
+              191.568
+            ]
+          },
+          {
+            "M": 16,
+            "N": 1280,
+            "K": 2560,
+            "phase": 5,
+            "mode": 2,
+            "median_us": 1687.712,
+            "samples_us": [
+              1669.096,
+              1690,
+              1707.888,
+              1684.072,
+              1687.712,
+              1687.296,
+              1689.168,
+              1673.36,
+              1937
+            ]
+          },
+          {
+            "M": 16,
+            "N": 1280,
+            "K": 2560,
+            "phase": 6,
+            "mode": 0,
+            "median_us": 216.32,
+            "samples_us": [
+              182.728,
+              215.384,
+              226.096,
+              181.792,
+              225.056,
+              216.32,
+              219.544,
+              203.216,
+              232.232
+            ]
+          },
+          {
+            "M": 16,
+            "N": 1280,
+            "K": 2560,
+            "phase": 7,
+            "mode": 3,
+            "median_us": 1513.512,
+            "samples_us": [
+              1502.176,
+              1511.016,
+              1496.04,
+              1523.184,
+              1515.384,
+              1516.008,
+              1513.512,
+              1512.16,
+              1515.176
+            ]
+          },
+          {
+            "M": 16,
+            "N": 1280,
+            "K": 2560,
+            "phase": 8,
+            "mode": 0,
+            "median_us": 214.552,
+            "samples_us": [
+              178.984,
+              214.864,
+              214.136,
+              214.552,
+              236.392,
+              209.664,
+              206.128,
+              221.208,
+              228.696
+            ]
+          },
+          {
+            "M": 16,
+            "N": 1280,
+            "K": 2560,
+            "phase": 9,
+            "mode": 5,
+            "median_us": 199.888,
+            "samples_us": [
+              178.256,
+              215.592,
+              177.424,
+              279.656,
+              199.888,
+              195.728,
+              223.808,
+              179.296,
+              241.696
+            ]
+          },
+          {
+            "M": 16,
+            "N": 1280,
+            "K": 2560,
+            "phase": 10,
+            "mode": 0,
+            "median_us": 217.568,
+            "samples_us": [
+              176.488,
+              222.456,
+              199.784,
+              217.568,
+              230.88,
+              203.632,
+              229.736,
+              180.336,
+              218.4
+            ]
+          },
+          {
+            "M": 40,
+            "N": 1280,
+            "K": 2560,
+            "phase": 0,
+            "mode": 0,
+            "median_us": 211.848,
+            "samples_us": [
+              186.264,
+              216.216,
+              198.744,
+              222.768,
+              218.4,
+              211.848,
+              234.208,
+              200.824,
+              201.448
+            ]
+          },
+          {
+            "M": 40,
+            "N": 1280,
+            "K": 2560,
+            "phase": 1,
+            "mode": 1,
+            "median_us": 207.168,
+            "samples_us": [
+              177.528,
+              219.336,
+              211.328,
+              200.616,
+              205.712,
+              211.536,
+              207.584,
+              205.92,
+              207.168
+            ]
+          },
+          {
+            "M": 40,
+            "N": 1280,
+            "K": 2560,
+            "phase": 2,
+            "mode": 0,
+            "median_us": 211.848,
+            "samples_us": [
+              188.656,
+              223.704,
+              204.464,
+              212.576,
+              211.848,
+              220.272,
+              207.48,
+              224.432,
+              205.4
+            ]
+          },
+          {
+            "M": 40,
+            "N": 1280,
+            "K": 2560,
+            "phase": 3,
+            "mode": 4,
+            "median_us": 303.16,
+            "samples_us": [
+              301.392,
+              301.496,
+              318.032,
+              296.816,
+              317.408,
+              299.312,
+              323.336,
+              303.16,
+              303.264
+            ]
+          },
+          {
+            "M": 40,
+            "N": 1280,
+            "K": 2560,
+            "phase": 4,
+            "mode": 0,
+            "median_us": 212.472,
+            "samples_us": [
+              190.84,
+              208.104,
+              216.32,
+              238.784,
+              210.08,
+              217.672,
+              217.152,
+              211.12,
+              212.472
+            ]
+          },
+          {
+            "M": 40,
+            "N": 1280,
+            "K": 2560,
+            "phase": 5,
+            "mode": 2,
+            "median_us": 1554.072,
+            "samples_us": [
+              1541.904,
+              1564.16,
+              1674.192,
+              1655.16,
+              1550.12,
+              1549.808,
+              1554.072,
+              1553.864,
+              1567.384
+            ]
+          },
+          {
+            "M": 40,
+            "N": 1280,
+            "K": 2560,
+            "phase": 6,
+            "mode": 0,
+            "median_us": 186.576,
+            "samples_us": [
+              187.304,
+              204.256,
+              186.576,
+              183.248,
+              183.352,
+              183.04,
+              215.488,
+              185.952,
+              214.136
+            ]
+          },
+          {
+            "M": 40,
+            "N": 1280,
+            "K": 2560,
+            "phase": 7,
+            "mode": 3,
+            "median_us": 2073.968,
+            "samples_us": [
+              2069.288,
+              2064.4,
+              2073.968,
+              2304.224,
+              2069.288,
+              2074.384,
+              2074.696,
+              2073.136,
+              2094.664
+            ]
+          },
+          {
+            "M": 40,
+            "N": 1280,
+            "K": 2560,
+            "phase": 8,
+            "mode": 0,
+            "median_us": 216.008,
+            "samples_us": [
+              185.224,
+              203.736,
+              183.664,
+              218.816,
+              208.312,
+              216.84,
+              216.008,
+              221.416,
+              216.632
+            ]
+          },
+          {
+            "M": 40,
+            "N": 1280,
+            "K": 2560,
+            "phase": 9,
+            "mode": 5,
+            "median_us": 209.352,
+            "samples_us": [
+              197.08,
+              209.352,
+              220.272,
+              203.32,
+              235.456,
+              183.976,
+              217.568,
+              201.656,
+              219.336
+            ]
+          },
+          {
+            "M": 40,
+            "N": 1280,
+            "K": 2560,
+            "phase": 10,
+            "mode": 0,
+            "median_us": 214.552,
+            "samples_us": [
+              185.328,
+              214.76,
+              231.608,
+              185.224,
+              213.2,
+              214.552,
+              214.032,
+              216.528,
+              219.336
+            ]
+          },
+          {
+            "M": 160,
+            "N": 1280,
+            "K": 2560,
+            "phase": 0,
+            "mode": 0,
+            "median_us": 550.056,
+            "samples_us": [
+              544.648,
+              538.72,
+              550.056,
+              553.072,
+              551.408,
+              542.672,
+              550.576,
+              538.096,
+              550.16
+            ]
+          },
+          {
+            "M": 160,
+            "N": 1280,
+            "K": 2560,
+            "phase": 1,
+            "mode": 1,
+            "median_us": 547.56,
+            "samples_us": [
+              527.28,
+              558.168,
+              566.696,
+              704.392,
+              561.808,
+              547.56,
+              537.68,
+              523.744,
+              529.464
+            ]
+          },
+          {
+            "M": 160,
+            "N": 1280,
+            "K": 2560,
+            "phase": 2,
+            "mode": 0,
+            "median_us": 543.608,
+            "samples_us": [
+              542.464,
+              538.72,
+              562.016,
+              563.264,
+              529.568,
+              540.176,
+              552.656,
+              543.608,
+              549.848
+            ]
+          },
+          {
+            "M": 160,
+            "N": 1280,
+            "K": 2560,
+            "phase": 3,
+            "mode": 4,
+            "median_us": 280.176,
+            "samples_us": [
+              276.848,
+              280.072,
+              284.232,
+              284.44,
+              280.8,
+              277.68,
+              276.744,
+              280.176,
+              300.976
+            ]
+          },
+          {
+            "M": 160,
+            "N": 1280,
+            "K": 2560,
+            "phase": 4,
+            "mode": 0,
+            "median_us": 546.832,
+            "samples_us": [
+              549.536,
+              538.824,
+              538.512,
+              541.528,
+              546.832,
+              552.864,
+              551.824,
+              533.416,
+              562.744
+            ]
+          },
+          {
+            "M": 160,
+            "N": 1280,
+            "K": 2560,
+            "phase": 5,
+            "mode": 2,
+            "median_us": 1653.392,
+            "samples_us": [
+              1751.672,
+              1748.968,
+              1644.656,
+              1653.392,
+              1659.216,
+              1676.064,
+              1645.592,
+              1647.256,
+              1641.12
+            ]
+          },
+          {
+            "M": 160,
+            "N": 1280,
+            "K": 2560,
+            "phase": 6,
+            "mode": 0,
+            "median_us": 551.928,
+            "samples_us": [
+              540.592,
+              557.232,
+              545.376,
+              543.296,
+              547.664,
+              555.464,
+              554.112,
+              551.928,
+              558.376
+            ]
+          },
+          {
+            "M": 160,
+            "N": 1280,
+            "K": 2560,
+            "phase": 7,
+            "mode": 3,
+            "median_us": 2165.592,
+            "samples_us": [
+              2185.664,
+              2165.592,
+              2165.592,
+              2160.184,
+              2179.216,
+              2157.064,
+              2393.872,
+              2172.56,
+              2157.896
+            ]
+          },
+          {
+            "M": 160,
+            "N": 1280,
+            "K": 2560,
+            "phase": 8,
+            "mode": 0,
+            "median_us": 542.36,
+            "samples_us": [
+              1007.448,
+              548.08,
+              537.368,
+              541.944,
+              558.688,
+              541.008,
+              542.36,
+              545.064,
+              531.856
+            ]
+          },
+          {
+            "M": 160,
+            "N": 1280,
+            "K": 2560,
+            "phase": 9,
+            "mode": 5,
+            "median_us": 557.648,
+            "samples_us": [
+              537.264,
+              557.648,
+              551.408,
+              586.456,
+              577.72,
+              561.184,
+              548.704,
+              550.992,
+              578.032
+            ]
+          },
+          {
+            "M": 160,
+            "N": 1280,
+            "K": 2560,
+            "phase": 10,
+            "mode": 0,
+            "median_us": 541.528,
+            "samples_us": [
+              541.528,
+              539.76,
+              542.152,
+              547.248,
+              546.52,
+              533.312,
+              544.128,
+              539.968,
+              534.976
+            ]
+          },
+          {
+            "M": 40,
+            "N": 2560,
+            "K": 640,
+            "phase": 0,
+            "mode": 0,
+            "median_us": 127.816,
+            "samples_us": [
+              116.688,
+              127.816,
+              119.184,
+              119.288,
+              146.016,
+              158.288,
+              141.648,
+              110.864,
+              139.88
+            ]
+          },
+          {
+            "M": 40,
+            "N": 2560,
+            "K": 640,
+            "phase": 1,
+            "mode": 1,
+            "median_us": 151.008,
+            "samples_us": [
+              109.824,
+              155.272,
+              147.264,
+              137.488,
+              151.008,
+              152.256,
+              153.4,
+              143.728,
+              180.44
+            ]
+          },
+          {
+            "M": 40,
+            "N": 2560,
+            "K": 640,
+            "phase": 2,
+            "mode": 0,
+            "median_us": 158.6,
+            "samples_us": [
+              110.032,
+              164.32,
+              148.72,
+              158.6,
+              157.456,
+              156.312,
+              177.112,
+              159.848,
+              169.936
+            ]
+          },
+          {
+            "M": 40,
+            "N": 2560,
+            "K": 640,
+            "phase": 3,
+            "mode": 4,
+            "median_us": 139.36,
+            "samples_us": [
+              110.344,
+              129.896,
+              139.36,
+              139.464,
+              110.032,
+              173.784,
+              149.136,
+              141.856,
+              130.52
+            ]
+          },
+          {
+            "M": 40,
+            "N": 2560,
+            "K": 640,
+            "phase": 4,
+            "mode": 0,
+            "median_us": 156.624,
+            "samples_us": [
+              107.12,
+              170.664,
+              165.672,
+              162.136,
+              141.648,
+              156.624,
+              163.8,
+              156.104,
+              142.48
+            ]
+          },
+          {
+            "M": 40,
+            "N": 2560,
+            "K": 640,
+            "phase": 5,
+            "mode": 2,
+            "median_us": 435.344,
+            "samples_us": [
+              417.56,
+              441.584,
+              435.344,
+              434.616,
+              435.552,
+              446.368,
+              415.272,
+              435.864,
+              432.744
+            ]
+          },
+          {
+            "M": 40,
+            "N": 2560,
+            "K": 640,
+            "phase": 6,
+            "mode": 0,
+            "median_us": 162.448,
+            "samples_us": [
+              108.576,
+              152.464,
+              153.296,
+              162.968,
+              170.768,
+              142.688,
+              180.232,
+              162.448,
+              168.792
+            ]
+          },
+          {
+            "M": 40,
+            "N": 2560,
+            "K": 640,
+            "phase": 7,
+            "mode": 3,
+            "median_us": 531.96,
+            "samples_us": [
+              517.92,
+              531.96,
+              534.872,
+              513.968,
+              536.64,
+              536.016,
+              537.784,
+              531.128,
+              531.648
+            ]
+          },
+          {
+            "M": 40,
+            "N": 2560,
+            "K": 640,
+            "phase": 8,
+            "mode": 0,
+            "median_us": 159.848,
+            "samples_us": [
+              112.112,
+              108.888,
+              181.064,
+              163.592,
+              171.912,
+              108.888,
+              159.848,
+              178.152,
+              138.632
+            ]
+          },
+          {
+            "M": 40,
+            "N": 2560,
+            "K": 640,
+            "phase": 9,
+            "mode": 5,
+            "median_us": 159.224,
+            "samples_us": [
+              135.616,
+              156.208,
+              177.32,
+              166.296,
+              141.648,
+              184.912,
+              168.584,
+              159.224,
+              148.304
+            ]
+          },
+          {
+            "M": 40,
+            "N": 2560,
+            "K": 640,
+            "phase": 10,
+            "mode": 0,
+            "median_us": 157.248,
+            "samples_us": [
+              126.152,
+              153.192,
+              157.248,
+              166.92,
+              165.152,
+              131.56,
+              161.2,
+              160.264,
+              154.024
+            ]
+          },
+          {
+            "M": 160,
+            "N": 2560,
+            "K": 640,
+            "phase": 0,
+            "mode": 0,
+            "median_us": 258.856,
+            "samples_us": [
+              265.824,
+              267.488,
+              258.856,
+              257.088,
+              257.608,
+              258.024,
+              286.728,
+              259.688,
+              258.544
+            ]
+          },
+          {
+            "M": 160,
+            "N": 2560,
+            "K": 640,
+            "phase": 1,
+            "mode": 1,
+            "median_us": 258.128,
+            "samples_us": [
+              256.776,
+              259.584,
+              287.352,
+              265.408,
+              258.128,
+              255.216,
+              255.112,
+              260.104,
+              255.008
+            ]
+          },
+          {
+            "M": 160,
+            "N": 2560,
+            "K": 640,
+            "phase": 2,
+            "mode": 0,
+            "median_us": 258.856,
+            "samples_us": [
+              258.232,
+              258.024,
+              259.48,
+              260.624,
+              256.048,
+              259.584,
+              259.064,
+              258.856,
+              256.256
+            ]
+          },
+          {
+            "M": 160,
+            "N": 2560,
+            "K": 640,
+            "phase": 3,
+            "mode": 4,
+            "median_us": 199.68,
+            "samples_us": [
+              157.976,
+              185.432,
+              226.2,
+              164.112,
+              207.896,
+              199.68,
+              214.552,
+              197.808,
+              207.688
+            ]
+          },
+          {
+            "M": 160,
+            "N": 2560,
+            "K": 640,
+            "phase": 4,
+            "mode": 0,
+            "median_us": 267.28,
+            "samples_us": [
+              259.688,
+              267.28,
+              268.32,
+              263.536,
+              258.544,
+              259.584,
+              447.824,
+              284.128,
+              453.44
+            ]
+          },
+          {
+            "M": 160,
+            "N": 2560,
+            "K": 640,
+            "phase": 5,
+            "mode": 2,
+            "median_us": 641.576,
+            "samples_us": [
+              641.576,
+              636.584,
+              663.312,
+              657.8,
+              633.568,
+              663.728,
+              637.416,
+              660.296,
+              637
+            ]
+          },
+          {
+            "M": 160,
+            "N": 2560,
+            "K": 640,
+            "phase": 6,
+            "mode": 0,
+            "median_us": 271.44,
+            "samples_us": [
+              256.672,
+              259.48,
+              277.888,
+              279.24,
+              262.496,
+              271.44,
+              262.496,
+              277.992,
+              273.936
+            ]
+          },
+          {
+            "M": 160,
+            "N": 2560,
+            "K": 640,
+            "phase": 7,
+            "mode": 3,
+            "median_us": 842.192,
+            "samples_us": [
+              833.144,
+              806.728,
+              833.352,
+              852.904,
+              845.728,
+              826.696,
+              844.688,
+              843.024,
+              842.192
+            ]
+          },
+          {
+            "M": 160,
+            "N": 2560,
+            "K": 640,
+            "phase": 8,
+            "mode": 0,
+            "median_us": 261.664,
+            "samples_us": [
+              257.816,
+              258.336,
+              261.664,
+              258.96,
+              265.72,
+              277.992,
+              257.712,
+              277.888,
+              271.336
+            ]
+          },
+          {
+            "M": 160,
+            "N": 2560,
+            "K": 640,
+            "phase": 9,
+            "mode": 5,
+            "median_us": 264.992,
+            "samples_us": [
+              266.656,
+              272.48,
+              266.448,
+              263.64,
+              264.992,
+              288.184,
+              263.952,
+              262.912,
+              261.872
+            ]
+          },
+          {
+            "M": 160,
+            "N": 2560,
+            "K": 640,
+            "phase": 10,
+            "mode": 0,
+            "median_us": 260.208,
+            "samples_us": [
+              260,
+              259.272,
+              259.48,
+              267.488,
+              261.768,
+              260.208,
+              259.688,
+              273.936,
+              261.248
+            ]
+          },
+          {
+            "M": 2048,
+            "N": 6144,
+            "K": 2560,
+            "phase": 0,
+            "mode": 0,
+            "median_us": 34129.472,
+            "samples_us": [
+              36857.912,
+              35741.68,
+              33450.248,
+              32361.992,
+              35513.296,
+              35058.712,
+              32916.416,
+              34129.472,
+              34071.648
+            ]
+          },
+          {
+            "M": 2048,
+            "N": 6144,
+            "K": 2560,
+            "phase": 1,
+            "mode": 1,
+            "median_us": 32132.984,
+            "samples_us": [
+              32489.496,
+              32365.424,
+              31674.552,
+              32520.384,
+              32112.392,
+              32043.44,
+              31938.712,
+              32132.984,
+              32374.576
+            ]
+          },
+          {
+            "M": 2048,
+            "N": 6144,
+            "K": 2560,
+            "phase": 2,
+            "mode": 0,
+            "median_us": 33042.88,
+            "samples_us": [
+              32843.096,
+              32673.472,
+              33816.64,
+              38027.184,
+              33042.88,
+              32398.392,
+              32467.552,
+              33077.616,
+              36605.088
+            ]
+          },
+          {
+            "M": 2048,
+            "N": 6144,
+            "K": 2560,
+            "phase": 3,
+            "mode": 4,
+            "median_us": 13274.664,
+            "samples_us": [
+              13297.856,
+              13274.664,
+              13382.616,
+              13219.544,
+              13401.44,
+              13129.584,
+              13413.712,
+              13247.832,
+              13168.064
+            ]
+          },
+          {
+            "M": 2048,
+            "N": 6144,
+            "K": 2560,
+            "phase": 4,
+            "mode": 0,
+            "median_us": 34517.912,
+            "samples_us": [
+              35529.936,
+              33804.576,
+              32837.792,
+              34517.912,
+              32427.512,
+              36575.032,
+              37451.336,
+              33225.192,
+              35379.136
+            ]
+          },
+          {
+            "M": 2048,
+            "N": 6144,
+            "K": 2560,
+            "phase": 5,
+            "mode": 2,
+            "median_us": 73279.232,
+            "samples_us": [
+              73017.776,
+              73140.808,
+              73137.376,
+              73279.232,
+              73310.328,
+              73459.776,
+              73160.152,
+              73285.992,
+              73368.256
+            ]
+          },
+          {
+            "M": 2048,
+            "N": 6144,
+            "K": 2560,
+            "phase": 6,
+            "mode": 0,
+            "median_us": 32707.688,
+            "samples_us": [
+              32626.152,
+              32799.312,
+              32577.376,
+              33002.84,
+              32997.432,
+              32538.064,
+              32707.688,
+              33006.272,
+              32531.512
+            ]
+          },
+          {
+            "M": 2048,
+            "N": 6144,
+            "K": 2560,
+            "phase": 7,
+            "mode": 3,
+            "median_us": 132813.72,
+            "samples_us": [
+              133773.952,
+              133506.776,
+              133350.776,
+              132813.72,
+              132239.432,
+              132819.856,
+              132308.592,
+              132080.936,
+              131997.32
+            ]
+          },
+          {
+            "M": 2048,
+            "N": 6144,
+            "K": 2560,
+            "phase": 8,
+            "mode": 0,
+            "median_us": 32901.44,
+            "samples_us": [
+              32901.44,
+              32449.144,
+              32412.12,
+              34045.96,
+              32426.68,
+              32998.68,
+              34020.584,
+              31722.808,
+              33169.656
+            ]
+          },
+          {
+            "M": 2048,
+            "N": 6144,
+            "K": 2560,
+            "phase": 9,
+            "mode": 5,
+            "median_us": 46232.576,
+            "samples_us": [
+              47882.328,
+              47786.024,
+              46117.448,
+              45755.112,
+              46232.576,
+              46117.448,
+              45905.392,
+              46254.208,
+              46401.888
+            ]
+          },
+          {
+            "M": 2048,
+            "N": 6144,
+            "K": 2560,
+            "phase": 10,
+            "mode": 0,
+            "median_us": 32928.064,
+            "samples_us": [
+              33672.08,
+              32417.632,
+              33460.336,
+              33115.68,
+              32880.848,
+              32928.064,
+              32264.336,
+              32702.28,
+              33128.68
+            ]
+          }
+        ],
+        "comparisons": [
+          {
+            "M": 4,
+            "N": 1280,
+            "K": 2560,
+            "mode": 1,
+            "control_us": 201.29212761556275,
+            "candidate_us": 211.12,
+            "throughput_pct": -4.655111966861147,
+            "control_duration_drift_pct": 16.267409470752092
+          },
+          {
+            "M": 4,
+            "N": 1280,
+            "K": 2560,
+            "mode": 4,
+            "control_us": 219.68399326305047,
+            "candidate_us": 294.424,
+            "throughput_pct": -25.38516110675404,
+            "control_duration_drift_pct": 2.4436990896022914
+          },
+          {
+            "M": 4,
+            "N": 1280,
+            "K": 2560,
+            "mode": 2,
+            "control_us": 218.94591200568237,
+            "candidate_us": 1476.592,
+            "throughput_pct": -85.17221331243279,
+            "control_duration_drift_pct": -3.040224508886802
+          },
+          {
+            "M": 4,
+            "N": 1280,
+            "K": 2560,
+            "mode": 3,
+            "control_us": 214.8627666953956,
+            "candidate_us": 1307.28,
+            "throughput_pct": -83.56413570961114,
+            "control_duration_drift_pct": -0.6753497346840387
+          },
+          {
+            "M": 4,
+            "N": 1280,
+            "K": 2560,
+            "mode": 5,
+            "control_us": 215.8451788852371,
+            "candidate_us": 225.056,
+            "throughput_pct": -4.092679650737119,
+            "control_duration_drift_pct": 1.6027197668771365
+          },
+          {
+            "M": 16,
+            "N": 1280,
+            "K": 2560,
+            "mode": 1,
+            "control_us": 180.84152673542656,
+            "candidate_us": 190.528,
+            "throughput_pct": -5.08401561165468,
+            "control_duration_drift_pct": 2.5626092020966773
+          },
+          {
+            "M": 16,
+            "N": 1280,
+            "K": 2560,
+            "mode": 4,
+            "control_us": 195.8586471514597,
+            "candidate_us": 261.768,
+            "throughput_pct": -25.178537043695282,
+            "control_duration_drift_pct": 14.366837024417944
+          },
+          {
+            "M": 16,
+            "N": 1280,
+            "K": 2560,
+            "mode": 2,
+            "control_us": 212.860334303975,
+            "candidate_us": 1687.712,
+            "throughput_pct": -87.38763874974077,
+            "control_duration_drift_pct": 3.277060575968216
+          },
+          {
+            "M": 16,
+            "N": 1280,
+            "K": 2560,
+            "mode": 3,
+            "control_us": 215.43418633076783,
+            "candidate_us": 1513.512,
+            "throughput_pct": -85.76594131194415,
+            "control_duration_drift_pct": -0.8173076923076894
+          },
+          {
+            "M": 16,
+            "N": 1280,
+            "K": 2560,
+            "mode": 5,
+            "control_us": 216.05473736069757,
+            "candidate_us": 199.888,
+            "throughput_pct": 8.087897903174568,
+            "control_duration_drift_pct": 1.405719825496865
+          },
+          {
+            "M": 40,
+            "N": 1280,
+            "K": 2560,
+            "mode": 1,
+            "control_us": 211.848,
+            "candidate_us": 207.168,
+            "throughput_pct": 2.259036144578319,
+            "control_duration_drift_pct": 0.0
+          },
+          {
+            "M": 40,
+            "N": 1280,
+            "K": 2560,
+            "mode": 4,
+            "control_us": 212.15977058811126,
+            "candidate_us": 303.16,
+            "throughput_pct": -30.01722833219711,
+            "control_duration_drift_pct": 0.2945508100147265
+          },
+          {
+            "M": 40,
+            "N": 1280,
+            "K": 2560,
+            "mode": 2,
+            "control_us": 199.10343008597314,
+            "candidate_us": 1554.072,
+            "throughput_pct": -87.18827505508283,
+            "control_duration_drift_pct": -12.187958883994131
+          },
+          {
+            "M": 40,
+            "N": 1280,
+            "K": 2560,
+            "mode": 3,
+            "control_us": 200.75335266938882,
+            "candidate_us": 2073.968,
+            "throughput_pct": -90.32032545008462,
+            "control_duration_drift_pct": 15.774804905239703
+          },
+          {
+            "M": 40,
+            "N": 1280,
+            "K": 2560,
+            "mode": 5,
+            "control_us": 215.27876907860653,
+            "candidate_us": 209.352,
+            "throughput_pct": 2.8310066675295786,
+            "control_duration_drift_pct": -0.6740491092922518
+          },
+          {
+            "M": 40,
+            "N": 2560,
+            "K": 640,
+            "mode": 1,
+            "control_us": 142.37843095075883,
+            "candidate_us": 151.008,
+            "throughput_pct": -5.714643627649652,
+            "control_duration_drift_pct": 24.084621643612692
+          },
+          {
+            "M": 40,
+            "N": 2560,
+            "K": 640,
+            "mode": 4,
+            "control_us": 157.60890330181223,
+            "candidate_us": 139.36,
+            "throughput_pct": 13.094792839991554,
+            "control_duration_drift_pct": -1.2459016393442601
+          },
+          {
+            "M": 40,
+            "N": 2560,
+            "K": 640,
+            "mode": 2,
+            "control_us": 159.50942151484344,
+            "candidate_us": 435.344,
+            "throughput_pct": -63.36014243567307,
+            "control_duration_drift_pct": 3.7184594953519445
+          },
+          {
+            "M": 40,
+            "N": 2560,
+            "K": 640,
+            "mode": 3,
+            "control_us": 161.1427562877091,
+            "candidate_us": 531.96,
+            "throughput_pct": -69.70773060235561,
+            "control_duration_drift_pct": -1.6005121638924424
+          },
+          {
+            "M": 40,
+            "N": 2560,
+            "K": 640,
+            "mode": 5,
+            "control_us": 158.5426702941514,
+            "candidate_us": 159.224,
+            "throughput_pct": -0.4279064122547971,
+            "control_duration_drift_pct": -1.626545217957076
+          },
+          {
+            "M": 160,
+            "N": 1280,
+            "K": 2560,
+            "mode": 1,
+            "control_us": 546.8224959234943,
+            "candidate_us": 547.56,
+            "throughput_pct": -0.13468918045613787,
+            "control_duration_drift_pct": -1.1722442805823574
+          },
+          {
+            "M": 160,
+            "N": 1280,
+            "K": 2560,
+            "mode": 4,
+            "control_us": 545.2176169714254,
+            "candidate_us": 280.176,
+            "throughput_pct": 94.59825858439888,
+            "control_duration_drift_pct": 0.5930744212741645
+          },
+          {
+            "M": 160,
+            "N": 1280,
+            "K": 2560,
+            "mode": 2,
+            "control_us": 549.3740912129002,
+            "candidate_us": 1653.392,
+            "throughput_pct": -66.77290737992561,
+            "control_duration_drift_pct": 0.9319132750094994
+          },
+          {
+            "M": 160,
+            "N": 1280,
+            "K": 2560,
+            "mode": 3,
+            "control_us": 547.1230849452434,
+            "candidate_us": 2165.592,
+            "throughput_pct": -74.73563418477518,
+            "control_duration_drift_pct": -1.7335594497833062
+          },
+          {
+            "M": 160,
+            "N": 1280,
+            "K": 2560,
+            "mode": 5,
+            "control_us": 541.9438403377236,
+            "candidate_us": 557.648,
+            "throughput_pct": -2.8161420218984823,
+            "control_duration_drift_pct": -0.1534036433365249
+          },
+          {
+            "M": 160,
+            "N": 2560,
+            "K": 640,
+            "mode": 1,
+            "control_us": 258.856,
+            "candidate_us": 258.128,
+            "throughput_pct": 0.28203062046736616,
+            "control_duration_drift_pct": 0.0
+          },
+          {
+            "M": 160,
+            "N": 2560,
+            "K": 640,
+            "mode": 4,
+            "control_us": 263.0342785265829,
+            "candidate_us": 199.68,
+            "throughput_pct": 31.72790390954672,
+            "control_duration_drift_pct": 3.254319003615902
+          },
+          {
+            "M": 160,
+            "N": 2560,
+            "K": 640,
+            "mode": 2,
+            "control_us": 269.35196899224627,
+            "candidate_us": 641.576,
+            "throughput_pct": -58.017137643514374,
+            "control_duration_drift_pct": 1.5564202334630517
+          },
+          {
+            "M": 160,
+            "N": 2560,
+            "K": 640,
+            "mode": 3,
+            "control_us": 266.50717843990617,
+            "candidate_us": 842.192,
+            "throughput_pct": -68.35553194047128,
+            "control_duration_drift_pct": -3.6015325670498144
+          },
+          {
+            "M": 160,
+            "N": 2560,
+            "K": 640,
+            "mode": 5,
+            "control_us": 260.93498445398234,
+            "candidate_us": 264.992,
+            "throughput_pct": -1.5309954813796933,
+            "control_duration_drift_pct": -0.5564387917328939
+          },
+          {
+            "M": 2048,
+            "N": 6144,
+            "K": 2560,
+            "mode": 1,
+            "control_us": 33581.78148579018,
+            "candidate_us": 32132.984,
+            "throughput_pct": 4.508754884981059,
+            "control_duration_drift_pct": -3.183735160039991
+          },
+          {
+            "M": 2048,
+            "N": 6144,
+            "K": 2560,
+            "mode": 4,
+            "control_us": 33772.34407124504,
+            "candidate_us": 13274.664,
+            "throughput_pct": 154.41204441216016,
+            "control_duration_drift_pct": 4.463993453355153
+          },
+          {
+            "M": 2048,
+            "N": 6144,
+            "K": 2560,
+            "mode": 2,
+            "control_us": 33600.61154365283,
+            "candidate_us": 73279.232,
+            "throughput_pct": -54.14715653180859,
+            "control_duration_drift_pct": -5.244303305483822
+          },
+          {
+            "M": 2048,
+            "N": 6144,
+            "K": 2560,
+            "mode": 3,
+            "control_us": 32804.42095618699,
+            "candidate_us": 132813.72,
+            "throughput_pct": -75.30042757917857,
+            "control_duration_drift_pct": 0.5923744900587335
+          },
+          {
+            "M": 2048,
+            "N": 6144,
+            "K": 2560,
+            "mode": 5,
+            "control_us": 32914.749308055805,
+            "candidate_us": 46232.576,
+            "throughput_pct": -28.806153245590714,
+            "control_duration_drift_pct": 0.08092047035022087
+          }
+        ]
+      }
+    },
+    "repeats": {
+      "complete": true,
+      "production_changed": false,
+      "scope": "Repeat the frozen six-mode screen without recompiling during measurement.",
+      "runs": [
+        {
+          "label": "repeat-0",
+          "exit_code": 0,
+          "rows": [
+            {
+              "M": 4,
+              "N": 1280,
+              "K": 2560,
+              "phase": 0,
+              "mode": 0,
+              "median_us": 206.856,
+              "samples_us": [
+                175.448,
+                169.832,
+                224.952,
+                174.408,
+                204.776,
+                210.392,
+                206.856,
+                208.52,
+                229.632
+              ]
+            },
+            {
+              "M": 4,
+              "N": 1280,
+              "K": 2560,
+              "phase": 1,
+              "mode": 1,
+              "median_us": 206.232,
+              "samples_us": [
+                191.672,
+                209.56,
+                199.68,
+                212.056,
+                206.232,
+                203.424,
+                212.472,
+                199.056,
+                226.304
+              ]
+            },
+            {
+              "M": 4,
+              "N": 1280,
+              "K": 2560,
+              "phase": 2,
+              "mode": 0,
+              "median_us": 181.064,
+              "samples_us": [
+                171.6,
+                194.584,
+                181.064,
+                205.192,
+                178.152,
+                175.136,
+                177.528,
+                297.232,
+                427.752
+              ]
+            },
+            {
+              "M": 4,
+              "N": 1280,
+              "K": 2560,
+              "phase": 3,
+              "mode": 4,
+              "median_us": 264.992,
+              "samples_us": [
+                269.88,
+                254.8,
+                269.672,
+                259.584,
+                264.992,
+                261.56,
+                253.344,
+                288.704,
+                282.464
+              ]
+            },
+            {
+              "M": 4,
+              "N": 1280,
+              "K": 2560,
+              "phase": 4,
+              "mode": 0,
+              "median_us": 209.144,
+              "samples_us": [
+                179.088,
+                179.296,
+                208.936,
+                209.144,
+                210.6,
+                198.016,
+                209.248,
+                210.288,
+                215.696
+              ]
+            },
+            {
+              "M": 4,
+              "N": 1280,
+              "K": 2560,
+              "phase": 5,
+              "mode": 2,
+              "median_us": 1464.216,
+              "samples_us": [
+                1733.472,
+                1632.072,
+                1464.216,
+                1456.52,
+                1476.8,
+                1475.032,
+                1456.208,
+                1455.376,
+                1460.784
+              ]
+            },
+            {
+              "M": 4,
+              "N": 1280,
+              "K": 2560,
+              "phase": 6,
+              "mode": 0,
+              "median_us": 200.616,
+              "samples_us": [
+                200.824,
+                176.384,
+                200.616,
+                197.288,
+                198.016,
+                202.592,
+                213.616,
+                192.4,
+                218.712
+              ]
+            },
+            {
+              "M": 4,
+              "N": 1280,
+              "K": 2560,
+              "phase": 7,
+              "mode": 3,
+              "median_us": 1305.72,
+              "samples_us": [
+                1294.176,
+                1293.864,
+                1292.304,
+                1287.728,
+                1312.272,
+                1626.768,
+                1500.304,
+                1305.72,
+                1317.16
+              ]
+            },
+            {
+              "M": 4,
+              "N": 1280,
+              "K": 2560,
+              "phase": 8,
+              "mode": 0,
+              "median_us": 207.792,
+              "samples_us": [
+                177.528,
+                200.616,
+                212.576,
+                207.792,
+                206.752,
+                214.24,
+                220.584,
+                204.776,
+                221.728
+              ]
+            },
+            {
+              "M": 4,
+              "N": 1280,
+              "K": 2560,
+              "phase": 9,
+              "mode": 5,
+              "median_us": 225.264,
+              "samples_us": [
+                198.224,
+                214.76,
+                228.072,
+                226.72,
+                225.264,
+                239.928,
+                191.256,
+                231.712,
+                199.472
+              ]
+            },
+            {
+              "M": 4,
+              "N": 1280,
+              "K": 2560,
+              "phase": 10,
+              "mode": 0,
+              "median_us": 195,
+              "samples_us": [
+                353.808,
+                174.512,
+                336.024,
+                184.08,
+                194.792,
+                184.704,
+                214.656,
+                209.456,
+                195
+              ]
+            },
+            {
+              "M": 16,
+              "N": 1280,
+              "K": 2560,
+              "phase": 0,
+              "mode": 0,
+              "median_us": 205.816,
+              "samples_us": [
+                177.32,
+                220.168,
+                205.816,
+                217.256,
+                210.704,
+                227.344,
+                177.528,
+                201.864,
+                202.488
+              ]
+            },
+            {
+              "M": 16,
+              "N": 1280,
+              "K": 2560,
+              "phase": 1,
+              "mode": 1,
+              "median_us": 181.48,
+              "samples_us": [
+                172.432,
+                171.6,
+                181.48,
+                168.584,
+                191.464,
+                222.456,
+                174.928,
+                213.512,
+                206.44
+              ]
+            },
+            {
+              "M": 16,
+              "N": 1280,
+              "K": 2560,
+              "phase": 2,
+              "mode": 0,
+              "median_us": 201.864,
+              "samples_us": [
+                177.32,
+                281.008,
+                170.872,
+                226.512,
+                201.864,
+                219.128,
+                226.304,
+                201.864,
+                176.28
+              ]
+            },
+            {
+              "M": 16,
+              "N": 1280,
+              "K": 2560,
+              "phase": 3,
+              "mode": 4,
+              "median_us": 263.64,
+              "samples_us": [
+                493.48,
+                263.64,
+                253.552,
+                263.328,
+                294.112,
+                255.944,
+                263.432,
+                265.2,
+                291.304
+              ]
+            },
+            {
+              "M": 16,
+              "N": 1280,
+              "K": 2560,
+              "phase": 4,
+              "mode": 0,
+              "median_us": 200.408,
+              "samples_us": [
+                169.832,
+                179.4,
+                198.848,
+                209.456,
+                214.136,
+                207.896,
+                181.376,
+                200.408,
+                207.168
+              ]
+            },
+            {
+              "M": 16,
+              "N": 1280,
+              "K": 2560,
+              "phase": 5,
+              "mode": 2,
+              "median_us": 1672.632,
+              "samples_us": [
+                1667.744,
+                1669.304,
+                1693.016,
+                1988.376,
+                1672.632,
+                1670.864,
+                1689.896,
+                1671.28,
+                1702.168
+              ]
+            },
+            {
+              "M": 16,
+              "N": 1280,
+              "K": 2560,
+              "phase": 6,
+              "mode": 0,
+              "median_us": 218.712,
+              "samples_us": [
+                176.176,
+                222.664,
+                180.856,
+                231.608,
+                218.712,
+                179.088,
+                215.384,
+                219.44,
+                238.784
+              ]
+            },
+            {
+              "M": 16,
+              "N": 1280,
+              "K": 2560,
+              "phase": 7,
+              "mode": 3,
+              "median_us": 1522.976,
+              "samples_us": [
+                1504.776,
+                1522.664,
+                1526.824,
+                1523.184,
+                1519.648,
+                1523.808,
+                1837.056,
+                1508.208,
+                1522.976
+              ]
+            },
+            {
+              "M": 16,
+              "N": 1280,
+              "K": 2560,
+              "phase": 8,
+              "mode": 0,
+              "median_us": 218.4,
+              "samples_us": [
+                175.656,
+                243.464,
+                218.4,
+                248.144,
+                197.288,
+                228.384,
+                195.832,
+                232.96,
+                178.984
+              ]
+            },
+            {
+              "M": 16,
+              "N": 1280,
+              "K": 2560,
+              "phase": 9,
+              "mode": 5,
+              "median_us": 203.112,
+              "samples_us": [
+                177.008,
+                225.16,
+                203.112,
+                230.464,
+                195.52,
+                229.216,
+                175.136,
+                235.248,
+                201.24
+              ]
+            },
+            {
+              "M": 16,
+              "N": 1280,
+              "K": 2560,
+              "phase": 10,
+              "mode": 0,
+              "median_us": 210.288,
+              "samples_us": [
+                175.24,
+                210.288,
+                199.68,
+                363.168,
+                176.696,
+                228.488,
+                229.008,
+                194.896,
+                232.648
+              ]
+            },
+            {
+              "M": 40,
+              "N": 1280,
+              "K": 2560,
+              "phase": 0,
+              "mode": 0,
+              "median_us": 221.104,
+              "samples_us": [
+                186.056,
+                234,
+                203.944,
+                234.936,
+                221.104,
+                232.648,
+                201.864,
+                234.104,
+                184.184
+              ]
+            },
+            {
+              "M": 40,
+              "N": 1280,
+              "K": 2560,
+              "phase": 1,
+              "mode": 1,
+              "median_us": 230.048,
+              "samples_us": [
+                176.696,
+                432.12,
+                176.384,
+                293.176,
+                350.272,
+                177.112,
+                231.088,
+                211.432,
+                230.048
+              ]
+            },
+            {
+              "M": 40,
+              "N": 1280,
+              "K": 2560,
+              "phase": 2,
+              "mode": 0,
+              "median_us": 224.224,
+              "samples_us": [
+                206.024,
+                235.768,
+                185.12,
+                239.616,
+                208.832,
+                243.88,
+                224.224,
+                183.664,
+                241.176
+              ]
+            },
+            {
+              "M": 40,
+              "N": 1280,
+              "K": 2560,
+              "phase": 3,
+              "mode": 4,
+              "median_us": 322.088,
+              "samples_us": [
+                294.32,
+                322.088,
+                320.112,
+                329.472,
+                321.464,
+                339.248,
+                344.656,
+                315.432,
+                324.792
+              ]
+            },
+            {
+              "M": 40,
+              "N": 1280,
+              "K": 2560,
+              "phase": 4,
+              "mode": 0,
+              "median_us": 216.008,
+              "samples_us": [
+                201.552,
+                186.68,
+                418.704,
+                184.912,
+                252.304,
+                216.008,
+                236.08,
+                201.656,
+                240.032
+              ]
+            },
+            {
+              "M": 40,
+              "N": 1280,
+              "K": 2560,
+              "phase": 5,
+              "mode": 2,
+              "median_us": 1561.664,
+              "samples_us": [
+                1545.024,
+                1566.448,
+                1553.344,
+                1544.4,
+                1801.28,
+                1766.128,
+                1547.624,
+                1567.384,
+                1561.664
+              ]
+            },
+            {
+              "M": 40,
+              "N": 1280,
+              "K": 2560,
+              "phase": 6,
+              "mode": 0,
+              "median_us": 222.56,
+              "samples_us": [
+                188.032,
+                231.712,
+                182.104,
+                245.024,
+                211.536,
+                237.328,
+                203.216,
+                254.384,
+                222.56
+              ]
+            },
+            {
+              "M": 40,
+              "N": 1280,
+              "K": 2560,
+              "phase": 7,
+              "mode": 3,
+              "median_us": 2092.168,
+              "samples_us": [
+                2079.064,
+                2086.136,
+                2092.168,
+                2079.48,
+                2263.248,
+                2297.776,
+                2075.84,
+                2097.888,
+                2092.896
+              ]
+            },
+            {
+              "M": 40,
+              "N": 1280,
+              "K": 2560,
+              "phase": 8,
+              "mode": 0,
+              "median_us": 222.04,
+              "samples_us": [
+                184.808,
+                258.232,
+                222.04,
+                235.768,
+                186.576,
+                242.216,
+                199.576,
+                231.92,
+                183.976
+              ]
+            },
+            {
+              "M": 40,
+              "N": 1280,
+              "K": 2560,
+              "phase": 9,
+              "mode": 5,
+              "median_us": 214.24,
+              "samples_us": [
+                187.408,
+                238.68,
+                214.24,
+                231.192,
+                182.936,
+                227.864,
+                199.784,
+                224.952,
+                185.224
+              ]
+            },
+            {
+              "M": 40,
+              "N": 1280,
+              "K": 2560,
+              "phase": 10,
+              "mode": 0,
+              "median_us": 221.624,
+              "samples_us": [
+                186.16,
+                245.648,
+                235.664,
+                203.424,
+                221.624,
+                185.224,
+                236.808,
+                203.32,
+                249.496
+              ]
+            },
+            {
+              "M": 160,
+              "N": 1280,
+              "K": 2560,
+              "phase": 0,
+              "mode": 0,
+              "median_us": 548.912,
+              "samples_us": [
+                548.912,
+                529.36,
+                780.728,
+                543.504,
+                536.848,
+                531.232,
+                565.032,
+                571.168,
+                554.736
+              ]
+            },
+            {
+              "M": 160,
+              "N": 1280,
+              "K": 2560,
+              "phase": 1,
+              "mode": 1,
+              "median_us": 545.168,
+              "samples_us": [
+                539.24,
+                551.72,
+                576.784,
+                531.544,
+                534.04,
+                556.088,
+                519.376,
+                545.168,
+                858.832
+              ]
+            },
+            {
+              "M": 160,
+              "N": 1280,
+              "K": 2560,
+              "phase": 2,
+              "mode": 0,
+              "median_us": 546.208,
+              "samples_us": [
+                524.992,
+                531.44,
+                546.208,
+                532.584,
+                561.184,
+                565.136,
+                558.168,
+                590.408,
+                546.104
+              ]
+            },
+            {
+              "M": 160,
+              "N": 1280,
+              "K": 2560,
+              "phase": 3,
+              "mode": 4,
+              "median_us": 276.744,
+              "samples_us": [
+                276.848,
+                274.352,
+                299.104,
+                277.16,
+                277.784,
+                272.896,
+                268.632,
+                269.672,
+                276.744
+              ]
+            },
+            {
+              "M": 160,
+              "N": 1280,
+              "K": 2560,
+              "phase": 4,
+              "mode": 0,
+              "median_us": 537.992,
+              "samples_us": [
+                542.256,
+                537.264,
+                537.992,
+                535.496,
+                874.952,
+                547.456,
+                532.168,
+                540.384,
+                533.624
+              ]
+            },
+            {
+              "M": 160,
+              "N": 1280,
+              "K": 2560,
+              "phase": 5,
+              "mode": 2,
+              "median_us": 1648.088,
+              "samples_us": [
+                1646.424,
+                1846.52,
+                1795.144,
+                1652.976,
+                1646.528,
+                1670.864,
+                1648.088,
+                1642.056,
+                1647.256
+              ]
+            },
+            {
+              "M": 160,
+              "N": 1280,
+              "K": 2560,
+              "phase": 6,
+              "mode": 0,
+              "median_us": 545.376,
+              "samples_us": [
+                545.376,
+                542.568,
+                562.536,
+                577.72,
+                532.064,
+                548.496,
+                570.232,
+                542.568,
+                530.192
+              ]
+            },
+            {
+              "M": 160,
+              "N": 1280,
+              "K": 2560,
+              "phase": 7,
+              "mode": 3,
+              "median_us": 2161.224,
+              "samples_us": [
+                2156.752,
+                2155.816,
+                2161.224,
+                2167.256,
+                2387.528,
+                2313.792,
+                2186.704,
+                2152.904,
+                2155.504
+              ]
+            },
+            {
+              "M": 160,
+              "N": 1280,
+              "K": 2560,
+              "phase": 8,
+              "mode": 0,
+              "median_us": 537.472,
+              "samples_us": [
+                524.056,
+                576.16,
+                542.36,
+                521.664,
+                537.472,
+                546.416,
+                533.52,
+                536.64,
+                570.96
+              ]
+            },
+            {
+              "M": 160,
+              "N": 1280,
+              "K": 2560,
+              "phase": 9,
+              "mode": 5,
+              "median_us": 566.488,
+              "samples_us": [
+                858.728,
+                986.96,
+                596.648,
+                560.872,
+                552.448,
+                557.96,
+                561.912,
+                577.72,
+                566.488
+              ]
+            },
+            {
+              "M": 160,
+              "N": 1280,
+              "K": 2560,
+              "phase": 10,
+              "mode": 0,
+              "median_us": 555.672,
+              "samples_us": [
+                530.088,
+                541.112,
+                817.544,
+                804.024,
+                545.376,
+                555.672,
+                561.496,
+                555.88,
+                550.16
+              ]
+            },
+            {
+              "M": 40,
+              "N": 2560,
+              "K": 640,
+              "phase": 0,
+              "mode": 0,
+              "median_us": 147.992,
+              "samples_us": [
+                123.76,
+                140.92,
+                167.648,
+                144.976,
+                147.992,
+                139.36,
+                153.504,
+                158.08,
+                160.888
+              ]
+            },
+            {
+              "M": 40,
+              "N": 2560,
+              "K": 640,
+              "phase": 1,
+              "mode": 1,
+              "median_us": 145.08,
+              "samples_us": [
+                110.76,
+                110.864,
+                109.928,
+                157.04,
+                523.328,
+                319.072,
+                145.08,
+                129.376,
+                145.6
+              ]
+            },
+            {
+              "M": 40,
+              "N": 2560,
+              "K": 640,
+              "phase": 2,
+              "mode": 0,
+              "median_us": 142.584,
+              "samples_us": [
+                111.8,
+                148.2,
+                108.888,
+                142.584,
+                113.776,
+                142.48,
+                147.16,
+                147.784,
+                145.288
+              ]
+            },
+            {
+              "M": 40,
+              "N": 2560,
+              "K": 640,
+              "phase": 3,
+              "mode": 4,
+              "median_us": 155.896,
+              "samples_us": [
+                111.072,
+                147.368,
+                164.32,
+                160.16,
+                155.792,
+                153.608,
+                175.76,
+                156.52,
+                155.896
+              ]
+            },
+            {
+              "M": 40,
+              "N": 2560,
+              "K": 640,
+              "phase": 4,
+              "mode": 0,
+              "median_us": 140.192,
+              "samples_us": [
+                343.304,
+                111.592,
+                118.976,
+                136.656,
+                140.192,
+                156.416,
+                175.24,
+                126.256,
+                170.352
+              ]
+            },
+            {
+              "M": 40,
+              "N": 2560,
+              "K": 640,
+              "phase": 5,
+              "mode": 2,
+              "median_us": 422.76,
+              "samples_us": [
+                426.504,
+                418.184,
+                418.912,
+                442.832,
+                425.464,
+                418.912,
+                435.24,
+                418.496,
+                422.76
+              ]
+            },
+            {
+              "M": 40,
+              "N": 2560,
+              "K": 640,
+              "phase": 6,
+              "mode": 0,
+              "median_us": 152.256,
+              "samples_us": [
+                112.112,
+                143.312,
+                155.896,
+                152.256,
+                110.344,
+                161.512,
+                170.768,
+                107.64,
+                325.208
+              ]
+            },
+            {
+              "M": 40,
+              "N": 2560,
+              "K": 640,
+              "phase": 7,
+              "mode": 3,
+              "median_us": 528.736,
+              "samples_us": [
+                514.488,
+                513.968,
+                536.328,
+                540.28,
+                534.248,
+                533.312,
+                513.24,
+                516.152,
+                528.736
+              ]
+            },
+            {
+              "M": 40,
+              "N": 2560,
+              "K": 640,
+              "phase": 8,
+              "mode": 0,
+              "median_us": 139.256,
+              "samples_us": [
+                110.448,
+                108.264,
+                139.256,
+                162.76,
+                150.592,
+                112.632,
+                319.592,
+                130.832,
+                154.336
+              ]
+            },
+            {
+              "M": 40,
+              "N": 2560,
+              "K": 640,
+              "phase": 9,
+              "mode": 5,
+              "median_us": 159.432,
+              "samples_us": [
+                114.192,
+                143.52,
+                148.928,
+                154.336,
+                164.112,
+                159.432,
+                162.448,
+                163.696,
+                161.824
+              ]
+            },
+            {
+              "M": 40,
+              "N": 2560,
+              "K": 640,
+              "phase": 10,
+              "mode": 0,
+              "median_us": 161.72,
+              "samples_us": [
+                107.848,
+                144.456,
+                170.04,
+                173.68,
+                164.84,
+                147.576,
+                161.72,
+                159.016,
+                164.528
+              ]
+            },
+            {
+              "M": 160,
+              "N": 2560,
+              "K": 640,
+              "phase": 0,
+              "mode": 0,
+              "median_us": 262.6,
+              "samples_us": [
+                257.504,
+                283.712,
+                258.232,
+                262.6,
+                274.248,
+                275.08,
+                259.376,
+                282.256,
+                256.984
+              ]
+            },
+            {
+              "M": 160,
+              "N": 2560,
+              "K": 640,
+              "phase": 1,
+              "mode": 1,
+              "median_us": 257.92,
+              "samples_us": [
+                279.864,
+                256.984,
+                256.256,
+                256.776,
+                257.92,
+                279.864,
+                258.336,
+                258.752,
+                256.568
+              ]
+            },
+            {
+              "M": 160,
+              "N": 2560,
+              "K": 640,
+              "phase": 2,
+              "mode": 0,
+              "median_us": 260.624,
+              "samples_us": [
+                256.256,
+                257.088,
+                260.624,
+                282.36,
+                278.304,
+                256.568,
+                256.672,
+                273.624,
+                270.712
+              ]
+            },
+            {
+              "M": 160,
+              "N": 2560,
+              "K": 640,
+              "phase": 3,
+              "mode": 4,
+              "median_us": 195,
+              "samples_us": [
+                159.848,
+                179.608,
+                189.176,
+                202.072,
+                195,
+                209.248,
+                202.592,
+                204.88,
+                194.272
+              ]
+            },
+            {
+              "M": 160,
+              "N": 2560,
+              "K": 640,
+              "phase": 4,
+              "mode": 0,
+              "median_us": 273.416,
+              "samples_us": [
+                262.808,
+                286.728,
+                277.056,
+                256.464,
+                265.096,
+                273.416,
+                255.944,
+                302.328,
+                304.72
+              ]
+            },
+            {
+              "M": 160,
+              "N": 2560,
+              "K": 640,
+              "phase": 5,
+              "mode": 2,
+              "median_us": 652.496,
+              "samples_us": [
+                634.712,
+                634.816,
+                638.976,
+                681.928,
+                657.28,
+                652.496,
+                635.96,
+                663.312,
+                660.712
+              ]
+            },
+            {
+              "M": 160,
+              "N": 2560,
+              "K": 640,
+              "phase": 6,
+              "mode": 0,
+              "median_us": 260,
+              "samples_us": [
+                260,
+                290.576,
+                289.744,
+                256.672,
+                269.152,
+                259.792,
+                282.88,
+                256.672,
+                258.96
+              ]
+            },
+            {
+              "M": 160,
+              "N": 2560,
+              "K": 640,
+              "phase": 7,
+              "mode": 3,
+              "median_us": 848.328,
+              "samples_us": [
+                822.744,
+                868.296,
+                865.592,
+                842.816,
+                848.328,
+                841.152,
+                863.2,
+                838.24,
+                1450.072
+              ]
+            },
+            {
+              "M": 160,
+              "N": 2560,
+              "K": 640,
+              "phase": 8,
+              "mode": 0,
+              "median_us": 258.96,
+              "samples_us": [
+                257.92,
+                258.96,
+                256.048,
+                257.712,
+                260,
+                257.712,
+                261.04,
+                281.632,
+                282.776
+              ]
+            },
+            {
+              "M": 160,
+              "N": 2560,
+              "K": 640,
+              "phase": 9,
+              "mode": 5,
+              "median_us": 264.68,
+              "samples_us": [
+                260,
+                281.736,
+                267.176,
+                263.016,
+                262.6,
+                265.408,
+                264.784,
+                264.68,
+                264.056
+              ]
+            },
+            {
+              "M": 160,
+              "N": 2560,
+              "K": 640,
+              "phase": 10,
+              "mode": 0,
+              "median_us": 260.312,
+              "samples_us": [
+                255.632,
+                257.504,
+                255.528,
+                260.312,
+                280.384,
+                265.304,
+                278.2,
+                260.208,
+                282.152
+              ]
+            },
+            {
+              "M": 2048,
+              "N": 6144,
+              "K": 2560,
+              "phase": 0,
+              "mode": 0,
+              "median_us": 32821.88,
+              "samples_us": [
+                33146.984,
+                33641.296,
+                32235.944,
+                32186.44,
+                32821.88,
+                32777.68,
+                32888.024,
+                32651.736,
+                32900.712
+              ]
+            },
+            {
+              "M": 2048,
+              "N": 6144,
+              "K": 2560,
+              "phase": 1,
+              "mode": 1,
+              "median_us": 32352.216,
+              "samples_us": [
+                31895.968,
+                31859.464,
+                32563.232,
+                32415.76,
+                32301.88,
+                33101.224,
+                31801.848,
+                33040.592,
+                32352.216
+              ]
+            },
+            {
+              "M": 2048,
+              "N": 6144,
+              "K": 2560,
+              "phase": 2,
+              "mode": 0,
+              "median_us": 33060.768,
+              "samples_us": [
+                32504.472,
+                32887.4,
+                32346.184,
+                33826.416,
+                35578.816,
+                33060.768,
+                34743.28,
+                31902.208,
+                33401.16
+              ]
+            },
+            {
+              "M": 2048,
+              "N": 6144,
+              "K": 2560,
+              "phase": 3,
+              "mode": 4,
+              "median_us": 13254.592,
+              "samples_us": [
+                13318.344,
+                13254.592,
+                13360.88,
+                13237.952,
+                13276.848,
+                13733.2,
+                13198.952,
+                13208.208,
+                13092.664
+              ]
+            },
+            {
+              "M": 2048,
+              "N": 6144,
+              "K": 2560,
+              "phase": 4,
+              "mode": 0,
+              "median_us": 33507.864,
+              "samples_us": [
+                32279.936,
+                36581.584,
+                32499.48,
+                39271.856,
+                33507.864,
+                35727.744,
+                32496.568,
+                32280.04,
+                35234.888
+              ]
+            },
+            {
+              "M": 2048,
+              "N": 6144,
+              "K": 2560,
+              "phase": 5,
+              "mode": 2,
+              "median_us": 73115.328,
+              "samples_us": [
+                73233.16,
+                73115.328,
+                73371.376,
+                73005.192,
+                73105.552,
+                72635.056,
+                73276.632,
+                72950.072,
+                73129.68
+              ]
+            },
+            {
+              "M": 2048,
+              "N": 6144,
+              "K": 2560,
+              "phase": 6,
+              "mode": 0,
+              "median_us": 34660.392,
+              "samples_us": [
+                34660.392,
+                37777.168,
+                32633.848,
+                36574.408,
+                35639.552,
+                34579.48,
+                34680.36,
+                32827.288,
+                33041.632
+              ]
+            },
+            {
+              "M": 2048,
+              "N": 6144,
+              "K": 2560,
+              "phase": 7,
+              "mode": 3,
+              "median_us": 132062.32,
+              "samples_us": [
+                131668.472,
+                132062.32,
+                131957.176,
+                131346.072,
+                131719.328,
+                134936.152,
+                133931.408,
+                133742.232,
+                132880.696
+              ]
+            },
+            {
+              "M": 2048,
+              "N": 6144,
+              "K": 2560,
+              "phase": 8,
+              "mode": 0,
+              "median_us": 33376.2,
+              "samples_us": [
+                34142.472,
+                34011.952,
+                33094.88,
+                32493.344,
+                33331.376,
+                33939.984,
+                32871.488,
+                33425.704,
+                33376.2
+              ]
+            },
+            {
+              "M": 2048,
+              "N": 6144,
+              "K": 2560,
+              "phase": 9,
+              "mode": 5,
+              "median_us": 46869.576,
+              "samples_us": [
+                48538.36,
+                46869.576,
+                46666.048,
+                48396.608,
+                45883.24,
+                46633.496,
+                46547.592,
+                48190.48,
+                48314.032
+              ]
+            },
+            {
+              "M": 2048,
+              "N": 6144,
+              "K": 2560,
+              "phase": 10,
+              "mode": 0,
+              "median_us": 32887.4,
+              "samples_us": [
+                32887.4,
+                38739.064,
+                32874.504,
+                32806.8,
+                37019.632,
+                32749.184,
+                34032.648,
+                32443.112,
+                34620.56
+              ]
+            }
+          ],
+          "comparisons": [
+            {
+              "M": 4,
+              "N": 1280,
+              "K": 2560,
+              "mode": 1,
+              "control_us": 193.53081094234065,
+              "candidate_us": 206.232,
+              "throughput_pct": -6.1586897560317215,
+              "control_duration_drift_pct": -12.468577174459528
+            },
+            {
+              "M": 4,
+              "N": 1280,
+              "K": 2560,
+              "mode": 4,
+              "control_us": 194.59817372216008,
+              "candidate_us": 264.992,
+              "throughput_pct": -26.56450997684455,
+              "control_duration_drift_pct": 15.508328546812189
+            },
+            {
+              "M": 4,
+              "N": 1280,
+              "K": 2560,
+              "mode": 2,
+              "control_us": 204.8356236205021,
+              "candidate_us": 1464.216,
+              "throughput_pct": -86.01055967012367,
+              "control_duration_drift_pct": -4.0775733465937325
+            },
+            {
+              "M": 4,
+              "N": 1280,
+              "K": 2560,
+              "mode": 3,
+              "control_us": 204.17247579436363,
+              "candidate_us": 1305.72,
+              "throughput_pct": -84.36322674123367,
+              "control_duration_drift_pct": 3.5769828926905056
+            },
+            {
+              "M": 4,
+              "N": 1280,
+              "K": 2560,
+              "mode": 5,
+              "control_us": 201.29441124879747,
+              "candidate_us": 225.264,
+              "throughput_pct": -10.640665508559977,
+              "control_duration_drift_pct": -6.156156156156156
+            },
+            {
+              "M": 16,
+              "N": 1280,
+              "K": 2560,
+              "mode": 1,
+              "control_us": 203.83042222396537,
+              "candidate_us": 181.48,
+              "throughput_pct": 12.31563931230184,
+              "control_duration_drift_pct": -1.920161697827183
+            },
+            {
+              "M": 16,
+              "N": 1280,
+              "K": 2560,
+              "mode": 4,
+              "control_us": 201.13468251895296,
+              "candidate_us": 263.64,
+              "throughput_pct": -23.708586512307328,
+              "control_duration_drift_pct": -0.7212776919113928
+            },
+            {
+              "M": 16,
+              "N": 1280,
+              "K": 2560,
+              "mode": 2,
+              "control_us": 209.3600594573855,
+              "candidate_us": 1672.632,
+              "throughput_pct": -87.4831965753743,
+              "control_duration_drift_pct": 9.133367929423986
+            },
+            {
+              "M": 16,
+              "N": 1280,
+              "K": 2560,
+              "mode": 3,
+              "control_us": 218.5559443254747,
+              "candidate_us": 1522.976,
+              "throughput_pct": -85.64941638440298,
+              "control_duration_drift_pct": -0.14265335235377208
+            },
+            {
+              "M": 16,
+              "N": 1280,
+              "K": 2560,
+              "mode": 5,
+              "control_us": 214.30562101820848,
+              "candidate_us": 203.112,
+              "throughput_pct": 5.511058439781258,
+              "control_duration_drift_pct": -3.7142857142857144
+            },
+            {
+              "M": 40,
+              "N": 1280,
+              "K": 2560,
+              "mode": 1,
+              "control_us": 222.65853519683452,
+              "candidate_us": 230.048,
+              "throughput_pct": -3.212140424244281,
+              "control_duration_drift_pct": 1.4111006585136199
+            },
+            {
+              "M": 40,
+              "N": 1280,
+              "K": 2560,
+              "mode": 4,
+              "control_us": 220.07766309191854,
+              "candidate_us": 322.088,
+              "throughput_pct": -31.671573268200458,
+              "control_duration_drift_pct": -3.66419294990723
+            },
+            {
+              "M": 40,
+              "N": 1280,
+              "K": 2560,
+              "mode": 2,
+              "control_us": 219.25952768351937,
+              "candidate_us": 1561.664,
+              "throughput_pct": -85.95987820148768,
+              "control_duration_drift_pct": 3.033220991815111
+            },
+            {
+              "M": 40,
+              "N": 1280,
+              "K": 2560,
+              "mode": 3,
+              "control_us": 222.29984795316437,
+              "candidate_us": 2092.168,
+              "throughput_pct": -89.3746655166715,
+              "control_duration_drift_pct": -0.2336448598130869
+            },
+            {
+              "M": 40,
+              "N": 1280,
+              "K": 2560,
+              "mode": 5,
+              "control_us": 221.83190248474182,
+              "candidate_us": 214.24,
+              "throughput_pct": 3.5436438035576057,
+              "control_duration_drift_pct": -0.18735362997658322
+            },
+            {
+              "M": 40,
+              "N": 2560,
+              "K": 640,
+              "mode": 1,
+              "control_us": 145.26283532961898,
+              "candidate_us": 145.08,
+              "throughput_pct": 0.12602380039907768,
+              "control_duration_drift_pct": -3.6542515811665455
+            },
+            {
+              "M": 40,
+              "N": 2560,
+              "K": 640,
+              "mode": 4,
+              "control_us": 141.3829414321261,
+              "candidate_us": 155.896,
+              "throughput_pct": -9.309448971028045,
+              "control_duration_drift_pct": -1.6776075857038664
+            },
+            {
+              "M": 40,
+              "N": 2560,
+              "K": 640,
+              "mode": 2,
+              "control_us": 146.09953166249372,
+              "candidate_us": 422.76,
+              "throughput_pct": -65.44149596402362,
+              "control_duration_drift_pct": 8.605341246290799
+            },
+            {
+              "M": 40,
+              "N": 2560,
+              "K": 640,
+              "mode": 3,
+              "control_us": 145.61099387065525,
+              "candidate_us": 528.736,
+              "throughput_pct": -72.46054857799446,
+              "control_duration_drift_pct": -8.53825136612022
+            },
+            {
+              "M": 40,
+              "N": 2560,
+              "K": 640,
+              "mode": 5,
+              "control_us": 150.06825220545483,
+              "candidate_us": 159.432,
+              "throughput_pct": -5.873192203914623,
+              "control_duration_drift_pct": 16.131441374159827
+            },
+            {
+              "M": 160,
+              "N": 1280,
+              "K": 2560,
+              "mode": 1,
+              "control_us": 547.5583308616535,
+              "candidate_us": 545.168,
+              "throughput_pct": 0.43845766106109796,
+              "control_duration_drift_pct": -0.49261083743843415
+            },
+            {
+              "M": 160,
+              "N": 1280,
+              "K": 2560,
+              "mode": 4,
+              "control_us": 542.084434692604,
+              "candidate_us": 276.744,
+              "throughput_pct": 95.87938119439046,
+              "control_duration_drift_pct": -1.5041888804265047
+            },
+            {
+              "M": 160,
+              "N": 1280,
+              "K": 2560,
+              "mode": 2,
+              "control_us": 541.6714179204954,
+              "candidate_us": 1648.088,
+              "throughput_pct": -67.1333437340424,
+              "control_duration_drift_pct": 1.372511115406927
+            },
+            {
+              "M": 160,
+              "N": 1280,
+              "K": 2560,
+              "mode": 3,
+              "control_us": 541.4095764502139,
+              "candidate_us": 2161.224,
+              "throughput_pct": -74.94893743312984,
+              "control_duration_drift_pct": -1.449275362318836
+            },
+            {
+              "M": 160,
+              "N": 1280,
+              "K": 2560,
+              "mode": 5,
+              "control_us": 546.4962407775556,
+              "candidate_us": 566.488,
+              "throughput_pct": -3.5290702049195155,
+              "control_duration_drift_pct": 3.3862229102167296
+            },
+            {
+              "M": 160,
+              "N": 2560,
+              "K": 640,
+              "mode": 1,
+              "control_us": 261.61013436027287,
+              "candidate_us": 257.92,
+              "throughput_pct": 1.4307282724382864,
+              "control_duration_drift_pct": -0.7524752475247531
+            },
+            {
+              "M": 160,
+              "N": 2560,
+              "K": 640,
+              "mode": 4,
+              "control_us": 266.94338647735776,
+              "candidate_us": 195,
+              "throughput_pct": 36.894044347362964,
+              "control_duration_drift_pct": 4.908220271348762
+            },
+            {
+              "M": 160,
+              "N": 2560,
+              "K": 640,
+              "mode": 2,
+              "control_us": 266.6236298605208,
+              "candidate_us": 652.496,
+              "throughput_pct": -59.137890521854416,
+              "control_duration_drift_pct": -4.906808672499052
+            },
+            {
+              "M": 160,
+              "N": 2560,
+              "K": 640,
+              "mode": 3,
+              "control_us": 259.4794789573927,
+              "candidate_us": 848.328,
+              "throughput_pct": -69.41283572422546,
+              "control_duration_drift_pct": -0.40000000000001146
+            },
+            {
+              "M": 160,
+              "N": 2560,
+              "K": 640,
+              "mode": 5,
+              "control_us": 259.63511996646366,
+              "candidate_us": 264.68,
+              "throughput_pct": -1.9060299355963206,
+              "control_duration_drift_pct": 0.5220883534136744
+            },
+            {
+              "M": 2048,
+              "N": 6144,
+              "K": 2560,
+              "mode": 1,
+              "control_us": 32941.1074495658,
+              "candidate_us": 32352.216,
+              "throughput_pct": 1.8202507351144037,
+              "control_duration_drift_pct": 0.7278315562667226
+            },
+            {
+              "M": 2048,
+              "N": 6144,
+              "K": 2560,
+              "mode": 4,
+              "control_us": 33283.565281975905,
+              "candidate_us": 13254.592,
+              "throughput_pct": 151.10969301790584,
+              "control_duration_drift_pct": 1.3523460798007036
+            },
+            {
+              "M": 2048,
+              "N": 6144,
+              "K": 2560,
+              "mode": 2,
+              "control_us": 34079.256173260124,
+              "candidate_us": 73115.328,
+              "throughput_pct": -53.389724007994424,
+              "control_duration_drift_pct": 3.4395746622345014
+            },
+            {
+              "M": 2048,
+              "N": 6144,
+              "K": 2560,
+              "mode": 3,
+              "control_us": 34012.23567292218,
+              "candidate_us": 132062.32,
+              "throughput_pct": -74.24531412675306,
+              "control_duration_drift_pct": -3.705070617781825
+            },
+            {
+              "M": 2048,
+              "N": 6144,
+              "K": 2560,
+              "mode": 5,
+              "control_us": 33130.89856734948,
+              "candidate_us": 46869.576,
+              "throughput_pct": -29.312570339126854,
+              "control_duration_drift_pct": -1.4645166316117342
+            }
+          ]
+        },
+        {
+          "label": "repeat-1",
+          "exit_code": 0,
+          "rows": [
+            {
+              "M": 4,
+              "N": 1280,
+              "K": 2560,
+              "phase": 0,
+              "mode": 0,
+              "median_us": 178.36,
+              "samples_us": [
+                176.696,
+                179.192,
+                181.792,
+                183.872,
+                173.368,
+                178.36,
+                176.28,
+                177.112,
+                196.04
+              ]
+            },
+            {
+              "M": 4,
+              "N": 1280,
+              "K": 2560,
+              "phase": 1,
+              "mode": 1,
+              "median_us": 177.736,
+              "samples_us": [
+                175.656,
+                177.736,
+                176.8,
+                172.64,
+                185.536,
+                175.032,
+                178.152,
+                180.856,
+                187.304
+              ]
+            },
+            {
+              "M": 4,
+              "N": 1280,
+              "K": 2560,
+              "phase": 2,
+              "mode": 0,
+              "median_us": 177.32,
+              "samples_us": [
+                176.28,
+                177.32,
+                169.936,
+                196.768,
+                191.36,
+                172.744,
+                196.872,
+                178.048,
+                175.656
+              ]
+            },
+            {
+              "M": 4,
+              "N": 1280,
+              "K": 2560,
+              "phase": 3,
+              "mode": 4,
+              "median_us": 280.488,
+              "samples_us": [
+                267.176,
+                274.872,
+                276.848,
+                280.488,
+                316.056,
+                308.152,
+                282.048,
+                279.968,
+                295.36
+              ]
+            },
+            {
+              "M": 4,
+              "N": 1280,
+              "K": 2560,
+              "phase": 4,
+              "mode": 0,
+              "median_us": 213.304,
+              "samples_us": [
+                184.496,
+                214.656,
+                213.2,
+                213.304,
+                196.04,
+                221.416,
+                203.528,
+                218.296,
+                222.872
+              ]
+            },
+            {
+              "M": 4,
+              "N": 1280,
+              "K": 2560,
+              "phase": 5,
+              "mode": 2,
+              "median_us": 1484.808,
+              "samples_us": [
+                1458.184,
+                1484.808,
+                1611.792,
+                1466.816,
+                1484.08,
+                1483.872,
+                1485.328,
+                1495.624,
+                1485.744
+              ]
+            },
+            {
+              "M": 4,
+              "N": 1280,
+              "K": 2560,
+              "phase": 6,
+              "mode": 0,
+              "median_us": 209.352,
+              "samples_us": [
+                179.088,
+                233.168,
+                216.424,
+                209.352,
+                180.752,
+                198.432,
+                176.696,
+                220.584,
+                212.16
+              ]
+            },
+            {
+              "M": 4,
+              "N": 1280,
+              "K": 2560,
+              "phase": 7,
+              "mode": 3,
+              "median_us": 1313.312,
+              "samples_us": [
+                1294.488,
+                1313,
+                1325.48,
+                1313.416,
+                1310.4,
+                1314.144,
+                1313.312,
+                1296.048,
+                1420.12
+              ]
+            },
+            {
+              "M": 4,
+              "N": 1280,
+              "K": 2560,
+              "phase": 8,
+              "mode": 0,
+              "median_us": 192.712,
+              "samples_us": [
+                177.32,
+                180.752,
+                175.344,
+                187.512,
+                192.712,
+                203.008,
+                205.192,
+                200.928,
+                195.208
+              ]
+            },
+            {
+              "M": 4,
+              "N": 1280,
+              "K": 2560,
+              "phase": 9,
+              "mode": 5,
+              "median_us": 211.848,
+              "samples_us": [
+                193.544,
+                211.848,
+                218.608,
+                194.064,
+                228.904,
+                194.688,
+                213.928,
+                225.056,
+                197.704
+              ]
+            },
+            {
+              "M": 4,
+              "N": 1280,
+              "K": 2560,
+              "phase": 10,
+              "mode": 0,
+              "median_us": 207.584,
+              "samples_us": [
+                176.488,
+                207.584,
+                212.68,
+                183.352,
+                188.136,
+                186.992,
+                218.92,
+                211.12,
+                248.872
+              ]
+            },
+            {
+              "M": 16,
+              "N": 1280,
+              "K": 2560,
+              "phase": 0,
+              "mode": 0,
+              "median_us": 212.264,
+              "samples_us": [
+                186.992,
+                213.408,
+                212.264,
+                214.136,
+                225.784,
+                192.816,
+                207.792,
+                233.48,
+                174.824
+              ]
+            },
+            {
+              "M": 16,
+              "N": 1280,
+              "K": 2560,
+              "phase": 1,
+              "mode": 1,
+              "median_us": 209.56,
+              "samples_us": [
+                178.776,
+                208.104,
+                209.56,
+                209.352,
+                212.368,
+                219.856,
+                198.952,
+                210.496,
+                232.648
+              ]
+            },
+            {
+              "M": 16,
+              "N": 1280,
+              "K": 2560,
+              "phase": 2,
+              "mode": 0,
+              "median_us": 195.936,
+              "samples_us": [
+                178.464,
+                205.712,
+                212.992,
+                392.6,
+                190.632,
+                177.944,
+                173.056,
+                230.048,
+                195.936
+              ]
+            },
+            {
+              "M": 16,
+              "N": 1280,
+              "K": 2560,
+              "phase": 3,
+              "mode": 4,
+              "median_us": 290.992,
+              "samples_us": [
+                263.432,
+                281.008,
+                293.176,
+                306.072,
+                305.24,
+                313.04,
+                278.096,
+                276.328,
+                290.992
+              ]
+            },
+            {
+              "M": 16,
+              "N": 1280,
+              "K": 2560,
+              "phase": 4,
+              "mode": 0,
+              "median_us": 214.032,
+              "samples_us": [
+                166.4,
+                223.6,
+                174.928,
+                232.96,
+                214.032,
+                235.768,
+                195.728,
+                234.312,
+                204.568
+              ]
+            },
+            {
+              "M": 16,
+              "N": 1280,
+              "K": 2560,
+              "phase": 5,
+              "mode": 2,
+              "median_us": 1690.312,
+              "samples_us": [
+                1672.32,
+                1680.744,
+                1670.448,
+                1706.224,
+                1691.872,
+                1690.312,
+                1688.336,
+                1693.432,
+                1795.664
+              ]
+            },
+            {
+              "M": 16,
+              "N": 1280,
+              "K": 2560,
+              "phase": 6,
+              "mode": 0,
+              "median_us": 213.512,
+              "samples_us": [
+                178.984,
+                215.8,
+                213.512,
+                238.368,
+                210.288,
+                232.128,
+                198.328,
+                231.816,
+                195.416
+              ]
+            },
+            {
+              "M": 16,
+              "N": 1280,
+              "K": 2560,
+              "phase": 7,
+              "mode": 3,
+              "median_us": 1522.144,
+              "samples_us": [
+                1519.128,
+                1522.144,
+                1525.056,
+                1509.872,
+                1527.24,
+                1530.88,
+                1523.496,
+                1520.896,
+                1521.104
+              ]
+            },
+            {
+              "M": 16,
+              "N": 1280,
+              "K": 2560,
+              "phase": 8,
+              "mode": 0,
+              "median_us": 210.288,
+              "samples_us": [
+                176.904,
+                211.848,
+                210.288,
+                204.464,
+                173.888,
+                180.232,
+                219.856,
+                222.04,
+                217.672
+              ]
+            },
+            {
+              "M": 16,
+              "N": 1280,
+              "K": 2560,
+              "phase": 9,
+              "mode": 5,
+              "median_us": 218.296,
+              "samples_us": [
+                293.904,
+                275.704,
+                178.152,
+                319.28,
+                178.88,
+                223.288,
+                196.248,
+                218.296,
+                209.144
+              ]
+            },
+            {
+              "M": 16,
+              "N": 1280,
+              "K": 2560,
+              "phase": 10,
+              "mode": 0,
+              "median_us": 210.184,
+              "samples_us": [
+                175.864,
+                220.168,
+                195.104,
+                210.184,
+                221.728,
+                196.144,
+                237.848,
+                170.664,
+                231.504
+              ]
+            },
+            {
+              "M": 40,
+              "N": 1280,
+              "K": 2560,
+              "phase": 0,
+              "mode": 0,
+              "median_us": 213.616,
+              "samples_us": [
+                185.848,
+                217.88,
+                235.04,
+                205.504,
+                172.536,
+                241.8,
+                213.616,
+                248.664,
+                212.888
+              ]
+            },
+            {
+              "M": 40,
+              "N": 1280,
+              "K": 2560,
+              "phase": 1,
+              "mode": 1,
+              "median_us": 206.128,
+              "samples_us": [
+                177.84,
+                223.392,
+                176.384,
+                226.928,
+                173.264,
+                227.76,
+                206.128,
+                241.28,
+                206.024
+              ]
+            },
+            {
+              "M": 40,
+              "N": 1280,
+              "K": 2560,
+              "phase": 2,
+              "mode": 0,
+              "median_us": 212.784,
+              "samples_us": [
+                205.608,
+                236.288,
+                205.4,
+                233.792,
+                185.12,
+                235.456,
+                203.632,
+                234.832,
+                212.784
+              ]
+            },
+            {
+              "M": 40,
+              "N": 1280,
+              "K": 2560,
+              "phase": 3,
+              "mode": 4,
+              "median_us": 322.608,
+              "samples_us": [
+                322.608,
+                305.76,
+                303.368,
+                402.688,
+                299.208,
+                329.576,
+                336.96,
+                340.392,
+                318.448
+              ]
+            },
+            {
+              "M": 40,
+              "N": 1280,
+              "K": 2560,
+              "phase": 4,
+              "mode": 0,
+              "median_us": 224.848,
+              "samples_us": [
+                186.576,
+                234.416,
+                201.76,
+                238.68,
+                212.368,
+                250.224,
+                224.848,
+                185.328,
+                250.12
+              ]
+            },
+            {
+              "M": 40,
+              "N": 1280,
+              "K": 2560,
+              "phase": 5,
+              "mode": 2,
+              "median_us": 1564.68,
+              "samples_us": [
+                1546.168,
+                1565.616,
+                1560.728,
+                1564.16,
+                1562.392,
+                1564.68,
+                1566.656,
+                1575.912,
+                1568.008
+              ]
+            },
+            {
+              "M": 40,
+              "N": 1280,
+              "K": 2560,
+              "phase": 6,
+              "mode": 0,
+              "median_us": 216.112,
+              "samples_us": [
+                355.472,
+                181.688,
+                192.4,
+                239.2,
+                216.112,
+                184.392,
+                231.296,
+                189.072,
+                245.752
+              ]
+            },
+            {
+              "M": 40,
+              "N": 1280,
+              "K": 2560,
+              "phase": 7,
+              "mode": 3,
+              "median_us": 2075.736,
+              "samples_us": [
+                2076.776,
+                2091.544,
+                2089.568,
+                2072.2,
+                2072.2,
+                2068.768,
+                2075.736,
+                2073.136,
+                2093.52
+              ]
+            },
+            {
+              "M": 40,
+              "N": 1280,
+              "K": 2560,
+              "phase": 8,
+              "mode": 0,
+              "median_us": 226.928,
+              "samples_us": [
+                184.288,
+                229.008,
+                302.12,
+                282.256,
+                184.808,
+                226.928,
+                207.272,
+                250.224,
+                186.472
+              ]
+            },
+            {
+              "M": 40,
+              "N": 1280,
+              "K": 2560,
+              "phase": 9,
+              "mode": 5,
+              "median_us": 218.192,
+              "samples_us": [
+                181.896,
+                218.192,
+                221.624,
+                214.136,
+                239.616,
+                185.328,
+                223.912,
+                206.648,
+                226.512
+              ]
+            },
+            {
+              "M": 40,
+              "N": 1280,
+              "K": 2560,
+              "phase": 10,
+              "mode": 0,
+              "median_us": 216.32,
+              "samples_us": [
+                185.744,
+                216.32,
+                226.824,
+                206.856,
+                229.112,
+                192.192,
+                219.336,
+                241.28,
+                182.52
+              ]
+            },
+            {
+              "M": 160,
+              "N": 1280,
+              "K": 2560,
+              "phase": 0,
+              "mode": 0,
+              "median_us": 549.016,
+              "samples_us": [
+                541.424,
+                551.72,
+                549.016,
+                551.824,
+                539.76,
+                561.288,
+                546.52,
+                548.496,
+                565.24
+              ]
+            },
+            {
+              "M": 160,
+              "N": 1280,
+              "K": 2560,
+              "phase": 1,
+              "mode": 1,
+              "median_us": 534.248,
+              "samples_us": [
+                537.576,
+                532.688,
+                534.248,
+                842.504,
+                558.064,
+                547.768,
+                522.704,
+                529.672,
+                527.8
+              ]
+            },
+            {
+              "M": 160,
+              "N": 1280,
+              "K": 2560,
+              "phase": 2,
+              "mode": 0,
+              "median_us": 544.96,
+              "samples_us": [
+                543.92,
+                544.96,
+                523.12,
+                530.504,
+                551.512,
+                569.92,
+                539.552,
+                587.912,
+                548.496
+              ]
+            },
+            {
+              "M": 160,
+              "N": 1280,
+              "K": 2560,
+              "phase": 3,
+              "mode": 4,
+              "median_us": 277.784,
+              "samples_us": [
+                292.344,
+                282.672,
+                275.912,
+                278.72,
+                292.76,
+                274.456,
+                274.352,
+                277.784,
+                274.768
+              ]
+            },
+            {
+              "M": 160,
+              "N": 1280,
+              "K": 2560,
+              "phase": 4,
+              "mode": 0,
+              "median_us": 549.328,
+              "samples_us": [
+                549.328,
+                564.304,
+                539.448,
+                544.752,
+                546.936,
+                569.4,
+                545.896,
+                549.536,
+                772.096
+              ]
+            },
+            {
+              "M": 160,
+              "N": 1280,
+              "K": 2560,
+              "phase": 5,
+              "mode": 2,
+              "median_us": 1658.488,
+              "samples_us": [
+                1653.288,
+                1995.656,
+                1658.592,
+                1658.488,
+                1658.072,
+                1657.968,
+                1676.896,
+                1660.672,
+                1648.192
+              ]
+            },
+            {
+              "M": 160,
+              "N": 1280,
+              "K": 2560,
+              "phase": 6,
+              "mode": 0,
+              "median_us": 547.248,
+              "samples_us": [
+                549.328,
+                559.728,
+                541.424,
+                542.36,
+                547.248,
+                567.944,
+                547.768,
+                529.464,
+                538.2
+              ]
+            },
+            {
+              "M": 160,
+              "N": 1280,
+              "K": 2560,
+              "phase": 7,
+              "mode": 3,
+              "median_us": 2165.488,
+              "samples_us": [
+                2168.712,
+                2169.648,
+                2165.488,
+                2186.08,
+                2156.648,
+                2331.16,
+                2156.648,
+                2156.648,
+                2156.856
+              ]
+            },
+            {
+              "M": 160,
+              "N": 1280,
+              "K": 2560,
+              "phase": 8,
+              "mode": 0,
+              "median_us": 571.584,
+              "samples_us": [
+                571.584,
+                562.848,
+                777.088,
+                566.8,
+                529.672,
+                557.128,
+                589.472,
+                681.928,
+                789.256
+              ]
+            },
+            {
+              "M": 160,
+              "N": 1280,
+              "K": 2560,
+              "phase": 9,
+              "mode": 5,
+              "median_us": 557.024,
+              "samples_us": [
+                558.272,
+                555.152,
+                552.552,
+                558.064,
+                549.016,
+                588.952,
+                557.232,
+                544.544,
+                557.024
+              ]
+            },
+            {
+              "M": 160,
+              "N": 1280,
+              "K": 2560,
+              "phase": 10,
+              "mode": 0,
+              "median_us": 555.152,
+              "samples_us": [
+                563.16,
+                538.824,
+                572.832,
+                533.208,
+                555.152,
+                560.768,
+                541.632,
+                535.704,
+                558.688
+              ]
+            },
+            {
+              "M": 40,
+              "N": 2560,
+              "K": 640,
+              "phase": 0,
+              "mode": 0,
+              "median_us": 139.152,
+              "samples_us": [
+                114.192,
+                147.992,
+                139.152,
+                160.472,
+                143.104,
+                153.816,
+                126.568,
+                114.192,
+                111.904
+              ]
+            },
+            {
+              "M": 40,
+              "N": 2560,
+              "K": 640,
+              "phase": 1,
+              "mode": 1,
+              "median_us": 140.088,
+              "samples_us": [
+                295.048,
+                130.832,
+                111.176,
+                149.864,
+                138.736,
+                136.24,
+                165.048,
+                174.2,
+                140.088
+              ]
+            },
+            {
+              "M": 40,
+              "N": 2560,
+              "K": 640,
+              "phase": 2,
+              "mode": 0,
+              "median_us": 146.328,
+              "samples_us": [
+                122.512,
+                146.328,
+                145.288,
+                139.256,
+                150.072,
+                141.856,
+                170.04,
+                159.848,
+                173.472
+              ]
+            },
+            {
+              "M": 40,
+              "N": 2560,
+              "K": 640,
+              "phase": 3,
+              "mode": 4,
+              "median_us": 159.016,
+              "samples_us": [
+                113.984,
+                130.52,
+                157.352,
+                159.016,
+                159.224,
+                159.328,
+                161.096,
+                167.128,
+                153.088
+              ]
+            },
+            {
+              "M": 40,
+              "N": 2560,
+              "K": 640,
+              "phase": 4,
+              "mode": 0,
+              "median_us": 166.92,
+              "samples_us": [
+                115.44,
+                166.92,
+                144.976,
+                180.96,
+                152.152,
+                169,
+                170.352,
+                156.416,
+                167.544
+              ]
+            },
+            {
+              "M": 40,
+              "N": 2560,
+              "K": 640,
+              "phase": 5,
+              "mode": 2,
+              "median_us": 440.232,
+              "samples_us": [
+                417.144,
+                435.448,
+                455.416,
+                442.208,
+                445.952,
+                439.712,
+                435.032,
+                441.896,
+                440.232
+              ]
+            },
+            {
+              "M": 40,
+              "N": 2560,
+              "K": 640,
+              "phase": 6,
+              "mode": 0,
+              "median_us": 154.648,
+              "samples_us": [
+                110.344,
+                141.96,
+                153.816,
+                496.912,
+                110.448,
+                154.648,
+                165.984,
+                166.192,
+                171.704
+              ]
+            },
+            {
+              "M": 40,
+              "N": 2560,
+              "K": 640,
+              "phase": 7,
+              "mode": 3,
+              "median_us": 535.496,
+              "samples_us": [
+                516.568,
+                532.896,
+                539.136,
+                550.68,
+                535.704,
+                535.392,
+                535.496,
+                536.952,
+                534.456
+              ]
+            },
+            {
+              "M": 40,
+              "N": 2560,
+              "K": 640,
+              "phase": 8,
+              "mode": 0,
+              "median_us": 162.448,
+              "samples_us": [
+                120.224,
+                108.16,
+                163.8,
+                167.44,
+                118.248,
+                162.448,
+                163.384,
+                156.104,
+                170.664
+              ]
+            },
+            {
+              "M": 40,
+              "N": 2560,
+              "K": 640,
+              "phase": 9,
+              "mode": 5,
+              "median_us": 166.816,
+              "samples_us": [
+                134.992,
+                157.976,
+                166.92,
+                162.24,
+                175.448,
+                172.952,
+                168.064,
+                163.176,
+                166.816
+              ]
+            },
+            {
+              "M": 40,
+              "N": 2560,
+              "K": 640,
+              "phase": 10,
+              "mode": 0,
+              "median_us": 162.76,
+              "samples_us": [
+                112.528,
+                153.296,
+                148.928,
+                160.16,
+                185.848,
+                162.76,
+                177.32,
+                164.424,
+                185.536
+              ]
+            },
+            {
+              "M": 160,
+              "N": 2560,
+              "K": 640,
+              "phase": 0,
+              "mode": 0,
+              "median_us": 290.264,
+              "samples_us": [
+                264.16,
+                294.736,
+                292.968,
+                286.208,
+                295.984,
+                290.264,
+                297.024,
+                285.688,
+                283.4
+              ]
+            },
+            {
+              "M": 160,
+              "N": 2560,
+              "K": 640,
+              "phase": 1,
+              "mode": 1,
+              "median_us": 257.712,
+              "samples_us": [
+                256.152,
+                255.528,
+                255.84,
+                276.016,
+                256.672,
+                257.712,
+                259.168,
+                259.48,
+                283.088
+              ]
+            },
+            {
+              "M": 160,
+              "N": 2560,
+              "K": 640,
+              "phase": 2,
+              "mode": 0,
+              "median_us": 261.04,
+              "samples_us": [
+                261.04,
+                258.44,
+                260.936,
+                257.712,
+                261.04,
+                272.688,
+                255.632,
+                269.568,
+                261.144
+              ]
+            },
+            {
+              "M": 160,
+              "N": 2560,
+              "K": 640,
+              "phase": 3,
+              "mode": 4,
+              "median_us": 191.36,
+              "samples_us": [
+                160.056,
+                197.08,
+                191.776,
+                158.704,
+                159.848,
+                201.552,
+                159.432,
+                194.064,
+                191.36
+              ]
+            },
+            {
+              "M": 160,
+              "N": 2560,
+              "K": 640,
+              "phase": 4,
+              "mode": 0,
+              "median_us": 264.576,
+              "samples_us": [
+                259.688,
+                283.296,
+                262.808,
+                261.768,
+                258.232,
+                274.248,
+                264.576,
+                267.176,
+                278.304
+              ]
+            },
+            {
+              "M": 160,
+              "N": 2560,
+              "K": 640,
+              "phase": 5,
+              "mode": 2,
+              "median_us": 654.576,
+              "samples_us": [
+                636.48,
+                643.344,
+                654.576,
+                664.664,
+                664.872,
+                638.248,
+                640.848,
+                656.864,
+                654.784
+              ]
+            },
+            {
+              "M": 160,
+              "N": 2560,
+              "K": 640,
+              "phase": 6,
+              "mode": 0,
+              "median_us": 261.976,
+              "samples_us": [
+                265.72,
+                259.792,
+                263.952,
+                282.984,
+                259.48,
+                261.976,
+                266.76,
+                261.768,
+                259.168
+              ]
+            },
+            {
+              "M": 160,
+              "N": 2560,
+              "K": 640,
+              "phase": 7,
+              "mode": 3,
+              "median_us": 839.592,
+              "samples_us": [
+                839.592,
+                848.536,
+                834.6,
+                817.96,
+                834.704,
+                836.472,
+                850.72,
+                842.816,
+                847.08
+              ]
+            },
+            {
+              "M": 160,
+              "N": 2560,
+              "K": 640,
+              "phase": 8,
+              "mode": 0,
+              "median_us": 261.248,
+              "samples_us": [
+                259.688,
+                257.816,
+                261.248,
+                272.584,
+                258.024,
+                259.688,
+                263.12,
+                265.928,
+                268.32
+              ]
+            },
+            {
+              "M": 160,
+              "N": 2560,
+              "K": 640,
+              "phase": 9,
+              "mode": 5,
+              "median_us": 266.552,
+              "samples_us": [
+                267.072,
+                266.24,
+                280.696,
+                275.808,
+                266.552,
+                262.392,
+                265.824,
+                280.592,
+                262.808
+              ]
+            },
+            {
+              "M": 160,
+              "N": 2560,
+              "K": 640,
+              "phase": 10,
+              "mode": 0,
+              "median_us": 273.416,
+              "samples_us": [
+                258.96,
+                299.208,
+                255.528,
+                305.552,
+                291.928,
+                297.96,
+                273.416,
+                258.024,
+                258.024
+              ]
+            },
+            {
+              "M": 2048,
+              "N": 6144,
+              "K": 2560,
+              "phase": 0,
+              "mode": 0,
+              "median_us": 34102.432,
+              "samples_us": [
+                34102.432,
+                32193.096,
+                35786.4,
+                32499.688,
+                33944.664,
+                36997.584,
+                32232.408,
+                38287.184,
+                36117.952
+              ]
+            },
+            {
+              "M": 2048,
+              "N": 6144,
+              "K": 2560,
+              "phase": 1,
+              "mode": 1,
+              "median_us": 32077.344,
+              "samples_us": [
+                31690.152,
+                32006.104,
+                32077.344,
+                32369.792,
+                32437.704,
+                31617.768,
+                32841.744,
+                32825.416,
+                31666.024
+              ]
+            },
+            {
+              "M": 2048,
+              "N": 6144,
+              "K": 2560,
+              "phase": 2,
+              "mode": 0,
+              "median_us": 32803.888,
+              "samples_us": [
+                33028.84,
+                32649.864,
+                32947.096,
+                33014.072,
+                32397.144,
+                32476.912,
+                33678.112,
+                32789.12,
+                32803.888
+              ]
+            },
+            {
+              "M": 2048,
+              "N": 6144,
+              "K": 2560,
+              "phase": 3,
+              "mode": 4,
+              "median_us": 13234.936,
+              "samples_us": [
+                13093.08,
+                13316.992,
+                13778.648,
+                13235.664,
+                13204.256,
+                13080.6,
+                12994.696,
+                13585.936,
+                13234.936
+              ]
+            },
+            {
+              "M": 2048,
+              "N": 6144,
+              "K": 2560,
+              "phase": 4,
+              "mode": 0,
+              "median_us": 33054.84,
+              "samples_us": [
+                32169.072,
+                34480.576,
+                32251.752,
+                34272.368,
+                32480.76,
+                33280.312,
+                33054.84,
+                32719.336,
+                33956.624
+              ]
+            },
+            {
+              "M": 2048,
+              "N": 6144,
+              "K": 2560,
+              "phase": 5,
+              "mode": 2,
+              "median_us": 73722.376,
+              "samples_us": [
+                73683.584,
+                73299.72,
+                73946.6,
+                73811.192,
+                73780.512,
+                73805.16,
+                73722.376,
+                73544.016,
+                73003.84
+              ]
+            },
+            {
+              "M": 2048,
+              "N": 6144,
+              "K": 2560,
+              "phase": 6,
+              "mode": 0,
+              "median_us": 32900.296,
+              "samples_us": [
+                32202.352,
+                32900.296,
+                35051.64,
+                32373.536,
+                33760.48,
+                32287.112,
+                33488.936,
+                33496.216,
+                31793.112
+              ]
+            },
+            {
+              "M": 2048,
+              "N": 6144,
+              "K": 2560,
+              "phase": 7,
+              "mode": 3,
+              "median_us": 132055.248,
+              "samples_us": [
+                132049.736,
+                132028.208,
+                132682.784,
+                132151.032,
+                132055.248,
+                132432.768,
+                131632.696,
+                132267.2,
+                131938.56
+              ]
+            },
+            {
+              "M": 2048,
+              "N": 6144,
+              "K": 2560,
+              "phase": 8,
+              "mode": 0,
+              "median_us": 32783.4,
+              "samples_us": [
+                32783.4,
+                32408.272,
+                32674.928,
+                33229.248,
+                33101.432,
+                32390.696,
+                32829.888,
+                32542.432,
+                33755.072
+              ]
+            },
+            {
+              "M": 2048,
+              "N": 6144,
+              "K": 2560,
+              "phase": 9,
+              "mode": 5,
+              "median_us": 46424.456,
+              "samples_us": [
+                45602.44,
+                44798.416,
+                45874.712,
+                46834.944,
+                43310.904,
+                46446.816,
+                47136.544,
+                46662.096,
+                46424.456
+              ]
+            },
+            {
+              "M": 2048,
+              "N": 6144,
+              "K": 2560,
+              "phase": 10,
+              "mode": 0,
+              "median_us": 33355.608,
+              "samples_us": [
+                33355.608,
+                34366.072,
+                32684.496,
+                34874.736,
+                32161.272,
+                34311.784,
+                33124.832,
+                33131.176,
+                34196.032
+              ]
+            }
+          ],
+          "comparisons": [
+            {
+              "M": 4,
+              "N": 1280,
+              "K": 2560,
+              "mode": 1,
+              "control_us": 177.83923976445692,
+              "candidate_us": 177.736,
+              "throughput_pct": 0.05808601772119282,
+              "control_duration_drift_pct": -0.5830903790087549
+            },
+            {
+              "M": 4,
+              "N": 1280,
+              "K": 2560,
+              "mode": 4,
+              "control_us": 194.48152940575102,
+              "candidate_us": 280.488,
+              "throughput_pct": -30.663155141841713,
+              "control_duration_drift_pct": 20.293255131964806
+            },
+            {
+              "M": 4,
+              "N": 1280,
+              "K": 2560,
+              "mode": 2,
+              "control_us": 211.3187616090914,
+              "candidate_us": 1484.808,
+              "throughput_pct": -85.76794025833027,
+              "control_duration_drift_pct": -1.8527547537786404
+            },
+            {
+              "M": 4,
+              "N": 1280,
+              "K": 2560,
+              "mode": 3,
+              "control_us": 200.85975859788343,
+              "candidate_us": 1313.312,
+              "throughput_pct": -84.70586131872065,
+              "control_duration_drift_pct": -7.948335817188279
+            },
+            {
+              "M": 4,
+              "N": 1280,
+              "K": 2560,
+              "mode": 5,
+              "control_us": 200.0098192789544,
+              "candidate_us": 211.848,
+              "throughput_pct": -5.588054039238322,
+              "control_duration_drift_pct": 7.717215326497584
+            },
+            {
+              "M": 16,
+              "N": 1280,
+              "K": 2560,
+              "mode": 1,
+              "control_us": 203.93665463569812,
+              "candidate_us": 209.56,
+              "throughput_pct": -2.6834058810373596,
+              "control_duration_drift_pct": -7.692307692307699
+            },
+            {
+              "M": 16,
+              "N": 1280,
+              "K": 2560,
+              "mode": 4,
+              "control_us": 204.7842131415408,
+              "candidate_us": 290.992,
+              "throughput_pct": -29.62548346980647,
+              "control_duration_drift_pct": 9.235668789808926
+            },
+            {
+              "M": 16,
+              "N": 1280,
+              "K": 2560,
+              "mode": 2,
+              "control_us": 213.7718418875601,
+              "candidate_us": 1690.312,
+              "throughput_pct": -87.35311339636942,
+              "control_duration_drift_pct": -0.24295432458698585
+            },
+            {
+              "M": 16,
+              "N": 1280,
+              "K": 2560,
+              "mode": 3,
+              "control_us": 211.89386837754415,
+              "candidate_us": 1522.144,
+              "throughput_pct": -86.07924950743529,
+              "control_duration_drift_pct": -1.5099853872381885
+            },
+            {
+              "M": 16,
+              "N": 1280,
+              "K": 2560,
+              "mode": 5,
+              "control_us": 210.23599356913172,
+              "candidate_us": 218.296,
+              "throughput_pct": -3.6922373432716427,
+              "control_duration_drift_pct": -0.049455984174096024
+            },
+            {
+              "M": 40,
+              "N": 1280,
+              "K": 2560,
+              "mode": 1,
+              "control_us": 213.19959414595516,
+              "candidate_us": 206.128,
+              "throughput_pct": 3.4306810069253846,
+              "control_duration_drift_pct": -0.3894839337877376
+            },
+            {
+              "M": 40,
+              "N": 1280,
+              "K": 2560,
+              "mode": 4,
+              "control_us": 218.73284351464002,
+              "candidate_us": 322.608,
+              "throughput_pct": -32.1985680718891,
+              "control_duration_drift_pct": 5.669599217986332
+            },
+            {
+              "M": 40,
+              "N": 1280,
+              "K": 2560,
+              "mode": 2,
+              "control_us": 220.4367278290984,
+              "candidate_us": 1564.68,
+              "throughput_pct": -85.91170540755309,
+              "control_duration_drift_pct": -3.885291396854773
+            },
+            {
+              "M": 40,
+              "N": 1280,
+              "K": 2560,
+              "mode": 3,
+              "control_us": 221.45397701554154,
+              "candidate_us": 2075.736,
+              "throughput_pct": -89.33130335382045,
+              "control_duration_drift_pct": 5.004812319538021
+            },
+            {
+              "M": 40,
+              "N": 1280,
+              "K": 2560,
+              "mode": 5,
+              "control_us": 221.56052211529018,
+              "candidate_us": 218.192,
+              "throughput_pct": 1.5438339239248755,
+              "control_duration_drift_pct": -4.674610449129246
+            },
+            {
+              "M": 40,
+              "N": 2560,
+              "K": 640,
+              "mode": 1,
+              "control_us": 142.69489779245788,
+              "candidate_us": 140.088,
+              "throughput_pct": 1.8609001430942573,
+              "control_duration_drift_pct": 5.156950672645744
+            },
+            {
+              "M": 40,
+              "N": 2560,
+              "K": 640,
+              "mode": 4,
+              "control_us": 156.2852192627313,
+              "candidate_us": 159.016,
+              "throughput_pct": -1.717299351806545,
+              "control_duration_drift_pct": 14.072494669509595
+            },
+            {
+              "M": 40,
+              "N": 2560,
+              "K": 640,
+              "mode": 2,
+              "control_us": 160.66687325021297,
+              "candidate_us": 440.232,
+              "throughput_pct": -63.504044855845784,
+              "control_duration_drift_pct": -7.352024922118372
+            },
+            {
+              "M": 40,
+              "N": 2560,
+              "K": 640,
+              "mode": 3,
+              "control_us": 158.50002619558143,
+              "candidate_us": 535.496,
+              "throughput_pct": -70.4012679468042,
+              "control_duration_drift_pct": 5.04371217215871
+            },
+            {
+              "M": 40,
+              "N": 2560,
+              "K": 640,
+              "mode": 5,
+              "control_us": 162.60392516787533,
+              "candidate_us": 166.816,
+              "throughput_pct": -2.5249825149414096,
+              "control_duration_drift_pct": 0.1920614596670811
+            },
+            {
+              "M": 160,
+              "N": 1280,
+              "K": 2560,
+              "mode": 1,
+              "control_us": 546.9842405042398,
+              "candidate_us": 534.248,
+              "throughput_pct": 2.38395660896058,
+              "control_duration_drift_pct": -0.7387762833869882
+            },
+            {
+              "M": 160,
+              "N": 1280,
+              "K": 2560,
+              "mode": 4,
+              "control_us": 547.1396411155017,
+              "candidate_us": 277.784,
+              "throughput_pct": 96.96585876634425,
+              "control_duration_drift_pct": 0.8015267175572438
+            },
+            {
+              "M": 160,
+              "N": 1280,
+              "K": 2560,
+              "mode": 2,
+              "control_us": 548.2870136561689,
+              "candidate_us": 1658.488,
+              "throughput_pct": -66.94054984683827,
+              "control_duration_drift_pct": -0.37864445285875625
+            },
+            {
+              "M": 160,
+              "N": 1280,
+              "K": 2560,
+              "mode": 3,
+              "control_us": 559.2836497091614,
+              "candidate_us": 2165.488,
+              "throughput_pct": -74.17285850999122,
+              "control_duration_drift_pct": 4.446978335233731
+            },
+            {
+              "M": 160,
+              "N": 1280,
+              "K": 2560,
+              "mode": 5,
+              "control_us": 563.3080869009426,
+              "candidate_us": 557.024,
+              "throughput_pct": 1.1281537062932,
+              "control_duration_drift_pct": -2.874818049490524
+            },
+            {
+              "M": 160,
+              "N": 2560,
+              "K": 640,
+              "mode": 1,
+              "control_us": 275.2644447799243,
+              "candidate_us": 257.712,
+              "throughput_pct": 6.810876008848754,
+              "control_duration_drift_pct": -10.068075958437827
+            },
+            {
+              "M": 160,
+              "N": 2560,
+              "K": 640,
+              "mode": 4,
+              "control_us": 262.8020529600178,
+              "candidate_us": 191.36,
+              "throughput_pct": 37.3338487458287,
+              "control_duration_drift_pct": 1.3545816733067761
+            },
+            {
+              "M": 160,
+              "N": 2560,
+              "K": 640,
+              "mode": 2,
+              "control_us": 263.27279042088645,
+              "candidate_us": 654.576,
+              "throughput_pct": -59.77964508003861,
+              "control_duration_drift_pct": -0.9827044025157328
+            },
+            {
+              "M": 160,
+              "N": 2560,
+              "K": 640,
+              "mode": 3,
+              "control_us": 261.6117467699033,
+              "candidate_us": 839.592,
+              "throughput_pct": -68.84060987123468,
+              "control_duration_drift_pct": -0.27788805081382373
+            },
+            {
+              "M": 160,
+              "N": 2560,
+              "K": 640,
+              "mode": 5,
+              "control_us": 267.2627605335244,
+              "candidate_us": 266.552,
+              "throughput_pct": 0.26664985951123654,
+              "control_duration_drift_pct": 4.657643312101922
+            },
+            {
+              "M": 2048,
+              "N": 6144,
+              "K": 2560,
+              "mode": 1,
+              "control_us": 33446.85874421716,
+              "candidate_us": 32077.344,
+              "throughput_pct": 4.269414401071248,
+              "control_duration_drift_pct": -3.8077753516230217
+            },
+            {
+              "M": 2048,
+              "N": 6144,
+              "K": 2560,
+              "mode": 4,
+              "control_us": 32929.124938539135,
+              "candidate_us": 13234.936,
+              "throughput_pct": 148.80456496759135,
+              "control_duration_drift_pct": 0.7650068796723142
+            },
+            {
+              "M": 2048,
+              "N": 6144,
+              "K": 2560,
+              "mode": 2,
+              "control_us": 32977.47746921587,
+              "candidate_us": 73722.376,
+              "throughput_pct": -55.26802138170931,
+              "control_duration_drift_pct": -0.467538188053529
+            },
+            {
+              "M": 2048,
+              "N": 6144,
+              "K": 2560,
+              "mode": 3,
+              "control_us": 32841.79599057275,
+              "candidate_us": 132055.248,
+              "throughput_pct": -75.1302606386588,
+              "control_duration_drift_pct": -0.35530379422726854
+            },
+            {
+              "M": 2048,
+              "N": 6144,
+              "K": 2560,
+              "mode": 5,
+              "control_us": 33068.26634867936,
+              "candidate_us": 46424.456,
+              "throughput_pct": -28.7697278592142,
+              "control_duration_drift_pct": 1.7454199381394142
+            }
+          ]
+        }
+      ],
+      "sha256": {
+        "G:\\GitHub\\Strata\\build-orca-slm-async-20261104\\confirm-r1\\runner.py": "d8700ee6bd25ff2a4d84da3265b65b64942fe534b6df3f51f5cb8b39df388348",
+        "G:\\GitHub\\Strata\\build-orca-slm-async-20261104\\confirm-r1\\repeat-0.stdout": "1929cb5469665aaacf870f50db9f1d60afcc71726fb1b55fcdc099bef73e2220",
+        "G:\\GitHub\\Strata\\build-orca-slm-async-20261104\\confirm-r1\\repeat-1.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "G:\\GitHub\\Strata\\build-orca-slm-async-20261104\\confirm-r1\\repeat-1.command.txt": "a45d6237d630ddd081a1aefcf89b43376481bc5889cb77c6a3c92ea916598527",
+        "G:\\GitHub\\Strata\\tools\\bench_deepinfer.py": "edef8c0e8c439c028b0c4787c069abab6932b0333df00a0128b76a33083bc868",
+        "G:\\GitHub\\Strata\\build-orca-slm-async-20261104\\tile-r1\\probe.exe": "7b449d6f8392a93df0ade05803c7b33a1c1a184641213326b73165b9f5a08e78",
+        "G:\\GitHub\\Strata\\build-orca-slm-async-20261104\\confirm-r1\\repeat-0.command.txt": "a45d6237d630ddd081a1aefcf89b43376481bc5889cb77c6a3c92ea916598527",
+        "G:\\GitHub\\Strata\\build-orca-slm-async-20261104\\tile-r1\\results.json": "ac8af73349e2506d20e07352af4e77d2158eff8ca72e8fc4713babc3b1726391",
+        "G:\\GitHub\\Strata\\build-orca-slm-async-20261104\\confirm-r1\\repeat-0.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "G:\\GitHub\\Strata\\build-orca-slm-async-20261104\\confirm-r1\\repeat-1.stdout": "5a8de760f6d212644be2ae1601a30180a5c42b5f843e21aa2a54b2b71e16b33a",
+        "G:\\GitHub\\Strata\\build-orca-slm-async-20261104\\run_v2.py": "7cb25559ee7eefb9a429ddbcece8c4bfd9de49a728c7d2df2e06798b372de4ce",
+        "G:\\GitHub\\Strata\\build-orca-slm-async-20261104\\confirm.py": "d8700ee6bd25ff2a4d84da3265b65b64942fe534b6df3f51f5cb8b39df388348"
+      }
+    },
+    "failed_attempts": {
+      "r1": {
+        "complete": false,
+        "production_changed": false,
+        "scope": "Isolated A770 XMX SLM screen; kernel timing is not model/runtime speedup.",
+        "commands": [
+          {
+            "label": "build",
+            "exit_code": 1
+          }
+        ],
+        "sha256": {},
+        "modes": {
+          "0": "M4N64 global load",
+          "1": "M4N64 register lookahead",
+          "2": "M8N32 BK64 padded SLM",
+          "3": "M8N32 BK64 double SLM with register lookahead"
+        },
+        "notes": [
+          "All variants request256 GRFs;actual occupancy/spills/overlap are unmeasured.",
+          "SLM variants also change workgroup tile;this is a combined kernel screen.",
+          "3 warmups and9 individual kernel timestamps per phase;no JIT/copy/CPU/model timing.",
+          "Same buffers and queue,A/B/A/C/A/D/A per shape;unlocked clocks."
+        ],
+        "error": "AssertionError('build')"
+      },
+      "r2": {
+        "complete": false,
+        "production_changed": false,
+        "scope": "Isolated A770 XMX SLM screen; kernel timing is not model/runtime speedup.",
+        "commands": [
+          {
+            "label": "build",
+            "exit_code": 1
+          }
+        ],
+        "sha256": {},
+        "modes": {
+          "0": "M4N64 global load",
+          "1": "M4N64 register lookahead",
+          "2": "M8N32 BK64 padded SLM",
+          "3": "M8N32 BK64 double SLM with register lookahead"
+        },
+        "notes": [
+          "All variants request256 GRFs;actual occupancy/spills/overlap are unmeasured.",
+          "SLM variants also change workgroup tile;this is a combined kernel screen.",
+          "3 warmups and9 individual kernel timestamps per phase;no JIT/copy/CPU/model timing.",
+          "Same buffers and queue,A/B/A/C/A/D/A per shape;unlocked clocks."
+        ],
+        "error": "AssertionError('build')"
+      }
+    }
+  },
+  "archive_sha256": "5f93bfeb1fef50214fd0324297d1e50d01f160345b48fa27c26d4f21c57a9e4a",
+  "report_sha256": "e358d7c41c7ef94748241a1bf5441926c00bef20b9940767cf367f366d11b78e",
+  "files": {
+    "build-orca-slm-async-20261104/confirm-r1/repeat-0.command.txt": "a45d6237d630ddd081a1aefcf89b43376481bc5889cb77c6a3c92ea916598527",
+    "build-orca-slm-async-20261104/confirm-r1/repeat-0.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-orca-slm-async-20261104/confirm-r1/repeat-0.stdout": "1929cb5469665aaacf870f50db9f1d60afcc71726fb1b55fcdc099bef73e2220",
+    "build-orca-slm-async-20261104/confirm-r1/repeat-1.command.txt": "a45d6237d630ddd081a1aefcf89b43376481bc5889cb77c6a3c92ea916598527",
+    "build-orca-slm-async-20261104/confirm-r1/repeat-1.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-orca-slm-async-20261104/confirm-r1/repeat-1.stdout": "5a8de760f6d212644be2ae1601a30180a5c42b5f843e21aa2a54b2b71e16b33a",
+    "build-orca-slm-async-20261104/confirm-r1/results.json": "4131071133128c88a64ee7787f95338a23e930a20b8f86babc79c01911860cff",
+    "build-orca-slm-async-20261104/confirm-r1/runner.py": "d8700ee6bd25ff2a4d84da3265b65b64942fe534b6df3f51f5cb8b39df388348",
+    "build-orca-slm-async-20261104/confirm.py": "d8700ee6bd25ff2a4d84da3265b65b64942fe534b6df3f51f5cb8b39df388348",
+    "build-orca-slm-async-20261104/publish.py": "ccb4d8e5d959caf360b55c17c970825655fa391fc34673105387ade0109fc9df",
+    "build-orca-slm-async-20261104/r1/build.command.txt": "f3bbc23ddbd69345060f630a697a9d4fdc32197c13caa1af809c21ac7342b206",
+    "build-orca-slm-async-20261104/r1/build.stderr": "a44bd645e7d9a00cfc690acc204b8d4da77b02d24326071f891a5f2d9c29542a",
+    "build-orca-slm-async-20261104/r1/build.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-orca-slm-async-20261104/r1/probe.cpp": "82ef2f9f42de1636baedf8bec9c1f829446473a0490693ec3f500a57499d5733",
+    "build-orca-slm-async-20261104/r1/results.json": "a7cb4d29506d2855d0202ea6a06a8638493c9cb02c2d2381c110e3fed4e4ee37",
+    "build-orca-slm-async-20261104/r1/runner.py": "d18c8655952a1b869b73580fb5dca4420244a8ecf1429430f025b6449e54971d",
+    "build-orca-slm-async-20261104/r2/build.command.txt": "a510e49ace58f7a1b0236010b8c4df2e6e23710fba503c37482a2fade7acd24a",
+    "build-orca-slm-async-20261104/r2/build.stderr": "6bab4fccd9ccc978bd38084e8b0b598c2d3884e18071033b278199caf6f0a576",
+    "build-orca-slm-async-20261104/r2/build.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-orca-slm-async-20261104/r2/probe.cpp": "da99101d2fba760cf1a7e177d71d6ca914ebb029af4c52d423ee61442e137e74",
+    "build-orca-slm-async-20261104/r2/results.json": "a7cb4d29506d2855d0202ea6a06a8638493c9cb02c2d2381c110e3fed4e4ee37",
+    "build-orca-slm-async-20261104/r2/runner.py": "197beb98fc17b6383fdd74f1d9ad287596368ef00193341c32556ff504ea823e",
+    "build-orca-slm-async-20261104/r3/build.command.txt": "ff20fbdcba253922738fbfbf7b6f4c735259f106048eaac0856f34a101dc132e",
+    "build-orca-slm-async-20261104/r3/build.stderr": "aeb5c67bd854ded47f9143f69bba2624c6f27f7df7c29e1253a1e3aabe886d26",
+    "build-orca-slm-async-20261104/r3/build.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-orca-slm-async-20261104/r3/probe.cpp": "3e8d359938b6eb8684bb9f3eb6d26c33841c3ac7cbbf95f0674627cbf558fdfc",
+    "build-orca-slm-async-20261104/r3/results.json": "39f01abb7fd04a4942d8094539e4fdaf7131f2e9faaac176270db480b32f38e5",
+    "build-orca-slm-async-20261104/r3/runner.py": "197beb98fc17b6383fdd74f1d9ad287596368ef00193341c32556ff504ea823e",
+    "build-orca-slm-async-20261104/r3/screen.command.txt": "60d462e1e282ba4196e55945a7356d12d70dd23340d6e4ee00da475ba54fa3c8",
+    "build-orca-slm-async-20261104/r3/screen.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-orca-slm-async-20261104/r3/screen.stdout": "5ae154b2c9da478bca01961e038bee66dcbcd893d13a89a3e91db3ccdecf8392",
+    "build-orca-slm-async-20261104/r3/smoke.command.txt": "584d5016cd4c8ff35c5d9f9ac609cdf09fe30cac78690fc89d3854d9e0fa13f3",
+    "build-orca-slm-async-20261104/r3/smoke.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-orca-slm-async-20261104/r3/smoke.stdout": "739582979d76861c34abed5958188d3efba57a345b43d238c40ad707fdb11cfa",
+    "build-orca-slm-async-20261104/run.py": "197beb98fc17b6383fdd74f1d9ad287596368ef00193341c32556ff504ea823e",
+    "build-orca-slm-async-20261104/run_v2.py": "7cb25559ee7eefb9a429ddbcece8c4bfd9de49a728c7d2df2e06798b372de4ce",
+    "build-orca-slm-async-20261104/tile-r1/build.command.txt": "13351fdaed1d2b0caa75825d69ef1cc720c5b87254ad643c7ea482500cee121f",
+    "build-orca-slm-async-20261104/tile-r1/build.stderr": "74eb9e845447b129ba82377ceb5daec84717e1f2a4e46ffd5258887ab4b4a31b",
+    "build-orca-slm-async-20261104/tile-r1/build.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-orca-slm-async-20261104/tile-r1/probe.cpp": "f122238a6ba7c1d98bd124bd189845b40e8e2904218959d5f11f742ef7035416",
+    "build-orca-slm-async-20261104/tile-r1/results.json": "ac8af73349e2506d20e07352af4e77d2158eff8ca72e8fc4713babc3b1726391",
+    "build-orca-slm-async-20261104/tile-r1/runner.py": "7cb25559ee7eefb9a429ddbcece8c4bfd9de49a728c7d2df2e06798b372de4ce",
+    "build-orca-slm-async-20261104/tile-r1/screen.command.txt": "a45d6237d630ddd081a1aefcf89b43376481bc5889cb77c6a3c92ea916598527",
+    "build-orca-slm-async-20261104/tile-r1/screen.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-orca-slm-async-20261104/tile-r1/screen.stdout": "788d51f734172e0054224fcb4384eff5d1904509f82bb719274fd2d075e12e50",
+    "build-orca-slm-async-20261104/tile-r1/smoke.command.txt": "fdbe665282ad0bceda5aca62c0d6b4254ab3a5d6aef49e1381a07e3801ceb0ee",
+    "build-orca-slm-async-20261104/tile-r1/smoke.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-orca-slm-async-20261104/tile-r1/smoke.stdout": "6e7b0b5fc207ae805433e648dbf054277ee9848d78d65e4ed0ab530febbcc922",
+    "build-orca-slm-async-20261104/xmx_slm_probe.cpp": "3e8d359938b6eb8684bb9f3eb6d26c33841c3ac7cbbf95f0674627cbf558fdfc",
+    "build-orca-slm-async-20261104/xmx_slm_probe_v2.cpp": "f122238a6ba7c1d98bd124bd189845b40e8e2904218959d5f11f742ef7035416",
+    "sycl/orca/xmx_slm_probe.cpp": "f122238a6ba7c1d98bd124bd189845b40e8e2904218959d5f11f742ef7035416",
+    "tools/bench_deepinfer.py": "edef8c0e8c439c028b0c4787c069abab6932b0333df00a0128b76a33083bc868"
+  }
+}

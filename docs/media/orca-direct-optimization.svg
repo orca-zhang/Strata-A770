@@ -1,91 +1,91 @@
 <?xml version='1.0' encoding='utf-8'?>
 <svg xmlns="http://www.w3.org/2000/svg" aria-labelledby="title desc" width="2000" height="1450" viewBox="0 0 2000 1450" role="img">
-  <title id="title">Orca L0 推荐路径；Orca Direct 为 WIP 备选：性能对照与三种调用链路</title>
+  <title id="title">Recommended Orca L0 and WIP Orca Direct: performance comparisons and Windows call paths</title>
   <desc id="desc">Windows A770 16GB, 2026-11-04. Orca L0 is recommended; Orca Direct is a WIP alternative. L0 59.3843 versus independently measured SYCL 42.0545 tok/s: +41.2079% descriptive cross-run reference, not an L0/SYCL bracket. Same-parameter whole-version SYCL/Direct/SYCL: SYCL 42.0545, Direct 58.4840 tok/s (+39.0672%). Includes numerical-kernel, scheduling and cache-policy differences, not an isolated API effect. Independent matched-policy L0 comparisons: Direct 58.3180, L0 59.3843 tok/s (-1.7956%); Direct 58.3002, L0 59.5705 tok/s (-2.1324%). Ten warmups and five retained requests per process; decode excludes preparation and prefill. SYCL uses UR and Level Zero/Intel UMD; Orca L0 uses Level Zero/Intel UMD; Orca Direct encodes GPU commands. All three Windows submission paths use D3DKMT and the kernel driver. Fixed repeated Short28/natural76, not general workload speed. No PPL or Linux GPU conclusion.</desc>
   <metadata data-source="sycl/orca/direct-idle-audit-a770-windows-2026-11-04.json" data-sha256="27df1e21476cb85772af01c7275f9ce9c655d7463951094beb9b0c02b5f6c37b" />
   <metadata data-source="sycl/orca/direct-vs-sycl-a770-windows-2026-11-04.json" data-sha256="b156728ab41236524cd8ea1f01811433e5ea46e81d5170f2aca2e6f79f2e4798" />
-  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="26" font-weight="700" text-anchor="start" x="76" y="76" fill="#64e8ef">STRATA-A770  /  NATIVE INFERENCE</text>
-  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="24" font-weight="400" text-anchor="end" x="1924" y="76" fill="#a5b7cd">2026-11-04 · WINDOWS · A770 16 GB</text>
-  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="108" font-weight="700" text-anchor="start" x="76" y="194" fill="#eaf2ff">Orca L0</text>
-  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="34" font-weight="400" text-anchor="start" x="80" y="249" fill="#a5b7cd">推荐路径 · 原生 Level Zero 推理 · Orca Direct 为 WIP 备选</text>
+  <text font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="700" text-anchor="start" x="76" y="76" fill="#64e8ef">STRATA-A770  /  NATIVE INFERENCE</text>
+  <text font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="400" text-anchor="end" x="1924" y="76" fill="#a5b7cd">2026-11-04 · WINDOWS · A770 16 GB</text>
+  <text font-family="Segoe UI, Arial, sans-serif" font-size="108" font-weight="700" text-anchor="start" x="76" y="194" fill="#eaf2ff">Orca L0</text>
+  <text font-family="Segoe UI, Arial, sans-serif" font-size="34" font-weight="400" text-anchor="start" x="80" y="249" fill="#a5b7cd">Recommended · Native Level Zero inference · Orca Direct is a WIP alternative</text>
   <rect x="72" y="294" width="890" height="308" rx="16" fill="#133033" />
   <rect x="984" y="294" width="944" height="308" rx="16" fill="#111f32" />
-  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="30" font-weight="400" text-anchor="start" x="104" y="347" fill="#b5d5cc">推荐 L0 · 固定短代码热态</text>
-  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="154" font-weight="700" text-anchor="start" x="100" y="508" fill="#c1f787">59.38</text>
-  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="46" font-weight="700" text-anchor="end" x="920" y="505" fill="#c1f787">tok/s</text>
-  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="34" font-weight="700" text-anchor="start" x="104" y="564" fill="#c1f787">相对独立实测 SYCL 基线  +41.21%</text>
-  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="30" font-weight="400" text-anchor="start" x="1018" y="347" fill="#a5b7cd">同策略夹测：L0 → Direct → L0</text>
-  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="26" font-weight="700" text-anchor="start" x="1018" y="412" fill="#c1f787">Orca L0</text>
+  <text font-family="Segoe UI, Arial, sans-serif" font-size="30" font-weight="400" text-anchor="start" x="104" y="347" fill="#b5d5cc">Recommended L0 · Warm fixed-code input</text>
+  <text font-family="Segoe UI, Arial, sans-serif" font-size="154" font-weight="700" text-anchor="start" x="100" y="508" fill="#c1f787">59.38</text>
+  <text font-family="Segoe UI, Arial, sans-serif" font-size="46" font-weight="700" text-anchor="end" x="920" y="505" fill="#c1f787">tok/s</text>
+  <text font-family="Segoe UI, Arial, sans-serif" font-size="34" font-weight="700" text-anchor="start" x="104" y="564" fill="#c1f787">vs independently measured SYCL  +41.21%</text>
+  <text font-family="Segoe UI, Arial, sans-serif" font-size="30" font-weight="400" text-anchor="start" x="1018" y="347" fill="#a5b7cd">Matched-policy bracket: L0 → Direct → L0</text>
+  <text font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="700" text-anchor="start" x="1018" y="412" fill="#c1f787">Orca L0</text>
   <rect x="1220" y="376" width="480" height="48" rx="7" fill="#1d3048" />
   <rect x="1220" y="376" width="475.07434781997347" height="48" rx="7" fill="#c1f787" />
-  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="38" font-weight="700" text-anchor="end" x="1894" y="414" fill="#c1f787">59.38</text>
-  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="26" font-weight="700" text-anchor="start" x="1018" y="501" fill="#90a5bd">Direct · WIP</text>
+  <text font-family="Segoe UI, Arial, sans-serif" font-size="38" font-weight="700" text-anchor="end" x="1894" y="414" fill="#c1f787">59.38</text>
+  <text font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="700" text-anchor="start" x="1018" y="501" fill="#90a5bd">Direct · WIP</text>
   <rect x="1220" y="465" width="480" height="48" rx="7" fill="#1d3048" />
   <rect x="1220" y="465" width="466.5438919582566" height="48" rx="7" fill="#90a5bd" />
-  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="38" font-weight="700" text-anchor="end" x="1894" y="503" fill="#90a5bd">58.32</text>
-  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="27" font-weight="400" text-anchor="start" x="1018" y="559" fill="#a5b7cd">同轮 Direct 低 1.80% · L0 反向复测 59.57</text>
-  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="29" font-weight="400" text-anchor="start" x="76" y="653" fill="#a5b7cd">WIP 备选 Direct：相对 SYCL +39.07%（42.05 → 58.48 tok/s，独立整版本夹测）</text>
+  <text font-family="Segoe UI, Arial, sans-serif" font-size="38" font-weight="700" text-anchor="end" x="1894" y="503" fill="#90a5bd">58.32</text>
+  <text font-family="Segoe UI, Arial, sans-serif" font-size="27" font-weight="400" text-anchor="start" x="1018" y="559" fill="#a5b7cd">Direct is 1.80% slower here · Reverse L0: 59.57</text>
+  <text font-family="Segoe UI, Arial, sans-serif" font-size="29" font-weight="400" text-anchor="start" x="76" y="653" fill="#a5b7cd">Direct WIP: +39.07% vs SYCL (42.05 → 58.48 tok/s, separate whole-version bracket)</text>
   <rect x="72" y="693" width="1856" height="373" rx="16" fill="#101d2e" />
-  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="34" font-weight="700" text-anchor="start" x="104" y="744" fill="#64e8ef">三种 Windows 调用链路</text>
-  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="26" font-weight="700" text-anchor="start" x="104" y="810" fill="#c5d2e4">SYCL</text>
+  <text font-family="Segoe UI, Arial, sans-serif" font-size="34" font-weight="700" text-anchor="start" x="104" y="744" fill="#64e8ef">Three Windows call paths</text>
+  <text font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="700" text-anchor="start" x="104" y="810" fill="#c5d2e4">SYCL</text>
   <rect x="295" y="775" width="180" height="52" rx="7" fill="#20314a" />
-  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="24" font-weight="700" text-anchor="start" x="310" y="810" fill="#c5d2e4">Strata</text>
-  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="24" font-weight="400" text-anchor="start" x="480" y="810" fill="#c5d2e4">→</text>
+  <text font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="700" text-anchor="start" x="310" y="810" fill="#c5d2e4">Strata</text>
+  <text font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="400" text-anchor="start" x="480" y="810" fill="#c5d2e4">→</text>
   <rect x="505" y="775" width="170" height="52" rx="7" fill="#20314a" />
-  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="24" font-weight="700" text-anchor="start" x="520" y="810" fill="#c5d2e4">SYCL</text>
-  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="24" font-weight="400" text-anchor="start" x="680" y="810" fill="#c5d2e4">→</text>
+  <text font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="700" text-anchor="start" x="520" y="810" fill="#c5d2e4">SYCL</text>
+  <text font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="400" text-anchor="start" x="680" y="810" fill="#c5d2e4">→</text>
   <rect x="705" y="775" width="120" height="52" rx="7" fill="#20314a" />
-  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="24" font-weight="700" text-anchor="start" x="720" y="810" fill="#c5d2e4">UR</text>
-  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="24" font-weight="400" text-anchor="start" x="830" y="810" fill="#c5d2e4">→</text>
+  <text font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="700" text-anchor="start" x="720" y="810" fill="#c5d2e4">UR</text>
+  <text font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="400" text-anchor="start" x="830" y="810" fill="#c5d2e4">→</text>
   <rect x="855" y="775" width="320" height="52" rx="7" fill="#20314a" />
-  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="24" font-weight="700" text-anchor="start" x="870" y="810" fill="#c5d2e4">Level Zero / Intel UMD</text>
-  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="24" font-weight="400" text-anchor="start" x="1180" y="810" fill="#c5d2e4">→</text>
+  <text font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="700" text-anchor="start" x="870" y="810" fill="#c5d2e4">Level Zero / Intel UMD</text>
+  <text font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="400" text-anchor="start" x="1180" y="810" fill="#c5d2e4">→</text>
   <rect x="1205" y="775" width="180" height="52" rx="7" fill="#20314a" />
-  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="24" font-weight="700" text-anchor="start" x="1220" y="810" fill="#c5d2e4">D3DKMT</text>
-  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="24" font-weight="400" text-anchor="start" x="1390" y="810" fill="#c5d2e4">→</text>
+  <text font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="700" text-anchor="start" x="1220" y="810" fill="#c5d2e4">D3DKMT</text>
+  <text font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="400" text-anchor="start" x="1390" y="810" fill="#c5d2e4">→</text>
   <rect x="1415" y="775" width="255" height="52" rx="7" fill="#20314a" />
-  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="24" font-weight="700" text-anchor="start" x="1430" y="810" fill="#c5d2e4">Windows 内核驱动</text>
-  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="24" font-weight="400" text-anchor="start" x="1675" y="810" fill="#c5d2e4">→</text>
+  <text font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="700" text-anchor="start" x="1430" y="810" fill="#c5d2e4">Windows KMD</text>
+  <text font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="400" text-anchor="start" x="1675" y="810" fill="#c5d2e4">→</text>
   <rect x="1700" y="775" width="190" height="52" rx="7" fill="#20314a" />
-  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="24" font-weight="700" text-anchor="start" x="1715" y="810" fill="#c5d2e4">Intel GPU</text>
-  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="26" font-weight="700" text-anchor="start" x="104" y="900" fill="#c1f787">L0 · 推荐</text>
+  <text font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="700" text-anchor="start" x="1715" y="810" fill="#c5d2e4">Intel GPU</text>
+  <text font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="700" text-anchor="start" x="104" y="900" fill="#c1f787">L0 · Default</text>
   <rect x="295" y="865" width="180" height="52" rx="7" fill="#17414b" />
-  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="24" font-weight="700" text-anchor="start" x="310" y="900" fill="#c1f787">Strata</text>
-  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="24" font-weight="400" text-anchor="start" x="480" y="900" fill="#c1f787">→</text>
+  <text font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="700" text-anchor="start" x="310" y="900" fill="#c1f787">Strata</text>
+  <text font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="400" text-anchor="start" x="480" y="900" fill="#c1f787">→</text>
   <rect x="505" y="865" width="320" height="52" rx="7" fill="#17414b" />
-  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="24" font-weight="700" text-anchor="start" x="520" y="900" fill="#c1f787">Orca L0</text>
-  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="24" font-weight="400" text-anchor="start" x="830" y="900" fill="#c1f787">→</text>
+  <text font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="700" text-anchor="start" x="520" y="900" fill="#c1f787">Orca L0</text>
+  <text font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="400" text-anchor="start" x="830" y="900" fill="#c1f787">→</text>
   <rect x="855" y="865" width="320" height="52" rx="7" fill="#17414b" />
-  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="24" font-weight="700" text-anchor="start" x="870" y="900" fill="#c1f787">Level Zero / Intel UMD</text>
-  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="24" font-weight="400" text-anchor="start" x="1180" y="900" fill="#c1f787">→</text>
+  <text font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="700" text-anchor="start" x="870" y="900" fill="#c1f787">Level Zero / Intel UMD</text>
+  <text font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="400" text-anchor="start" x="1180" y="900" fill="#c1f787">→</text>
   <rect x="1205" y="865" width="180" height="52" rx="7" fill="#17414b" />
-  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="24" font-weight="700" text-anchor="start" x="1220" y="900" fill="#c1f787">D3DKMT</text>
-  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="24" font-weight="400" text-anchor="start" x="1390" y="900" fill="#c1f787">→</text>
+  <text font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="700" text-anchor="start" x="1220" y="900" fill="#c1f787">D3DKMT</text>
+  <text font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="400" text-anchor="start" x="1390" y="900" fill="#c1f787">→</text>
   <rect x="1415" y="865" width="255" height="52" rx="7" fill="#17414b" />
-  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="24" font-weight="700" text-anchor="start" x="1430" y="900" fill="#c1f787">Windows 内核驱动</text>
-  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="24" font-weight="400" text-anchor="start" x="1675" y="900" fill="#c1f787">→</text>
+  <text font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="700" text-anchor="start" x="1430" y="900" fill="#c1f787">Windows KMD</text>
+  <text font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="400" text-anchor="start" x="1675" y="900" fill="#c1f787">→</text>
   <rect x="1700" y="865" width="190" height="52" rx="7" fill="#17414b" />
-  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="24" font-weight="700" text-anchor="start" x="1715" y="900" fill="#c1f787">Intel GPU</text>
-  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="26" font-weight="700" text-anchor="start" x="104" y="990" fill="#90a5bd">Direct WIP</text>
+  <text font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="700" text-anchor="start" x="1715" y="900" fill="#c1f787">Intel GPU</text>
+  <text font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="700" text-anchor="start" x="104" y="990" fill="#90a5bd">Direct WIP</text>
   <rect x="295" y="955" width="180" height="52" rx="7" fill="#20314a" />
-  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="24" font-weight="700" text-anchor="start" x="310" y="990" fill="#90a5bd">Strata</text>
-  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="24" font-weight="400" text-anchor="start" x="480" y="990" fill="#90a5bd">→</text>
+  <text font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="700" text-anchor="start" x="310" y="990" fill="#90a5bd">Strata</text>
+  <text font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="400" text-anchor="start" x="480" y="990" fill="#90a5bd">→</text>
   <rect x="505" y="955" width="670" height="52" rx="7" fill="#20314a" />
-  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="24" font-weight="700" text-anchor="start" x="520" y="990" fill="#90a5bd">Orca Direct · WIP 备选 · GPU 命令编码</text>
-  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="24" font-weight="400" text-anchor="start" x="1180" y="990" fill="#90a5bd">→</text>
+  <text font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="700" text-anchor="start" x="520" y="990" fill="#90a5bd">Orca Direct · WIP · GPU command encoding</text>
+  <text font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="400" text-anchor="start" x="1180" y="990" fill="#90a5bd">→</text>
   <rect x="1205" y="955" width="180" height="52" rx="7" fill="#20314a" />
-  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="24" font-weight="700" text-anchor="start" x="1220" y="990" fill="#90a5bd">D3DKMT</text>
-  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="24" font-weight="400" text-anchor="start" x="1390" y="990" fill="#90a5bd">→</text>
+  <text font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="700" text-anchor="start" x="1220" y="990" fill="#90a5bd">D3DKMT</text>
+  <text font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="400" text-anchor="start" x="1390" y="990" fill="#90a5bd">→</text>
   <rect x="1415" y="955" width="255" height="52" rx="7" fill="#20314a" />
-  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="24" font-weight="700" text-anchor="start" x="1430" y="990" fill="#90a5bd">Windows 内核驱动</text>
-  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="24" font-weight="400" text-anchor="start" x="1675" y="990" fill="#90a5bd">→</text>
+  <text font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="700" text-anchor="start" x="1430" y="990" fill="#90a5bd">Windows KMD</text>
+  <text font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="400" text-anchor="start" x="1675" y="990" fill="#90a5bd">→</text>
   <rect x="1700" y="955" width="190" height="52" rx="7" fill="#20314a" />
-  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="24" font-weight="700" text-anchor="start" x="1715" y="990" fill="#90a5bd">Intel GPU</text>
-  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="25" font-weight="400" text-anchor="start" x="104" y="1045" fill="#a5b7cd">执行提交路径示意 · UR = Unified Runtime · 离线内核构建仍使用 Intel 编译器</text>
+  <text font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="700" text-anchor="start" x="1715" y="990" fill="#90a5bd">Intel GPU</text>
+  <text font-family="Segoe UI, Arial, sans-serif" font-size="25" font-weight="400" text-anchor="start" x="104" y="1045" fill="#a5b7cd">UR = Unified Runtime · UMD / KMD = user-mode / kernel-mode driver · Offline kernels use the Intel compiler</text>
   <rect x="72" y="1096" width="1856" height="238" rx="16" fill="#101d2e" />
-  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="29" font-weight="700" text-anchor="start" x="104" y="1145" fill="#c1f787">L0 双向对照 90 次、独立 SYCL 对照 45 次：输出一致 · 每进程 10 次预热 + 5 次保留</text>
-  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="27" font-weight="400" text-anchor="start" x="104" y="1194" fill="#a5b7cd">28 输入 / 76 自然输出 · 5771 槽 · read256 / decay0.95 · MTP4 · 累计门槛 0</text>
-  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="27" font-weight="400" text-anchor="start" x="104" y="1240" fill="#a5b7cd">同参数整版本对比，包含数值内核、调度与缓存策略差异；提升不能全部归于 API。</text>
-  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="27" font-weight="400" text-anchor="start" x="104" y="1286" fill="#a5b7cd">L0 对 SYCL 增幅为跨组速率参考；decode 排除准备和预填充，固定输入非通用速度。</text>
-  <text font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="25" font-weight="400" text-anchor="start" x="76" y="1396" fill="#a5b7cd">推荐使用 Orca L0 · Orca Direct 为 WIP 备选 · GPU 时钟未锁定 · 无新增 PPL / Linux GPU 结论</text>
+  <text font-family="Segoe UI, Arial, sans-serif" font-size="29" font-weight="700" text-anchor="start" x="104" y="1145" fill="#c1f787">90 L0 comparison requests + 45 separate SYCL requests match · 10 warmups + 5 retained per process</text>
+  <text font-family="Segoe UI, Arial, sans-serif" font-size="27" font-weight="400" text-anchor="start" x="104" y="1194" fill="#a5b7cd">28 input / 76 natural output · 5771 slots · read256 / decay0.95 · MTP4 · Cumulative threshold 0</text>
+  <text font-family="Segoe UI, Arial, sans-serif" font-size="27" font-weight="400" text-anchor="start" x="104" y="1240" fill="#a5b7cd">Matched parameters; whole versions differ in numerical kernels, scheduling and cache policies. No API-only attribution.</text>
+  <text font-family="Segoe UI, Arial, sans-serif" font-size="27" font-weight="400" text-anchor="start" x="104" y="1286" fill="#a5b7cd">L0/SYCL is a cross-cohort reference. Decode excludes preparation/prefill. Fixed-input speed is workload-specific.</text>
+  <text font-family="Segoe UI, Arial, sans-serif" font-size="25" font-weight="400" text-anchor="start" x="76" y="1396" fill="#a5b7cd">Orca L0 recommended · Direct is WIP · GPU clocks unlocked · No new PPL or Linux GPU conclusions</text>
 </svg>

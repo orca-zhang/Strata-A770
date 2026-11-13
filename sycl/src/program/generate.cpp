@@ -115,6 +115,7 @@ namespace strata::prefill { void set_nonresident_share(double share); }   // SYC
 #include <filesystem>
 #include <fstream>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 #include <set>
 #include <vector>
@@ -253,6 +254,24 @@ const bool g_env_decode_timing = std::getenv("STRATA_DECODE_TIMING") != nullptr;
 const bool g_env_arena_mmap = [] { const char* v = std::getenv("STRATA_ARENA_MMAP"); return v && v[0] == '1'; }();
 const bool g_env_rss_trace = std::getenv("STRATA_RSS_TRACE") != nullptr;
 const bool g_env_refill_blocking = std::getenv("STRATA_REFILL_BLOCKING") != nullptr;
+const bool g_orca_mirror_refill = [] {
+    if (const char* v = std::getenv("STRATA_ORCA_MIRROR_REFILL")) {
+        if (!std::strcmp(v, "1")) return true;
+        if (!std::strcmp(v, "0")) return false;
+        throw std::invalid_argument("STRATA_ORCA_MIRROR_REFILL must be 0 or 1");
+    }
+#if defined(STRATA_ORCA_NATIVE) && !defined(STRATA_ORCA_DG2)
+    return true;
+#else
+    return false;
+#endif
+}();
+const bool g_orca_ple_row0 = [] {
+    const char* v = std::getenv("STRATA_ORCA_PLE_ROW0");
+    if (!v || !std::strcmp(v, "1")) return true;
+    if (std::strcmp(v, "0")) throw std::invalid_argument("STRATA_ORCA_PLE_ROW0 must be 0 or 1");
+    return false;
+}();
 const bool g_env_adapt_nowait = [] { const char* e = std::getenv("STRATA_ADAPT_NOWAIT"); return e && e[0] == '1'; }();
 const bool g_env_serve_quiet = [] {
     const char* v = std::getenv("STRATA_SERVE_QUIET");
@@ -2461,6 +2480,13 @@ int main(int argc, char **argv) try {
                      o.pack.c_str(), (double) strata::kernels::cpu::expert_layout().max_blob / 1e6,
                      strata::ggml_type_name((uint32_t) native_embed.type()), (double) native_embed.bytes() / 1048576.0);
     }
+    strata::core::GgufExpertSource gguf_src;
+    std::string early_mirror_error;
+#if defined(STRATA_ORCA_NATIVE) && !defined(STRATA_ORCA_DG2)
+    std::unique_ptr<strata::l0::Queue> early_mirror_queue;
+#endif
+    // Declared after the source/error: even an early return joins before destroying them.
+    std::future<int64_t> early_mirror;
     // Plan v0.3 P1: tensors served in native form are not also loaded in canonical form (~2.7 GB of VRAM back
     // to the expert cache with --native).  `--keep-canonical` loads both, as before.
     std::set<std::string> skip;
@@ -2570,6 +2596,44 @@ int main(int argc, char **argv) try {
                          "served natively)\n",
                  (unsigned long long) (pool_bytes >> 20), o.pack.c_str(), skip.size());
 
+#if defined(STRATA_ORCA_NATIVE) && !defined(STRATA_ORCA_DG2)
+    // ponytail: overlap only an explicitly budgeted full mirror on one L0 device.
+    const char* mirror_mib = std::getenv("STRATA_MIRROR_MIB");
+    char* mirror_end = nullptr;
+    const uint64_t mib = mirror_mib && mirror_mib[0] != '-' ? std::strtoull(mirror_mib, &mirror_end, 10) : 0;
+    if (native_pack && g_env_verify_adapt && g_env_verify_no_host && !multi_gpu && !remote_caches &&
+        o.peer_device < 1 && o.stream_experts && !o.mmap_experts && o.expert_cache > 0 &&
+        !o.expert_cache_per_layer && !std::getenv("STRATA_FILL_SERIAL") &&
+        !std::getenv("ORCA_L0_POISON_ALLOCATIONS") && mirror_end && !*mirror_end &&
+        mib <= (UINT64_MAX >> 20) && g.n_layers > 0 && g.n_expert > 0) {
+        const uint64_t cap = mib << 20;
+        const auto& layout = strata::kernels::cpu::expert_layout();
+        uint64_t needed = 0;
+        bool fits = (uint64_t) g.n_layers <= layout.bytes.size();
+        for (int64_t l = 0; fits && l < g.n_layers; ++l) {
+            const uint64_t bytes = (layout.bytes[(size_t) l] + 255) / 256 * 256;
+            if (bytes > (cap - needed) / (uint64_t) g.n_expert) fits = false;
+            else needed += bytes * (uint64_t) g.n_expert;
+        }
+        if (fits && needed > 0) {
+            if (!gguf_src.open(o.native_preset, g.n_layers, g.n_expert, err)) {
+                std::fprintf(stderr, "strata generate: %s\n", err.c_str());
+                return 1;
+            }
+            std::vector<std::pair<int64_t, int64_t>> pairs;
+            pairs.reserve((size_t) (g.n_layers * g.n_expert));
+            for (int64_t l = 0; l < g.n_layers; ++l)
+                for (int64_t e = 0; e < g.n_expert; ++e) pairs.push_back({l, e});
+            auto& owner = dpct::get_in_order_queue();
+            // A failed read frees host chunks through this idle queue, never the upload queue.
+            early_mirror_queue = std::make_unique<strata::l0::Queue>(owner.runtime(), owner.program());
+            early_mirror = std::async(std::launch::async, [&, pairs = std::move(pairs), cap] {
+                strata::l0::bind_default(*early_mirror_queue);
+                return gguf_src.mirror(pairs, cap, 8, early_mirror_error);
+            });
+        }
+    }
+#endif
     strata::core::NativeDense native_dense;
     if (!o.native_dense_gguf.empty()) {
         if (!native_dense.load(o.native_dense_gguf, wt, err, o.native_ple_key)) {
@@ -3607,7 +3671,6 @@ int main(int argc, char **argv) try {
         }
     }
     strata::core::ArenaExpertSource arena_src;
-    strata::core::GgufExpertSource gguf_src;
     strata::core::ExpertSource* srcp = nullptr;
     if (o.stream_experts && !o.mmap_experts) {
         // the SYCL port: a card that holds every expert needs no host copy of them, and a 23 GiB machine cannot
@@ -3617,7 +3680,7 @@ int main(int argc, char **argv) try {
             std::fprintf(stderr, "strata generate: --stream-experts needs a native (IQ) pack and --native SHARD1\n");
             return 2;
         }
-        if (!gguf_src.open(o.native_preset, g.n_layers, g.n_expert, err)) {
+        if (!early_mirror.valid() && !gguf_src.open(o.native_preset, g.n_layers, g.n_expert, err)) {
             std::fprintf(stderr, "strata generate: %s\n", err.c_str());
             return 1;
         }
@@ -3998,6 +4061,81 @@ int main(int argc, char **argv) try {
             std::fprintf(stderr, "                 PROFILE, ranked by routing frequency, no eviction.\n");
         }
     }
+    // SYCL port, plan item 2: the experts that did not fit VRAM, mirrored once in pinned host memory the GPU reads
+    // over PCIe (--stream-experts has no host copy otherwise: each routed miss was an SSD read). The share of misses
+    // the GPU takes is --pcie-frac; STRATA_MIRROR_MIB caps the mirror (default: MemAvailable less 4 GiB), 0 = off.
+    unsigned long long* mirror_table_d = nullptr;   // [n_layers][n_expert] device-readable mirror addresses (0 = none)
+    int64_t unmirrored_misses = 0;
+    const bool device_adapt = g_env_verify_adapt && g_env_verify_no_host;
+    bool mirror_prepared = false;
+    auto prepare_mirror = [&]() -> bool {
+        if (device_adapt && (multi_gpu || !o.stream_experts || srcp != &gguf_src || o.expert_cache <= 0)) {
+            std::fprintf(stderr, "strata generate: STRATA_VERIFY_ADAPT requires one GPU, --stream-experts and a GGUF expert cache\n");
+            return false;
+        }
+        if (o.stream_experts && srcp == &gguf_src && o.expert_cache > 0) {
+            std::vector<std::pair<int64_t, int64_t>> miss;
+            // ponytail: bounded expert IDs need one byte each instead of rescanning the growing list.
+            std::vector<uint8_t> listed((size_t) (g.n_layers * g.n_expert), 0);
+            for (const auto& pr : profile)   // the profile's order: the most-routed misses first, if the cap is reached
+                if (xcache.slot_of(pr.first, pr.second) == strata::core::kNotResident) {
+                    miss.push_back({pr.first, pr.second});
+                    listed[(size_t) (pr.first * g.n_expert + pr.second)] = 1;
+                }
+            for (int64_t l = 0; l < g.n_layers; ++l)                     // pairs the profile does not list at all
+                for (int64_t e = 0; e < g.n_expert; ++e)
+                    if (xcache.slot_of(l, e) == strata::core::kNotResident &&
+                        !listed[(size_t) (l * g.n_expert + e)])
+                        miss.push_back({l, e});
+            // Every eviction must retain a device-readable RAM copy before the NO_HOST cache can adapt.
+            if (device_adapt)
+                for (int64_t l = 0; l < g.n_layers; ++l)
+                    for (int64_t e = 0; e < g.n_expert; ++e)
+                        if (xcache.slot_of(l, e) >= 0) miss.push_back({l, e});
+            const uint64_t avail = mem_sample().avail_mib << 20;
+            const char* mv = std::getenv("STRATA_MIRROR_MIB");
+            const uint64_t cap = mv ? (uint64_t) std::atoll(mv) << 20 : (avail > (4ull << 30) ? avail - (4ull << 30) : 0);
+            if (!miss.empty() && cap > 0) {
+                const auto tm = Clock::now();
+                int64_t got;
+                if (early_mirror.valid()) {
+                    got = early_mirror.get();
+                    err = std::move(early_mirror_error);
+                } else got = gguf_src.mirror(miss, cap, 8, err);
+                if (got < 0) {
+                    std::fprintf(stderr, "strata generate: mirroring the experts missing from VRAM: %s (they stay on the SSD)\n",
+                                 err.c_str());
+                    err.clear();
+                } else {
+                    std::fprintf(stderr, "strata generate: %lld of %zu experts missing from VRAM mirrored in pinned host memory "
+                                         "(%.2f GiB, %.1f s); the GPU reads them over PCIe\n", (long long) got, miss.size(),
+                                 (double) gguf_src.mirrored_bytes() / 1073741824.0,
+                                 std::chrono::duration<double>(Clock::now() - tm).count());
+                    // the device-built verify plan's view of it: each (layer, expert) -> its mirror address, 0 = none
+                    std::vector<unsigned long long> tab((size_t) (g.n_layers * g.n_expert), 0ull);
+                    for (int64_t l = 0; l < g.n_layers; ++l)
+                        for (int64_t e = 0; e < g.n_expert; ++e)
+                            if (gguf_src.pinned(l, e))
+                                tab[(size_t) (l * g.n_expert + e)] = (unsigned long long) gguf_src.device_alias(l, e);
+                    mirror_table_d = sycl::malloc_device<unsigned long long>(tab.size(), dpct::get_in_order_queue());
+                    dpct::get_in_order_queue().memcpy(mirror_table_d, tab.data(), tab.size() * sizeof(unsigned long long)).wait();
+                }
+            }
+            unmirrored_misses = (int64_t) miss.size() - (int64_t) (gguf_src.mirrored_bytes() ? std::count_if(miss.begin(), miss.end(),
+                [&](const std::pair<int64_t, int64_t>& pr) { return gguf_src.pinned(pr.first, pr.second); }) : 0);
+            if (device_adapt && unmirrored_misses > 0) {
+                std::fprintf(stderr, "strata generate: NO_HOST adaptation needs every expert mirrored; raise STRATA_MIRROR_MIB\n");
+                return false;
+            }
+            if (unmirrored_misses > 0 && g_env_verify_no_host)
+                std::fprintf(stderr, "strata generate: WARNING: %lld experts are neither in VRAM nor mirrored; with STRATA_VERIFY_NO_HOST "
+                                     "the device plan cannot run them and their layers' windows fall back slowly - raise "
+                                     "STRATA_MIRROR_MIB or the free RAM, or lower --max-context\n", (long long) unmirrored_misses);
+        }
+        mirror_prepared = true;
+        return true;
+    };
+
     // ---- R4.2e: fill the tier from the profile.  This is the only place the plan is applied, and it runs
     // ONCE: with `slots` pairs and `slots` slots the cache is full when this returns, so the decode-time
     // admission finds no room and every non-profiled expert stays a CPU miss.  That is what makes the profile
@@ -4011,6 +4149,7 @@ int main(int argc, char **argv) try {
                                        : std::min<int64_t>((int64_t) profile.size(), xcache.slots());
         const auto tfill = std::chrono::steady_clock::now();
         uint64_t fill_bytes = 0;
+        double mirror_s = 0;
         // SYCL port: from the GGUF (--stream-experts) the fill is a pipeline. The serial form read each expert's three
         // slices, copied it, and waited for the copy before the next read (~18,000 experts, neither the SSD nor PCIe
         // kept busy). Here the slots are admitted first (the same profile order, so the same placement), the reads go
@@ -4033,43 +4172,58 @@ int main(int argc, char **argv) try {
             constexpr size_t kBatch = 64;
             const size_t blob_cap = (size_t) lay.max_blob;
             sycl::queue& q = dpct::get_in_order_queue();
-            uint8_t* pin = sycl::malloc_host<uint8_t>(2 * kBatch * blob_cap, q);
-            if (pin == nullptr) {
-                std::fprintf(stderr, "strata generate: the profile fill could not pin %zu MiB\n",
-                             (2 * kBatch * blob_cap) >> 20);
-                return 1;
-            }
-            const int nthreads = std::max(2, std::min(8, (int) std::thread::hardware_concurrency()));
-            sycl::event done[2];
-            bool read_ok = true;
-            for (size_t b0 = 0, k = 0; b0 < fills.size() && read_ok; b0 += kBatch, ++k) {
-                const size_t n = std::min(kBatch, fills.size() - b0);
-                uint8_t* set = pin + (k % 2) * kBatch * blob_cap;
-                done[k % 2].wait();                       // the copies that last read this half are finished
-                std::atomic<size_t> next{0};
-                std::atomic<bool> ok{true};
-                std::vector<std::thread> ts;
-                for (int t = 0; t < nthreads; ++t)
-                    ts.emplace_back([&] {
-                        for (size_t j; (j = next.fetch_add(1)) < n;) {
-                            const Fill& f = fills[b0 + j];
-                            if (!gguf_src.read_into(f.l, f.e, set + j * blob_cap, blob_cap)) ok = false;
-                        }
-                    });
-                for (auto& t : ts) t.join();
-                if (!ok) { read_ok = false; break; }
-                for (size_t j = 0; j < n; ++j) {
-                    const Fill& f = fills[b0 + j];
+            // ponytail: NO_HOST adaptation needs a full stable mirror anyway; read each expert only once.
+            if (device_adapt) {
+                const auto tm = Clock::now();
+                if (!prepare_mirror()) return 1;
+                mirror_s = std::chrono::duration<double>(Clock::now() - tm).count();
+                size_t copied = 0;
+                for (const auto& f : fills) {
                     const size_t nb = (size_t) lay.blob_bytes(f.l);
-                    done[k % 2] = q.memcpy(xcache.device_slot(f.slot), set + j * blob_cap, nb);
+                    q.memcpy(xcache.device_slot(f.slot), gguf_src.blob(f.l, f.e), nb);
                     fill_bytes += nb;
+                    if (++copied % kBatch == 0) q.wait();
                 }
-            }
-            q.wait();
-            sycl::free(pin, q);
-            if (!read_ok) {
-                std::fprintf(stderr, "strata generate: the profile fill could not read an expert from the GGUF\n");
-                return 1;
+                q.wait();
+            } else {
+                uint8_t* pin = sycl::malloc_host<uint8_t>(2 * kBatch * blob_cap, q);
+                if (pin == nullptr) {
+                    std::fprintf(stderr, "strata generate: the profile fill could not pin %zu MiB\n",
+                                 (2 * kBatch * blob_cap) >> 20);
+                    return 1;
+                }
+                const int nthreads = std::max(2, std::min(8, (int) std::thread::hardware_concurrency()));
+                sycl::event done[2];
+                bool read_ok = true;
+                for (size_t b0 = 0, k = 0; b0 < fills.size() && read_ok; b0 += kBatch, ++k) {
+                    const size_t n = std::min(kBatch, fills.size() - b0);
+                    uint8_t* set = pin + (k % 2) * kBatch * blob_cap;
+                    done[k % 2].wait();                       // the copies that last read this half are finished
+                    std::atomic<size_t> next{0};
+                    std::atomic<bool> ok{true};
+                    std::vector<std::thread> ts;
+                    for (int t = 0; t < nthreads; ++t)
+                        ts.emplace_back([&] {
+                            for (size_t j; (j = next.fetch_add(1)) < n;) {
+                                const Fill& f = fills[b0 + j];
+                                if (!gguf_src.read_into(f.l, f.e, set + j * blob_cap, blob_cap)) ok = false;
+                            }
+                        });
+                    for (auto& t : ts) t.join();
+                    if (!ok) { read_ok = false; break; }
+                    for (size_t j = 0; j < n; ++j) {
+                        const Fill& f = fills[b0 + j];
+                        const size_t nb = (size_t) lay.blob_bytes(f.l);
+                        done[k % 2] = q.memcpy(xcache.device_slot(f.slot), set + j * blob_cap, nb);
+                        fill_bytes += nb;
+                    }
+                }
+                q.wait();
+                sycl::free(pin, q);
+                if (!read_ok) {
+                    std::fprintf(stderr, "strata generate: the profile fill could not read an expert from the GGUF\n");
+                    return 1;
+                }
             }
             prefilled = (int64_t) fills.size();
         }
@@ -4097,10 +4251,10 @@ int main(int argc, char **argv) try {
             ++prefilled;
             fill_bytes += (uint64_t) strata::kernels::cpu::expert_layout().blob_bytes(profile[(size_t) i].first);
         }
-        const double fill_s = std::chrono::duration<double>(std::chrono::steady_clock::now() - tfill).count();
+        const double fill_s = std::chrono::duration<double>(std::chrono::steady_clock::now() - tfill).count() - mirror_s;
         std::fprintf(stderr, "strata generate: profile fill: %.2f GiB in %.1f s (%.2f GB/s, %s)\n",
                      (double) fill_bytes / 1073741824.0, fill_s, fill_s > 0 ? (double) fill_bytes / 1e9 / fill_s : 0.0,
-                     piped ? "pipelined" : "serial");
+                     piped && device_adapt ? "host mirror" : piped ? "pipelined" : "serial");
         // **AND ONE SLOT IS READ BACK AND COMPARED.**  A residency table that is right about indices and wrong
         // about bytes produces a plausible token, which is this project's most expensive failure mode; the
         // cache's own `verify_slot` is the check and it costs one 1.38 MB D2H at startup.
@@ -4114,66 +4268,7 @@ int main(int argc, char **argv) try {
         std::fprintf(stderr, "strata generate: pre-filled %lld of %lld slots from the profile; slot 0 verified\n",
                      (long long) prefilled, (long long) (per_layer ? xcache.slots() : want));
     }
-    // SYCL port, plan item 2: the experts that did not fit VRAM, mirrored once in pinned host memory the GPU reads
-    // over PCIe (--stream-experts has no host copy otherwise: each routed miss was an SSD read). The share of misses
-    // the GPU takes is --pcie-frac; STRATA_MIRROR_MIB caps the mirror (default: MemAvailable less 4 GiB), 0 = off.
-    unsigned long long* mirror_table_d = nullptr;   // [n_layers][n_expert] device-readable mirror addresses (0 = none)
-    int64_t unmirrored_misses = 0;
-    const bool device_adapt = g_env_verify_adapt && g_env_verify_no_host;
-    if (device_adapt && (multi_gpu || !o.stream_experts || srcp != &gguf_src || o.expert_cache <= 0)) {
-        std::fprintf(stderr, "strata generate: STRATA_VERIFY_ADAPT requires one GPU, --stream-experts and a GGUF expert cache\n");
-        return 1;
-    }
-    if (o.stream_experts && srcp == &gguf_src && o.expert_cache > 0) {
-        std::vector<std::pair<int64_t, int64_t>> miss;
-        for (const auto& pr : profile)   // the profile's order: the most-routed misses first, if the cap is reached
-            if (xcache.slot_of(pr.first, pr.second) == strata::core::kNotResident) miss.push_back({pr.first, pr.second});
-        for (int64_t l = 0; l < g.n_layers; ++l)                     // pairs the profile does not list at all
-            for (int64_t e = 0; e < g.n_expert; ++e)
-                if (xcache.slot_of(l, e) == strata::core::kNotResident &&
-                    std::find(miss.begin(), miss.end(), std::pair<int64_t, int64_t>{l, e}) == miss.end())
-                    miss.push_back({l, e});
-        // Every eviction must retain a device-readable RAM copy before the NO_HOST cache can adapt.
-        if (device_adapt)
-            for (int64_t l = 0; l < g.n_layers; ++l)
-                for (int64_t e = 0; e < g.n_expert; ++e)
-                    if (xcache.slot_of(l, e) >= 0) miss.push_back({l, e});
-        const uint64_t avail = mem_sample().avail_mib << 20;
-        const char* mv = std::getenv("STRATA_MIRROR_MIB");
-        const uint64_t cap = mv ? (uint64_t) std::atoll(mv) << 20 : (avail > (4ull << 30) ? avail - (4ull << 30) : 0);
-        if (!miss.empty() && cap > 0) {
-            const auto tm = Clock::now();
-            const int64_t got = gguf_src.mirror(miss, cap, 8, err);
-            if (got < 0) {
-                std::fprintf(stderr, "strata generate: mirroring the experts missing from VRAM: %s (they stay on the SSD)\n",
-                             err.c_str());
-                err.clear();
-            } else {
-                std::fprintf(stderr, "strata generate: %lld of %zu experts missing from VRAM mirrored in pinned host memory "
-                                     "(%.2f GiB, %.1f s); the GPU reads them over PCIe\n", (long long) got, miss.size(),
-                             (double) gguf_src.mirrored_bytes() / 1073741824.0,
-                             std::chrono::duration<double>(Clock::now() - tm).count());
-                // the device-built verify plan's view of it: each (layer, expert) -> its mirror address, 0 = none
-                std::vector<unsigned long long> tab((size_t) (g.n_layers * g.n_expert), 0ull);
-                for (int64_t l = 0; l < g.n_layers; ++l)
-                    for (int64_t e = 0; e < g.n_expert; ++e)
-                        if (gguf_src.pinned(l, e))
-                            tab[(size_t) (l * g.n_expert + e)] = (unsigned long long) gguf_src.device_alias(l, e);
-                mirror_table_d = sycl::malloc_device<unsigned long long>(tab.size(), dpct::get_in_order_queue());
-                dpct::get_in_order_queue().memcpy(mirror_table_d, tab.data(), tab.size() * sizeof(unsigned long long)).wait();
-            }
-        }
-        unmirrored_misses = (int64_t) miss.size() - (int64_t) (gguf_src.mirrored_bytes() ? std::count_if(miss.begin(), miss.end(),
-            [&](const std::pair<int64_t, int64_t>& pr) { return gguf_src.pinned(pr.first, pr.second); }) : 0);
-        if (device_adapt && unmirrored_misses > 0) {
-            std::fprintf(stderr, "strata generate: NO_HOST adaptation needs every expert mirrored; raise STRATA_MIRROR_MIB\n");
-            return 1;
-        }
-        if (unmirrored_misses > 0 && g_env_verify_no_host)
-            std::fprintf(stderr, "strata generate: WARNING: %lld experts are neither in VRAM nor mirrored; with STRATA_VERIFY_NO_HOST "
-                                 "the device plan cannot run them and their layers' windows fall back slowly - raise "
-                                 "STRATA_MIRROR_MIB or the free RAM, or lower --max-context\n", (long long) unmirrored_misses);
-    }
+    if (!mirror_prepared && !prepare_mirror()) return 1;
 
     for (auto& stp : stages) {
         GpuStage& st = *stp;
@@ -7796,6 +7891,21 @@ int main(int argc, char **argv) try {
                 return true;
             };
             // tokens [a, b) through the windows: commit all of them, then give the draft layer their residuals
+            // ponytail: cached process flag; reuse the existing mapped routes and four-batch LFU policy.
+            static const bool short_route_heat = [] {
+                const char* v = std::getenv("STRATA_SHORT_ROUTE_HEAT");
+                if (!v) {
+#if defined(STRATA_ORCA_DG2)
+                    return true;
+#else
+                    return false;
+#endif
+                }
+                if (!std::strcmp(v, "0")) return false;
+                if (std::strcmp(v, "1")) throw std::invalid_argument("STRATA_SHORT_ROUTE_HEAT must be 0 or 1");
+                return true;
+            }();
+            std::vector<float> short_routes(short_route_heat && device_adapt && read_from < n - 1 ? drive.d.usage.size() : 0, 0.0f);
             auto read_windows = [&](int64_t a, int64_t b, std::string& e) -> bool {
                 strata::core::progress_at("reading the prompt (verify windows), from token", a);   // #217: not "batched"
                 // every token is committed and the picks are discarded: no head sampling (see set_head_sampling)
@@ -7822,6 +7932,7 @@ int main(int argc, char **argv) try {
                         if (drive.d.failed && drive.d.fail) e = drive.d.fail;
                         return false;
                     }
+                    if (!short_routes.empty()) ver.count_routing(short_routes.data(), nullptr);
                     // STRATA_LOGPOS=<path>: the teacher-forced log-probability of every token read here (every
                     // token is committed and nxt[t] is the prompt's own next token), appended to <path>; the last
                     // column is the log-probability of STRATA_LOGPOS_EXTRA (default 248046, <|im_end|>), so the
@@ -7856,8 +7967,12 @@ int main(int argc, char **argv) try {
                 for (const auto& [i, slot] : p.lent) {   // D-4: queued, one wait (STRATA_REFILL_BLOCKING=1: each)
                     const uint8_t* b = srcp->blob(i / g.n_expert, i % g.n_expert);
                     const int64_t nb = (int64_t) strata::kernels::cpu::expert_layout().blob_bytes(i / g.n_expert);
+                    // ponytail: batch immutable USM mirrors; a transient ring hit may be overwritten by the next miss.
+                    const bool stable = g_orca_mirror_refill && !refill_blocking() && srcp == &gguf_src &&
+                                        gguf_src.pinned(i / g.n_expert, i % g.n_expert);
                     if (b == nullptr || !(refill_blocking() ? p.cache->fill_slot_blocking(slot, b, e, nb)
-                                                            : p.cache->fill_slot_queued(slot, b, e, nb)))
+                                             : stable ? p.cache->fill_slot(slot, b, nullptr, e, nb)
+                                                      : p.cache->fill_slot_queued(slot, b, e, nb)))
                         return false;
                     host_res[(size_t) i] = slot;
                     // SYCL port: drain before GgufExpertSource's 512-buffer blob ring can wrap onto a queued copy
@@ -8186,8 +8301,10 @@ int main(int argc, char **argv) try {
                 return 1;
             }
             tr("prompt done (slots refilled)");
-            if (!cancelled && routed_prefill && device_adapt && sp.stats().routing_tail.size() == drive.d.usage.size()) {
-                const auto& tail = sp.stats().routing_tail;
+            if (!cancelled && device_adapt &&
+                ((routed_prefill && sp.stats().routing_tail.size() == drive.d.usage.size()) ||
+                 (!routed_prefill && !short_routes.empty()))) {
+                const auto& tail = routed_prefill ? sp.stats().routing_tail : short_routes;
                 for (size_t i = 0; i < tail.size(); ++i) drive.d.usage[i] += 0.125f * tail[i];
                 // ponytail: at most four existing LFU batches before decode; include these copies in prompt time.
                 for (int i = 0; i < 4; ++i) {
@@ -8395,6 +8512,17 @@ int main(int argc, char **argv) try {
                 // commit, outv[a] is its row 0) - the drafts extend it on the device as the verify rows will
                 if (hist_n > 0 && mtp.coupled() && !last)
                     mtp.set_draft_history(consumed.data(), (int64_t) consumed.size(), outv[(size_t) a]);
+                // ponytail: reuse the reader's private buffers and worker; only row 0 is known before MTP.
+                // consumed includes accepted inputs; ss.ple_prev is not current until wait_commit().
+                // The next gather waits for the ticket before consuming it; never overwrite mapped GPU inputs here.
+                if (g_orca_ple_row0 && use_mtp && !last && stages.empty() && ss.ple.ready() &&
+                    p + a + 1 < o.max_context) {
+                    const size_t n = consumed.size();
+                    const int32_t prev[2] = {n >= 2 ? consumed[n - 2] : -1, n ? consumed[n - 1] : -1};
+                    uint32_t rows[strata::kernels::PLE_N_HEADS];
+                    strata::kernels::ngram_rows(outv.data() + a, prev, 1, ss.ple.consts, rows);
+                    ss.ple.table->prefetch_rows(rows);
+                }
                 bool drafted;
                 {
 #ifdef STRATA_EZPP

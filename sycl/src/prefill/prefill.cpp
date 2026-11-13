@@ -1,3 +1,7 @@
+#if defined(STRATA_ORCA_NATIVE)
+#include <dpct/dpct.hpp>
+#include "orca/u4n16.hpp"
+#endif
 // src/prefill/prefill.cpp - see include/strata/prefill/prefill.hpp.
 #define DPCT_PROFILING_ENABLED
 #include <sycl/sycl.hpp>
@@ -515,6 +519,9 @@ struct PeerPrefill {
 };
 
 struct Prefill::Impl {
+#if defined(STRATA_ORCA_NATIVE)
+    std::unique_ptr<model_u4::Cache> expert_u4;
+#endif
     const core::WeightTable* wt = nullptr;
     const core::ModelGeometry* g = nullptr;
     core::SessionState* ss = nullptr;
@@ -667,6 +674,9 @@ void Prefill::release() {
     if (!impl_) return;
     if (impl_->cs) impl_->cs->wait();
     if (impl_->copy) impl_->copy->wait();
+#if defined(STRATA_ORCA_NATIVE)
+    impl_->expert_u4.reset();
+#endif
     for (int i = 0; i < RING_MAX; ++i) {
         if (impl_->copied[i]) dpct::destroy_event(impl_->copied[i]);
         if (impl_->used[i]) dpct::destroy_event(impl_->used[i]);
@@ -2029,6 +2039,18 @@ bool Prefill::run(const int64_t *tokens, int64_t n, int64_t pos0,
         // k lands in ring slot k % ring); a copy is issued once the entry `ring` before it is consumed (its slot's
         // `used` event recorded), so the copy stream never waits on an event that is not queued yet
         const strata::kernels::cpu::ExpertLayout& lay0 = strata::kernels::cpu::expert_layout();
+#if defined(STRATA_ORCA_NATIVE)
+        if (model_u4::enabled()) {
+            if(m.ring!=STAGE || m.pp || N!=2560 || g.n_layers!=48 || !lay0.native)
+                throw std::runtime_error("U4 N16 requires native single-A770 routed staging");
+            const char* tile=std::getenv("STRATA_U4_TILE_N8");
+            const char* priority=std::getenv("STRATA_U4_GROUP_PRIORITY");
+            if((tile && std::strcmp(tile,"0")) || (priority && std::strcmp(priority,"id")))
+                throw std::runtime_error("Orca U4 supports measured N16/id priority only");
+            if(!m.expert_u4)m.expert_u4=std::make_unique<model_u4::Cache>(*m.cs,*m.copy,int(m.T_max));
+            m.expert_u4->begin();
+        }
+#endif
         const bool stream_all = m.ring > STAGE && T >= stream_all_min() && m.src != nullptr;
         const bool ps_on = stream_all && m.pp && m.pp->ps_frac > 0.0;
         if (m.pp && !ps_on) m.pp->ps_flag.clear();
@@ -3291,6 +3313,42 @@ bool Prefill::run(const int64_t *tokens, int64_t n, int64_t pos0,
                             */
                             dpct::select_device(pd);
                         }
+#if defined(STRATA_ORCA_NATIVE)
+                        if(m.expert_u4) {
+                            u4s4::require(!use_mmq && !fused_l && m.Xs,"U4 FP16 expert path");
+                            std::vector<int> selected;
+                            for(int e:order)if(m.expert_u4->eligible(l,e,m.cnt[size_t(e)]))selected.push_back(e);
+                            if(!selected.empty()) {
+                                // ponytail: retain the measured eight-expert banks and original routed output slots.
+                                u4s4::pack<false,2>(*m.cs,m.mixed_h,int(T),m.expert_u4->ax);
+                                size_t next=0;
+                                auto stage=[&](int bank) {
+                                    grouped_u4::Batch batch;
+                                    while(next<selected.size()) {
+                                        const int e=selected[next],ne=m.cnt[size_t(e)];
+                                        if(batch.count==8 || batch.rows+(ne+7)/8*8>m.expert_u4->ax.rows)break;
+                                        const int slot=bank+batch.count;
+                                        m.expert_u4->stage(l,e,slot);
+                                        batch.add(m.expert_u4->device[slot],m.off[size_t(e)],ne,m.expert_u4->ax.rows);
+                                        ++next;
+                                    }
+                                    if(batch.count)m.expert_u4->flush(bank,batch.count);
+                                    return batch;
+                                };
+                                auto current=stage(0);
+                                for(int round=0;current.count;++round) {
+                                    auto ahead=stage((round+1)%2*8);
+                                    shared_u4::run(*m.expert_u4,m.src_dev,m.GU,m.Dm,current,round%2*8);
+                                    current=ahead;
+                                }
+                            }
+                            // Keep FP16 pair/DQ indices contiguous after removing U4 experts; routed offsets stay unchanged.
+                            order.erase(std::remove_if(order.begin(),order.end(),[&](int e) {
+                                return m.expert_u4->eligible(l,e,m.cnt[size_t(e)]);
+                            }),order.end());
+                        }
+
+#endif
                         // Stage ahead: the copy stream moves blobs host -> device while the compute stream works.
                         int stage_next = 0;
                         std::vector<int> stage_of(order.size(), -1);
@@ -3771,6 +3829,9 @@ bool Prefill::run(const int64_t *tokens, int64_t n, int64_t pos0,
             stats_.experts_streamed += iss_streamed;
             stats_.experts_dma += iss_dma;
         }
+#if defined(STRATA_ORCA_NATIVE)
+        if(m.expert_u4)m.expert_u4->end();
+#endif
         stats_.tokens += T;
         core::progress_at("reading the prompt (batched): finishing the chunk from token", p0);
         pt.mark(kPfStart, cs);

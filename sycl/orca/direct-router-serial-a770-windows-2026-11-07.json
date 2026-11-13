@@ -1,0 +1,252 @@
+{
+  "complete": true,
+  "date": "2026-11-07",
+  "hardware": "Windows10,Arc A77016GB,driver32.0.101.9034,XeonE5-2696v4,oneAPI2025.3.2",
+  "requests": 120,
+  "retained_requests": 40,
+  "output_tokens_per_request": 70,
+  "prompt_tokens": 23,
+  "quality": true,
+  "order": [
+    "l0",
+    "parallel",
+    "serial",
+    "parallel",
+    "serial",
+    "parallel",
+    "serial",
+    "l0"
+  ],
+  "arms": [
+    {
+      "index": 0,
+      "mode": "l0",
+      "summary": {
+        "decode_tok_s": 51.28580848413803,
+        "ttft_ms": 756.1478000000079,
+        "request_ms": 2080.2037999999357
+      },
+      "ready_ms": 24330.420900000034
+    },
+    {
+      "index": 1,
+      "mode": "parallel",
+      "summary": {
+        "decode_tok_s": 49.70531846907619,
+        "ttft_ms": 766.7332999999417,
+        "request_ms": 2136.84760000001
+      },
+      "ready_ms": 16016.508299999941
+    },
+    {
+      "index": 2,
+      "mode": "serial",
+      "summary": {
+        "decode_tok_s": 49.02647429611991,
+        "ttft_ms": 778.4598000000642,
+        "request_ms": 2170.152700000017
+      },
+      "ready_ms": 16309.201199999961
+    },
+    {
+      "index": 3,
+      "mode": "parallel",
+      "summary": {
+        "decode_tok_s": 49.77600796416127,
+        "ttft_ms": 771.2455999999293,
+        "request_ms": 2126.101399999925
+      },
+      "ready_ms": 14761.73279999989
+    },
+    {
+      "index": 4,
+      "mode": "serial",
+      "summary": {
+        "decode_tok_s": 49.55050612302683,
+        "ttft_ms": 769.9124999999185,
+        "request_ms": 2141.121600000133
+      },
+      "ready_ms": 14736.014599999862
+    },
+    {
+      "index": 5,
+      "mode": "parallel",
+      "summary": {
+        "decode_tok_s": 49.81497295758611,
+        "ttft_ms": 763.101000000006,
+        "request_ms": 2122.4361000001863
+      },
+      "ready_ms": 14477.818900000102
+    },
+    {
+      "index": 6,
+      "mode": "serial",
+      "summary": {
+        "decode_tok_s": 49.5926319518243,
+        "ttft_ms": 760.5464999999185,
+        "request_ms": 2131.7646999998487
+      },
+      "ready_ms": 15219.789900000023
+    },
+    {
+      "index": 7,
+      "mode": "l0",
+      "summary": {
+        "decode_tok_s": 51.706308169596696,
+        "ttft_ms": 756.1596999998983,
+        "request_ms": 2070.0489999999263
+      },
+      "ready_ms": 10133.18349999986
+    }
+  ],
+  "comparison": [
+    {
+      "order": [
+        "parallel",
+        "serial",
+        "parallel"
+      ],
+      "metrics": {
+        "decode_tok_s": {
+          "serial": 49.02647429611991,
+          "parallel": 49.74065065897217,
+          "serial_change_pct": -1.435800202431492,
+          "control_drift_pct": 0.1422171656118909
+        },
+        "ttft_ms": {
+          "serial": 778.4598000000642,
+          "parallel": 768.9861403161833,
+          "serial_change_pct": 1.2319675462532542,
+          "control_drift_pct": 0.588509720392727
+        },
+        "request_ms": {
+          "serial": 2170.152700000017,
+          "parallel": 2131.467727634294,
+          "serial_change_pct": 1.8149452541164734,
+          "control_drift_pct": -0.5028996920550144
+        }
+      }
+    },
+    {
+      "order": [
+        "serial",
+        "parallel",
+        "serial"
+      ],
+      "metrics": {
+        "decode_tok_s": {
+          "serial": 49.571564562618825,
+          "parallel": 49.81497295758611,
+          "serial_change_pct": -0.48862496658289567,
+          "control_drift_pct": 0.08501594048884176
+        },
+        "ttft_ms": {
+          "serial": 765.2151705116185,
+          "parallel": 763.101000000006,
+          "serial_change_pct": 0.2770498939999255,
+          "control_drift_pct": -1.2165018752132162
+        },
+        "request_ms": {
+          "serial": 2136.438027485815,
+          "parallel": 2122.4361000001863,
+          "serial_change_pct": 0.6597102021411727,
+          "control_drift_pct": -0.4370092758993138
+        }
+      }
+    }
+  ],
+  "l0_reference": {
+    "decode_tok_s": 51.495629117506255,
+    "ttft_ms": 756.1537499765435,
+    "request_ms": 2075.1201883230556
+  },
+  "l0_drift_pct": {
+    "decode_tok_s": 0.8199143152607613,
+    "ttft_ms": 0.0015737663840775795,
+    "request_ms": -0.4881637078063994
+  },
+  "direct_arms_vs_outer_l0": [
+    {
+      "index": 1,
+      "mode": "parallel",
+      "change_pct": {
+        "decode_tok_s": -3.476626422690776,
+        "ttft_ms": 1.3991268341559282,
+        "request_ms": 2.9746427230722183
+      }
+    },
+    {
+      "index": 2,
+      "mode": "serial",
+      "change_pct": {
+        "decode_tok_s": -4.794882330211092,
+        "ttft_ms": 2.949935780152213,
+        "request_ms": 4.579614819985878
+      }
+    },
+    {
+      "index": 3,
+      "mode": "parallel",
+      "change_pct": {
+        "decode_tok_s": -3.3393536166361426,
+        "ttft_ms": 1.9958705519682818,
+        "request_ms": 2.456783561923137
+      }
+    },
+    {
+      "index": 4,
+      "mode": "serial",
+      "change_pct": {
+        "decode_tok_s": -3.777258434965247,
+        "ttft_ms": 1.819570427813355,
+        "request_ms": 3.180606696830157
+      }
+    },
+    {
+      "index": 5,
+      "mode": "parallel",
+      "change_pct": {
+        "decode_tok_s": -3.2636870132902174,
+        "ttft_ms": 0.9187615645201763,
+        "request_ms": 2.2801528289003725
+      }
+    },
+    {
+      "index": 6,
+      "mode": "serial",
+      "change_pct": {
+        "decode_tok_s": -3.695453766259582,
+        "ttft_ms": 0.5809334442249625,
+        "request_ms": 2.729697874635817
+      }
+    }
+  ],
+  "gates": {
+    "workload_exact": true,
+    "serial_decode_positive_both_orders": false,
+    "bracket_control_drift_within_3pct": true,
+    "ttft_and_request_regression_within_3pct": true,
+    "outer_l0_drift_within_3pct": true
+  },
+  "screen_pass": false,
+  "parameters": {
+    "spec": 4,
+    "min_p": 0.5,
+    "last_min_p": 0.5,
+    "cumulative_min_p": 0,
+    "expert_slots": 5771,
+    "reserve_mib": 1536
+  },
+  "scope": "One independent wrapper becomes a sequential lambda. Same early quant location,kernel calls,Host libraries,Direct residency object,HC128 native math pack. All other independent forks unchanged. Each fresh process15 Short,discard10 retain5. Two opposed Direct brackets. No timestamps,profiler or inner timers. Net decode=generated/decode_ms,excludes preparation/initialization/prefill;TTFT and whole-request time measured separately. Outer L0 brackets span the entire run,not local paired controls.",
+  "prior_failure": "build-r1 stopped before compilation/GPU because link-input audit treated Windows SDK libraries/output options as workspace inputs;original script and failure preserved. build-r2 resolves actual SDK libraries and excludes output flags. Initial offline publisher assumed nine DONE fields;frozen engine emits16. Original report script/failure retained;parser now checks exact extended counters and full23 prompt read;no GPU rerun.",
+  "production_changed": false,
+  "release_speed_claimed": false,
+  "linux_gpu_tested": false,
+  "limitations": "Short screen only. Does not settle arbitrary prompts,PPL,long-context nonfinite/residency failures or Linux GPU behavior. Control drift is not a confidence interval.",
+  "source_sha256": {
+    "build-orca-router-serial-20261107\\report.py": "ddceb81b7c4103bdb48b6b3de7627e110fc5c394de56a4ccfc6b2dfc05f0724a",
+    "build-orca-router-serial-20261107\\experiment.py": "040bcd8a78974f3fb6e04056b3d431bf02da284e241524b3379cb123e994a636",
+    "build-orca-router-serial-20261107\\prepared-r1.json": "07aa1e0a8684a4dc9ebbae7420d1a5e67e7483fdf55e82d7bbd9d803b4911109",
+    "build-orca-router-serial-20261107\\run-r1\\results.json": "3cb7c51475dcd6366287bd712b8a2e82b1dfe9e5d4521d112581c1e57d25080f"
+  }
+}

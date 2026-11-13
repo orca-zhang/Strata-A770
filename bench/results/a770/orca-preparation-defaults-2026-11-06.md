@@ -52,4 +52,4 @@ python -X utf8 build-orca-preparation-adopt-20261106/publish.py check
 归档保存精确源代码、前后差异、编译／链接命令、完整协议、配置及依赖摘要；模型资产使用stat-cached SHA256身份核验。
 编译、GPU、重型哈希及归档持共享实验锁；不分发权重或二进制。
 
-[JSON](../../../sycl/orca/preparation-defaults-a770-windows-2026-11-06.json) · [精确文本归档](../../../sycl/orca/preparation-defaults-a770-windows-2026-11-06.json.gz)
+[JSON](../../../sycl/orca/preparation-defaults-a770-windows-2026-11-06.json) · 精确文本归档 (`preparation-defaults-a770-windows-2026-11-06.json.gz`, raw capture retained locally)

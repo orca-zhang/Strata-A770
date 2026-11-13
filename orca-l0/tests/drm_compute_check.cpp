@@ -495,6 +495,11 @@ void self_check() {
     expected_timestamp.setPostSyncOperation(packet::DG2::PIPE_CONTROL::POST_SYNC_OPERATION_WRITE_TIMESTAMP);
     require(!std::memcmp(&timestamp, &expected_timestamp, sizeof(timestamp)),
             "timestamp changed required synchronization or canonical destination");
+    const auto device_timestamp = detail::timestamp_value(0x800000010000ull, false);
+    expected_timestamp.setDcFlushEnable(false);
+    require(!std::memcmp(&device_timestamp, &expected_timestamp, sizeof(device_timestamp)) &&
+            detail::signal_value(0x10000, 1).getDcFlushEnable(),
+            "device timestamp lost ordering or completion lost host visibility");
     reject([] { detail::timestamp_value(0); }); reject([] { detail::timestamp_value(0x10004); });
     reject([] { detail::timestamp_value(0x1000000000000ull); });
     const auto signal = detail::signal_value(0x800000010000ull, 0x1234567887654321ull);
@@ -512,6 +517,18 @@ void self_check() {
     const uint32_t delta = 7;
     const std::vector<Allocation> resident{{nullptr, 0x1000000, 4096, 1}};
     const auto packed = detail::pack_arguments(k, 64, 16, {Argument::value(va), Argument::value(delta)}, resident);
+    const std::array<Argument, 2> stack_args{Argument::value(va), Argument::value(delta)};
+    require(detail::pack_arguments(k, {64,1,1}, {16,1,1}, stack_args.data(), stack_args.size(), resident) == packed,
+            "stack argument view changed packed bytes");
+    reject([&] { detail::pack_arguments(k, {64,1,1}, {16,1,1}, nullptr, 2, resident); });
+    reject([&] { detail::pack_arguments(k, {64,1,1}, {16,1,1}, stack_args.data(), 1, resident); });
+    {
+        detail::Kernel empty;
+        empty.cross_bytes = 32;
+        require(detail::pack_arguments(empty, {1,1,1}, {1,1,1}, nullptr, 0, {}) == std::vector<uint8_t>(32),
+                "empty argument view changed zero-initialized payload");
+        reject([&] { detail::local_memory_bytes(empty, nullptr, 1); });
+    }
     std::vector<size_t> resident_hints;
     for (const auto& shifted : {resident, std::vector<Allocation>{{nullptr, 0x80000, 4096, 2}, resident[0]}, resident})
         require(detail::pack_arguments(k, 64, 16, {Argument::value(va), Argument::value(delta)}, shifted, 0, 0, 0, &resident_hints) == packed,
@@ -525,6 +542,9 @@ void self_check() {
     reject([&] { detail::gpu_address(0x81000, mapped); });
     const auto translated = detail::pack_arguments(k, 64, 16,
         {Argument::capture(&cpu_pointer, sizeof(cpu_pointer)), Argument::value(delta)}, mapped);
+    const std::array<Argument, 2> captured_args{Argument::capture(&cpu_pointer, sizeof(cpu_pointer)), Argument::value(delta)};
+    require(detail::pack_arguments(k, {64,1,1}, {16,1,1}, captured_args.data(), captured_args.size(), mapped) == translated,
+            "stack argument view changed captured-pointer translation");
     {
         detail::Kernel aggregate;
         aggregate.cross_bytes = 64;
@@ -631,6 +651,9 @@ void self_check() {
     local_kernel.payload[1].mode = "slm"; local_kernel.payload[1].space = "local"; local_kernel.payload[1].alignment = 16;
     const std::vector<Argument> local_args{Argument::local(512), Argument::value(delta)};
     const auto local_cross = detail::pack_arguments(local_kernel, 64, 16, local_args, {});
+    require(detail::pack_arguments(local_kernel, {64,1,1}, {16,1,1}, local_args.data(), local_args.size(), {}) == local_cross &&
+            detail::local_memory_bytes(local_kernel, local_args.data(), local_args.size()) == 544,
+            "stack argument view changed dynamic local memory");
     uint64_t local_offset = 0; std::memcpy(&local_offset, local_cross.data() + 24, 8);
     require(local_offset == 32 && detail::local_memory_bytes(local_kernel, local_args) == 544,
             "dynamic local offset/alignment or static SLM extent lost");
@@ -1085,6 +1108,146 @@ void strata_gemv(const std::filesystem::path& pack, bool device = false, const s
     }
     std::printf("PASS 48 Strata native BF16 GEMV replays, 19x1027, local64/local256, dynamic SLM, changed inputs and guards; device_local=%u max_abs_error=%.9g\n", unsigned(device), max_error);
 }
+// Inflate only the declared memory requirement; ISA and argument ABI stay byte-identical.
+std::string larger_thread_fixture(const std::pair<std::string, std::string>& original,
+                                  const std::filesystem::path& target, bool scratch) {
+    auto elf = detail::read_zebin(original.first);
+    bool changed = false;
+    for (size_t i = 1; i < elf.sections.size(); ++i) if (elf.name(i) == ".ze_info") {
+        const auto& section = elf.sections[i];
+        std::string info(reinterpret_cast<const char*>(elf.bytes.data() + section.offset), size_t(section.size));
+        const auto name = info.find(original.second);
+        require(name != info.npos, "fixture kernel metadata missing");
+        const auto limit = info.find("\n  - name:", name);
+        const auto buffers = info.find("per_thread_memory_buffers:", name);
+        require(buffers != info.npos && (limit == info.npos || buffers < limit), "fixture memory descriptor missing");
+        const auto size = info.find("size:", buffers);
+        require(size != info.npos && (limit == info.npos || size < limit), "fixture memory size missing");
+        const auto begin = info.find_first_not_of(" \t", size + 5);
+        const auto end = info.find_first_not_of("0123456789", begin);
+        const auto value = std::stoul(info.substr(begin, end - begin));
+        const auto larger = std::to_string(value * 2);
+        require(larger.size() == end - begin && !changed, "fixture size edit would move ELF sections");
+        std::copy(larger.begin(), larger.end(), elf.bytes.begin() + section.offset + begin);
+        changed = true;
+    }
+    require(changed, "fixture metadata was not enlarged");
+    std::ofstream file(target, std::ios::binary | std::ios::trunc);
+    file.write(reinterpret_cast<const char*>(elf.bytes.data()), std::streamsize(elf.bytes.size())); file.close();
+    require(bool(file), "write enlarged thread fixture");
+    const auto before = detail::load(original.first, original.second), after = detail::load(target.string(), original.second);
+    require(after.isa == before.isa && (scratch ? after.scratch_bytes[0] == 2 * before.scratch_bytes[0] :
+            after.private_bytes == 2 * before.private_bytes), "enlarged fixture changed ISA or unexpected thread ABI");
+    return target.string();
+}
+void strata_thread_trim(const std::filesystem::path& pack, const std::string& memory) {
+    const auto spill = find_native(pack, "cvec", "cvec_kernel_");
+    const auto priv = find_native(pack, "dequant_bf16", "dpct_kernel_scalarILi11EEtEE");
+    require(detail::load(spill.first, spill.second).scratch_bytes[0] == 2048 &&
+            detail::load(priv.first, priv.second).private_bytes == 512, "thread trim fixtures changed");
+    struct Temporary {
+        std::filesystem::path path;
+        Temporary() {
+            const auto candidate = std::filesystem::temp_directory_path() / ("orca-thread-trim-" +
+                std::to_string(std::chrono::steady_clock::now().time_since_epoch().count()));
+            require(std::filesystem::create_directory(candidate), "create exclusive thread fixture directory");
+            path = candidate;
+        }
+        ~Temporary() { std::error_code e; for (auto name : {"scratch.zebin", "private.zebin"}) std::filesystem::remove(path / name, e); std::filesystem::remove(path, e); }
+    } temporary;
+    const auto grown_spill = larger_thread_fixture(spill, temporary.path / "scratch.zebin", true);
+    const auto grown_priv = larger_thread_fixture(priv, temporary.path / "private.zebin", false);
+    for (bool local : {false, true}) {
+        Runtime r;
+        r.set_memory_module(memory, local, local);
+        const auto main = r.default_queue(), other = r.create_queue();
+        constexpr int32_t n = 4096, hc = 3, mode = 0;
+        constexpr int64_t layer = 1, ld = int64_t(n) * hc, bo_ld = n, inj_ld = hc;
+        constexpr int64_t rows = 19, row0 = 1, row_bytes = 220, groups = 16;
+        constexpr size_t guard = 64;
+        const uint8_t write = 0;
+        // Reservation sizes are a platform property (Windows native Host rounds large spans to 2MiB).
+        const auto reserved = [&](size_t bytes) {
+            auto allocation = local ? r.allocate_device(bytes) : r.allocate(bytes);
+            const auto size = allocation.bytes; r.release(allocation); return uint64_t(size);
+        };
+        const auto expected = reserved(size_t(2048) * detail::thread_memory_slots + 2 * detail::thread_memory_guard) +
+            reserved(size_t(512) * detail::thread_memory_slots + 2 * detail::thread_memory_guard) + reserved(4096);
+        const auto residual = r.allocate(size_t(ld) * 4 + 2 * guard), direction = r.allocate(3 * n * 4 + 2 * guard);
+        const auto scales = r.allocate(3 * 4 + 2 * guard), on = r.allocate(4 + 2 * guard);
+        const auto blocks = r.allocate(size_t((rows + row0) * row_bytes) + 2 * guard);
+        const auto output = r.allocate(size_t(rows * 512) * 2 + 2 * guard);
+        const auto va = [guard](const Allocation& a) { return a.gpu + guard; };
+        const auto record = [&](const Queue& q, bool grown) {
+            r.begin(q);
+            const auto x = va(residual), d = va(direction), y = va(output), b = va(blocks);
+            struct { uint64_t dir, scales, on; } tables{d, va(scales), va(on)};
+            r.append(grown ? grown_spill : spill.first, spill.second, 256, hc,
+                {Argument::value(x), Argument::value(tables), Argument::value(mode), Argument::value(layer),
+                 Argument::value(n), Argument::value(hc), Argument::value(ld), Argument::value(d),
+                 Argument::value(bo_ld), Argument::value(d), Argument::value(inj_ld), Argument::value(write)});
+            r.append(grown ? grown_priv : priv.first, priv.second, 256, uint32_t((rows * groups + 255) / 256),
+                {Argument::value(b), Argument::value(row_bytes), Argument::value(row0), Argument::value(rows),
+                 Argument::value(groups), Argument::value(y)});
+            reject([&] { r.trim_thread_memory(); }); // Nonempty active recording.
+            return r.finish();
+        };
+        const auto replay = [&](const Commands& list, const Queue& q) {
+            for (auto a : {residual, direction, scales, on, blocks, output}) {
+                r.cpu_access(a, true); std::memset(a.data, 0xa7, a.bytes);
+            }
+            auto* values = reinterpret_cast<float*>(static_cast<uint8_t*>(residual.data) + guard);
+            std::fill_n(values, size_t(ld), 2.0f);
+            std::fill_n(reinterpret_cast<float*>(static_cast<uint8_t*>(direction.data) + guard), 3 * n, 1.0f / 256);
+            std::fill_n(reinterpret_cast<float*>(static_cast<uint8_t*>(scales.data) + guard), 3, 1.0f / 8);
+            const int32_t enabled = 1; std::memcpy(static_cast<uint8_t*>(on.data) + guard, &enabled, 4);
+            for (int64_t row = 0; row < rows + row0; ++row) for (int block = 0; block < 2; ++block) {
+                auto* b = static_cast<uint8_t*>(blocks.data) + guard + row * row_bytes + block * 110;
+                std::memset(b, 0xff, 32); std::memset(b + 32, 0x55, 64);
+                std::memset(b + 96, 0x77, 8); std::memset(b + 104, 0, 4);
+                const uint16_t half = 0x3c00; std::memcpy(b + 108, &half, 2);
+            }
+            std::vector<std::vector<uint8_t>> before;
+            for (auto a : {residual, direction, scales, on, blocks, output})
+                before.emplace_back(static_cast<uint8_t*>(a.data), static_cast<uint8_t*>(a.data) + a.bytes);
+            for (size_t j = 0; j < size_t(ld); ++j) {
+                const float value = 2.0f * 127.0f / 128;
+                std::memcpy(before[0].data() + guard + j * 4, &value, 4);
+            }
+            const uint16_t bf16 = 0xc1c8; // (7 - 32) * 1 = -25.
+            for (size_t j = 0; j < size_t(rows * 512); ++j) std::memcpy(before[5].data() + guard + j * 2, &bf16, 2);
+            r.wait(r.submit(list, q));
+            size_t index = 0;
+            for (auto a : {residual, direction, scales, on, blocks, output}) {
+                r.cpu_access(a, false); require(!std::memcmp(a.data, before[index++].data(), a.bytes), "trim changed exact result/input/full guards");
+            }
+            r.check_scratch_guards();
+        };
+        auto old = record(main, false), preserved = record(other, false), current = record(main, true);
+        const auto held = r.allocated_bytes();
+        require(r.trim_thread_memory() == 0 && r.allocated_bytes() == held, "trim freed a pool held by an idle recorded list");
+        replay(old, main); replay(preserved, other); replay(current, main);
+        const auto gate = r.create_gate();
+        r.begin(main); r.depend_on(gate); r.barrier();
+        r.close(); reject([&] { r.trim_thread_memory(); }); // Closed implicit list.
+        auto blocked = r.finish(); const auto pending = r.submit(blocked, main);
+        try { reject([&] { r.trim_thread_memory(); }); } catch (...) { gate.signal(); r.wait(pending); throw; }
+        gate.signal(); r.wait(pending); r.discard(blocked);
+        r.discard(old);
+        const auto before = r.allocated_bytes();
+        const auto freed = r.trim_thread_memory();
+        std::printf("TRIM_BYTES local=%u expected=%llu reclaimed=%llu allocation_delta=%llu\n", unsigned(local),
+            static_cast<unsigned long long>(expected), static_cast<unsigned long long>(freed), static_cast<unsigned long long>(before - r.allocated_bytes()));
+        require(freed == expected && r.allocated_bytes() == before - freed, "trim did not reclaim exactly the obsolete pools/descriptor");
+        require(r.trim_thread_memory() == 0, "repeated trim must be idempotent");
+        for (int pass = 0; pass < 4; ++pass) { replay(current, main); replay(preserved, other); }
+        r.discard(current); r.discard(preserved);
+        require(r.trim_thread_memory() == 0, "trim freed current bindings after their lists were discarded");
+        auto again = record(main, true); replay(again, main); r.discard(again);
+        std::printf("PASS thread trim local=%u: exact reclaimed_bytes=%llu; retained lists, other queue/current bindings, empty/closed/pending rejection, idempotence, re-recording, 12 exact scratch/private replays and all guards\n", unsigned(local), static_cast<unsigned long long>(freed));
+    }
+}
+
 void strata_scratch(const std::filesystem::path& pack) {
     const auto kernel = find_native(pack, "cvec", "cvec_kernel_");
     const auto metadata = detail::load(kernel.first, kernel.second);
@@ -1096,8 +1259,8 @@ void strata_scratch(const std::filesystem::path& pack) {
     const auto residual = r.allocate(size_t(r_ld + 2 * guard) * 4), direction = r.allocate((3 * n + 2 * guard) * 4);
     const auto scales = r.allocate((3 + 2 * guard) * 4), on = r.allocate((1 + 2 * guard) * 4);
     const auto bo = r.allocate((n + 2 * guard) * 4), inj = r.allocate((hc + 2 * guard) * 4);
-    auto ptr = [](const Allocation& a) { return static_cast<float*>(a.data) + guard; };
-    auto va = [](const Allocation& a) { return a.gpu + guard * 4; };
+    auto ptr = [guard](const Allocation& a) { return static_cast<float*>(a.data) + guard; };
+    auto va = [guard](const Allocation& a) { return a.gpu + guard * 4; };
     struct Tables { uint64_t dir, scales, on; } tables{va(direction), va(scales), va(on)};
     static_assert(sizeof(tables) == 24);
     std::vector<float> expected(residual.bytes / 4);
@@ -1249,7 +1412,7 @@ void strata_multiqueue_memory(const std::filesystem::path& pack, const std::stri
     auto blocked = r.finish();
     const auto pending = r.submit(blocked, r.default_queue());
     require(!pending.ready(), "thread-memory fixture did not retain its leading gate");
-    const auto va = [](const Allocation& a) { return a.gpu + guard; };
+    const auto va = [guard](const Allocation& a) { return a.gpu + guard; };
     for (size_t i = 0; i < lanes.size(); ++i) {
         auto& lane = lanes[i];
         lane.residual = r.allocate(size_t(r_ld) * 4 + 2 * guard);
@@ -2854,6 +3017,7 @@ int main(int argc, char** argv) try {
     else if (argc == 3 && std::string(argv[1]) == "--strata-gate") strata_gate(argv[2]);
     else if (argc == 3 && std::string(argv[1]) == "--strata-gemv") strata_gemv(argv[2]);
     else if (argc == 4 && std::string(argv[1]) == "--strata-device") { strata_device(argv[3]); strata_gemv(argv[2], true, argv[3]); strata_xmx(argv[2], true, argv[3]); }
+    else if (argc == 4 && std::string(argv[1]) == "--strata-thread-trim") strata_thread_trim(argv[2], argv[3]);
     else if (argc == 3 && std::string(argv[1]) == "--strata-scratch") strata_scratch(argv[2]);
     else if (argc == 3 && std::string(argv[1]) == "--strata-private") strata_private(argv[2]);
     else if (argc == 3 && std::string(argv[1]) == "--strata-multiqueue-memory") strata_multiqueue_memory(argv[2]);

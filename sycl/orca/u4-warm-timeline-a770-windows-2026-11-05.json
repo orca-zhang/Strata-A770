@@ -1,0 +1,134 @@
+{
+  "date": "2026-11-05",
+  "timezone": "Asia/Shanghai",
+  "hardware": "Arc A77016 GB; Xeon E5-2696v4; Windows; driver32.0.101.9034; oneAPI2025.3",
+  "performance_claimed": false,
+  "production_changed": false,
+  "scope": "Archive coarse warm U4 timelines; no clean performance or kernel-exclusive claims.",
+  "protocol": "Short23/16 initializer, three alternating Code/Prose2048/128 cycles per backend; warm cycles1/2; exact outputs and speculative work against previous U4 references.",
+  "timestamps": "Nominal calibrated A77019.2MHz,36-bit masked ticks,64-byte guarded slots;591 markers per request;GPU barrier before every mark.",
+  "limitations": [
+    "Markers and profiling waits perturb scheduling.",
+    "Intervals include host/copy/dependency gaps and are not exclusive kernel durations or removable-time bounds.",
+    "Only six long requests per backend;this is localization,not a stable throughput comparison.",
+    "Cycle0 includes lazy U4 loading and is omitted from warm summaries."
+  ],
+  "warm": {
+    "l0": {
+      "Code2K": {
+        "phase_median_ms": {
+          "embed+steps": 2.1298958333333333,
+          "hc read": 878.6274479166666,
+          "gdn projections": 5980.144322916667,
+          "qsa projections": 2287.757369791667,
+          "qsa indexer": 5.785651041666666,
+          "qsa select": 33.43927083333333,
+          "qsa attention": 339.85677083333337,
+          "router+shared": 787.4670833333333,
+          "host grouping": 49.127239583333335,
+          "gather+fallback experts": 8332.49921875,
+          "wait copy": 0.0,
+          "dequant": 0.0,
+          "gemm gate/up": 0.0,
+          "gemm down": 0.0,
+          "combine+write": 81.58346354166667,
+          "ple": 61.53130208333333,
+          "kv stage": 0.0,
+          "gdn conv+gates": 59.090260416666666,
+          "gdn recurrence": 236.260390625,
+          "gdn out projection": 1774.0505729166666,
+          "u4 chain": 2980.572994791667
+        },
+        "span_median_ms": 23889.923255208334,
+        "projection_sum_ms": 10041.952265625001,
+        "u4_chain_ms": 2980.572994791667
+      },
+      "Prose2K": {
+        "phase_median_ms": {
+          "embed+steps": 1.4190625,
+          "hc read": 867.4791666666667,
+          "gdn projections": 5974.8295312499995,
+          "qsa projections": 2284.219322916667,
+          "qsa indexer": 9.332526041666666,
+          "qsa select": 31.749375,
+          "qsa attention": 332.485,
+          "router+shared": 767.05578125,
+          "host grouping": 37.32416666666667,
+          "gather+fallback experts": 7865.711848958334,
+          "wait copy": 0.0,
+          "dequant": 0.0,
+          "gemm gate/up": 0.0,
+          "gemm down": 0.0,
+          "combine+write": 82.669921875,
+          "ple": 64.41130208333334,
+          "kv stage": 0.0,
+          "gdn conv+gates": 60.958984375,
+          "gdn recurrence": 239.54065104166668,
+          "gdn out projection": 1769.7173697916667,
+          "u4 chain": 2799.0685677083334
+        },
+        "span_median_ms": 23187.972578125,
+        "projection_sum_ms": 10028.766223958333,
+        "u4_chain_ms": 2799.0685677083334
+      }
+    },
+    "direct": {
+      "Code2K": {
+        "phase_median_ms": {
+          "embed+steps": 1.7031770833333333,
+          "hc read": 974.0419010416667,
+          "gdn projections": 7182.290807291667,
+          "qsa projections": 2605.433046875,
+          "qsa indexer": 0.9915104166666666,
+          "qsa select": 8.174817708333334,
+          "qsa attention": 239.57122395833335,
+          "router+shared": 723.3012239583334,
+          "host grouping": 43.876536458333334,
+          "gather+fallback experts": 6475.21796875,
+          "wait copy": 0.0,
+          "dequant": 0.0,
+          "gemm gate/up": 0.0,
+          "gemm down": 0.0,
+          "combine+write": 91.38695312499999,
+          "ple": 80.72270833333333,
+          "kv stage": 0.0,
+          "gdn conv+gates": 30.283854166666664,
+          "gdn recurrence": 237.925546875,
+          "gdn out projection": 1961.3889583333334,
+          "u4 chain": 2939.4556249999996
+        },
+        "span_median_ms": 23595.765859375002,
+        "projection_sum_ms": 11749.1128125,
+        "u4_chain_ms": 2939.4556249999996
+      },
+      "Prose2K": {
+        "phase_median_ms": {
+          "embed+steps": 1.6852864583333333,
+          "hc read": 975.44671875,
+          "gdn projections": 7028.487656249999,
+          "qsa projections": 2531.6297135416667,
+          "qsa indexer": 1.024140625,
+          "qsa select": 8.851197916666667,
+          "qsa attention": 227.46638020833333,
+          "router+shared": 689.0645312500001,
+          "host grouping": 43.52427083333333,
+          "gather+fallback experts": 5927.445572916667,
+          "wait copy": 0.0,
+          "dequant": 0.0,
+          "gemm gate/up": 0.0,
+          "gemm down": 0.0,
+          "combine+write": 89.190859375,
+          "ple": 75.15861979166667,
+          "kv stage": 0.0,
+          "gdn conv+gates": 29.84421875,
+          "gdn recurrence": 228.084609375,
+          "gdn out projection": 1905.9697916666669,
+          "u4 chain": 2701.8614322916665
+        },
+        "span_median_ms": 22464.735,
+        "projection_sum_ms": 11466.087161458332,
+        "u4_chain_ms": 2701.8614322916665
+      }
+    }
+  }
+}

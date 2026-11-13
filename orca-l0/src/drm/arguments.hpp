@@ -12,6 +12,7 @@ struct RecordedImage {
     std::weak_ptr<const dg2::Allocation> indirect;
     uint32_t isa_offset = 0, indirect_offset = 0;
     std::vector<uint8_t> last_indirect;
+    bool last_local_parameters = false;
     std::array<uint32_t, 3> last_local{};
     std::vector<size_t> resident_hints;
 };
@@ -167,26 +168,30 @@ inline void validate_host_import(void* data, size_t bytes, const std::vector<dg2
                 "host import overlaps an existing allocation");
     }
 }
-inline uint32_t local_memory_bytes(const Kernel& k, const std::vector<dg2::Argument>& args) {
+inline uint32_t local_memory_bytes(const Kernel& k, const dg2::Argument* args, size_t argument_count) {
+    require(args || !argument_count, "null kernel argument list");
     size_t bytes = k.slm;
     for (const auto& p : k.payload) if (p.mode == "slm") {
-        require(p.index < args.size() && !args[p.index].data && args[p.index].bytes, "local argument requires Argument::local(nonzero bytes)");
+        require(p.index < argument_count && !args[p.index].data && args[p.index].bytes, "local argument requires Argument::local(nonzero bytes)");
         bytes = align(bytes, p.alignment);
         require(bytes <= 65536 && args[p.index].bytes <= 65536 - bytes, "local memory exceeds DG2 limit");
         bytes += args[p.index].bytes;
     }
     return uint32_t(bytes);
 }
+inline uint32_t local_memory_bytes(const Kernel& k, const std::vector<dg2::Argument>& args) {
+    return local_memory_bytes(k, args.data(), args.size());
+}
 inline std::vector<uint8_t> pack_arguments(const Kernel& k, std::array<uint32_t, 3> local, std::array<uint32_t, 3> groups,
-        const std::vector<dg2::Argument>& args, const std::vector<dg2::Allocation>& allocations,
+        const dg2::Argument* args, size_t argument_count, const std::vector<dg2::Allocation>& allocations,
         uint64_t global_base = 0, uint64_t constant_base = 0, uint64_t private_base = 0,
         std::vector<size_t>* resident_hints = nullptr, const std::array<uint64_t, 2>* cpu_bounds = nullptr) {
     workgroup_threads(local, groups);
     require(!k.required_local[0] || k.required_local == local, "required local size mismatch");
     uint32_t count = 0;
     for (const auto& p : k.payload) if (p.index != UINT32_MAX) count = std::max(count, p.index + 1);
-    require(args.size() == count, "kernel argument count mismatch");
-    local_memory_bytes(k, args);
+    require(argument_count == count, "kernel argument count mismatch");
+    local_memory_bytes(k, args, argument_count);
     if (resident_hints) resident_hints->resize(k.payload.size(), SIZE_MAX);
     size_t slm_offset = k.slm;
     std::vector<uint8_t> cross(k.cross_bytes);
@@ -228,6 +233,13 @@ inline std::vector<uint8_t> pack_arguments(const Kernel& k, std::array<uint32_t,
         }
     }
     return cross;
+}
+inline std::vector<uint8_t> pack_arguments(const Kernel& k, std::array<uint32_t, 3> local, std::array<uint32_t, 3> groups,
+        const std::vector<dg2::Argument>& args, const std::vector<dg2::Allocation>& allocations,
+        uint64_t global_base = 0, uint64_t constant_base = 0, uint64_t private_base = 0,
+        std::vector<size_t>* resident_hints = nullptr, const std::array<uint64_t, 2>* cpu_bounds = nullptr) {
+    return pack_arguments(k, local, groups, args.data(), args.size(), allocations,
+                          global_base, constant_base, private_base, resident_hints, cpu_bounds);
 }
 inline void bind_base_arguments(const Kernel& k, std::vector<uint8_t>& cross,
                                 uint64_t global_base, uint64_t constant_base, uint64_t private_base) {

@@ -43,4 +43,4 @@ python -X utf8 build-orca-decode-stages-20261105/publish.py --check
 ```
 
 新测使用不存在的编号，例如 `fine.py fine-r2` 或 `compact_model.py compact-forward-r2`，保留冻结依赖、输入顺序和配置。
-[精确 JSON](../../../sycl/orca/decode-expert-stages-a770-windows-2026-11-05.json) · [原始文本证据](../../../sycl/orca/decode-expert-stages-a770-windows-2026-11-05.json.gz)
+[精确 JSON](../../../sycl/orca/decode-expert-stages-a770-windows-2026-11-05.json) · 原始文本证据 (`decode-expert-stages-a770-windows-2026-11-05.json.gz`, raw capture retained locally)

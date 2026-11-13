@@ -1,0 +1,4458 @@
+{
+  "complete": true,
+  "source_adopted": true,
+  "production_executable_changed": false,
+  "model_speedup_claimed": false,
+  "linux_gpu_validated": false,
+  "source_sha256": {
+    "G:\\GitHub\\Strata\\orca-l0\\src\\drm\\encoding.hpp": "81866bd5dd06a9e6e19f56f44b1127660b74a6ef0482c8ec99d4040655533ad4",
+    "G:\\GitHub\\Strata\\orca-l0\\src\\drm\\recording.inl": "2a495505848c60fdb78f38a59ab6924c1d8027451de967f5bfeea041d4a5a726",
+    "G:\\GitHub\\Strata\\orca-l0\\tests\\drm_compute_check.cpp": "480f4fb390a4a4337549af966a44021391919850462305ce512fe8377a8e4b03"
+  },
+  "windows_commands": [
+    {
+      "label": "old-compile-runtime",
+      "exit_code": 0
+    },
+    {
+      "label": "old-compile-check",
+      "exit_code": 0
+    },
+    {
+      "label": "old-link-check",
+      "exit_code": 0
+    },
+    {
+      "label": "old-cpu",
+      "exit_code": 0
+    },
+    {
+      "label": "old-raw-timestamps",
+      "exit_code": 0
+    },
+    {
+      "label": "old-link-density",
+      "exit_code": 0
+    },
+    {
+      "label": "new-compile-runtime",
+      "exit_code": 0
+    },
+    {
+      "label": "new-compile-check",
+      "exit_code": 0
+    },
+    {
+      "label": "new-link-check",
+      "exit_code": 0
+    },
+    {
+      "label": "new-cpu",
+      "exit_code": 0
+    },
+    {
+      "label": "new-raw-timestamps",
+      "exit_code": 0
+    },
+    {
+      "label": "new-link-density",
+      "exit_code": 0
+    },
+    {
+      "label": "0-old",
+      "exit_code": 0
+    },
+    {
+      "label": "1-new",
+      "exit_code": 0
+    },
+    {
+      "label": "2-old",
+      "exit_code": 0
+    },
+    {
+      "label": "3-l0",
+      "exit_code": 0
+    },
+    {
+      "label": "4-new",
+      "exit_code": 0
+    },
+    {
+      "label": "5-old",
+      "exit_code": 0
+    },
+    {
+      "label": "6-new",
+      "exit_code": 0
+    }
+  ],
+  "linux": {
+    "complete": true,
+    "linux_gpu_executed": false,
+    "commands": [
+      {
+        "label": "compile",
+        "args": [
+          "wsl.exe",
+          "-d",
+          "OrcaL0-Check-20261031",
+          "--",
+          "/usr/bin/g++",
+          "-std=c++17",
+          "-O2",
+          "-pthread",
+          "-I/mnt/g/GitHub/Strata/build-orca-timestamp-visibility-20261106/new/include",
+          "-I/mnt/g/GitHub/Strata/build-orca-timestamp-visibility-20261106/new/third_party",
+          "-I/usr/include/libdrm",
+          "/mnt/g/GitHub/Strata/build-orca-timestamp-visibility-20261106/new/src/drm/runtime.cpp",
+          "/mnt/g/GitHub/Strata/build-orca-timestamp-visibility-20261106/new/tests/drm_compute_check.cpp",
+          "-o",
+          "/mnt/g/GitHub/Strata/build-orca-timestamp-visibility-20261106/linux-r1/check"
+        ],
+        "exit_code": 0
+      },
+      {
+        "label": "encoder-cpu",
+        "args": [
+          "wsl.exe",
+          "-d",
+          "OrcaL0-Check-20261031",
+          "--",
+          "/mnt/g/GitHub/Strata/build-orca-timestamp-visibility-20261106/linux-r1/check",
+          "--self-check"
+        ],
+        "exit_code": 0
+      },
+      {
+        "label": "dependencies",
+        "args": [
+          "wsl.exe",
+          "-d",
+          "OrcaL0-Check-20261031",
+          "--",
+          "/usr/bin/ldd",
+          "/mnt/g/GitHub/Strata/build-orca-timestamp-visibility-20261106/linux-r1/check"
+        ],
+        "exit_code": 0
+      }
+    ],
+    "sha256": {
+      "G:\\GitHub\\Strata\\build-orca-timestamp-visibility-20261106\\linux.py": "e2ae1ae82d978538abb6f11ca177b7ee8fca0f1582a38408c9b718ba24da6e0f",
+      "G:\\GitHub\\Strata\\build-orca-timestamp-visibility-20261106\\linux-r1\\check": "66c9a9a31c4b6146e4a0bf50aa25fecb7210ea970f3d9e1ea9509c095a841188",
+      "G:\\GitHub\\Strata\\build-orca-timestamp-visibility-20261106\\linux-r1\\compile.stderr": "b61404cfcdfdee6fd99b4e7539d15ddc3b05ea9bfd29d2737c2837e206279a6b",
+      "G:\\GitHub\\Strata\\build-orca-timestamp-visibility-20261106\\linux-r1\\compile.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "G:\\GitHub\\Strata\\build-orca-timestamp-visibility-20261106\\linux-r1\\dependencies.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "G:\\GitHub\\Strata\\build-orca-timestamp-visibility-20261106\\linux-r1\\dependencies.stdout": "4dd18d608c37613bef90d70ce916678cef860a3cceda27b3a2d5ef0468d4d7a0",
+      "G:\\GitHub\\Strata\\build-orca-timestamp-visibility-20261106\\linux-r1\\encoder-cpu.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "G:\\GitHub\\Strata\\build-orca-timestamp-visibility-20261106\\linux-r1\\encoder-cpu.stdout": "775637d4d21b304fa4d365c3b87b3e49da458e236196ebadfc94d0074f78fa52"
+    }
+  },
+  "references": [
+    [
+      "1",
+      "1",
+      "0",
+      "322541179a2fcc29",
+      "10500",
+      "133152",
+      "4.62364608822e-07"
+    ],
+    [
+      "1",
+      "1",
+      "1",
+      "d95eae4f8d4074c3",
+      "10500",
+      "133152",
+      "2.93675912921e-07"
+    ],
+    [
+      "1",
+      "48",
+      "0",
+      "d09a71247056bd4c",
+      "504000",
+      "6391296",
+      "5.16000942419e-07"
+    ],
+    [
+      "1",
+      "48",
+      "1",
+      "24e8d021db267a3b",
+      "504000",
+      "6391296",
+      "4.79677898291e-07"
+    ],
+    [
+      "4",
+      "1",
+      "0",
+      "4c23ab5a373c5b60",
+      "41232",
+      "409728",
+      "3.51235715179e-07"
+    ],
+    [
+      "4",
+      "1",
+      "1",
+      "d18d6fa0ac962ea9",
+      "41232",
+      "409728",
+      "3.52815606064e-07"
+    ],
+    [
+      "4",
+      "48",
+      "0",
+      "0969edf9c4833590",
+      "1979136",
+      "19666944",
+      "5.42432437634e-07"
+    ],
+    [
+      "4",
+      "48",
+      "1",
+      "b609d0bf41e4cc73",
+      "1979136",
+      "19666944",
+      "4.80362718935e-07"
+    ],
+    [
+      "8",
+      "1",
+      "0",
+      "9ea243043691a054",
+      "82208",
+      "778496",
+      "4.72674567487e-07"
+    ],
+    [
+      "8",
+      "1",
+      "1",
+      "8e0712a6dd32982d",
+      "82208",
+      "778496",
+      "4.13392148069e-07"
+    ],
+    [
+      "8",
+      "48",
+      "0",
+      "c3ff94e1a39cf19b",
+      "3945984",
+      "37367808",
+      "5.43121828844e-07"
+    ],
+    [
+      "8",
+      "48",
+      "1",
+      "9574401f256e7e20",
+      "3945984",
+      "37367808",
+      "5.1139332724e-07"
+    ]
+  ],
+  "runs": [
+    {
+      "label": "0-old",
+      "mode": "old",
+      "config": {
+        "exe": "G:\\GitHub\\Strata\\build-orca-timestamp-visibility-20261106\\run-r1\\old.exe",
+        "args": [
+          "G:\\GitHub\\Strata\\build-orca-hc-sg16-grf-20261106\\bake-r1\\images128"
+        ],
+        "cwd": "G:\\GitHub\\Strata",
+        "tokenizer": "G:\\GitHub\\Strata-data\\packs\\iq2_xs\\tokenizer",
+        "backend": "orca",
+        "model_name": "qwen3.8-flash-next-iq2_xs-u4n16-orca-direct-m16-9402",
+        "host": "127.0.0.1",
+        "port": 8080,
+        "lib_dirs": [
+          "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin",
+          "C:\\Program Files (x86)\\Intel\\oneAPI\\mkl\\2025.3\\bin"
+        ],
+        "env": {
+          "ZES_ENABLE_SYSMAN": "1",
+          "STRATA_MIRROR_MIB": "49152",
+          "STRATA_VERIFY_DEVICE_PLAN": "1",
+          "STRATA_VERIFY_NO_HOST": "1",
+          "STRATA_STAGER_THREADS": "12",
+          "STRATA_VERIFY_ADAPT": "1",
+          "STRATA_ADAPT_COST_WEIGHTED": "1",
+          "STRATA_PREFILL_FIRST": "0",
+          "STRATA_GDN_SG16": "1",
+          "STRATA_IQ4_XS_SG16": "2",
+          "STRATA_VERIFY_FUSED_ACT": "1",
+          "STRATA_VERIFY_DESC_CACHE": "1",
+          "STRATA_SERVE_QUIET": "1",
+          "STRATA_GU_LANES": "16",
+          "STRATA_DOWN_LANES": "4",
+          "STRATA_GU_IQ2S_SG16": "1",
+          "STRATA_GU_IQ2S_SINGLE_GROUP": "1",
+          "STRATA_GDN_Q8_TAIL": "1",
+          "STRATA_QSA_Q8_TAIL": "1",
+          "STRATA_PREFILL_NATIVE_XMX": "1",
+          "STRATA_PREFILL_XMX_EXPERT_CHAIN": "1",
+          "STRATA_PREFILL_XMX_EXPERT_BATCH": "1",
+          "STRATA_PREFILL_XMX_HC_INJECT": "1",
+          "STRATA_VALUE_PACKED_BITS": "4",
+          "STRATA_VALUE_PACKED_RESIDUAL": "0",
+          "STRATA_NO_BATCH_KV_STEP": "1",
+          "STRATA_QSA_FUSED_KV_STORE": "0",
+          "STRATA_PROMPT_ATTN_XMX": "0",
+          "STRATA_KV_RING_OFF": "1",
+          "STRATA_PREFILL_CACHE_TAIL64": "1",
+          "STRATA_ORCA_L0": "1",
+          "STRATA_ORCA_IMAGES": "G:\\GitHub\\Strata\\build-orca-hc-sg16-grf-20261106\\bake-r1\\images128",
+          "STRATA_ORCA_READY_OPS": "1",
+          "STRATA_PREFILL_FP16_PAIR": "1",
+          "STRATA_MTP_CUM_MIN_P": "0",
+          "STRATA_MTP_LAST_MIN_P": "0.5",
+          "STRATA_WARM_GRAPHS": "1",
+          "STRATA_ORCA_DG2_MEMORY": "G:\\GitHub\\Strata\\engine\\u4n16-orca-direct-m16\\memory.zebin",
+          "STRATA_ORCA_DG2_ISA_MEMORY": "device",
+          "STRATA_ORCA_DG2_THREAD_MEMORY": "device",
+          "STRATA_MTP_COST_WINDOW": "0",
+          "ORCA_DG2_BCS_COPY": "1",
+          "STRATA_PREFILL_U4_EXPERT_DIR": "G:\\GitHub\\Strata\\engine\\u4n16-expanded-assets",
+          "STRATA_U4_MIN_ROWS": "16",
+          "STRATA_U4_TILE_N8": "0",
+          "STRATA_U4_GROUP_PRIORITY": "id",
+          "STRATA_PREFILL_U2_DOWN": "0",
+          "STRATA_PREFILL_U4_EXPERTS": "1",
+          "STRATA_ORCA_XMX_WIDE": "1",
+          "STRATA_ORCA_DG2_TIMESTAMP_HZ": "19200000",
+          "STRATA_ORCA_DG2_TIMESTAMP_BITS": "36"
+        },
+        "log": "G:\\GitHub\\Strata\\strata-iq2_xs-u4n16-orca-direct-m16.log"
+      },
+      "outputs": [
+        [
+          "1",
+          "1",
+          "0",
+          "322541179a2fcc29",
+          "10500",
+          "133152",
+          "4.62364608822e-07"
+        ],
+        [
+          "1",
+          "1",
+          "1",
+          "d95eae4f8d4074c3",
+          "10500",
+          "133152",
+          "2.93675912921e-07"
+        ],
+        [
+          "1",
+          "48",
+          "0",
+          "d09a71247056bd4c",
+          "504000",
+          "6391296",
+          "5.16000942419e-07"
+        ],
+        [
+          "1",
+          "48",
+          "1",
+          "24e8d021db267a3b",
+          "504000",
+          "6391296",
+          "4.79677898291e-07"
+        ],
+        [
+          "4",
+          "1",
+          "0",
+          "4c23ab5a373c5b60",
+          "41232",
+          "409728",
+          "3.51235715179e-07"
+        ],
+        [
+          "4",
+          "1",
+          "1",
+          "d18d6fa0ac962ea9",
+          "41232",
+          "409728",
+          "3.52815606064e-07"
+        ],
+        [
+          "4",
+          "48",
+          "0",
+          "0969edf9c4833590",
+          "1979136",
+          "19666944",
+          "5.42432437634e-07"
+        ],
+        [
+          "4",
+          "48",
+          "1",
+          "b609d0bf41e4cc73",
+          "1979136",
+          "19666944",
+          "4.80362718935e-07"
+        ],
+        [
+          "8",
+          "1",
+          "0",
+          "9ea243043691a054",
+          "82208",
+          "778496",
+          "4.72674567487e-07"
+        ],
+        [
+          "8",
+          "1",
+          "1",
+          "8e0712a6dd32982d",
+          "82208",
+          "778496",
+          "4.13392148069e-07"
+        ],
+        [
+          "8",
+          "48",
+          "0",
+          "c3ff94e1a39cf19b",
+          "3945984",
+          "37367808",
+          "5.43121828844e-07"
+        ],
+        [
+          "8",
+          "48",
+          "1",
+          "9574401f256e7e20",
+          "3945984",
+          "37367808",
+          "5.1139332724e-07"
+        ]
+      ],
+      "summary": {
+        "T1_B1_P0_D0_R192_gpu_us_per_norm": 3.771430121527778,
+        "T1_B1_P0_D0_R192_host_us_per_norm": 4.518229166666667,
+        "T1_B1_P0_D0_R768_gpu_us_per_norm": 3.723890516493056,
+        "T1_B1_P0_D0_R768_host_us_per_norm": 3.947265625,
+        "T1_B1_P0_D8_R192_gpu_us_per_norm": 4.3310546875,
+        "T1_B1_P0_D8_R192_host_us_per_norm": 5.3125,
+        "T1_B1_P0_D8_R768_gpu_us_per_norm": 4.313422309027778,
+        "T1_B1_P0_D8_R768_host_us_per_norm": 4.545963541666667,
+        "T1_B1_P0_D1_R192_gpu_us_per_norm": 8.844672309027779,
+        "T1_B1_P0_D1_R192_host_us_per_norm": 9.895312500000001,
+        "T1_B1_P0_D1_R768_gpu_us_per_norm": 8.7701416015625,
+        "T1_B1_P0_D1_R768_host_us_per_norm": 9.029166666666667,
+        "T1_B1_P1_D0_R192_gpu_us_per_norm": 3.7727864583333335,
+        "T1_B1_P1_D0_R192_host_us_per_norm": 4.684895833333333,
+        "T1_B1_P1_D0_R768_gpu_us_per_norm": 3.81591796875,
+        "T1_B1_P1_D0_R768_host_us_per_norm": 4.008072916666666,
+        "T1_B1_P1_D8_R192_gpu_us_per_norm": 4.947102864583333,
+        "T1_B1_P1_D8_R192_host_us_per_norm": 5.623958333333333,
+        "T1_B1_P1_D8_R768_gpu_us_per_norm": 4.462348090277778,
+        "T1_B1_P1_D8_R768_host_us_per_norm": 4.672916666666667,
+        "T1_B1_P1_D1_R192_gpu_us_per_norm": 9.288465711805555,
+        "T1_B1_P1_D1_R192_host_us_per_norm": 10.348437500000001,
+        "T1_B1_P1_D1_R768_gpu_us_per_norm": 8.893025716145834,
+        "T1_B1_P1_D1_R768_host_us_per_norm": 9.148697916666666,
+        "T1_B48_P0_D0_R192_gpu_us_per_norm": 4.761284722222222,
+        "T1_B48_P0_D0_R192_host_us_per_norm": 5.827604166666667,
+        "T1_B48_P0_D0_R768_gpu_us_per_norm": 4.225396050347222,
+        "T1_B48_P0_D0_R768_host_us_per_norm": 4.4945312500000005,
+        "T1_B48_P0_D8_R192_gpu_us_per_norm": 7.87353515625,
+        "T1_B48_P0_D8_R192_host_us_per_norm": 9.197916666666666,
+        "T1_B48_P0_D8_R768_gpu_us_per_norm": 7.873874240451389,
+        "T1_B48_P0_D8_R768_host_us_per_norm": 8.085286458333334,
+        "T1_B48_P0_D1_R192_gpu_us_per_norm": 8.682996961805555,
+        "T1_B48_P0_D1_R192_host_us_per_norm": 9.769270833333334,
+        "T1_B48_P0_D1_R768_gpu_us_per_norm": 8.663736979166666,
+        "T1_B48_P0_D1_R768_host_us_per_norm": 8.966666666666667,
+        "T1_B48_P1_D0_R192_gpu_us_per_norm": 4.727105034722222,
+        "T1_B48_P1_D0_R192_host_us_per_norm": 5.827604166666667,
+        "T1_B48_P1_D0_R768_gpu_us_per_norm": 4.362996419270833,
+        "T1_B48_P1_D0_R768_host_us_per_norm": 4.581380208333333,
+        "T1_B48_P1_D8_R192_gpu_us_per_norm": 7.162814670138889,
+        "T1_B48_P1_D8_R192_host_us_per_norm": 8.123958333333333,
+        "T1_B48_P1_D8_R768_gpu_us_per_norm": 7.442084418402779,
+        "T1_B48_P1_D8_R768_host_us_per_norm": 7.732291666666666,
+        "T1_B48_P1_D1_R192_gpu_us_per_norm": 8.477105034722223,
+        "T1_B48_P1_D1_R192_host_us_per_norm": 9.567187500000001,
+        "T1_B48_P1_D1_R768_gpu_us_per_norm": 9.30636935763889,
+        "T1_B48_P1_D1_R768_host_us_per_norm": 9.469531250000001,
+        "T4_B1_P0_D0_R192_gpu_us_per_norm": 4.015299479166667,
+        "T4_B1_P0_D0_R192_host_us_per_norm": 4.9593750000000005,
+        "T4_B1_P0_D0_R768_gpu_us_per_norm": 3.980984157986111,
+        "T4_B1_P0_D0_R768_host_us_per_norm": 4.261979166666666,
+        "T4_B1_P0_D8_R192_gpu_us_per_norm": 4.560818142361112,
+        "T4_B1_P0_D8_R192_host_us_per_norm": 5.538541666666667,
+        "T4_B1_P0_D8_R768_gpu_us_per_norm": 4.643486870659722,
+        "T4_B1_P0_D8_R768_host_us_per_norm": 4.839973958333333,
+        "T4_B1_P0_D1_R192_gpu_us_per_norm": 8.944498697916666,
+        "T4_B1_P0_D1_R192_host_us_per_norm": 9.8671875,
+        "T4_B1_P0_D1_R768_gpu_us_per_norm": 9.211832682291666,
+        "T4_B1_P0_D1_R768_host_us_per_norm": 9.421614583333334,
+        "T4_B1_P1_D0_R192_gpu_us_per_norm": 3.932020399305556,
+        "T4_B1_P1_D0_R192_host_us_per_norm": 4.843229166666666,
+        "T4_B1_P1_D0_R768_gpu_us_per_norm": 3.8800048828125,
+        "T4_B1_P1_D0_R768_host_us_per_norm": 4.116015625,
+        "T4_B1_P1_D8_R192_gpu_us_per_norm": 4.525010850694445,
+        "T4_B1_P1_D8_R192_host_us_per_norm": 5.51875,
+        "T4_B1_P1_D8_R768_gpu_us_per_norm": 4.561699761284722,
+        "T4_B1_P1_D8_R768_host_us_per_norm": 4.865104166666667,
+        "T4_B1_P1_D1_R192_gpu_us_per_norm": 8.680013020833334,
+        "T4_B1_P1_D1_R192_host_us_per_norm": 9.721874999999999,
+        "T4_B1_P1_D1_R768_gpu_us_per_norm": 8.827379014756945,
+        "T4_B1_P1_D1_R768_host_us_per_norm": 9.088932291666667,
+        "T4_B48_P0_D0_R192_gpu_us_per_norm": 6.9224717881944455,
+        "T4_B48_P0_D0_R192_host_us_per_norm": 8.015625,
+        "T4_B48_P0_D0_R768_gpu_us_per_norm": 6.846042209201389,
+        "T4_B48_P0_D0_R768_host_us_per_norm": 7.1468750000000005,
+        "T4_B48_P0_D8_R192_gpu_us_per_norm": 7.5048828125,
+        "T4_B48_P0_D8_R192_host_us_per_norm": 8.6421875,
+        "T4_B48_P0_D8_R768_gpu_us_per_norm": 7.677815755208333,
+        "T4_B48_P0_D8_R768_host_us_per_norm": 7.960416666666667,
+        "T4_B48_P0_D1_R192_gpu_us_per_norm": 8.729926215277779,
+        "T4_B48_P0_D1_R192_host_us_per_norm": 9.635937499999999,
+        "T4_B48_P0_D1_R768_gpu_us_per_norm": 9.116143120659723,
+        "T4_B48_P0_D1_R768_host_us_per_norm": 9.335546875,
+        "T4_B48_P1_D0_R192_gpu_us_per_norm": 6.869845920138889,
+        "T4_B48_P1_D0_R192_host_us_per_norm": 7.9734375,
+        "T4_B48_P1_D0_R768_gpu_us_per_norm": 7.210828993055556,
+        "T4_B48_P1_D0_R768_host_us_per_norm": 7.501953125,
+        "T4_B48_P1_D8_R192_gpu_us_per_norm": 7.630208333333333,
+        "T4_B48_P1_D8_R192_host_us_per_norm": 8.683333333333334,
+        "T4_B48_P1_D8_R768_gpu_us_per_norm": 7.545369466145833,
+        "T4_B48_P1_D8_R768_host_us_per_norm": 7.907161458333333,
+        "T4_B48_P1_D1_R192_gpu_us_per_norm": 8.949652777777779,
+        "T4_B48_P1_D1_R192_host_us_per_norm": 10.0875,
+        "T4_B48_P1_D1_R768_gpu_us_per_norm": 8.951348198784723,
+        "T4_B48_P1_D1_R768_host_us_per_norm": 9.205208333333333,
+        "T8_B1_P0_D0_R192_gpu_us_per_norm": 4.120822482638889,
+        "T8_B1_P0_D0_R192_host_us_per_norm": 5.2625,
+        "T8_B1_P0_D0_R768_gpu_us_per_norm": 4.087795681423612,
+        "T8_B1_P0_D0_R768_host_us_per_norm": 4.415364583333333,
+        "T8_B1_P0_D8_R192_gpu_us_per_norm": 4.824761284722222,
+        "T8_B1_P0_D8_R192_host_us_per_norm": 5.976041666666667,
+        "T8_B1_P0_D8_R768_gpu_us_per_norm": 4.702487521701389,
+        "T8_B1_P0_D8_R768_host_us_per_norm": 4.915104166666667,
+        "T8_B1_P0_D1_R192_gpu_us_per_norm": 9.176703559027779,
+        "T8_B1_P0_D1_R192_host_us_per_norm": 10.186979166666667,
+        "T8_B1_P0_D1_R768_gpu_us_per_norm": 9.277547200520834,
+        "T8_B1_P0_D1_R768_host_us_per_norm": 9.553385416666666,
+        "T8_B1_P1_D0_R192_gpu_us_per_norm": 4.612087673611112,
+        "T8_B1_P1_D0_R192_host_us_per_norm": 5.605208333333334,
+        "T8_B1_P1_D0_R768_gpu_us_per_norm": 4.192572699652778,
+        "T8_B1_P1_D0_R768_host_us_per_norm": 4.4144531250000005,
+        "T8_B1_P1_D8_R192_gpu_us_per_norm": 4.736870659722222,
+        "T8_B1_P1_D8_R192_host_us_per_norm": 5.944270833333333,
+        "T8_B1_P1_D8_R768_gpu_us_per_norm": 4.805094401041667,
+        "T8_B1_P1_D8_R768_host_us_per_norm": 5.064713541666666,
+        "T8_B1_P1_D1_R192_gpu_us_per_norm": 9.14794921875,
+        "T8_B1_P1_D1_R192_host_us_per_norm": 10.083333333333334,
+        "T8_B1_P1_D1_R768_gpu_us_per_norm": 9.247233072916666,
+        "T8_B1_P1_D1_R768_host_us_per_norm": 9.508593750000001,
+        "T8_B48_P0_D0_R192_gpu_us_per_norm": 6.819390190972222,
+        "T8_B48_P0_D0_R192_host_us_per_norm": 7.828645833333333,
+        "T8_B48_P0_D0_R768_gpu_us_per_norm": 6.860555013020833,
+        "T8_B48_P0_D0_R768_host_us_per_norm": 7.12890625,
+        "T8_B48_P0_D8_R192_gpu_us_per_norm": 8.265516493055555,
+        "T8_B48_P0_D8_R192_host_us_per_norm": 9.547916666666667,
+        "T8_B48_P0_D8_R768_gpu_us_per_norm": 7.949150933159722,
+        "T8_B48_P0_D8_R768_host_us_per_norm": 8.284505208333334,
+        "T8_B48_P0_D1_R192_gpu_us_per_norm": 11.028917100694445,
+        "T8_B48_P0_D1_R192_host_us_per_norm": 12.584895833333334,
+        "T8_B48_P0_D1_R768_gpu_us_per_norm": 9.408976236979166,
+        "T8_B48_P0_D1_R768_host_us_per_norm": 9.739453124999999,
+        "T8_B48_P1_D0_R192_gpu_us_per_norm": 6.793348524305556,
+        "T8_B48_P1_D0_R192_host_us_per_norm": 8.041145833333333,
+        "T8_B48_P1_D0_R768_gpu_us_per_norm": 7.185804578993056,
+        "T8_B48_P1_D0_R768_host_us_per_norm": 7.386458333333334,
+        "T8_B48_P1_D8_R192_gpu_us_per_norm": 7.848036024305556,
+        "T8_B48_P1_D8_R192_host_us_per_norm": 8.770312500000001,
+        "T8_B48_P1_D8_R768_gpu_us_per_norm": 8.023952907986112,
+        "T8_B48_P1_D8_R768_host_us_per_norm": 8.346744791666667,
+        "T8_B48_P1_D1_R192_gpu_us_per_norm": 9.634602864583334,
+        "T8_B48_P1_D1_R192_host_us_per_norm": 10.372395833333334,
+        "T8_B48_P1_D1_R768_gpu_us_per_norm": 9.851345486111112,
+        "T8_B48_P1_D1_R768_host_us_per_norm": 10.043229166666666
+      }
+    },
+    {
+      "label": "1-new",
+      "mode": "new",
+      "config": {
+        "exe": "G:\\GitHub\\Strata\\build-orca-timestamp-visibility-20261106\\run-r1\\new.exe",
+        "args": [
+          "G:\\GitHub\\Strata\\build-orca-hc-sg16-grf-20261106\\bake-r1\\images128"
+        ],
+        "cwd": "G:\\GitHub\\Strata",
+        "tokenizer": "G:\\GitHub\\Strata-data\\packs\\iq2_xs\\tokenizer",
+        "backend": "orca",
+        "model_name": "qwen3.8-flash-next-iq2_xs-u4n16-orca-direct-m16-9402",
+        "host": "127.0.0.1",
+        "port": 8080,
+        "lib_dirs": [
+          "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin",
+          "C:\\Program Files (x86)\\Intel\\oneAPI\\mkl\\2025.3\\bin"
+        ],
+        "env": {
+          "ZES_ENABLE_SYSMAN": "1",
+          "STRATA_MIRROR_MIB": "49152",
+          "STRATA_VERIFY_DEVICE_PLAN": "1",
+          "STRATA_VERIFY_NO_HOST": "1",
+          "STRATA_STAGER_THREADS": "12",
+          "STRATA_VERIFY_ADAPT": "1",
+          "STRATA_ADAPT_COST_WEIGHTED": "1",
+          "STRATA_PREFILL_FIRST": "0",
+          "STRATA_GDN_SG16": "1",
+          "STRATA_IQ4_XS_SG16": "2",
+          "STRATA_VERIFY_FUSED_ACT": "1",
+          "STRATA_VERIFY_DESC_CACHE": "1",
+          "STRATA_SERVE_QUIET": "1",
+          "STRATA_GU_LANES": "16",
+          "STRATA_DOWN_LANES": "4",
+          "STRATA_GU_IQ2S_SG16": "1",
+          "STRATA_GU_IQ2S_SINGLE_GROUP": "1",
+          "STRATA_GDN_Q8_TAIL": "1",
+          "STRATA_QSA_Q8_TAIL": "1",
+          "STRATA_PREFILL_NATIVE_XMX": "1",
+          "STRATA_PREFILL_XMX_EXPERT_CHAIN": "1",
+          "STRATA_PREFILL_XMX_EXPERT_BATCH": "1",
+          "STRATA_PREFILL_XMX_HC_INJECT": "1",
+          "STRATA_VALUE_PACKED_BITS": "4",
+          "STRATA_VALUE_PACKED_RESIDUAL": "0",
+          "STRATA_NO_BATCH_KV_STEP": "1",
+          "STRATA_QSA_FUSED_KV_STORE": "0",
+          "STRATA_PROMPT_ATTN_XMX": "0",
+          "STRATA_KV_RING_OFF": "1",
+          "STRATA_PREFILL_CACHE_TAIL64": "1",
+          "STRATA_ORCA_L0": "1",
+          "STRATA_ORCA_IMAGES": "G:\\GitHub\\Strata\\build-orca-hc-sg16-grf-20261106\\bake-r1\\images128",
+          "STRATA_ORCA_READY_OPS": "1",
+          "STRATA_PREFILL_FP16_PAIR": "1",
+          "STRATA_MTP_CUM_MIN_P": "0",
+          "STRATA_MTP_LAST_MIN_P": "0.5",
+          "STRATA_WARM_GRAPHS": "1",
+          "STRATA_ORCA_DG2_MEMORY": "G:\\GitHub\\Strata\\engine\\u4n16-orca-direct-m16\\memory.zebin",
+          "STRATA_ORCA_DG2_ISA_MEMORY": "device",
+          "STRATA_ORCA_DG2_THREAD_MEMORY": "device",
+          "STRATA_MTP_COST_WINDOW": "0",
+          "ORCA_DG2_BCS_COPY": "1",
+          "STRATA_PREFILL_U4_EXPERT_DIR": "G:\\GitHub\\Strata\\engine\\u4n16-expanded-assets",
+          "STRATA_U4_MIN_ROWS": "16",
+          "STRATA_U4_TILE_N8": "0",
+          "STRATA_U4_GROUP_PRIORITY": "id",
+          "STRATA_PREFILL_U2_DOWN": "0",
+          "STRATA_PREFILL_U4_EXPERTS": "1",
+          "STRATA_ORCA_XMX_WIDE": "1",
+          "STRATA_ORCA_DG2_TIMESTAMP_HZ": "19200000",
+          "STRATA_ORCA_DG2_TIMESTAMP_BITS": "36"
+        },
+        "log": "G:\\GitHub\\Strata\\strata-iq2_xs-u4n16-orca-direct-m16.log"
+      },
+      "outputs": [
+        [
+          "1",
+          "1",
+          "0",
+          "322541179a2fcc29",
+          "10500",
+          "133152",
+          "4.62364608822e-07"
+        ],
+        [
+          "1",
+          "1",
+          "1",
+          "d95eae4f8d4074c3",
+          "10500",
+          "133152",
+          "2.93675912921e-07"
+        ],
+        [
+          "1",
+          "48",
+          "0",
+          "d09a71247056bd4c",
+          "504000",
+          "6391296",
+          "5.16000942419e-07"
+        ],
+        [
+          "1",
+          "48",
+          "1",
+          "24e8d021db267a3b",
+          "504000",
+          "6391296",
+          "4.79677898291e-07"
+        ],
+        [
+          "4",
+          "1",
+          "0",
+          "4c23ab5a373c5b60",
+          "41232",
+          "409728",
+          "3.51235715179e-07"
+        ],
+        [
+          "4",
+          "1",
+          "1",
+          "d18d6fa0ac962ea9",
+          "41232",
+          "409728",
+          "3.52815606064e-07"
+        ],
+        [
+          "4",
+          "48",
+          "0",
+          "0969edf9c4833590",
+          "1979136",
+          "19666944",
+          "5.42432437634e-07"
+        ],
+        [
+          "4",
+          "48",
+          "1",
+          "b609d0bf41e4cc73",
+          "1979136",
+          "19666944",
+          "4.80362718935e-07"
+        ],
+        [
+          "8",
+          "1",
+          "0",
+          "9ea243043691a054",
+          "82208",
+          "778496",
+          "4.72674567487e-07"
+        ],
+        [
+          "8",
+          "1",
+          "1",
+          "8e0712a6dd32982d",
+          "82208",
+          "778496",
+          "4.13392148069e-07"
+        ],
+        [
+          "8",
+          "48",
+          "0",
+          "c3ff94e1a39cf19b",
+          "3945984",
+          "37367808",
+          "5.43121828844e-07"
+        ],
+        [
+          "8",
+          "48",
+          "1",
+          "9574401f256e7e20",
+          "3945984",
+          "37367808",
+          "5.1139332724e-07"
+        ]
+      ],
+      "summary": {
+        "T1_B1_P0_D0_R192_gpu_us_per_norm": 3.771430121527778,
+        "T1_B1_P0_D0_R192_host_us_per_norm": 4.502083333333333,
+        "T1_B1_P0_D0_R768_gpu_us_per_norm": 3.794013129340278,
+        "T1_B1_P0_D0_R768_host_us_per_norm": 4.062760416666666,
+        "T1_B1_P0_D8_R192_gpu_us_per_norm": 3.8628472222222228,
+        "T1_B1_P0_D8_R192_host_us_per_norm": 4.999479166666666,
+        "T1_B1_P0_D8_R768_gpu_us_per_norm": 3.8108995225694446,
+        "T1_B1_P0_D8_R768_host_us_per_norm": 4.009895833333333,
+        "T1_B1_P0_D1_R192_gpu_us_per_norm": 4.488389756944445,
+        "T1_B1_P0_D1_R192_host_us_per_norm": 5.541666666666667,
+        "T1_B1_P0_D1_R768_gpu_us_per_norm": 4.531317816840278,
+        "T1_B1_P0_D1_R768_host_us_per_norm": 4.767447916666667,
+        "T1_B1_P1_D0_R192_gpu_us_per_norm": 3.7741427951388893,
+        "T1_B1_P1_D0_R192_host_us_per_norm": 4.6671875,
+        "T1_B1_P1_D0_R768_gpu_us_per_norm": 3.725111219618056,
+        "T1_B1_P1_D0_R768_host_us_per_norm": 4.004166666666666,
+        "T1_B1_P1_D8_R192_gpu_us_per_norm": 4.055989583333333,
+        "T1_B1_P1_D8_R192_host_us_per_norm": 4.8390625,
+        "T1_B1_P1_D8_R768_gpu_us_per_norm": 3.812934027777778,
+        "T1_B1_P1_D8_R768_host_us_per_norm": 4.053776041666667,
+        "T1_B1_P1_D1_R192_gpu_us_per_norm": 4.487575954861112,
+        "T1_B1_P1_D1_R192_host_us_per_norm": 5.5125,
+        "T1_B1_P1_D1_R768_gpu_us_per_norm": 4.429524739583333,
+        "T1_B1_P1_D1_R768_host_us_per_norm": 4.649348958333333,
+        "T1_B48_P0_D0_R192_gpu_us_per_norm": 4.736056857638889,
+        "T1_B48_P0_D0_R192_host_us_per_norm": 5.694270833333333,
+        "T1_B48_P0_D0_R768_gpu_us_per_norm": 4.131740993923612,
+        "T1_B48_P0_D0_R768_host_us_per_norm": 4.427734375,
+        "T1_B48_P0_D8_R192_gpu_us_per_norm": 4.815809461805556,
+        "T1_B48_P0_D8_R192_host_us_per_norm": 5.974479166666666,
+        "T1_B48_P0_D8_R768_gpu_us_per_norm": 4.365030924479167,
+        "T1_B48_P0_D8_R768_host_us_per_norm": 4.771614583333333,
+        "T1_B48_P0_D1_R192_gpu_us_per_norm": 5.617404513888889,
+        "T1_B48_P0_D1_R192_host_us_per_norm": 6.668229166666666,
+        "T1_B48_P0_D1_R768_gpu_us_per_norm": 5.154486762152778,
+        "T1_B48_P0_D1_R768_host_us_per_norm": 5.329296875,
+        "T1_B48_P1_D0_R192_gpu_us_per_norm": 4.76318359375,
+        "T1_B48_P1_D0_R192_host_us_per_norm": 5.867708333333333,
+        "T1_B48_P1_D0_R768_gpu_us_per_norm": 4.132893880208333,
+        "T1_B48_P1_D0_R768_host_us_per_norm": 4.4136718749999995,
+        "T1_B48_P1_D8_R192_gpu_us_per_norm": 4.863552517361112,
+        "T1_B48_P1_D8_R192_host_us_per_norm": 5.949479166666666,
+        "T1_B48_P1_D8_R768_gpu_us_per_norm": 4.216715494791667,
+        "T1_B48_P1_D8_R768_host_us_per_norm": 4.505859375,
+        "T1_B48_P1_D1_R192_gpu_us_per_norm": 5.556098090277779,
+        "T1_B48_P1_D1_R192_host_us_per_norm": 6.730729166666666,
+        "T1_B48_P1_D1_R768_gpu_us_per_norm": 5.688747829861112,
+        "T1_B48_P1_D1_R768_host_us_per_norm": 5.926302083333333,
+        "T4_B1_P0_D0_R192_gpu_us_per_norm": 3.922254774305556,
+        "T4_B1_P0_D0_R192_host_us_per_norm": 4.8046875,
+        "T4_B1_P0_D0_R768_gpu_us_per_norm": 3.9446343315972228,
+        "T4_B1_P0_D0_R768_host_us_per_norm": 4.0992187499999995,
+        "T4_B1_P0_D8_R192_gpu_us_per_norm": 4.04052734375,
+        "T4_B1_P0_D8_R192_host_us_per_norm": 4.931770833333333,
+        "T4_B1_P0_D8_R768_gpu_us_per_norm": 4.076605902777778,
+        "T4_B1_P0_D8_R768_host_us_per_norm": 4.277994791666667,
+        "T4_B1_P0_D1_R192_gpu_us_per_norm": 4.713812934027778,
+        "T4_B1_P0_D1_R192_host_us_per_norm": 5.530208333333333,
+        "T4_B1_P0_D1_R768_gpu_us_per_norm": 4.747721354166667,
+        "T4_B1_P0_D1_R768_host_us_per_norm": 4.938411458333333,
+        "T4_B1_P1_D0_R192_gpu_us_per_norm": 4.402398003472222,
+        "T4_B1_P1_D0_R192_host_us_per_norm": 5.057291666666667,
+        "T4_B1_P1_D0_R768_gpu_us_per_norm": 4.163886176215278,
+        "T4_B1_P1_D0_R768_host_us_per_norm": 4.445572916666666,
+        "T4_B1_P1_D8_R192_gpu_us_per_norm": 4.018825954861112,
+        "T4_B1_P1_D8_R192_host_us_per_norm": 4.8374999999999995,
+        "T4_B1_P1_D8_R768_gpu_us_per_norm": 4.060126410590278,
+        "T4_B1_P1_D8_R768_host_us_per_norm": 4.265364583333334,
+        "T4_B1_P1_D1_R192_gpu_us_per_norm": 4.643825954861112,
+        "T4_B1_P1_D1_R192_host_us_per_norm": 5.678645833333333,
+        "T4_B1_P1_D1_R768_gpu_us_per_norm": 4.6075439453125,
+        "T4_B1_P1_D1_R768_host_us_per_norm": 4.821484375,
+        "T4_B48_P0_D0_R192_gpu_us_per_norm": 9.535047743055555,
+        "T4_B48_P0_D0_R192_host_us_per_norm": 10.844791666666666,
+        "T4_B48_P0_D0_R768_gpu_us_per_norm": 6.893581814236112,
+        "T4_B48_P0_D0_R768_host_us_per_norm": 7.1773437499999995,
+        "T4_B48_P0_D8_R192_gpu_us_per_norm": 7.009819878472222,
+        "T4_B48_P0_D8_R192_host_us_per_norm": 8.535416666666666,
+        "T4_B48_P0_D8_R768_gpu_us_per_norm": 6.9181993272569455,
+        "T4_B48_P0_D8_R768_host_us_per_norm": 7.177734375,
+        "T4_B48_P0_D1_R192_gpu_us_per_norm": 7.6963975694444455,
+        "T4_B48_P0_D1_R192_host_us_per_norm": 8.952604166666667,
+        "T4_B48_P0_D1_R768_gpu_us_per_norm": 7.671169704861112,
+        "T4_B48_P0_D1_R768_host_us_per_norm": 7.942708333333333,
+        "T4_B48_P1_D0_R192_gpu_us_per_norm": 6.812065972222222,
+        "T4_B48_P1_D0_R192_host_us_per_norm": 8.3359375,
+        "T4_B48_P1_D0_R768_gpu_us_per_norm": 6.711086697048612,
+        "T4_B48_P1_D0_R768_host_us_per_norm": 7.03515625,
+        "T4_B48_P1_D8_R192_gpu_us_per_norm": 6.824273003472222,
+        "T4_B48_P1_D8_R192_host_us_per_norm": 8.086458333333333,
+        "T4_B48_P1_D8_R768_gpu_us_per_norm": 6.828748914930556,
+        "T4_B48_P1_D8_R768_host_us_per_norm": 7.172135416666666,
+        "T4_B48_P1_D1_R192_gpu_us_per_norm": 7.466362847222222,
+        "T4_B48_P1_D1_R192_host_us_per_norm": 8.736979166666666,
+        "T4_B48_P1_D1_R768_gpu_us_per_norm": 7.344699435763889,
+        "T4_B48_P1_D1_R768_host_us_per_norm": 7.717578125,
+        "T8_B1_P0_D0_R192_gpu_us_per_norm": 4.116482204861112,
+        "T8_B1_P0_D0_R192_host_us_per_norm": 5.241145833333333,
+        "T8_B1_P0_D0_R768_gpu_us_per_norm": 4.065144856770833,
+        "T8_B1_P0_D0_R768_host_us_per_norm": 4.3125,
+        "T8_B1_P0_D8_R192_gpu_us_per_norm": 4.203287760416667,
+        "T8_B1_P0_D8_R192_host_us_per_norm": 5.127083333333333,
+        "T8_B1_P0_D8_R768_gpu_us_per_norm": 4.154527452256945,
+        "T8_B1_P0_D8_R768_host_us_per_norm": 4.369921875,
+        "T8_B1_P0_D1_R192_gpu_us_per_norm": 4.829915364583333,
+        "T8_B1_P0_D1_R192_host_us_per_norm": 5.868229166666667,
+        "T8_B1_P0_D1_R768_gpu_us_per_norm": 4.771660698784722,
+        "T8_B1_P0_D1_R768_host_us_per_norm": 5.001432291666666,
+        "T8_B1_P1_D0_R192_gpu_us_per_norm": 4.111328125,
+        "T8_B1_P1_D0_R192_host_us_per_norm": 4.973958333333333,
+        "T8_B1_P1_D0_R768_gpu_us_per_norm": 4.234822591145833,
+        "T8_B1_P1_D0_R768_host_us_per_norm": 4.458854166666667,
+        "T8_B1_P1_D8_R192_gpu_us_per_norm": 4.206000434027778,
+        "T8_B1_P1_D8_R192_host_us_per_norm": 5.028645833333333,
+        "T8_B1_P1_D8_R768_gpu_us_per_norm": 4.152628580729167,
+        "T8_B1_P1_D8_R768_host_us_per_norm": 4.384505208333334,
+        "T8_B1_P1_D1_R192_gpu_us_per_norm": 4.830186631944445,
+        "T8_B1_P1_D1_R192_host_us_per_norm": 5.8046875,
+        "T8_B1_P1_D1_R768_gpu_us_per_norm": 4.7711181640625,
+        "T8_B1_P1_D1_R768_host_us_per_norm": 5.006119791666666,
+        "T8_B48_P0_D0_R192_gpu_us_per_norm": 6.8345811631944455,
+        "T8_B48_P0_D0_R192_host_us_per_norm": 8.127083333333333,
+        "T8_B48_P0_D0_R768_gpu_us_per_norm": 7.127821180555556,
+        "T8_B48_P0_D0_R768_host_us_per_norm": 7.4183593750000005,
+        "T8_B48_P0_D8_R192_gpu_us_per_norm": 6.907280815972222,
+        "T8_B48_P0_D8_R192_host_us_per_norm": 8.211458333333333,
+        "T8_B48_P0_D8_R768_gpu_us_per_norm": 6.816202799479167,
+        "T8_B48_P0_D8_R768_host_us_per_norm": 7.200651041666667,
+        "T8_B48_P0_D1_R192_gpu_us_per_norm": 7.552625868055556,
+        "T8_B48_P0_D1_R192_host_us_per_norm": 8.778645833333334,
+        "T8_B48_P0_D1_R768_gpu_us_per_norm": 7.622002495659722,
+        "T8_B48_P0_D1_R768_host_us_per_norm": 7.974609375,
+        "T8_B48_P1_D0_R192_gpu_us_per_norm": 6.8907335069444455,
+        "T8_B48_P1_D0_R192_host_us_per_norm": 8.296875,
+        "T8_B48_P1_D0_R768_gpu_us_per_norm": 7.818603515625,
+        "T8_B48_P1_D0_R768_host_us_per_norm": 8.110416666666667,
+        "T8_B48_P1_D8_R192_gpu_us_per_norm": 6.9957139756944455,
+        "T8_B48_P1_D8_R192_host_us_per_norm": 8.382291666666667,
+        "T8_B48_P1_D8_R768_gpu_us_per_norm": 6.8212890625,
+        "T8_B48_P1_D8_R768_host_us_per_norm": 7.1410156250000005,
+        "T8_B48_P1_D1_R192_gpu_us_per_norm": 8.123101128472223,
+        "T8_B48_P1_D1_R192_host_us_per_norm": 9.527604166666666,
+        "T8_B48_P1_D1_R768_gpu_us_per_norm": 7.475925021701389,
+        "T8_B48_P1_D1_R768_host_us_per_norm": 7.829166666666667
+      }
+    },
+    {
+      "label": "2-old",
+      "mode": "old",
+      "config": {
+        "exe": "G:\\GitHub\\Strata\\build-orca-timestamp-visibility-20261106\\run-r1\\old.exe",
+        "args": [
+          "G:\\GitHub\\Strata\\build-orca-hc-sg16-grf-20261106\\bake-r1\\images128"
+        ],
+        "cwd": "G:\\GitHub\\Strata",
+        "tokenizer": "G:\\GitHub\\Strata-data\\packs\\iq2_xs\\tokenizer",
+        "backend": "orca",
+        "model_name": "qwen3.8-flash-next-iq2_xs-u4n16-orca-direct-m16-9402",
+        "host": "127.0.0.1",
+        "port": 8080,
+        "lib_dirs": [
+          "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin",
+          "C:\\Program Files (x86)\\Intel\\oneAPI\\mkl\\2025.3\\bin"
+        ],
+        "env": {
+          "ZES_ENABLE_SYSMAN": "1",
+          "STRATA_MIRROR_MIB": "49152",
+          "STRATA_VERIFY_DEVICE_PLAN": "1",
+          "STRATA_VERIFY_NO_HOST": "1",
+          "STRATA_STAGER_THREADS": "12",
+          "STRATA_VERIFY_ADAPT": "1",
+          "STRATA_ADAPT_COST_WEIGHTED": "1",
+          "STRATA_PREFILL_FIRST": "0",
+          "STRATA_GDN_SG16": "1",
+          "STRATA_IQ4_XS_SG16": "2",
+          "STRATA_VERIFY_FUSED_ACT": "1",
+          "STRATA_VERIFY_DESC_CACHE": "1",
+          "STRATA_SERVE_QUIET": "1",
+          "STRATA_GU_LANES": "16",
+          "STRATA_DOWN_LANES": "4",
+          "STRATA_GU_IQ2S_SG16": "1",
+          "STRATA_GU_IQ2S_SINGLE_GROUP": "1",
+          "STRATA_GDN_Q8_TAIL": "1",
+          "STRATA_QSA_Q8_TAIL": "1",
+          "STRATA_PREFILL_NATIVE_XMX": "1",
+          "STRATA_PREFILL_XMX_EXPERT_CHAIN": "1",
+          "STRATA_PREFILL_XMX_EXPERT_BATCH": "1",
+          "STRATA_PREFILL_XMX_HC_INJECT": "1",
+          "STRATA_VALUE_PACKED_BITS": "4",
+          "STRATA_VALUE_PACKED_RESIDUAL": "0",
+          "STRATA_NO_BATCH_KV_STEP": "1",
+          "STRATA_QSA_FUSED_KV_STORE": "0",
+          "STRATA_PROMPT_ATTN_XMX": "0",
+          "STRATA_KV_RING_OFF": "1",
+          "STRATA_PREFILL_CACHE_TAIL64": "1",
+          "STRATA_ORCA_L0": "1",
+          "STRATA_ORCA_IMAGES": "G:\\GitHub\\Strata\\build-orca-hc-sg16-grf-20261106\\bake-r1\\images128",
+          "STRATA_ORCA_READY_OPS": "1",
+          "STRATA_PREFILL_FP16_PAIR": "1",
+          "STRATA_MTP_CUM_MIN_P": "0",
+          "STRATA_MTP_LAST_MIN_P": "0.5",
+          "STRATA_WARM_GRAPHS": "1",
+          "STRATA_ORCA_DG2_MEMORY": "G:\\GitHub\\Strata\\engine\\u4n16-orca-direct-m16\\memory.zebin",
+          "STRATA_ORCA_DG2_ISA_MEMORY": "device",
+          "STRATA_ORCA_DG2_THREAD_MEMORY": "device",
+          "STRATA_MTP_COST_WINDOW": "0",
+          "ORCA_DG2_BCS_COPY": "1",
+          "STRATA_PREFILL_U4_EXPERT_DIR": "G:\\GitHub\\Strata\\engine\\u4n16-expanded-assets",
+          "STRATA_U4_MIN_ROWS": "16",
+          "STRATA_U4_TILE_N8": "0",
+          "STRATA_U4_GROUP_PRIORITY": "id",
+          "STRATA_PREFILL_U2_DOWN": "0",
+          "STRATA_PREFILL_U4_EXPERTS": "1",
+          "STRATA_ORCA_XMX_WIDE": "1",
+          "STRATA_ORCA_DG2_TIMESTAMP_HZ": "19200000",
+          "STRATA_ORCA_DG2_TIMESTAMP_BITS": "36"
+        },
+        "log": "G:\\GitHub\\Strata\\strata-iq2_xs-u4n16-orca-direct-m16.log"
+      },
+      "outputs": [
+        [
+          "1",
+          "1",
+          "0",
+          "322541179a2fcc29",
+          "10500",
+          "133152",
+          "4.62364608822e-07"
+        ],
+        [
+          "1",
+          "1",
+          "1",
+          "d95eae4f8d4074c3",
+          "10500",
+          "133152",
+          "2.93675912921e-07"
+        ],
+        [
+          "1",
+          "48",
+          "0",
+          "d09a71247056bd4c",
+          "504000",
+          "6391296",
+          "5.16000942419e-07"
+        ],
+        [
+          "1",
+          "48",
+          "1",
+          "24e8d021db267a3b",
+          "504000",
+          "6391296",
+          "4.79677898291e-07"
+        ],
+        [
+          "4",
+          "1",
+          "0",
+          "4c23ab5a373c5b60",
+          "41232",
+          "409728",
+          "3.51235715179e-07"
+        ],
+        [
+          "4",
+          "1",
+          "1",
+          "d18d6fa0ac962ea9",
+          "41232",
+          "409728",
+          "3.52815606064e-07"
+        ],
+        [
+          "4",
+          "48",
+          "0",
+          "0969edf9c4833590",
+          "1979136",
+          "19666944",
+          "5.42432437634e-07"
+        ],
+        [
+          "4",
+          "48",
+          "1",
+          "b609d0bf41e4cc73",
+          "1979136",
+          "19666944",
+          "4.80362718935e-07"
+        ],
+        [
+          "8",
+          "1",
+          "0",
+          "9ea243043691a054",
+          "82208",
+          "778496",
+          "4.72674567487e-07"
+        ],
+        [
+          "8",
+          "1",
+          "1",
+          "8e0712a6dd32982d",
+          "82208",
+          "778496",
+          "4.13392148069e-07"
+        ],
+        [
+          "8",
+          "48",
+          "0",
+          "c3ff94e1a39cf19b",
+          "3945984",
+          "37367808",
+          "5.43121828844e-07"
+        ],
+        [
+          "8",
+          "48",
+          "1",
+          "9574401f256e7e20",
+          "3945984",
+          "37367808",
+          "5.1139332724e-07"
+        ]
+      ],
+      "summary": {
+        "T1_B1_P0_D0_R192_gpu_us_per_norm": 4.249945746527778,
+        "T1_B1_P0_D0_R192_host_us_per_norm": 5.270833333333333,
+        "T1_B1_P0_D0_R768_gpu_us_per_norm": 3.7261962890625,
+        "T1_B1_P0_D0_R768_host_us_per_norm": 3.9718750000000003,
+        "T1_B1_P0_D8_R192_gpu_us_per_norm": 4.36279296875,
+        "T1_B1_P0_D8_R192_host_us_per_norm": 5.309895833333333,
+        "T1_B1_P0_D8_R768_gpu_us_per_norm": 4.365505642361112,
+        "T1_B1_P0_D8_R768_host_us_per_norm": 4.627473958333334,
+        "T1_B1_P0_D1_R192_gpu_us_per_norm": 8.78879123263889,
+        "T1_B1_P0_D1_R192_host_us_per_norm": 9.711979166666667,
+        "T1_B1_P0_D1_R768_gpu_us_per_norm": 9.581298828125,
+        "T1_B1_P0_D1_R768_host_us_per_norm": 9.792317708333334,
+        "T1_B1_P1_D0_R192_gpu_us_per_norm": 4.285753038194445,
+        "T1_B1_P1_D0_R192_host_us_per_norm": 5.032291666666667,
+        "T1_B1_P1_D0_R768_gpu_us_per_norm": 3.723822699652778,
+        "T1_B1_P1_D0_R768_host_us_per_norm": 3.936458333333333,
+        "T1_B1_P1_D8_R192_gpu_us_per_norm": 4.375271267361112,
+        "T1_B1_P1_D8_R192_host_us_per_norm": 5.195833333333334,
+        "T1_B1_P1_D8_R768_gpu_us_per_norm": 4.476386176215278,
+        "T1_B1_P1_D8_R768_host_us_per_norm": 4.717317708333334,
+        "T1_B1_P1_D1_R192_gpu_us_per_norm": 8.858778211805555,
+        "T1_B1_P1_D1_R192_host_us_per_norm": 9.629687500000001,
+        "T1_B1_P1_D1_R768_gpu_us_per_norm": 8.328179253472223,
+        "T1_B1_P1_D1_R768_host_us_per_norm": 8.558723958333333,
+        "T1_B48_P0_D0_R192_gpu_us_per_norm": 4.737684461805556,
+        "T1_B48_P0_D0_R192_host_us_per_norm": 5.922916666666667,
+        "T1_B48_P0_D0_R768_gpu_us_per_norm": 4.132419162326389,
+        "T1_B48_P0_D0_R768_host_us_per_norm": 4.41484375,
+        "T1_B48_P0_D8_R192_gpu_us_per_norm": 7.6133897569444455,
+        "T1_B48_P0_D8_R192_host_us_per_norm": 8.578125,
+        "T1_B48_P0_D8_R768_gpu_us_per_norm": 7.124837239583333,
+        "T1_B48_P0_D8_R768_host_us_per_norm": 7.414973958333333,
+        "T1_B48_P0_D1_R192_gpu_us_per_norm": 8.555230034722223,
+        "T1_B48_P0_D1_R192_host_us_per_norm": 9.612499999999999,
+        "T1_B48_P0_D1_R768_gpu_us_per_norm": 8.50497775607639,
+        "T1_B48_P0_D1_R768_host_us_per_norm": 8.835286458333334,
+        "T1_B48_P1_D0_R192_gpu_us_per_norm": 4.747450086805556,
+        "T1_B48_P1_D0_R192_host_us_per_norm": 6.105208333333334,
+        "T1_B48_P1_D0_R768_gpu_us_per_norm": 4.131130642361112,
+        "T1_B48_P1_D0_R768_host_us_per_norm": 4.445182291666667,
+        "T1_B48_P1_D8_R192_gpu_us_per_norm": 7.170952690972222,
+        "T1_B48_P1_D8_R192_host_us_per_norm": 8.385416666666666,
+        "T1_B48_P1_D8_R768_gpu_us_per_norm": 7.264607747395833,
+        "T1_B48_P1_D8_R768_host_us_per_norm": 7.6460937499999995,
+        "T1_B48_P1_D1_R192_gpu_us_per_norm": 8.489312065972223,
+        "T1_B48_P1_D1_R192_host_us_per_norm": 9.575000000000001,
+        "T1_B48_P1_D1_R768_gpu_us_per_norm": 8.560451931423612,
+        "T1_B48_P1_D1_R768_host_us_per_norm": 8.834375,
+        "T4_B1_P0_D0_R192_gpu_us_per_norm": 3.9279513888888893,
+        "T4_B1_P0_D0_R192_host_us_per_norm": 4.996354166666666,
+        "T4_B1_P0_D0_R768_gpu_us_per_norm": 3.8780381944444446,
+        "T4_B1_P0_D0_R768_host_us_per_norm": 4.155078125,
+        "T4_B1_P0_D8_R192_gpu_us_per_norm": 4.513617621527778,
+        "T4_B1_P0_D8_R192_host_us_per_norm": 5.263541666666667,
+        "T4_B1_P0_D8_R768_gpu_us_per_norm": 4.460584852430556,
+        "T4_B1_P0_D8_R768_host_us_per_norm": 4.7164062499999995,
+        "T4_B1_P0_D1_R192_gpu_us_per_norm": 8.968641493055555,
+        "T4_B1_P0_D1_R192_host_us_per_norm": 9.818229166666667,
+        "T4_B1_P0_D1_R768_gpu_us_per_norm": 8.687947591145834,
+        "T4_B1_P0_D1_R768_host_us_per_norm": 8.883984374999999,
+        "T4_B1_P1_D0_R192_gpu_us_per_norm": 3.928493923611111,
+        "T4_B1_P1_D0_R192_host_us_per_norm": 5.215104166666666,
+        "T4_B1_P1_D0_R768_gpu_us_per_norm": 3.8777669270833335,
+        "T4_B1_P1_D0_R768_host_us_per_norm": 4.119921875,
+        "T4_B1_P1_D8_R192_gpu_us_per_norm": 4.596896701388889,
+        "T4_B1_P1_D8_R192_host_us_per_norm": 5.353645833333334,
+        "T4_B1_P1_D8_R768_gpu_us_per_norm": 4.490763346354167,
+        "T4_B1_P1_D8_R768_host_us_per_norm": 4.70625,
+        "T4_B1_P1_D1_R192_gpu_us_per_norm": 8.697645399305555,
+        "T4_B1_P1_D1_R192_host_us_per_norm": 9.612499999999999,
+        "T4_B1_P1_D1_R768_gpu_us_per_norm": 8.706190321180555,
+        "T4_B1_P1_D1_R768_host_us_per_norm": 8.958072916666667,
+        "T4_B48_P0_D0_R192_gpu_us_per_norm": 6.754828559027779,
+        "T4_B48_P0_D0_R192_host_us_per_norm": 7.984375,
+        "T4_B48_P0_D0_R768_gpu_us_per_norm": 6.628553602430556,
+        "T4_B48_P0_D0_R768_host_us_per_norm": 6.950130208333333,
+        "T4_B48_P0_D8_R192_gpu_us_per_norm": 7.502712673611112,
+        "T4_B48_P0_D8_R192_host_us_per_norm": 8.765104166666667,
+        "T4_B48_P0_D8_R768_gpu_us_per_norm": 7.790323893229167,
+        "T4_B48_P0_D8_R768_host_us_per_norm": 8.093619791666667,
+        "T4_B48_P0_D1_R192_gpu_us_per_norm": 9.263509114583334,
+        "T4_B48_P0_D1_R192_host_us_per_norm": 10.199479166666666,
+        "T4_B48_P0_D1_R768_gpu_us_per_norm": 8.779839409722223,
+        "T4_B48_P0_D1_R768_host_us_per_norm": 9.094791666666667,
+        "T4_B48_P1_D0_R192_gpu_us_per_norm": 6.743435329861112,
+        "T4_B48_P1_D0_R192_host_us_per_norm": 8.071875,
+        "T4_B48_P1_D0_R768_gpu_us_per_norm": 6.725056966145833,
+        "T4_B48_P1_D0_R768_host_us_per_norm": 7.065755208333333,
+        "T4_B48_P1_D8_R192_gpu_us_per_norm": 8.113335503472223,
+        "T4_B48_P1_D8_R192_host_us_per_norm": 9.245833333333334,
+        "T4_B48_P1_D8_R768_gpu_us_per_norm": 7.472059461805556,
+        "T4_B48_P1_D8_R768_host_us_per_norm": 7.779817708333333,
+        "T4_B48_P1_D1_R192_gpu_us_per_norm": 8.93527560763889,
+        "T4_B48_P1_D1_R192_host_us_per_norm": 10.486979166666666,
+        "T4_B48_P1_D1_R768_gpu_us_per_norm": 8.651936848958334,
+        "T4_B48_P1_D1_R768_host_us_per_norm": 9.013151041666667,
+        "T8_B1_P0_D0_R192_gpu_us_per_norm": 4.213053385416667,
+        "T8_B1_P0_D0_R192_host_us_per_norm": 5.443229166666666,
+        "T8_B1_P0_D0_R768_gpu_us_per_norm": 4.229600694444445,
+        "T8_B1_P0_D0_R768_host_us_per_norm": 4.510286458333334,
+        "T8_B1_P0_D8_R192_gpu_us_per_norm": 4.749348958333333,
+        "T8_B1_P0_D8_R192_host_us_per_norm": 5.797395833333333,
+        "T8_B1_P0_D8_R768_gpu_us_per_norm": 4.686075846354167,
+        "T8_B1_P0_D8_R768_host_us_per_norm": 4.971484375,
+        "T8_B1_P0_D1_R192_gpu_us_per_norm": 9.297960069444445,
+        "T8_B1_P0_D1_R192_host_us_per_norm": 10.028125000000001,
+        "T8_B1_P0_D1_R768_gpu_us_per_norm": 9.040391710069445,
+        "T8_B1_P0_D1_R768_host_us_per_norm": 9.263020833333334,
+        "T8_B1_P1_D0_R192_gpu_us_per_norm": 4.114040798611112,
+        "T8_B1_P1_D0_R192_host_us_per_norm": 4.984895833333334,
+        "T8_B1_P1_D0_R768_gpu_us_per_norm": 4.088880750868056,
+        "T8_B1_P1_D0_R768_host_us_per_norm": 4.305338541666667,
+        "T8_B1_P1_D8_R192_gpu_us_per_norm": 4.959309895833333,
+        "T8_B1_P1_D8_R192_host_us_per_norm": 6.0515625,
+        "T8_B1_P1_D8_R768_gpu_us_per_norm": 4.716864691840278,
+        "T8_B1_P1_D8_R768_host_us_per_norm": 4.980729166666666,
+        "T8_B1_P1_D1_R192_gpu_us_per_norm": 9.184841579861112,
+        "T8_B1_P1_D1_R192_host_us_per_norm": 10.3671875,
+        "T8_B1_P1_D1_R768_gpu_us_per_norm": 9.446275499131945,
+        "T8_B1_P1_D1_R768_host_us_per_norm": 9.661458333333334,
+        "T8_B48_P0_D0_R192_gpu_us_per_norm": 6.82373046875,
+        "T8_B48_P0_D0_R192_host_us_per_norm": 8.147395833333333,
+        "T8_B48_P0_D0_R768_gpu_us_per_norm": 6.726413302951389,
+        "T8_B48_P0_D0_R768_host_us_per_norm": 7.1273437500000005,
+        "T8_B48_P0_D8_R192_gpu_us_per_norm": 7.883843315972222,
+        "T8_B48_P0_D8_R192_host_us_per_norm": 9.25625,
+        "T8_B48_P0_D8_R768_gpu_us_per_norm": 7.882758246527779,
+        "T8_B48_P0_D8_R768_host_us_per_norm": 8.176302083333333,
+        "T8_B48_P0_D1_R192_gpu_us_per_norm": 9.52121310763889,
+        "T8_B48_P0_D1_R192_host_us_per_norm": 10.758333333333333,
+        "T8_B48_P0_D1_R768_gpu_us_per_norm": 9.085286458333334,
+        "T8_B48_P0_D1_R768_host_us_per_norm": 9.445442708333333,
+        "T8_B48_P1_D0_R192_gpu_us_per_norm": 7.24365234375,
+        "T8_B48_P1_D0_R192_host_us_per_norm": 8.25,
+        "T8_B48_P1_D0_R768_gpu_us_per_norm": 6.8011474609375,
+        "T8_B48_P1_D0_R768_host_us_per_norm": 7.081770833333334,
+        "T8_B48_P1_D8_R192_gpu_us_per_norm": 8.228352864583334,
+        "T8_B48_P1_D8_R192_host_us_per_norm": 9.586458333333333,
+        "T8_B48_P1_D8_R768_gpu_us_per_norm": 7.930501302083333,
+        "T8_B48_P1_D8_R768_host_us_per_norm": 8.260416666666666,
+        "T8_B48_P1_D1_R192_gpu_us_per_norm": 9.092068142361112,
+        "T8_B48_P1_D1_R192_host_us_per_norm": 10.114062500000001,
+        "T8_B48_P1_D1_R768_gpu_us_per_norm": 9.173109266493055,
+        "T8_B48_P1_D1_R768_host_us_per_norm": 9.473437500000001
+      }
+    },
+    {
+      "label": "3-l0",
+      "mode": "l0",
+      "config": {
+        "exe": "G:\\GitHub\\Strata\\build-orca-hc-norm-density-20261106\\stage-r1\\l0.exe",
+        "args": [
+          "G:\\GitHub\\Strata\\build-orca-hc-sg16-grf-20261106\\bake-r1\\images128"
+        ],
+        "cwd": "G:\\GitHub\\Strata",
+        "tokenizer": "G:\\GitHub\\Strata-data\\packs\\iq2_xs\\tokenizer",
+        "backend": "orca",
+        "model_name": "qwen3.8-flash-next-iq2_xs",
+        "host": "127.0.0.1",
+        "port": 8080,
+        "lib_dirs": [
+          "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin",
+          "C:\\Program Files (x86)\\Intel\\oneAPI\\mkl\\2025.3\\bin"
+        ],
+        "env": {
+          "ZES_ENABLE_SYSMAN": "1",
+          "STRATA_MIRROR_MIB": "49152",
+          "STRATA_VERIFY_DEVICE_PLAN": "1",
+          "STRATA_VERIFY_NO_HOST": "1",
+          "STRATA_STAGER_THREADS": "12",
+          "STRATA_VERIFY_ADAPT": "1",
+          "STRATA_ADAPT_COST_WEIGHTED": "1",
+          "STRATA_PREFILL_FIRST": "0",
+          "STRATA_GDN_SG16": "1",
+          "STRATA_IQ4_XS_SG16": "2",
+          "STRATA_VERIFY_FUSED_ACT": "1",
+          "STRATA_VERIFY_DESC_CACHE": "1",
+          "STRATA_SERVE_QUIET": "1",
+          "STRATA_GU_LANES": "16",
+          "STRATA_DOWN_LANES": "4",
+          "STRATA_GU_IQ2S_SG16": "1",
+          "STRATA_GU_IQ2S_SINGLE_GROUP": "1",
+          "STRATA_GDN_Q8_TAIL": "1",
+          "STRATA_QSA_Q8_TAIL": "1",
+          "STRATA_PREFILL_NATIVE_XMX": "1",
+          "STRATA_PREFILL_XMX_EXPERT_CHAIN": "1",
+          "STRATA_PREFILL_XMX_EXPERT_BATCH": "1",
+          "STRATA_PREFILL_XMX_HC_INJECT": "1",
+          "STRATA_VALUE_PACKED_BITS": "4",
+          "STRATA_VALUE_PACKED_RESIDUAL": "0",
+          "STRATA_NO_BATCH_KV_STEP": "1",
+          "STRATA_QSA_FUSED_KV_STORE": "0",
+          "STRATA_PROMPT_ATTN_XMX": "0",
+          "STRATA_KV_RING_OFF": "1",
+          "STRATA_PREFILL_CACHE_TAIL64": "1",
+          "STRATA_ORCA_L0": "1",
+          "STRATA_ORCA_IMAGES": "G:\\GitHub\\Strata\\build-orca-hc-sg16-grf-20261106\\bake-r1\\images128",
+          "STRATA_ORCA_READY_OPS": "1",
+          "STRATA_PREFILL_FP16_PAIR": "1",
+          "STRATA_MTP_CUM_MIN_P": "0",
+          "STRATA_MTP_LAST_MIN_P": "0.5",
+          "STRATA_WARM_GRAPHS": "1",
+          "STRATA_MTP_COST_WINDOW": "0",
+          "STRATA_PREFILL_U4_EXPERT_DIR": "G:\\GitHub\\Strata\\engine\\u4n16-expanded-assets",
+          "STRATA_U4_MIN_ROWS": "16",
+          "STRATA_U4_TILE_N8": "0",
+          "STRATA_U4_GROUP_PRIORITY": "id",
+          "STRATA_PREFILL_U2_DOWN": "0",
+          "STRATA_PREFILL_U4_EXPERTS": "1",
+          "STRATA_ORCA_XMX_WIDE": "1",
+          "STRATA_ORCA_DG2_TIMESTAMP_HZ": "19200000",
+          "STRATA_ORCA_DG2_TIMESTAMP_BITS": "36"
+        },
+        "log": "G:\\GitHub\\Strata\\strata-iq2_xs-u4n16-orca-l0-m16.log"
+      },
+      "outputs": [
+        [
+          "1",
+          "1",
+          "0",
+          "322541179a2fcc29",
+          "10500",
+          "133152",
+          "4.62364608822e-07"
+        ],
+        [
+          "1",
+          "1",
+          "1",
+          "d95eae4f8d4074c3",
+          "10500",
+          "133152",
+          "2.93675912921e-07"
+        ],
+        [
+          "1",
+          "48",
+          "0",
+          "d09a71247056bd4c",
+          "504000",
+          "6391296",
+          "5.16000942419e-07"
+        ],
+        [
+          "1",
+          "48",
+          "1",
+          "24e8d021db267a3b",
+          "504000",
+          "6391296",
+          "4.79677898291e-07"
+        ],
+        [
+          "4",
+          "1",
+          "0",
+          "4c23ab5a373c5b60",
+          "41232",
+          "409728",
+          "3.51235715179e-07"
+        ],
+        [
+          "4",
+          "1",
+          "1",
+          "d18d6fa0ac962ea9",
+          "41232",
+          "409728",
+          "3.52815606064e-07"
+        ],
+        [
+          "4",
+          "48",
+          "0",
+          "0969edf9c4833590",
+          "1979136",
+          "19666944",
+          "5.42432437634e-07"
+        ],
+        [
+          "4",
+          "48",
+          "1",
+          "b609d0bf41e4cc73",
+          "1979136",
+          "19666944",
+          "4.80362718935e-07"
+        ],
+        [
+          "8",
+          "1",
+          "0",
+          "9ea243043691a054",
+          "82208",
+          "778496",
+          "4.72674567487e-07"
+        ],
+        [
+          "8",
+          "1",
+          "1",
+          "8e0712a6dd32982d",
+          "82208",
+          "778496",
+          "4.13392148069e-07"
+        ],
+        [
+          "8",
+          "48",
+          "0",
+          "c3ff94e1a39cf19b",
+          "3945984",
+          "37367808",
+          "5.43121828844e-07"
+        ],
+        [
+          "8",
+          "48",
+          "1",
+          "9574401f256e7e20",
+          "3945984",
+          "37367808",
+          "5.1139332724e-07"
+        ]
+      ],
+      "summary": {
+        "T1_B1_P0_D0_R192_gpu_us_per_norm": 4.636773003472222,
+        "T1_B1_P0_D0_R192_host_us_per_norm": 5.7140625,
+        "T1_B1_P0_D0_R768_gpu_us_per_norm": 4.315524631076389,
+        "T1_B1_P0_D0_R768_host_us_per_norm": 4.4535156250000005,
+        "T1_B1_P0_D8_R192_gpu_us_per_norm": 4.473198784722222,
+        "T1_B1_P0_D8_R192_host_us_per_norm": 4.893229166666667,
+        "T1_B1_P0_D8_R768_gpu_us_per_norm": 4.428304036458333,
+        "T1_B1_P0_D8_R768_host_us_per_norm": 4.556770833333333,
+        "T1_B1_P0_D1_R192_gpu_us_per_norm": 5.282660590277778,
+        "T1_B1_P0_D1_R192_host_us_per_norm": 5.761979166666666,
+        "T1_B1_P0_D1_R768_gpu_us_per_norm": 5.648193359375,
+        "T1_B1_P0_D1_R768_host_us_per_norm": 5.776692708333333,
+        "T1_B1_P1_D0_R192_gpu_us_per_norm": 4.554036458333333,
+        "T1_B1_P1_D0_R192_host_us_per_norm": 5.289583333333334,
+        "T1_B1_P1_D0_R768_gpu_us_per_norm": 4.315321180555556,
+        "T1_B1_P1_D0_R768_host_us_per_norm": 4.436588541666667,
+        "T1_B1_P1_D8_R192_gpu_us_per_norm": 4.762641059027778,
+        "T1_B1_P1_D8_R192_host_us_per_norm": 5.351041666666667,
+        "T1_B1_P1_D8_R768_gpu_us_per_norm": 4.427897135416667,
+        "T1_B1_P1_D8_R768_host_us_per_norm": 4.565494791666667,
+        "T1_B1_P1_D1_R192_gpu_us_per_norm": 5.279405381944445,
+        "T1_B1_P1_D1_R192_host_us_per_norm": 5.700520833333333,
+        "T1_B1_P1_D1_R768_gpu_us_per_norm": 5.359836154513889,
+        "T1_B1_P1_D1_R768_host_us_per_norm": 5.496875,
+        "T1_B48_P0_D0_R192_gpu_us_per_norm": 5.10009765625,
+        "T1_B48_P0_D0_R192_host_us_per_norm": 5.805729166666667,
+        "T1_B48_P0_D0_R768_gpu_us_per_norm": 4.627346462673612,
+        "T1_B48_P0_D0_R768_host_us_per_norm": 4.79296875,
+        "T1_B48_P0_D8_R192_gpu_us_per_norm": 5.208604600694445,
+        "T1_B48_P0_D8_R192_host_us_per_norm": 5.9312499999999995,
+        "T1_B48_P0_D8_R768_gpu_us_per_norm": 4.613308376736112,
+        "T1_B48_P0_D8_R768_host_us_per_norm": 4.788151041666667,
+        "T1_B48_P0_D1_R192_gpu_us_per_norm": 6.0167100694444455,
+        "T1_B48_P0_D1_R192_host_us_per_norm": 6.776041666666667,
+        "T1_B48_P0_D1_R768_gpu_us_per_norm": 5.5487060546875,
+        "T1_B48_P0_D1_R768_host_us_per_norm": 5.7265625,
+        "T1_B48_P1_D0_R192_gpu_us_per_norm": 5.10009765625,
+        "T1_B48_P1_D0_R192_host_us_per_norm": 5.9078124999999995,
+        "T1_B48_P1_D0_R768_gpu_us_per_norm": 4.56787109375,
+        "T1_B48_P1_D0_R768_host_us_per_norm": 4.771484375,
+        "T1_B48_P1_D8_R192_gpu_us_per_norm": 5.209418402777778,
+        "T1_B48_P1_D8_R192_host_us_per_norm": 5.9171875,
+        "T1_B48_P1_D8_R768_gpu_us_per_norm": 5.201822916666667,
+        "T1_B48_P1_D8_R768_host_us_per_norm": 5.329296875,
+        "T1_B48_P1_D1_R192_gpu_us_per_norm": 6.1973741319444455,
+        "T1_B48_P1_D1_R192_host_us_per_norm": 6.983333333333333,
+        "T1_B48_P1_D1_R768_gpu_us_per_norm": 5.499945746527779,
+        "T1_B48_P1_D1_R768_host_us_per_norm": 5.663932291666666,
+        "T4_B1_P0_D0_R192_gpu_us_per_norm": 4.530164930555556,
+        "T4_B1_P0_D0_R192_host_us_per_norm": 5.2078125,
+        "T4_B1_P0_D0_R768_gpu_us_per_norm": 4.549289279513889,
+        "T4_B1_P0_D0_R768_host_us_per_norm": 4.7496093749999995,
+        "T4_B1_P0_D8_R192_gpu_us_per_norm": 4.6435546875,
+        "T4_B1_P0_D8_R192_host_us_per_norm": 5.369791666666667,
+        "T4_B1_P0_D8_R768_gpu_us_per_norm": 4.593505859375,
+        "T4_B1_P0_D8_R768_host_us_per_norm": 4.7261718749999995,
+        "T4_B1_P0_D1_R192_gpu_us_per_norm": 5.693088107638889,
+        "T4_B1_P0_D1_R192_host_us_per_norm": 6.217708333333333,
+        "T4_B1_P0_D1_R768_gpu_us_per_norm": 5.4924180772569455,
+        "T4_B1_P0_D1_R768_host_us_per_norm": 5.6566406250000005,
+        "T4_B1_P1_D0_R192_gpu_us_per_norm": 4.714626736111112,
+        "T4_B1_P1_D0_R192_host_us_per_norm": 5.2359374999999995,
+        "T4_B1_P1_D0_R768_gpu_us_per_norm": 4.630872938368056,
+        "T4_B1_P1_D0_R768_host_us_per_norm": 4.816276041666667,
+        "T4_B1_P1_D8_R192_gpu_us_per_norm": 4.909396701388889,
+        "T4_B1_P1_D8_R192_host_us_per_norm": 5.326041666666667,
+        "T4_B1_P1_D8_R768_gpu_us_per_norm": 4.593980577256945,
+        "T4_B1_P1_D8_R768_host_us_per_norm": 4.815104166666667,
+        "T4_B1_P1_D1_R192_gpu_us_per_norm": 5.436740451388889,
+        "T4_B1_P1_D1_R192_host_us_per_norm": 6.073958333333334,
+        "T4_B1_P1_D1_R768_gpu_us_per_norm": 5.389404296875,
+        "T4_B1_P1_D1_R768_host_us_per_norm": 5.498307291666666,
+        "T4_B48_P0_D0_R192_gpu_us_per_norm": 7.418619791666667,
+        "T4_B48_P0_D0_R192_host_us_per_norm": 8.323958333333334,
+        "T4_B48_P0_D0_R768_gpu_us_per_norm": 7.020399305555556,
+        "T4_B48_P0_D0_R768_host_us_per_norm": 7.332161458333334,
+        "T4_B48_P0_D8_R192_gpu_us_per_norm": 7.274576822916667,
+        "T4_B48_P0_D8_R192_host_us_per_norm": 8.552083333333334,
+        "T4_B48_P0_D8_R768_gpu_us_per_norm": 7.268880208333333,
+        "T4_B48_P0_D8_R768_host_us_per_norm": 7.544140625,
+        "T4_B48_P0_D1_R192_gpu_us_per_norm": 8.069661458333334,
+        "T4_B48_P0_D1_R192_host_us_per_norm": 9.481770833333334,
+        "T4_B48_P0_D1_R768_gpu_us_per_norm": 7.982516818576389,
+        "T4_B48_P0_D1_R768_host_us_per_norm": 8.316015625,
+        "T4_B48_P1_D0_R192_gpu_us_per_norm": 7.1630859375,
+        "T4_B48_P1_D0_R192_host_us_per_norm": 7.966145833333333,
+        "T4_B48_P1_D0_R768_gpu_us_per_norm": 7.034979926215279,
+        "T4_B48_P1_D0_R768_host_us_per_norm": 7.305208333333333,
+        "T4_B48_P1_D8_R192_gpu_us_per_norm": 7.3521592881944455,
+        "T4_B48_P1_D8_R192_host_us_per_norm": 8.522916666666667,
+        "T4_B48_P1_D8_R768_gpu_us_per_norm": 7.1490478515625,
+        "T4_B48_P1_D8_R768_host_us_per_norm": 7.394401041666666,
+        "T4_B48_P1_D1_R192_gpu_us_per_norm": 8.280707465277779,
+        "T4_B48_P1_D1_R192_host_us_per_norm": 9.022395833333333,
+        "T4_B48_P1_D1_R768_gpu_us_per_norm": 8.064100477430555,
+        "T4_B48_P1_D1_R768_host_us_per_norm": 8.248958333333333,
+        "T8_B1_P0_D0_R192_gpu_us_per_norm": 4.727105034722222,
+        "T8_B1_P0_D0_R192_host_us_per_norm": 5.289583333333334,
+        "T8_B1_P0_D0_R768_gpu_us_per_norm": 4.692857530381945,
+        "T8_B1_P0_D0_R768_host_us_per_norm": 4.880208333333333,
+        "T8_B1_P0_D8_R192_gpu_us_per_norm": 4.847276475694445,
+        "T8_B1_P0_D8_R192_host_us_per_norm": 5.470833333333334,
+        "T8_B1_P0_D8_R768_gpu_us_per_norm": 4.792955186631945,
+        "T8_B1_P0_D8_R768_host_us_per_norm": 4.992317708333333,
+        "T8_B1_P0_D1_R192_gpu_us_per_norm": 5.656467013888889,
+        "T8_B1_P0_D1_R192_host_us_per_norm": 6.2953125000000005,
+        "T8_B1_P0_D1_R768_gpu_us_per_norm": 5.722113715277779,
+        "T8_B1_P0_D1_R768_host_us_per_norm": 5.868489583333333,
+        "T8_B1_P1_D0_R192_gpu_us_per_norm": 4.740939670138889,
+        "T8_B1_P1_D0_R192_host_us_per_norm": 5.409375,
+        "T8_B1_P1_D0_R768_gpu_us_per_norm": 4.678005642361112,
+        "T8_B1_P1_D0_R768_host_us_per_norm": 4.955078125,
+        "T8_B1_P1_D8_R192_gpu_us_per_norm": 4.855143229166667,
+        "T8_B1_P1_D8_R192_host_us_per_norm": 5.41875,
+        "T8_B1_P1_D8_R768_gpu_us_per_norm": 4.802313910590278,
+        "T8_B1_P1_D8_R768_host_us_per_norm": 5.017317708333334,
+        "T8_B1_P1_D1_R192_gpu_us_per_norm": 5.6480577256944455,
+        "T8_B1_P1_D1_R192_host_us_per_norm": 6.155729166666667,
+        "T8_B1_P1_D1_R768_gpu_us_per_norm": 5.751274956597222,
+        "T8_B1_P1_D1_R768_host_us_per_norm": 5.918880208333333,
+        "T8_B48_P0_D0_R192_gpu_us_per_norm": 7.668728298611112,
+        "T8_B48_P0_D0_R192_host_us_per_norm": 8.386458333333334,
+        "T8_B48_P0_D0_R768_gpu_us_per_norm": 8.903401692708334,
+        "T8_B48_P0_D0_R768_host_us_per_norm": 9.075911458333334,
+        "T8_B48_P0_D8_R192_gpu_us_per_norm": 7.703993055555556,
+        "T8_B48_P0_D8_R192_host_us_per_norm": 8.78125,
+        "T8_B48_P0_D8_R768_gpu_us_per_norm": 7.389051649305556,
+        "T8_B48_P0_D8_R768_host_us_per_norm": 7.6484375,
+        "T8_B48_P0_D1_R192_gpu_us_per_norm": 8.118489583333334,
+        "T8_B48_P0_D1_R192_host_us_per_norm": 9.269270833333334,
+        "T8_B48_P0_D1_R768_gpu_us_per_norm": 8.113199869791666,
+        "T8_B48_P0_D1_R768_host_us_per_norm": 8.382031249999999,
+        "T8_B48_P1_D0_R192_gpu_us_per_norm": 7.2642686631944455,
+        "T8_B48_P1_D0_R192_host_us_per_norm": 8.616145833333333,
+        "T8_B48_P1_D0_R768_gpu_us_per_norm": 7.539130316840279,
+        "T8_B48_P1_D0_R768_host_us_per_norm": 7.796223958333333,
+        "T8_B48_P1_D8_R192_gpu_us_per_norm": 7.768012152777779,
+        "T8_B48_P1_D8_R192_host_us_per_norm": 8.788541666666667,
+        "T8_B48_P1_D8_R768_gpu_us_per_norm": 7.611490885416667,
+        "T8_B48_P1_D8_R768_host_us_per_norm": 7.881119791666666,
+        "T8_B48_P1_D1_R192_gpu_us_per_norm": 8.095703125,
+        "T8_B48_P1_D1_R192_host_us_per_norm": 9.218229166666667,
+        "T8_B48_P1_D1_R768_gpu_us_per_norm": 8.765462239583334,
+        "T8_B48_P1_D1_R768_host_us_per_norm": 8.964713541666667
+      }
+    },
+    {
+      "label": "4-new",
+      "mode": "new",
+      "config": {
+        "exe": "G:\\GitHub\\Strata\\build-orca-timestamp-visibility-20261106\\run-r1\\new.exe",
+        "args": [
+          "G:\\GitHub\\Strata\\build-orca-hc-sg16-grf-20261106\\bake-r1\\images128"
+        ],
+        "cwd": "G:\\GitHub\\Strata",
+        "tokenizer": "G:\\GitHub\\Strata-data\\packs\\iq2_xs\\tokenizer",
+        "backend": "orca",
+        "model_name": "qwen3.8-flash-next-iq2_xs-u4n16-orca-direct-m16-9402",
+        "host": "127.0.0.1",
+        "port": 8080,
+        "lib_dirs": [
+          "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin",
+          "C:\\Program Files (x86)\\Intel\\oneAPI\\mkl\\2025.3\\bin"
+        ],
+        "env": {
+          "ZES_ENABLE_SYSMAN": "1",
+          "STRATA_MIRROR_MIB": "49152",
+          "STRATA_VERIFY_DEVICE_PLAN": "1",
+          "STRATA_VERIFY_NO_HOST": "1",
+          "STRATA_STAGER_THREADS": "12",
+          "STRATA_VERIFY_ADAPT": "1",
+          "STRATA_ADAPT_COST_WEIGHTED": "1",
+          "STRATA_PREFILL_FIRST": "0",
+          "STRATA_GDN_SG16": "1",
+          "STRATA_IQ4_XS_SG16": "2",
+          "STRATA_VERIFY_FUSED_ACT": "1",
+          "STRATA_VERIFY_DESC_CACHE": "1",
+          "STRATA_SERVE_QUIET": "1",
+          "STRATA_GU_LANES": "16",
+          "STRATA_DOWN_LANES": "4",
+          "STRATA_GU_IQ2S_SG16": "1",
+          "STRATA_GU_IQ2S_SINGLE_GROUP": "1",
+          "STRATA_GDN_Q8_TAIL": "1",
+          "STRATA_QSA_Q8_TAIL": "1",
+          "STRATA_PREFILL_NATIVE_XMX": "1",
+          "STRATA_PREFILL_XMX_EXPERT_CHAIN": "1",
+          "STRATA_PREFILL_XMX_EXPERT_BATCH": "1",
+          "STRATA_PREFILL_XMX_HC_INJECT": "1",
+          "STRATA_VALUE_PACKED_BITS": "4",
+          "STRATA_VALUE_PACKED_RESIDUAL": "0",
+          "STRATA_NO_BATCH_KV_STEP": "1",
+          "STRATA_QSA_FUSED_KV_STORE": "0",
+          "STRATA_PROMPT_ATTN_XMX": "0",
+          "STRATA_KV_RING_OFF": "1",
+          "STRATA_PREFILL_CACHE_TAIL64": "1",
+          "STRATA_ORCA_L0": "1",
+          "STRATA_ORCA_IMAGES": "G:\\GitHub\\Strata\\build-orca-hc-sg16-grf-20261106\\bake-r1\\images128",
+          "STRATA_ORCA_READY_OPS": "1",
+          "STRATA_PREFILL_FP16_PAIR": "1",
+          "STRATA_MTP_CUM_MIN_P": "0",
+          "STRATA_MTP_LAST_MIN_P": "0.5",
+          "STRATA_WARM_GRAPHS": "1",
+          "STRATA_ORCA_DG2_MEMORY": "G:\\GitHub\\Strata\\engine\\u4n16-orca-direct-m16\\memory.zebin",
+          "STRATA_ORCA_DG2_ISA_MEMORY": "device",
+          "STRATA_ORCA_DG2_THREAD_MEMORY": "device",
+          "STRATA_MTP_COST_WINDOW": "0",
+          "ORCA_DG2_BCS_COPY": "1",
+          "STRATA_PREFILL_U4_EXPERT_DIR": "G:\\GitHub\\Strata\\engine\\u4n16-expanded-assets",
+          "STRATA_U4_MIN_ROWS": "16",
+          "STRATA_U4_TILE_N8": "0",
+          "STRATA_U4_GROUP_PRIORITY": "id",
+          "STRATA_PREFILL_U2_DOWN": "0",
+          "STRATA_PREFILL_U4_EXPERTS": "1",
+          "STRATA_ORCA_XMX_WIDE": "1",
+          "STRATA_ORCA_DG2_TIMESTAMP_HZ": "19200000",
+          "STRATA_ORCA_DG2_TIMESTAMP_BITS": "36"
+        },
+        "log": "G:\\GitHub\\Strata\\strata-iq2_xs-u4n16-orca-direct-m16.log"
+      },
+      "outputs": [
+        [
+          "1",
+          "1",
+          "0",
+          "322541179a2fcc29",
+          "10500",
+          "133152",
+          "4.62364608822e-07"
+        ],
+        [
+          "1",
+          "1",
+          "1",
+          "d95eae4f8d4074c3",
+          "10500",
+          "133152",
+          "2.93675912921e-07"
+        ],
+        [
+          "1",
+          "48",
+          "0",
+          "d09a71247056bd4c",
+          "504000",
+          "6391296",
+          "5.16000942419e-07"
+        ],
+        [
+          "1",
+          "48",
+          "1",
+          "24e8d021db267a3b",
+          "504000",
+          "6391296",
+          "4.79677898291e-07"
+        ],
+        [
+          "4",
+          "1",
+          "0",
+          "4c23ab5a373c5b60",
+          "41232",
+          "409728",
+          "3.51235715179e-07"
+        ],
+        [
+          "4",
+          "1",
+          "1",
+          "d18d6fa0ac962ea9",
+          "41232",
+          "409728",
+          "3.52815606064e-07"
+        ],
+        [
+          "4",
+          "48",
+          "0",
+          "0969edf9c4833590",
+          "1979136",
+          "19666944",
+          "5.42432437634e-07"
+        ],
+        [
+          "4",
+          "48",
+          "1",
+          "b609d0bf41e4cc73",
+          "1979136",
+          "19666944",
+          "4.80362718935e-07"
+        ],
+        [
+          "8",
+          "1",
+          "0",
+          "9ea243043691a054",
+          "82208",
+          "778496",
+          "4.72674567487e-07"
+        ],
+        [
+          "8",
+          "1",
+          "1",
+          "8e0712a6dd32982d",
+          "82208",
+          "778496",
+          "4.13392148069e-07"
+        ],
+        [
+          "8",
+          "48",
+          "0",
+          "c3ff94e1a39cf19b",
+          "3945984",
+          "37367808",
+          "5.43121828844e-07"
+        ],
+        [
+          "8",
+          "48",
+          "1",
+          "9574401f256e7e20",
+          "3945984",
+          "37367808",
+          "5.1139332724e-07"
+        ]
+      ],
+      "summary": {
+        "T1_B1_P0_D0_R192_gpu_us_per_norm": 3.7706163194444446,
+        "T1_B1_P0_D0_R192_host_us_per_norm": 4.717708333333333,
+        "T1_B1_P0_D0_R768_gpu_us_per_norm": 3.7247721354166665,
+        "T1_B1_P0_D0_R768_host_us_per_norm": 3.9406250000000003,
+        "T1_B1_P0_D8_R192_gpu_us_per_norm": 3.861762152777778,
+        "T1_B1_P0_D8_R192_host_us_per_norm": 4.723958333333333,
+        "T1_B1_P0_D8_R768_gpu_us_per_norm": 3.8132052951388893,
+        "T1_B1_P0_D8_R768_host_us_per_norm": 4.0453125000000005,
+        "T1_B1_P0_D1_R192_gpu_us_per_norm": 4.487847222222222,
+        "T1_B1_P0_D1_R192_host_us_per_norm": 5.369270833333334,
+        "T1_B1_P0_D1_R768_gpu_us_per_norm": 4.405246310763889,
+        "T1_B1_P0_D1_R768_host_us_per_norm": 4.642317708333334,
+        "T1_B1_P1_D0_R192_gpu_us_per_norm": 3.770887586805556,
+        "T1_B1_P1_D0_R192_host_us_per_norm": 4.586979166666667,
+        "T1_B1_P1_D0_R768_gpu_us_per_norm": 3.7245686848958335,
+        "T1_B1_P1_D0_R768_host_us_per_norm": 3.955208333333333,
+        "T1_B1_P1_D8_R192_gpu_us_per_norm": 3.8370768229166665,
+        "T1_B1_P1_D8_R192_host_us_per_norm": 4.714583333333334,
+        "T1_B1_P1_D8_R768_gpu_us_per_norm": 3.812391493055556,
+        "T1_B1_P1_D8_R768_host_us_per_norm": 4.081510416666666,
+        "T1_B1_P1_D1_R192_gpu_us_per_norm": 4.490288628472222,
+        "T1_B1_P1_D1_R192_host_us_per_norm": 5.2859375,
+        "T1_B1_P1_D1_R768_gpu_us_per_norm": 4.427964952256945,
+        "T1_B1_P1_D1_R768_host_us_per_norm": 4.655208333333333,
+        "T1_B48_P0_D0_R192_gpu_us_per_norm": 4.738498263888889,
+        "T1_B48_P0_D0_R192_host_us_per_norm": 5.864583333333333,
+        "T1_B48_P0_D0_R768_gpu_us_per_norm": 4.293077256944445,
+        "T1_B48_P0_D0_R768_host_us_per_norm": 4.6203125,
+        "T1_B48_P0_D8_R192_gpu_us_per_norm": 4.833713107638889,
+        "T1_B48_P0_D8_R192_host_us_per_norm": 5.996354166666666,
+        "T1_B48_P0_D8_R768_gpu_us_per_norm": 4.217325846354167,
+        "T1_B48_P0_D8_R768_host_us_per_norm": 4.5218750000000005,
+        "T1_B48_P0_D1_R192_gpu_us_per_norm": 5.448133680555556,
+        "T1_B48_P0_D1_R192_host_us_per_norm": 6.5140625000000005,
+        "T1_B48_P0_D1_R768_gpu_us_per_norm": 4.834526909722222,
+        "T1_B48_P0_D1_R768_host_us_per_norm": 5.11796875,
+        "T1_B48_P1_D0_R192_gpu_us_per_norm": 4.765082465277778,
+        "T1_B48_P1_D0_R192_host_us_per_norm": 5.811458333333333,
+        "T1_B48_P1_D0_R768_gpu_us_per_norm": 4.128757052951389,
+        "T1_B48_P1_D0_R768_host_us_per_norm": 4.452864583333334,
+        "T1_B48_P1_D8_R192_gpu_us_per_norm": 4.953070746527778,
+        "T1_B48_P1_D8_R192_host_us_per_norm": 5.998958333333333,
+        "T1_B48_P1_D8_R768_gpu_us_per_norm": 4.276055230034722,
+        "T1_B48_P1_D8_R768_host_us_per_norm": 4.548697916666667,
+        "T1_B48_P1_D1_R192_gpu_us_per_norm": 5.551215277777779,
+        "T1_B48_P1_D1_R192_host_us_per_norm": 6.721875,
+        "T1_B48_P1_D1_R768_gpu_us_per_norm": 4.836154513888889,
+        "T1_B48_P1_D1_R768_host_us_per_norm": 5.124088541666667,
+        "T4_B1_P0_D0_R192_gpu_us_per_norm": 4.494900173611112,
+        "T4_B1_P0_D0_R192_host_us_per_norm": 5.371354166666666,
+        "T4_B1_P0_D0_R768_gpu_us_per_norm": 3.878445095486111,
+        "T4_B1_P0_D0_R768_host_us_per_norm": 4.121875,
+        "T4_B1_P0_D8_R192_gpu_us_per_norm": 4.205457899305556,
+        "T4_B1_P0_D8_R192_host_us_per_norm": 5.082291666666666,
+        "T4_B1_P0_D8_R768_gpu_us_per_norm": 3.9866807725694446,
+        "T4_B1_P0_D8_R768_host_us_per_norm": 4.222526041666667,
+        "T4_B1_P0_D1_R192_gpu_us_per_norm": 4.712727864583333,
+        "T4_B1_P0_D1_R192_host_us_per_norm": 5.6515625,
+        "T4_B1_P0_D1_R768_gpu_us_per_norm": 4.712117513020833,
+        "T4_B1_P0_D1_R768_host_us_per_norm": 4.955859375,
+        "T4_B1_P1_D0_R192_gpu_us_per_norm": 3.9263237847222228,
+        "T4_B1_P1_D0_R192_host_us_per_norm": 4.863541666666666,
+        "T4_B1_P1_D0_R768_gpu_us_per_norm": 3.8768853081597228,
+        "T4_B1_P1_D0_R768_host_us_per_norm": 4.084765625,
+        "T4_B1_P1_D8_R192_gpu_us_per_norm": 4.016927083333333,
+        "T4_B1_P1_D8_R192_host_us_per_norm": 4.811458333333333,
+        "T4_B1_P1_D8_R768_gpu_us_per_norm": 3.9662679036458335,
+        "T4_B1_P1_D8_R768_host_us_per_norm": 4.181640625,
+        "T4_B1_P1_D1_R192_gpu_us_per_norm": 4.641927083333333,
+        "T4_B1_P1_D1_R192_host_us_per_norm": 5.4640625,
+        "T4_B1_P1_D1_R768_gpu_us_per_norm": 4.581637912326389,
+        "T4_B1_P1_D1_R768_host_us_per_norm": 4.844010416666666,
+        "T4_B48_P0_D0_R192_gpu_us_per_norm": 6.882866753472222,
+        "T4_B48_P0_D0_R192_host_us_per_norm": 8.1234375,
+        "T4_B48_P0_D0_R768_gpu_us_per_norm": 6.620551215277779,
+        "T4_B48_P0_D0_R768_host_us_per_norm": 7.052473958333334,
+        "T4_B48_P0_D8_R192_gpu_us_per_norm": 7.621256510416667,
+        "T4_B48_P0_D8_R192_host_us_per_norm": 8.855208333333334,
+        "T4_B48_P0_D8_R768_gpu_us_per_norm": 6.861911349826389,
+        "T4_B48_P0_D8_R768_host_us_per_norm": 7.1171875,
+        "T4_B48_P0_D1_R192_gpu_us_per_norm": 7.59521484375,
+        "T4_B48_P0_D1_R192_host_us_per_norm": 8.6546875,
+        "T4_B48_P0_D1_R768_gpu_us_per_norm": 7.832370334201389,
+        "T4_B48_P0_D1_R768_host_us_per_norm": 8.057942708333334,
+        "T4_B48_P1_D0_R192_gpu_us_per_norm": 7.071668836805556,
+        "T4_B48_P1_D0_R192_host_us_per_norm": 8.2734375,
+        "T4_B48_P1_D0_R768_gpu_us_per_norm": 6.8193223741319455,
+        "T4_B48_P1_D0_R768_host_us_per_norm": 7.080338541666666,
+        "T4_B48_P1_D8_R192_gpu_us_per_norm": 6.825086805555556,
+        "T4_B48_P1_D8_R192_host_us_per_norm": 7.968229166666667,
+        "T4_B48_P1_D8_R768_gpu_us_per_norm": 6.702609592013889,
+        "T4_B48_P1_D8_R768_host_us_per_norm": 7.11328125,
+        "T4_B48_P1_D1_R192_gpu_us_per_norm": 7.455240885416667,
+        "T4_B48_P1_D1_R192_host_us_per_norm": 8.375520833333333,
+        "T4_B48_P1_D1_R768_gpu_us_per_norm": 7.818806966145833,
+        "T4_B48_P1_D1_R768_host_us_per_norm": 8.071875,
+        "T8_B1_P0_D0_R192_gpu_us_per_norm": 4.116482204861112,
+        "T8_B1_P0_D0_R192_host_us_per_norm": 5.3015625,
+        "T8_B1_P0_D0_R768_gpu_us_per_norm": 4.064873589409722,
+        "T8_B1_P0_D0_R768_host_us_per_norm": 4.3328125,
+        "T8_B1_P0_D8_R192_gpu_us_per_norm": 4.204372829861112,
+        "T8_B1_P0_D8_R192_host_us_per_norm": 5.602604166666667,
+        "T8_B1_P0_D8_R768_gpu_us_per_norm": 4.418877495659722,
+        "T8_B1_P0_D8_R768_host_us_per_norm": 4.680338541666667,
+        "T8_B1_P0_D1_R192_gpu_us_per_norm": 4.827745225694445,
+        "T8_B1_P0_D1_R192_host_us_per_norm": 5.706770833333334,
+        "T8_B1_P0_D1_R768_gpu_us_per_norm": 4.789496527777778,
+        "T8_B1_P0_D1_R768_host_us_per_norm": 5.012239583333334,
+        "T8_B1_P1_D0_R192_gpu_us_per_norm": 4.109429253472222,
+        "T8_B1_P1_D0_R192_host_us_per_norm": 4.971875,
+        "T8_B1_P1_D0_R768_gpu_us_per_norm": 4.242757161458333,
+        "T8_B1_P1_D0_R768_host_us_per_norm": 4.533723958333334,
+        "T8_B1_P1_D8_R192_gpu_us_per_norm": 4.229600694444445,
+        "T8_B1_P1_D8_R192_host_us_per_norm": 5.233333333333333,
+        "T8_B1_P1_D8_R768_gpu_us_per_norm": 4.244181315104167,
+        "T8_B1_P1_D8_R768_host_us_per_norm": 4.501432291666666,
+        "T8_B1_P1_D1_R192_gpu_us_per_norm": 4.902886284722222,
+        "T8_B1_P1_D1_R192_host_us_per_norm": 5.83125,
+        "T8_B1_P1_D1_R768_gpu_us_per_norm": 4.769965277777778,
+        "T8_B1_P1_D1_R768_host_us_per_norm": 5.000130208333333,
+        "T8_B48_P0_D0_R192_gpu_us_per_norm": 7.519259982638889,
+        "T8_B48_P0_D0_R192_host_us_per_norm": 9.025,
+        "T8_B48_P0_D0_R768_gpu_us_per_norm": 6.790703667534722,
+        "T8_B48_P0_D0_R768_host_us_per_norm": 7.085286458333333,
+        "T8_B48_P0_D8_R192_gpu_us_per_norm": 6.933322482638889,
+        "T8_B48_P0_D8_R192_host_us_per_norm": 8.307812499999999,
+        "T8_B48_P0_D8_R768_gpu_us_per_norm": 7.467176649305556,
+        "T8_B48_P0_D8_R768_host_us_per_norm": 7.750130208333334,
+        "T8_B48_P0_D1_R192_gpu_us_per_norm": 7.630750868055556,
+        "T8_B48_P0_D1_R192_host_us_per_norm": 8.942708333333334,
+        "T8_B48_P0_D1_R768_gpu_us_per_norm": 7.591688368055556,
+        "T8_B48_P0_D1_R768_host_us_per_norm": 7.997135416666667,
+        "T8_B48_P1_D0_R192_gpu_us_per_norm": 6.888020833333333,
+        "T8_B48_P1_D0_R192_host_us_per_norm": 8.143229166666666,
+        "T8_B48_P1_D0_R768_gpu_us_per_norm": 6.78955078125,
+        "T8_B48_P1_D0_R768_host_us_per_norm": 7.179166666666667,
+        "T8_B48_P1_D8_R192_gpu_us_per_norm": 6.983778211805556,
+        "T8_B48_P1_D8_R192_host_us_per_norm": 8.592708333333333,
+        "T8_B48_P1_D8_R768_gpu_us_per_norm": 7.051730685763889,
+        "T8_B48_P1_D8_R768_host_us_per_norm": 7.486979166666667,
+        "T8_B48_P1_D1_R192_gpu_us_per_norm": 7.6939561631944455,
+        "T8_B48_P1_D1_R192_host_us_per_norm": 9.066145833333334,
+        "T8_B48_P1_D1_R768_gpu_us_per_norm": 7.564290364583333,
+        "T8_B48_P1_D1_R768_host_us_per_norm": 7.926432291666667
+      }
+    },
+    {
+      "label": "5-old",
+      "mode": "old",
+      "config": {
+        "exe": "G:\\GitHub\\Strata\\build-orca-timestamp-visibility-20261106\\run-r1\\old.exe",
+        "args": [
+          "G:\\GitHub\\Strata\\build-orca-hc-sg16-grf-20261106\\bake-r1\\images128"
+        ],
+        "cwd": "G:\\GitHub\\Strata",
+        "tokenizer": "G:\\GitHub\\Strata-data\\packs\\iq2_xs\\tokenizer",
+        "backend": "orca",
+        "model_name": "qwen3.8-flash-next-iq2_xs-u4n16-orca-direct-m16-9402",
+        "host": "127.0.0.1",
+        "port": 8080,
+        "lib_dirs": [
+          "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin",
+          "C:\\Program Files (x86)\\Intel\\oneAPI\\mkl\\2025.3\\bin"
+        ],
+        "env": {
+          "ZES_ENABLE_SYSMAN": "1",
+          "STRATA_MIRROR_MIB": "49152",
+          "STRATA_VERIFY_DEVICE_PLAN": "1",
+          "STRATA_VERIFY_NO_HOST": "1",
+          "STRATA_STAGER_THREADS": "12",
+          "STRATA_VERIFY_ADAPT": "1",
+          "STRATA_ADAPT_COST_WEIGHTED": "1",
+          "STRATA_PREFILL_FIRST": "0",
+          "STRATA_GDN_SG16": "1",
+          "STRATA_IQ4_XS_SG16": "2",
+          "STRATA_VERIFY_FUSED_ACT": "1",
+          "STRATA_VERIFY_DESC_CACHE": "1",
+          "STRATA_SERVE_QUIET": "1",
+          "STRATA_GU_LANES": "16",
+          "STRATA_DOWN_LANES": "4",
+          "STRATA_GU_IQ2S_SG16": "1",
+          "STRATA_GU_IQ2S_SINGLE_GROUP": "1",
+          "STRATA_GDN_Q8_TAIL": "1",
+          "STRATA_QSA_Q8_TAIL": "1",
+          "STRATA_PREFILL_NATIVE_XMX": "1",
+          "STRATA_PREFILL_XMX_EXPERT_CHAIN": "1",
+          "STRATA_PREFILL_XMX_EXPERT_BATCH": "1",
+          "STRATA_PREFILL_XMX_HC_INJECT": "1",
+          "STRATA_VALUE_PACKED_BITS": "4",
+          "STRATA_VALUE_PACKED_RESIDUAL": "0",
+          "STRATA_NO_BATCH_KV_STEP": "1",
+          "STRATA_QSA_FUSED_KV_STORE": "0",
+          "STRATA_PROMPT_ATTN_XMX": "0",
+          "STRATA_KV_RING_OFF": "1",
+          "STRATA_PREFILL_CACHE_TAIL64": "1",
+          "STRATA_ORCA_L0": "1",
+          "STRATA_ORCA_IMAGES": "G:\\GitHub\\Strata\\build-orca-hc-sg16-grf-20261106\\bake-r1\\images128",
+          "STRATA_ORCA_READY_OPS": "1",
+          "STRATA_PREFILL_FP16_PAIR": "1",
+          "STRATA_MTP_CUM_MIN_P": "0",
+          "STRATA_MTP_LAST_MIN_P": "0.5",
+          "STRATA_WARM_GRAPHS": "1",
+          "STRATA_ORCA_DG2_MEMORY": "G:\\GitHub\\Strata\\engine\\u4n16-orca-direct-m16\\memory.zebin",
+          "STRATA_ORCA_DG2_ISA_MEMORY": "device",
+          "STRATA_ORCA_DG2_THREAD_MEMORY": "device",
+          "STRATA_MTP_COST_WINDOW": "0",
+          "ORCA_DG2_BCS_COPY": "1",
+          "STRATA_PREFILL_U4_EXPERT_DIR": "G:\\GitHub\\Strata\\engine\\u4n16-expanded-assets",
+          "STRATA_U4_MIN_ROWS": "16",
+          "STRATA_U4_TILE_N8": "0",
+          "STRATA_U4_GROUP_PRIORITY": "id",
+          "STRATA_PREFILL_U2_DOWN": "0",
+          "STRATA_PREFILL_U4_EXPERTS": "1",
+          "STRATA_ORCA_XMX_WIDE": "1",
+          "STRATA_ORCA_DG2_TIMESTAMP_HZ": "19200000",
+          "STRATA_ORCA_DG2_TIMESTAMP_BITS": "36"
+        },
+        "log": "G:\\GitHub\\Strata\\strata-iq2_xs-u4n16-orca-direct-m16.log"
+      },
+      "outputs": [
+        [
+          "1",
+          "1",
+          "0",
+          "322541179a2fcc29",
+          "10500",
+          "133152",
+          "4.62364608822e-07"
+        ],
+        [
+          "1",
+          "1",
+          "1",
+          "d95eae4f8d4074c3",
+          "10500",
+          "133152",
+          "2.93675912921e-07"
+        ],
+        [
+          "1",
+          "48",
+          "0",
+          "d09a71247056bd4c",
+          "504000",
+          "6391296",
+          "5.16000942419e-07"
+        ],
+        [
+          "1",
+          "48",
+          "1",
+          "24e8d021db267a3b",
+          "504000",
+          "6391296",
+          "4.79677898291e-07"
+        ],
+        [
+          "4",
+          "1",
+          "0",
+          "4c23ab5a373c5b60",
+          "41232",
+          "409728",
+          "3.51235715179e-07"
+        ],
+        [
+          "4",
+          "1",
+          "1",
+          "d18d6fa0ac962ea9",
+          "41232",
+          "409728",
+          "3.52815606064e-07"
+        ],
+        [
+          "4",
+          "48",
+          "0",
+          "0969edf9c4833590",
+          "1979136",
+          "19666944",
+          "5.42432437634e-07"
+        ],
+        [
+          "4",
+          "48",
+          "1",
+          "b609d0bf41e4cc73",
+          "1979136",
+          "19666944",
+          "4.80362718935e-07"
+        ],
+        [
+          "8",
+          "1",
+          "0",
+          "9ea243043691a054",
+          "82208",
+          "778496",
+          "4.72674567487e-07"
+        ],
+        [
+          "8",
+          "1",
+          "1",
+          "8e0712a6dd32982d",
+          "82208",
+          "778496",
+          "4.13392148069e-07"
+        ],
+        [
+          "8",
+          "48",
+          "0",
+          "c3ff94e1a39cf19b",
+          "3945984",
+          "37367808",
+          "5.43121828844e-07"
+        ],
+        [
+          "8",
+          "48",
+          "1",
+          "9574401f256e7e20",
+          "3945984",
+          "37367808",
+          "5.1139332724e-07"
+        ]
+      ],
+      "summary": {
+        "T1_B1_P0_D0_R192_gpu_us_per_norm": 3.7754991319444446,
+        "T1_B1_P0_D0_R192_host_us_per_norm": 4.630208333333333,
+        "T1_B1_P0_D0_R768_gpu_us_per_norm": 3.7469482421875,
+        "T1_B1_P0_D0_R768_host_us_per_norm": 4.008463541666667,
+        "T1_B1_P0_D8_R192_gpu_us_per_norm": 4.363606770833333,
+        "T1_B1_P0_D8_R192_host_us_per_norm": 5.401041666666667,
+        "T1_B1_P0_D8_R768_gpu_us_per_norm": 4.3487548828125,
+        "T1_B1_P0_D8_R768_host_us_per_norm": 4.526302083333333,
+        "T1_B1_P0_D1_R192_gpu_us_per_norm": 8.65966796875,
+        "T1_B1_P0_D1_R192_host_us_per_norm": 9.653125000000001,
+        "T1_B1_P0_D1_R768_gpu_us_per_norm": 8.66305881076389,
+        "T1_B1_P0_D1_R768_host_us_per_norm": 8.93515625,
+        "T1_B1_P1_D0_R192_gpu_us_per_norm": 4.02587890625,
+        "T1_B1_P1_D0_R192_host_us_per_norm": 4.9125000000000005,
+        "T1_B1_P1_D0_R768_gpu_us_per_norm": 3.7251790364583335,
+        "T1_B1_P1_D0_R768_host_us_per_norm": 3.9389322916666667,
+        "T1_B1_P1_D8_R192_gpu_us_per_norm": 4.345160590277778,
+        "T1_B1_P1_D8_R192_host_us_per_norm": 5.136979166666666,
+        "T1_B1_P1_D8_R768_gpu_us_per_norm": 4.294772677951389,
+        "T1_B1_P1_D8_R768_host_us_per_norm": 4.4925781250000005,
+        "T1_B1_P1_D1_R192_gpu_us_per_norm": 8.435872395833334,
+        "T1_B1_P1_D1_R192_host_us_per_norm": 9.549479166666666,
+        "T1_B1_P1_D1_R768_gpu_us_per_norm": 8.434855143229166,
+        "T1_B1_P1_D1_R768_host_us_per_norm": 8.674999999999999,
+        "T1_B48_P0_D0_R192_gpu_us_per_norm": 4.745551215277778,
+        "T1_B48_P0_D0_R192_host_us_per_norm": 5.831770833333334,
+        "T1_B48_P0_D0_R768_gpu_us_per_norm": 4.1851806640625,
+        "T1_B48_P0_D0_R768_host_us_per_norm": 4.466015625,
+        "T1_B48_P0_D8_R192_gpu_us_per_norm": 7.212185329861112,
+        "T1_B48_P0_D8_R192_host_us_per_norm": 8.380729166666667,
+        "T1_B48_P0_D8_R768_gpu_us_per_norm": 7.115275065104167,
+        "T1_B48_P0_D8_R768_host_us_per_norm": 7.402473958333334,
+        "T1_B48_P0_D1_R192_gpu_us_per_norm": 8.515625,
+        "T1_B48_P0_D1_R192_host_us_per_norm": 9.705729166666666,
+        "T1_B48_P0_D1_R768_gpu_us_per_norm": 8.625556098090279,
+        "T1_B48_P0_D1_R768_host_us_per_norm": 8.929166666666667,
+        "T1_B48_P1_D0_R192_gpu_us_per_norm": 4.740397135416667,
+        "T1_B48_P1_D0_R192_host_us_per_norm": 6.0125,
+        "T1_B48_P1_D0_R768_gpu_us_per_norm": 4.133029513888889,
+        "T1_B48_P1_D0_R768_host_us_per_norm": 4.4437500000000005,
+        "T1_B48_P1_D8_R192_gpu_us_per_norm": 7.159559461805556,
+        "T1_B48_P1_D8_R192_host_us_per_norm": 8.293229166666666,
+        "T1_B48_P1_D8_R768_gpu_us_per_norm": 7.5352647569444455,
+        "T1_B48_P1_D8_R768_host_us_per_norm": 7.732161458333334,
+        "T1_B48_P1_D1_R192_gpu_us_per_norm": 8.446451822916666,
+        "T1_B48_P1_D1_R192_host_us_per_norm": 9.801041666666666,
+        "T1_B48_P1_D1_R768_gpu_us_per_norm": 8.5467529296875,
+        "T1_B48_P1_D1_R768_host_us_per_norm": 8.813932291666667,
+        "T4_B1_P0_D0_R192_gpu_us_per_norm": 3.9274088541666665,
+        "T4_B1_P0_D0_R192_host_us_per_norm": 4.810416666666667,
+        "T4_B1_P0_D0_R768_gpu_us_per_norm": 3.8781060112847228,
+        "T4_B1_P0_D0_R768_host_us_per_norm": 4.171223958333333,
+        "T4_B1_P0_D8_R192_gpu_us_per_norm": 4.541286892361112,
+        "T4_B1_P0_D8_R192_host_us_per_norm": 5.521354166666666,
+        "T4_B1_P0_D8_R768_gpu_us_per_norm": 4.462822808159722,
+        "T4_B1_P0_D8_R768_host_us_per_norm": 4.698958333333334,
+        "T4_B1_P0_D1_R192_gpu_us_per_norm": 8.931749131944445,
+        "T4_B1_P0_D1_R192_host_us_per_norm": 9.865625,
+        "T4_B1_P0_D1_R768_gpu_us_per_norm": 8.822089301215279,
+        "T4_B1_P0_D1_R768_host_us_per_norm": 9.073697916666667,
+        "T4_B1_P1_D0_R192_gpu_us_per_norm": 3.9303927951388893,
+        "T4_B1_P1_D0_R192_host_us_per_norm": 4.8625,
+        "T4_B1_P1_D0_R768_gpu_us_per_norm": 3.8799370659722228,
+        "T4_B1_P1_D0_R768_host_us_per_norm": 4.21953125,
+        "T4_B1_P1_D8_R192_gpu_us_per_norm": 4.646267361111112,
+        "T4_B1_P1_D8_R192_host_us_per_norm": 5.5828125,
+        "T4_B1_P1_D8_R768_gpu_us_per_norm": 4.473741319444445,
+        "T4_B1_P1_D8_R768_host_us_per_norm": 4.6878906250000005,
+        "T4_B1_P1_D1_R192_gpu_us_per_norm": 8.938530815972223,
+        "T4_B1_P1_D1_R192_host_us_per_norm": 9.871875000000001,
+        "T4_B1_P1_D1_R768_gpu_us_per_norm": 8.798760308159723,
+        "T4_B1_P1_D1_R768_host_us_per_norm": 9.023697916666666,
+        "T4_B48_P0_D0_R192_gpu_us_per_norm": 6.749674479166667,
+        "T4_B48_P0_D0_R192_host_us_per_norm": 8.21875,
+        "T4_B48_P0_D0_R768_gpu_us_per_norm": 6.799858940972222,
+        "T4_B48_P0_D0_R768_host_us_per_norm": 7.087369791666667,
+        "T4_B48_P0_D8_R192_gpu_us_per_norm": 7.50244140625,
+        "T4_B48_P0_D8_R192_host_us_per_norm": 8.670833333333333,
+        "T4_B48_P0_D8_R768_gpu_us_per_norm": 7.548489040798612,
+        "T4_B48_P0_D8_R768_host_us_per_norm": 7.8519531250000005,
+        "T4_B48_P0_D1_R192_gpu_us_per_norm": 8.682183159722223,
+        "T4_B48_P0_D1_R192_host_us_per_norm": 9.836458333333333,
+        "T4_B48_P0_D1_R768_gpu_us_per_norm": 8.696831597222223,
+        "T4_B48_P0_D1_R768_host_us_per_norm": 8.988541666666666,
+        "T4_B48_P1_D0_R192_gpu_us_per_norm": 6.728515625,
+        "T4_B48_P1_D0_R192_host_us_per_norm": 7.985416666666667,
+        "T4_B48_P1_D0_R768_gpu_us_per_norm": 6.642727322048612,
+        "T4_B48_P1_D0_R768_host_us_per_norm": 6.970442708333334,
+        "T4_B48_P1_D8_R192_gpu_us_per_norm": 7.513563368055556,
+        "T4_B48_P1_D8_R192_host_us_per_norm": 8.834375,
+        "T4_B48_P1_D8_R768_gpu_us_per_norm": 7.478976779513889,
+        "T4_B48_P1_D8_R768_host_us_per_norm": 7.8453124999999995,
+        "T4_B48_P1_D1_R192_gpu_us_per_norm": 8.946126302083334,
+        "T4_B48_P1_D1_R192_host_us_per_norm": 10.25625,
+        "T4_B48_P1_D1_R768_gpu_us_per_norm": 9.137776692708334,
+        "T4_B48_P1_D1_R768_host_us_per_norm": 9.426302083333333,
+        "T8_B1_P0_D0_R192_gpu_us_per_norm": 4.125434027777778,
+        "T8_B1_P0_D0_R192_host_us_per_norm": 5.413020833333333,
+        "T8_B1_P0_D0_R768_gpu_us_per_norm": 4.067925347222222,
+        "T8_B1_P0_D0_R768_host_us_per_norm": 4.396223958333334,
+        "T8_B1_P0_D8_R192_gpu_us_per_norm": 4.727918836805556,
+        "T8_B1_P0_D8_R192_host_us_per_norm": 5.91875,
+        "T8_B1_P0_D8_R768_gpu_us_per_norm": 4.810316297743056,
+        "T8_B1_P0_D8_R768_host_us_per_norm": 5.148307291666667,
+        "T8_B1_P0_D1_R192_gpu_us_per_norm": 9.446885850694445,
+        "T8_B1_P0_D1_R192_host_us_per_norm": 10.791145833333333,
+        "T8_B1_P0_D1_R768_gpu_us_per_norm": 9.299519856770834,
+        "T8_B1_P0_D1_R768_host_us_per_norm": 9.582552083333333,
+        "T8_B1_P1_D0_R192_gpu_us_per_norm": 4.114040798611112,
+        "T8_B1_P1_D0_R192_host_us_per_norm": 5.2625,
+        "T8_B1_P1_D0_R768_gpu_us_per_norm": 4.064466688368056,
+        "T8_B1_P1_D0_R768_host_us_per_norm": 4.356510416666667,
+        "T8_B1_P1_D8_R192_gpu_us_per_norm": 4.739583333333333,
+        "T8_B1_P1_D8_R192_host_us_per_norm": 5.765104166666667,
+        "T8_B1_P1_D8_R768_gpu_us_per_norm": 4.686075846354167,
+        "T8_B1_P1_D8_R768_host_us_per_norm": 4.95703125,
+        "T8_B1_P1_D1_R192_gpu_us_per_norm": 9.13058810763889,
+        "T8_B1_P1_D1_R192_host_us_per_norm": 10.276041666666666,
+        "T8_B1_P1_D1_R768_gpu_us_per_norm": 9.255032009548612,
+        "T8_B1_P1_D1_R768_host_us_per_norm": 9.514453125000001,
+        "T8_B48_P0_D0_R192_gpu_us_per_norm": 7.229546440972222,
+        "T8_B48_P0_D0_R192_host_us_per_norm": 8.418750000000001,
+        "T8_B48_P0_D0_R768_gpu_us_per_norm": 6.841634114583333,
+        "T8_B48_P0_D0_R768_host_us_per_norm": 7.130989583333334,
+        "T8_B48_P0_D8_R192_gpu_us_per_norm": 8.355034722222223,
+        "T8_B48_P0_D8_R192_host_us_per_norm": 9.604166666666666,
+        "T8_B48_P0_D8_R768_gpu_us_per_norm": 7.938571506076389,
+        "T8_B48_P0_D8_R768_host_us_per_norm": 8.288281249999999,
+        "T8_B48_P0_D1_R192_gpu_us_per_norm": 9.17941623263889,
+        "T8_B48_P0_D1_R192_host_us_per_norm": 10.6171875,
+        "T8_B48_P0_D1_R768_gpu_us_per_norm": 9.258829752604166,
+        "T8_B48_P0_D1_R768_host_us_per_norm": 9.571093750000001,
+        "T8_B48_P1_D0_R192_gpu_us_per_norm": 7.267795138888889,
+        "T8_B48_P1_D0_R192_host_us_per_norm": 8.440624999999999,
+        "T8_B48_P1_D0_R768_gpu_us_per_norm": 6.879950629340279,
+        "T8_B48_P1_D0_R768_host_us_per_norm": 7.209635416666667,
+        "T8_B48_P1_D8_R192_gpu_us_per_norm": 8.253851996527779,
+        "T8_B48_P1_D8_R192_host_us_per_norm": 9.542708333333334,
+        "T8_B48_P1_D8_R768_gpu_us_per_norm": 7.974921332465279,
+        "T8_B48_P1_D8_R768_host_us_per_norm": 8.234244791666667,
+        "T8_B48_P1_D1_R192_gpu_us_per_norm": 9.19406467013889,
+        "T8_B48_P1_D1_R192_host_us_per_norm": 10.394270833333334,
+        "T8_B48_P1_D1_R768_gpu_us_per_norm": 9.233805338541666,
+        "T8_B48_P1_D1_R768_host_us_per_norm": 9.54140625
+      }
+    },
+    {
+      "label": "6-new",
+      "mode": "new",
+      "config": {
+        "exe": "G:\\GitHub\\Strata\\build-orca-timestamp-visibility-20261106\\run-r1\\new.exe",
+        "args": [
+          "G:\\GitHub\\Strata\\build-orca-hc-sg16-grf-20261106\\bake-r1\\images128"
+        ],
+        "cwd": "G:\\GitHub\\Strata",
+        "tokenizer": "G:\\GitHub\\Strata-data\\packs\\iq2_xs\\tokenizer",
+        "backend": "orca",
+        "model_name": "qwen3.8-flash-next-iq2_xs-u4n16-orca-direct-m16-9402",
+        "host": "127.0.0.1",
+        "port": 8080,
+        "lib_dirs": [
+          "C:\\Program Files (x86)\\Intel\\oneAPI\\compiler\\2025.3\\bin",
+          "C:\\Program Files (x86)\\Intel\\oneAPI\\mkl\\2025.3\\bin"
+        ],
+        "env": {
+          "ZES_ENABLE_SYSMAN": "1",
+          "STRATA_MIRROR_MIB": "49152",
+          "STRATA_VERIFY_DEVICE_PLAN": "1",
+          "STRATA_VERIFY_NO_HOST": "1",
+          "STRATA_STAGER_THREADS": "12",
+          "STRATA_VERIFY_ADAPT": "1",
+          "STRATA_ADAPT_COST_WEIGHTED": "1",
+          "STRATA_PREFILL_FIRST": "0",
+          "STRATA_GDN_SG16": "1",
+          "STRATA_IQ4_XS_SG16": "2",
+          "STRATA_VERIFY_FUSED_ACT": "1",
+          "STRATA_VERIFY_DESC_CACHE": "1",
+          "STRATA_SERVE_QUIET": "1",
+          "STRATA_GU_LANES": "16",
+          "STRATA_DOWN_LANES": "4",
+          "STRATA_GU_IQ2S_SG16": "1",
+          "STRATA_GU_IQ2S_SINGLE_GROUP": "1",
+          "STRATA_GDN_Q8_TAIL": "1",
+          "STRATA_QSA_Q8_TAIL": "1",
+          "STRATA_PREFILL_NATIVE_XMX": "1",
+          "STRATA_PREFILL_XMX_EXPERT_CHAIN": "1",
+          "STRATA_PREFILL_XMX_EXPERT_BATCH": "1",
+          "STRATA_PREFILL_XMX_HC_INJECT": "1",
+          "STRATA_VALUE_PACKED_BITS": "4",
+          "STRATA_VALUE_PACKED_RESIDUAL": "0",
+          "STRATA_NO_BATCH_KV_STEP": "1",
+          "STRATA_QSA_FUSED_KV_STORE": "0",
+          "STRATA_PROMPT_ATTN_XMX": "0",
+          "STRATA_KV_RING_OFF": "1",
+          "STRATA_PREFILL_CACHE_TAIL64": "1",
+          "STRATA_ORCA_L0": "1",
+          "STRATA_ORCA_IMAGES": "G:\\GitHub\\Strata\\build-orca-hc-sg16-grf-20261106\\bake-r1\\images128",
+          "STRATA_ORCA_READY_OPS": "1",
+          "STRATA_PREFILL_FP16_PAIR": "1",
+          "STRATA_MTP_CUM_MIN_P": "0",
+          "STRATA_MTP_LAST_MIN_P": "0.5",
+          "STRATA_WARM_GRAPHS": "1",
+          "STRATA_ORCA_DG2_MEMORY": "G:\\GitHub\\Strata\\engine\\u4n16-orca-direct-m16\\memory.zebin",
+          "STRATA_ORCA_DG2_ISA_MEMORY": "device",
+          "STRATA_ORCA_DG2_THREAD_MEMORY": "device",
+          "STRATA_MTP_COST_WINDOW": "0",
+          "ORCA_DG2_BCS_COPY": "1",
+          "STRATA_PREFILL_U4_EXPERT_DIR": "G:\\GitHub\\Strata\\engine\\u4n16-expanded-assets",
+          "STRATA_U4_MIN_ROWS": "16",
+          "STRATA_U4_TILE_N8": "0",
+          "STRATA_U4_GROUP_PRIORITY": "id",
+          "STRATA_PREFILL_U2_DOWN": "0",
+          "STRATA_PREFILL_U4_EXPERTS": "1",
+          "STRATA_ORCA_XMX_WIDE": "1",
+          "STRATA_ORCA_DG2_TIMESTAMP_HZ": "19200000",
+          "STRATA_ORCA_DG2_TIMESTAMP_BITS": "36"
+        },
+        "log": "G:\\GitHub\\Strata\\strata-iq2_xs-u4n16-orca-direct-m16.log"
+      },
+      "outputs": [
+        [
+          "1",
+          "1",
+          "0",
+          "322541179a2fcc29",
+          "10500",
+          "133152",
+          "4.62364608822e-07"
+        ],
+        [
+          "1",
+          "1",
+          "1",
+          "d95eae4f8d4074c3",
+          "10500",
+          "133152",
+          "2.93675912921e-07"
+        ],
+        [
+          "1",
+          "48",
+          "0",
+          "d09a71247056bd4c",
+          "504000",
+          "6391296",
+          "5.16000942419e-07"
+        ],
+        [
+          "1",
+          "48",
+          "1",
+          "24e8d021db267a3b",
+          "504000",
+          "6391296",
+          "4.79677898291e-07"
+        ],
+        [
+          "4",
+          "1",
+          "0",
+          "4c23ab5a373c5b60",
+          "41232",
+          "409728",
+          "3.51235715179e-07"
+        ],
+        [
+          "4",
+          "1",
+          "1",
+          "d18d6fa0ac962ea9",
+          "41232",
+          "409728",
+          "3.52815606064e-07"
+        ],
+        [
+          "4",
+          "48",
+          "0",
+          "0969edf9c4833590",
+          "1979136",
+          "19666944",
+          "5.42432437634e-07"
+        ],
+        [
+          "4",
+          "48",
+          "1",
+          "b609d0bf41e4cc73",
+          "1979136",
+          "19666944",
+          "4.80362718935e-07"
+        ],
+        [
+          "8",
+          "1",
+          "0",
+          "9ea243043691a054",
+          "82208",
+          "778496",
+          "4.72674567487e-07"
+        ],
+        [
+          "8",
+          "1",
+          "1",
+          "8e0712a6dd32982d",
+          "82208",
+          "778496",
+          "4.13392148069e-07"
+        ],
+        [
+          "8",
+          "48",
+          "0",
+          "c3ff94e1a39cf19b",
+          "3945984",
+          "37367808",
+          "5.43121828844e-07"
+        ],
+        [
+          "8",
+          "48",
+          "1",
+          "9574401f256e7e20",
+          "3945984",
+          "37367808",
+          "5.1139332724e-07"
+        ]
+      ],
+      "summary": {
+        "T1_B1_P0_D0_R192_gpu_us_per_norm": 3.771430121527778,
+        "T1_B1_P0_D0_R192_host_us_per_norm": 4.709895833333333,
+        "T1_B1_P0_D0_R768_gpu_us_per_norm": 3.722601996527778,
+        "T1_B1_P0_D0_R768_host_us_per_norm": 3.9459635416666665,
+        "T1_B1_P0_D8_R192_gpu_us_per_norm": 4.277886284722222,
+        "T1_B1_P0_D8_R192_host_us_per_norm": 4.9984375000000005,
+        "T1_B1_P0_D8_R768_gpu_us_per_norm": 3.9352756076388893,
+        "T1_B1_P0_D8_R768_host_us_per_norm": 4.154557291666666,
+        "T1_B1_P0_D1_R192_gpu_us_per_norm": 4.577365451388889,
+        "T1_B1_P0_D1_R192_host_us_per_norm": 5.492708333333333,
+        "T1_B1_P0_D1_R768_gpu_us_per_norm": 4.427558051215278,
+        "T1_B1_P0_D1_R768_host_us_per_norm": 4.649609375,
+        "T1_B1_P1_D0_R192_gpu_us_per_norm": 3.7736002604166665,
+        "T1_B1_P1_D0_R192_host_us_per_norm": 4.6546875000000005,
+        "T1_B1_P1_D0_R768_gpu_us_per_norm": 3.8785807291666665,
+        "T1_B1_P1_D0_R768_host_us_per_norm": 4.105729166666666,
+        "T1_B1_P1_D8_R192_gpu_us_per_norm": 4.300672743055556,
+        "T1_B1_P1_D8_R192_host_us_per_norm": 5.209895833333333,
+        "T1_B1_P1_D8_R768_gpu_us_per_norm": 3.8765462239583335,
+        "T1_B1_P1_D8_R768_host_us_per_norm": 4.119010416666667,
+        "T1_B1_P1_D1_R192_gpu_us_per_norm": 4.487575954861112,
+        "T1_B1_P1_D1_R192_host_us_per_norm": 5.309895833333333,
+        "T1_B1_P1_D1_R768_gpu_us_per_norm": 4.556410047743056,
+        "T1_B1_P1_D1_R768_host_us_per_norm": 4.786328125,
+        "T1_B48_P0_D0_R192_gpu_us_per_norm": 4.739583333333333,
+        "T1_B48_P0_D0_R192_host_us_per_norm": 5.903125,
+        "T1_B48_P0_D0_R768_gpu_us_per_norm": 4.2230224609375,
+        "T1_B48_P0_D0_R768_host_us_per_norm": 4.522005208333334,
+        "T1_B48_P0_D8_R192_gpu_us_per_norm": 4.955783420138889,
+        "T1_B48_P0_D8_R192_host_us_per_norm": 6.215625,
+        "T1_B48_P0_D8_R768_gpu_us_per_norm": 4.447970920138889,
+        "T1_B48_P0_D8_R768_host_us_per_norm": 4.754036458333333,
+        "T1_B48_P0_D1_R192_gpu_us_per_norm": 5.568576388888889,
+        "T1_B48_P0_D1_R192_host_us_per_norm": 6.863020833333334,
+        "T1_B48_P0_D1_R768_gpu_us_per_norm": 5.121392144097222,
+        "T1_B48_P0_D1_R768_host_us_per_norm": 5.432682291666667,
+        "T1_B48_P1_D0_R192_gpu_us_per_norm": 5.081651475694445,
+        "T1_B48_P1_D0_R192_host_us_per_norm": 6.099479166666666,
+        "T1_B48_P1_D0_R768_gpu_us_per_norm": 4.300537109375,
+        "T1_B48_P1_D0_R768_host_us_per_norm": 4.605989583333334,
+        "T1_B48_P1_D8_R192_gpu_us_per_norm": 5.074598524305556,
+        "T1_B48_P1_D8_R192_host_us_per_norm": 6.14375,
+        "T1_B48_P1_D8_R768_gpu_us_per_norm": 4.310234917534722,
+        "T1_B48_P1_D8_R768_host_us_per_norm": 4.573958333333334,
+        "T1_B48_P1_D1_R192_gpu_us_per_norm": 5.445692274305556,
+        "T1_B48_P1_D1_R192_host_us_per_norm": 6.693229166666666,
+        "T1_B48_P1_D1_R768_gpu_us_per_norm": 4.9371337890625,
+        "T1_B48_P1_D1_R768_host_us_per_norm": 5.190494791666667,
+        "T4_B1_P0_D0_R192_gpu_us_per_norm": 3.9217122395833335,
+        "T4_B1_P0_D0_R192_host_us_per_norm": 4.79375,
+        "T4_B1_P0_D0_R768_gpu_us_per_norm": 4.062364366319445,
+        "T4_B1_P0_D0_R768_host_us_per_norm": 4.282291666666667,
+        "T4_B1_P0_D8_R192_gpu_us_per_norm": 4.013129340277778,
+        "T4_B1_P0_D8_R192_host_us_per_norm": 4.820833333333334,
+        "T4_B1_P0_D8_R768_gpu_us_per_norm": 3.9664035373263893,
+        "T4_B1_P0_D8_R768_host_us_per_norm": 4.2085937499999995,
+        "T4_B1_P0_D1_R192_gpu_us_per_norm": 4.641655815972222,
+        "T4_B1_P0_D1_R192_host_us_per_norm": 5.7625,
+        "T4_B1_P0_D1_R768_gpu_us_per_norm": 4.582587348090278,
+        "T4_B1_P0_D1_R768_host_us_per_norm": 4.816666666666666,
+        "T4_B1_P1_D0_R192_gpu_us_per_norm": 3.9238823784722228,
+        "T4_B1_P1_D0_R192_host_us_per_norm": 4.821354166666667,
+        "T4_B1_P1_D0_R768_gpu_us_per_norm": 4.042900933159722,
+        "T4_B1_P1_D0_R768_host_us_per_norm": 4.286328125,
+        "T4_B1_P1_D8_R192_gpu_us_per_norm": 4.038899739583333,
+        "T4_B1_P1_D8_R192_host_us_per_norm": 4.96875,
+        "T4_B1_P1_D8_R768_gpu_us_per_norm": 3.966200086805556,
+        "T4_B1_P1_D8_R768_host_us_per_norm": 4.1832031249999995,
+        "T4_B1_P1_D1_R192_gpu_us_per_norm": 4.711371527777778,
+        "T4_B1_P1_D1_R192_host_us_per_norm": 5.7484375000000005,
+        "T4_B1_P1_D1_R768_gpu_us_per_norm": 4.581773546006945,
+        "T4_B1_P1_D1_R768_host_us_per_norm": 4.791276041666666,
+        "T4_B48_P0_D0_R192_gpu_us_per_norm": 6.907552083333333,
+        "T4_B48_P0_D0_R192_host_us_per_norm": 8.428645833333333,
+        "T4_B48_P0_D0_R768_gpu_us_per_norm": 6.937255859375,
+        "T4_B48_P0_D0_R768_host_us_per_norm": 7.170963541666667,
+        "T4_B48_P0_D8_R192_gpu_us_per_norm": 6.974826388888889,
+        "T4_B48_P0_D8_R192_host_us_per_norm": 8.1171875,
+        "T4_B48_P0_D8_R768_gpu_us_per_norm": 6.7205810546875,
+        "T4_B48_P0_D8_R768_host_us_per_norm": 7.0492187500000005,
+        "T4_B48_P0_D1_R192_gpu_us_per_norm": 7.6548936631944455,
+        "T4_B48_P0_D1_R192_host_us_per_norm": 8.692708333333334,
+        "T4_B48_P0_D1_R768_gpu_us_per_norm": 7.478569878472222,
+        "T4_B48_P0_D1_R768_host_us_per_norm": 7.850651041666667,
+        "T4_B48_P1_D0_R192_gpu_us_per_norm": 6.850043402777779,
+        "T4_B48_P1_D0_R192_host_us_per_norm": 8.2578125,
+        "T4_B48_P1_D0_R768_gpu_us_per_norm": 6.802435980902779,
+        "T4_B48_P1_D0_R768_host_us_per_norm": 7.131640625,
+        "T4_B48_P1_D8_R192_gpu_us_per_norm": 6.909993489583333,
+        "T4_B48_P1_D8_R192_host_us_per_norm": 8.200520833333334,
+        "T4_B48_P1_D8_R768_gpu_us_per_norm": 6.709187825520833,
+        "T4_B48_P1_D8_R768_host_us_per_norm": 7.014973958333333,
+        "T4_B48_P1_D1_R192_gpu_us_per_norm": 7.467719184027779,
+        "T4_B48_P1_D1_R192_host_us_per_norm": 8.466666666666667,
+        "T4_B48_P1_D1_R768_gpu_us_per_norm": 7.334391276041667,
+        "T4_B48_P1_D1_R768_host_us_per_norm": 7.689713541666666,
+        "T8_B1_P0_D0_R192_gpu_us_per_norm": 4.118381076388889,
+        "T8_B1_P0_D0_R192_host_us_per_norm": 5.029166666666667,
+        "T8_B1_P0_D0_R768_gpu_us_per_norm": 4.065890842013889,
+        "T8_B1_P0_D0_R768_host_us_per_norm": 4.327473958333333,
+        "T8_B1_P0_D8_R192_gpu_us_per_norm": 4.207085503472222,
+        "T8_B1_P0_D8_R192_host_us_per_norm": 5.109895833333334,
+        "T8_B1_P0_D8_R768_gpu_us_per_norm": 4.152086046006945,
+        "T8_B1_P0_D8_R768_host_us_per_norm": 4.391927083333333,
+        "T8_B1_P0_D1_R192_gpu_us_per_norm": 4.831814236111112,
+        "T8_B1_P0_D1_R192_host_us_per_norm": 5.7171875000000005,
+        "T8_B1_P0_D1_R768_gpu_us_per_norm": 4.791191948784722,
+        "T8_B1_P0_D1_R768_host_us_per_norm": 5.01875,
+        "T8_B1_P1_D0_R192_gpu_us_per_norm": 4.107801649305556,
+        "T8_B1_P1_D0_R192_host_us_per_norm": 4.8734375000000005,
+        "T8_B1_P1_D0_R768_gpu_us_per_norm": 4.065619574652778,
+        "T8_B1_P1_D0_R768_host_us_per_norm": 4.305208333333334,
+        "T8_B1_P1_D8_R192_gpu_us_per_norm": 4.297688802083333,
+        "T8_B1_P1_D8_R192_host_us_per_norm": 5.2671874999999995,
+        "T8_B1_P1_D8_R768_gpu_us_per_norm": 4.153510199652778,
+        "T8_B1_P1_D8_R768_host_us_per_norm": 4.3773437500000005,
+        "T8_B1_P1_D1_R192_gpu_us_per_norm": 5.134819878472222,
+        "T8_B1_P1_D1_R192_host_us_per_norm": 5.8203125,
+        "T8_B1_P1_D1_R768_gpu_us_per_norm": 4.790852864583333,
+        "T8_B1_P1_D1_R768_host_us_per_norm": 5.0816406249999995,
+        "T8_B48_P0_D0_R192_gpu_us_per_norm": 7.296820746527779,
+        "T8_B48_P0_D0_R192_host_us_per_norm": 8.660937500000001,
+        "T8_B48_P0_D0_R768_gpu_us_per_norm": 6.7181396484375,
+        "T8_B48_P0_D0_R768_host_us_per_norm": 7.073567708333333,
+        "T8_B48_P0_D8_R192_gpu_us_per_norm": 7.001139322916667,
+        "T8_B48_P0_D8_R192_host_us_per_norm": 8.057812499999999,
+        "T8_B48_P0_D8_R768_gpu_us_per_norm": 6.815592447916667,
+        "T8_B48_P0_D8_R768_host_us_per_norm": 7.0804687500000005,
+        "T8_B48_P0_D1_R192_gpu_us_per_norm": 7.559136284722222,
+        "T8_B48_P0_D1_R192_host_us_per_norm": 8.426041666666666,
+        "T8_B48_P0_D1_R768_gpu_us_per_norm": 7.9783799913194455,
+        "T8_B48_P0_D1_R768_host_us_per_norm": 8.164973958333333,
+        "T8_B48_P1_D0_R192_gpu_us_per_norm": 8.70090060763889,
+        "T8_B48_P1_D0_R192_host_us_per_norm": 9.706770833333334,
+        "T8_B48_P1_D0_R768_gpu_us_per_norm": 7.026095920138889,
+        "T8_B48_P1_D0_R768_host_us_per_norm": 7.726692708333334,
+        "T8_B48_P1_D8_R192_gpu_us_per_norm": 7.26806640625,
+        "T8_B48_P1_D8_R192_host_us_per_norm": 8.293229166666666,
+        "T8_B48_P1_D8_R768_gpu_us_per_norm": 6.92138671875,
+        "T8_B48_P1_D8_R768_host_us_per_norm": 7.184765625,
+        "T8_B48_P1_D1_R192_gpu_us_per_norm": 7.841525607638889,
+        "T8_B48_P1_D1_R192_host_us_per_norm": 8.769791666666666,
+        "T8_B48_P1_D1_R768_gpu_us_per_norm": 7.459920247395833,
+        "T8_B48_P1_D1_R768_host_us_per_norm": 7.722786458333334
+      }
+    }
+  ],
+  "comparisons": [
+    {
+      "T1_B1_P0_D0_R192_gpu_us_per_norm": {
+        "old": 4.003545104443526,
+        "new": 3.771430121527778,
+        "latency_change_pct": -5.797736177822088,
+        "outer_drift_pct": 12.687909084370276
+      },
+      "T1_B1_P0_D0_R192_host_us_per_norm": {
+        "old": 4.880044354235477,
+        "new": 4.502083333333333,
+        "latency_change_pct": -7.745032492872839,
+        "outer_drift_pct": 16.65706051873197
+      },
+      "T1_B1_P0_D0_R768_gpu_us_per_norm": {
+        "old": 3.725043224370888,
+        "new": 3.794013129340278,
+        "latency_change_pct": 1.8515195882334634,
+        "outer_drift_pct": 0.061918377010061754
+      },
+      "T1_B1_P0_D0_R768_host_us_per_norm": {
+        "old": 3.9595511935441468,
+        "new": 4.062760416666666,
+        "latency_change_pct": 2.606588930856546,
+        "outer_drift_pct": 0.6234537357743708
+      },
+      "T1_B1_P0_D8_R192_gpu_us_per_norm": {
+        "old": 4.34689486161061,
+        "new": 3.8628472222222228,
+        "latency_change_pct": -11.135480723567316,
+        "outer_drift_pct": 0.732807215332576
+      },
+      "T1_B1_P0_D8_R192_host_us_per_norm": {
+        "old": 5.311197757058508,
+        "new": 4.999479166666666,
+        "latency_change_pct": -5.869082731434205,
+        "outer_drift_pct": -0.04901960784314818
+      },
+      "T1_B1_P0_D8_R768_gpu_us_per_norm": {
+        "old": 4.339385835339727,
+        "new": 3.8108995225694446,
+        "latency_change_pct": -12.17882743835126,
+        "outer_drift_pct": 1.2074712282246436
+      },
+      "T1_B1_P0_D8_R768_host_us_per_norm": {
+        "old": 4.5865376815845815,
+        "new": 4.009895833333333,
+        "latency_change_pct": -12.572486879733368,
+        "outer_drift_pct": 1.7930283848423434
+      },
+      "T1_B1_P0_D1_R192_gpu_us_per_norm": {
+        "old": 8.81668749843995,
+        "new": 4.488389756944445,
+        "latency_change_pct": -49.092107917643304,
+        "outer_drift_pct": -0.6318049378929658
+      },
+      "T1_B1_P0_D1_R192_host_us_per_norm": {
+        "old": 9.803217270246348,
+        "new": 5.541666666666667,
+        "latency_change_pct": -43.47093904073587,
+        "outer_drift_pct": -1.85272909100479
+      },
+      "T1_B1_P0_D1_R768_gpu_us_per_norm": {
+        "old": 9.166752284726641,
+        "new": 4.531317816840278,
+        "latency_change_pct": -50.56790370139903,
+        "outer_drift_pct": 9.249077875983014
+      },
+      "T1_B1_P0_D1_R768_host_us_per_norm": {
+        "old": 9.403003171407159,
+        "new": 4.767447916666667,
+        "latency_change_pct": -49.298667353812895,
+        "outer_drift_pct": 8.452065066912784
+      },
+      "T1_B1_P1_D0_R192_gpu_us_per_norm": {
+        "old": 4.0210982363355585,
+        "new": 3.7741427951388893,
+        "latency_change_pct": -6.141492365571266,
+        "outer_drift_pct": 13.596491228070185
+      },
+      "T1_B1_P1_D0_R192_host_us_per_norm": {
+        "old": 4.855487849978076,
+        "new": 4.6671875,
+        "latency_change_pct": -3.878093320302012,
+        "outer_drift_pct": 7.41523068371317
+      },
+      "T1_B1_P1_D0_R768_gpu_us_per_norm": {
+        "old": 3.7695890959153853,
+        "new": 3.725111219618056,
+        "latency_change_pct": -1.1799131195897261,
+        "outer_drift_pct": -2.413449918248378
+      },
+      "T1_B1_P1_D0_R768_host_us_per_norm": {
+        "old": 3.972104232446593,
+        "new": 4.004166666666666,
+        "latency_change_pct": 0.80719015271975,
+        "outer_drift_pct": -1.786758495224483
+      },
+      "T1_B1_P1_D8_R192_gpu_us_per_norm": {
+        "old": 4.652409807840589,
+        "new": 4.055989583333333,
+        "latency_change_pct": -12.819597781393288,
+        "outer_drift_pct": -11.558918681800723
+      },
+      "T1_B1_P1_D8_R192_host_us_per_norm": {
+        "old": 5.405659087808916,
+        "new": 4.8390625,
+        "latency_change_pct": -10.481544962514,
+        "outer_drift_pct": -7.612520837192072
+      },
+      "T1_B1_P1_D8_R768_gpu_us_per_norm": {
+        "old": 4.469361621616681,
+        "new": 3.812934027777778,
+        "latency_change_pct": -14.687278618583932,
+        "outer_drift_pct": 0.31458966565349744
+      },
+      "T1_B1_P1_D8_R768_host_us_per_norm": {
+        "old": 4.695064700430937,
+        "new": 4.053776041666667,
+        "latency_change_pct": -13.658782140007775,
+        "outer_drift_pct": 0.9501783325903013
+      },
+      "T1_B1_P1_D1_R192_gpu_us_per_norm": {
+        "old": 9.071078087462704,
+        "new": 4.487575954861112,
+        "latency_change_pct": -50.52874739262283,
+        "outer_drift_pct": -4.626033118191641
+      },
+      "T1_B1_P1_D1_R192_host_us_per_norm": {
+        "old": 9.982595816634133,
+        "new": 5.5125,
+        "latency_change_pct": -44.77889217136841,
+        "outer_drift_pct": -6.945492979012535
+      },
+      "T1_B1_P1_D1_R768_gpu_us_per_norm": {
+        "old": 8.605969571744993,
+        "new": 4.429524739583333,
+        "latency_change_pct": -48.52962582942089,
+        "outer_drift_pct": -6.351566729961178
+      },
+      "T1_B1_P1_D1_R768_host_us_per_norm": {
+        "old": 8.848795400896623,
+        "new": 4.649348958333333,
+        "latency_change_pct": -47.457831855144626,
+        "outer_drift_pct": -6.448720503259231
+      },
+      "T1_B48_P0_D0_R192_gpu_us_per_norm": {
+        "old": 4.749469933235119,
+        "new": 4.736056857638889,
+        "latency_change_pct": -0.28241205407723013,
+        "outer_drift_pct": -0.4956700091157562
+      },
+      "T1_B48_P0_D0_R192_host_us_per_norm": {
+        "old": 5.875067135402464,
+        "new": 5.694270833333333,
+        "latency_change_pct": -3.077348699211846,
+        "outer_drift_pct": 1.6355349003485564
+      },
+      "T1_B48_P0_D0_R768_gpu_us_per_norm": {
+        "old": 4.178649016951903,
+        "new": 4.131740993923612,
+        "latency_change_pct": -1.122564322535713,
+        "outer_drift_pct": -2.200430135139464
+      },
+      "T1_B48_P0_D0_R768_host_us_per_norm": {
+        "old": 4.454509310602257,
+        "new": 4.427734375,
+        "latency_change_pct": -0.6010748599970195,
+        "outer_drift_pct": -1.7729880062576142
+      },
+      "T1_B48_P0_D8_R192_gpu_us_per_norm": {
+        "old": 7.742369915570796,
+        "new": 4.815809461805556,
+        "latency_change_pct": -37.79928478849338,
+        "outer_drift_pct": -3.3040482342807764
+      },
+      "T1_B48_P0_D8_R192_host_us_per_norm": {
+        "old": 8.88261667000496,
+        "new": 5.974479166666666,
+        "latency_change_pct": -32.739648814955224,
+        "outer_drift_pct": -6.738391845979608
+      },
+      "T1_B48_P0_D8_R768_gpu_us_per_norm": {
+        "old": 7.489998158088158,
+        "new": 4.365030924479167,
+        "latency_change_pct": -41.72186918676955,
+        "outer_drift_pct": -9.51294087248612
+      },
+      "T1_B48_P0_D8_R768_host_us_per_norm": {
+        "old": 7.742879860504541,
+        "new": 4.771614583333333,
+        "latency_change_pct": -38.37416220710409,
+        "outer_drift_pct": -8.290522586359616
+      },
+      "T1_B48_P0_D1_R192_gpu_us_per_norm": {
+        "old": 8.61887674810591,
+        "new": 5.617404513888889,
+        "latency_change_pct": -34.824401391708335,
+        "outer_drift_pct": -1.4714611515511122
+      },
+      "T1_B48_P0_D1_R192_host_us_per_norm": {
+        "old": 9.690568398469548,
+        "new": 6.668229166666666,
+        "latency_change_pct": -31.188461889193263,
+        "outer_drift_pct": -1.6047342325531955
+      },
+      "T1_B48_P0_D1_R768_gpu_us_per_norm": {
+        "old": 8.583990347869046,
+        "new": 5.154486762152778,
+        "latency_change_pct": -39.952323415270776,
+        "outer_drift_pct": -1.8324566347297733
+      },
+      "T1_B48_P0_D1_R768_host_us_per_norm": {
+        "old": 8.900734159404431,
+        "new": 5.329296875,
+        "latency_change_pct": -40.12519889306979,
+        "outer_drift_pct": -1.465206784386608
+      },
+      "T1_B48_P1_D0_R192_gpu_us_per_norm": {
+        "old": 4.73726663883626,
+        "new": 4.76318359375,
+        "latency_change_pct": 0.5470866828831467,
+        "outer_drift_pct": 0.43039136921843024
+      },
+      "T1_B48_P1_D0_R192_host_us_per_norm": {
+        "old": 5.964791490211656,
+        "new": 5.867708333333333,
+        "latency_change_pct": -1.6276035304442549,
+        "outer_drift_pct": 4.763607114129953
+      },
+      "T1_B48_P1_D0_R768_gpu_us_per_norm": {
+        "old": 4.245480915062691,
+        "new": 4.132893880208333,
+        "latency_change_pct": -2.6519265333382225,
+        "outer_drift_pct": -5.314370094039001
+      },
+      "T1_B48_P1_D0_R768_host_us_per_norm": {
+        "old": 4.512767462818739,
+        "new": 4.4136718749999995,
+        "latency_change_pct": -2.1958939527728982,
+        "outer_drift_pct": -2.972857751882896
+      },
+      "T1_B48_P1_D8_R192_gpu_us_per_norm": {
+        "old": 7.1668825254616655,
+        "new": 4.863552517361112,
+        "latency_change_pct": -32.138520478290964,
+        "outer_drift_pct": 0.11361484567316005
+      },
+      "T1_B48_P1_D8_R192_host_us_per_norm": {
+        "old": 8.25365225870577,
+        "new": 5.949479166666666,
+        "latency_change_pct": -27.917012006517638,
+        "outer_drift_pct": 3.2183613283754298
+      },
+      "T1_B48_P1_D8_R768_gpu_us_per_norm": {
+        "old": 7.352810627420146,
+        "new": 4.216715494791667,
+        "latency_change_pct": -42.6516510697737,
+        "outer_drift_pct": -2.3847710000182376
+      },
+      "T1_B48_P1_D8_R768_host_us_per_norm": {
+        "old": 7.689071919658255,
+        "new": 4.505859375,
+        "latency_change_pct": -41.39917766304018,
+        "outer_drift_pct": -1.1147783914859155
+      },
+      "T1_B48_P1_D1_R192_gpu_us_per_norm": {
+        "old": 8.483206354662206,
+        "new": 5.556098090277779,
+        "latency_change_pct": -34.50473962331172,
+        "outer_drift_pct": 0.14400000000001079
+      },
+      "T1_B48_P1_D1_R192_host_us_per_norm": {
+        "old": 9.571092952871162,
+        "new": 6.730729166666666,
+        "latency_change_pct": -29.67648313719945,
+        "outer_drift_pct": 0.08165931732810883
+      },
+      "T1_B48_P1_D1_R768_gpu_us_per_norm": {
+        "old": 8.925621969484332,
+        "new": 5.688747829861112,
+        "latency_change_pct": -36.26497011289206,
+        "outer_drift_pct": -8.015128107966296
+      },
+      "T1_B48_P1_D1_R768_host_us_per_norm": {
+        "old": 9.146441391968724,
+        "new": 5.926302083333333,
+        "latency_change_pct": -35.2064717920012,
+        "outer_drift_pct": -6.707367378929141
+      },
+      "T4_B1_P0_D0_R192_gpu_us_per_norm": {
+        "old": 3.971385295586106,
+        "new": 3.922254774305556,
+        "latency_change_pct": -1.2371129372704015,
+        "outer_drift_pct": -2.1753817051749724
+      },
+      "T4_B1_P0_D0_R192_host_us_per_norm": {
+        "old": 4.977830244726361,
+        "new": 4.8046875,
+        "latency_change_pct": -3.478277406301522,
+        "outer_drift_pct": 0.7456416719176406
+      },
+      "T4_B1_P0_D0_R768_gpu_us_per_norm": {
+        "old": 3.9291740373962054,
+        "new": 3.9446343315972228,
+        "latency_change_pct": 0.3934744059151507,
+        "outer_drift_pct": -2.5859425573234285
+      },
+      "T4_B1_P0_D0_R768_host_us_per_norm": {
+        "old": 4.208189207322123,
+        "new": 4.0992187499999995,
+        "latency_change_pct": -2.589485689771698,
+        "outer_drift_pct": -2.508248808505431
+      },
+      "T4_B1_P0_D8_R192_gpu_us_per_norm": {
+        "old": 4.537156503355896,
+        "new": 4.04052734375,
+        "latency_change_pct": -10.945823870932504,
+        "outer_drift_pct": -1.0349134598227727
+      },
+      "T4_B1_P0_D8_R192_host_us_per_norm": {
+        "old": 5.399291141906449,
+        "new": 4.931770833333333,
+        "latency_change_pct": -8.658920148692662,
+        "outer_drift_pct": -4.965205943201056
+      },
+      "T4_B1_P0_D8_R768_gpu_us_per_norm": {
+        "old": 4.551117137332868,
+        "new": 4.076605902777778,
+        "latency_change_pct": -10.426258438014468,
+        "outer_drift_pct": -3.938893838267288
+      },
+      "T4_B1_P0_D8_R768_host_us_per_norm": {
+        "old": 4.7777906428516275,
+        "new": 4.277994791666667,
+        "latency_change_pct": -10.460815229163266,
+        "outer_drift_pct": -2.553065561862755
+      },
+      "T4_B1_P0_D1_R192_gpu_us_per_norm": {
+        "old": 8.95656196074793,
+        "new": 4.713812934027778,
+        "latency_change_pct": -47.37028611328733,
+        "outer_drift_pct": 0.2699178115427747
+      },
+      "T4_B1_P0_D1_R192_host_us_per_norm": {
+        "old": 9.842677893005986,
+        "new": 5.530208333333333,
+        "latency_change_pct": -43.81398646334864,
+        "outer_drift_pct": -0.4961731327527086
+      },
+      "T4_B1_P0_D1_R768_gpu_us_per_norm": {
+        "old": 8.94605608981714,
+        "new": 4.747721354166667,
+        "latency_change_pct": -46.92944794331475,
+        "outer_drift_pct": -5.687088652325622
+      },
+      "T4_B1_P0_D1_R768_host_us_per_norm": {
+        "old": 9.148851116156905,
+        "new": 4.938411458333333,
+        "latency_change_pct": -46.02151247589896,
+        "outer_drift_pct": -5.706348986981413
+      },
+      "T4_B1_P1_D0_R192_gpu_us_per_norm": {
+        "old": 3.9302567659361407,
+        "new": 4.402398003472222,
+        "latency_change_pct": 12.01298708084848,
+        "outer_drift_pct": -0.08968609865471766
+      },
+      "T4_B1_P1_D0_R192_host_us_per_norm": {
+        "old": 5.02572826635154,
+        "new": 5.057291666666667,
+        "latency_change_pct": 0.6280363490093865,
+        "outer_drift_pct": 7.678244972577697
+      },
+      "T4_B1_P1_D0_R768_gpu_us_per_norm": {
+        "old": 3.878885743546999,
+        "new": 4.163886176215278,
+        "latency_change_pct": 7.347482022186691,
+        "outer_drift_pct": -0.05767919878348904
+      },
+      "T4_B1_P1_D0_R768_host_us_per_norm": {
+        "old": 4.11796828682292,
+        "new": 4.445572916666666,
+        "latency_change_pct": 7.95549181114501,
+        "outer_drift_pct": 0.09490367277213974
+      },
+      "T4_B1_P1_D8_R192_gpu_us_per_norm": {
+        "old": 4.560812148434336,
+        "new": 4.018825954861112,
+        "latency_change_pct": -11.883545647879423,
+        "outer_drift_pct": 1.5886337749535517
+      },
+      "T4_B1_P1_D8_R192_host_us_per_norm": {
+        "old": 5.435571077882097,
+        "new": 4.8374999999999995,
+        "latency_change_pct": -11.002911548994554,
+        "outer_drift_pct": -2.991694979237436
+      },
+      "T4_B1_P1_D8_R768_gpu_us_per_norm": {
+        "old": 4.526092584674996,
+        "new": 4.060126410590278,
+        "latency_change_pct": -10.295109199985086,
+        "outer_drift_pct": -1.5550434847245942
+      },
+      "T4_B1_P1_D8_R768_host_us_per_norm": {
+        "old": 4.785017918918904,
+        "new": 4.265364583333334,
+        "latency_change_pct": -10.860008141891718,
+        "outer_drift_pct": -3.2651750347928554
+      },
+      "T4_B1_P1_D1_R192_gpu_us_per_norm": {
+        "old": 8.688824737360246,
+        "new": 4.643825954861112,
+        "latency_change_pct": -46.55403814403611,
+        "outer_drift_pct": 0.20313769610600385
+      },
+      "T4_B1_P1_D1_R192_host_us_per_norm": {
+        "old": 9.667032814545525,
+        "new": 5.678645833333333,
+        "latency_change_pct": -41.25761293797468,
+        "outer_drift_pct": -1.1250401800064314
+      },
+      "T4_B1_P1_D1_R768_gpu_us_per_norm": {
+        "old": 8.76657525717251,
+        "new": 4.6075439453125,
+        "latency_change_pct": -47.441916482234426,
+        "outer_drift_pct": -1.3728728920984978
+      },
+      "T4_B1_P1_D1_R768_host_us_per_norm": {
+        "old": 9.023265384737185,
+        "new": 4.821484375,
+        "latency_change_pct": -46.56608035539418,
+        "outer_drift_pct": -1.439766199160497
+      },
+      "T4_B48_P0_D0_R192_gpu_us_per_norm": {
+        "old": 6.838136451838317,
+        "new": 9.535047743055555,
+        "latency_change_pct": 39.43927282252781,
+        "outer_drift_pct": -2.421724989223717
+      },
+      "T4_B48_P0_D0_R192_host_us_per_norm": {
+        "old": 7.999984741196386,
+        "new": 10.844791666666666,
+        "latency_change_pct": 35.56015439405505,
+        "outer_drift_pct": -0.3898635477582846
+      },
+      "T4_B48_P0_D0_R768_gpu_us_per_norm": {
+        "old": 6.73642024729704,
+        "new": 6.893581814236112,
+        "latency_change_pct": 2.333013101463388,
+        "outer_drift_pct": -3.1768516775797617
+      },
+      "T4_B48_P0_D0_R768_host_us_per_norm": {
+        "old": 7.047816103778694,
+        "new": 7.1773437499999995,
+        "latency_change_pct": 1.837840890199427,
+        "outer_drift_pct": -2.7528785891269614
+      },
+      "T4_B48_P0_D8_R192_gpu_us_per_norm": {
+        "old": 7.503797664603567,
+        "new": 7.009819878472222,
+        "latency_change_pct": -6.583037126140878,
+        "outer_drift_pct": -0.028916359430342098
+      },
+      "T4_B48_P0_D8_R192_host_us_per_norm": {
+        "old": 8.703428845309451,
+        "new": 8.535416666666666,
+        "latency_change_pct": -1.9304136522392823,
+        "outer_drift_pct": 1.4222865063580947
+      },
+      "T4_B48_P0_D8_R768_gpu_us_per_norm": {
+        "old": 7.733865238392172,
+        "new": 6.9181993272569455,
+        "latency_change_pct": -10.54667861402766,
+        "outer_drift_pct": 1.465366474110974
+      },
+      "T4_B48_P0_D8_R768_host_us_per_norm": {
+        "old": 8.026741922053214,
+        "new": 7.177734375,
+        "latency_change_pct": -10.577237380967652,
+        "outer_drift_pct": 1.6733185030096687
+      },
+      "T4_B48_P0_D1_R192_gpu_us_per_norm": {
+        "old": 8.992761036793189,
+        "new": 7.6963975694444455,
+        "latency_change_pct": -14.41563344166238,
+        "outer_drift_pct": 6.112112360947108
+      },
+      "T4_B48_P0_D1_R192_host_us_per_norm": {
+        "old": 9.913704846451303,
+        "new": 8.952604166666667,
+        "latency_change_pct": -9.694667076241126,
+        "outer_drift_pct": 5.848332522566357
+      },
+      "T4_B48_P0_D1_R768_gpu_us_per_norm": {
+        "old": 8.946411159534104,
+        "new": 7.671169704861112,
+        "latency_change_pct": -14.254223642672404,
+        "outer_drift_pct": -3.6891008235197864
+      },
+      "T4_B48_P0_D1_R768_host_us_per_norm": {
+        "old": 9.214382991960235,
+        "new": 7.942708333333333,
+        "latency_change_pct": -13.800974625609419,
+        "outer_drift_pct": -2.578908461999796
+      },
+      "T4_B48_P1_D0_R192_gpu_us_per_norm": {
+        "old": 6.806347161919293,
+        "new": 6.812065972222222,
+        "latency_change_pct": 0.08402172511747796,
+        "outer_drift_pct": -1.8400789733464928
+      },
+      "T4_B48_P1_D0_R192_host_us_per_norm": {
+        "old": 8.022505270818618,
+        "new": 8.3359375,
+        "latency_change_pct": 3.9069121004067453,
+        "outer_drift_pct": 1.2345679012345734
+      },
+      "T4_B48_P1_D0_R768_gpu_us_per_norm": {
+        "old": 6.963708476913333,
+        "new": 6.711086697048612,
+        "latency_change_pct": -3.627690342038792,
+        "outer_drift_pct": -6.736701527349343
+      },
+      "T4_B48_P1_D0_R768_host_us_per_norm": {
+        "old": 7.2805881881645576,
+        "new": 7.03515625,
+        "latency_change_pct": -3.3710454680507262,
+        "outer_drift_pct": -5.8144580404408615
+      },
+      "T4_B48_P1_D8_R192_gpu_us_per_norm": {
+        "old": 7.868064575848558,
+        "new": 6.824273003472222,
+        "latency_change_pct": -13.266179532642742,
+        "outer_drift_pct": 6.331769055745173
+      },
+      "T4_B48_P1_D8_R192_host_us_per_norm": {
+        "old": 8.960170354283326,
+        "new": 8.086458333333333,
+        "latency_change_pct": -9.75106483921171,
+        "outer_drift_pct": 6.477927063339739
+      },
+      "T4_B48_P1_D8_R768_gpu_us_per_norm": {
+        "old": 7.508624994786576,
+        "new": 6.828748914930556,
+        "latency_change_pct": -9.05460161251993,
+        "outer_drift_pct": -0.9715893259992114
+      },
+      "T4_B48_P1_D8_R768_host_us_per_norm": {
+        "old": 7.843231141321317,
+        "new": 7.172135416666666,
+        "latency_change_pct": -8.556368065184849,
+        "outer_drift_pct": -1.610486274638967
+      },
+      "T4_B48_P1_D1_R192_gpu_us_per_norm": {
+        "old": 8.942461303361362,
+        "new": 7.466362847222222,
+        "latency_change_pct": -16.506623915546527,
+        "outer_drift_pct": -0.16064500484966882
+      },
+      "T4_B48_P1_D1_R192_host_us_per_norm": {
+        "old": 10.285300304013976,
+        "new": 8.736979166666666,
+        "latency_change_pct": -15.053728054425953,
+        "outer_drift_pct": 3.960140437835591
+      },
+      "T4_B48_P1_D1_R768_gpu_us_per_norm": {
+        "old": 8.800369272304565,
+        "new": 7.344699435763889,
+        "latency_change_pct": -16.541008581557815,
+        "outer_drift_pct": -3.34487434939732
+      },
+      "T4_B48_P1_D1_R768_host_us_per_norm": {
+        "old": 9.108673508164733,
+        "new": 7.717578125,
+        "latency_change_pct": -15.272206012410017,
+        "outer_drift_pct": -2.086398098902331
+      },
+      "T8_B1_P0_D0_R192_gpu_us_per_norm": {
+        "old": 4.166682746644252,
+        "new": 4.116482204861112,
+        "latency_change_pct": -1.2048083532054554,
+        "outer_drift_pct": 2.2381673359225918
+      },
+      "T8_B1_P0_D0_R192_host_us_per_norm": {
+        "old": 5.352101782438683,
+        "new": 5.241145833333333,
+        "latency_change_pct": -2.0731285318492665,
+        "outer_drift_pct": 3.4342834520981524
+      },
+      "T8_B1_P0_D0_R768_gpu_us_per_norm": {
+        "old": 4.158093728248115,
+        "new": 4.065144856770833,
+        "latency_change_pct": -2.235372205437114,
+        "outer_drift_pct": 3.4689848532607703
+      },
+      "T8_B1_P0_D0_R768_host_us_per_norm": {
+        "old": 4.462573146606443,
+        "new": 4.3125,
+        "latency_change_pct": -3.3629285543603116,
+        "outer_drift_pct": 2.149808316130941
+      },
+      "T8_B1_P0_D8_R192_gpu_us_per_norm": {
+        "old": 4.786906619290007,
+        "new": 4.203287760416667,
+        "latency_change_pct": -12.191983368163184,
+        "outer_drift_pct": -1.5630270999662743
+      },
+      "T8_B1_P0_D8_R192_host_us_per_norm": {
+        "old": 5.886041034359149,
+        "new": 5.127083333333333,
+        "latency_change_pct": -12.8941965677011,
+        "outer_drift_pct": -2.9893672651211567
+      },
+      "T8_B1_P0_D8_R768_gpu_us_per_norm": {
+        "old": 4.694274511916271,
+        "new": 4.154527452256945,
+        "latency_change_pct": -11.497986713158658,
+        "outer_drift_pct": -0.34899987020665657
+      },
+      "T8_B1_P0_D8_R768_host_us_per_norm": {
+        "old": 4.943213890383536,
+        "new": 4.369921875,
+        "latency_change_pct": -11.597556328663227,
+        "outer_drift_pct": 1.147080640033904
+      },
+      "T8_B1_P0_D1_R192_gpu_us_per_norm": {
+        "old": 9.237132848507105,
+        "new": 4.829915364583333,
+        "latency_change_pct": -47.711963833410294,
+        "outer_drift_pct": 1.3213515031481826
+      },
+      "T8_B1_P0_D1_R192_host_us_per_norm": {
+        "old": 10.10724000188623,
+        "new": 5.868229166666667,
+        "latency_change_pct": -41.940340136659195,
+        "outer_drift_pct": -1.5593844266066692
+      },
+      "T8_B1_P0_D1_R768_gpu_us_per_norm": {
+        "old": 9.1582018323122,
+        "new": 4.771660698784722,
+        "latency_change_pct": -47.897406214075474,
+        "outer_drift_pct": -2.556230492021383
+      },
+      "T8_B1_P0_D1_R768_host_us_per_norm": {
+        "old": 9.407082871084222,
+        "new": 5.001432291666666,
+        "latency_change_pct": -46.83333441188,
+        "outer_drift_pct": -3.0393893962109786
+      },
+      "T8_B1_P1_D0_R192_gpu_us_per_norm": {
+        "old": 4.355951888624061,
+        "new": 4.111328125,
+        "latency_change_pct": -5.6158509065014295,
+        "outer_drift_pct": -10.798729561228093
+      },
+      "T8_B1_P1_D0_R192_host_us_per_norm": {
+        "old": 5.285960619017002,
+        "new": 4.973958333333333,
+        "latency_change_pct": -5.902470868988241,
+        "outer_drift_pct": -11.066716223750229
+      },
+      "T8_B1_P1_D0_R768_gpu_us_per_norm": {
+        "old": 4.140402131221696,
+        "new": 4.234822591145833,
+        "latency_change_pct": 2.280465928952591,
+        "outer_drift_pct": -2.4732295946426675
+      },
+      "T8_B1_P1_D0_R768_host_us_per_norm": {
+        "old": 4.359554470292046,
+        "new": 4.458854166666667,
+        "latency_change_pct": 2.2777487252721107,
+        "outer_drift_pct": -2.471757661563878
+      },
+      "T8_B1_P1_D8_R192_gpu_us_per_norm": {
+        "old": 4.846814370082992,
+        "new": 4.206000434027778,
+        "latency_change_pct": -13.221342661906842,
+        "outer_drift_pct": 4.695911121291929
+      },
+      "T8_B1_P1_D8_R192_host_us_per_norm": {
+        "old": 5.99767675561494,
+        "new": 5.028645833333333,
+        "latency_change_pct": -16.156771392763268,
+        "outer_drift_pct": 1.8049592569876483
+      },
+      "T8_B1_P1_D8_R768_gpu_us_per_norm": {
+        "old": 4.76077515970171,
+        "new": 4.152628580729167,
+        "latency_change_pct": -12.774108387228422,
+        "outer_drift_pct": -1.836170152708394
+      },
+      "T8_B1_P1_D8_R768_host_us_per_norm": {
+        "old": 5.022545814404364,
+        "new": 4.384505208333334,
+        "latency_change_pct": -12.703529836227045,
+        "outer_drift_pct": -1.658225570095384
+      },
+      "T8_B1_P1_D1_R192_gpu_us_per_norm": {
+        "old": 9.166376839015129,
+        "new": 4.830186631944445,
+        "latency_change_pct": -47.305388849108034,
+        "outer_drift_pct": 0.40328559143612
+      },
+      "T8_B1_P1_D1_R192_host_us_per_norm": {
+        "old": 10.224275392010266,
+        "new": 5.8046875,
+        "latency_change_pct": -43.22641676361674,
+        "outer_drift_pct": 2.8150826446280863
+      },
+      "T8_B1_P1_D1_R768_gpu_us_per_norm": {
+        "old": 9.346224436180382,
+        "new": 4.7711181640625,
+        "latency_change_pct": -48.951384629787874,
+        "outer_drift_pct": 2.152453870750115
+      },
+      "T8_B1_P1_D1_R768_host_us_per_norm": {
+        "old": 9.584721296115958,
+        "new": 5.006119791666666,
+        "latency_change_pct": -47.76979280873499,
+        "outer_drift_pct": 1.6076465916248894
+      },
+      "T8_B48_P0_D0_R192_gpu_us_per_norm": {
+        "old": 6.821559984668612,
+        "new": 6.8345811631944455,
+        "latency_change_pct": 0.19088270945499808,
+        "outer_drift_pct": 0.06364612753093635
+      },
+      "T8_B48_P0_D0_R192_host_us_per_norm": {
+        "old": 7.986430769946131,
+        "new": 8.127083333333333,
+        "latency_change_pct": 1.7611442137142719,
+        "outer_drift_pct": 4.071585390193588
+      },
+      "T8_B48_P0_D0_R768_gpu_us_per_norm": {
+        "old": 6.79315306063489,
+        "new": 7.127821180555556,
+        "latency_change_pct": 4.9265505566186585,
+        "outer_drift_pct": -1.9552603224498921
+      },
+      "T8_B48_P0_D0_R768_host_us_per_norm": {
+        "old": 7.128124957187089,
+        "new": 7.4183593750000005,
+        "latency_change_pct": 4.071679713194087,
+        "outer_drift_pct": -0.021917808219173995
+      },
+      "T8_B48_P0_D8_R192_gpu_us_per_norm": {
+        "old": 8.072424478236647,
+        "new": 6.907280815972222,
+        "latency_change_pct": -14.433627287634165,
+        "outer_drift_pct": -4.617656711519524
+      },
+      "T8_B48_P0_D8_R192_host_us_per_norm": {
+        "old": 9.400952273351532,
+        "new": 8.211458333333333,
+        "latency_change_pct": -12.652909039757654,
+        "outer_drift_pct": -3.05476761946325
+      },
+      "T8_B48_P0_D8_R768_gpu_us_per_norm": {
+        "old": 7.9158849834531315,
+        "new": 6.816202799479167,
+        "latency_change_pct": -13.89209401441116,
+        "outer_drift_pct": -0.835217335665217
+      },
+      "T8_B48_P0_D8_R768_host_us_per_norm": {
+        "old": 8.230225828875032,
+        "new": 7.200651041666667,
+        "latency_change_pct": -12.509678453733198,
+        "outer_drift_pct": -1.3060903732809548
+      },
+      "T8_B48_P0_D1_R192_gpu_us_per_norm": {
+        "old": 10.247373812943229,
+        "new": 7.552625868055556,
+        "latency_change_pct": -26.296961485722292,
+        "outer_drift_pct": -13.670462650958015
+      },
+      "T8_B48_P0_D1_R192_host_us_per_norm": {
+        "old": 11.63582847674706,
+        "new": 8.778645833333334,
+        "latency_change_pct": -24.555042635111846,
+        "outer_drift_pct": -14.51392625087945
+      },
+      "T8_B48_P0_D1_R768_gpu_us_per_norm": {
+        "old": 9.245714920578449,
+        "new": 7.622002495659722,
+        "latency_change_pct": -17.56178336522991,
+        "outer_drift_pct": -3.440223149609689
+      },
+      "T8_B48_P0_D1_R768_host_us_per_norm": {
+        "old": 9.59132141587829,
+        "new": 7.974609375,
+        "latency_change_pct": -16.85598856276308,
+        "outer_drift_pct": -3.0187569352531307
+      },
+      "T8_B48_P1_D0_R192_gpu_us_per_norm": {
+        "old": 7.014888093191263,
+        "new": 6.8907335069444455,
+        "latency_change_pct": -1.7698726565192557,
+        "outer_drift_pct": 6.628598810046715
+      },
+      "T8_B48_P1_D0_R192_host_us_per_norm": {
+        "old": 8.144903506181029,
+        "new": 8.296875,
+        "latency_change_pct": 1.8658476887251307,
+        "outer_drift_pct": 2.597318479176125
+      },
+      "T8_B48_P1_D0_R768_gpu_us_per_norm": {
+        "old": 6.9908308924770655,
+        "new": 7.818603515625,
+        "latency_change_pct": 11.840833169612397,
+        "outer_drift_pct": -5.353013901603465
+      },
+      "T8_B48_P1_D0_R768_host_us_per_norm": {
+        "old": 7.232510296337776,
+        "new": 8.110416666666667,
+        "latency_change_pct": 12.138335575870872,
+        "outer_drift_pct": -4.124947116062616
+      },
+      "T8_B48_P1_D8_R192_gpu_us_per_norm": {
+        "old": 8.035944854337156,
+        "new": 6.9957139756944455,
+        "latency_change_pct": -12.944723955905168,
+        "outer_drift_pct": 4.846012927309795
+      },
+      "T8_B48_P1_D8_R192_host_us_per_norm": {
+        "old": 9.169309426099792,
+        "new": 8.382291666666667,
+        "latency_change_pct": -8.583173746901096,
+        "outer_drift_pct": 9.305778252865359
+      },
+      "T8_B48_P1_D8_R768_gpu_us_per_norm": {
+        "old": 7.977090258022609,
+        "new": 6.8212890625,
+        "latency_change_pct": -14.489007371581542,
+        "outer_drift_pct": -1.1646579556787828
+      },
+      "T8_B48_P1_D8_R768_host_us_per_norm": {
+        "old": 8.30346853968247,
+        "new": 7.1410156250000005,
+        "latency_change_pct": -13.999606419017308,
+        "outer_drift_pct": -1.0342729669438389
+      },
+      "T8_B48_P1_D1_R192_gpu_us_per_norm": {
+        "old": 9.359405203824613,
+        "new": 8.123101128472223,
+        "latency_change_pct": -13.209216274204994,
+        "outer_drift_pct": -5.6311062308190385
+      },
+      "T8_B48_P1_D1_R192_host_us_per_norm": {
+        "old": 10.242414741313345,
+        "new": 9.527604166666666,
+        "latency_change_pct": -6.978926285453479,
+        "outer_drift_pct": -2.490584986191313
+      },
+      "T8_B48_P1_D1_R768_gpu_us_per_norm": {
+        "old": 9.506180545627691,
+        "new": 7.475925021701389,
+        "latency_change_pct": -21.35721612041237,
+        "outer_drift_pct": -6.884706465469781
+      },
+      "T8_B48_P1_D1_R768_host_us_per_norm": {
+        "old": 9.754173660981937,
+        "new": 7.829166666666667,
+        "latency_change_pct": -19.735213470881384,
+        "outer_drift_pct": -5.673391069854262
+      }
+    },
+    {
+      "T1_B1_P0_D0_R192_gpu_us_per_norm": {
+        "old": 3.7754991319444446,
+        "new": 3.7710231985333884,
+        "latency_change_pct": -0.11855209747462236,
+        "outer_drift_pct": 0.021582733812963717
+      },
+      "T1_B1_P0_D0_R192_host_us_per_norm": {
+        "old": 4.630208333333333,
+        "new": 4.713800464810598,
+        "latency_change_pct": 1.8053643693627608,
+        "outer_drift_pct": -0.16559947008170095
+      },
+      "T1_B1_P0_D0_R768_gpu_us_per_norm": {
+        "old": 3.7469482421875,
+        "new": 3.72368690787949,
+        "latency_change_pct": -0.6208074626200322,
+        "outer_drift_pct": -0.058262326123359465
+      },
+      "T1_B1_P0_D0_R768_host_us_per_norm": {
+        "old": 4.008463541666667,
+        "new": 3.9432933673999213,
+        "latency_change_pct": -1.6258143198590425,
+        "outer_drift_pct": 0.13547449114459376
+      },
+      "T1_B1_P0_D8_R192_gpu_us_per_norm": {
+        "old": 4.363606770833333,
+        "new": 4.064502349393763,
+        "latency_change_pct": -6.8545228098646716,
+        "outer_drift_pct": 10.775498735599886
+      },
+      "T1_B1_P0_D8_R192_host_us_per_norm": {
+        "old": 5.401041666666667,
+        "new": 4.859260281336125,
+        "latency_change_pct": -10.03105361460599,
+        "outer_drift_pct": 5.810363836824717
+      },
+      "T1_B1_P0_D8_R768_gpu_us_per_norm": {
+        "old": 4.3487548828125,
+        "new": 3.8737596446965474,
+        "latency_change_pct": -10.922557166725289,
+        "outer_drift_pct": 3.2012520452443516
+      },
+      "T1_B1_P0_D8_R768_host_us_per_norm": {
+        "old": 4.526302083333333,
+        "new": 4.099571019502567,
+        "latency_change_pct": -9.427807865543658,
+        "outer_drift_pct": 2.7005278743401417
+      },
+      "T1_B1_P0_D1_R192_gpu_us_per_norm": {
+        "old": 8.65966796875,
+        "new": 4.532385335131115,
+        "latency_change_pct": -47.66098017283043,
+        "outer_drift_pct": 1.9946808510638459
+      },
+      "T1_B1_P0_D1_R192_host_us_per_norm": {
+        "old": 9.653125000000001,
+        "new": 5.4306388804793135,
+        "latency_change_pct": -43.74216763504758,
+        "outer_drift_pct": 2.2989620719759296
+      },
+      "T1_B1_P0_D1_R768_gpu_us_per_norm": {
+        "old": 8.66305881076389,
+        "new": 4.4163880910546185,
+        "latency_change_pct": -49.020453542722855,
+        "outer_drift_pct": 0.5064811108716372
+      },
+      "T1_B1_P0_D1_R768_host_us_per_norm": {
+        "old": 8.93515625,
+        "new": 4.645962111166554,
+        "latency_change_pct": -48.00357172079052,
+        "outer_drift_pct": 0.15706953131573442
+      },
+      "T1_B1_P1_D0_R192_gpu_us_per_norm": {
+        "old": 4.02587890625,
+        "new": 3.7722436797708894,
+        "latency_change_pct": -6.300120604356807,
+        "outer_drift_pct": 0.07193727069993994
+      },
+      "T1_B1_P1_D0_R192_host_us_per_norm": {
+        "old": 4.9125000000000005,
+        "new": 4.620709316743886,
+        "latency_change_pct": -5.9397594555952065,
+        "outer_drift_pct": 1.4760985579652663
+      },
+      "T1_B1_P1_D0_R768_gpu_us_per_norm": {
+        "old": 3.7251790364583335,
+        "new": 3.8007946965989383,
+        "latency_change_pct": 2.0298530460027386,
+        "outer_drift_pct": 4.135030316272448
+      },
+      "T1_B1_P1_D0_R768_host_us_per_norm": {
+        "old": 3.9389322916666667,
+        "new": 4.029766024772371,
+        "latency_change_pct": 2.306049619026851,
+        "outer_drift_pct": 3.8056360284435042
+      },
+      "T1_B1_P1_D8_R192_gpu_us_per_norm": {
+        "old": 4.345160590277778,
+        "new": 4.062266818578997,
+        "latency_change_pct": -6.510548133289962,
+        "outer_drift_pct": 12.082007776599536
+      },
+      "T1_B1_P1_D8_R192_host_us_per_norm": {
+        "old": 5.136979166666666,
+        "new": 4.956055696240319,
+        "latency_change_pct": -3.521981782607597,
+        "outer_drift_pct": 10.505965532479
+      },
+      "T1_B1_P1_D8_R768_gpu_us_per_norm": {
+        "old": 4.294772677951389,
+        "new": 3.8443350330915993,
+        "latency_change_pct": -10.488043923075551,
+        "outer_drift_pct": 1.682794933826659
+      },
+      "T1_B1_P1_D8_R768_host_us_per_norm": {
+        "old": 4.4925781250000005,
+        "new": 4.100217545689924,
+        "latency_change_pct": -8.733528241316368,
+        "outer_drift_pct": 0.9187775154724909
+      },
+      "T1_B1_P1_D1_R192_gpu_us_per_norm": {
+        "old": 8.435872395833334,
+        "new": 4.488932086757186,
+        "latency_change_pct": -46.787577192675776,
+        "outer_drift_pct": -0.060412009907562236
+      },
+      "T1_B1_P1_D1_R192_host_us_per_norm": {
+        "old": 9.549479166666666,
+        "new": 5.297903123549015,
+        "latency_change_pct": -44.521548965289824,
+        "outer_drift_pct": 0.45324662528327675
+      },
+      "T1_B1_P1_D1_R768_gpu_us_per_norm": {
+        "old": 8.434855143229166,
+        "new": 4.491728397790504,
+        "latency_change_pct": -46.74800786121256,
+        "outer_drift_pct": 2.900770373546946
+      },
+      "T1_B1_P1_D1_R768_host_us_per_norm": {
+        "old": 8.674999999999999,
+        "new": 4.720312974111749,
+        "latency_change_pct": -45.58717032724208,
+        "outer_drift_pct": 2.8166256433206582
+      },
+      "T1_B48_P0_D0_R192_gpu_us_per_norm": {
+        "old": 4.745551215277778,
+        "new": 4.739040767555889,
+        "latency_change_pct": -0.13719054808488673,
+        "outer_drift_pct": 0.022899015342314755
+      },
+      "T1_B48_P0_D0_R192_host_us_per_norm": {
+        "old": 5.831770833333334,
+        "new": 5.883822608609417,
+        "latency_change_pct": 0.8925552248823854,
+        "outer_drift_pct": 0.6571936056838368
+      },
+      "T1_B48_P0_D0_R768_gpu_us_per_norm": {
+        "old": 4.1851806640625,
+        "new": 4.257905786019266,
+        "latency_change_pct": 1.7376817823241186,
+        "outer_drift_pct": -1.6318084165297675
+      },
+      "T1_B48_P0_D0_R768_host_us_per_norm": {
+        "old": 4.466015625,
+        "new": 4.570894572086257,
+        "latency_change_pct": 2.348378418095143,
+        "outer_drift_pct": -2.127719535565309
+      },
+      "T1_B48_P0_D8_R192_gpu_us_per_norm": {
+        "old": 7.212185329861112,
+        "new": 4.894367709576471,
+        "latency_change_pct": -32.13752162868055,
+        "outer_drift_pct": 2.52539424210112
+      },
+      "T1_B48_P0_D8_R192_host_us_per_norm": {
+        "old": 8.380729166666667,
+        "new": 6.105005230725646,
+        "latency_change_pct": -27.154247448926483,
+        "outer_drift_pct": 3.6567358638061487
+      },
+      "T1_B48_P0_D8_R768_gpu_us_per_norm": {
+        "old": 7.115275065104167,
+        "new": 4.331113335544738,
+        "latency_change_pct": -39.129361888115135,
+        "outer_drift_pct": 5.468988695386501
+      },
+      "T1_B48_P0_D8_R768_host_us_per_norm": {
+        "old": 7.402473958333334,
+        "new": 4.636502842663427,
+        "latency_change_pct": -37.36549606575941,
+        "outer_drift_pct": 5.134185671504254
+      },
+      "T1_B48_P0_D1_R192_gpu_us_per_norm": {
+        "old": 8.515625,
+        "new": 5.508025833005142,
+        "latency_change_pct": -35.31859572250843,
+        "outer_drift_pct": 2.2107149970125306
+      },
+      "T1_B48_P0_D1_R192_host_us_per_norm": {
+        "old": 9.705729166666666,
+        "new": 6.686265523230095,
+        "latency_change_pct": -31.11011642285063,
+        "outer_drift_pct": 5.35700007995521
+      },
+      "T1_B48_P0_D1_R768_gpu_us_per_norm": {
+        "old": 8.625556098090279,
+        "new": 4.975892697383858,
+        "latency_change_pct": -42.31220989351012,
+        "outer_drift_pct": 5.933677477275268
+      },
+      "T1_B48_P0_D1_R768_host_us_per_norm": {
+        "old": 8.929166666666667,
+        "new": 5.272978114635825,
+        "latency_change_pct": -40.94658201061139,
+        "outer_drift_pct": 6.149188419070883
+      },
+      "T1_B48_P1_D0_R192_gpu_us_per_norm": {
+        "old": 4.740397135416667,
+        "new": 4.920821917269974,
+        "latency_change_pct": 3.8061111062891673,
+        "outer_drift_pct": 6.643515882955708
+      },
+      "T1_B48_P1_D0_R192_host_us_per_norm": {
+        "old": 6.0125,
+        "new": 5.953727322620516,
+        "latency_change_pct": -0.9775081476837255,
+        "outer_drift_pct": 4.956085319949799
+      },
+      "T1_B48_P1_D0_R768_gpu_us_per_norm": {
+        "old": 4.133029513888889,
+        "new": 4.213771816533402,
+        "latency_change_pct": 1.9535864037065753,
+        "outer_drift_pct": 4.16057554902185
+      },
+      "T1_B48_P1_D0_R768_host_us_per_norm": {
+        "old": 4.4437500000000005,
+        "new": 4.5287799556643575,
+        "latency_change_pct": 1.9134729826015606,
+        "outer_drift_pct": 3.4387975905023627
+      },
+      "T1_B48_P1_D8_R192_gpu_us_per_norm": {
+        "old": 7.159559461805556,
+        "new": 5.013466415675972,
+        "latency_change_pct": -29.975210871261694,
+        "outer_drift_pct": 2.4535845336546513
+      },
+      "T1_B48_P1_D8_R192_host_us_per_norm": {
+        "old": 8.293229166666666,
+        "new": 6.0709225213649916,
+        "latency_change_pct": -26.796638566722454,
+        "outer_drift_pct": 2.413613474561549
+      },
+      "T1_B48_P1_D8_R768_gpu_us_per_norm": {
+        "old": 7.5352647569444455,
+        "new": 4.293111058638319,
+        "latency_change_pct": -43.02640720511089,
+        "outer_drift_pct": 0.799327549839024
+      },
+      "T1_B48_P1_D8_R768_host_us_per_norm": {
+        "old": 7.732161458333334,
+        "new": 4.561310638594293,
+        "latency_change_pct": -41.00859555023464,
+        "outer_drift_pct": 0.555332913494011
+      },
+      "T1_B48_P1_D1_R192_gpu_us_per_norm": {
+        "old": 8.446451822916666,
+        "new": 5.498200628496693,
+        "latency_change_pct": -34.90520346568324,
+        "outer_drift_pct": -1.900899139953094
+      },
+      "T1_B48_P1_D1_R192_host_us_per_norm": {
+        "old": 9.801041666666666,
+        "new": 6.707536791154223,
+        "latency_change_pct": -31.563021367753695,
+        "outer_drift_pct": -0.4261583759491816
+      },
+      "T1_B48_P1_D1_R768_gpu_us_per_norm": {
+        "old": 8.5467529296875,
+        "new": 4.88638331075735,
+        "latency_change_pct": -42.82760539638048,
+        "outer_drift_pct": 2.0880076284496285
+      },
+      "T1_B48_P1_D1_R768_host_us_per_norm": {
+        "old": 8.813932291666667,
+        "new": 5.157184783150559,
+        "latency_change_pct": -41.48826411990325,
+        "outer_drift_pct": 1.2959621883973371
+      },
+      "T4_B1_P0_D0_R192_gpu_us_per_norm": {
+        "old": 3.9274088541666665,
+        "new": 4.1985360575510065,
+        "latency_change_pct": 6.903462650614944,
+        "outer_drift_pct": -12.751961375980692
+      },
+      "T4_B1_P0_D0_R192_host_us_per_norm": {
+        "old": 4.810416666666667,
+        "new": 5.074340256275522,
+        "latency_change_pct": 5.48650164626463,
+        "outer_drift_pct": -10.753418016096184
+      },
+      "T4_B1_P0_D0_R768_gpu_us_per_norm": {
+        "old": 3.8781060112847228,
+        "new": 3.96933963684505,
+        "latency_change_pct": 2.3525304696377702,
+        "outer_drift_pct": 4.742087777583492
+      },
+      "T4_B1_P0_D0_R768_host_us_per_norm": {
+        "old": 4.171223958333333,
+        "new": 4.201317765123422,
+        "latency_change_pct": 0.7214622636113166,
+        "outer_drift_pct": 3.8918372504422427
+      },
+      "T4_B1_P0_D8_R192_gpu_us_per_norm": {
+        "old": 4.541286892361112,
+        "new": 4.108168263959751,
+        "latency_change_pct": -9.537354469498693,
+        "outer_drift_pct": -4.573308391924158
+      },
+      "T4_B1_P0_D8_R192_host_us_per_norm": {
+        "old": 5.521354166666666,
+        "new": 4.949836469661284,
+        "latency_change_pct": -10.35104214932867,
+        "outer_drift_pct": -5.144496823119482
+      },
+      "T4_B1_P0_D8_R768_gpu_us_per_norm": {
+        "old": 4.462822808159722,
+        "new": 3.976529230184351,
+        "latency_change_pct": -10.896546846678367,
+        "outer_drift_pct": -0.508624502432542
+      },
+      "T4_B1_P0_D8_R768_host_us_per_norm": {
+        "old": 4.698958333333334,
+        "new": 4.21555414010668,
+        "latency_change_pct": -10.287475626193466,
+        "outer_drift_pct": -0.32995158654292034
+      },
+      "T4_B1_P0_D1_R192_gpu_us_per_norm": {
+        "old": 8.931749131944445,
+        "new": 4.677056841833075,
+        "latency_change_pct": -47.635600006883784,
+        "outer_drift_pct": -1.508087261843083
+      },
+      "T4_B1_P0_D1_R192_host_us_per_norm": {
+        "old": 9.865625,
+        "new": 5.706761682973102,
+        "latency_change_pct": -42.15509222200213,
+        "outer_drift_pct": 1.96295272325131
+      },
+      "T4_B1_P0_D1_R768_gpu_us_per_norm": {
+        "old": 8.822089301215279,
+        "new": 4.646901128481635,
+        "latency_change_pct": -47.32652357257928,
+        "outer_drift_pct": -2.7488738252522182
+      },
+      "T4_B1_P0_D1_R768_host_us_per_norm": {
+        "old": 9.073697916666667,
+        "new": 4.885767355927828,
+        "latency_change_pct": -46.15461743603346,
+        "outer_drift_pct": -2.8086492735346025
+      },
+      "T4_B1_P1_D0_R192_gpu_us_per_norm": {
+        "old": 3.9303927951388893,
+        "new": 3.925102891778494,
+        "latency_change_pct": -0.1345896869884844,
+        "outer_drift_pct": -0.0621804615172028
+      },
+      "T4_B1_P1_D0_R192_host_us_per_norm": {
+        "old": 4.8625,
+        "new": 4.8424019741591335,
+        "latency_change_pct": -0.4133270095807995,
+        "outer_drift_pct": -0.8674234311415674
+      },
+      "T4_B1_P1_D0_R768_gpu_us_per_norm": {
+        "old": 3.8799370659722228,
+        "new": 3.959023014597435,
+        "latency_change_pct": 2.038330706928493,
+        "outer_drift_pct": 4.282190774397798
+      },
+      "T4_B1_P1_D0_R768_host_us_per_norm": {
+        "old": 4.21953125,
+        "new": 4.184333373725223,
+        "latency_change_pct": -0.8341655551141414,
+        "outer_drift_pct": 4.934493640623505
+      },
+      "T4_B1_P1_D8_R192_gpu_us_per_norm": {
+        "old": 4.646267361111112,
+        "new": 4.027898428560511,
+        "latency_change_pct": -13.30893994018294,
+        "outer_drift_pct": 0.5470016207455464
+      },
+      "T4_B1_P1_D8_R192_host_us_per_norm": {
+        "old": 5.5828125,
+        "new": 4.8894717090653055,
+        "latency_change_pct": -12.419202524438976,
+        "outer_drift_pct": 3.2691058670707873
+      },
+      "T4_B1_P1_D8_R768_gpu_us_per_norm": {
+        "old": 4.473741319444445,
+        "new": 3.9662339950807484,
+        "latency_change_pct": -11.344136554294993,
+        "outer_drift_pct": -0.001709840129948681
+      },
+      "T4_B1_P1_D8_R768_host_us_per_norm": {
+        "old": 4.6878906250000005,
+        "new": 4.182421802033716,
+        "latency_change_pct": -10.782436353584613,
+        "outer_drift_pct": 0.03736571695467372
+      },
+      "T4_B1_P1_D1_R192_gpu_us_per_norm": {
+        "old": 8.938530815972223,
+        "new": 4.676520404578302,
+        "latency_change_pct": -47.681330401391605,
+        "outer_drift_pct": 1.4960261804581654
+      },
+      "T4_B1_P1_D1_R192_host_us_per_norm": {
+        "old": 9.871875000000001,
+        "new": 5.604446607591489,
+        "latency_change_pct": -43.22814452582221,
+        "outer_drift_pct": 5.204460966542768
+      },
+      "T4_B1_P1_D1_R768_gpu_us_per_norm": {
+        "old": 8.798760308159723,
+        "new": 4.581705728664766,
+        "latency_change_pct": -47.92782655511344,
+        "outer_drift_pct": 0.0029603753755935713
+      },
+      "T4_B1_P1_D1_R768_host_us_per_norm": {
+        "old": 9.023697916666666,
+        "new": 4.817571074198986,
+        "latency_change_pct": -46.61200852811144,
+        "outer_drift_pct": -1.0886511477877558
+      },
+      "T4_B48_P0_D0_R192_gpu_us_per_norm": {
+        "old": 6.749674479166667,
+        "new": 6.895198371493947,
+        "latency_change_pct": 2.1560134903757078,
+        "outer_drift_pct": 0.35864895755330917
+      },
+      "T4_B48_P0_D0_R192_host_us_per_norm": {
+        "old": 8.21875,
+        "new": 8.274634592338126,
+        "latency_change_pct": 0.6799646216045785,
+        "outer_drift_pct": 3.7571327819452494
+      },
+      "T4_B48_P0_D0_R768_gpu_us_per_norm": {
+        "old": 6.799858940972222,
+        "new": 6.7770537632866725,
+        "latency_change_pct": -0.33537721713811086,
+        "outer_drift_pct": 4.783659755797731
+      },
+      "T4_B48_P0_D0_R768_host_us_per_norm": {
+        "old": 7.087369791666667,
+        "new": 7.1114719737732175,
+        "latency_change_pct": 0.340072309122208,
+        "outer_drift_pct": 1.680113730775612
+      },
+      "T4_B48_P0_D8_R192_gpu_us_per_norm": {
+        "old": 7.50244140625,
+        "new": 7.290880675566252,
+        "latency_change_pct": -2.8198918089184177,
+        "outer_drift_pct": -8.481936287595659
+      },
+      "T4_B48_P0_D8_R192_host_us_per_norm": {
+        "old": 8.670833333333333,
+        "new": 8.478171170319055,
+        "latency_change_pct": -2.2219567094390547,
+        "outer_drift_pct": -8.334313610163512
+      },
+      "T4_B48_P0_D8_R768_gpu_us_per_norm": {
+        "old": 7.548489040798612,
+        "new": 6.790878545268526,
+        "latency_change_pct": -10.036584691787965,
+        "outer_drift_pct": -2.0596345235859848
+      },
+      "T4_B48_P0_D8_R768_host_us_per_norm": {
+        "old": 7.8519531250000005,
+        "new": 7.083121598014934,
+        "latency_change_pct": -9.791595985681168,
+        "outer_drift_pct": -0.9549945115257863
+      },
+      "T4_B48_P0_D1_R192_gpu_us_per_norm": {
+        "old": 8.682183159722223,
+        "new": 7.624995867410176,
+        "latency_change_pct": -12.176514510963976,
+        "outer_drift_pct": 0.7857423479410208
+      },
+      "T4_B48_P0_D1_R192_host_us_per_norm": {
+        "old": 9.836458333333333,
+        "new": 8.673677083777434,
+        "latency_change_pct": -11.821137345903443,
+        "outer_drift_pct": 0.4393091412409067
+      },
+      "T4_B48_P0_D1_R768_gpu_us_per_norm": {
+        "old": 8.696831597222223,
+        "new": 7.65342595563568,
+        "latency_change_pct": -11.997537608061858,
+        "outer_drift_pct": -4.517156883966999
+      },
+      "T4_B48_P0_D1_R768_host_us_per_norm": {
+        "old": 8.988541666666666,
+        "new": 7.953621584967908,
+        "latency_change_pct": -11.513770754789753,
+        "outer_drift_pct": -2.572513533166365
+      },
+      "T4_B48_P1_D0_R192_gpu_us_per_norm": {
+        "old": 6.728515625,
+        "new": 6.959974027407653,
+        "latency_change_pct": 3.4399623231558207,
+        "outer_drift_pct": -3.1339905635045406
+      },
+      "T4_B48_P1_D0_R192_host_us_per_norm": {
+        "old": 7.985416666666667,
+        "new": 8.265621307891426,
+        "latency_change_pct": 3.5089545470358585,
+        "outer_drift_pct": -0.18885741265344258
+      },
+      "T4_B48_P1_D0_R768_gpu_us_per_norm": {
+        "old": 6.642727322048612,
+        "new": 6.810873944155075,
+        "latency_change_pct": 2.5312889413411366,
+        "outer_drift_pct": -0.2476256774899377
+      },
+      "T4_B48_P1_D0_R768_host_us_per_norm": {
+        "old": 6.970442708333334,
+        "new": 7.1059432859053455,
+        "latency_change_pct": 1.9439307263800831,
+        "outer_drift_pct": 0.7245710502602254
+      },
+      "T4_B48_P1_D8_R192_gpu_us_per_norm": {
+        "old": 7.513563368055556,
+        "new": 6.867408928571969,
+        "latency_change_pct": -8.599840153485072,
+        "outer_drift_pct": 1.2440381558028513
+      },
+      "T4_B48_P1_D8_R192_host_us_per_norm": {
+        "old": 8.834375,
+        "new": 8.083540640463454,
+        "latency_change_pct": -8.499009375723187,
+        "outer_drift_pct": 2.915223217203744
+      },
+      "T4_B48_P1_D8_R768_gpu_us_per_norm": {
+        "old": 7.478976779513889,
+        "new": 6.705897902142468,
+        "latency_change_pct": -10.336693108728568,
+        "outer_drift_pct": 0.09814436327577614
+      },
+      "T4_B48_P1_D8_R768_host_us_per_norm": {
+        "old": 7.8453124999999995,
+        "new": 7.063956591532169,
+        "latency_change_pct": -9.959525620780951,
+        "outer_drift_pct": -1.3820245286472632
+      },
+      "T4_B48_P1_D1_R192_gpu_us_per_norm": {
+        "old": 8.946126302083334,
+        "new": 7.461477426192101,
+        "latency_change_pct": -16.59543835800189,
+        "outer_drift_pct": 0.16737619619402455
+      },
+      "T4_B48_P1_D1_R192_host_us_per_norm": {
+        "old": 10.25625,
+        "new": 8.420970434311924,
+        "latency_change_pct": -17.894255363198784,
+        "outer_drift_pct": 1.0882407810459682
+      },
+      "T4_B48_P1_D1_R768_gpu_us_per_norm": {
+        "old": 9.137776692708334,
+        "new": 7.572726695289736,
+        "latency_change_pct": -17.12725151915191,
+        "outer_drift_pct": -6.195519242278358
+      },
+      "T4_B48_P1_D1_R768_host_us_per_norm": {
+        "old": 9.426302083333333,
+        "new": 7.878477422328545,
+        "latency_change_pct": -16.420274327315486,
+        "outer_drift_pct": -4.734481868628215
+      },
+      "T8_B1_P0_D0_R192_gpu_us_per_norm": {
+        "old": 4.125434027777778,
+        "new": 4.1174315311601255,
+        "latency_change_pct": -0.19397950770195793,
+        "outer_drift_pct": 0.04612850082372777
+      },
+      "T8_B1_P0_D0_R192_host_us_per_norm": {
+        "old": 5.413020833333333,
+        "new": 5.163568669655707,
+        "latency_change_pct": -4.60837250323336,
+        "outer_drift_pct": -5.13802927596031
+      },
+      "T8_B1_P0_D0_R768_gpu_us_per_norm": {
+        "old": 4.067925347222222,
+        "new": 4.065382183894291,
+        "latency_change_pct": -0.0625174532681072,
+        "outer_drift_pct": 0.025025442533244124
+      },
+      "T8_B1_P0_D0_R768_host_us_per_norm": {
+        "old": 4.396223958333334,
+        "new": 4.330142406444752,
+        "latency_change_pct": -1.503143436614951,
+        "outer_drift_pct": -0.12321192451016927
+      },
+      "T8_B1_P0_D8_R192_gpu_us_per_norm": {
+        "old": 4.727918836805556,
+        "new": 4.205728947959101,
+        "latency_change_pct": -11.044814999389363,
+        "outer_drift_pct": 0.06452029163170891
+      },
+      "T8_B1_P0_D8_R192_host_us_per_norm": {
+        "old": 5.91875,
+        "new": 5.350581621381546,
+        "latency_change_pct": -9.599465742233647,
+        "outer_drift_pct": -8.794273496327964
+      },
+      "T8_B1_P0_D8_R768_gpu_us_per_norm": {
+        "old": 4.810316297743056,
+        "new": 4.283405139458892,
+        "latency_change_pct": -10.953773632960162,
+        "outer_drift_pct": -6.037538943200471
+      },
+      "T8_B1_P0_D8_R768_host_us_per_norm": {
+        "old": 5.148307291666667,
+        "new": 4.533840050146749,
+        "latency_change_pct": -11.935325665477048,
+        "outer_drift_pct": -6.162192238141618
+      },
+      "T8_B1_P0_D1_R192_gpu_us_per_norm": {
+        "old": 9.446885850694445,
+        "new": 4.82977930239342,
+        "latency_change_pct": -48.87437639528183,
+        "outer_drift_pct": 0.0842838680676472
+      },
+      "T8_B1_P0_D1_R192_host_us_per_norm": {
+        "old": 10.791145833333333,
+        "new": 5.711976792118287,
+        "latency_change_pct": -47.067930687450584,
+        "outer_drift_pct": 0.18253171488546993
+      },
+      "T8_B1_P0_D1_R768_gpu_us_per_norm": {
+        "old": 9.299519856770834,
+        "new": 4.790344163274834,
+        "latency_change_pct": -48.48826351193756,
+        "outer_drift_pct": 0.035398731309466136
+      },
+      "T8_B1_P0_D1_R768_host_us_per_norm": {
+        "old": 9.582552083333333,
+        "new": 5.015493735302056,
+        "latency_change_pct": -47.660146360953625,
+        "outer_drift_pct": 0.12989037252557623
+      },
+      "T8_B1_P1_D0_R192_gpu_us_per_norm": {
+        "old": 4.114040798611112,
+        "new": 4.108615370793145,
+        "latency_change_pct": -0.13187588756529145,
+        "outer_drift_pct": -0.03960657469138651
+      },
+      "T8_B1_P1_D0_R192_host_us_per_norm": {
+        "old": 5.2625,
+        "new": 4.922410189156579,
+        "latency_change_pct": -6.462514220302551,
+        "outer_drift_pct": -1.9798868636077827
+      },
+      "T8_B1_P1_D0_R768_gpu_us_per_norm": {
+        "old": 4.064466688368056,
+        "new": 4.153244101437243,
+        "latency_change_pct": 2.1842327635075875,
+        "outer_drift_pct": -4.175058342124604
+      },
+      "T8_B1_P1_D0_R768_host_us_per_norm": {
+        "old": 4.356510416666667,
+        "new": 4.417988927832398,
+        "latency_change_pct": 1.4111870576627883,
+        "outer_drift_pct": -5.0403515322094306
+      },
+      "T8_B1_P1_D8_R192_gpu_us_per_norm": {
+        "old": 4.739583333333333,
+        "new": 4.2635088298017845,
+        "latency_change_pct": -10.044648865720585,
+        "outer_drift_pct": 1.6097998973832572
+      },
+      "T8_B1_P1_D8_R192_host_us_per_norm": {
+        "old": 5.765104166666667,
+        "new": 5.250233129744494,
+        "latency_change_pct": -8.930819323250272,
+        "outer_drift_pct": 0.6468949044585948
+      },
+      "T8_B1_P1_D8_R768_gpu_us_per_norm": {
+        "old": 4.686075846354167,
+        "new": 4.1986010028890455,
+        "latency_change_pct": -10.40262384665378,
+        "outer_drift_pct": -2.136362910055456
+      },
+      "T8_B1_P1_D8_R768_host_us_per_norm": {
+        "old": 4.95703125,
+        "new": 4.4389544386009705,
+        "latency_change_pct": -10.451352538861435,
+        "outer_drift_pct": -2.756645743542252
+      },
+      "T8_B1_P1_D1_R192_gpu_us_per_norm": {
+        "old": 9.13058810763889,
+        "new": 5.0175131247143225,
+        "latency_change_pct": -45.04720763258897,
+        "outer_drift_pct": 4.730552174394154
+      },
+      "T8_B1_P1_D1_R192_host_us_per_norm": {
+        "old": 10.276041666666666,
+        "new": 5.8257786831997835,
+        "latency_change_pct": -43.30717145593723,
+        "outer_drift_pct": -0.187566988210075
+      },
+      "T8_B1_P1_D1_R768_gpu_us_per_norm": {
+        "old": 9.255032009548612,
+        "new": 4.780397662852401,
+        "latency_change_pct": -48.3481239403563,
+        "outer_drift_pct": 0.43789808917196194
+      },
+      "T8_B1_P1_D1_R768_host_us_per_norm": {
+        "old": 9.514453125000001,
+        "new": 5.040720662460515,
+        "latency_change_pct": -47.020384711175765,
+        "outer_drift_pct": 1.6301658810968345
+      },
+      "T8_B48_P0_D0_R192_gpu_us_per_norm": {
+        "old": 7.229546440972222,
+        "new": 7.407205427140221,
+        "latency_change_pct": 2.457401548195981,
+        "outer_drift_pct": -2.958259677477537
+      },
+      "T8_B48_P0_D0_R192_host_us_per_norm": {
+        "old": 8.418750000000001,
+        "new": 8.841095007831328,
+        "latency_change_pct": 5.016718727023917,
+        "outer_drift_pct": -4.033933518005528
+      },
+      "T8_B48_P0_D0_R768_gpu_us_per_norm": {
+        "old": 6.841634114583333,
+        "new": 6.754324211174272,
+        "latency_change_pct": -1.276155695361647,
+        "outer_drift_pct": -1.0685787902090182
+      },
+      "T8_B48_P0_D0_R768_host_us_per_norm": {
+        "old": 7.130989583333334,
+        "new": 7.079424658540983,
+        "latency_change_pct": -0.7231103648344894,
+        "outer_drift_pct": -0.16539557107415614
+      },
+      "T8_B48_P0_D8_R192_gpu_us_per_norm": {
+        "old": 8.355034722222223,
+        "new": 6.967148388807672,
+        "latency_change_pct": -16.61137720616689,
+        "outer_drift_pct": 0.9781290347822713
+      },
+      "T8_B48_P0_D8_R192_host_us_per_norm": {
+        "old": 9.604166666666666,
+        "new": 8.181857699212095,
+        "latency_change_pct": -14.809290767422867,
+        "outer_drift_pct": -3.009215723152159
+      },
+      "T8_B48_P0_D8_R768_gpu_us_per_norm": {
+        "old": 7.938571506076389,
+        "new": 7.1339493114450026,
+        "latency_change_pct": -10.135604296257938,
+        "outer_drift_pct": -8.725978130562728
+      },
+      "T8_B48_P0_D8_R768_host_us_per_norm": {
+        "old": 8.288281249999999,
+        "new": 7.407736141935346,
+        "latency_change_pct": -10.62397717336937,
+        "outer_drift_pct": -8.640647838577987
+      },
+      "T8_B48_P0_D1_R192_gpu_us_per_norm": {
+        "old": 9.17941623263889,
+        "new": 7.594859166988836,
+        "latency_change_pct": -17.262067929939885,
+        "outer_drift_pct": -0.9384998222538243
+      },
+      "T8_B48_P0_D1_R192_host_us_per_norm": {
+        "old": 10.6171875,
+        "new": 8.680531840245383,
+        "latency_change_pct": -18.240759709241427,
+        "outer_drift_pct": -5.777518928363435
+      },
+      "T8_B48_P0_D1_R768_gpu_us_per_norm": {
+        "old": 9.258829752604166,
+        "new": 7.782632882002531,
+        "latency_change_pct": -15.94366577683789,
+        "outer_drift_pct": 5.093618237690278
+      },
+      "T8_B48_P0_D1_R768_host_us_per_norm": {
+        "old": 9.571093750000001,
+        "new": 8.080618937825772,
+        "latency_change_pct": -15.57266965621592,
+        "outer_drift_pct": 2.0987332703767514
+      },
+      "T8_B48_P1_D0_R192_gpu_us_per_norm": {
+        "old": 7.267795138888889,
+        "new": 7.741575075795579,
+        "latency_change_pct": 6.518895041104877,
+        "outer_drift_pct": 26.319313169502223
+      },
+      "T8_B48_P1_D0_R192_host_us_per_norm": {
+        "old": 8.440624999999999,
+        "new": 8.890695100167889,
+        "latency_change_pct": 5.332189265224918,
+        "outer_drift_pct": 19.200511672529586
+      },
+      "T8_B48_P1_D0_R768_gpu_us_per_norm": {
+        "old": 6.879950629340279,
+        "new": 6.9068107722534595,
+        "latency_change_pct": 0.39041185555361846,
+        "outer_drift_pct": 3.4839586080147145
+      },
+      "T8_B48_P1_D0_R768_host_us_per_norm": {
+        "old": 7.209635416666667,
+        "new": 7.447900021834548,
+        "latency_change_pct": 3.304807960428624,
+        "outer_drift_pct": 7.62659605339524
+      },
+      "T8_B48_P1_D8_R192_gpu_us_per_norm": {
+        "old": 8.253851996527779,
+        "new": 7.1245044606572225,
+        "latency_change_pct": -13.682672482443936,
+        "outer_drift_pct": 4.070693338512332
+      },
+      "T8_B48_P1_D8_R192_host_us_per_norm": {
+        "old": 9.542708333333334,
+        "new": 8.441640798485784,
+        "latency_change_pct": -11.538312776483439,
+        "outer_drift_pct": -3.48527094193235
+      },
+      "T8_B48_P1_D8_R768_gpu_us_per_norm": {
+        "old": 7.974921332465279,
+        "new": 6.986254727151596,
+        "latency_change_pct": -12.397195710118158,
+        "outer_drift_pct": -1.8483968379142568
+      },
+      "T8_B48_P1_D8_R768_host_us_per_norm": {
+        "old": 8.234244791666667,
+        "new": 7.334315956635479,
+        "latency_change_pct": -10.92909984825744,
+        "outer_drift_pct": -4.036521739130439
+      },
+      "T8_B48_P1_D1_R192_gpu_us_per_norm": {
+        "old": 9.19406467013889,
+        "new": 7.767390441952838,
+        "latency_change_pct": -15.517339494246773,
+        "outer_drift_pct": 1.9179917498148846
+      },
+      "T8_B48_P1_D1_R192_host_us_per_norm": {
+        "old": 10.394270833333334,
+        "new": 8.916737642094859,
+        "latency_change_pct": -14.214880629242233,
+        "outer_drift_pct": -3.2687999080829644
+      },
+      "T8_B48_P1_D1_R768_gpu_us_per_norm": {
+        "old": 9.233805338541666,
+        "new": 7.5119240443402,
+        "latency_change_pct": -18.64758061353512,
+        "outer_drift_pct": -1.379774072081763
+      },
+      "T8_B48_P1_D1_R768_host_us_per_norm": {
+        "old": 9.54140625,
+        "new": 7.823946827847144,
+        "latency_change_pct": -18.000065998163063,
+        "outer_drift_pct": -2.5691991786447543
+      }
+    }
+  ],
+  "raw_result_sha256": "d0f0c09b0db674c512240243fd0b5a6b5d28be8cb4f9e0da092ac776d0a66d24",
+  "report_sha256": "7fe9213b0d00c70304f2f38dabc0114823b8c351f135d3a74e1e0f730debe001",
+  "archive_encoding": {
+    "build-orca-timestamp-visibility-20261106/linux-r1/compile.stderr": "utf-16-le"
+  },
+  "previous_archive_attempt": "publish-r1-failure.json",
+  "archive_sha256": {
+    "build-orca-timestamp-visibility-20261106/check.py": "30d715c53ffc11713e198f082872bfa5e61d3418a023ab412eeb01a270be4fec",
+    "build-orca-timestamp-visibility-20261106/linux.py": "e2ae1ae82d978538abb6f11ca177b7ee8fca0f1582a38408c9b718ba24da6e0f",
+    "build-orca-timestamp-visibility-20261106/prepared.json": "da9e91d2e3f47482f7a2cee4de7498fc9a45738f389bcb6da3bb5535ee2dce70",
+    "build-orca-timestamp-visibility-20261106/publish-r1-failure.json": "cecddeb25be8a8e22bcd31574ba6cdcdc9621e60e728baee3e57d6000355f57b",
+    "build-orca-timestamp-visibility-20261106/publish.py": "a46c3fd2df77be1cd003cbc26beb517922bfe84df550b57e0f74f2d4f58c4ae2",
+    "build-orca-timestamp-visibility-20261106/publish_r2.py": "e0593279710486599115982af7d22767c7685d51ae8c379b5ed2569a402fe161",
+    "build-orca-timestamp-visibility-20261106/linux-r1/compile.stderr": "b61404cfcdfdee6fd99b4e7539d15ddc3b05ea9bfd29d2737c2837e206279a6b",
+    "build-orca-timestamp-visibility-20261106/linux-r1/compile.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-orca-timestamp-visibility-20261106/linux-r1/dependencies.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-orca-timestamp-visibility-20261106/linux-r1/dependencies.stdout": "4dd18d608c37613bef90d70ce916678cef860a3cceda27b3a2d5ef0468d4d7a0",
+    "build-orca-timestamp-visibility-20261106/linux-r1/encoder-cpu.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-orca-timestamp-visibility-20261106/linux-r1/encoder-cpu.stdout": "775637d4d21b304fa4d365c3b87b3e49da458e236196ebadfc94d0074f78fa52",
+    "build-orca-timestamp-visibility-20261106/linux-r1/results.json": "3b7992d64203a54bd0c49dfac5810b8c174c8ff0544b1402070771f4491e1094",
+    "build-orca-timestamp-visibility-20261106/new/include/orca_l0/dg2.hpp": "518153f5e439f44a6e0e269cc57c3b8e21ac860b1de6c64be9db86d76c5f6e7c",
+    "build-orca-timestamp-visibility-20261106/new/include/orca_l0/direct_driver.hpp": "cd87a73ef80e8b2052a192ddd2ff174d36be595d79c42e454e0bb1b3d86e61c0",
+    "build-orca-timestamp-visibility-20261106/new/include/orca_l0/drm.hpp": "44c49672eed6602435052b716c7180ec40ce0d15ae47e1c48ff3dd2485ebe0bb",
+    "build-orca-timestamp-visibility-20261106/new/include/orca_l0/ring.hpp": "c0bc88a290d32ba5ee6cf26f2fe82c38cced25a334a02c23591e11bb67f75112",
+    "build-orca-timestamp-visibility-20261106/new/include/orca_l0/runtime.hpp": "1b800beb8a4ec7b1777192afc599a4cf519870acd2438b1aea43e79ffafc0869",
+    "build-orca-timestamp-visibility-20261106/new/include/orca_l0/compiler/dg2.hpp": "5ebed74bc9b2ae8672b1a30c56282c357318bad2638d1b26cfbcaebd2bacbe20",
+    "build-orca-timestamp-visibility-20261106/new/include/orca_l0/compiler/local_accessor.hpp": "749634fcbcd2a094d87b8f3cac4610aa095317e840e8c807fdb1beb342d81fc2",
+    "build-orca-timestamp-visibility-20261106/new/include/orca_l0/compiler/program.hpp": "3aedf164c9bc4320e2be356acc93cd2dae03f75fc49058cdb6f29671fbf02a25",
+    "build-orca-timestamp-visibility-20261106/new/include/orca_l0/compiler/stream.hpp": "4a5255d2ee3820603df48a098b86d17ef07ebc009fb4038baf3db47260f1e97b",
+    "build-orca-timestamp-visibility-20261106/new/include/orca_l0/compiler/sycl.hpp": "78c74406a5b0f702fbcfe8b1bedf73cb377ead1c7b2e9f0dd7188f493879e7dc",
+    "build-orca-timestamp-visibility-20261106/new/src/direct_driver.cpp": "7fe701e2c34dccd80868685b29b83fc846406bf531faa4579a220c7bc4107548",
+    "build-orca-timestamp-visibility-20261106/new/src/runtime.cpp": "6b60e902f8f92d924b21704c2e87d453f44705b993685b6f3d5f2105ad033e95",
+    "build-orca-timestamp-visibility-20261106/new/src/drm/arguments.hpp": "60edbdf3f285c0f59b722e4ec0d5c128134445cb4e968b003e0bb6864a91983c",
+    "build-orca-timestamp-visibility-20261106/new/src/drm/blitter.hpp": "c584140a730d1e9ca4d049a6431846c9a993767803011b3e24f59da10097f9b7",
+    "build-orca-timestamp-visibility-20261106/new/src/drm/blitter_operations.inl": "cdaab7bb00f701a01a4752670a17a966830158a1455d200b4ef8064a90d4a927",
+    "build-orca-timestamp-visibility-20261106/new/src/drm/blitter_packets.hpp": "349da852da789160e8075073d6d29e45e9fbcfa378af5c7ba4abaf99a740415b",
+    "build-orca-timestamp-visibility-20261106/new/src/drm/encoding.hpp": "81866bd5dd06a9e6e19f56f44b1127660b74a6ef0482c8ec99d4040655533ad4",
+    "build-orca-timestamp-visibility-20261106/new/src/drm/recording.inl": "2a495505848c60fdb78f38a59ab6924c1d8027451de967f5bfeea041d4a5a726",
+    "build-orca-timestamp-visibility-20261106/new/src/drm/runtime.cpp": "fd6a0255cbce15fca035b92ea05aad36ca3d25cdb47f77a80d1c0eb877842d87",
+    "build-orca-timestamp-visibility-20261106/new/src/drm/zebin.hpp": "a927dfee4f823ca74bf85a84b07a6790c9caa752d4504cbfc10227e39a789283",
+    "build-orca-timestamp-visibility-20261106/new/src/wddm/allocation.hpp": "b92121aae95767b861c128d6142834d790d73cd73f2219556088d11957ab586f",
+    "build-orca-timestamp-visibility-20261106/new/src/wddm/runtime.cpp": "6ec0729377a8fc80664c17a551ec51bf93b179f17126e921ab5d75d423133edb",
+    "build-orca-timestamp-visibility-20261106/new/tests/blitter_check.cpp": "c217519a90e482c42bfab960d6a958aa6db508545c02d146c406ecc01c3ad15e",
+    "build-orca-timestamp-visibility-20261106/new/tests/compiler_check.cpp": "0cec3be040240834476916155bade46c0edbf76cf81aa528d92fc4a0707f2ab1",
+    "build-orca-timestamp-visibility-20261106/new/tests/compiler_flags_check.py": "8fa480a5df5dcdc1f08a4ba64a4d6bea290d55795c076828d299c20039e014fd",
+    "build-orca-timestamp-visibility-20261106/new/tests/dg2_compiler_check.cpp": "a9e04111ac9c9ad98366d2bd9a88c3cd31b0895a441552630df976ffa548fdf9",
+    "build-orca-timestamp-visibility-20261106/new/tests/drm_compute_check.cpp": "480f4fb390a4a4337549af966a44021391919850462305ce512fe8377a8e4b03",
+    "build-orca-timestamp-visibility-20261106/new/tests/drm_submit_check.cpp": "a2fd00de705be46804d2913cc10af3a58623ea253bf4e16963921922e73540a8",
+    "build-orca-timestamp-visibility-20261106/new/tests/native_pack_check.cpp": "631ed0ecb003351464fb999113ff444721b5e8f70562bf1fdc0656989338dc51",
+    "build-orca-timestamp-visibility-20261106/new/tests/ring_check.cpp": "edf589faf8df29b1c4d190a0e7a2e83d698f1726aa2365f3112e3bec5b529798",
+    "build-orca-timestamp-visibility-20261106/new/tests/runtime_check.cpp": "2740d46200db9b62e39102396bf7c5768aa02315a456752ffe3d408091a386d0",
+    "build-orca-timestamp-visibility-20261106/new/tests/runtime_dependencies.hpp": "f7fad56243713663e4936a9af44011364fc59cea27be0494d84b216e65cc5709",
+    "build-orca-timestamp-visibility-20261106/new/tests/submit_check.cpp": "e8634fdb6547448a3bf54efc9773da5ef6325e826858cea02f2c63a93dd1901e",
+    "build-orca-timestamp-visibility-20261106/new/tests/wddm_allocation_check.cpp": "62b56ff0d9abb84ee3f682327f6ca69ed788caf560f7d25ae795b08509cf2205",
+    "build-orca-timestamp-visibility-20261106/new/tests/wddm_memory_check.cpp": "edd939546d352641af67be08dc402f9b93d9d25664bbbba00a92809b92864b3f",
+    "build-orca-timestamp-visibility-20261106/new/third_party/intel-dg2/packets.hpp": "ffa6713e5586d753ea79ad837e608e802989b2f45f1f5fdff23a6aee7d95407c",
+    "build-orca-timestamp-visibility-20261106/old/include/orca_l0/dg2.hpp": "518153f5e439f44a6e0e269cc57c3b8e21ac860b1de6c64be9db86d76c5f6e7c",
+    "build-orca-timestamp-visibility-20261106/old/include/orca_l0/direct_driver.hpp": "cd87a73ef80e8b2052a192ddd2ff174d36be595d79c42e454e0bb1b3d86e61c0",
+    "build-orca-timestamp-visibility-20261106/old/include/orca_l0/drm.hpp": "44c49672eed6602435052b716c7180ec40ce0d15ae47e1c48ff3dd2485ebe0bb",
+    "build-orca-timestamp-visibility-20261106/old/include/orca_l0/ring.hpp": "c0bc88a290d32ba5ee6cf26f2fe82c38cced25a334a02c23591e11bb67f75112",
+    "build-orca-timestamp-visibility-20261106/old/include/orca_l0/runtime.hpp": "1b800beb8a4ec7b1777192afc599a4cf519870acd2438b1aea43e79ffafc0869",
+    "build-orca-timestamp-visibility-20261106/old/include/orca_l0/compiler/dg2.hpp": "5ebed74bc9b2ae8672b1a30c56282c357318bad2638d1b26cfbcaebd2bacbe20",
+    "build-orca-timestamp-visibility-20261106/old/include/orca_l0/compiler/local_accessor.hpp": "749634fcbcd2a094d87b8f3cac4610aa095317e840e8c807fdb1beb342d81fc2",
+    "build-orca-timestamp-visibility-20261106/old/include/orca_l0/compiler/program.hpp": "3aedf164c9bc4320e2be356acc93cd2dae03f75fc49058cdb6f29671fbf02a25",
+    "build-orca-timestamp-visibility-20261106/old/include/orca_l0/compiler/stream.hpp": "4a5255d2ee3820603df48a098b86d17ef07ebc009fb4038baf3db47260f1e97b",
+    "build-orca-timestamp-visibility-20261106/old/include/orca_l0/compiler/sycl.hpp": "78c74406a5b0f702fbcfe8b1bedf73cb377ead1c7b2e9f0dd7188f493879e7dc",
+    "build-orca-timestamp-visibility-20261106/old/src/direct_driver.cpp": "7fe701e2c34dccd80868685b29b83fc846406bf531faa4579a220c7bc4107548",
+    "build-orca-timestamp-visibility-20261106/old/src/runtime.cpp": "6b60e902f8f92d924b21704c2e87d453f44705b993685b6f3d5f2105ad033e95",
+    "build-orca-timestamp-visibility-20261106/old/src/drm/arguments.hpp": "60edbdf3f285c0f59b722e4ec0d5c128134445cb4e968b003e0bb6864a91983c",
+    "build-orca-timestamp-visibility-20261106/old/src/drm/blitter.hpp": "c584140a730d1e9ca4d049a6431846c9a993767803011b3e24f59da10097f9b7",
+    "build-orca-timestamp-visibility-20261106/old/src/drm/blitter_operations.inl": "cdaab7bb00f701a01a4752670a17a966830158a1455d200b4ef8064a90d4a927",
+    "build-orca-timestamp-visibility-20261106/old/src/drm/blitter_packets.hpp": "349da852da789160e8075073d6d29e45e9fbcfa378af5c7ba4abaf99a740415b",
+    "build-orca-timestamp-visibility-20261106/old/src/drm/encoding.hpp": "55a243ccefdb918661ffaaf1a3b912b275a4a51497b6c23538ba4c37b8037a09",
+    "build-orca-timestamp-visibility-20261106/old/src/drm/recording.inl": "1d2d2c3072fe611de6c4834b493fa0c29b6e1579da6015a29dcb6898031c48ea",
+    "build-orca-timestamp-visibility-20261106/old/src/drm/runtime.cpp": "fd6a0255cbce15fca035b92ea05aad36ca3d25cdb47f77a80d1c0eb877842d87",
+    "build-orca-timestamp-visibility-20261106/old/src/drm/zebin.hpp": "a927dfee4f823ca74bf85a84b07a6790c9caa752d4504cbfc10227e39a789283",
+    "build-orca-timestamp-visibility-20261106/old/src/wddm/allocation.hpp": "b92121aae95767b861c128d6142834d790d73cd73f2219556088d11957ab586f",
+    "build-orca-timestamp-visibility-20261106/old/src/wddm/runtime.cpp": "6ec0729377a8fc80664c17a551ec51bf93b179f17126e921ab5d75d423133edb",
+    "build-orca-timestamp-visibility-20261106/old/tests/blitter_check.cpp": "c217519a90e482c42bfab960d6a958aa6db508545c02d146c406ecc01c3ad15e",
+    "build-orca-timestamp-visibility-20261106/old/tests/compiler_check.cpp": "0cec3be040240834476916155bade46c0edbf76cf81aa528d92fc4a0707f2ab1",
+    "build-orca-timestamp-visibility-20261106/old/tests/compiler_flags_check.py": "8fa480a5df5dcdc1f08a4ba64a4d6bea290d55795c076828d299c20039e014fd",
+    "build-orca-timestamp-visibility-20261106/old/tests/dg2_compiler_check.cpp": "a9e04111ac9c9ad98366d2bd9a88c3cd31b0895a441552630df976ffa548fdf9",
+    "build-orca-timestamp-visibility-20261106/old/tests/drm_compute_check.cpp": "6e6576a1fb0e2654dd0f7d4e500ef12d1124c1090fe4c525bedca6d8131fc2e7",
+    "build-orca-timestamp-visibility-20261106/old/tests/drm_submit_check.cpp": "a2fd00de705be46804d2913cc10af3a58623ea253bf4e16963921922e73540a8",
+    "build-orca-timestamp-visibility-20261106/old/tests/native_pack_check.cpp": "631ed0ecb003351464fb999113ff444721b5e8f70562bf1fdc0656989338dc51",
+    "build-orca-timestamp-visibility-20261106/old/tests/ring_check.cpp": "edf589faf8df29b1c4d190a0e7a2e83d698f1726aa2365f3112e3bec5b529798",
+    "build-orca-timestamp-visibility-20261106/old/tests/runtime_check.cpp": "2740d46200db9b62e39102396bf7c5768aa02315a456752ffe3d408091a386d0",
+    "build-orca-timestamp-visibility-20261106/old/tests/runtime_dependencies.hpp": "f7fad56243713663e4936a9af44011364fc59cea27be0494d84b216e65cc5709",
+    "build-orca-timestamp-visibility-20261106/old/tests/submit_check.cpp": "e8634fdb6547448a3bf54efc9773da5ef6325e826858cea02f2c63a93dd1901e",
+    "build-orca-timestamp-visibility-20261106/old/tests/wddm_allocation_check.cpp": "62b56ff0d9abb84ee3f682327f6ca69ed788caf560f7d25ae795b08509cf2205",
+    "build-orca-timestamp-visibility-20261106/old/tests/wddm_memory_check.cpp": "edd939546d352641af67be08dc402f9b93d9d25664bbbba00a92809b92864b3f",
+    "build-orca-timestamp-visibility-20261106/old/third_party/intel-dg2/packets.hpp": "ffa6713e5586d753ea79ad837e608e802989b2f45f1f5fdff23a6aee7d95407c",
+    "build-orca-timestamp-visibility-20261106/run-r1/0-old.command.json": "a17995f147a618696263b70ec7e9f84fe0758f703c9d9fe7373e86e8b25c79f9",
+    "build-orca-timestamp-visibility-20261106/run-r1/0-old.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-orca-timestamp-visibility-20261106/run-r1/0-old.stdout": "c59e350e9ac26d5ceeba0deaaf8932d5f288f0e05dbe741a6cd4b53391fea17d",
+    "build-orca-timestamp-visibility-20261106/run-r1/1-new.command.json": "75ef5113b64a993d0da4f5a973ddedbc978a3c7ce8546e5d1942ac53d9a8a15f",
+    "build-orca-timestamp-visibility-20261106/run-r1/1-new.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-orca-timestamp-visibility-20261106/run-r1/1-new.stdout": "0cf383376b409ee41c704e1b010370eae05363a530277a75edbf3d8dbd39f05d",
+    "build-orca-timestamp-visibility-20261106/run-r1/2-old.command.json": "a17995f147a618696263b70ec7e9f84fe0758f703c9d9fe7373e86e8b25c79f9",
+    "build-orca-timestamp-visibility-20261106/run-r1/2-old.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-orca-timestamp-visibility-20261106/run-r1/2-old.stdout": "41697dbbcde9b35a9740f2eac34400dfdf5fdd600119c9d76696c8641096fbe5",
+    "build-orca-timestamp-visibility-20261106/run-r1/3-l0.command.json": "509fd382882822a81cc2f23a3dac7a612a0e57cd7a78d58689fd1e2a856a5770",
+    "build-orca-timestamp-visibility-20261106/run-r1/3-l0.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-orca-timestamp-visibility-20261106/run-r1/3-l0.stdout": "774ae451faff2c972e9573ad06786bb0e40b4c731fb73adcc175c773c3553386",
+    "build-orca-timestamp-visibility-20261106/run-r1/4-new.command.json": "75ef5113b64a993d0da4f5a973ddedbc978a3c7ce8546e5d1942ac53d9a8a15f",
+    "build-orca-timestamp-visibility-20261106/run-r1/4-new.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-orca-timestamp-visibility-20261106/run-r1/4-new.stdout": "52ac282139a0c11e56990a75420c67d800558cd370cea703af4f58d52371bd02",
+    "build-orca-timestamp-visibility-20261106/run-r1/5-old.command.json": "a17995f147a618696263b70ec7e9f84fe0758f703c9d9fe7373e86e8b25c79f9",
+    "build-orca-timestamp-visibility-20261106/run-r1/5-old.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-orca-timestamp-visibility-20261106/run-r1/5-old.stdout": "ea614af69106c51fc8a562b088532cb22a0641d6993a5f70c8f91eadd605831c",
+    "build-orca-timestamp-visibility-20261106/run-r1/6-new.command.json": "75ef5113b64a993d0da4f5a973ddedbc978a3c7ce8546e5d1942ac53d9a8a15f",
+    "build-orca-timestamp-visibility-20261106/run-r1/6-new.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-orca-timestamp-visibility-20261106/run-r1/6-new.stdout": "5b8b142827a3244dba5a4d50cf04aa3054ac0eea76f1f21f222c873fa9239321",
+    "build-orca-timestamp-visibility-20261106/run-r1/new-compile-check.command.json": "ef4e277f85852e8f754386245b98a885958f2560a3b2a319258e0fa66d2fa29b",
+    "build-orca-timestamp-visibility-20261106/run-r1/new-compile-check.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-orca-timestamp-visibility-20261106/run-r1/new-compile-check.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-orca-timestamp-visibility-20261106/run-r1/new-compile-runtime.command.json": "62b4148c2abb05c67289f2121c86fc3635d23f068f2974a52411d175fdc199cf",
+    "build-orca-timestamp-visibility-20261106/run-r1/new-compile-runtime.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-orca-timestamp-visibility-20261106/run-r1/new-compile-runtime.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-orca-timestamp-visibility-20261106/run-r1/new-cpu.command.json": "250142cc6574796d5c3c06c11214eaff49eae6a02e713e38d4f8a38e8c3c1877",
+    "build-orca-timestamp-visibility-20261106/run-r1/new-cpu.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-orca-timestamp-visibility-20261106/run-r1/new-cpu.stdout": "1df58f4e3fffc2c5bf1872185f596f3de6388f74213b6a15f1efd94fdf2a9abf",
+    "build-orca-timestamp-visibility-20261106/run-r1/new-link-check.command.json": "b9e81de605160d02d2a088f13f415f762fe83525645f2066314258e00fb1f97c",
+    "build-orca-timestamp-visibility-20261106/run-r1/new-link-check.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-orca-timestamp-visibility-20261106/run-r1/new-link-check.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-orca-timestamp-visibility-20261106/run-r1/new-link-density.command.json": "53b12804f50ae22d0bf7928076d4fbf3fbe528c41f59e9b344324f2cab31ba57",
+    "build-orca-timestamp-visibility-20261106/run-r1/new-link-density.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-orca-timestamp-visibility-20261106/run-r1/new-link-density.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-orca-timestamp-visibility-20261106/run-r1/new-raw-timestamps.command.json": "bb02d856fcfc2f811b0446bab4a44464fdd68d2f61ddeceaee8cd5c172944604",
+    "build-orca-timestamp-visibility-20261106/run-r1/new-raw-timestamps.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-orca-timestamp-visibility-20261106/run-r1/new-raw-timestamps.stdout": "f194e71e384b1a44c7e714ce5d29db29bb208120a485215a2eb4832b1eb55e46",
+    "build-orca-timestamp-visibility-20261106/run-r1/old-compile-check.command.json": "e219191907bb3a7c17641fbe2c879a535cd64c8f2d4abc0eea80a6e08f22fff4",
+    "build-orca-timestamp-visibility-20261106/run-r1/old-compile-check.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-orca-timestamp-visibility-20261106/run-r1/old-compile-check.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-orca-timestamp-visibility-20261106/run-r1/old-compile-runtime.command.json": "cabf9c25dcbf87fe9fab21bfd887a785de1657b3e98851279074e69d98cca12d",
+    "build-orca-timestamp-visibility-20261106/run-r1/old-compile-runtime.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-orca-timestamp-visibility-20261106/run-r1/old-compile-runtime.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-orca-timestamp-visibility-20261106/run-r1/old-cpu.command.json": "f0515c94dffada3e06aa4b0ee7b4bcff42b548a08786064602be34ae7e441927",
+    "build-orca-timestamp-visibility-20261106/run-r1/old-cpu.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-orca-timestamp-visibility-20261106/run-r1/old-cpu.stdout": "1df58f4e3fffc2c5bf1872185f596f3de6388f74213b6a15f1efd94fdf2a9abf",
+    "build-orca-timestamp-visibility-20261106/run-r1/old-link-check.command.json": "5058dbff5282bbbf16bc4beca446fd75ac1f224316a4acb3233ff760dde1aeee",
+    "build-orca-timestamp-visibility-20261106/run-r1/old-link-check.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-orca-timestamp-visibility-20261106/run-r1/old-link-check.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-orca-timestamp-visibility-20261106/run-r1/old-link-density.command.json": "5a48c4daf0d6f3ed7086a187de6a7bc2ce67e69b24487cce4bbc5c9d8daad491",
+    "build-orca-timestamp-visibility-20261106/run-r1/old-link-density.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-orca-timestamp-visibility-20261106/run-r1/old-link-density.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-orca-timestamp-visibility-20261106/run-r1/old-raw-timestamps.command.json": "96e8df37eb669dafa8a20197ca452908b58d4f1dca9b3d86010cf8d395bfb84a",
+    "build-orca-timestamp-visibility-20261106/run-r1/old-raw-timestamps.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build-orca-timestamp-visibility-20261106/run-r1/old-raw-timestamps.stdout": "d6fc7df4f4447aad8f6ba5e2e99547cebfb3d6665145ea80384a6283915ddbed",
+    "bench/results/a770/orca-timestamp-visibility-2026-11-06.md": "7fe9213b0d00c70304f2f38dabc0114823b8c351f135d3a74e1e0f730debe001",
+    "build-orca-hc-norm-density-20261106/probe.cpp": "7a3bf2a5f212a322fb45d13a2906991abb6f66cc026409e14a5e08aa3ae5c24c",
+    "build-orca-hc-norm-density-20261106/stage-r1/norm_capture.hpp": "3bcb0e11f93ed75e6c0d2cfffb7d1421521073ad57bbfd7f689868d66830902e",
+    "build-orca-hc-norm-density-20261106/stage-r1/prepared.json": "d1086a4a1695429bef32cfc7bacd3aaacb57babc4f201f6a3400f607e4e81cbf",
+    "build-orca-hc-norm-density-20261106/bench.py": "eab88698e9f320f2e3d9957320640ad058684d324af4baaf1c70326d7802482b"
+  }
+}

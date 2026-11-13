@@ -71,7 +71,7 @@ TTFT 为协议首 token 的主机观测值，单独列出；测试没有内部�
 这是旧固定容量锚点，**不是日常平衡参数或自动缓存容量的成绩**。
 
 [完整数据与哈希](../../../sycl/orca/direct-current-frontend-a770-windows-2026-11-04.json)及
-[原始证据归档](../../../sycl/orca/direct-current-frontend-a770-windows-2026-11-04.json.gz)
+原始证据归档 (`direct-current-frontend-a770-windows-2026-11-04.json.gz`, raw capture retained locally)
 保存 955 个源文件／脚本／构建命令／日志／配置／协议文件。
 EXE、数值包和专家 profile 有哈希；GGUF／权重 pack 记录路径，本轮未重新计算全部模型内容哈希。
 同等条件复现需要相同硬件、驱动、编译器、外部资产、初始 profile、参数、预热历史和空闲条件，速率仍允许波动。

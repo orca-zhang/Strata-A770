@@ -355,11 +355,68 @@ class OrcaFp16ExpertPair;
 class OrcaFp16PairSwiGLU;
 namespace {
 
+
+class OrcaFp16ExpertPairWide;
+void multiply_wide(strata::l0::Queue& q, Expert a, Expert b, int tiles_a, int tiles_b, bool down) {
+    if (!tiles_a && !tiles_b) return;
+    namespace jm = sycl::ext::oneapi::experimental::matrix;
+    constexpr int SG = 8, NSG = 8;
+    const int n = down ? 2560 : 1280, k = down ? 640 : 2560;
+    q.parallel_for<OrcaFp16ExpertPairWide>(sycl::nd_range<3>(
+        sycl::range<3>(size_t(tiles_a + tiles_b), size_t(n / 64), SG * NSG),
+        sycl::range<3>(1, 1, SG * NSG)), [=](sycl::nd_item<3> it) [[sycl::reqd_sub_group_size(SG)]] {
+        const auto sg = it.get_sub_group();
+        const int sid = int(sg.get_group_id()[0]);
+        const int tile = int(it.get_group(0)), which = tile >= tiles_a;
+        const Expert e = which ? b : a;
+        const int row = (tile - (which ? tiles_a : 0)) * 16 + sid / 4 * 8;
+        const int col = int(it.get_group(1)) * 64 + sid % 4 * 16;
+        const auto* x = reinterpret_cast<const sycl::half*>(down ? e.hidden : e.x);
+        const auto* w = reinterpret_cast<const sycl::half*>(down ? e.down_weight : e.gu_weight);
+        float* y = down ? e.output : e.gu;
+        auto gp = [](auto* p) { return sycl::address_space_cast<sycl::access::address_space::global_space,
+            sycl::access::decorated::no>(p); };
+        using A = jm::joint_matrix<sycl::sub_group, sycl::half, jm::use::a, 4, 16, jm::layout::row_major>;
+        using B = jm::joint_matrix<sycl::sub_group, sycl::half, jm::use::b, 16, 8, jm::layout::col_major>;
+        jm::joint_matrix<sycl::sub_group, float, jm::use::accumulator, 4, 8> acc[2][2];
+        #pragma unroll
+        for (int r = 0; r < 2; ++r)
+            #pragma unroll
+            for (int c = 0; c < 2; ++c) jm::joint_matrix_fill(sg, acc[r][c], 0.f);
+        for (int z = 0; z < k; z += 64) {
+            #pragma unroll
+            for (int j = 0; j < 64; j += 16) {
+                A aa[2]; B bb[2];
+                #pragma unroll
+                for (int r = 0; r < 2; ++r) {
+                    jm::joint_matrix_load(sg, aa[r], gp(x + size_t(row + r * 4) * k + z + j), size_t(k));
+                    jm::joint_matrix_load(sg, bb[r], gp(w + size_t(col + r * 8) * k + z + j), size_t(k));
+                }
+                #pragma unroll
+                for (int r = 0; r < 2; ++r)
+                    #pragma unroll
+                    for (int c = 0; c < 2; ++c) jm::joint_matrix_mad(sg, acc[r][c], aa[r], bb[c], acc[r][c]);
+            }
+        }
+        #pragma unroll
+        for (int r = 0; r < 2; ++r)
+            #pragma unroll
+            for (int c = 0; c < 2; ++c)
+                jm::joint_matrix_store(sg, acc[r][c], gp(y + size_t(row + r * 4) * n + col + c * 8), size_t(n), jm::layout::row_major);
+    });
+}
+
 void multiply(strata::l0::Queue& q, Expert a, Expert b, uint16_t* padding, bool down) {
     namespace jm = sycl::ext::oneapi::experimental::matrix;
     constexpr int SG = 8, NSG = 8, ROWS = 4, TILE = 8;
     const int n = down ? 2560 : 1280, k = down ? 640 : 2560;
-    const int tiles_a = (a.rows + ROWS - 1) / ROWS, tiles_b = (b.rows + ROWS - 1) / ROWS;
+    // ponytail: measured A770 threshold; M4 retains small experts and tails, without extra workspace.
+    const int full_a = a.rows >= 128 ? a.rows / 16 * 16 : 0;
+    const int full_b = b.rows >= 128 ? b.rows / 16 * 16 : 0;
+    multiply_wide(q, a, b, full_a / 16, full_b / 16, down);
+    const int tiles_a = (a.rows - full_a + ROWS - 1) / ROWS;
+    const int tiles_b = (b.rows - full_b + ROWS - 1) / ROWS;
+    if (!tiles_a && !tiles_b) return;
     if (!down && (a.rows % TILE || b.rows % TILE)) {
         q.parallel_for(sycl::range<1>(2 * TILE * size_t(k)), [=](sycl::id<1> id) {
             const size_t i = id[0];
@@ -380,7 +437,7 @@ void multiply(strata::l0::Queue& q, Expert a, Expert b, uint16_t* padding, bool 
                 const int subgroup = int(sg.get_group_id()[0]), lane = int(sg.get_local_id()[0]);
                 const int tile = int(it.get_group(0)), which = tile >= tiles_a;
                 const Expert e = which ? b : a;
-                const int row = (tile - (which ? tiles_a : 0)) * ROWS;
+                const int row = (which ? full_b : full_a) + (tile - (which ? tiles_a : 0)) * ROWS;
                 const int col = (int(it.get_group(1)) * NSG + subgroup) * TILE;
                 const bool partial = row + ROWS > e.rows;
                 const auto* x = reinterpret_cast<const sycl::half*>(down ? e.hidden : e.x);

@@ -51,4 +51,4 @@ Both orders pass. The actual server additionally completes first8000-input/128-o
 
 Recompute: `python -X utf8 build-orca-u4-threshold-m16-20261105/publish.py --check`. GPU work and heavy resource hashes use the shared experiment lock. The archive retains source, configuration, raw logs, TSV and JSON, excluding weights, executable/object/device binaries, input binaries and tensor dumps.
 
-[JSON](../../../sycl/orca/u4-threshold-m16-a770-windows-2026-11-05.json) · [Text evidence](../../../sycl/orca/u4-threshold-m16-a770-windows-2026-11-05.json.gz)
+[JSON](../../../sycl/orca/u4-threshold-m16-a770-windows-2026-11-05.json) · Text evidence (`u4-threshold-m16-a770-windows-2026-11-05.json.gz`, raw capture retained locally)

@@ -29,4 +29,4 @@ python -X utf8 build-orca-gemv-xxs-sg16-20261105/check_source.py
 python -X utf8 build-orca-gemv-xxs-sg16-20261105/publish.py --check
 ```
 
-[数字](../../../sycl/orca/gemv-xxs-sg16-a770-windows-2026-11-05.json) · [文本证据](../../../sycl/orca/gemv-xxs-sg16-a770-windows-2026-11-05.json.gz)
+[数字](../../../sycl/orca/gemv-xxs-sg16-a770-windows-2026-11-05.json) · 文本证据 (`gemv-xxs-sg16-a770-windows-2026-11-05.json.gz`, raw capture retained locally)

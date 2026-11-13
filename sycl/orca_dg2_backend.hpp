@@ -209,6 +209,12 @@ public:
             throw std::invalid_argument("STRATA_ORCA_DG2_BATCH_OPS must be an integer from 1 to 4096");
         return count;
     }();
+    const bool dependency_only = [] {
+        const char* value = std::getenv("STRATA_ORCA_DG2_DEPENDENCY_ONLY");
+        if (!value || !std::strcmp(value, "1")) return true;
+        if (!std::strcmp(value, "0")) return false;
+        throw std::invalid_argument("STRATA_ORCA_DG2_DEPENDENCY_ONLY must be 0 or 1");
+    }();
     const bool inline_events = [] {
         const char* value = std::getenv("STRATA_ORCA_DG2_INLINE_EVENTS");
         if (!value || !std::strcmp(value, "1")) return true;
@@ -464,8 +470,18 @@ struct Commands {
 };
 class Stream {
 public:
-    Stream(Runtime& runtime, Program& program, bool = false) : runtime_(runtime), program_(program) {
-        runtime_.invoke([&] { queue_ = runtime_.stream_count++ ? runtime_.gpu.create_queue() : runtime_.gpu.default_queue(); });
+    Stream(Runtime& runtime, Program& program, bool copy_engine = false) : runtime_(runtime), program_(program) {
+        // Startup-only option, cached once; queue role comes from the caller.
+        static const bool native_copy=[] {
+            const auto value=std::getenv("ORCA_DG2_BCS_COPY");
+            if(value && std::strcmp(value,"0") && std::strcmp(value,"1"))throw std::invalid_argument("ORCA_DG2_BCS_COPY must be0or1");
+            return value && value[0]=='1';
+        }();
+        runtime_.invoke([&] {
+            queue_ = copy_engine && native_copy ? runtime_.gpu.create_copy_queue() :
+                runtime_.stream_count++ ? runtime_.gpu.create_queue() : runtime_.gpu.default_queue();
+            if(copy_engine)std::fprintf(stderr,"ORCA_COPY_ENGINE enabled=%u\n",unsigned(native_copy));
+        });
     }
     Stream(Runtime& runtime, Program& program, native::Queue queue)
         : runtime_(runtime), program_(program), queue_(std::move(queue)) {}
@@ -748,7 +764,7 @@ private:
         // Another producer may switch the shared recorder. It can submit only
         // committed commands; the pending-copy array belongs to its own producer.
         if (runtime_.active) runtime_.active->freeze_recorded();
-        runtime_.gpu.begin(queue_, !recording_ || recording_->in_order); runtime_.active = this;
+        runtime_.gpu.begin(queue_, !recording_ || recording_->in_order, bool(recording_)); runtime_.active = this;
     }
     void collect() {
         if (pending_.empty()) return;

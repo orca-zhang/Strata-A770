@@ -60,4 +60,4 @@ python -X utf8 build-orca-slm-async-20261104/publish_mirror_refill.py --check
 重测prepare新目录再run，保留全部尝试。同条件复现需要相同设备/驱动、冻结源码/数学pack/运行库、参数和请求历史。
 实际argv/env绕过已更新的生产启动JSON，基线审计仅接受已知JSON差异。归档含候选源码、完整命令、协议、计数、配置和依赖哈希。
 [精确JSON](../../../sycl/orca/mirror-refill-a770-windows-2026-11-05.json) ·
-[原始证据](../../../sycl/orca/mirror-refill-a770-windows-2026-11-05.json.gz)
+原始证据 (`mirror-refill-a770-windows-2026-11-05.json.gz`, raw capture retained locally)

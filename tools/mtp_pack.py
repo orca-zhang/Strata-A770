@@ -14,6 +14,7 @@ Layout: dense tensors (attention, indexer, hyper-connections, shared expert, rou
            that grid (the ggml reference sets d = max|w| and never uses the +2 level). Same format as the main
            model's experts, so Strata's CPU VNNI kernel and GPU hit kernel serve it unchanged. ~0.71 GB.
     q4_0   ggml reference rounding. ~1.42 GB.       q8_0   ggml reference. ~2.67 GB.
+    q5_0   gguf-py's existing reference quantizer. ~1.73 GB (SYCL native grouped experts).
 
 This is round-to-nearest, not GSQ: the plan picks the expert format by MEASURED draft acceptance (P0.3/P6), not
 by this file's reconstruction error, which is reported per tensor only as a sanity check. No model runs here.
@@ -55,24 +56,55 @@ def load_bf16(path: Path, shape: list[int]) -> np.ndarray:
 
 
 # ------------------------------------------------------------------------------------------------ quantizers
-def q2_0(w: np.ndarray) -> np.ndarray:
+def q2_0(w: np.ndarray, importance: np.ndarray | None = None) -> np.ndarray:
     """[..., n] float32 -> bytes of Q2_0 blocks (fp16 d, 16 bytes of 2-bit codes, code = q + 1, 4 per byte)."""
     x = w.reshape(-1, 64).astype(np.float32)
+    weights = 1.0
+    if importance is not None:
+        importance = np.asarray(importance, dtype=np.float32)
+        if importance.shape != (w.shape[-1],) or not np.isfinite(importance).all() or (importance < 0).any():
+            raise ValueError("Q2 importance must be finite nonnegative input-channel weights")
+        if not np.isfinite(x).all():
+            raise ValueError("Q2 calibration requires finite weights")
+        weights = np.broadcast_to(importance, w.shape).reshape(-1, 64)
     amax = np.abs(x).max(axis=1, keepdims=True)
     best_err = np.full((x.shape[0], 1), np.inf, dtype=np.float32)
     best_d = np.zeros_like(amax)
+    if importance is not None:
+        seed = q2_0(w).reshape(-1, 18)
+        best_d = seed[:, :2].copy().view(np.float16).astype(np.float32)
+        reconstructed = dequant("q2_0", seed, x.size).reshape(x.shape)
+        best_err = (((reconstructed - x) ** 2) * weights).sum(axis=1, keepdims=True)
     # Candidate scales span amax/2 (the +2 level reaches the max) to amax (the ggml reference); 17 steps.
-    for f in np.linspace(0.5, 1.0, 17, dtype=np.float32):
+    factors = np.linspace(0.5, 1.0, 17, dtype=np.float32)
+    if importance is not None:
+        factors = np.concatenate((factors, -factors))
+    for f in factors:
         d = amax * f
-        inv = np.where(d > 0, 1.0 / np.where(d > 0, d, 1.0), 0.0)
+        if importance is not None:
+            d = d.astype(np.float16).astype(np.float32)
+        inv = np.where(d != 0, 1.0 / np.where(d != 0, d, 1.0), 0.0)
         q = np.clip(np.rint(x * inv), -1, 2)
-        err = ((q * d - x) ** 2).sum(axis=1, keepdims=True)
+        err = (((q * d - x) ** 2) * weights).sum(axis=1, keepdims=True)
+        better = err < best_err
+        best_err = np.where(better, err, best_err)
+        best_d = np.where(better, d, best_d)
+    # ponytail: diagonal activation moments and four local fits; full Hessians need a separate measured case.
+    for _ in range(4 if importance is not None else 0):
+        inv = np.where(best_d != 0, 1.0 / np.where(best_d != 0, best_d, 1.0), 0.0)
+        q = np.clip(np.rint(x * inv), -1, 2)
+        qq = (weights * q * q).sum(axis=1, keepdims=True)
+        d = ((weights * x * q).sum(axis=1, keepdims=True) / np.where(qq != 0, qq, 1.0))
+        d = d.astype(np.float16).astype(np.float32)
+        inv = np.where(d != 0, 1.0 / np.where(d != 0, d, 1.0), 0.0)
+        q = np.clip(np.rint(x * inv), -1, 2)
+        err = (((q * d - x) ** 2) * weights).sum(axis=1, keepdims=True)
         better = err < best_err
         best_err = np.where(better, err, best_err)
         best_d = np.where(better, d, best_d)
     d16 = best_d.astype(np.float16)
     d = d16.astype(np.float32)                                   # quantize against the STORED scale
-    inv = np.where(d > 0, 1.0 / np.where(d > 0, d, 1.0), 0.0)
+    inv = np.where(d != 0, 1.0 / np.where(d != 0, d, 1.0), 0.0)
     codes = (np.clip(np.rint(x * inv), -1, 2) + 1).astype(np.uint8)          # 0..3
     c = codes.reshape(-1, 16, 4)
     packed = (c[:, :, 0] | (c[:, :, 1] << 2) | (c[:, :, 2] << 4) | (c[:, :, 3] << 6)).astype(np.uint8)
@@ -109,6 +141,8 @@ def q8_0(w: np.ndarray) -> np.ndarray:
 
 
 def dequant(kind: str, blob: np.ndarray, n: int) -> np.ndarray:
+    if kind == "q5_0":
+        return gguf.dequantize(blob, gguf.GGMLQuantizationType.Q5_0).reshape(-1)[:n]
     if kind == "q2_0":
         b = blob.reshape(-1, 18)
         d = b[:, :2].copy().view(np.float16).astype(np.float32)
@@ -128,6 +162,8 @@ def dequant(kind: str, blob: np.ndarray, n: int) -> np.ndarray:
 
 QUANT = {"q2_0": (q2_0, gguf.GGMLQuantizationType.Q2_0, 64, 18),
          "q4_0": (q4_0, gguf.GGMLQuantizationType.Q4_0, 32, 18),
+         "q5_0": (lambda x: gguf.quantize(x, gguf.GGMLQuantizationType.Q5_0).reshape(-1),
+                  gguf.GGMLQuantizationType.Q5_0, 32, 22),
          "q8_0": (q8_0, gguf.GGMLQuantizationType.Q8_0, 32, 34)}
 
 
@@ -136,17 +172,34 @@ def main() -> int:
     ap.add_argument("--src", required=True, help="directory written by tools/mtp_fetch.py fetch")
     ap.add_argument("--experts", choices=sorted(QUANT), default="q2_0")
     ap.add_argument("--out", required=True)
+    ap.add_argument("--q2-imatrix", type=Path,
+                    help="optional NPZ of per-expert input-channel second moments: gate_up_proj and down_proj")
     ap.add_argument("--check-experts", type=int, default=8, help="experts per tensor used for the error report")
     a = ap.parse_args()
+    if a.q2_imatrix and a.experts != "q2_0":
+        ap.error("--q2-imatrix requires --experts q2_0")
     src = Path(a.src)
     manifest = json.loads((src / "mtp-manifest.json").read_text())
+    moments = {}
+    if a.q2_imatrix:
+        with np.load(a.q2_imatrix, allow_pickle=False) as data:
+            for t in manifest:
+                if t["name"] in EXPERT_TENSORS:
+                    key = t["name"].rsplit(".", 1)[-1]
+                    values = np.asarray(data[key], dtype=np.float32)
+                    if values.shape != (t["shape"][0], t["shape"][-1]) or not np.isfinite(values).all() or (values < 0).any():
+                        raise ValueError(f"{key}: invalid calibration moments")
+                    moments[key] = values
     fn, qtype, block, block_bytes = QUANT[a.experts]
     w = gguf.GGUFWriter(a.out, "qwen4exp-mtp")
     w.add_string("strata.mtp.source", "Qwen/Qwen3.8-Flash-Next BF16 checkpoint, mtp.* tensors")
     w.add_string("strata.mtp.source_sha256", hashlib.sha256(
         json.dumps({t["name"]: t["sha256"] for t in manifest}, sort_keys=True).encode()).hexdigest())
     w.add_string("strata.mtp.expert_format", a.experts)
-    w.add_string("strata.mtp.expert_quantizer", "per-block MSE scale search" if a.experts == "q2_0" else "ggml reference")
+    w.add_string("strata.mtp.expert_quantizer", "activation-weighted signed scale search" if a.q2_imatrix else
+                 "per-block MSE scale search" if a.experts == "q2_0" else "ggml reference")
+    if a.q2_imatrix:
+        w.add_string("strata.mtp.imatrix_sha256", hashlib.sha256(a.q2_imatrix.read_bytes()).hexdigest())
     report = []
     for t in sorted(manifest, key=lambda t: t["name"]):
         name, shape = t["name"], t["shape"]
@@ -158,7 +211,9 @@ def main() -> int:
             x = _Experts(raw)
             if shape[-1] % block:
                 raise ValueError(f"{name}: inner dim {shape[-1]} not a multiple of {block}")
-            parts = [fn(x[e]) for e in range(shape[0])]            # one expert at a time bounds memory
+            importance = moments.get(name.rsplit(".", 1)[-1])
+            parts = [q2_0(x[e], importance[e]) if importance is not None else fn(x[e])
+                     for e in range(shape[0])]                    # one expert at a time bounds memory
             blob = np.concatenate(parts)
             errs = []
             for e in range(min(a.check_experts, shape[0])):

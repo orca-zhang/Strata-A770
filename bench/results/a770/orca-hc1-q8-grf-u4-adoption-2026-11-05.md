@@ -30,4 +30,4 @@ python -X utf8 build-orca-hc1-grf-u4-20261105/finish.py --check
 
 以上核对保留的历史记录；日后合法更新当前源码或配置可能使当前文件哈希核对失败。归档含文本、源码、配置、日志与哈希，不包含模型、EXE、对象、SPIR-V或二进制张量。
 
-[精确JSON](../../../sycl/orca/hc1-q8-grf-u4-adoption-a770-windows-2026-11-05.json) · [文本证据](../../../sycl/orca/hc1-q8-grf-u4-adoption-a770-windows-2026-11-05.json.gz)
+[精确JSON](../../../sycl/orca/hc1-q8-grf-u4-adoption-a770-windows-2026-11-05.json) · 文本证据 (`hc1-q8-grf-u4-adoption-a770-windows-2026-11-05.json.gz`, raw capture retained locally)

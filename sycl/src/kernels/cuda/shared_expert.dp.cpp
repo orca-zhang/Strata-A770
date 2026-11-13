@@ -307,7 +307,7 @@ void shared_expert_multi(int n_tok, const float* x, const uint16_t* x_bf16, cons
     auto raw_type = [](int t) { return t == 8 || t == 14 || t == 21 || t == 23; };
     if (phase < 0 || phase > 5 || (phase == 5 && (!x_q8_1_ready || n_tok > 4 ||
         !raw_type(nw.gate_type) || !raw_type(nw.up_type) ||
-        (nw.down_type != 8 && nw.down_type != 20 && nw.down_type != 23))) || (phase && (!native_bf16 ||
+        (nw.down_type != 8 && nw.down_type != 20 && nw.down_type != 23 && nw.down_type != 42))) || (phase && (!native_bf16 ||
         (x_q8_1_ready && n_tok > 4))))
         throw std::invalid_argument("unsupported shared expert phase");
     bool early_scalar = phase != 0;

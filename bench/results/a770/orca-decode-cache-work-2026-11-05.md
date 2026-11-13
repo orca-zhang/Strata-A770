@@ -29,4 +29,4 @@ python -X utf8 build-orca-cache-work-20261105/run.py check forward-r1
 python -X utf8 build-orca-cache-work-20261105/publish.py --check
 ```
 
-[精确 JSON](../../../sycl/orca/decode-cache-work-a770-windows-2026-11-05.json) · [文本证据归档](../../../sycl/orca/decode-cache-work-a770-windows-2026-11-05.json.gz)
+[精确 JSON](../../../sycl/orca/decode-cache-work-a770-windows-2026-11-05.json) · 文本证据归档 (`decode-cache-work-a770-windows-2026-11-05.json.gz`, raw capture retained locally)

@@ -43,8 +43,9 @@ inline P::PIPE_CONTROL signal_value(uint64_t address, uint64_t value) {
     signal.setImmediateData(value);
     return signal;
 }
-inline P::PIPE_CONTROL timestamp_value(uint64_t address) {
+inline P::PIPE_CONTROL timestamp_value(uint64_t address, bool host_visibility = true) {
     auto timestamp = signal_value(address, 0);
+    timestamp.setDcFlushEnable(host_visibility);
     timestamp.setPostSyncOperation(P::PIPE_CONTROL::POST_SYNC_OPERATION_WRITE_TIMESTAMP);
     return timestamp;
 }

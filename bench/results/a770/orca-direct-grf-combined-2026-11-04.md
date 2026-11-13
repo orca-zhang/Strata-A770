@@ -78,7 +78,7 @@ Direct 与 L0 仍有堆状态、同步和派发几何差别；单凭命令数量
 Linux GPU、PPL 和其他输入的质量等价不在本轮验证范围内。
 
 [完整结果与哈希清单](../../../sycl/orca/direct-grf-combined-a770-windows-2026-11-04.json)及
-[可还原的原始证据](../../../sycl/orca/direct-grf-combined-a770-windows-2026-11-04.json.gz)
+可还原的原始证据 (`direct-grf-combined-a770-windows-2026-11-04.json.gz`, raw capture retained locally)
 保留冻结源码、失败记录、构建命令、逐请求协议和实际 GPU 命令缓冲。
 数值内核包、EXE 和专家 profile 按哈希标识；模型 GGUF／权重 pack 记录了路径，本轮未重算其全量哈希。
 复测需准备相同外部资产、对应构建，并映射本机路径。

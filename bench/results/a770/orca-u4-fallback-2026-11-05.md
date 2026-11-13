@@ -21,4 +21,4 @@ The exact JSON records every completed cohort and all raw requests; failure logs
 
 Recompute: `python -X utf8 build-orca-u4-fallback-20261105/publish.py --check`. Compilation/GPU execution/heavy resource verification uses the shared GPU lock. The archive contains source, configuration, raw logs and JSON; no weights, input binaries, EXEs, objects, device binaries or tensor dumps.
 
-[JSON](../../../sycl/orca/u4-fallback-a770-windows-2026-11-05.json) · [Text evidence](../../../sycl/orca/u4-fallback-a770-windows-2026-11-05.json.gz)
+[JSON](../../../sycl/orca/u4-fallback-a770-windows-2026-11-05.json) · Text evidence (`u4-fallback-a770-windows-2026-11-05.json.gz`, raw capture retained locally)

@@ -309,7 +309,8 @@ int main(int argc, char** argv) try {
             if (unquantized[i] != k::bf16_from_f32((i - 16) * 0.5f))
                 throw std::runtime_error("Strata Q8_0 dequantization mismatch");
     }
-    for (bool brain : {false, true}) for (int t : {1, 8, 13}) for (int n : {8, 48, 64}) for (int inner : {16, 64}) {
+    for (bool brain : {false, true}) for (int t : {1, 8, 13, 127, 128, 129, 143, 159, 160, 257})
+        for (int n : {8, 48, 64}) for (int inner : {16, 64}) {
         const int stride = inner + 8;
         const int first_tail_row = t - t % 8;
         std::vector<uint16_t> hx(size_t(t) * stride, 0), hw(size_t(n) * inner), ht(8 * inner, 0);
@@ -332,15 +333,35 @@ int main(int argc, char** argv) try {
         stream.memcpy(dt, ht.data(), ht.size() * 2);
         stream.memcpy(dy, got.data(), got.size() * sizeof(float));
         strata::prefill::orca_xmx_gemm(dx, dw, dy, t, n, inner, stride, t % 8 ? dt : nullptr, brain, &stream);
-        stream.memcpy(got.data(), dy, got.size() * 4).wait_and_throw();
-        for (int row = 0; row < t; ++row) for (int col = 0; col < n; ++col) {
-            float expected = 0;
-            for (int i = 0; i < inner; ++i) expected += input_value(row, i) * weight_value(col, i);
-            if (got[size_t(row) * n + col] != expected)
-                throw std::runtime_error("Strata native XMX output mismatch");
+        auto check_xmx = [&](int factor) {
+            stream.memcpy(got.data(), dy, got.size() * 4).wait_and_throw();
+            for (int row = 0; row < t; ++row) for (int col = 0; col < n; ++col) {
+                float expected = 0;
+                for (int i = 0; i < inner; ++i) expected += input_value(row, i) * weight_value(col, i);
+                if (got[size_t(row) * n + col] != expected * factor)
+                    throw std::runtime_error("Strata native XMX output mismatch");
+            }
+            for (size_t i = size_t(t) * n; i < got.size(); ++i)
+                if (got[i] != -1234.f) throw std::runtime_error("Strata native XMX guard overwritten");
+        };
+        check_xmx(1);
+        if (t == 129 && n == 64 && inner == 64) {
+            stream.begin_recording();
+            strata::prefill::orca_xmx_gemm(dx, dw, dy, t, n, inner, stride, dt, brain, &stream);
+            auto recorded_xmx = stream.end_recording();
+            for (int factor : {1, 2}) {
+                for (int row = 0; row < t; ++row) for (int col = 0; col < inner; ++col) {
+                    hx[size_t(row) * stride + col] = encode(input_value(row, col) * factor);
+                    if (row >= first_tail_row)
+                        ht[size_t(row - first_tail_row) * inner + col] = hx[size_t(row) * stride + col];
+                }
+                stream.memcpy(dx, hx.data(), hx.size() * 2);
+                stream.memcpy(dt, ht.data(), ht.size() * 2);
+                stream.fill(dy, std::numeric_limits<float>::quiet_NaN(), size_t(t) * n);
+                stream.replay(recorded_xmx);
+                check_xmx(factor);
+            }
         }
-        for (size_t i = size_t(t) * n; i < got.size(); ++i)
-            if (got[i] != -1234.f) throw std::runtime_error("Strata native XMX guard overwritten");
         runtime.deallocate(dx); runtime.deallocate(dw); runtime.deallocate(dt); runtime.deallocate(dy);
     }
     // Exercise the engine's actual API with row padding, beta, XMX input/weight
@@ -573,9 +594,9 @@ int main(int argc, char** argv) try {
     dependencies();
     std::printf("PASS Strata numerical sources on %s: embedding, scale/add, gate, RMSNorm, FP16/BF16, Q8_0, doorbells; 3 native graph replays\n",
                 runtime.properties().name);
-    std::puts("PASS Strata native XMX FP16/BF16 GEMM: 36 shapes, padded strides and partial tiles, exact outputs and guards");
+    std::puts("PASS Strata native XMX FP16/BF16 GEMM: 120 shapes, M16/M4 boundaries, strided inputs, exact outputs/guards and changed-input replay");
     {
-        constexpr int n = 2560, hidden = 640, gu_cols = 1280, max_rows = 129, guard = 32;
+        constexpr int n = 2560, hidden = 640, gu_cols = 1280, max_rows = 257, guard = 32;
         const size_t gx = size_t(max_rows) * n, gw = size_t(gu_cols) * n, dw = size_t(n) * hidden;
         const size_t gs = size_t(max_rows) * gu_cols + 2 * guard;
         const size_t hs = size_t(max_rows) * hidden + 2 * guard, ys = gx + 2 * guard;
@@ -621,7 +642,7 @@ int main(int argc, char** argv) try {
             }
         };
         for (auto shape : {std::pair{1, 1}, {3, 5}, {4, 4}, {4, 5}, {7, 9}, {8, 16},
-                           {1, 129}, {129, 1}, {32, 32}, {31, 33}, {127, 129}, {129, 129}}) {
+                           {1, 129}, {129, 1}, {32, 32}, {31, 33}, {127, 129}, {127, 128}, {128, 129}, {128, 128}, {159, 160}, {160, 161}, {256, 257}, {1, 256}, {256, 1}, {129, 129}}) {
             if (shape == std::pair{129, 129}) {
                 std::fill(x.begin(), x.end(), k::f16_from_f32(0.5f));
                 for (size_t i = 0; i < wg.size(); ++i)

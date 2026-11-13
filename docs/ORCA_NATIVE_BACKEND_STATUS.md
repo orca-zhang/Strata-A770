@@ -1,9 +1,10 @@
 # Orca native backend: what has actually been replaced
 
-Status on 2026-11-04. Measurements below identify their frozen profiles.
+Status on 2026-11-08. Measurements below identify their frozen profiles.
 
 **Orca L0 is the recommended path. Orca Direct remains WIP and an alternative.**
-The matched Short brackets measure L0 at **59.38–59.57 tok/s**, ahead of Direct.
+Current matched Short brackets still put L0 ahead of Direct; each comparison
+below identifies its source, executable and fixed policy.
 
 The [Windows call-path diagram](../README.md#runtime-call-paths) is retained
 separately from performance plots: SYCL uses UR and Level Zero/Intel UMD;
@@ -12,7 +13,2264 @@ commands. All three continue through D3DKMT and the Windows kernel driver.
 The default remains Orca L0; Direct is WIP. Offline kernel compilation is
 separate from these execution paths.
 
-The latest [current-frontend context comparison](../bench/results/a770/orca-direct-current-contexts-2026-11-04.md)
+The [early-commit control failure](../bench/results/a770/orca-direct-early-commit-2026-11-08.md)
+does not establish a performance result. The candidate builds, but has zero GPU
+requests: the unchanged control completes one exact 128-token Code2K request
+with abnormal 474,695.8 ms prefill / 21,997.0 ms decode, then the predefined
+600-second watchdog terminates its second request. One offline snapshot observes
+dequantization dispatch waiting in `WaitOnAddress`; non-atomic thread capture
+does not prove deadlock or a cause. A separate frozen CPU probe passes 2,112
+checks with idle worker medians of 23.00–26.85 us. All failures are retained;
+the candidate remains unvalidated and the default remains Orca L0.
+
+The [adaptive-executor comparison](../bench/results/a770/orca-direct-adapt-future-2026-11-08.md)
+passes 102 requests / 7,836 output tokens across six fresh processes. Replacing
+per-window thread creation with the installed `std::async` executor produces
+Short throughput changes of +0.377% / -1.097% in opposed brackets, with decode
+control drift -0.368% / +2.100%. The CPU check confirms thread/TLS reuse, but
+the model gain gate fails; it is not adopted. Both sides retain identical
+disabled ETW instrumentation and the separate 5243-slot profile. This is
+neither an L0 comparison nor a canonical-capacity or Linux performance result.
+
+The [Host-stage attribution](../bench/results/a770/orca-direct-decode-stages-2026-11-08.md)
+passes 36 requests / 2,868 output tokens with zero trace losses and 0.356%
+control decode drift. Across 29 traced rounds, empty GPU/queue intervals
+outside Owner and wait scopes total 7.018 ms: 3.460 ms in post-verify routing,
+acceptance and adaptive-thread preparation, 1.657 ms within verify, and
+1.084 ms in finalization. Per-window adaptive-thread creation is a candidate,
+not yet an isolated cost. Both active contexts are compute contexts; only
+one executes during verify, while the other appears during draft. Asynchronous
+work can cross Host boundaries; this 5243-slot diagnostic changes no default.
+
+The [completion-wait diagnostic](../bench/results/a770/orca-direct-wait-trace-2026-11-08.md)
+passes 36 requests / 2,868 output tokens with zero trace losses. The traced
+decode enters `NativeCompletion::wait` 128 times, with 99 registrations and
+101 OS waits; neither `wait_sequence` nor `wait_fence` is entered. Two OS
+timeouts are normal 50 ms wait slices, not failed requests. Of 17.086 ms
+without owned DMA, outstanding packets or Owner calls, 9.434 ms is inside
+OS waits, 0.326 ms in other completion-wait code and 7.326 ms outside marked
+wait scopes. Wait duration includes GPU work, not just wakeup latency.
+Control drift is about 3.8%; this 5243-slot diagnostic establishes neither
+normal throughput nor recoverable time and changes no default.
+
+The [actual decode-owner diagnostic](../bench/results/a770/orca-direct-owner-handoff-2026-11-08.md)
+passes 36 requests / 2,868 output tokens with zero trace losses. The traced
+decode contains 128 cross-thread calls, all at one Owner's replay callsite.
+Publish-to-run and end-to-return intervals total 9.403 ms, overlapping 4.897 ms
+of the 17.902 ms without owned DMA or outstanding packets; 2.176 ms falls in
+Owner bodies and 10.829 ms outside Owner intervals. All three Direct windows
+use two active GPU contexts. This narrows attribution; it is neither a normal
+speed result nor a CallerOwner adoption gate, and does not prove recoverable time.
+
+The [idle-owner CPU diagnostic](../bench/results/a770/orca-direct-owner-idle-2026-11-08.md)
+passes 2,112 return/ownership checks in six alternating worker/caller windows.
+After measured idle intervals of about 16/31–32/63 ms, worker invoke medians
+are 22.55–52.05 us versus caller's 1.60–3.10 us; hot medians are 0.90–1.50
+versus 0.20 us. This does not measure actual model handoffs or GPU work;
+the previous CallerOwner model experiment still has no established gain.
+
+The [decode-boundary ETW diagnostic](../bench/results/a770/orca-direct-etw-phases-2026-11-08.md)
+passes 36 requests / 2,868 output tokens; two Host markers bracket the unchanged
+decode timer within 0.051 ms. Both backends have 128 decode DMA segments.
+Against the arithmetic mean of the two L0 controls, Direct's marked decode
+takes 25.823 ms more: 14.551 ms within DMA intervals and 11.272 ms between them.
+Gaps with no outstanding queue packet total 14.089 ms versus L0's 2.867/2.483 ms;
+gaps with outstanding packets remain similar. This isolates decode from observed
+prefill, without proving a specific Host handoff, context or kernel cause. The
+5243-slot frozen profile and instrumented timings remain diagnostic only.
+
+The [Short-request ETW diagnostic](../bench/results/a770/orca-direct-etw-scheduler-2026-11-08.md)
+passes 36 requests / 2,868 output tokens with zero lost trace events/buffers and
+complete owned queue/DMA pairs. Direct uses 153 work-DMA segments versus 240
+for matched L0. Median submit-to-first-DMA wait is 35.2 us versus 64.15/71.55 us,
+but gaps without this process's DMA total 22.478 versus 10.299/11.316 ms.
+This covers the whole Short request, including preparation/prefill; it does not
+isolate decode or establish a normal speed result or driver-queue cause.
+The [checker correction](../bench/results/a770/orca-direct-etw-scheduler-check-2026-11-08.md)
+preserves the original JSON-key comparison failure. Correct offline command:
+`python -X utf8 build-orca-etw-scheduler-20261108/check.py`.
+
+The [equal-Q2-source diagnostic](../bench/results/a770/orca-direct-policy-parity-2026-11-08.md)
+matches all 60 requests / 4,780 output tokens at 5,243 slots / 7,201 MiB.
+The matched L0 Verifier/shared-expert source texts equal Direct's. Warm Short
+decode changes from 50.505 to 50.822 tok/s for L0 (+0.628%); Direct reaches
+49.918 tok/s (-1.779% versus matched L0). Control drift passes. This single
+nested ordering uses cache budget5000 and disables short-route heat for all;
+it is separate from the 5771-slot anchor and current spec6 production. Other
+adapters/dynamic work are not proved equal, and no production change is adopted.
+
+The [whole-window replay functional check](../bench/results/a770/orca-direct-whole-window-functional-2026-11-08.md)
+passes 20 Short requests / 1,400 output tokens and 20 extra real T4 window replays.
+Every replay restores pre-window PLE, QSA and GDN state, then checks all state,
+history snapshots, logits and sampled IDs byte for byte. Restoring PLE alone
+first failed the QSA check; that failure remains. The full-reset matched attempt
+stopped at READY with 5757 versus required 5771 slots. The separate functional
+run uses 5748/5771 slots, so it establishes no new speed comparison or Short
+cause. No production code, deployment or Linux GPU status changes.
+
+The [current-qualified runtime comparison](../bench/results/a770/orca-direct-qualified-contexts-r2-2026-11-08.md)
+uses the 19-check-qualified pure native object and corrected L0 global-residency
+accounting, with the original frozen HC128/MTP4/min-p0.5/reserve1536 history.
+All 84 requests / 7,272 output tokens match. Direct Short decode throughput is
+1.686%/2.058% below L0; repeated 8K changes -0.442%/+0.466%. Short TTFT takes
+9.732%/10.186% less time and whole requests 2.215%/2.147% less time.
+Quality, capacity and control-drift gates pass; the no-regression gate fails.
+The first attempt failed linking libircmt.lib before any engine started; only
+the recorded oneAPI link environment was restored. This is separate from current
+spec6 production. Deployment and the recommended L0 path are unchanged;
+Linux GPU validation remains pending. Offline verification uses
+`python -X utf8 build-orca-qualified-contexts-r2-20261108/publish.py check`;
+the report's copied command points to the first failed attempt instead.
+
+The [first attempt](../bench/results/a770/orca-direct-qualified-contexts-2026-11-08.md)
+is preserved with its link-environment failure and zero GPU requests. It did not
+reach capacity, numerical or performance checks; its generic gate wording does
+not describe the actual failure.
+
+The [largest-window-first capture experiment](../bench/results/a770/orca-direct-warm-order-2026-11-08.md)
+reduces frozen native thread storage from 344 to 332 MiB, without removing either
+old private pool. Eight complete model requests and 12 matched 5771-slot Short
+requests pass output/counter checks. The Short forward bracket observes decode
+throughput -0.213%, with control-time drift +0.780%; this small delta may be
+noise and establishes no speed gain. The candidate is not adopted or retried;
+runtime/defaults remain unchanged and Linux GPU validation is pending.
+
+The [within-submission HC ordering audit](../bench/results/a770/orca-direct-hc-ordering-paths-2026-11-08.md)
+follows all 129 captured L0 batch-chain jumps. In 32 up tails, two PIPE_CONTROL
+commands occur after the captured-buffer boundary; the comparable norm paths
+also retain CS stalls. The previously tested duplicate-tail removal established
+no gain and is not repeated. This offline evidence adds no model-speed claim
+or runtime/default change.
+
+The [idle-only reclamation qualification](../bench/results/a770/orca-direct-thread-trim-2026-11-08.md)
+passes Host/device lifecycle checks, all 19 existing CTests, Linux compilation/CPU
+checks, and eight complete frozen HC128/MTP4/min-p0.5 model protocols. The explicit
+`Runtime::trim_thread_memory()` protects every current queue binding and retained
+list. Isolated startup recapture plus trim frees 73.5 MiB: thread pools fall from
+344 to 270.625 MiB, descriptors from 0.25 to 0.125 MiB. Actual capacity is 5707
+slots, without a pass of the original 5771-slot performance conditions or a new
+speed/PPL result. The initial Host-rounding expectation and link-directory
+failures remain recorded. Recapture/model auto-trim remain off by default;
+deployed EXEs are unchanged and Linux GPU validation remains pending.
+
+The [pool reference audit](../bench/results/a770/orca-direct-thread-pools-2026-11-08.md)
+finds 122.5 MiB of older pools still retained by recorded lists, alongside
+221.5 MiB currently bound. A separate [READY-only recapture observation](../bench/results/a770/orca-direct-pool-recapture-2026-11-08.md)
+leaves three old pools (73.375 MiB) unreferenced; one older 49.125 MiB pool is
+still retained. No memory was freed: all eight pools still total 344 MiB.
+Actual slots are 5413/5586, without GEN, a new performance claim or a pass of
+the original 5771-slot performance conditions. Recapture is not default-enabled.
+
+The [READY memory ownership inventory](../bench/results/a770/orca-direct-memory-inventory-2026-11-08.md)
+finds 351.875 MiB of native internal local storage: eight scratch/private pools
+account for 344 MiB; parameter mirrors use 2 MiB, ISA 4 MiB, module data 1.625 MiB
+and scratch descriptors 0.25 MiB. All five handle/byte partitions and exact-source
+normalization/archive checks pass. This frozen HC128/MTP4/min-p0.5 diagnostic
+sends no GEN and uses 5569 slots; it neither passes the original 5771-slot
+performance conditions nor measures the corresponding L0 categories. It narrows
+the memory investigation without establishing a decode cause or speed gain.
+
+The [current native-runtime model qualification](../bench/results/a770/orca-direct-native-import-model-2026-11-08.md)
+now passes eight complete 2K/8K/Short/Prose2K protocols with the 19-check-qualified
+runtime and frozen HC128/MTP4/min-p0.5 math/Host policy. No SYCL, UR, Level Zero,
+IGC or GMM DLL is loaded. The functional run used 5577 slots. Its destructor-only
+allocation summary was skipped by the model's `_Exit`; that observation gap is
+retained. Two separate 2K/8K diagnostic requests use live flushed counters and
+match exactly at 5567 slots: 1143 successful native allocation calls, zero caller-
+page or StandardAllocation calls. Thus these model requests do not exercise the
+new external-import or larger-than-2-GiB owned-Host paths; those capabilities do
+not explain the previous decode gap. The exact-source/protocol/archive check
+passes. These are functional and allocation-path checks, without a new speed/PPL
+claim or a pass of the original 5771-slot performance conditions. Deployment and
+Linux GPU status are unchanged.
+
+The [Windows memory-accounting diagnostic](../bench/results/a770/orca-direct-memory-budget-2026-11-08.md)
+finds that both frozen L0 controls return `have_sysman=0`, leaving INFO constrained
+only by DXGI process-budget headroom. Their INFO exceeds independent global
+queries by about 623--644 MiB; Direct's global counter agrees with the independent
+query. The exact checked Windows L0 Host source now also applies the global
+residency limit, caching topology and refreshing residency at capacity checks.
+Six query-fault/recovery checks and eight complete 2K/8K/Short/Prose2K protocols
+pass. The strict 5771-slot attempt instead obtained 5734 slots and remains failed;
+the separate functional run obtained 5673. These are not new same-slot performance
+results. Reserve1536 is still configured; it does not guarantee that much remains
+after later graph allocations. Source is adopted; deployed EXEs, numerical kernels,
+configuration and Linux GPU status are unchanged.
+
+The [native caller-page import qualification](../bench/results/a770/orca-direct-native-import-2026-11-08.md)
+now has eight successful driver calibrations through 4 GiB + 64 KiB, with full
+CPU contents/base lookup/caller ownership and no GPU command submissions. Seven
+eligible descriptors match the actual C++ serializer exactly, including 2 GiB;
+two larger vendor descriptors remain outside its per-part scope. An isolated
+current-source candidate removes both remaining Standard ExistingHeap paths,
+using at most 2 GiB parts for imports and larger owned Host spans. All 19 CTests
+and dynamic-token semantic checks now pass, including full 4 GiB + 64 KiB owned/
+imported contents, GPU boundary reads/writes and five injected import failures.
+The exact checked source is adopted into Windows Direct; every unchanged source
+file also matches the checked snapshot. Original preparation/reference-layout/
+log-decoding failures remain. No deployment or model-speed claim changes. The
+frozen --stream-experts model has no external PinnedArena, so import calibration
+alone cannot explain its decode gap.
+
+The [driver-owned Host allocation diagnostic](../bench/results/a770/orca-direct-native-host-2026-11-08.md)
+matches all 84 request protocols with fixed HC128/MTP4/min-p0.5/5771 slots.
+Against the same Direct backend's standard allocation, first 2K TTFT takes
+15.155%/17.419% less time in opposed orders. Warm Short decode time changes
++0.044%/−0.969%, so no stable decode gain is established. Endpoint drift and
+regression gates pass; the allocation component itself exceeds the 3% drift
+limit and is only diagnostic. The candidate passes 2 GiB contents, six injected
+failure paths and 920 GPU transfer replays. A separate 84-request untimed L0
+comparison now passes complete output/counter and control-drift checks (maximum
+2.232%). Short decode is 2.254%/2.077% below L0, narrowing to 1.359%/0.308% on
+repeated 8K. Short TTFT takes 10.588%/10.430% less time and whole requests
+2.237%/2.152% less time; the overall no-regression gate fails because decode
+remains behind. This uses the frozen runtime and fixed 5771-slot policy, not
+current spec6 production. The current-source model attempt stopped at READY
+with 5763 versus L0's 5771 slots; that failure remains. The qualified Host path
+is now adopted into Windows Direct source. A fresh build passes all 18 registered
+CTests, including full Host contents/ownership, six injected failures and 920 GPU
+transfer replays. These checks do not establish current-source model performance.
+Deployment is unchanged and Linux GPU execution remains untested.
+
+The [short-prompt route-heat ablation](../bench/results/a770/orca-direct-short-route-heat-2026-11-07.md)
+reuses the completed prompt windows' mapped expert IDs, with the existing
+0.125 heat weight and at most four predecode LFU batches. All 120 Short
+protocols match. Opposed warm brackets improve Direct decode
+**+1.008%/+1.540%**, TTFT time **-13.497%/-13.450%**, and directly timed
+whole-request time **-5.068%/-6.279%**. Decode excludes prompt/cache preparation;
+those costs remain in TTFT and whole-request time. Warm decode control drift
+is +0.137%/-0.196%; the frozen performance gates pass. Cold reverse decode
+effect is smaller than its control drift, so cold-start acceleration remains
+unproven. Direct reaches 50.942/50.974 tok/s; outer L0 controls are
+51.192/51.241 tok/s, so this still does not establish an overall Direct lead.
+
+After that isolated measurement, eight additional off/on
+2K/8K/Prose2K/Short protocols match exactly. The
+[subsequent source adoption](../sycl/orca/direct-short-route-heat-adoption-a770-windows-2026-11-07.json)
+enables this preparation by default for Direct; L0 retains its disabled
+default. `STRATA_SHORT_ROUTE_HEAT=0` rolls back. A request with no new prompt
+rows skips collection and preparation. The frozen generated frontend equals
+the tested candidate after normalizing only that default/empty-read block;
+the same patch commutes with current frontend generation. Both exact-byte
+archives pass verification. The benchmark's unchanged-production statement
+records its sampling stage; this paragraph records the later source adoption.
+Deployed EXEs, configuration and README headlines remain unchanged; rebuild
+to use the source default. Evidence remains HC128/MTP4/min-p0.5/5771 slots,
+not the separate spec6/calibrated production profile. No broad PPL, Linux
+GPU or historical intermittent 8K-fault resolution is claimed.
+
+The [routing and expert-slot diagnostic](../bench/results/a770/orca-direct-q2-residency-2026-11-07.md)
+checks 70 complete protocols, 2,300 windows and 3,219,840 routed entries with
+the same frozen HC128/MTP4/min-p0.5/5771-slot profile. For matching complete
+request histories, all 35 L0/Direct request pairs have identical expert IDs,
+Host slot indices and planned VRAM-or-mirror classes. Long-request history
+changes the later Short cache state equally on both backends: each warmed
+Short has 1,190 mirror entries instead of 1,476 after Short-only warmup, a
+19.4% reduction. This is a Host-table diagnostic, not a measurement of actual
+PCIe traffic, physical residency, device-cache hits or performance. It does
+not explain the backend timing gap. All original failures and exact-byte
+evidence are retained; source, deployed EXEs and defaults are unchanged.
+
+The [matched-HC128 context comparison](../bench/results/a770/orca-direct-q2-contexts-2026-11-07.md)
+uses the qualified/adopted Direct Q2_0 fork and the same numerical pack on both
+backends. All 120 protocols match across six fresh processes and opposed
+2K/2K/8K/8K/Prose2K/Short histories. Direct Short decode is **-0.260%/-2.572%**
+versus L0; repeated 8K is **+1.352%/-1.273%**. Thus repeated 8K improves the
+relative gap by 1.612/1.298 percentage points versus Short in these two fixed
+histories, but forward control drift exceeds the 3% limit and reaches 4.375%
+across metrics. This does not establish a repeatable context-length effect or
+identify API dispatch, cache state or locks as its cause. Repeated 2K TTFT
+uses **18.628%/17.320% less time**, repeated 8K **9.823%/8.177% less**; first
+2K instead uses **3.638%/3.432% more**. Decode excludes startup/preparation/
+prefill; all timing, drift failures and raw protocols are retained. Source,
+artifact and cached asset identities plus the exact-byte text archive pass
+verification. The frozen profile is MTP4/min-p0.5/5771 actual slots, not the
+separate current spec6/calibrated policy. No deployed executable, configuration
+or README headline changes; historical intermittent 8K faults, broad PPL and
+Linux GPU validation remain open.
+
+The [Q2_0 shared-down fork qualification](../bench/results/a770/orca-direct-q2-fork-2026-11-07.md)
+adds the five previously excluded layers to Direct's existing full-fork path
+under its unchanged one-group, at-most-four-row conditions. Both native safety
+probes pass 2,304 complete input/output/scratch/guard comparisons over T1--8
+and changing routed plans; the full fork itself remains limited to T1--4.
+All 120 same-HC128/MTP4 Short model protocols match exactly. Direct decode
+improves +1.743%/+0.851% in opposed brackets, versus -0.700%/-0.239%
+control drift; TTFT time changes -0.282%/-0.436% and whole-request time
+-1.283%/-0.155%. Candidate decode is 49.508/49.233 tok/s; outer L0 is
+50.190 tok/s with -0.201% drift, so Direct still does not lead L0 overall.
+The [source adoption proof](../sycl/orca/direct-q2-fork-adoption-a770-windows-2026-11-07.json)
+uses the existing `STRATA_ORCA_DG2` compile macro: the entire generated Direct
+Verifier equals the tested candidate, while the L0 Verifier equals its old
+baseline. The shared phase5 wrapper equals both safety-tested versions.
+No new runtime flag, numerical kernel, scratch layout or public ABI is added.
+This source change is adopted for Direct; L0's Verifier policy, deployed EXEs,
+configuration and README headline remain unchanged. The frozen profile is not
+the separate current spec6/calibrated policy. Both text archives pass byte
+round-trip checks; there is no new long-context, PPL or Linux GPU claim.
+
+The [real HC-to-router phase-order diagnostic](../bench/results/a770/orca-direct-hc-router-2026-11-07.md)
+captures all 48 real T4 layers, with the complete 70-token model protocol exact
+and all HC capture bytes identical to the preceding real-HC check. The actual
+model uses the early router/quant fork in 43 layers; layers 6, 7, 11, 22 and 30
+fall back. The standalone graphs retain a three-way router/quant fork for all
+cases, so those five fallback schedules are not reproduced. All 48 work
+protocols, 1,032,192 replay launches and 144 independent FP64/BF16/Q8/TopK plus
+full-buffer/guard case checks pass. Grouping independent HC cases before their
+router stages reduces Host replay/wait time by 13.188--19.109% across the three
+processes. This reordering is diagnostic: it omits real cross-layer recurrence
+and changes memory/cache/state/dependency history together. Direct time versus
+L0 is +0.683%/-0.644% for interleaved 384/1536-kernel lists and
+-2.272%/-1.910% for grouped lists; every apparent Direct advantage is smaller
+than its corresponding L0 control drift, which reaches 7.120%. All samples and
+both failed capture revisions are retained without a performance rerun. The
+third capture records data after BF16/native-Q8 preparation; non-fork shared
+scratch is internally reused, so its replay oracle uses captured native-Q8
+bytes, separately checked against the replay quantizer. The fresh offline
+protocol/pin audit and exact-byte text archive pass. No stable model-speed,
+cache-specific cause, production-default or Linux GPU claim follows.
+
+The [same-ZEBIN hardware-counter comparison](../bench/results/a770/orca-direct-gpu-counters-2026-11-07.md)
+finishes 75 matching Short protocols in L0/Direct/L0 order, with the same HC128
+native pack on both frozen full-current engines. Clean decode is 50.229 versus
+48.920 tok/s, Direct -2.606%; closing/opening L0 decode drift is -0.390%.
+Device-wide whole-request counters show Direct memory reads -0.482%, writes
++2.556%, average EU active core cycles -0.647% and stall core cycles +3.498%.
+These counters include prefill, desktop activity and collection-control boundaries;
+they do not isolate decode, PCIe traffic or a root cause. All three new GPU timers
+pass validation. An earlier interrupted 50-request run retains two impossible
+Direct elapsed-timer bins, invalidating that run's frequency estimate; it cannot
+establish downclocking. Its samples and the earlier readiness failure remain
+separate. No product runtime, default, deployed EXE or Linux GPU claim changes.
+
+The [timestamp-free HC norm counters](../bench/results/a770/orca-direct-hc-counters-2026-11-07.md)
+keep the same frozen full-current headers/runtimes and HC128 native pack, with
+T4, residuals and 48 disjoint banks of checked synthetic input. All 30 work
+protocols and 12,976,128 norm launches pass complete output/source/guard checks.
+At 192 norms per replay, Direct Host replay plus per-list wait is 8.237 versus
+7.913 microseconds/norm, +4.097%; closing/opening L0 drift is +0.061%.
+Device-wide counters show reads -1.028%, writes -1.549%, average EU active
+core cycles -0.697% and stall core cycles +1.368%; all three timers validate.
+These counters include validation and control boundaries and cannot isolate a
+kernel or establish the cause. Host times are neither pure GPU spans nor model
+tok/s, and cannot be subtracted from earlier endpoint-timestamp measurements.
+The offline publisher's initial same-name module import failure is preserved;
+loading the unchanged parser by exact path fixes reporting without a GPU rerun.
+All source/protocol hashes and exact-byte archive round-trips pass; production
+defaults, the deployed engine and Linux GPU status remain unchanged.
+
+The [paired 192/768 replay check](../bench/results/a770/orca-direct-hc-batching-2026-11-07.md)
+and its [opposed-order repeat](../bench/results/a770/orca-direct-hc-batching-reverse-2026-11-07.md)
+keep total work fixed at 196,608 norms per measured sample, using the same two
+EXEs and mathematical pack. Direct Host time is +3.975%/+3.552% at 192 norms
+per list, but -4.017%/-1.417% at 768; increasing list length reduces replay/wait
+boundaries fourfold without waiting for extra work or fusing kernels.
+The reverse 768 control drift is +2.060%, larger than its 1.417% time advantage;
+these observations do not establish a stable model-speed gain or a single cause.
+All 120 work protocols pass complete output/source/guard checks. Mixed-size
+device-wide counters cannot distinguish the two sizes. Two impossible elapsed
+timer bins also occur in the opening forward L0 arm, invalidating its frequency
+estimate; clean Host times do not use those counters. The prior
+[caller-owner check](../bench/results/a770/orca-direct-caller-owner-2026-11-05.md)
+did not establish model acceleration, so boundary sensitivity alone does not
+identify thread handoff as the cause. Production defaults remain unchanged.
+Both archives pass exact-byte round-trip verification, preserving all samples
+and the reverse advantage's control-drift limitation.
+
+The [timestamp-free full HC chain](../bench/results/a770/orca-direct-hc-chain-2026-11-07.md)
+links the frozen model Host wrappers and common HC128 native pack, interleaving
+norm/down-sliced/reduce/up-Q8 at T4 with residuals and one hot weight group.
+Direct replay plus per-list wait is -0.088% at 192 kernels/list and -3.446%
+at 768; outer L0 time drift is +0.225%/-0.383%. All 60 work protocols,
+6,488,064 native launches and independent FP64/Q8/full-source/output/guard
+checks pass. The offline publisher first rejects mismatched counter grids;
+its revision preserves every exported bin and records Direct's missing final
+read/Busy bin, disabling the read-byte comparison. The Direct elapsed timer
+also fails validation, so its average frequency is invalid. No GPU rerun or
+repair of raw counters occurs; Host times do not use those counters.
+
+The [same-process 1/48-weight-group check](../bench/results/a770/orca-direct-hc-chain-banks-2026-11-07.md)
+allocates all 48 independent cloned BF16 weight groups in every process,
+then changes only the groups touched by each graph and the list length.
+Requested weight buffers plus guards total 603.785 MiB; this is not measured
+physical VRAM usage or a DRAM-bank mapping. The four graphs share input/output
+addresses, math and allocation layout, with equal total work per sample.
+
+| Touched weight groups | Kernels/list | Direct Host time versus L0 | Closing/opening L0 time drift |
+| --- | ---: | ---: | ---: |
+| 1 | 192 | -0.272% | -0.239% |
+| 1 | 768 | -3.731% | -0.209% |
+| 48 | 192 | +0.899% | -0.083% |
+| 48 | 768 | -1.924% | -0.119% |
+
+Expanding the touched weights increases Direct time by 34.331%/35.613%,
+versus 32.668--33.174% across the L0 controls. The larger workset reverses
+the small-list advantage and reduces the long-list advantage; it still does
+not reproduce the full model's 2.606% throughput deficit. These are one
+L0/Direct/L0 ordering, not confidence intervals or opposed-order confirmation.
+All 120 work protocols and 12,976,128 native launches pass the independent
+FP64/Q8 and complete source/output/guard checks. Counters mix all four cases
+and full 48-group validation readbacks; they cannot attribute per-case memory
+traffic or a cache-level cause. The opening L0 elapsed timer is invalid and
+retained. Both full-HC archives pass exact-byte round-trip checks. Synthetic
+cloned weights omit real layer intermediates and cross-layer input recurrence;
+real-model surrounding operators and required synchronization remain to be
+isolated. Production defaults, deployed EXEs and Linux GPU status are unchanged.
+
+The [residual input/output aliasing control](../bench/results/a770/orca-direct-hc-alias-2026-11-07.md)
+addresses another model/probe difference: Verifier uses `R == R_out`, whereas
+the earlier HC probes read a separate R buffer. All four new graphs touch the
+same 48 weight groups and write the same output addresses. Both modes retain
+`apply=true` but use a zero residual addend, keeping repeated R values fixed.
+At 192 kernels/list, Direct time is +0.282% with separate input and +0.157%
+with aliased input; at 768, it is -2.394%/-2.524%. Maximum outer L0 drift is
+0.502%. Within Direct, aliasing changes time by -0.004%/+0.125%; L0 controls
+change by -0.220% to +0.464%. This control does not show an enlarged Direct
+deficit from address aliasing alone. It does not verify nonzero recurrent data
+dependencies or rule them out in the model. All 120 protocols, 12,976,128
+native launches and independent FP64/Q8/full-source/output/guard checks pass;
+all outputs hash to `e4947135518a19d0`. The opening L0 elapsed timer is invalid
+and retained; Host timing is independent of that counter. The archive passes
+exact-byte round-trip verification, with no production or Linux GPU change.
+
+The [nonzero two-state follow-up](../bench/results/a770/orca-direct-hc-alias-recurrence-2026-11-07.md)
+alternates residual addends of +2^-10/-2^-10 with zero injection logits and
+exact dyadic R0/R1 values. Separate-input and in-place graphs perform the same
+math at each step; both finish at R0 after each even-length list. This adds
+a bounded nonzero read-after-write dependency without accumulating numerical
+drift. It still uses synthetic cloned weights rather than real model history.
+
+| Nonzero residual input | Kernels/list | Direct Host time versus L0 | Closing/opening L0 time drift |
+| --- | ---: | ---: | ---: |
+| Separate R0/R1 | 192 | +0.825% | -0.358% |
+| Separate R0/R1 | 768 | -1.569% | -0.371% |
+| In-place R | 192 | +0.901% | -0.788% |
+| In-place R | 768 | -1.503% | -0.377% |
+
+Within Direct, in-place time changes +0.022%/-0.283%; the L0 controls range
+from -0.353% to +0.163%. This one L0/Direct/L0 ordering does not show the
+nonzero in-place dependency enlarging the backend gap; it does not exclude
+arbitrary model recurrence or surrounding operators as contributors. All
+120 work protocols, 12,976,128 native launches and independent FP64/Q8 plus
+full input/output/guard checks pass. The complete output again hashes to
+`e4947135518a19d0`, with maximum CPU-reference absolute error 4.173e-7.
+Direct's elapsed timer is invalid and retained, so no frequency claim follows.
+The completed publication passes a fresh offline exact-byte/archive/protocol
+check without a GPU rerun. No production or Linux GPU change is adopted.
+
+The [real-model 48-layer HC1 replay](../bench/results/a770/orca-direct-hc-real-2026-11-07.md)
+records one actual T4 window's inputs, weights and complete outputs from the
+frozen full-current diagnostic Direct engine. Its entire 70-token Short protocol
+still matches the reference, including draft counts, stop and zero reuse/resume.
+All 48 private capture files total **663,379,968 bytes**; weight payloads stay
+local, with only hashes in the public evidence. Recording adds diagnostic copy
+nodes and is not a throughput measurement.
+
+Independent L0/Direct/L0 processes replay all 48 real cases with the common
+HC128 mathematical pack, frozen Host wrappers/runtimes and Direct residency
+object. They read immutable R0 and write disjoint R1, omitting the original
+model's in-place cross-layer recurrence and surrounding operators. Every full
+output matches the model capture bitwise. All **144** independent case checks
+pass the original FP64 tolerance, separate/fused Q8 and complete source/output/
+guard checks; maximum CPU absolute error is 4.598477e-5 in every arm. Output hash
+is `b71f656ec4f65bce`. No numerical kernel is rebuilt.
+
+| Real HC graph | L0 Host us/read | Direct Host us/read | Direct time change | L0 time drift |
+| --- | ---: | ---: | ---: | ---: |
+| 192 kernels/list | 75.724288 | 76.975643 | +1.653% | -0.065% |
+| 768 kernels/list | 72.976021 | 72.742578 | -0.320% | +0.660% |
+
+All **30** work protocols and **663,552** replay kernel launches pass; that count
+excludes startup numerical checks and memory operations. Each cell has
+four retained 6,144-read samples per process, with two warmups; reset, full
+validation and readback stay outside the Host replay/per-list-wait timer.
+There are no GPU timestamps or profiler. The smaller long-list advantage is
+below observed control drift and does not establish a stable speed gain.
+This real-data fixture still does not reproduce the whole model's complete
+deficit. Data and allocation layout both differ from the seeded fixture, so
+the cross-run difference cannot be attributed solely to real numerical values.
+Surrounding operators, allocation layout and arbitrary model recurrence remain
+to be isolated. These Host times are neither pure GPU spans nor model tok/s.
+The initial post-build byte comparison fails on generated CRLF versus LF;
+both probes had already compiled/linked. The original script/failure remains,
+and normalized text plus actual compiled-byte/library/header hashes verify
+without rebuilding or a GPU rescue rerun. Exact-byte text archive checks pass;
+production defaults, deployed EXEs, README scores, PPL and Linux GPU status
+remain unchanged. Historical Direct 8K/nonfinite/residency issues stay open.
+
+The [same-math real-model Router/Quant isolation](../bench/results/a770/orca-direct-router-serial-2026-11-07.md)
+keeps early quantization in place and changes only its one `independent`
+wrapper into a sequential lambda. All mathematical kernel calls, other forks,
+Host libraries, the Direct residency object and the common HC128 native pack
+are preserved. Eight fresh-process arms are fixed in advance:
+L0/parallel/serial/parallel/serial/parallel/serial/L0. Each completes 15 Short
+requests, discards ten warmups and retains five; all **120** complete token,
+draft-count, stop and reuse/resume protocols match and are independently parsed.
+No profiler, GPU timestamps or inner timing switches run in this comparison.
+
+| Opposed Direct bracket | Serial decode change | Serial TTFT time change | Serial request time change | Control decode drift |
+| --- | ---: | ---: | ---: | ---: |
+| parallel/serial/parallel | -1.436% | +1.232% | +1.815% | +0.142% |
+| serial/parallel/serial | -0.489% | +0.277% | +0.660% | +0.085% |
+
+Net decode excludes preparation, initialization and prefill. Serial is slower
+in both orderings, so this concurrency fork is retained; removing it does not
+close Direct's deficit. The smaller reverse TTFT change is below its 1.217%
+control drift, so it does not establish a stable TTFT difference. Outer L0
+decode drift is +0.820%; those outer controls span the entire run, rather than
+pairing locally with each Direct arm. All samples and both orders are retained;
+control drift is not a confidence interval. The initial build-input audit failure
+occurs before compilation/GPU and is preserved separately. The first offline
+publisher assumes nine DONE fields and rejects the frozen engine's sixteen-field
+protocol before publishing; the corrected parser checks all appended counters
+and the full prompt read. Both failed scripts and records remain archived,
+without a GPU rerun; shared pins and the exact-byte archive round-trip pass.
+No production default,
+deployed EXE, main README result, PPL or Linux GPU status changes. This fixed
+Short screen does not close arbitrary model recurrence or historical Direct
+8K/nonfinite/residency issues.
+
+The [preparation-default adoption](../bench/results/a770/orca-preparation-defaults-2026-11-06.md)
+enables known MTP position preparation and persistent-mirror service refill
+batching in Orca L0 source. Rebuild to apply; `STRATA_MTP_PRESTAGE=0` and
+`STRATA_ORCA_MIRROR_REFILL=0` independently restore the previous paths.
+The earlier small measurements remain separate from whole-version speed claims.
+This source change does not replace the deployed HC SG16 executable or change
+draft confidence thresholds.
+The L0 rebuild matches all eight complete default/rollback protocols across
+fresh 2K, repeat 2K, 8K and Short histories.
+Direct keeps these switches opt-in after the combined check exited on nonfinite
+activations in its third request, 8K prefill; that failure is retained separately.
+The [bounded four-arm follow-up](../bench/results/a770/orca-direct-nonfinite-factors-2026-11-06.md)
+matches all 16 Direct protocols across both switches off, each alone and both on.
+Six Direct/L0 real-NaN cases also verify input/hidden classification and reset.
+The historical failure did not recur; its cause remains unresolved, with no new
+performance claim or change to Direct defaults.
+
+The local L0 configuration also enables [accepted-row-only MTP catch-up](../bench/results/a770/orca-mtp-accepted-only-adoption-2026-11-06.md)
+after the user's small-gain adoption request. Code2K decode observations are
++0.964%/+0.499%, Prose2K +0.767%/+0.102% in opposed orders; the original
+reverse gain gate remains failed. All 42 measurement and 18 mixed-8K/HTTP
+protocols match. This config-only change takes effect next launch, retains
+0.5 confidence thresholds and does not claim improved TTFT for every workload.
+
+The [timestamp visibility correction](../bench/results/a770/orca-timestamp-visibility-2026-11-06.md)
+now lets ordered timestamps follow the queue's device/host visibility policy;
+completion signals keep their host flush. Both native gate checks and 5,040
+full norm replays pass, along with Linux DRM compilation and CPU encoding checks.
+Dense-marker overhead changes substantially, but 54 of 144 comparisons exceed
+the 3% drift reference. This improves the diagnostic path without a model-speed
+claim, production-EXE replacement or Linux GPU validation.
+
+The [sparse real-model HC check](../bench/results/a770/orca-direct-hc-sparse-2026-11-06.md)
+uses the corrected timestamp runtime and only GDN layer 0/QSA layer 47: twelve
+ordered marks per window instead of the earlier 242. All 90 protocols and
+2,610 windows match. The selected norm intervals remain 9.266%/9.511% longer
+than L0; whole-window GPU spans are 2.269%/1.533% longer in opposed orders.
+These two layers do not represent all 48, and changing both marker density
+and visibility prevents a single-factor subtraction from the old dense data.
+The earlier roughly 95% norm gap must not be treated as pure kernel overhead.
+
+The [ordered-timestamp wrapper cleanup](../bench/results/a770/orca-ordered-stamp-2026-11-06.md)
+now omits Direct's duplicate pre-timestamp barrier. The native timestamp keeps
+its CS stall/HDC/untyped flush, final host completion and subsequent ordering;
+L0 retains its explicit barrier. All 5,040 replays match, with identical other
+compiled headers. Dense-marker representative intervals shrink about 3--5%,
+but seven of 144 GPU comparisons exceed the 3% drift reference. This source
+adoption takes effect after rebuilding and leaves normal timestamp-free decode
+unchanged. There is no new model-speed or Linux GPU claim.
+
+The [full HC walker audit](../bench/results/a770/orca-direct-hc-walker-audit-2026-11-06.md)
+checks retained same-math captures at every actual command boundary, including
+160 norm and 80 fused-Q8 up walkers per backend. After explicit address/inline
+exclusions and the separately reported payload-length/SLM differences, the
+remaining control difference is walker post-sync: L0 embeds a completion-counter
+write with dataport pipeline/subslice flushes; Direct uses subsequent barriers
+and list completion instead. This establishes a synchronization-mechanism
+difference, without new GPU execution or a latency/performance attribution.
+
+The [walker-flush isolation](../bench/results/a770/orca-direct-walker-flush-2026-11-06.md)
+puts the observed dataport flushes inside Direct walkers, retaining CS stalls
+and conservative Host/state/timestamp completion. Packed queue-private cache
+lines fix the first candidate's allocation-plateau failure without weakening
+that assertion. Both policies pass 28 native checks and 128 full HC cases;
+480 selected actual walkers verify activation and unchanged other controls.
+All 90 clean Short protocols match, but opposed net decode changes are
+-0.275%/-1.434%, with maximum control drift 3.470% against the 3% reference.
+The candidate is not adopted. These Direct-only results do not establish
+the synchronization mechanism as the cause of the Direct/L0 gap, and add no
+long-context, PPL or Linux GPU claim. Both earlier failures remain recorded.
+
+The [complete pipeline diagram](ORCA_PARALLEL_PIPELINE.md) maps request flow,
+per-layer dependencies and CPU/BCS/compute staging. It marks conditional overlap,
+explicit copy roles, logical versus physical queues and buffer ownership.
+
+The [full current-source comparison](../bench/results/a770/orca-direct-full-current-2026-11-06.md)
+rebuilds both backends and matches all 120 complete protocols and draft counters,
+with current shared tail clipping and Direct128/L0256 defaults. Direct repeat-2K
+TTFT is 16.630%/13.509% shorter in opposed orders; repeat-8K is 7.154%/6.765%
+shorter. Short net decode remains 51.192/51.384 tok/s versus L0's
+52.493/52.755 (-2.479%/-2.598%). First-2K TTFT is instead 8.011%/4.573% longer.
+Maximum control drift is 5.866%, exceeding the preset 3% gate. These are retained
+observations, not a stable all-workload speedup. Repeat-8K decode gaps are
+-1.374%/-2.964%; the gap does not consistently shrink relative to Short.
+The initial attempt failed before Direct READY on local residency of the
+7.74-GiB cache. Its failure remains archived and unresolved. The completed run
+uses a diagnostic-only runtime relink; 17 controlled allocation rejections and
+retries pass, without changing residency policy, cache size or reserve.
+Both full builds pass their PLE CPU checks and 64 HC cases per backend.
+No production EXE/config or Linux GPU status changes follow from this test.
+
+The [native global-memory accounting check](../bench/results/a770/orca-direct-global-memory-2026-11-06.md)
+now bounds Windows Direct availability by local-segment residency as well as
+the process budget and tracked allocations. Adapter/segment identity is cached;
+only memory checks refresh residency. Independent Sysman calibration observes a
+775.113-MiB process-budget overestimate in an idle observer. Old-runtime negative
+controls and the new allocation/error checks pass, followed by seven exact
+2K/8K/Short model protocols at the same 5771 slots and 1536-MiB reserve.
+There are no added queries in kernel dispatch or successful allocation paths.
+This corrects accounting without a new speed claim, production deployment,
+Linux GPU result or closure of the earlier residency/8K failures.
+
+The [current Short state census](../bench/results/a770/orca-direct-state-domains-2026-11-06.md)
+weights encoded commands by actual successful submissions, including frozen-list
+replays. Both exact-output requests execute 67,271 walkers, with 3,934 GRF-only,
+50 parameter-base-only and 28 scratch-base-only transitions each. No within-list
+systolic transition or invariant-SBA rewrite occurs, excluding that proposed
+redundancy for these requests. The trace includes whole-request work and intrusive
+logging; it is not net-decode timing or a new speed result. The original publisher
+retains two JSON-key comparison failures; the [supplemental audit](../bench/results/a770/orca-direct-state-domains-2026-11-06-audit.md)
+passes raw protocols, packet/list invariants and exact-archive checks without
+rerunning GPU. Runtime defaults and deployed binaries remain unchanged.
+
+The [startup window-recapture experiment](../bench/results/a770/orca-direct-scratch-recapture-2026-11-06.md)
+keeps the grown scratch pools and records Verifier windows again before READY.
+Four exact diagnostic protocols reduce scratch-base changes from 28 to 7 and
+parameter-base changes from 50 to 0 per whole request, with 67,271 walkers
+unchanged. The changed recording layout prevents attributing this to scratch
+alone. All 90 clean model protocols match at 5771 slots and 1536-MiB reserve,
+but opposed-order net decode changes are -0.352%/-0.582%; TTFT changes are
+-1.751%/+0.497%. Control drift passes the preset 3% gate; the gain gate fails.
+This is not a small positive result, so the candidate remains isolated.
+READY is reported separately; no default, deployment or Linux GPU status changes.
+
+The [physical-context census of the frozen full builds](../bench/results/a770/orca-direct-queue-topology-2026-11-06.md)
+matches all 14 calibrated 2K/8K/Prose2K/Short protocols and all 28 phase totals.
+Net decode uses one compute plus one copy context on L0, versus three compute
+plus one copy context on Direct, in every tested context length. Whole-process
+creation totals are four (2 compute/2 copy) and nine (6 compute/3 copy),
+respectively; those totals include contexts that are inactive in net decode.
+L0 host synchronization can itself submit commands. The first seven exact L0
+protocols retain a failed API-attribution check; the corrected observer adds
+synchronization/reset/teardown scopes without changing math or runtime policy.
+The report's API-handle column counts distinct (API, first-argument handle)
+identities, not unique handles or application Streams. Intrusive logging and
+the census lock prevent speed attribution. This establishes a scheduling
+difference that persists at 8K, not its latency cost or a reason to merge contexts
+without first proving HostGate progress, scratch/fence ownership and dependencies.
+
+The service source now defaults to preparing the known next-window PLE row
+after commit submission and before MTP. The next gather still collects its
+reader ticket before consumption; `STRATA_ORCA_PLE_ROW0=0` restores the old
+order. This reuses private reader buffers and its worker, without mapped GPU
+input writes. The [source adoption evidence](../bench/results/a770/orca-ple-row0-source-2026-11-05.md)
+retains the initial Direct 8K all-zero failure and subsequent same-EXE controls.
+All 24 follow-up protocols match on Direct/L0 with the switch unset, 0 and 1,
+each starting a fresh 2K→2K→8K→Short history; the initial failure is retained.
+The [consumer follow-up](../bench/results/a770/orca-ple-prefix-2026-11-05.md)
+reuses an ordered matching prefetch prefix and submits only the suffix before
+collecting all writers. One prefetched token followed by four tokens now needs
+64 rather than 80 logical row requests; physical I/O was not measured.
+The extended CPU selftest passes 336 prefix/batch cases per reader implementation,
+and the native CPU-only CMake/CTest target passes. All 16 rebuilt U4 Host/retained-
+library protocols match across Direct/L0 through cold Code2K→8K→Prose2K→Short
+histories, using HC128. That consumer check did not cover HC256; the later
+full-source comparison above covers current Direct128/L0256 defaults.
+Rebuilding is required; deployment is unchanged and the intermittent fault remains open.
+No stable model-speed gain is claimed for this scheduling change.
+
+The [earlier HC128 endpoint diagnostic](../bench/results/a770/orca-direct-hc1-span-2026-11-05.md)
+passes 360 complete output/guard/span checks. T1 fused-Q8 Direct GPU spans
+were about 19% longer than L0, locating a difference inside the GPU list too.
+A [one-image 256-GRF ablation](../bench/results/a770/orca-hc1-q8-grf-2026-11-05.md)
+removes reported spills, retains the same payload ABI and passes 960 output/
+guard checks. Component replay improves on both backends, while global private
+memory remains. Component results require separate model checks; neither
+result closes the Direct 8K fault.
+
+The [subsequent clean Short model screen](../bench/results/a770/orca-hc1-q8-grf-model-2026-11-05.md)
+matches 120 protocols in opposed 128/256-GRF orders, using the same EXE per
+backend. Direct improves **57.936→59.650 tok/s (+2.959%)** and L0 improves
+**59.575→60.708 (+1.901%)**; 128-GRF control drift is −0.168%/+0.031%.
+This is frozen generic M16 Short28, without the new PLE prefetch; the gains
+cannot be credited to scheduling or API removal alone. That experiment used an
+isolated image; matched 256-GRF Direct still trails L0.
+
+The [later current-U4 adoption checks](../bench/results/a770/orca-hc1-q8-grf-u4-adoption-2026-11-05.md)
+pass all 18 mixed-history/actual HTTP requests and two final-path smoke requests;
+the Windows A770 primary L0 config selected permanent HC256 images at that
+stage. The EXE, native fallback, profiles and RAM guard were retained.
+The [matched U4/M16 context experiment](../bench/results/a770/orca-hc1-production-contexts-2026-11-05.md)
+then passes all 120 complete protocols. HC128→HC256 improves Direct Short net
+decode **45.494→47.119 tok/s (+3.571%)** and TTFT
+**766.087→754.491 ms (−1.514%)** together; L0 Short improves **+2.479% / −1.485%**.
+With HC256 on both backends, Direct Code2K/8K TTFT is **11.039%/7.462% shorter**
+than L0 while net decode remains **2.211%/0.627% lower**; Short remains
+**2.524% lower**. Shorter TTFT does not establish that prefill optimizations
+caused the decode gap. Long cases have one retained sample per process;
+all samples and control drift are archived. The targeted GRF flag is now a
+source build default. This context experiment did not replace deployed EXEs
+or configs; shared kernel gains cannot be attributed entirely to API removal.
+
+The [post-HC256 endpoint replay](../bench/results/a770/orca-hc1-post256-span-2026-11-05.md)
+passes 720 complete output/guard/span checks and 72 CPU references. T1/input0
+fused GPU spans are now **4.917%/5.424% shorter** on Direct in opposed orders;
+ordinary HC remains **4.699%/4.303% longer**. The old fused-chain +19% attribution
+therefore does not apply to this HC256 replay. The ordinary HC and submission
+boundaries need mapping to real-model decode; hot independent buffers and
+endpoint spans do not isolate the entire residual. Linux GPU validation and
+the intermittent Direct 8K fault remain open.
+
+The [ordinary-HC register screen](../bench/results/a770/orca-hc-plain-grf-2026-11-05.md)
+changes only SG16 ordinary up from 128 to 256 GRF, retaining fused HC256.
+All 720 complete output/guard/span checks and 72 CPU references pass. Direct T1
+ordinary-chain wall throughput improves **1.81–5.23%**, while T4 loses
+**7.55–8.71%** and L0 regresses. The preset joint gate fails, so this policy
+is not adopted. Both images have zero spills and the same 1,256-byte private
+allocation per SIMT thread; more registers do not ensure a faster chain.
+These component results do not replace model decode or TTFT measurements.
+
+The [narrow-capture model check](../bench/results/a770/orca-hc-up-capture-2026-11-05.md)
+passes 108 complete protocols but changes L0/Direct Short net decode by
+−0.879%/−1.208%; TTFT also lengthens, so the candidate remains isolated.
+The [Q8 split/subgroup follow-up](../bench/results/a770/orca-hc-q8-sg16-2026-11-05.md)
+retains those failures and separately records SG16 bitwise checks, the failed
+joint component gate, and the matched full model. Shared kernel gains do not
+establish gains from API removal; those isolated experiments did not change production defaults.
+
+The subsequent [local HC SG16 adoption](A770_PERFORMANCE.md#hc-sg16-default)
+now selects the complete matching narrow-capture EXE/images tuple on next start.
+Opposed HC256/SG16 brackets match all 42 protocols and improve Code2K/Prose2K
+net decode throughput by **5.60–5.61%/5.97–6.15%**. Permanent-path first/repeated
+8K, mixed histories and actual HTTP checks match all 18 generation requests;
+169 one-second candidate samples have a minimum **1336.047 MiB** free VRAM.
+The initial control-side memory failure remains archived. Only the primary
+EXE/images fields change; HC256 and native fallbacks, U4N16 data, profiles and
+the RAM guard remain available. This deployed tuple uses the frozen U4 Host
+and generic libraries from the isolated model experiment; the current-tree
+build measurements below retain their own executable and pack provenance.
+
+The later source adoption selects narrow captures together with SG16 fused Q8,
+preserving all eight token slots and the fused kernel's 256-GRF option. The
+complete current-tree Windows L0 and Direct builds now each pass PLE CPU CTest
+and all 64 HC eager/replay output/source/guard checks against CPU FP64 and separate-Q8
+references, using the retained matching HC pack for that build-time check.
+The portable `strata-orca-hc-check` target is documented in the
+[frontend README](../sycl/orca/README.md); the Linux frontend checker builds and
+audits it without GPU execution. Static PE audits find the expected Level Zero
+loader on L0 and no Level Zero/SYCL/UR/oneMKL direct imports on Direct; dynamic
+or transitive DLL dependencies are outside this check. Matched current-tree
+L0/Direct/L0 testing now passes all 60 full protocols and the 3% control-drift
+gate, using one fresh 1,254-ZEBIN pack with 24 unsupported SPIR-V variants.
+Warm Short is **51.228 L0 / 49.480 Direct tok/s** (−3.411% Direct); repeated
+Code2K/8K decode gaps narrow to **−1.298%/−1.181%**, with TTFT
+**16.496%/7.772% shorter**. Cold first Code2K TTFT is **4.971% longer** instead.
+Each long-request position has one sample per arm, and the old Direct 8K fault
+remains open. This comparison does not deploy executables or change the launch
+configuration; earlier isolated speed results remain separate measurements.
+The [frozen-build report](../bench/results/a770/orca-current-tree-2026-11-05.md)
+and its JSON/text archive are now published and pass the source, protocol,
+comparison and archive checks, subject to the asset-identity limitation below.
+
+A CPU audit of all 60 recorded protocols also compares delivery after the
+first token, excluding that token from the throughput numerator. Direct
+post-first delivery throughput is **1.354% lower** for repeated Code2K,
+**1.218% lower** for repeated 8K, and **3.436% lower** for retained Short.
+These agree with the engine decode gaps, so the observed gap is not explained
+solely by moving the first-token timing boundary. The timestamps are from
+the Host protocol reader, not GPU or HTTP timestamps; this audit adds no new
+GPU samples. Repeated Code2K nevertheless completes in **19.183 s L0 /
+16.652 s Direct (13.194% less time)**. TTFT and engine decode overlap at
+the first window; whole-request time is measured directly, not their sum.
+The root cause of the remaining backend gap is still unconfirmed; the earlier
+same-backend HC256 Short comparison already improves both TTFT and decode.
+
+These are matched transport comparisons, not evidence of a necessary TTFT/decode
+tradeoff. Prefill's larger batched matrix work and decode's small dependent
+launches have different costs; improving one does not remove the other's
+bottleneck. Cache carryover or concurrent prefetch could couple them, but this
+cohort does not isolate either cause. Preparing known data after submission and
+waiting at consumption remains the scheduling rule: preserve buffer ownership,
+avoid waiting to fill a tail batch, and check both TTFT and net decode. Moving
+initialization before READY must also retain startup-to-first-delivery timing;
+shorter request TTFT alone is insufficient evidence of less total work.
+
+The current Short comparison is also a counterexample to a simple tradeoff:
+Direct TTFT is **0.370% longer**, while net decode throughput is **3.411% lower**.
+Its decode loss therefore does not require a TTFT improvement. The native
+M16 selector in `sycl/orca/prepare.py` already restricts wide FP16 projection
+tiles to aligned **T >= 128**; decode T1..8 keeps the small-shape path. Keep
+phase-specific shapes and dispatch policies rather than delaying ready decode
+work to form prefill-sized batches. This source boundary does not identify
+the remaining backend cause; the matched HC128-to-HC256 result above is the
+measured example of improving both metrics on the same backend.
+
+On 2026-11-06 the native DG2 source removes a remaining temporary parameter-
+descriptor allocation: `compiler::append` uses the compiler-known capture
+count for a stack `std::array`, passing a borrowed pointer/count into the
+shared Windows/Linux append implementation. Initializer-list callers also
+avoid constructing a descriptor vector. The existing out-of-line vector
+entry points remain for older Host objects. Values are serialized before
+append returns; this adds no TLS buffer, shared argument storage, dependency
+or C++ standard upgrade to the C++17 runtime. Other recording allocations
+remain; recorded-graph replay largely bypasses this path, so this change
+does not explain or claim to fix the warm Short gap.
+
+The Windows source build passes the extended CPU argument checks: scalar and
+captured-pointer payload equality, dynamic SLM alignment, zero arguments,
+null/nonzero lists and wrong-count rejection. The fresh compiler check passes
+12 GPU pipeline replays over eight frozen lists with changed data, aggregate
+pointer/scalar captures, local memory, 3D/SYCL/ESIMD/range kernels and guards.
+Rebuilding the Strata `fused_gr` Host TU and linking the new runtime alongside
+the other frozen Host objects passes all 64 portable HC checks with the original
+math pack and bitwise original outputs. This covers new stack captures plus
+the retained vector ABI; it is not a fully rebuilt model measurement.
+A fresh Linux/WSL GCC build passes all four CPU checks and dependency audit;
+neither the Linux compiler frontend nor Linux GPU executes in this cohort.
+Exact pre-edit source copies extend the existing resolver without changing
+historical receipts. No deployed EXE, launch profile, model policy or numerical
+image changes were made by these initial checks; they did not establish a
+TTFT/decode performance result.
+Local evidence: `build-orca-argument-array-20261106/{windows-r1,strata-hc-r1,linux-r1}`.
+The normal native CPU check remains runnable after rebuilding:
+`orca-l0-dg2-check --self-check` on Windows or
+`orca-l0-drm-compute-check --self-check` on Linux.
+
+The subsequent [full Host/model comparison](../bench/results/a770/orca-direct-argument-array-2026-11-06.md)
+rebuilds all 49 kernel Host units and the native runtime, retaining the original
+engine core, numerical pack, assets and policy. All 64 HC checks and **100/100
+complete model protocols** pass in L0 → old Direct → new Direct → old Direct →
+L0 order. Each process runs Code2K twice, 8K twice, Prose2K, then Short ×15;
+Short discards ten warmups and retains five. Actual expert slots remain 5771,
+VRAM reserve 1536 MiB, MTP4/min-p0.5 and U4/min16/M16. The largest absolute
+L0/Direct control drifts are 1.946%/1.263%, within the preset 3% limit.
+
+| Retained case | L0 / new Direct decode tok/s | Direct decode change | Direct TTFT time change | Direct whole-request time change |
+| --- | ---: | ---: | ---: | ---: |
+| Repeated Code2K | 36.950 / 36.110 | −2.272% | −13.419% | −10.441% |
+| Repeated 8K | 34.331 / 33.751 | −1.690% | −6.566% | −5.742% |
+| Short | 52.789 / 51.226 | −2.961% | +0.522% | +2.332% |
+
+All changes in this table compare new Direct with L0, not production SYCL.
+Against old Direct, Short decode changes only **+0.472%**, failing the preset
+1% gain gate; descriptor allocation removal does not establish a stable model
+speedup. Quality and same-backend nonregression gates pass, while the gate for
+decode exceeding L0 in every case fails. Longer-context decode gaps narrow,
+but workloads/draft trajectories differ and capped long requests retain the
+existing backend tail-work distinction. Post-first delivery gaps agree with
+decode, so a first-token timing-boundary shift does not explain the result.
+Each long position runs once per arm; control drift is not a confidence interval.
+
+Old/new Direct READY is 30.214/30.722 s and first Code2K TTFT is 26.709/26.261 s.
+Their sequential sum is 56.922/56.983 s (+0.106%); startup through the first
+complete request changes +0.069%. These exclude controller gaps and establish
+no cold-start gain or causal initialization shift. Whole-request time is
+measured directly; TTFT and overlapping engine decode are not added. The
+published JSON/text archive passes protocol, build/source and integrity checks;
+asset identity uses the reported stat-cached SHA256 checks. Deployment is
+unchanged; the intermittent Direct 8K fault and Linux GPU remain open.
+
+The subsequent [cached-dependency trial](../bench/results/a770/orca-direct-completed-dependencies-2026-11-06.md)
+isolates two native runtime filters, one per platform, without changing Host
+objects, core, math, ABI or state layout. Only cross-queue points already
+confirmed by owner/immutable-observer monotonic caches can bypass the driver
+wait; pending points and Host gates remain. In the standalone BCS demo, the
+old/new binaries each pass 36 complete snapshots over 12 waves: cached-prefix
+wait calls fall from **24 to zero**, while all 12 pending-tail waits remain.
+Observer/owner caches, duplicate/invalid dependencies and full guards are
+checked. Another 920 transfer replays and 64 HC checks pass; the isolated
+Linux/WSL build passes four CPU checks and dependency audit, without GPU use.
+
+The fixed L0/old/candidate/old/L0 model cohort matches **100/100 protocols**.
+Short changes **50.832→51.009 tok/s (+0.350%)**, below the preset 1% gain gate;
+max absolute L0/Direct control drift is **4.331%/1.670%**, failing the 3% gate.
+The candidate also retains longer first-2K/first-8K samples; nonregression fails.
+No stable model speedup or causal regression is established, and the candidate
+is **not adopted** into production source or deployment. The observed repeated
+8K backend gap of −0.279% comes with failed control drift and does not supersede
+the accepted argument-array cohort's −1.690%. Demo call counts are not model
+counts. Compiler flags match; initial compiler-mode/checker-capacity failures
+and the localized-log archive failure are retained. The report and raw text
+archive retain the failed performance gates; Linux GPU and the old 8K fault
+remain open.
+
+The [current U4/HC whole-window diagnostic](../bench/results/a770/orca-direct-current-window-2026-11-06.md)
+replaces the old generic-M16 diagnostic inputs with the frozen current pack
+and accepted array-argument Direct Host/runtime. Only one Verifier TU per
+backend is rebuilt; actual dependencies cover 60/62 repository headers,
+including 11 generated headers per backend derived from frozen originals.
+The first diagnostic attempt dereferenced its queue before initialization
+and exited before READY; its source/logs remain. Moving the diagnostic init
+after queue creation and adding a CPU order assertion resolves that probe bug.
+
+Both opposed orders match all **90 request protocols and 2,610 windows**,
+including the same position/actual-T schedule, guards/raw ticks and Host sums.
+Each natural 70-token Short request has 29 windows, not the old pack's 20.
+Direct GPU window spans take **2.513%/2.613%** longer than L0; Host
+submit-to-return takes **2.874%/2.866%** longer. Primary-metric outer drift
+stays below 0.15%, passing the preset 3% gate. Host input preparation is only
+about 1.21/0.69 ms per request; its own drift exceeds 3%, so no stable gain is
+claimed for this small component. Preparation alone cannot explain the
+remaining difference. GPU spans include execution, memory/dependency gaps
+and marker ordering; Host return includes diagnostic readback. Do not subtract
+clock domains to infer wake latency, or call these clean tok/s measurements.
+Current-pack window phases and outside-window MTP/commit remain to be split;
+the old M16 HC/router ranking is not current attribution. No deployment,
+Linux GPU, PPL or 8K reliability claim is added.
+
+The [Host-only reanalysis of those same logs](../bench/results/a770/orca-direct-current-host-split-2026-11-06.md)
+uses arithmetic retained-request/outer-control means so stage differences
+remain additive. In the two orders, Direct's extra 48.400/47.180 ms per
+diagnostic request consists of 33.640/32.654 ms in the Verifier-call region,
+11.687/11.397 ms in the draft region and 2.987/2.987 ms in commit/emit;
+the remaining Host difference is 0.086/0.142 ms. This rechecks all 90 raw
+protocols and log frames without GPU work. Printed stage precision bounds
+each reconstructed phase to +/-0.145 ms per request; DONE precision is
++/-0.05 ms. Draft includes PLE/history preparation and waiting, and commit
+includes adaptive-thread startup/output. These Host regions include GPU
+work and overlap on the GPU, so they are neither exclusive kernel time nor
+pure CPU costs. They identify both regions for investigation without changing
+the original diagnostic or performance gates.
+
+The [current-pack HC1-to-route/device-plan diagnostic](../bench/results/a770/orca-direct-current-route-phase-2026-11-06.md)
+matches another 90 complete protocols and 2,610 windows in opposed orders.
+The 48-layer region takes **217.801/217.722 ms** on Direct versus
+**204.840/204.861 ms** on L0, or **6.327%/6.278%** longer; phase-control
+drift is +0.045%/-0.113%. Whole-window GPU spans are 3.484%/2.974% longer,
+with primary GPU/Host control gates passing. This region includes HC1,
+router projection, Top-K, quantization and device-plan dependencies. Adding
+96 ordered markers per window changes scheduling, so it neither isolates HC1
+nor supplies clean throughput or an additive contribution to the parent run.
+No runtime policy is adopted. The initial publication import failure is
+retained; an explicit-path publisher and independent check preserve the
+frozen measurements without another GPU run.
+
+The [matched GRF128 HC1/router split](../bench/results/a770/orca-direct-hc-route-split-2026-11-06.md)
+then holds the fused-Q8 GRF128 pack constant on both backends. All 90 complete
+protocols and 2,610 windows match in opposed orders. Direct's HC1 interval takes
+**10.706%/9.639%** longer, versus **2.891%/2.279%** for router/device-plan;
+HC1 T4 takes **11.727%/10.834%** longer, compared with **7.623%/6.958%** for T1.
+Primary whole-window/Host outer drift stays below 0.65%, passing the preset 3%
+gate; aggregate HC1 and router phase controls also stay below 0.5%. The T1
+subgroup can exceed 0.5%. This narrows the next
+investigation to HC1 memory/code generation rather than Host input preparation.
+It does not isolate a particular HC1 kernel or prove private-memory policy is
+the cause. Three ordered marks per layer introduce 146 boundaries per window;
+the intervals include dependency gaps and marker ordering. Neither these
+percentages nor differences from the earlier 98-marker probe are clean model
+speedups or additive causal contributions. No production change follows from
+this diagnostic; the default remains Direct128/L0256, and the old 8K fault and
+Linux GPU validation remain open.
+
+The [isolated getter128 build/output check](../bench/results/a770/orca-hc-q8-getter128-2026-11-06.md)
+combines the previously audited six Q8-only row selections with 128 GRF.
+Declared private memory falls 9,728→0 bytes per SIMD16 hardware thread, with
+zero spill; ELF text instead grows 27,392→27,456 bytes. The 256 rebake is byte
+identical to the measured getter256 image, and getter128/256 payloads match.
+Both frozen backends pass 256 complete generic128/getter128 output/CPU/source/
+guard eager/replay cases with identical 64 full-output hashes. This covers
+production entries 2/3, not an additional image 9 run. Earlier getter256 failed
+gates remain retained. Compiler resources and operator checks alone do not
+establish model speed.
+
+The [clean Direct Short model trial](../bench/results/a770/orca-hc-q8-getter128-model-2026-11-06.md)
+then matches all 90 complete protocols, using the same EXE and 128 GRF on both
+arms with profiling disabled. In the stable first bracket, getter128 changes
+net decode by **-0.364%**, TTFT by **-0.105%**, and whole-request time by
+**+0.303%**. The reverse bracket reports -3.152% decode, but its getter control
+drifts -4.289% in decode and +5.970% in TTFT; it does not establish a regression
+of that size. The original drift, gain and time gates remain failed. Even with
+the user's acceptance of small positive gains, this candidate has not shown
+one, so it stays isolated without a source/default/deployment change or rescue
+repeats. The adopted Direct GRF128 policy above remains in place. No new long
+context, PPL, Linux GPU or 8K reliability claim follows from this Short trial.
+
+The [current-U4/HC compact-GRF follow-up](../bench/results/a770/orca-direct-current-grf-u4-2026-11-06.md)
+tests the earlier invariant-packet candidate with the accepted array Host and
+current math pack. Both capture censuses contain 14,879 appended kernels and
+1,202 GRF-only transitions; each eligible append loses exactly three packets /
+40 bytes, with the complete normalized kernel/state/length histogram matching.
+This is capture-side accounting, not replay-weighted per-token work.
+All four census and 150 clean Short protocols match. Both opposed clean
+brackets pass control drift, but net decode changes only **-0.007%/-0.053%**,
+failing the preset +1% gate; the candidate remains isolated and default-off.
+Each process runs only Short requests; absolute rates must not be compared
+with the earlier all-Host cohort's long-context-then-Short request history.
+The two policies pass 28 native CTests and 128 HC checks in total; the same
+Linux/WSL source passes five CPU checks and four dependency audits, without
+Linux GPU execution. Removing constant packets retains actual GRF mode changes
+and their synchronization, so it does not rule out optimizing those transitions.
+The initial queued cancellation and audit-build compiler-flag failure remain
+archived. No new long-context, PPL or reliability claim is added.
+
+The [adjacent-barrier follow-up](../bench/results/a770/orca-direct-grf-barrier-2026-11-06.md)
+instead keeps the GRF state programming and removes only a second identical
+24-byte PIPE_CONTROL at a tracked command boundary. Both capture censuses
+contain 1,097 eligible pairs among 14,879 appended kernels; this is not
+replay-weighted per-token accounting. All four census and 150 clean Short
+protocols match, alongside 28 native CTests, 128 HC checks and five Linux/WSL
+CPU checks with four dependency audits. Opposed-order decode changes are
+**-0.050%/+0.160%**, with control drift and TTFT gates passing but the preset
+two-order 1% decode-gain gate failing. The candidate stays isolated and
+default-off. The first build's CPU packet-expectation failure is retained;
+the corrected build changes that assertion, with byte-identical runtime code.
+No long-context, PPL, Linux GPU or new reliability claim is added.
+
+The [current SG16 HC Q8 register comparison](../bench/results/a770/orca-hc-sg16-grf-2026-11-06.md)
+removes the large-register option from only the fused image. Both 128/256-GRF
+builds report SIMD16, zero spill and 9,728 private bytes per hardware thread;
+the payload ABI is identical, but machine code also changes, so occupancy alone
+is not isolated. All 256 full HC checks and 180 complete Short protocols match.
+Opposed-order Direct decode improves **+1.142%/+0.743%**, with TTFT
+**-0.237%/-0.385%** and measured request time **-0.803%/-0.686%**;
+L0 decode changes **+0.070%/+0.059%**. Both backends pass quality, control-drift
+and time-nonregression gates, but fail the preset two-order 1% decode-gain gate.
+The original two-order 1% gate remains failed. Under the user's later acceptance
+of small positive gains, the [source-default adoption](../bench/results/a770/orca-hc-sg16-grf-adoption-2026-11-06.md)
+now omits this override for Direct (128 GRF on the measured A770); L0 retains
+256 GRF. Both generated build recipes and source equivalence to the measured
+kernel pass. Rebuild/rebake is required; deployed executables and configs are
+unchanged. No additional repeats were used to obtain a pass. These observations do not
+establish a necessary TTFT/decode tradeoff or close the Direct backend gap.
+No new PPL, Linux GPU or reliability result is added.
+
+The [subsequent five-arm context check](../bench/results/a770/orca-hc-sg16-grf-contexts-2026-11-06.md)
+matches all 100 complete protocols with the same Direct EXE and frozen 5771-slot
+policy. Direct128 versus256 net decode changes **+1.320% Short, +3.010% repeated2K,
++2.440% repeated8K**; TTFT changes **-1.126%/-2.368%/-2.032%** respectively.
+The original 3% control-drift gate fails: repeated8K L0 decode drift is +5.145%,
+and Direct Short decode drift is -3.211%. These are supporting observations,
+not a stable speedup claim or a replacement for the original opposed-order
+Short evidence. Direct128 still trails L0 Short by 1.359%; its observed
+repeated2K/8K advantages are 1.591%/0.719%, with single long positions per arm.
+All-case superiority is not established. No rescue repeats or deployment
+changes were made; the earlier Direct8K fault remains open.
+
+The [fused HC Q8 preferred-SLM trial](../bench/results/a770/orca-direct-hc-slm-2026-11-06.md)
+isolates the remaining target allocation-preference difference from L0. Both
+settings pass 28 native CTests, 72 complete packet comparisons and 128 full HC
+checks in total; real captures retain every non-target policy and command count.
+All 90 clean Short protocols match. Opposed-order net decode changes are
+**+0.057%/+0.065%**, against **+0.257%/+0.587%** control drift; TTFT changes
+**+0.314%/+0.026%**, and whole-request time **+0.042%/-0.034%**. The original
+gain gate remains failed. This establishes no model-speed benefit and does not
+explain the backend gap. The candidate stays isolated and default-off; the
+user-authorized Direct128/L0256 source defaults remain. No deployment or Linux
+GPU validation follows from this trial.
+
+The [fused HC Q8 indirect-length trial](../bench/results/a770/orca-direct-hc-indirect-2026-11-06.md)
+then changes just the target walker length **832→800 bytes** to match L0,
+preserving its 832-byte backing allocation, parameter bytes/padding, SBA
+window, SLM and mathematical images. Both settings pass 28 native CTests,
+144 complete normalized CPU packet comparisons and 128 full HC cases in total;
+actual captures verify 160 target walkers with other decoded fields/counts
+unchanged. All 90 clean Short protocols match. Opposed-order net decode changes
+are **-3.427%/+0.007%**, with **-0.050%/-0.357%** decode control drift; TTFT
+changes **+2.835%/+0.866%** and whole-request time **+3.427%/+0.358%**. The
+original drift gate passes, but the gain and request-nonregression gates fail.
+The results establish neither a consistent benefit nor a stable 3.427% loss;
+the candidate remains isolated and default-off. Existing component-capture
+logs also put both backends' compute submissions on node5 (Compute), without
+fresh hardware queries or a full-model engine-utilization measurement. No
+deployment, new long-context or Linux GPU result follows.
+
+Scope clarification for both field trials: their selectors use kernel
+metadata/shape, not a Verifier stage identity. `gr_read_group` can pass
+`q8_mixed` in either half, and `fused_gr_read_multi` selects the fused Q8 entry
+when those inputs are present. Matching HC0 and HC1 calls can therefore both
+be affected; the HC checker's historical `HC1.*` labels do not establish an
+HC1-only ablation. The frozen SLM report and its archive remain unchanged.
+This does not change the separate HC1/router interval comparison, whose
+markers use actual Verifier stage boundaries.
+
+The [actual-HC1 internal diagnostic](../bench/results/a770/orca-direct-hc-internal-2026-11-06.md)
+then uses the existing optional math-Host stamps after norm and down, enabled
+only for Verifier `half == 1`. Both backends retain the identical GRF128 pack,
+normal independent projections and shared/routed scheduling, with the legacy
+per-layer profiler disabled. Only Verifier is rebuilt; 242 ordered marks per
+window and a 1,952-byte readback perturb scheduling. All **90 complete protocols
+and 2,610 windows** match, with raw ticks partitioned into norm/down/up/router,
+48 layers, 36 GDN/12 QSA, valid guards, ordering, wrap and identical actual-T
+sequences. Whole-window/Host-wall control drift stays below **0.20%**.
+
+| Opposed order | Direct norm ms/request | L0 norm ms/request | Direct norm change | Down change | Up change | Whole HC1 change |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Direct→L0→Direct | 33.2342 | 17.0291 | +95.162% | -2.586% | +5.842% | +13.785% |
+| L0→Direct→L0 | 33.3434 | 16.9858 | +96.302% | -2.866% | +5.011% | +13.660% |
+
+The marked norm interval is the next investigation target, not proof of a
+95% pure-kernel regression. Existing [empty-marker calibration](../bench/results/a770/orca-direct-timestamp-cost-2026-11-05.md)
+shows unequal timestamp/barrier costs; those cannot be subtracted as a fixed
+correction under model load. A no-intermediate-marker norm replay is needed
+before changing runtime policies. Separate medians are not additive, and
+different marker densities cannot be subtracted for precise attribution.
+Defaults/deployment remain unchanged; no new clean throughput, long-context,
+PPL or Linux GPU evidence, and the historical Direct8K fault remains open.
+
+The [independent norm replay](../bench/results/a770/orca-direct-hc-norm-replay-2026-11-06.md)
+uses that same baked norm entry and generated **392-byte capture ABI**, without
+recompiling mathematical code. Each list has 128/512 consecutive norm launches
+and only two endpoints. T1/4/8, residual off/on and two inputs cover 72 CPU
+reference/eager/source/guard cases and **1,440 complete replay checks**, with
+1,008 retained samples and matching hashes across all six processes. Both
+backend orders and every case show Direct GPU time **13.029%–16.669% lower**,
+with maximum absolute GPU control drift **0.181%**.
+
+For residual-on T4/input0/512 reads, Direct/L0 GPU time is
+**3.882904/4.488322 µs** forward (**-13.489%**) and
+**3.882650/4.486694 µs** reverse (**-13.463%**). Corresponding Host replay/wait
+time changes **-9.130%/-10.401%**; short 128-read Host samples are noisier and
+do not establish a general Host advantage. Static PE imports contain no
+SYCL/UR/OpenCL; Direct has no ze_loader import, while L0 retains it. This is
+not an enumeration of dynamically loaded modules.
+
+The single-weight/single-buffer hot replay therefore does not reproduce the
+marked model's norm slowdown. It moves the next investigation toward layer
+working sets, surrounding state transitions/dependencies and probe boundaries;
+it does not establish which factor causes the model gap, or a new end-to-end
+gain. All named generated descriptors remain exact; the unused anonymous fill
+specialization is excluded for plain Host compilation. Four build/audit
+failures occurred before GPU execution and retain their original sources,
+commands and logs. Source defaults remain Direct128/L0256; deployed executables
+and configs are unchanged, with no new long-context, PPL or Linux GPU claim.
+
+The [independent buffer-bank follow-up](../bench/results/a770/orca-direct-hc-norm-banks-2026-11-06.md)
+then rotates **1/48/192** distinct data/parameter-address sets, keeping the same
+native norm zebin, 392-byte ABI, local256, frozen runtime and two endpoints.
+Residual-on T1/4/8, two inputs and 192/768 launches cover **108 full CPU/eager/
+source/guard cases, 2,160 replay checks and 1,512 retained samples**. All six
+processes produce matching complete output hashes; actual compiled headers and
+static PE imports also pass independent publication checks.
+
+For T4/input0/768 launches, one bank gives Direct/L0 **3.912593/4.614190 µs**
+forward and **3.878581/4.513386 µs** reverse, time changes
+**-15.205%/-14.065%**. With 48 banks and an **18.756-MiB logical active
+footprint**, these become **6.712188/7.245144 µs** and
+**6.791585/7.076637 µs**, or **-7.356%/-4.028%**. These four controls stay
+within the earlier 3% drift reference. Both backends slow as the independent
+working set grows, while Direct's advantage shrinks. This does not reproduce
+the marked model's approximately doubled norm interval, and logical bytes are
+not measured physical traffic, cache misses or bandwidth.
+
+All **72 GPU comparisons** remain in the evidence: Direct time changes span
+**-19.876% to +3.096%**, maximum absolute control drift is **11.970%**, and
+**23/72** exceed that earlier 3% reference. Some cases change direction; the
+T4/input0/192-bank/768 forward control itself drifts **-4.108%** and cannot
+establish a stable paired estimate. This reference is diagnostic, not a newly
+passed performance gate; no repeat is added to obtain a pass. Independent bank
+rotation cannot exclude the model's real cache history. Surrounding kernel
+state/dependency changes and probe boundaries remain the next isolation.
+Source defaults remain Direct128/L0256; deployed executables/configs are
+unchanged. There is no new full-model, PPL or Linux GPU measurement, and the
+historical Direct8K intermittent failure stays open.
+
+The [ordered-marker density control](../bench/results/a770/orca-direct-hc-norm-density-2026-11-06.md)
+then keeps that same native norm, ABI, data and 1/48-bank layouts while changing
+only the ordered timestamp period: **0** for two endpoints, **8** for one mark
+per eight norms, and **1** for one per norm. With 768 launches these produce
+2/97/769 marks. All modes use a fixed 771-slot timestamp buffer; every inactive
+slot remains a guard. Each raw marker is retained and independently checked for
+count, valid range, order, wrap and interval sum. **72 CPU/eager/source/guard
+cases, 4,320 full replay checks and 3,024 retained samples** pass. Complete
+reference hashes also match every corresponding shape in the bank trial.
+
+For T4/one-bank/input0/768, the opposed-order GPU results are:
+
+| Ordered marker period | Direct/L0 µs per norm, forward | Direct/L0, reverse | Direct time change, forward/reverse |
+| --- | ---: | ---: | ---: |
+| Endpoints only | 3.877496/4.482286 | 3.878038/4.483235 | -13.493%/-13.499% |
+| Every 8 norms | 4.485835/4.595269 | 4.468926/4.600352 | -2.381%/-2.857% |
+| Every norm | 8.881304/5.522597 | 8.825005/5.469885 | +60.818%/+61.338% |
+
+All six listed controls stay within **2.906%** drift. The same mathematical
+work can therefore change backend ranking when ordered instrumentation changes.
+This establishes substantial probe disturbance in this component, not an exact
+explanation of the earlier model's +95% interval. Every-8 marks also alter some
+larger-bank cases substantially; subtracting an empty-marker constant or simply
+assuming sparse probes are harmless would be unjustified.
+
+All **144 GPU comparisons** are retained: Direct time changes span
+**-14.707% to +66.986%**, maximum control drift is **8.259%**, and **10/144**
+exceed the earlier 3% diagnostic reference. This is not a new passed performance
+gate. The next model comparison should use no inner markers and coarse window
+endpoints, then isolate surrounding state/dependencies at matched probe density.
+No runtime/default/deployment change or new model-throughput, PPL, long-request
+or Linux GPU claim follows; the historical Direct8K failure stays open.
+
+The [fixed-T HC follow-up](../bench/results/a770/orca-hc-fixed-t-2026-11-06.md)
+specializes T1/T4 inside the same SG16/256-GRF kernel, preserving the deployed
+capture ABI, other native images, dispatch count and model policy. Both the initial
+by-value and corrected const-reference helpers pass 256 full HC checks each.
+The first doubles declared private space to 19,456 bytes and is retained without
+model sampling; the correction reports 9,856 bytes versus baseline 9,728, zero
+spill, but grows text from 27,840 to 90,880 bytes. Exact IGA disassembly is archived;
+static instruction counts include all branches/padding and do not measure execution.
+The const-reference frontend also changes ordinary-up images 2/9; these are not
+deployed. The first publication audit incorrectly required only one frontend
+change and failed before writing results; its source/failure remain archived.
+All 180 fixed Short protocols match. Opposed-order decode changes are
+**+0.032%/-0.413% Direct** and **-0.887%/-0.441% L0**; control-drift and time
+nonregression gates pass, but neither backend passes the preset 1% gain gate.
+The candidate stays isolated with defaults unchanged and no added repeats or
+long-context run. This rejects this implementation, not shape-specific tuning
+in general, and does not establish a TTFT/decode tradeoff.
+
+The [separate T1/T4 entry follow-up](../bench/results/a770/orca-hc-split-t-2026-11-06.md)
+reduces capture sizes from 616 to 112/328 bytes and declared private space from
+9,728 to 1,792/5,248 bytes per hardware thread. T1 text shrinks to 24,768 bytes,
+while T4 grows to 42,240; both retain SIMD16/256GRF/zero spill. All original 25
+Host parameter descriptions and deployed native images remain identical. Four
+frontend modules differ only in eight numeric OpName type suffixes, with all
+other instructions and IDs identical; the initial byte-check failure is retained.
+The matching Host builds pass 256 full HC checks and 180 complete Short protocols.
+Opposed-order decode changes are **-0.025%/-0.469% Direct** and
+**-2.275%/+0.061% L0**. These fail the original gain gate and establish no
+consistent positive gain under the later user-authorized small-gain policy.
+The candidate remains isolated. Resource savings alone do not prove a speedup;
+no additional repetitions, long-context runs or source-default changes follow.
+
+The [current-pack CPU-activity isolation](../bench/results/a770/orca-direct-cpu-activity-2026-11-06.md)
+retains the accepted array Direct EXE, event waits, numerical pack and model
+settings. After READY, a bounded helper either blocks or runs on logical CPU43
+at BELOW_NORMAL priority. Two fixed opposed five-arm orders match all 150
+Short protocols. Decode changes **+0.632%/+0.377%**, TTFT **-0.228%/-0.886%**;
+control drift passes, while the preset two-window 1% decode-gain gate fails.
+The helper adds **2.122--2.141 CPU seconds per complete retained request**,
+sampled separately from engine CPU; this includes prefill and decode, not energy.
+Engine affinity, Windows power settings and production defaults remain unchanged.
+There is no C-state/uncore measurement or causal claim, and no adopted busy helper.
+This Short-only result does not close the Direct decode gap or its 8K issue,
+and adds no long-context, PPL or Linux GPU verification.
+
+Fresh Windows sampling uses new directories and the same frozen assets,
+compiler, pack, policy and request history. This command is documented, not
+executed to obtain a passing result; existing output directories are rejected:
+
+```powershell
+python -X utf8 -c "import sys; sys.path.insert(0,'build-orca-current-grf-20261106'); import run as n; n.STAGE=n.OUT/'build-repro-r1'; sys.path.insert(0,str(n.OUT)); import model as m; m.BUILT=n.STAGE; m.STAGE=n.OUT/'model-repro-r1'; m.PLAN=n.OUT/'model-prepared-repro-r1.json'; n.run(); m.prepare(); m.run()"
+```
+
+The generated Host frontend also applies its remaining-output MTP draft cap
+only outside `STRATA_ORCA_DG2`. Both arms retain min-p 0.5/cumulative zero and
+match full protocols, but that alone does not establish identical discarded
+tail work on length-capped requests. Warm Short ends naturally at 70 of the
+128-token limit, so the cap stays at the full three drafts and cannot explain
+its backend gap. Aligning Direct's tail cap is a separate prepared Host
+candidate. Its isolated Host TU now compiles and links against the retained
+Direct libraries. A source check permits exactly the two guard removals,
+retains the first KV-maintenance round and leaves thresholds unchanged.
+The baseline/candidate/baseline cohort now completes all 60 normal requests
+plus 15 Short requests at output budgets 1/2/3/4/8, with complete matching
+output and draft protocols. Repeated Code2K/8K net decode throughput changes
+**+0.931%/+0.343%**; Short changes **+0.142%** and never activates a smaller cap.
+All cases meet the preset 3% timing-nonregression limit, but cold-first Code2K
+TTFT control drift reaches **4.426%**, failing the 3% whole-cohort drift gate.
+The candidate remains isolated and is not adopted. This finite bracket does
+not establish a stable speed improvement or close the original Direct 8K fault.
+The single opposite-order candidate/baseline/candidate cohort also completes
+all 75 service protocols and four CLI checks at budgets 3 and 8, covering the
+second patched call site. Those cold CLI processes are correctness checks,
+not performance samples. Repeated Code2K/8K decode changes are
+**-0.512%/+0.136%**, and Short changes **-0.797%**. Quality and timing
+nonregression pass, but first-Code2K TTFT control drift is **+5.068%**, so
+the unchanged 3% drift gate fails again. Both failed cohorts are retained;
+the candidate remains isolated, with no further retry to pass. The runner's
+raw-protocol, CLI, arithmetic, source and asset checks pass. Local evidence:
+`build-orca-hc-up-capture-20261105/native-tail-budget-r1/model-reverse-r1/results.json`.
+
+Later independent GGUF-cache edits changed two source files after this
+cohort was built. Exact original versions have been recovered against the
+recorded digests, preserving the retained EXEs and newer workspace sources.
+Subsequent startup-mirror work also changes `sycl/src/program/generate.cpp`;
+its exact original has likewise been recovered from the retained pre-edit
+copy (SHA-256 `fa7efbb299fb20411d9d798677f4ba5b0b0f0b9eb6bb45603869a599e3f2c18a`).
+The publication and first tail-candidate build reject that drift before
+publication or compilation; both failures are retained. The source resolver
+now records that original as well, without restoring it over the new code.
+The original cohort did not snapshot model/MTP/U4 assets or external Direct
+`memory.zebin`; its source/EXE/math-pack hashes must not be called a complete
+model-asset freeze. A later 18,816-file asset snapshot is complete for new
+cohorts and does not retrospectively prove the old files' contents.
+
+A separate isolated U4-preload Host candidate completes all 60 L0 off/on/off
+protocols, including an independent raw-token/DONE and startup-sum audit.
+First Code2K TTFT changes 26.750 to 15.506 s, while READY changes 26.810 to
+38.209 s; startup-to-first-token is 53.560/53.715 s (+0.289%, control drift
+-2.558%). This establishes preparation moving earlier, not less total waiting.
+Direct then matches 20 off requests and two on Code2K requests, but rejects
+the first on 8K prefill with `U4 expert nonfinite activation`, exit 1. All 82
+completed matching protocols and the failure are retained; the 120-request
+acceptance is incomplete and preloading has not been adopted. This experiment
+uses the original current math pack. The cause is not established.
+
+A subsequent bounded Direct diagnostic retains preload=1 and adds flag
+reporting only after the existing nonfinite rejection. Its fresh
+Code2K→Code2K→8K process matches all three protocols and exits normally,
+so no failing input/hidden flags are captured. This is diagnostic collection,
+not a stability or performance pass; the original rejection and adoption
+failure remain open.
+
+A single subsequent `gdn-all` collection reuses the same post-rejection
+diagnostic EXE with preload enabled, adding the existing GDN stage scans.
+Code2K→Code2K→8K again matches all three full protocols and exits zero;
+the recorded 2047/2047/7999-row reports contain zero bad residual halves,
+no GDN nonfinite-stage reports and no U4 rejection flags. A CPU reparse
+checks the raw tokens/DONE fields against references, configured mode,
+all three reports and retained log hashes. Evidence:
+`build-orca-hc-up-capture-20261105/preload-nonfinite-r1/model-gdn-all-r1`.
+The scans change scheduling: their times are not performance results, and
+this non-reproduction neither identifies the earlier fault nor enables
+startup preloading. The failed preload acceptance remains retained.
+
+A later isolated U4 bank-history diagnostic now passes serial SYCL, L0 and
+Direct execution through **2047→2047→7999 input tokens**, changing input and
+row IDs while retaining the same cache. It uses 32 real experts from layers
+0/15/31/47, two eight-slot banks, and 12 batches per history with one to eight
+experts, varied row counts and padding. Native runs use production copy-ahead
+order; the serial SYCL reference waits after every batch. Both native backends
+bitwise match all **94,372,224 final GU/Down float elements per backend** across
+the three histories, including output gaps/guards, with input/ID and packed
+guards checked. The Direct log confirms `ORCA_COPY_ENGINE enabled=1`; physical
+engine overlap is not measured. All eight compile/link/GPU commands exit zero.
+The runner's source/artifact check passes, as does an independent CPU audit
+of the recorded counts, copy-engine log, source/log hashes and output scope.
+Asset checks use the explicitly labelled cached-SHA identity mode.
+
+This is a subset diagnostic, not a full-model or VRAM-pressure reproduction.
+Output rows overlap between batches: the full arrays verify each history's
+final state, not every overwritten intermediate result. The original Direct
+8K failures remain open, and no production source or default changes.
+Local evidence and CPU recheck:
+`build-orca-hc-up-capture-20261105/u4-bank-history-r1/run-r1/results.json` and
+`python -X utf8 build-orca-hc-up-capture-20261105/u4_bank_history_decision.py --check`.
+
+The follow-up disjoint-output check closes that intermediate-output coverage
+gap without changing the two-bank weight lifecycle or copy-ahead order.
+All 61 expert operations per history retain separate GU/Down rows (6,946 active
+rows within capacity 8,192); the three histories again pass on serial SYCL,
+L0 and Direct. Each native backend bitwise matches 94,372,224 final float
+elements, now retaining every batch's expert results. The same input/ID,
+gap, guard, packed-buffer and nonfinite checks pass; Direct's copy-engine
+log is confirmed. All eight commands and the runner check pass, followed by
+the independent CPU audit with `u4_bank_history_decision.py --disjoint --check`.
+Evidence is in `build-orca-hc-up-capture-20261105/u4-bank-disjoint-r1`.
+This still uses only 32 experts and does not reproduce full-model pressure,
+prove physical overlap, establish a speedup or close the original 8K fault.
+
+A separate literal-index HC Q8 candidate removes its compiler-reported
+9,728-byte private allocation per SIMD16 thread (608 bytes per SIMT thread),
+retaining 256 GRF and zero spills. Explicit Host descriptors remain unchanged;
+the deleted implicit private-base payload is audited separately. Current-pack
+baseline/candidate checks on both backends pass all 256 complete HC output,
+CPU-reference, input and guard checks, with bitwise matching outputs. The first
+strict-payload-equality failure is retained. It is not adopted, and this is
+not a model speed or total-VRAM reduction claim.
+The next timing attempt compiles both probes and completes its three L0
+arms, then Direct rejects missing diagnostic clock calibration before GPU
+work. That failed attempt is retained. A new complete six-arm bracket reuses
+those EXEs with the existing 19.2-MHz/36-bit Direct calibration; its samples
+are kept separate from the partial L0 bracket. All six new probe processes
+complete, but the preset joint performance screen fails. For example,
+L0 T1/fused-Q8/input1 wall time grows **1629.300→1707.300 µs** (4.787% longer),
+with control drift 0.000%; its GPU span grows **1553.854→1622.656 µs**
+(4.428% longer), with drift -0.047%. Direct's same wall time is 0.177% longer,
+while its two T4 fused wall times are 0.623%/1.033% shorter.
+Some other controls drift beyond 3%; these are finite component observations,
+not steady-state or model throughput. Removing private memory alone does not
+establish a performance improvement. The 120-request full-model candidate
+cohort is not started after this failed screen; the prepared plan is retained.
+
+A separate retained by-value row getter is now checked against the fresh
+current pack. Its old native metadata exactly matches the current baseline,
+and its explicit compiler ABI matches except debug file/line information.
+The new image has zero private memory and spills, while its ELF text is
+**26,624 versus 27,840 baseline bytes**, rather than the literal candidate's
+34,624 bytes. Both backends pass **256 current-pack portable HC checks**;
+a new six-arm bracket also passes **720 complete output/guard/span checks
+and 72 CPU references**, reusing the fixed probes and clock calibration.
+Direct fused replay throughput changes **+2.289% to +6.980% at T1** and
+**+2.312% to +6.800% at T4** across the two inputs. These are component wall
+rates, not model tok/s. The joint component screen still fails: some control
+drifts exceed 3%, some other cases regress, and one L0 T1 fused wall gain is
+only 0.497%. The separate current-model cohort now completes all **120/120**
+protocols with the original model gates unchanged and that component failure
+retained. Both asset checks pass in the explicitly labelled stat-cached SHA256
+mode; no new full asset rehash is claimed. Its runner's complete artifact check
+and an independent CPU raw-protocol/timing/gate audit pass.
+
+| Same-backend Short bracket | Baseline / getter decode tok/s | Throughput change | Decode control drift | Baseline / getter TTFT ms | TTFT change | TTFT control drift |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| L0 | 52.244 / 52.854 | +1.169% | +1.156% | 720.405 / 722.722 | +0.322% | -1.391% |
+| Direct | 50.989 / 51.702 | +1.400% | -0.226% | 724.832 / 724.752 | -0.011% | +1.101% |
+
+Repeated Code2K/8K decode throughput changes **-0.199%/+0.340%** on L0 and
+**+0.524%/+1.516%** on Direct. These are finite same-backend comparisons, not
+a new matched cross-backend speedup. The quality, time-nonregression,
+Short-gain and Short-TTFT gates pass, but the original whole-cohort drift gate
+fails: L0 first-Code2K TTFT control drift is **-28.352%**, and Direct is
+**+3.205%**, both beyond 3%. The apparent first-load TTFT reduction must not be
+credited to the getter. Component and model failures remain recorded; the
+candidate stays isolated and no production source/image is adopted. The local
+decision receipt is `build-orca-hc-up-capture-20261105/current-getter-model-r1/decision-r1.json`;
+`current_getter_decision.py --check` independently checks its 120 raw protocols
+and decision arithmetic without a GPU run or full asset rehash.
+
+The system reboot
+at 21:05 interrupted its first zero-sample lock wait and the reverse-tail
+waiter. Both original result files are preserved byte-for-byte in the local
+`build-orca-hc-up-capture-20261105/reboot-recovery-r1` directory; neither had
+started a GPU arm. Fresh processes completed the same prepared plans.
+The recovery audit separately records a failed PowerShell lock reservation;
+recovery only moved metadata directories, and the GPU runners acquire their
+own shared lock.
+
+A scoped-source follow-up applies the same by-value getter at six Q8-only
+access sites. The isolated model pack changes only fused-Q8 image 3, whereas
+the original broad template edit could also change ordinary HC images.
+The new transformation preserves the ordinary branches and its inverse
+restores every original source byte; repeated transformation is rejected.
+The corrected isolated compile now checks all 25 native images: image 3's
+loadable sections, relocations, compatibility note and native metadata match
+the measured getter; the other 24 match the baseline. Explicit compiler Host
+ABI matches except debug filename/line information. Its independent retained
+compile/ABI/section/hash check passes. This adds no GPU or model-speed samples;
+the original failed model/component gates remain and the source is not adopted.
+The first isolated compile (`current-getter-scoped-r1/build-r1`) fails before
+GPU execution because its runner omits the existing native `transform`
+step; the original runner, compiler errors and failure audit are retained.
+The runner also had an unexecuted nine-image assertion; the actual source
+index contains 25 images. The successful fresh `build-r2` uses the native
+transformation, requires its original-source output to equal the measured
+generated source, and compares all 25 images' executable sections/relocations
+and native metadata. Its target Q8 reference is the measured getter image;
+the other images must match the baseline. Compilation/pack loading uses the
+shared experiment lock. Recheck the retained result with
+`python -X utf8 build-orca-hc-up-capture-20261105/current_getter_scoped_build.py check`.
+
+A separate ordinary-HC follow-up reuses the retained broad getter SPIR-V for
+images 2 and 9, preserving baseline fused-Q8 image 3. Both ordinary images keep
+SIMD16/128 GRFs and zero spills/SLM, while reported private memory falls from
+**9,728 to 0 bytes per SIMD16 hardware thread** (608 bytes per SIMT thread).
+Their ELF text falls **40,000 to 16,384 bytes**. Exact native metadata comparison
+allows only four compiler-owned private-memory removals; six mutated-metadata
+checks are rejected. The original bake's field-parser rejection is retained:
+its regex swallowed root-level metadata after the private-memory block vanished.
+The independent audit passes without rebaking or changing that failed result.
+
+The added full upstream self-check then fails on the **unchanged L0 baseline**
+with `ZE_RESULT_ERROR_OUT_OF_DEVICE_MEMORY` at kernel append, before any
+candidate execution. This failure is retained in `ordinary-getter-check-r1`;
+it does not establish a candidate regression or an out-of-memory root cause.
+The subsequent production-entry check reuses the existing portable binaries:
+**256 complete output/CPU/source/guard cases** pass on baseline/candidate and
+both backends. Its six-arm baseline/candidate/baseline endpoint bracket passes
+**720 complete replay checks and 72 CPU references**, with the fixed probes and
+19.2-MHz/36-bit Direct calibration. These production-entry checks execute image
+2 and unchanged fused-Q8 image 3; **image 9 remains GPU-unvalidated**.
+
+| Ordinary HC chain component wall throughput | T1 change | T4 change |
+| --- | ---: | ---: |
+| L0, two inputs and pending-write off/on | -5.682% to +6.602% | +6.288% to +9.681% |
+| Direct, same cases | +2.514% to +6.030% | +7.341% to +11.618% |
+
+All ordinary-chain endpoint GPU rates improve in this bracket, but the preset
+joint wall-time screen **fails**: L0 T1/no-write/input1 regresses 5.682%, and
+unchanged fused-Q8 controls also have wall regressions beyond 1%. Control drift
+stays within 3%; it is not a confidence interval. These finite component gains
+are not model tok/s or TTFT gains, and do not identify the remaining transport
+gap. No production source/image is adopted and no full-model cohort is run.
+Local evidence and independent checks:
+`python -X utf8 build-orca-hc-up-capture-20261105/ordinary_getter_audit.py --check`
+and `python -X utf8 build-orca-hc-up-capture-20261105/ordinary_getter_followup.py check`.
+
+An isolated Host-dispatch follow-up now covers ordinary **image 9** too. It
+keeps the production norm/down path and its initialized partial workspace,
+dispatching only the final ordinary up through the existing `launch_multi`
+entry. Both backends and baseline/candidate pass another **256 complete
+output/CPU/source/guard eager-and-replay cases**, T1..8 with pending writes
+off/on and changed inputs. Packs that omit image 9 fail at that exact kernel
+lookup on both backends before any HC output, proving which entry was requested.
+The mathematical images are reused; this is a test-only Host dispatch, not
+validation of the complete upstream norm/down/split/staged pipeline or a fix
+for its retained baseline memory error. The original production-entry report
+still correctly limits its own coverage to images 2/3. Recheck locally with
+`ordinary_entry9_check.py check` and `ordinary_entry9_dispatch.py check`, both
+under `build-orca-hc-up-capture-20261105`.
+The ordinary-only source candidate changes four access sites and preserves
+all six Q8 sites and eight token slots; its inverse restores the original
+source bytes. `ordinary_getter_scoped.py check` verifies the prepared edit,
+but its scoped compilation and image-equivalence acceptance remain pending;
+the production source is not changed by that preparation.
+
+The first ordinary-only full-model cohort now completes **120/120 exact
+protocols**, all six processes exiting zero. It uses the same current EXE per
+backend, off/on/off images 2/9, unchanged fused-Q8 image 3, actual 5,771 slots,
+1,536-MiB reserve, U4/min16/M16, MTP4/min-p0.5 and the same
+2K→2K→8K→8K→Prose2K→15 Short history. Short drops ten warmups and retains five;
+each long position is sampled once per arm. Model timing has no inner probes
+or GPU timestamps. Both before/after asset checks pass in the explicitly
+labelled stat-cached SHA256 mode, without rehashing the 89.8-GiB assets.
+
+| Ordinary-only model bracket | Baseline / candidate Short tok/s | Decode change | Decode control drift | Short TTFT change | TTFT control drift |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| L0 | 51.942 / 52.545 | +1.161% | +2.890% | -1.446% | -3.371% |
+| Direct | 50.955 / 50.865 | -0.178% | +0.080% | -0.711% | -0.681% |
+
+Repeated Code2K/8K net decode changes **-3.132%/+1.470% on L0** and
+**-0.247%/+0.278% on Direct**. L0 repeated-8K decode control drift is +3.728%,
+so that position cannot establish a steady gain. L0 first/repeated-2K TTFT is
+5.592%/5.733% longer and first-8K decode throughput is 3.894% lower in this
+finite cohort. The original quality and Short-TTFT gates pass; whole-cohort
+control drift, all-case nonregression and both-backend minimum-Short-gain
+gates **fail**. The failed component screen remains recorded too. Less private
+memory and faster component GPU execution do not establish a model speedup;
+no source/default/image is adopted and no repeat is added to obtain a pass.
+This also does not isolate the remaining transport gap or close the intermittent
+8K fault. The completed runner verifies all raw protocols, timing arithmetic
+and frozen dependencies. Local results and recheck:
+`build-orca-hc-up-capture-20261105/ordinary-getter-model-r1/model-r1/results.json`
+and `python -X utf8 build-orca-hc-up-capture-20261105/ordinary_getter_model.py check`.
+
+The independent `ordinary_getter_decision.py` audit now also passes, including
+its separate `--check`: all 120 raw protocols, selection, original gates and
+post-first-token delivery arithmetic are reconstructed without new GPU work.
+For Direct, repeated Code2K/8K post-first delivery changes **-0.243%/+0.272%**
+and Short **-0.149%** with the ordinary-only getter. These finite differences
+do not establish a stable win. The original failed gates are retained in
+`ordinary-getter-model-r1/decision-r1.json`.
+
+The first **combined ordinary-plus-Q8 getter** check completes on 2026-11-06.
+The ten-site source candidate retains all eight token slots; inverse edits
+restore the original bytes. Applying the native preparation transform exactly
+matches the previously retained source/25 SPIR-V images and compiler Host ABI
+apart from debug location. Rebaking all 25 images and comparing executable
+sections, relocations and native metadata changes only images **2/3/9**;
+each equals its separately audited ordinary/Q8 candidate. No new compilation
+or production source adoption is implied.
+
+Using one isolated complete pack, the original production checker and the
+image-9 Host entry pass **512 complete output/CPU/source/guard eager-and-replay
+cases** across T1..8, changed inputs, pending writes off/on, both backends and
+baseline/candidate. The reused six-arm endpoint probes additionally pass
+**720 complete replay checks and 72 CPU references**. The original upstream
+norm/down memory failure is retained; these production-workspace checks do
+not validate that full alternative pipeline or fix the intermittent 8K fault.
+
+| Combined component wall throughput change | T1 | T4 |
+| --- | ---: | ---: |
+| L0 ordinary HC | +5.330% to +12.699% | +4.901% to +8.267% |
+| L0 fused Q8 HC | +3.907% to +5.097% | +3.889% to +5.509% |
+| Direct ordinary HC | +3.399% to +7.031% | +8.422% to +15.151% |
+| Direct fused Q8 HC | +3.415% to +4.117% | +6.479% to +7.317% |
+
+All 12 actual timing cases per backend exceed the preset 1% component gain
+threshold, but the joint screen **fails control drift**: three L0 T1 cases
+exceed 3%, reaching **13.140%** absolute drift. Direct's maximum absolute drift
+is **2.749%**. These are component brackets, not model decode or TTFT results;
+the L0 values with excessive drift do not establish stable gains. No combined
+model cohort, retry to obtain a pass, default change or performance adoption
+follows this failed joint screen.
+
+The historical combined runner mistakenly names timing mode 3 in its minimum-
+gain loop: modes 0..3 belong to functional tests, while timing has only 0..2.
+Its earlier failed drift predicate short-circuits that loop, yielding False.
+The original receipt and source remain unchanged. A separate audit reparses
+all raw outputs, CPU checks and timing rows, verifies exactly 12 timing keys
+per backend, and evaluates all corrected gates; the joint result remains
+**False**. It retains the separate ordinary-only and Q8-only failed model gates.
+Local evidence is `hc-all-getters-r1/bake-r1/results.json` and
+`hc-all-getters-r1/check-r1/{results,audit-r1}.json` under
+`build-orca-hc-up-capture-20261105`. Recheck under the shared experiment lock:
+`python -X utf8 build-orca-hc-up-capture-20261105/hc_all_getters_audit.py --check`.
+
+The [generic FP16 M16 projection comparison](../bench/results/a770/orca-generic-projection-m16-2026-11-04.md)
+extends register reuse beyond paired experts. Each backend uses one EXE and
+math pack, switching M16 off/on/off; **102 requests match** complete output,
+draft and finish state. Direct 2K/8K TTFT falls from **23.676/67.963 s to
+15.754/38.362 s** (**33.46%/43.55% less time**); L0 falls from
+**27.071/71.359 s to 19.917/43.575 s** (**26.43%/38.94% less time**).
+With the same M16 math, Direct TTFT is **20.90%/11.96% shorter than L0**.
+Forward/opposed standalone projections also improve on both transports by
+about 68–70%, while Direct still takes 1.94–3.95% longer than L0 with M16.
+Short decode remains **58.30 Direct / 59.37 L0 tok/s**; no stable Short gain
+is established. Long cases run once per process, so this is a finite same-day
+window. These shared math gains are not backend-only gains. The source
+defaults `STRATA_ORCA_XMX_WIDE` to 1 for aligned FP16 M≥128, retaining M4
+tails/fallbacks and BF16. Rebuild the native backend and its XMX image pack
+together. Fresh default builds pass 168 edge checks, 240 canonical FP16/BF16
+shapes, eight changed-input replays and 1,680 pair checks across both backends.
+Prepared fresh-process Direct/L0/Direct 2K→2K→8K histories also match all nine
+requests, with no zero diagnostic triggered; finite retries do not close the fault.
+Deployed EXEs/configs are unchanged. Linux GPU and the intermittent
+Direct 8K fault remain open.
+
+The [full GEMM API long-history check](../bench/results/a770/orca-long-gemm-api-2026-11-05.md)
+adds 2047→2047→7999 rows and reverse retained-list replay with changed inputs
+and weights. All **96 Direct/L0 M4/M16 cases** pass, checking **867,309,960
+active outputs**, complete sources and caller-buffer guards, including FP16,
+BF16, Q8 dequantization and beta=0/1. This is correctness evidence, without
+timing; workspace rebinding, cache-slot loans and real-model multi-queue state
+remain outside its scope. It does not close the intermittent 8K fault.
+**Frozen-report errata:** “逐位数值相等” means exact elementwise numerical
+equality, not signed-zero bit identity. Preparation preceded the experiment
+lock; compilation, GPU work, heavy hashes and publication held it. The original
+report/archive are preserved and their independent publication check passes.
+
+The [subsequent workspace-rebinding check](../bench/results/a770/orca-rebind-gemm-2026-11-05.md)
+adds three caller arenas, pending auto-batched requests, rebind completion
+queries and reverse retained-list replay while the current binding points
+elsewhere. All **120 Direct/L0 M4/M16 cases** pass, checking **873,501,576
+active outputs**, complete sources/guards and every element of inactive
+scratch/workspace arenas. Across four processes, **240 rebind queries** and
+**32 Host merged-request counts** (including recording) match expectations.
+This checks ownership under changed workspace addresses; it adds no timing
+claim and does not execute real ExpertCache loans or residency handoff.
+The intermittent model 8K fault remains open.
+
+The [stable-mirror expert refill screen](../bench/results/a770/orca-mirror-refill-2026-11-05.md)
+then checks real cache-slot loans. The migrated `fill_slot_queued` waits after
+every copy; the isolated service candidate reuses asynchronous `fill_slot`
+only for persistent GGUF USM mirrors, preserving transient-source waits,
+the blocking override, 256-copy drains and final residency publication.
+Six diagnostic requests byte-check **8,016 slots / 11,442,329,600 bytes**
+and six complete **24,576-entry** device residency tables. Another 18
+off/on/off requests without readback instrumentation match outputs/drafts/finish
+state; all 24 protocols pass. Direct 8K TTFT changes **−1.788%**, with
+off-control drift +0.444%; L0 changes **−0.316%**, with drift +0.037%.
+The two 2K positions do not consistently improve. Each position runs once
+per arm, and enabled timing arms retain one refill-count log per request.
+That initial candidate stayed isolated/default-off; deployed EXEs/configs and ordinary
+generate/elastic-refill paths are unchanged. Refill belongs to prefill/TTFT,
+not decode. These are frozen generic-M16 comparisons, not production U4
+results; actual copy/preparation overlap, unmirrored or multi-device GPU
+execution and Linux GPU remain unmeasured. Passed retries do not close the
+original intermittent 8K fault.
+
+The [persistent-mirror service branch](../bench/results/a770/orca-mirror-refill-source-2026-11-05.md)
+was subsequently integrated into
+`sycl/src/program/generate.cpp`, initially using `STRATA_ORCA_MIRROR_REFILL=1`
+after rebuilding, with unset/0 retaining the original behavior. Freshly generated
+complete Host TUs for Direct/L0 each pass default and opt-in 2K→2K→8K→Short
+histories: **16 protocols match** with no refill audit/count logs. This is
+source integration, not a new performance result or a complete production-U4
+rebuild. Deployed EXEs/configs and CLI generate are unchanged.
+L0 source now enables it by default under the [later adoption](../bench/results/a770/orca-preparation-defaults-2026-11-06.md);
+explicit 0 restores the previous path, and Direct remains opt-in. The existing
+Intel `ExpertCache::open_segmented` explicitly rejects elastic VRAM, so that
+refill branch is currently unreachable. The [pipeline document](ORCA_PARALLEL_PIPELINE.md)
+also identifies the 1,024-callback ring, 512-blob source ring, default
+16-buffer Stager and 64-copy descriptor array. Fully mirrored experts bypass
+the two Host expert-data rings; GPU routed staging still uses eight slots
+and FP16 dequantization two slots. The DG2 owner uses an MPSC linked list
+rather than a fixed-capacity ring. These source boundaries do not measure
+GPU occupancy or slot-reuse waits.
+Its independent publication check now passes. The first check was mistakenly
+queued before publication and acquired the lock first, so it failed on the
+missing public JSON; a subsequent check after publication verifies every
+recorded file and hash. The model/source verification itself passed on both
+attempts; the failed command is preserved in the local experiment notes.
+
+The [copy-descriptor census](../bench/results/a770/orca-copy-capacity-census-2026-11-05.md)
+then matches all eight requests across two 2K→2K→8K→Short histories on Windows A770. Both
+default and asynchronous mirror refill issue **54,068 Host copy calls**
+with identical byte arguments. Default peaks at **32/64**, with **zero**
+capacity flushes; asynchronous refill reaches **64/64**, with **62** capacity
+flushes (40 at the 8K boundary). Counters cover Host calls before DONE,
+not physical transfers or recorded GPU replays. All eight boundaries balance;
+cleanup is excluded because the service uses `_Exit(0)`. The report preserves
+both diagnostic failures and the independent audit. No timing benefit or GPU
+staging-depth conclusion follows; this uses frozen generic M16, not production U4.
+The original publication check subsequently fails because concurrent U4
+adoption updates the primary launcher JSON. A separate
+[archive audit](../sycl/orca/copy-capacity-census-a770-windows-2026-11-05-audit.json)
+and independent recheck pass all **1,003 files**, protocols and boundaries,
+recording that launcher-only difference. Frozen argv/env do not read that
+JSON; the original publication and failed check remain preserved.
+
+The [routed prefetch-depth screen](../bench/results/a770/orca-routed-ring-depth-2026-11-05.md)
+then compares **8→16→8** while reserving 16 GPU slots in both arms, keeping
+routed experts and borrowed-slot layout fixed. All **12 protocols** and
+per-request FP16-pair work counts match. Depth16 TTFT changes by
+**−0.490%/+0.670% for the two 2K positions, +0.505% for 8K**, and −0.806%
+for Short. One bracketed window establishes no stable benefit; the default
+remains eight slots. This isolates prefetch depth, not the full production
+allocation change, GPU occupancy or slot-reuse waiting. Frozen M16 dependencies
+are used; no production-U4, L0 or Short net-decode gain follows. The 42-file
+publication check passes; Linux GPU and the intermittent 8K fault remain open.
+
+The [Host descriptor-depth comparison](../bench/results/a770/orca-copy-depth-2026-11-05.md)
+then runs **64→256→64**, reserving 256 descriptors in both arms while retaining
+64-operation GPU batches and the same frozen M16 math/runtime. Asynchronous
+mirror refill is enabled throughout. All 74 TUs, eight GPU checker runs and
+12 complete model protocols pass independent auditing; a separate checker
+asserts all 521 copy counts, full-capacity flushes and tails for both limits.
+Relative to the two 64 controls, 256-item TTFT changes by **+1.780%/+0.450%**
+for the two 2K positions, **+0.352%** for 8K and **+0.082%** for Short.
+No speedup is established; the production default stays 64. This finite window
+does not measure model high-water marks, per-flush blocking, production U4,
+L0 or steady Short throughput. The original final verifier exits 1 after an
+incorrect nested-list comparison; its source and error remain immutable.
+Independent auditing validates raw DONE fields/tokens, work counts, all 90
+successful commands and hashes without rerunning the GPU. The 1,028-file
+publication check passes. A [fresh-attempt runner snapshot](../sycl/orca/copy-depth-reproduction-a770-windows-2026-11-05.json)
+corrects only that assertion, with syntax and three guard checks; it makes no
+new GPU-run claim. See the pipeline notes for the corrected rerun commands.
+
+The [original-binary zero-output reprobe](../bench/results/a770/orca-legacy-zero-reprobe-2026-11-05.md)
+runs two fresh historical M4 Direct processes, each directly 2K→2K→8K:
+all **six complete protocols match**. The original EXE, initial expert profile
+and all 1,516 math-directory hashes match the retained failure evidence; the
+memory module also matches the earlier history fingerprint. Only the existing
+post-zero diagnostic is enabled, and no diagnostic GPU readback is triggered.
+Its enabled Host condition may still perturb timing. The original 64-zero-token,
+0/0-draft failure remains archived and unresolved; these retries establish
+neither a fix, failure rate, ring-capacity cause nor a performance result.
+Preparation-only r1 and executed r2 are retained separately; the 54-file
+publication recheck passes. Production files
+are unchanged by this reprobe; Linux GPU and the Short backend gap remain open.
+
+The [bounded-wait and CPU attribution screen](../bench/results/a770/orca-direct-hybrid-wait-2026-11-04.md)
+keeps current Host/math fixed and changes one WDDM runtime file. Two opposed
+Short windows match all **210 requests**. Neither 8-us nor 32-us spin before
+the existing event wait establishes a throughput gain; the candidate is not
+adopted. Direct event decode remains **2.13–4.40% below L0** in these windows.
+Whole-request process CPU, excluding startup/warmup but including prefill and
+decode, is **45.29/46.77 ms Direct versus 2175.00/2259.38 ms L0**, about
+**97.92% less CPU time** for Direct in both windows. This is not an energy
+measurement. A separate import observer matches **30 requests/60 phases**;
+**97.92% of retained L0 process CPU** falls inside observed
+`zeCommandListHostSynchronize` calls. The diagnostic uses the original default
+runtime libraries, not the spin candidate; its durations are not speed results.
+Vendor-internal spinning, syscalls and locks are not separately attributed.
+Defaults, deployed EXEs and the Linux wait path remain unchanged.
+
+The [L1 WBP/WB Short screen](../bench/results/a770/orca-direct-l1-short-2026-11-04.md)
+independently rebuilds the isolated cache-policy runtime and retains current
+Host/math. Both policies pass 28 named CTests, 240 shapes and 1,680 pair checks
+in total; two opposed model windows match all **150 requests**. WB changes
+decode throughput by **+0.34%/+0.14%**, below WBP control-drift magnitudes
+**1.03%/0.62%**. No stable gain is established; WBP remains the default.
+Default Direct is still **1.83%/2.09% below L0** in those windows. This tests a
+global SBA field, not every cache or dispatch difference. CPU accounting has
+large control drift and does not justify choosing WB. An initial CTest replay
+rewrote two generated bookkeeping files in an older cached build, invalidating
+its full live-hash check; original source/library/sample bytes are unchanged.
+The report preserves that incident and uses only the subsequent independent
+build for its model results. No new Linux GPU or long-context result follows.
+
+The [Short GPU phase diagnostic](../bench/results/a770/orca-direct-short-phases-2026-11-05.md)
+retains normal shared/routed interleaving and independent projections rather
+than using legacy profiling predicates that disable them. Direct/L0/Direct
+matches all **45 requests**, including exact per-window T schedules. Existing
+Host staging logs put window input preparation near **1.20/0.80 ms per request**
+for Direct/L0. GDN/QSA hc1-router-plan spans are **4.09%/4.43% longer** on
+Direct, totaling **9.00 ms per request** of additional marked time; these are
+split by the finer diagnostic below. The full marked-span difference is **+1.13%**, with
+Direct control drift **-1.35%**, so it is not a stable overall speed conclusion.
+Markers add barriers and per-window readback/logging; spans include dependency
+gaps and exclude inter-window draft/commit/Host preparation. They are not
+exclusive kernel times or clean throughput. Both initial diagnostic failures
+(output-path replacement and integer-versus-floating clock validation) are
+preserved; the report uses only the corrected independent build/run. Defaults
+and deployed EXEs remain unchanged; Linux GPU and intermittent Direct 8K stay open.
+
+The [finer HC1/router/plan diagnostic](../bench/results/a770/orca-direct-short-router-phases-2026-11-05.md)
+matches another **45 requests**, retaining normal scheduling and exact T
+sequences with 386 timestamps per window. HC1 and router-plus-quantization
+contribute **14.99/10.49 ms per request** of additional marked time. Increasing
+marker density changes the observed differences; full-span difference is
+**+4.06%** with Direct control drift **-4.99%**. These are localization hints,
+not established exclusive-kernel or model-speed differences. A separate
+[empty timestamp calibration](../bench/results/a770/orca-direct-timestamp-cost-2026-11-05.md)
+passes **120 raw/guard/replay checks** across four marker counts. At 512 dense
+markers, median GPU time per ordered interval is about **1.145 us Direct /
+0.552 us L0**. This quantifies instrumentation cost in an empty context; it
+cannot be subtracted from actual model phases or explain the entire gap.
+The subsequent replays below remove per-operator markers. No default or
+deployment changes follow from these diagnostics.
+
+The [ready-input router replay](../bench/results/a770/orca-direct-router-replay-2026-11-05.md)
+uses the original runtimes and the same math pack, with 48 operation groups per
+list, T=1/4 and two changed inputs. Direct/L0/Direct and L0/Direct/L0 match all
+**720 full-output/guard checks**, retaining **504 wall samples** and 72 matching
+output checksums. In T=4 projection-plus-quantization independent groups,
+Direct takes **5.59–8.78% more list wall time** across the two orders. Upload,
+recording, poison, readback and validation are outside timing; submission,
+completion notification and wakeup remain inside. Repeated same-weight hot
+cache, fixed mode order and the T=1 interface-only fork limit extrapolation.
+These are not exclusive kernel timings or a full-model result.
+
+The [ready-input HC1 replay](../bench/results/a770/orca-direct-hc1-replay-2026-11-05.md)
+matches **360 full-output/guard checks**, with FP64 CPU reference maximum
+absolute error **7.62e-7** and bitwise fused-Q8/native-quantizer agreement.
+T=1 pending-write-plus-Q8 takes **19.18–21.67% more list wall time** on Direct;
+T=4 takes **1.56–2.37% less**. The other modes differ by about 0.91–3.23%.
+This single Direct/L0/Direct bracket has no GPU timestamps. Inputs and R_out
+are separate to make all 48 reads stable, unlike the model's usual in-place
+writeback. The shape-dependent difference persists with ready inputs but still
+includes submission/completion/wakeup; it does not attribute all model loss to
+HC1 or establish a runtime fix. Linux GPU and intermittent Direct 8K remain open.
+
+The [FFN Q8 reuse pilot](../bench/results/a770/orca-ffn-q8-reuse-2026-11-05.md)
+then reuses HC1's completed Q8 input and runs only the existing BF16 conversion
+at two preparation sites. A single-group readiness guard retains all original
+fallbacks; each backend rebuilds one Host TU, with no math/runtime change.
+Direct off/on/off and L0 off/on/off match all **90 exact-protocol requests**.
+Direct decode changes **58.457→57.971 tok/s (-0.831%)**, with zero observed
+control drift; L0 changes **59.566→59.838 (+0.457%)**, with +0.157% drift.
+No consistent benefit across transports is established, so this remains an
+isolated default-off candidate. It preserves kernel count and is not a new
+preparation thread or production change. Long-context/PPL/Linux results are
+not available for this candidate; input readiness alone does not remove the
+remaining device/submission/completion differences.
+
+The [two-endpoint router diagnostic](../bench/results/a770/orca-direct-router-span-2026-11-05.md)
+adds only a first/last GPU timestamp to each recorded list. All **360 output,
+guard and raw-tick checks** pass, with 252 retained wall/GPU pairs. T=4
+projection-plus-quantization independent groups take **643.411/642.187 us GPU**
+on Direct versus **658.646/658.854 us** on L0, or **2.31/2.53% less device span**.
+The same lists take **798.170/793.245 us wall** versus **741.500/759.500 us**,
+or **7.64/4.44% more wall time**. Direct GPU control drift is +0.219/+0.276%;
+wall drift is +1.744/+0.721%. This prioritizes submission/completion/wakeup
+diagnosis for this probe. It does not establish full-model speed: the two
+markers add ordering, device spans include dependency gaps, weights repeat
+in hot cache, mode order is fixed and this is one Direct/L0/Direct bracket.
+The failed r1 compile is preserved; r2 and all four
+new report archives pass independent publication checks.
+
+The [opposed endpoint and Host submit/wait diagnostic](../bench/results/a770/orca-direct-submit-wait-2026-11-05.md)
+extends this to **1,440 output/guard/raw-tick checks**, including 720 exact
+per-sample submit-plus-wait wall checks. The original EXEs in L0/Direct/L0
+again show T=4 Direct GPU spans **2.34–2.46% shorter** but wall time
+**4.73–10.38% longer**. Adding one Host clock reading, both backend orders
+show T=4 Direct submission at **31.4–46.1 us versus 21.2–24.2 us L0**;
+the final wait differs too. Wait includes outstanding GPU work and cannot be
+called pure wakeup latency. GPU spans include dependencies and marker ordering;
+there is no absolute CPU/GPU clock correlation for subtracting those domains.
+Ready inputs and recorded lists exclude late preparation from this local
+comparison, motivating separate submission-handoff and completion-path trials.
+The archive explicitly audits a concurrent launcher-JSON promotion while
+requiring all historical executable/runtime/math dependencies unchanged;
+saved argv/env bypass that launcher. No model/default/Linux GPU claim follows.
+
+The [caller-consumed owner pilot](../bench/results/a770/orca-direct-caller-owner-2026-11-05.md)
+then removes the dedicated worker handoff while retaining MPSC publication,
+FIFO batches, serialized native mutations and nested TLS ownership. Windows
+and Linux/WSL each pass **98,304 CPU concurrency checks**. The extra Linux
+ASan/UBSan link fails because its runtimes are missing; that failure is retained
+and is not a sanitizer pass. Rebuilding all 69 affected Host TUs and five
+other header users avoids mixed layouts: **74 compilations**, three GPU
+checkers and 120 guarded router/tick/Host checks pass. The unchanged native
+library/math pack is then used for worker/caller/worker and L0/caller/L0.
+All **90 full model protocols match**. Caller decode is **58.669 versus
+58.583 tok/s** for worker controls (**+0.146%**, control drift **-0.599%**),
+and **58.597 versus 59.871 tok/s L0 (-2.128%)** in the second bracket.
+Hot sequential CPU calls fall from 1,368/1,090 ns controls to 59 ns, but do not
+establish a model gain. The candidate remains isolated; no default, deployed
+EXE or production source is changed. These use the earlier frozen pack and
+saved policy, not the concurrently promoted production U4 configuration.
+Long-context/PPL/Linux GPU and the intermittent Direct 8K fault remain open.
+
+The [low-density real-model window diagnostic](../bench/results/a770/orca-direct-window-span-2026-11-05.md)
+records only two ordered GPU endpoints per Verifier window plus a 32-byte
+readback published by the existing final wait. Legacy per-layer profiling is
+disabled internally, preserving normal independent projections and expert
+interleaving. Direct/L0/Direct matches **45 requests and 900 windows**, with
+300 retained windows, identical T schedules, full guards/raw ticks and exact
+per-window Host sums. Median per-request GPU-window totals are **1132.582 ms
+Direct versus 1120.277 ms L0 (+1.098%)**; Host submit-to-return totals are
+**1140.052 versus 1123.091 ms (+1.510%)**. Direct GPU/wall control drift is
+**+0.203%/+0.419%**. Host submission totals **1.812/0.916 ms**, while input
+staging totals **1.181/0.748 ms**. Device execution/dependency spans also differ;
+the gap is not confined to final notification. These marked intervals include
+ordering and diagnostic readback, exclude commit/MTP/inter-window work, and
+establish no clean throughput or pure wakeup latency. No absolute CPU/GPU clock
+correlation or cross-domain subtraction is used. The earlier frozen pack and
+policy remain fixed; production defaults and deployed binaries are unchanged.
+
+The [current-v14 GRF state screen](../bench/results/a770/orca-direct-current-grf-2026-11-05.md)
+rechecks invariant CFE/preemption/pipeline packets with the later ISA and scratch
+reuse already present. One Direct EXE switches the isolated process-cached policy;
+28 named CTests, 240 numerical shapes, 1,680 pair checks and **150 complete model
+protocols** pass. Opposed Short windows change decode **+0.139%/+0.204%**;
+the second full-policy control drifts **−0.490%**. Compact Direct still trails its
+respective L0 reference by **2.075%/2.466%**. No default change is justified;
+the candidate stays isolated. Runtime source matches current v14, while Host/math
+remain frozen generic M16 rather than production U4. The pre-model path-hashing
+failure and corrected runner are preserved; no new long-context, PPL or Linux GPU
+result follows, and the intermittent Direct 8K fault remains open.
+
+The [MTP independent Q8 projection screen](../bench/results/a770/orca-mtp-ready-projections-2026-11-05.md)
+groups ready-input Q/K/V operations, joining before normalization, KV append
+and quantization-scratch reuse. KV-only paths still omit Q. One MTP Host TU
+per backend changes, retaining math/runtime/header layout and min-p 0.5.
+Two opposed backend/flag orders match **180 complete model protocols**.
+Direct decode changes **+0.273%/-0.223%**, with two-sided policy drift
+**+0.177%/+0.293%**; L0 changes **+0.280%/+0.268%**. Direct does not establish
+a stable gain or a smaller backend gap, so the candidate remains isolated
+and disabled by default. This checks the model trajectories, not every
+intermediate tensor. Common graphs are already cached before READY;
+in-flight mapped metadata must not be overwritten while preparing later
+steps. These trials retain the older frozen M16 pack and saved policy,
+not the concurrently promoted production U4 pack. No production source,
+deployed binary, Linux GPU or long-context result changes.
+
+The [MTP norm/RoPE fusion screen](../bench/results/a770/orca-mtp-norm-rope-2026-11-05.md)
+reuses the existing fused kernel: K stays in place and Q reads interleaved
+Q/gate directly, removing its split copy. Both backends pass **192 complete
+bitwise output/source/guard cases** with changed-input graph replay across
+HD128/256, four row counts, three analytic RoPE scalings and two layouts.
+Two opposed model orders match **180 complete protocols**, retaining min-p
+0.5 and the older frozen M16 pack. Direct decode changes **+0.443%/+0.127%**,
+against two-sided policy drift **-0.421%/+0.501%**; L0 changes
+**+0.252%/-0.083%**. No stable model gain or smaller backend gap is established.
+The isolated candidate stays default-off; production MTP source and deployed
+EXEs are unchanged. The focused probe does not cover table lookup, multimodal
+MRoPE or every model intermediate. Linux GPU and long-context checks remain open.
+
+The [MTP single-dispatch greedy/probability pilot](../bench/results/a770/orca-mtp-fused-head-2026-11-05.md)
+joins the existing reductions with a global/local workgroup barrier. It still
+scans the vocabulary twice, preserving finite probability bits, NaN behavior,
+argmax ties and min-p 0.5. One extra image and one MTP Host TU per backend
+pass **216 functional cases, 288 timed graph checks and 90 complete model
+protocols**. Ready-input T=4 list wall time falls **2.96-4.27%**, including
+submission/completion/wakeup and repeated same-input hot-cache effects.
+Model Direct decode changes **58.435 to 58.601 tok/s (+0.285%)**, against
+**-0.261%** off-control drift; L0 changes **+0.004%**, against **+0.212%** drift.
+This single window establishes no stable model gain or Direct win. The actual
+zebin metadata remains 128 GRF/SIMD32 with 384 bytes of SLM, not measured
+occupancy or bandwidth. The candidate stays isolated and default-off. Its
+initial final verifier failed on tuple/list JSON representation after all
+GPU checks passed; an independent raw-log/hash audit passes, preserving the
+original error and artifacts. The older frozen M16 profile is used; production
+U4, long-context, PPL and Linux GPU results are not updated by this pilot.
+
+The [MTP metadata prestaging screen](../bench/results/a770/orca-mtp-prestage-2026-11-05.md)
+prepares known future positions before the first round submission and reuses
+its publication fence; GPU copies and result waits remain unchanged. All
+**90 complete model protocols match**, with min-p 0.5. Direct decode changes
+**58.412 to 58.543 tok/s (+0.223%)**; L0 changes **-0.024%**. This bounded
+window establishes no stable gain; the initial candidate stayed isolated and
+default-off. The [later source adoption](../bench/results/a770/orca-preparation-defaults-2026-11-06.md)
+enables it on L0 after the user accepts smaller improvements, with an explicit0
+rollback; Direct remains opt-in. Commit may still run during preparation, but overlap duration
+was not measured. The round reads `2*T` mapped rows, so those slots must be
+published before submission. Production U4 and the Direct 8K issue remain outside this screen.
+
+The [next-window PLE row0 read-ahead pilot](../bench/results/a770/orca-ple-row0-2026-11-05.md)
+uses the existing I/O worker to read 16 known rows before MTP starts. The two
+predecessors come from accepted input history, since `ss.ple_prev` advances only
+after commit finishes. No preparation thread or mapped GPU-input write is added.
+Direct and L0 off/on/off match **90 complete protocols**, with **19 actual
+prefetches per enabled request**. Net decode changes **+0.165%/+0.071%**;
+this single repeated-Short window establishes no stable gain. The candidate
+stays isolated and default-off; actual I/O/GPU overlap duration and cold-read
+benefits were not measured. It retains the older frozen M16 profile and min-p
+0.5. The initial preparation target error and original EOS-count assertion
+failure are preserved. A separate publication audit checks every raw protocol,
+count, command, statistic, configuration and archive hash; EOS truncated the
+last accepted window, invalidating the original count formula. Production U4,
+long-context/PPL/Linux GPU and the intermittent 8K issue are not updated by it.
+
+The isolated [early-route preparation trial](../bench/results/a770/orca-direct-early-route-2026-11-04.md)
+moves the route-ID readback ahead of independent shared-expert work. The CPU
+waits for that earlier event, then groups rows and prepares expert staging
+while later shared work can remain in flight. Same-queue ordering and buffer
+ownership stay intact. One prefill Host TU per backend changes; math/runtime
+objects are reused. Direct/L0 pass **48 event checks** with deliberately
+blocked shared tails, and all **68 model requests match**. The same-EXE Direct
+off/on/off comparison changes 2K/8K prefill by **+0.416%/-0.266%**, against
+off-control drift **+0.587%/-0.639%**; Short decode changes **-0.284%**.
+No stable model gain is established, so the candidate remains isolated with
+`STRATA_PREFILL_EARLY_ROUTE` defaulting to 0. L0-on checks output safety only
+and is not a performance control. Cached request IDs, exact references and
+configs are prepared before waiting for the shared GPU lock and reused by
+the test. Long cases run once per process; no PPL/Linux GPU or closure of
+the intermittent Direct 8K issue follows.
+
+The subsequent [large-M4 preferred-SLM screen](../bench/results/a770/orca-direct-projection-slm-2026-11-04.md)
+keeps the Host objects, mathematical pack, payload placement and dependencies
+fixed. Only calibrated C0 generic M4 grids with at least 4,096 groups opt into
+the previously checked occupancy rule; the measured 1-KiB-per-group shapes
+change preferred SLM from MAX to 16 KiB. Fourteen CTests and 14 packet checks
+pass, and only the preferred-partition bits differ. Forward/opposed brackets
+provide **180 clean wall samples, 168 data checks and 112 separate traces**.
+The first screen's final assertion assumed SYCL dimension order instead of
+native XYZ; it remains failed and an independent validator checks its raw
+samples and actual `(1,96,512/2000)` groups, `(64,1,1)` local dimensions.
+M2047/M7999 on/off times change **-1.967%/-2.020%** forward, but only
+**+0.042%/-0.944%** opposed. Forward M2047 control drift is -3.489%; opposed
+on controls drift +0.453%/+0.275%. The adjustment does not establish a stable
+gain across these shapes or remove the gap: opposed on times remain
+**5.212%/5.611% longer than L0**. The candidate stays isolated and off by
+default. These are synthetic launch-plus-wait samples, not new model or
+exclusive-kernel timings; no production/Linux GPU/PPL/8K-closure claim follows.
+
+The [actual projection commands and L1 trial](../bench/results/a770/orca-direct-projection-packets-cache-2026-11-04.md)
+now capture initialization and both synthetic shapes with the same frozen
+runtime/math. Bounded capture has zero failures and passes **24 data checks**;
+all **56 M4 walkers** are identified separately from memory/initialization
+kernels. Their decoded geometry, SIMD, execution mask, indirect length,
+hardware local IDs, walk order, required SLM and barrier fields match. Preferred
+SLM remains the sole difference among the selected per-projection fields.
+The full command streams confirm SBA L1 WBP=0 for Direct versus WB=2 for L0;
+MOCS is 6 in both. Aggregate state counts include memory kernels and are not
+exclusive-kernel or physical-traffic measurements. A header-only isolated
+candidate changes just this process-wide L1 policy, reusing the Host probe and
+math objects. Fourteen CTests, both policy encodings and invalid-selector
+rejection pass. Forward/opposed brackets pass **180 clean wall samples and
+120 data checks**. WB changes M2047/M7999 time by **+2.450%/+0.349%** forward
+and **+1.292%/+0.645%** opposed; it does not improve these projections and is
+not adopted. Opposed on-control drift is +2.640%/+1.559%, so the small 8K effect
+is not established as stable. The recorded command fields narrow the search
+but do not explain the remaining allocation/context/dispatch difference.
+There is no new model, Linux GPU, PPL or intermittent-8K-closure result.
+
+The [large-M4 allocation/VA screen](../bench/results/a770/orca-direct-projection-alignment-2026-11-04.md)
+then changes only two frozen WDDM source files, retaining the same Host objects,
+math, parameter placement and synchronization. It tests the previously calibrated
+2-MiB bulk descriptors plus aligned GPU VA without increasing physical bytes;
+tails and the 1-GiB part limit remain. Both builds pass **28 CTests and 80
+changing-input allocation replays**, including boundaries, guards and release
+accounting. Forward/opposed brackets pass **180 clean samples and 120 data
+checks**. M2047/M7999 on/off time changes **+0.472%/+0.018%** forward and
+**-0.388%/+0.361%** opposed: no stable improvement is established, and the
+policy is not adopted. Opposed on times remain **3.659%/5.309% longer than L0**,
+with on-control drift **-0.318%/-0.100%** and L0 drift **-0.045%/-0.023%**.
+This does not support alignment alone explaining the projection gap; descriptors
+and VA layout change together, and physical PTE sizes are not measured. A first
+build lost `/EHsc` in its script and stopped before GPU work; the corrected
+fresh build retains the frozen compiler defaults and preserves the failure.
+The Linux CPU checker also adds the shared BCS entry point: a separate WSL
+build passes four CPU checks, including 2,268 BLT cases, plus four dependency
+audits. That checks the current Linux/i915 source, not the Windows candidate;
+no Linux GPU, full-model/PPL or intermittent-8K closure result follows.
+
+The isolated [prefill phase timeline](../bench/results/a770/orca-direct-prefill-phases-2026-11-04.md)
+now measures the stage shares left open by the submission census below. One
+prefill Host TU per backend is rebuilt; all other Host/runtime objects and the
+mathematical pack stay fixed. All **51 requests match**, and six long-request
+timelines pass raw timestamp, guard, stage-count and interval-sum checks. Against
+the arithmetic mean of the flanking L0 runs, Direct's gather/expert intervals
+save **4.614/5.802 seconds** at 2K/8K, while its three GDN/QSA projection
+intervals add **0.620/2.747 seconds**. Those projections occupy **36.33%/54.02%**
+of L0's timeline, versus **45.23%/59.93%** for Direct. The larger projection
+share and added projection time offset more expert-chain savings at 8K.
+Host grouping takes only tens of milliseconds; this does not exclude waits
+inside the expert chain. The markers add barriers and enable two existing
+prefill waits; intervals include GPU work and possible Host/copy/dependency
+gaps, rather than exclusive kernel time. **Diagnostic durations are not new
+end-to-end performance results.** The internal GEMM/dequant/parameter/cache/
+scheduling cause was not isolated in that experiment; its frozen generic FP16
+used M4, while M16 covered only paired experts. The later generic M16 trial
+above addresses this math path. That diagnostic changed no source policy or deployed EXE; no Linux
+GPU/PPL result or closure of the intermittent Direct 8K issue follows.
+
+The [large-XMX parameter isolation](../bench/results/a770/orca-direct-projection-parameters-2026-11-04.md)
+then keeps the generic M4 mathematical kernel and all existing Host objects
+fixed, rebuilding only private runtime state and the placement condition.
+Fourteen CTests, 840 pair checks and engine/BCS queue checks pass. Five clean
+processes provide **90 samples and 60 data checks** on representative M2047/
+M7999, N6144, K2560 shapes with changing output pointers. Separate traces
+confirm both Host/device placements and pass another 24 data checks. Device
+parameters change launch-plus-wait time by **-1.32%/+0.80%**, against off-control
+drift **-1.46%/-0.35%**; no stable gain is established and the candidate is not
+adopted. A separate L0/Direct/L0 timestamp probe passes **36 data checks and
+84 guarded intervals**, retaining 54 raw sample intervals. Direct's GPU marker
+intervals remain **5.25%/6.83% longer**, with L0 drift **+0.087%/+0.008%**.
+The gap therefore also appears between GPU markers, rather than only in the
+Host wall clock. Marker intervals still include possible dispatch/dependency
+gaps; these are diagnostic observations, not exclusive kernel timings or new
+model results. The source of the remaining cache/resource/dispatch difference
+is not isolated. These representative shapes do not cover all real model
+projections; no model/PPL/Linux GPU or intermittent-8K closure claim follows.
+
+The [source adoption](../bench/results/a770/orca-source-adoption-2026-11-04.md)
+integrates Host eager/device-recorded parameters, shared BCS encoding and M16
+FP16 pair tiles. All 80 Direct Host TUs are rebuilt; L0 rebuilds the two changed
+TUs after checking the other generated sources and actual dependencies. Both
+pass 840 pair output checks. Fresh-process 2K/2K/8K checks on both source builds
+match all six requests, including tokens, drafts and finish state; successful
+retries do not close the earlier intermittent 8K failure. The real repository
+Linux/i915 source builds and passes four CPU CTests. Direct stays experimental, BCS requires
+`ORCA_DG2_BCS_COPY=1`, and **Linux GPU remains untested**. Deployed EXEs and
+production configs are unchanged; this adoption is not a new performance run.
+
+The isolated [graph-tail proof trial](../bench/results/a770/orca-direct-replay-prefix-2026-11-04.md)
+uses those source builds with identical mathematics. It preserves new tag resets
+and fences while reusing the completed segment tail to finish old inline points.
+Both safety screens pass 12,800 old-point checks; the extended screen includes
+800 points depending on earlier unpublished readbacks. All 69 adapter-dependent
+Host TUs are rebuilt, and all 85 model requests plus a
+[75-request opposed Short repeat](../bench/results/a770/orca-direct-replay-prefix-repeat-2026-11-04.md)
+match. Same-EXE Short decode gains are **+0.95%/+0.13%**; Direct remains
+**0.93%/2.45% below L0**. The repeat gain is smaller than the observed control
+drift, so the candidate remains isolated without an established stable model
+gain. Forward 2K/8K TTFT is **10.71%/2.11% lower than current-source L0**,
+but each long case runs only once per process. No long-context repeatability,
+new PPL or Linux GPU conclusion follows, and the intermittent Direct 8K issue
+remains open. Independent optimization percentages are not added together.
+
+The [current-source wait isolation](../bench/results/a770/orca-direct-replay-prefix-wait-2026-11-04.md)
+then reuses the same prefix-proof Host objects and changes only the native
+completion observer from OS events to active polling. Fourteen runtime CTests,
+840 pair checks and engine/BCS=0/1 queue checks pass; all **75 model requests
+match**. Short event/poll/L0 decode is **56.61/57.39/58.32 tok/s**. Polling is
+**+1.37% over events**, but still **1.60% below L0**, with event/poll flank drift
+**+0.76%/+0.29%**. This supports a partial wait-path cost, not an attribution of
+the entire remaining gap. Active polling is a CPU-consuming diagnostic upper
+bound; CPU usage/power are not measured and default waiting stays unchanged.
+No new long-context, PPL or Linux GPU result follows.
+
+The isolated [Point allocation batch trial](../bench/results/a770/orca-direct-point-batch-2026-11-04.md)
+groups at most 16 inline event objects under one shared owner. It creates new
+objects on every replay, preserves old generations and does not wait to fill
+a batch. Both policies pass lifetime and unpublished-readback checks; all 69
+adapter-dependent Host TUs are rebuilt and all **85 model requests match**.
+Short decode is **56.51 tok/s versus 56.83 off and 58.16 L0**. The same-EXE
+change is **−0.57%**, against **+1.14%** off-control drift; no full-model gain
+is established and the candidate is not adopted. Unmodified Direct's 2K/8K
+prefill is **8.03%/0.69% shorter** than current-source L0, with TTFT
+**8.01%/0.68% shorter**. Each long case runs once per process; this is not
+steady-state or cross-day evidence. No PPL or Linux GPU claim follows, and
+the intermittent Direct 8K issue remains open.
+
+The separate [prefill submission census](../bench/results/a770/orca-direct-prefill-submit-census-2026-11-04.md)
+uses adopted-source Host/runtime objects and an observer without per-call
+clocks or packet capture. All **34 requests match**, with 68 prefill/decode
+spans retained. Direct/L0 2K prefill submits **67,669/184,527** times; 8K
+submits **81,510/225,908** times: Direct has **63.33%/63.92% fewer** submits.
+Its Copy node2 counts are **28,002/33,876**, versus L0 **56,140/67,890**.
+The last hot Short decode has **97 submits and 112 observable `_Mtx_lock`
+calls on both paths**. CPU fence registration and GPU queue waits serve
+different purposes; unobserved private locks are outside the census. Atomic
+counters and diagnostic SRW locks still perturb execution, so these durations
+are not performance evidence. The similar prefill count reductions do not
+explain the smaller clean 8K time gain; compute, memory and expert-pipeline
+time shares remain unmeasured. Each long case runs once per process, and the
+earlier intermittent 8K issue stays open.
+
+The [dependency-only prefill follow-up](../bench/results/a770/orca-direct-dependency-only-2026-11-04.md)
+is now adopted in three source files byte-identical to the tested candidate;
+repository generator output also matches. It removes unused eager completion
+exports at 16 prefill wait sites, preserving recorded/exported events and actual
+submission boundaries. All 69 adapter-dependent Host TUs are rebuilt, GPU
+kernel/engine/BCS queue checks pass, and **85 clean plus 34 diagnostic requests
+match**. Same-EXE 2K/8K prefill is **5.35%/2.08% shorter**, with off-control
+drift **−0.44%/−0.02%**; versus common-math L0 it is **14.15%/3.44% shorter**,
+with TTFT **14.11%/3.43% shorter**. Short decode is **56.77 tok/s**, versus
+**56.85 off and 58.10 L0**, leaving Direct **2.28% below L0**. Long cases run
+once per process; no steady-state or cross-day claim follows. Independent
+2K/8K prefill counts fall **67,669→39,671 / 81,510→47,638**
+(**41.37%/41.56% fewer**); visible application mutex counts show no consistent
+decrease. Hot Short decode still has 97 submits and 112 visible mutex calls.
+Diagnostic durations are excluded from the performance conclusion. Clean
+2K/8K prefill saves about **1.35/1.49 seconds** against off: similar absolute
+savings occupy a smaller share of the longer 8K duration. The count advantage
+persists; separate compute/memory/expert time shares remain unmeasured. The new policy
+defaults to 1 inside opt-in Direct; `STRATA_ORCA_DG2_DEPENDENCY_ONLY=0` restores
+the previous policy. Deployed EXEs/configs are unchanged. Linux GPU, PPL and the
+intermittent Direct 8K correctness issue remain open; L0 stays recommended.
+
+The isolated [small-primary/secondary-batch trial](../bench/results/a770/orca-direct-secondary-batch-2026-11-04.md)
+keeps the dependency-only Host policy and mathematical pack fixed. Fourteen
+runtime CTests, 840 pair checks and engine/BCS=0/1 queue checks pass; all **85
+clean model requests match**. Short on/off/L0 is **56.94/57.11/58.31 tok/s**,
+or **−0.30% versus off and −2.35% versus L0**, with off-control drift **+0.71%**.
+2K/8K prefill changes **+1.74%/+0.41%** versus off, against off-control drift
+**−1.59%/−1.02%**. No model gain is established; the candidate remains isolated.
+All **30 diagnostic Short requests match**, and every measured on-submit has
+a 16-byte primary. Hot decode primary bytes fall **7,198,104→1,552**, while
+submits and observable mutex calls remain **97/112**. Diagnostic durations
+are not used for the performance claim.
+The existing body copy happens at close, not at replay. Smaller primary command
+lengths do not prove reduced tensor transfers or a speedup, and this experiment
+does not exclude every KMD cost. Long cases run once per process, Linux GPU is
+untested, and the earlier Direct 8K correctness issue remains open.
+
+The bounded [cold-history and NaN-scratch checks](../bench/results/a770/orca-direct-cold-history-2026-11-04.md)
+retain the original 8K failure alongside **15 new clean requests**: old Direct,
+current dependency-only on/off/on and current L0 each start with 2K/2K/8K,
+without Short warmup. All match complete outputs and draft counts. Another
+**six diagnostic requests** poison the shared attention/MoE scratch before
+every half on current L0 and Direct; all match, with **576 residual scan points
+and zero non-finite halves**. The existing post-zero logits/residual diagnostic
+never triggers. Poisoning and scans alter scheduling and cover only that
+scratch/residual path; these finite successes **do not close or identify the
+cause of the original intermittent issue**. Frozen executables and mathematical
+packs are reused, no runtime source or default changes, and no new performance,
+PPL or Linux GPU conclusion follows. The report preserves all 21 new requests
+and the original failure; L0 remains recommended.
+
+The isolated [seven-arm combination trial](../bench/results/a770/orca-direct-combined-2026-11-04.md)
+combines Host eager parameters, BCS copy roles and M16 pair tiles, with all
+**119 requests matching**. Against original L0, 2K/8K prefill takes
+**8.92%/6.97% less time**; with the identical wide mathematical pack in L0,
+it takes **7.84%/1.55% less time**. Short decode remains **1.90% below L0**.
+Long cases run once per process, with control drift reported; this does not
+establish steady-state or cross-day repeatability. This is the frozen isolated
+EXE; source adoption above has separate checks. The intermittent shortened-history
+Direct 8K correctness issue stays open.
+
+Separate portable BCS source checks in that report share the calibrated packet
+bodies and add cached i915 compute/copy engine selection. The Windows rebuild
+passes 1,632 fills, 12 chains and 16 multi-queue outputs; WSL Linux/i915 builds
+and passes its three CPU checks. Both OSes pass 2,268 CPU packet-output cases.
+That portable-source check predates the source adoption above and is separate
+from the timed binary.
+**Linux GPU remains untested**, including BCS MOCS/cache visibility.
+
+The isolated [current-frontend BCS integration](../bench/results/a770/orca-direct-current-bcs-2026-11-04.md)
+rebuilds all 80 Host TUs, including 69 adapter users, and routes prefill,
+verification and expert-refill copy roles to Copy node2 while compute stays
+on node5. Same-EXE BCS off/on/off gives **7.32%/2.89% shorter 2K/8K prefill**
+and **+0.98% Short decode**. All 51 model requests match, plus 1,632 guarded
+fills, 12 cross-engine chains and 16 outputs across two compute/two BCS
+logical queues. Multiple logical queues share those nodes; simultaneous
+physical-engine utilization is not measured. Long cases run once per process;
+no L0 model-performance arm is included. This Windows candidate is isolated,
+the earlier 8K issue remains open, and this frozen snapshot has no Linux BCS.
+The separate portable source above has only compile/CPU validation on Linux.
+
+The [real-model FP16 pair tile follow-up](../bench/results/a770/orca-fp16-pair-tiles-2026-11-04.md)
+keeps the dynamic-parameter policy fixed and changes only native_gemm. Larger
+register-reuse tiles handle full 16-row prefixes for experts with at least 128
+rows; original M4 handles smaller experts and tails. All 51 model requests
+match, with **3.77%/10.09% shorter 2K/8K prefill** versus Direct's previous pair.
+Long cases have one ordinal-matched request per process; no steady-state or
+L0 model-performance win is established. Direct/L0 pass **1,680 pair checks**.
+Short has no measured gain. The candidate is isolated; the intermittent 8K
+correctness issue remains unresolved. Its unchanged baseline selects CCS0;
+the separate BCS candidate above adds explicit copy roles. Earlier isolated BCS
+results are not proof of this frontend's active simultaneous engine utilization.
+
+The [dynamic-parameter follow-up](../bench/results/a770/orca-direct-dynamic-parameters-2026-11-04.md)
+keeps eager parameters on the host and retains device mirrors for recorded graphs.
+All 51 clean model requests match, plus 12 cold-history requests and 32 dedicated
+placement/replay submissions. Observed 2K/8K prefill time falls **5.77%/2.77%**
+against Direct itself; each long case has one request per process, Short has no
+measured gain, and the earlier intermittent 8K failure remains unresolved.
+The candidate is isolated and establishes no win over L0.
+
+An independent [XMX SLM/prefetch screen](../bench/results/a770/orca-xmx-slm-async-2026-11-04.md)
+passes **760 output/guard checks**. Larger register-reuse tiles improve kernel
+throughput for M160 GU/Down and M2048 shapes by **1.95–1.97x/1.32–1.37x/2.49–2.54x**
+over its M4 baseline across three runs, but regress small GU batches. The tested
+SLM/double-buffer variants lose; L2 prefetch is not a general win. These are
+standalone SYCL kernel measurements, not Orca or model speedups. Production
+kernels and defaults are unchanged; no Linux GPU result is established.
+
+The earlier [current-frontend context comparison](../bench/results/a770/orca-direct-current-contexts-2026-11-04.md)
 keeps the same fixed anchor and mathematical pack in an L0/Direct/L0 bracket.
 Direct decode is **1.83%/1.51%/2.21% below L0** for Short/2K/8K; 2K/8K
 prefill takes **6.62%/7.75% longer**. All 69 clean requests match tokens/drafts.

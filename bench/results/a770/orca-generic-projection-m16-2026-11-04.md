@@ -114,4 +114,4 @@ python -X utf8 build-orca-slm-async-20261104/publish_generic_projection.py --che
 使用归档的输入及固定配置，分别设置开关 0/1；新二进制应另立结果，不能混作冻结 EXE 的复测。
 
 [精确 JSON](../../../sycl/orca/generic-projection-m16-a770-windows-2026-11-04.json) ·
-[原始证据](../../../sycl/orca/generic-projection-m16-a770-windows-2026-11-04.json.gz)
+原始证据 (`generic-projection-m16-a770-windows-2026-11-04.json.gz`, raw capture retained locally)

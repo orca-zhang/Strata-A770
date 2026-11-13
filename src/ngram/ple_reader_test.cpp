@@ -10,6 +10,7 @@
 #include "strata/ngram/ple_reader.hpp"
 #include "strata/platform/direct_file.hpp"
 
+#include <algorithm>
 #include <chrono>
 #include <cstdio>
 #include <cstdlib>
@@ -156,7 +157,7 @@ void format_round_trip(const std::string& dir, const k::PleFormatInfo& f, uint32
     for (uint32_t i = 0; i < rows; ++i) want[i] = rng() % rows;
     want[0] = 0;
     want[1] = rows - 1;
-    for (k::PleIo mode : {k::PleIo::Direct, k::PleIo::Mmap}) {
+    for (bool worker : {false, true}) for (k::PleIo mode : {k::PleIo::Direct, k::PleIo::Mmap}) {
         const char* name = mode == k::PleIo::Direct ? "direct" : "mmap";
         k::PleTable t;
         std::string err;
@@ -164,6 +165,7 @@ void format_round_trip(const std::string& dir, const k::PleFormatInfo& f, uint32
         io.mode = mode;
         io.max_inflight = 8;
         io.cache_rows = 0;
+        io.io_thread = worker;
         CHECK(t.open(path, err, io), "%s: open in %s mode: %s", f.name, name, err.c_str());
         if (g_fail) break;
         CHECK(std::strcmp(t.format(), f.name) == 0, "%s: format() says \"%s\"", f.name, t.format());
@@ -188,6 +190,41 @@ void format_round_trip(const std::string& dir, const k::PleFormatInfo& f, uint32
             expected_row(rows16[h], f.row_bytes, raw.data());
             f.dequant(raw.data(), f.needs_scale ? 0.75f : 1.0f, ref);
             CHECK(std::memcmp(tok + (size_t) h * k::PLE_HEAD_DIM, ref, sizeof ref) == 0, "%s: %s: gather head %d differs", f.name, name, h);
+        }
+        if (mode == k::PleIo::Direct) {
+            // A partially known window must reuse its prefix even with the row cache disabled.
+            for (int count : {0, 1, 4, 19}) for (int prefix : {0, 1, 2, 4, 6, 16}) {
+                uint32_t batch[19 * k::PLE_N_HEADS];
+                for (size_t j = 0; j < std::size(batch); ++j) batch[j] = (uint32_t) (j * 19) % rows;
+                batch[63] = rows;   // out of range, in the suffix for the partial-prefix cases
+                unsigned long long before = 0, after = 0;
+                CHECK(std::sscanf(t.io_report().c_str(), "ple io: %llu rows", &before) == 1, "missing row count");
+                for (int j = 0; j < prefix; ++j) t.prefetch_rows(batch + j * k::PLE_N_HEADS);
+                std::vector<float> output((size_t) count * k::NG_N_EMBD + 2, 12345.0f);
+                CHECK(t.gather_batch(batch, count, output.data() + 1, err), "%s: prefix %d: %s", f.name, prefix, err.c_str());
+                CHECK(output.front() == 12345.0f && output.back() == 12345.0f, "batch wrote a guard");
+                for (int j = 0; j < count * k::PLE_N_HEADS; ++j) {
+                    if (batch[j] >= rows) std::memset(raw.data(), 0, raw.size());
+                    else expected_row(batch[j], f.row_bytes, raw.data());
+                    f.dequant(raw.data(), f.needs_scale ? 0.75f : 1.0f, ref);
+                    CHECK(std::memcmp(output.data() + 1 + (size_t) j * k::PLE_HEAD_DIM, ref, sizeof ref) == 0,
+                          "%s: prefix %d: batch row %d differs", f.name, prefix, j);
+                }
+                CHECK(std::sscanf(t.io_report().c_str(), "ple io: %llu rows", &after) == 1, "missing row count");
+                CHECK(after - before == (unsigned) std::max(prefix, count) * k::PLE_N_HEADS,
+                      "%s: prefix %d reread prepared rows (%llu requests)", f.name, prefix, after - before);
+            }
+            // A different window must never consume stale prepared data.
+            t.prefetch_rows(rows16);
+            uint32_t changed[16];
+            for (int h = 0; h < 16; ++h) changed[h] = (rows16[h] + 1) % rows;
+            CHECK(t.gather_batch(changed, 1, tok, err), "%s: mismatched prefix: %s", f.name, err.c_str());
+            for (int h = 0; h < 16; ++h) {
+                expected_row(changed[h], f.row_bytes, raw.data());
+                f.dequant(raw.data(), f.needs_scale ? 0.75f : 1.0f, ref);
+                CHECK(std::memcmp(tok + (size_t) h * k::PLE_HEAD_DIM, ref, sizeof ref) == 0,
+                      "%s: mismatched prefix returned stale row %d", f.name, h);
+            }
         }
     }
     std::filesystem::remove(path);
