@@ -86,7 +86,7 @@ See the [Orca native engine guide](sycl/orca/README.md) for features, checks and
 
 ## Model downloads
 
-Both mirrors use the repository name **Qwen3.8-Flash-Next-U4-N16**. **ModelScope's 19 files have been uploaded and verified; the HF upload is still in progress (2026-11-13).**
+Both mirrors use the repository name **Qwen3.8-Flash-Next-U4-N16**. **All 19 files on each platform have been uploaded and verified.**
 
 | Component | Repository path | Hugging Face | ModelScope |
 | --- | --- | --- | --- |

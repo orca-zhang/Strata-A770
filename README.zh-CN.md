@@ -86,7 +86,7 @@ Strata-A770 基于 [Strata](https://github.com/Niko1221/Strata)，针对 Intel A
 
 ## 模型下载
 
-两个平台的仓库名均为 **Qwen3.8-Flash-Next-U4-N16**。**ModelScope 的 19 个文件已上传并校验通过，HF 仍在上传中（2026-11-13）。**
+两个平台的仓库名均为 **Qwen3.8-Flash-Next-U4-N16**。**两个平台的全部 19 个文件均已上传并校验通过。**
 
 | 组件 | 仓库内路径 | Hugging Face | ModelScope |
 | --- | --- | --- | --- |
