@@ -20,9 +20,11 @@
 
 This diagram retains the original call paths independently of benchmark data. Run `python tools/render_orca_current.py --paths-only` to redraw the PNG/SVG; add `--check-only` to verify all three paths offline, without a GPU. [L0 submission](orca-l0/src/runtime.cpp) · [Direct submission](orca-l0/src/wddm/runtime.cpp) · [Backend selection](sycl/orca_queue.hpp).
 
-[![Current default versus SYCL: Code2K decode throughput +40.78%–41.01%, Prose2K +49.12%–49.31%. Same-machine comparison across measurement cohorts: corrected SYCL from November 4 and current default from November 8.](docs/media/orca-current-vs-sycl.png)](#current-default-versus-sycl)
+**Latest recorded control rates (2026-11-17): Code2K 39.17 / Prose2K 38.65 tok/s** with the preferred tiered-draft / INT8 KV configuration, at 2048 input / 128 output tokens. These are control observations from one trial; stable combined speed gains remain unestablished. The existing launcher reads the new main configuration on its next start; nine requests / 912 output tokens and real HTTP adoption checks pass. [Latest measurements, separate-feature gains and limits](#latest-measurements).
 
-**Current default versus SYCL:** Code2K **26.82 → 37.76–37.82 tok/s (+40.78%–41.01%)**, Prose2K **25.46 → 37.96–38.01 tok/s (+49.12%–49.31%)**. SYCL is the corrected native FP16 M4 build from November 4; the current U4 / HC SG16 / spec6 configuration is from November 8. This compares whole-version rates from separate measurement cohorts on the same machine. Ranges come from the current default's two test orders. [Conditions and data](#current-default-versus-sycl).
+[![November 8 baseline versus SYCL: Code2K decode throughput +40.78%–41.01%, Prose2K +49.12%–49.31%. Same-machine comparison across measurement cohorts: corrected SYCL from November 4 and the November 8 configuration.](docs/media/orca-current-vs-sycl.png)](#current-default-versus-sycl)
+
+**November 8 baseline versus SYCL:** Code2K **26.82 → 37.76–37.82 tok/s (+40.78%–41.01%)**, Prose2K **25.46 → 37.96–38.01 tok/s (+49.12%–49.31%)**. SYCL is the corrected native FP16 M4 build from November 4; the U4 / HC SG16 / spec6 configuration is from November 8. This compares whole-version rates from separate measurement cohorts on the same machine. Ranges come from the November 8 configuration's two test orders. [Conditions and data](#current-default-versus-sycl).
 
 <a id="sycl-original-mainline"></a>
 
@@ -38,17 +40,17 @@ This diagram retains the original call paths independently of benchmark data. Ru
 
 The original-mainline figures use the earliest archived stage with MTP enabled; the 8K prefill baseline comes from the VRAM-budget correction stage. SYCL uses the fully optimized source test build from October 21: 39 requests, five retained per scenario. Historical configurations and reference outputs differ, including a Short input change from 36 to 28 tokens. This SYCL version is distinct from the corrected November 4 build in the chart above. Do not multiply their ratios. [Archived JSON](bench/results/a770/refresh-2026-10-21.json) · [Historical conditions](docs/A770_PERFORMANCE.md#sycl-original-mainline-history).
 
-**Current default versus original HC256: direct measurements in both orders**
+**November 8 baseline versus original HC256: direct measurements in both orders**
 
-[![2026-11-08 current default versus original HC256: Code2K decode +21.21%–21.64%, Prose2K +22.89%–23.27%; full-request throughput +4.15%–5.19%. All outputs match across 42 requests; maximum decode control drift is 0.150%.](docs/media/orca-current-default.png)](#performance)
+[![2026-11-08 baseline versus original HC256: Code2K decode +21.21%–21.64%, Prose2K +22.89%–23.27%; full-request throughput +4.15%–5.19%. All outputs match across 42 requests; maximum decode control drift is 0.150%.](docs/media/orca-current-default.png)](#performance)
 
-**Latest measurement (2026-11-08): decode throughput improves by 21.21%–21.64% for Code2K and 22.89%–23.27% for Prose2K versus original HC256, across both orders.** Net generation rates are **37.76–37.82 / 37.96–38.01 tok/s**, respectively, with fixed 2048-token inputs and 128-token outputs. Both pass the 20% target. [Conditions and data](#performance).
+**November 8 reference measurement: decode throughput improves by 21.21%–21.64% for Code2K and 22.89%–23.27% for Prose2K versus original HC256, across both orders.** Net generation rates are **37.76–37.82 / 37.96–38.01 tok/s**, respectively, with fixed 2048-token inputs and 128-token outputs. Both pass the 20% target. [Conditions and data](#performance).
 
 **Full-request throughput gains are separate: Code2K 4.30%–4.38%, Prose2K 4.15%–5.19%.** All 42 requests / 4704 output tokens match across independent forward and reverse trials. Maximum absolute decode control drift is **0.150%**, and all six engine processes exit normally. Net decode speed excludes prefill, HTTP and process startup.
 
 **Short28 records above 60 tok/s:** the frozen L0 baseline reaches **60.01 tok/s** in one retained request (**59.57 tok/s** median in that process); a separate 256 GRF test reaches **60.71 tok/s** as the geometric mean of two process medians. The 256 GRF setting subsequently passed U4 service validation and was adopted for L0. [Short results and adoption history](#short-results). **Startup optimization:** the latest validated startup candidate reaches **7.904 s to READY**, with the OS file cache warm. [Startup measurements](#startup-optimizations).
 
-**Preferred configuration on the test machine: U4 N16 + M16 / Orca L0, HC SG16, spec6, confidence 0.6 and within-layer expert ordering.** It retains the 6200 cache budget (6509 actual slots), adapt16, 8K context, U4N16 data and RAM checks / native fallback. The SYCL chart is a cross-cohort reference; the HC256 chart directly compares the complete current configuration in both orders. Individual gains are not compounded. [Adoption and validation](docs/A770_PERFORMANCE.md).
+**Preferred configuration on the test machine: U4 N16 + M16 / Orca L0, HC SG16, tiered draft vocabularies, INT8 KV, spec6, confidence 0.6 and within-layer expert ordering.** It retains the 6200 cache budget (6509 actual slots), adapt16, 8K context, U4N16 data and RAM checks / native fallback. The charts above retain the November 8 configuration; individual gains are not compounded. [Adoption and validation](docs/A770_PERFORMANCE.md).
 
 **Model repositories: [Hugging Face](https://huggingface.co/orca-zhang/Qwen3.8-Flash-Next-U4-N16) · [ModelScope](https://modelscope.cn/models/orcazhang/Qwen3.8-Flash-Next-U4-N16).** See [Model downloads](#model-downloads) for the U4 weights, IQ2_XS main model and calibrated Q2 MTP draft model. The installer below still prepares native IQ2_XS and does not automatically reproduce the local U4 configuration. [Adoption and required resources](bench/results/a770/orca-u4-m16-combined-2026-11-05.md).
 
@@ -193,11 +195,37 @@ With authentication enabled, include your configured key, for example `-Headers 
 
 Results below use **A770 16 GB + Xeon E5-2696 v4 + 256 GiB DDR3 + Windows 10 22H2**, running Qwen3.8-Flash-Next IQ2_XS. Each experiment identifies its date and protocol. Generation rates are in tok/s; lower time to first token (TTFT) and full-request duration are better.
 
-### Current default versus SYCL
+<a id="latest-measurements"></a>
 
-The SYCL chart retains the earlier three-way table's baseline: the corrected native FP16 paired-M4 build from November 4, with 5771 actual slots / spec4. The current side is the adopted November 8 configuration: U4 / HC SG16 / 6509 slots / spec6 / confidence 0.6 / within-layer profile. Both use 2K input / 128 output, measured after warmup.
+### Latest measurements and preferred configuration (2026-11-17)
 
-| Task | SYCL net decode (tok/s) | Current net decode (tok/s) | Decode throughput gain | Prefill throughput gain | Full-request throughput gain |
+The local preferred configuration adds tiered MTP draft vocabularies and native INT8 KV to U4 / M16 / HC SG16. English/code uses a 40,525-row draft head; CJK/Cyrillic extension tokens trigger the original 248,320-row head with a 32-round hold. The main model retains its full vocabulary. Actual expert slots remain 6509, with 8K context, spec6 and prompt-cache0.
+
+The latest normal-model trial compares the preferred configuration with a QSA candidate, in preferred / candidate / preferred order. Each process runs Short16 followed by three alternating Code2K/Prose2K cycles, with 2048 input / 128 output tokens. The first cycle warms up; the last two provide medians. Control time is the geometric mean of the two preferred-process medians; net decode is `128000 / decode_ms`.
+
+| Task | Preferred control net decode (tok/s) | QSA candidate throughput change | Control decode-time drift |
+| --- | ---: | ---: | ---: |
+| Code2K | **39.17** | +0.051% | +0.237% |
+| Prose2K | **38.65** | −0.031% | −0.032% |
+
+All 21 timed requests / 2352 output tokens match the current configuration's frozen reference, and all three processes exit normally. The candidate falls below the preset Code/Prose gain thresholds of 0.2%/0.8%; no reverse trial or adoption follows. The control rates describe this trial and do not establish a paired gain versus November 8 or SYCL.
+
+**Separate-feature measurements (November 15):** each row uses its own full-vocabulary / FP16 control and independent forward/reverse trials, with 6509 slots and the same fixed 2K/128-output workload.
+
+| Change tested separately | Code2K decode throughput gain | Prose2K decode throughput gain |
+| --- | ---: | ---: |
+| Tiered draft vocabularies, FP16 KV | +3.282%–3.367% | +1.319%–1.387% |
+| INT8 KV, full draft vocabulary | +1.935%–2.877% | +2.459%–3.314% |
+
+These gains are not added. The earlier combined trial's reverse decode drift is **3.127% / 3.142%**, exceeding its 3% limit, so a stable combined gain remains unestablished. INT8 KV changes Prose output versus FP16. Standalone INT8 passed limited cold/warm checks on 758 distinct targets: aggregate PPL **+0.128486%**, worst case **+0.443393%**; the combination has no independent PPL result. November 17 adoption checks pass nine requests / 912 output tokens, including real HTTP generation. [Archived measurements and latest raw protocol](bench/results/a770/readme-refresh-2026-11-17.json) · [Local adoption record](docs/A770_PERFORMANCE.md).
+
+<a id="current-default-versus-sycl"></a>
+
+### November 8 baseline versus SYCL
+
+The SYCL chart retains the earlier three-way table's baseline: the corrected native FP16 paired-M4 build from November 4, with 5771 actual slots / spec4. The other side is the adopted November 8 configuration: U4 / HC SG16 / FP16 KV / full draft vocabulary / 6509 slots / spec6 / confidence 0.6 / within-layer profile. Both use 2K input / 128 output, measured after warmup.
+
+| Task | SYCL net decode (tok/s) | November 8 net decode (tok/s) | Decode throughput gain | Prefill throughput gain | Full-request throughput gain |
 | --- | ---: | ---: | ---: | ---: | ---: |
 | Code2K | 26.82 | 37.76–37.82 | **+40.78%–41.01%** | +54.35%–54.55% | +51.91%–52.02% |
 | Prose2K | 25.46 | 37.96–38.01 | **+49.12%–49.31%** | +52.72%–54.42% | +52.05%–53.46% |
@@ -206,16 +234,16 @@ SYCL durations are geometric means of the two native-control summaries in the or
 
 The five historical SYCL/original-mainline metrics remain in the [homepage table](#sycl-original-mainline). They use the October 21 archive, separately from this section's November 4 SYCL build.
 
-### Latest default: both orders versus original HC256 (2026-11-08)
+### November 8 baseline: both orders versus original HC256
 
-The current Orca L0 default is directly compared with original HC256: fixed 2048 input / 128 output, greedy generation, prompt-cache0. Forward order is original / current / original; reverse order is current / original / current. Each process runs Short16, then three alternating Code/Prose cycles. The first cycle warms up; the last two provide medians. Outer control durations use geometric means.
+The November 8 Orca L0 configuration is directly compared with original HC256: fixed 2048 input / 128 output, greedy generation, prompt-cache0. Forward order is original / November 8 / original; reverse order is November 8 / original / November 8. Each process runs Short16, then three alternating Code/Prose cycles. The first cycle warms up; the last two provide medians. Outer control durations use geometric means.
 
-| Task | Original HC256 net decode (tok/s) | Current net decode (tok/s) | Decode throughput gain (forward / reverse) | Full-request throughput gain (forward / reverse) |
+| Task | Original HC256 net decode (tok/s) | November 8 net decode (tok/s) | Decode throughput gain (forward / reverse) | Full-request throughput gain (forward / reverse) |
 | --- | ---: | ---: | ---: | ---: |
 | Code2K | 31.09–31.15 | **37.76–37.82** | **+21.642% / +21.212%** | +4.379% / +4.299% |
 | Prose2K | 30.84–30.89 | **37.96–38.01** | **+23.267% / +22.889%** | +5.191% / +4.154% |
 
-| Current default | Prefill | TTFT | Full request |
+| November 8 configuration | Prefill | TTFT | Full request |
 | --- | ---: | ---: | ---: |
 | Code2K | 15.08–15.10 s | 15.11–15.13 s | 18.47–18.48 s |
 | Prose2K | 14.50–14.66 s | 14.53–14.69 s | 17.87–18.03 s |
@@ -289,7 +317,7 @@ Percentages are `backend rate / SYCL rate − 1`. These are **measured cross-coh
 
 ### Current configuration and earlier adoption steps
 
-The local configuration is U4 N16 / M16 / HC SG16, spec6, minimum and cumulative confidence 0.6, MTP window 1024, accepted-row-only recomputation, within-layer expert profile, cache6200 (6509 slots), adapt16 and 8K context. HC SG16 alone previously improved decode over HC256 by **5.60%–5.61%** for Code and **5.97%–6.15%** for Prose; 42 full-model and 18 service generation requests passed comparison. The **1336.047 MiB** minimum free VRAM across 169 samples at 1 Hz belongs to that earlier configuration and does not represent current headroom. [Adoption and review](docs/A770_PERFORMANCE.md#hc-sg16-default).
+The local preferred configuration now includes [tiered drafts and INT8 KV](#latest-measurements). The November 8 configuration used by the charts is U4 N16 / M16 / HC SG16, FP16 KV, spec6, minimum and cumulative confidence 0.6, MTP window 1024, accepted-row-only recomputation, within-layer expert profile, cache6200 (6509 slots), adapt16 and 8K context. HC SG16 alone previously improved decode over HC256 by **5.60%–5.61%** for Code and **5.97%–6.15%** for Prose; 42 full-model and 18 service generation requests passed comparison. The **1336.047 MiB** minimum free VRAM across 169 samples at 1 Hz belongs to that earlier configuration and does not represent current headroom. [Adoption and review](docs/A770_PERFORMANCE.md#hc-sg16-default).
 
 **November 8 configuration update:** only within-layer expert ordering changes, retaining spec6 / confidence 0.6 / budget6200 / 6509 slots / 8K context. It is selected as the default for the next start. Compared with the previous default, forward/reverse decode gains are **+2.905% / +3.369%** for Code2K and **+8.085% / +7.748%** for Prose2K. Maximum absolute control drift is 0.644%; full outputs and protocol checks pass for 42 benchmark requests and 27 mixed-8K / real HTTP requests. The current candidate's measured minimum free VRAM is only **295.234 MiB**, below the original 1 GiB headroom threshold. This flag remains under the user's choice to keep 8K. The 1336 MiB figure above belongs to the earlier HC SG16 stage. Gains are not compounded with history; full-request gains are listed separately. U4N16 and fallback support remain. [Measurements, headroom and fallback](bench/results/a770/orca-mtp-confidence40x40-2026-11-07.md#11-08-固定各层缓存份额的专家排序备选).
 
